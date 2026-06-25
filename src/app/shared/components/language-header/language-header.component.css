@@ -1,4 +1,4 @@
-:host {
+﻿:host {
   display: block;
 }
 
@@ -11,9 +11,9 @@
 
 .app-header-navbar {
   min-height: 3.75rem;
-  background: #ffffff;
-  border-bottom: 1px solid var(--border-color);
-  box-shadow: 0 4px 18px rgba(15, 23, 42, 0.04);
+  background: rgba(255, 255, 255, 0.96);
+  border-bottom: 1px solid var(--border-subtle);
+  box-shadow: 0 8px 24px rgba(16, 24, 32, 0.06);
   pointer-events: auto;
 }
 
@@ -24,20 +24,20 @@
 
 .brand-mark {
   display: inline-flex;
-  width: 2.25rem;
-  height: 2.25rem;
+  width: 2.3rem;
+  height: 2.3rem;
   flex: 0 0 auto;
   align-items: center;
   justify-content: center;
-  border-radius: var(--radius-md);
   background: #ffffff;
   border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
   box-shadow: var(--shadow-card);
 }
 
 .brand-icon {
-  width: 1.45rem;
-  height: 1.45rem;
+  width: 1.48rem;
+  height: 1.48rem;
   object-fit: contain;
 }
 
@@ -66,8 +66,8 @@
 }
 
 .language-switcher {
-  flex: 0 0 auto;
   display: inline-flex;
+  flex: 0 0 auto;
   gap: 4px;
   padding: 4px;
   background: var(--surface-muted);
@@ -84,13 +84,13 @@
   justify-content: center;
   gap: 7px;
   padding: 0 12px;
-  color: #1e3a8a;
+  color: var(--primary-hover);
   background: transparent;
   border: 1px solid transparent;
   border-radius: var(--radius-sm) !important;
   font: inherit;
   font-size: 0.78rem;
-  font-weight: 800;
+  font-weight: 850;
   line-height: 1.2;
   transition:
     color 160ms ease,
@@ -127,7 +127,7 @@
   color: #ffffff;
   background: var(--primary-color);
   border-color: var(--primary-color);
-  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.16);
+  box-shadow: 0 8px 18px rgba(0, 166, 180, 0.18);
 }
 
 .language-button.active:hover {
@@ -155,7 +155,7 @@
   }
 
   .language-button {
-    min-width: 0;
     width: 100%;
+    min-width: 0;
   }
 }

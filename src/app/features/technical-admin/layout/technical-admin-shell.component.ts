@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+﻿import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 
 import { AppShellComponent } from '../../../shared/layouts/app-shell/app-shell.component';
@@ -23,7 +23,7 @@ export class TechnicalAdminShellComponent {
     return [
       {
         label: translations.themeConfigurationLabel,
-        icon: 'bi-pencil-square',
+        icon: 'bi-sliders',
         expanded: true,
         children: [
           {
@@ -40,13 +40,13 @@ export class TechnicalAdminShellComponent {
       },
       {
         label: translations.branchManagementLabel,
-        icon: 'bi-globe-americas',
+        icon: 'bi-diagram-3',
         expanded: true,
         children: [
           {
             label: translations.branchEditorLabel,
             route: '/technical-admin/branch-editor',
-            icon: 'bi-diagram-3'
+            icon: 'bi-building-gear'
           },
           {
             label: translations.waitingAreasLabel,
@@ -54,14 +54,14 @@ export class TechnicalAdminShellComponent {
             icon: 'bi-hourglass-split'
           },
           {
-            label: translations.terminalsManagementLabel,
-            route: '/technical-admin/terminals',
-            icon: 'bi-terminal'
-          },
-          {
             label: translations.windowsManagementLabel,
             route: '/technical-admin/windows',
             icon: 'bi-window'
+          },
+          {
+            label: translations.terminalsManagementLabel,
+            route: '/technical-admin/terminals',
+            icon: 'bi-terminal'
           },
           {
             label: translations.displaysManagementLabel,
@@ -86,3 +86,4 @@ export class TechnicalAdminShellComponent {
     void this.router.navigateByUrl('/login');
   }
 }
+
