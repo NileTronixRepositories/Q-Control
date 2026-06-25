@@ -1,0 +1,18 @@
+<app-shell
+  [navigationItems]="organizationItems()"
+  [direction]="shellStore.direction()"
+  [language]="shellStore.language()"
+  [closeSidebarLabel]="shellStore.translations().closeSidebarLabel"
+  [openSidebarLabel]="shellStore.translations().openSidebarLabel"
+  [navigationLabel]="shellStore.translations().navigationLabel"
+  [accountActionsLabel]="shellStore.translations().accountActionsLabel"
+  [topbarEyebrow]="shellStore.translations().topbarEyebrow"
+  [topbarTitle]="shellStore.translations().topbarTitle"
+  topbarLogoAlt="Hayah Clinic"
+  [languageButtonLabel]="shellStore.translations().languageButtonLabel"
+  [logoutLabel]="shellStore.translations().logoutLabel"
+  (languageToggle)="toggleLanguage()"
+  (logout)="logout()"
+>
+  <router-outlet />
+</app-shell>

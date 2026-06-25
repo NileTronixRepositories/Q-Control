@@ -1,0 +1,78 @@
+﻿<section class="organization-page container-fluid px-0 px-sm-2 px-xl-3">
+  <header class="page-hero d-flex align-items-start justify-content-between gap-3 flex-column flex-md-row">
+    <div>
+      <p class="eyebrow">{{ translations().statusCatalogLabel }}</p>
+      <h3>{{ translations().ticketStatusManagementTitle }}</h3>
+      <span>{{ translations().ticketStatusManagementDescription }}</span>
+    </div>
+
+    <div class="hero-actions">
+      @if (saved()) {
+        <p class="save-chip">{{ translations().savedLabel }}</p>
+      }
+
+      <button type="button" class="secondary-action" (click)="addStatus()">
+        {{ translations().createNewStatusLabel }}
+      </button>
+    </div>
+  </header>
+
+  @if (hasStatuses()) {
+    <section class="status-list" [attr.aria-label]="translations().ticketStatusListLabel">
+      <div class="status-list-head">
+        <span>{{ translations().idLabel }}</span>
+        <span>{{ translations().nameLabel }}</span>
+        <span>{{ translations().descriptionLabel }}</span>
+        <span>{{ translations().colorLabel }}</span>
+        <span>{{ translations().activeLabel }}</span>
+      </div>
+
+      @for (status of statuses(); track status.id) {
+        <article class="status-row">
+          <strong>{{ status.id }}</strong>
+          <input
+            type="text"
+            [value]="status.name"
+            (input)="updateStatusName(status.id, $event)"
+            [attr.aria-label]="translations().statusNameAriaLabel"
+          />
+          <input
+            type="text"
+            [value]="status.description"
+            (input)="updateStatusDescription(status.id, $event)"
+            [attr.aria-label]="translations().statusDescriptionAriaLabel"
+          />
+          <label class="color-field">
+            <span [style.background]="status.color"></span>
+            <input
+              type="color"
+              [value]="status.color"
+              (input)="updateStatusColor(status.id, $event)"
+              [attr.aria-label]="translations().statusColorAriaLabel"
+            />
+          </label>
+          <input
+            class="status-toggle"
+            type="checkbox"
+            [checked]="status.active"
+            (change)="updateStatusActive(status.id, $event)"
+            [attr.aria-label]="translations().statusActiveAriaLabel"
+          />
+        </article>
+      }
+
+      <button type="button" class="primary-action" (click)="save()">
+        {{ translations().saveStatusCatalogLabel }}
+      </button>
+    </section>
+  } @else {
+    <section class="empty-state">
+      <p>{{ translations().emptyStatusesMessage }}</p>
+      <h4>{{ translations().emptyStatusesTitle }}</h4>
+      <button type="button" class="primary-action" (click)="addStatus()">
+        {{ translations().createFirstStatusLabel }}
+      </button>
+    </section>
+  }
+</section>
+

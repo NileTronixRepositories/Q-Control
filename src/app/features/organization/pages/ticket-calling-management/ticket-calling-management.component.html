@@ -1,0 +1,98 @@
+﻿<section class="organization-page container-fluid px-0 px-sm-2 px-xl-3">
+  <header class="page-hero d-flex align-items-start justify-content-between gap-3 flex-column flex-md-row">
+    <div>
+      <p class="eyebrow">{{ translations().queueRulesLabel }}</p>
+      <h3>{{ translations().ticketCallingManagementTitle }}</h3>
+      <span>{{ translations().ticketCallingManagementDescription }}</span>
+    </div>
+
+    @if (saved()) {
+      <p class="save-chip">{{ translations().savedLabel }}</p>
+    }
+  </header>
+
+  <div class="calling-grid">
+    <section class="settings-panel">
+      <label class="form-field" for="queueName">
+        <span>{{ translations().queueNameLabel }}</span>
+        <input
+          id="queueName"
+          type="text"
+          [value]="configuration().queueName"
+          (input)="updateQueueName($event)"
+        />
+      </label>
+
+      <div class="counter-grid">
+        <article class="counter-card">
+          <div>
+            <p>{{ translations().noShowTimeLabel }}</p>
+            <span>{{ translations().noShowTimeDescription }}</span>
+          </div>
+          <div class="stepper">
+            <button type="button" (click)="decreaseNoShowSeconds()">-</button>
+            <input
+              type="number"
+              min="0"
+              [value]="configuration().noShowSeconds"
+              (input)="updateNoShowSeconds($event)"
+              [attr.aria-label]="translations().noShowTimeAriaLabel"
+            />
+            <button type="button" (click)="increaseNoShowSeconds()">+</button>
+          </div>
+        </article>
+
+        <article class="counter-card">
+          <div>
+            <p>{{ translations().ticketLookupLabel }}</p>
+            <span>{{ translations().ticketLookupDescription }}</span>
+          </div>
+          <div class="stepper">
+            <button type="button" (click)="decreaseTicketLookupCount()">-</button>
+            <input
+              type="number"
+              min="0"
+              [value]="configuration().ticketLookupCount"
+              (input)="updateTicketLookupCount($event)"
+              [attr.aria-label]="translations().ticketLookupAriaLabel"
+            />
+            <button type="button" (click)="increaseTicketLookupCount()">+</button>
+          </div>
+        </article>
+      </div>
+
+      <label class="toggle-row" for="priorityCalling">
+        <span>
+          <strong>{{ translations().priorityCallingLabel }}</strong>
+          <small>{{ translations().priorityCallingDescription }}</small>
+        </span>
+        <input
+          id="priorityCalling"
+          type="checkbox"
+          [checked]="configuration().priorityCallingEnabled"
+          (change)="updatePriorityCalling($event)"
+        />
+      </label>
+
+      <button type="button" class="primary-action" (click)="save()">
+        {{ translations().saveCallingRulesLabel }}
+      </button>
+    </section>
+
+    <aside class="queue-preview">
+      <p>{{ translations().mainQueueLabel }}</p>
+      <h4>{{ configuration().queueName }}</h4>
+      <div class="queue-metrics">
+        <div>
+          <span>{{ configuration().noShowSeconds }}</span>
+          <small>{{ translations().noShowSecondsLabel }}</small>
+        </div>
+        <div>
+          <span>{{ configuration().ticketLookupCount }}</span>
+          <small>{{ translations().lookupTicketsLabel }}</small>
+        </div>
+      </div>
+    </aside>
+  </div>
+</section>
+

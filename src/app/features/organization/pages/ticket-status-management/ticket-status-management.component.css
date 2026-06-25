@@ -1,0 +1,259 @@
+﻿.organization-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.page-hero {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 16px;
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+}
+
+.eyebrow,
+.empty-state p {
+  margin: 0 0 8px;
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.page-hero h3,
+.empty-state h4 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: normal;
+  color: var(--text-primary);
+}
+
+.page-hero span {
+  display: block;
+  margin-top: 4px;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.save-chip {
+  padding: 6px 12px;
+  color: #ffffff;
+  font-size: 0.85rem;
+  background: #10b981;
+  border-radius: 4px;
+}
+
+.status-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+}
+
+.status-list-head,
+.status-row {
+  display: grid;
+  grid-template-columns: 50px minmax(160px, 1fr) minmax(220px, 2fr) 80px 80px;
+  gap: 16px;
+  align-items: center;
+}
+
+.status-list-head {
+  padding: 0 12px 8px;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: bold;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.status-row {
+  padding: 8px 12px;
+  background: #f8fafc;
+  border: 1px solid var(--border-color);
+}
+
+.status-row strong {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: #e2e8f0;
+  font-size: 0.85rem;
+}
+
+.status-row input[type='text'] {
+  width: 100%;
+  height: 32px;
+  padding: 0 8px;
+  color: var(--text-primary);
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  font-size: 0.9rem;
+  outline: 0;
+}
+
+.status-row input[type='text']:focus {
+  border-color: var(--primary-color);
+}
+
+.color-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.color-field span {
+  width: 24px;
+  height: 24px;
+  border: 1px solid var(--border-color);
+}
+
+.color-field input {
+  width: 48px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.status-toggle {
+  margin: 0;
+  cursor: pointer;
+}
+
+.primary-action,
+.secondary-action {
+  height: 36px;
+  padding: 0 16px;
+  font-size: 0.9rem;
+  border-radius: 4px;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.primary-action {
+  color: #ffffff;
+  background: var(--primary-color);
+}
+
+.primary-action:hover {
+  background: var(--primary-hover);
+}
+
+.secondary-action {
+  color: var(--text-primary);
+  background: #ffffff;
+  border-color: var(--border-color);
+}
+
+.secondary-action:hover {
+  background: #f1f5f9;
+}
+
+.status-list > .primary-action {
+  align-self: flex-start;
+  margin-top: 16px;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 24px;
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+}
+
+.empty-state h4 {
+  font-size: 1.25rem;
+}
+
+@media (max-width: 1100px) {
+  .status-list {
+    overflow-x: auto;
+  }
+
+  .status-list-head,
+  .status-row {
+    min-width: 800px;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .page-hero {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .hero-actions {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+/* Bootstrap breakpoint responsive refinements */
+.organization-page {
+  width: 100%;
+  max-width: 100%;
+}
+
+@media (max-width: 767.98px) {
+  .hero-actions {
+    width: 100%;
+  }
+
+  .hero-actions,
+  .status-row {
+    align-items: stretch;
+  }
+
+  .status-list {
+    overflow-x: visible;
+  }
+
+  .status-list-head {
+    display: none;
+  }
+
+  .status-row {
+    grid-template-columns: 1fr;
+    min-width: 0;
+    gap: 10px;
+  }
+
+  .status-row strong {
+    justify-content: flex-start;
+    width: 100%;
+    padding-inline: 10px;
+  }
+
+  .color-field {
+    justify-content: space-between;
+  }
+
+  .secondary-action,
+  .status-list > .primary-action,
+  .empty-state .primary-action {
+    width: 100%;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .page-hero,
+  .status-list,
+  .empty-state {
+    padding: 14px;
+  }
+}
+

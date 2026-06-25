@@ -1,0 +1,134 @@
+﻿<main
+  class="app-shell"
+  [class.sidebar-expanded]="sidebarExpanded()"
+  [class.sidebar-collapsed]="!sidebarExpanded()"
+  [class.is-mobile]="isMobile()"
+  [class.app-shell-rtl]="direction() === 'rtl'"
+  [class.app-shell-ltr]="direction() === 'ltr'"
+  [attr.lang]="language()"
+>
+  @if (isMobile() && sidebarExpanded()) {
+    <div class="sidebar-backdrop" (click)="closeSidebar()" aria-hidden="true"></div>
+  }
+
+  <!-- Sidebar -->
+  <aside class="sidebar" [attr.dir]="direction()">
+    <div class="sidebar-header">
+      @if (sidebarExpanded()) {
+        <div class="logo-container">
+          <img src="/images/nile.png" alt="" class="sidebar-logo" />
+        </div>
+      }
+      <button
+        type="button"
+        class="sidebar-toggle"
+        [attr.aria-label]="sidebarExpanded() ? closeSidebarLabel() : openSidebarLabel()"
+        (click)="toggleSidebar()"
+      >
+        <i
+          class="bi toggle-icon"
+          [class.bi-x-lg]="sidebarExpanded()"
+          [class.bi-list]="!sidebarExpanded()"
+        ></i>
+      </button>
+    </div>
+
+    <nav class="sidebar-nav" [attr.aria-label]="navigationLabel()">
+      @for (item of navigationItems(); track item.label) {
+        <div class="nav-group">
+          <button
+            type="button"
+            class="sidebar-group-header"
+            [class.active]="item.expanded"
+            (click)="toggleGroup(item)"
+          >
+            @if (item.icon) {
+              <i class="bi {{ item.icon }} group-icon" aria-hidden="true"></i>
+            }
+            @if (sidebarExpanded()) {
+              <span class="group-text">{{ item.label }}</span>
+              <i class="bi bi-chevron-down chevron-icon" [class.rotated]="item.expanded"></i>
+            }
+          </button>
+
+          @if (item.children) {
+            <div
+              class="sidebar-group-children"
+              [class.expanded]="item.expanded && sidebarExpanded()"
+              [attr.aria-hidden]="!(item.expanded && sidebarExpanded())"
+            >
+              @for (child of item.children; track child.route ?? child.label) {
+                <a
+                  class="sidebar-link"
+                  [routerLink]="child.route"
+                  routerLinkActive="sidebar-link-active"
+                  [title]="child.label"
+                  [attr.tabindex]="item.expanded && sidebarExpanded() ? null : -1"
+                  (click)="isMobile() && closeSidebar()"
+                >
+                  @if (child.icon) {
+                    <i class="bi {{ child.icon }} child-icon" aria-hidden="true"></i>
+                  }
+                  @if (!child.icon) {
+                    <span class="child-dot" aria-hidden="true"></span>
+                  }
+                  @if (sidebarExpanded()) {
+                    <span class="link-text">
+                      <strong>{{ child.label }}</strong>
+                    </span>
+                  }
+                </a>
+              }
+            </div>
+          }
+        </div>
+      }
+    </nav>
+
+    <div class="sidebar-actions" [attr.aria-label]="accountActionsLabel()">
+      @if (showLanguageAction()) {
+        <button
+          type="button"
+          class="sidebar-action-button"
+          [attr.aria-label]="languageButtonLabel()"
+          [attr.title]="languageButtonLabel()"
+          (click)="toggleLanguage()"
+        >
+          <i class="bi bi-translate" aria-hidden="true"></i>
+          @if (sidebarExpanded()) {
+            <span>{{ languageButtonLabel() }}</span>
+          }
+        </button>
+      }
+      <button
+        type="button"
+        class="sidebar-action-button sidebar-logout-button"
+        [attr.aria-label]="logoutLabel()"
+        [attr.title]="logoutLabel()"
+        (click)="logoutRequested()"
+      >
+        <i class="bi bi-box-arrow-right" aria-hidden="true"></i>
+        @if (sidebarExpanded()) {
+          <span>{{ logoutLabel() }}</span>
+        }
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main workspace -->
+  <section class="workspace" [attr.dir]="direction()">
+    <!-- <header class="topbar">
+      <div class="topbar-title">
+        <p>{{ topbarEyebrow() }}</p>
+        <h2>{{ topbarTitle() }}</h2>
+      </div>
+      <div class="topbar-actions">
+        <img src="/images/nile.png" [alt]="topbarLogoAlt()" class="topbar-logo" />
+      </div>
+    </header> -->
+
+    <div class="workspace-content">
+      <ng-content />
+    </div>
+  </section>
+</main>

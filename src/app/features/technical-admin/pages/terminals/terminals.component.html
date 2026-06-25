@@ -1,0 +1,773 @@
+<section class="terminal-management-page container-fluid py-3 py-lg-4">
+  <!-- Header -->
+  <header
+    class="page-header d-flex flex-column flex-md-row align-items-start justify-content-between gap-3"
+  >
+    <div>
+      <p class="eyebrow mb-2">
+        {{ translations().title }}
+      </p>
+
+      <h1 class="mb-2">
+        {{ translations().title }}
+      </h1>
+
+      <span class="header-description">
+        {{ translations().description }}
+      </span>
+    </div>
+
+    @if (activeTab() === 'active' && canCreate() && canViewActive()) {
+      <button type="button" class="btn primary-action" (click)="openCreate()">
+        <i class="bi bi-plus-lg"></i>
+
+        {{ translations().addTerminal }}
+      </button>
+    }
+  </header>
+
+  <!-- Toast -->
+  @if (message(); as currentMessage) {
+    <div class="toast-stack" role="status" aria-live="polite" aria-atomic="true">
+      <div
+        class="toast-item"
+        [class.toast-success]="currentMessage.tone === 'success'"
+        [class.toast-error]="currentMessage.tone === 'error'"
+        [class.toast-info]="currentMessage.tone === 'info'"
+      >
+        <i
+          class="bi"
+          [class.bi-check-circle-fill]="currentMessage.tone === 'success'"
+          [class.bi-x-octagon-fill]="currentMessage.tone === 'error'"
+          [class.bi-info-circle-fill]="currentMessage.tone === 'info'"
+        ></i>
+
+        <p class="mb-0">
+          {{ currentMessage.text }}
+        </p>
+
+        <button type="button" class="toast-close" (click)="clearMessage()">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- No Access -->
+  @if (!hasTerminalAccess()) {
+    <section class="empty-state mt-4">
+      <i class="bi bi-shield-lock"></i>
+
+      <h2>
+        {{ translations().accessDenied }}
+      </h2>
+
+      <p>
+        {{ translations().noPermissionHint }}
+      </p>
+    </section>
+  } @else {
+    <!-- Tabs -->
+    <div class="tabs mt-4">
+      @if (canViewActive()) {
+        <button
+          type="button"
+          class="btn"
+          [class.primary-action]="activeTab() === 'active'"
+          [class.secondary-action]="activeTab() !== 'active'"
+          (click)="switchTab('active')"
+        >
+          {{ translations().activeTab }}
+        </button>
+      }
+
+      @if (canViewDeleted()) {
+        <button
+          type="button"
+          class="btn"
+          [class.primary-action]="activeTab() === 'deleted'"
+          [class.secondary-action]="activeTab() !== 'deleted'"
+          (click)="switchTab('deleted')"
+        >
+          {{ translations().deletedTab }}
+        </button>
+      }
+    </div>
+
+    <!-- Active -->
+    @if (activeTab() === 'active') {
+      <section class="list-panel mt-3">
+        <!-- Toolbar -->
+        <div class="row g-3 align-items-end mb-4">
+          <!-- Search -->
+          <div class="col-12 col-lg-5">
+            <label class="filter-field w-100">
+              <span>{{ translations().searchPlaceholder }}</span>
+
+              <input
+                class="form-control"
+                type="search"
+                [value]="activeSearch()"
+                [placeholder]="translations().searchPlaceholder"
+                (input)="updateActiveSearch($event)"
+              />
+            </label>
+          </div>
+
+          <!-- Window -->
+          <div class="col-12 col-md-6 col-lg-3">
+            <label class="filter-field w-100">
+              <span>{{ translations().windowFilter }}</span>
+
+              <select
+                class="form-select"
+                [value]="activeWindowId() ?? ''"
+                (change)="updateActiveWindowFilter($event)"
+              >
+                <option value="">
+                  {{ translations().allWindows }}
+                </option>
+
+                @for (windowItem of windows(); track windowItem.id) {
+                  <option [value]="windowItem.id">
+                    {{ windowOptionLabel(windowItem) }}
+                  </option>
+                }
+              </select>
+            </label>
+          </div>
+
+          <!-- Page Size -->
+          <div class="col-6 col-md-3 col-lg-2">
+            <label class="filter-field w-100">
+              <span>{{ translations().pageSize }}</span>
+
+              <select
+                class="form-select"
+                [value]="activePageSize()"
+                (change)="updateActivePageSize($event)"
+              >
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+              </select>
+            </label>
+          </div>
+
+          <!-- Refresh -->
+          <div class="col-6 col-md-3 col-lg-2">
+            <button
+              type="button"
+              class="btn secondary-action w-100"
+              [disabled]="activeLoading()"
+              (click)="refreshActive()"
+            >
+              <i class="bi bi-arrow-clockwise"></i>
+
+              {{ translations().refresh }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Loading -->
+        @if (activeLoading()) {
+          <p class="state-note">
+            <i class="bi bi-arrow-repeat"></i>
+            {{ translations().loading }}
+          </p>
+        }
+
+        <!-- Table -->
+        @if (activeTerminalsPage().data.length > 0) {
+          <div class="table-responsive">
+            <table class="table align-middle custom-table">
+              <thead>
+                <tr>
+                  <th>{{ translations().terminalNumber }}</th>
+                  <th>{{ translations().typeLabel }}</th>
+                  <th>{{ translations().ipAddress }}</th>
+                  <th>{{ translations().serialNumber }}</th>
+                  <th>{{ translations().windowNumber }}</th>
+                  <th>{{ translations().waitingAreaNumber }}</th>
+                  <th>{{ translations().branch }}</th>
+                  <th class="text-center">
+                    {{ translations().actions }}
+                  </th>
+                </tr>
+              </thead>
+
+              <tbody>
+                @for (item of activeTerminalsPage().data; track item.id) {
+                  <tr>
+                    <td>
+                      <strong>{{ item.number }}</strong>
+                    </td>
+
+                    <td>{{ formatText(item.type) }}</td>
+
+                    <td>{{ formatText(item.ipAddress) }}</td>
+
+                    <td>{{ formatText(item.serialNo) }}</td>
+
+                    <td>{{ item.windowNumber }}</td>
+
+                    <td>{{ item.waitingAreaNumber }}</td>
+
+                    <td>
+                      {{ branchLabel(item.branchArabicName, item.branchEnglishName) }}
+                    </td>
+
+                    <td>
+                      <div class="d-flex align-items-center justify-content-center gap-2">
+                        @if (canViewDetails()) {
+                          <button type="button" class="icon-action" (click)="openView(item.id)">
+                            <i class="bi bi-eye"></i>
+                          </button>
+                        }
+
+                        @if (canUpdate()) {
+                          <button type="button" class="icon-action" (click)="openEdit(item.id)">
+                            <i class="bi bi-pencil-square"></i>
+                          </button>
+                        }
+
+                        @if (canDelete()) {
+                          <button
+                            type="button"
+                            class="icon-action danger-action"
+                            (click)="requestSoftDelete(item)"
+                          >
+                            <i class="bi bi-trash3"></i>
+                          </button>
+                        }
+                      </div>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+
+        <!-- Empty -->
+        @else if (!activeLoading()) {
+          <div class="empty-state">
+            <i class="bi bi-hourglass-split"></i>
+
+            <h2>
+              {{ translations().noItems }}
+            </h2>
+          </div>
+        }
+
+        <!-- Pagination -->
+        <footer
+          class="pagination-bar d-flex flex-column flex-md-row align-items-center justify-content-between gap-3 mt-4"
+        >
+          <span>
+            {{ translations().totalItems }}:
+            {{ activeTerminalsPage().totalItems }}
+          </span>
+
+          <div class="d-flex align-items-center gap-2">
+            <button
+              type="button"
+              class="btn secondary-action compact-action"
+              [disabled]="!activeTerminalsPage().hasPreviousPage"
+              (click)="previousActivePage()"
+            >
+              {{ translations().previous }}
+            </button>
+
+            <span class="page-indicator">
+              {{ activeTerminalsPage().currentPage }}
+              /
+              {{ activeTerminalsPage().totalPages || 1 }}
+            </span>
+
+            <button
+              type="button"
+              class="btn secondary-action compact-action"
+              [disabled]="!activeTerminalsPage().hasNextPage"
+              (click)="nextActivePage()"
+            >
+              {{ translations().next }}
+            </button>
+          </div>
+        </footer>
+      </section>
+    }
+
+    <!-- Deleted -->
+    @if (activeTab() === 'deleted') {
+      <section class="list-panel mt-3">
+        <div class="row g-3 align-items-end mb-4">
+          <div class="col-12 col-lg-5">
+            <label class="filter-field w-100">
+              <span>{{ translations().searchPlaceholder }}</span>
+
+              <input
+                class="form-control"
+                type="search"
+                [value]="deletedSearch()"
+                [placeholder]="translations().searchPlaceholder"
+                (input)="updateDeletedSearch($event)"
+              />
+            </label>
+          </div>
+
+          <div class="col-12 col-md-6 col-lg-3">
+            <label class="filter-field w-100">
+              <span>{{ translations().windowFilter }}</span>
+
+              <select
+                class="form-select"
+                [value]="deletedWindowId() ?? ''"
+                (change)="updateDeletedWindowFilter($event)"
+              >
+                <option value="">
+                  {{ translations().allWindows }}
+                </option>
+
+                @for (windowItem of windows(); track windowItem.id) {
+                  <option [value]="windowItem.id">
+                    {{ windowOptionLabel(windowItem) }}
+                  </option>
+                }
+              </select>
+            </label>
+          </div>
+
+          <div class="col-6 col-md-3 col-lg-2">
+            <label class="filter-field w-100">
+              <span>{{ translations().pageSize }}</span>
+
+              <select
+                class="form-select"
+                [value]="deletedPageSize()"
+                (change)="updateDeletedPageSize($event)"
+              >
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="col-6 col-md-3 col-lg-2">
+            <button
+              type="button"
+              class="btn secondary-action w-100"
+              [disabled]="deletedLoading()"
+              (click)="refreshDeleted()"
+            >
+              <i class="bi bi-arrow-clockwise"></i>
+
+              {{ translations().refresh }}
+            </button>
+          </div>
+        </div>
+
+        @if (deletedLoading()) {
+          <p class="state-note">
+            <i class="bi bi-arrow-repeat"></i>
+            {{ translations().loading }}
+          </p>
+        }
+
+        @if (deletedTerminalsPage().data.length > 0) {
+          <div class="table-responsive">
+            <table class="table align-middle custom-table">
+              <thead>
+                <tr>
+                  <th>{{ translations().terminalNumber }}</th>
+                  <th>{{ translations().typeLabel }}</th>
+                  <th>{{ translations().ipAddress }}</th>
+                  <th>{{ translations().serialNumber }}</th>
+                  <th>{{ translations().windowNumber }}</th>
+                  <th>{{ translations().waitingAreaNumber }}</th>
+                  <th>{{ translations().branch }}</th>
+                  <th>{{ translations().deletedOn }}</th>
+                  <th class="text-center">
+                    {{ translations().actions }}
+                  </th>
+                </tr>
+              </thead>
+
+              <tbody>
+                @for (item of deletedTerminalsPage().data; track item.id) {
+                  <tr>
+                    <td>
+                      <strong>{{ item.number }}</strong>
+                    </td>
+
+                    <td>{{ formatText(item.type) }}</td>
+
+                    <td>{{ formatText(item.ipAddress) }}</td>
+
+                    <td>{{ formatText(item.serialNo) }}</td>
+
+                    <td>{{ item.windowNumber }}</td>
+
+                    <td>{{ item.waitingAreaNumber }}</td>
+
+                    <td>
+                      {{ branchLabel(item.branchArabicName, item.branchEnglishName) }}
+                    </td>
+
+                    <td>{{ formatDate(item.deletedOnUtc) }}</td>
+
+                    <td>
+                      <div class="d-flex align-items-center justify-content-center gap-2">
+                        @if (canRestore()) {
+                          <button
+                            type="button"
+                            class="icon-action restore-action"
+                            [attr.aria-label]="translations().restore"
+                            [title]="translations().restore"
+                            (click)="requestRestore(item)"
+                          >
+                            <i class="bi bi-arrow-counterclockwise"></i>
+                          </button>
+                        }
+
+                        @if (canDeletePermanent()) {
+                          <button
+                            type="button"
+                            class="icon-action danger-action"
+                            [attr.aria-label]="translations().permanentDelete"
+                            [title]="translations().permanentDelete"
+                            (click)="requestPermanentDelete(item)"
+                          >
+                            <i class="bi bi-trash3-fill"></i>
+                          </button>
+                        }
+                      </div>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        } @else if (!deletedLoading()) {
+          <div class="empty-state">
+            <i class="bi bi-hourglass-split"></i>
+
+            <h2>
+              {{ translations().noItems }}
+            </h2>
+          </div>
+        }
+
+        <footer
+          class="pagination-bar d-flex flex-column flex-md-row align-items-center justify-content-between gap-3 mt-4"
+        >
+          <span>
+            {{ translations().totalItems }}:
+            {{ deletedTerminalsPage().totalItems }}
+          </span>
+
+          <div class="d-flex align-items-center gap-2">
+            <button
+              type="button"
+              class="btn secondary-action compact-action"
+              [disabled]="!deletedTerminalsPage().hasPreviousPage || deletedLoading()"
+              (click)="previousDeletedPage()"
+            >
+              {{ translations().previous }}
+            </button>
+
+            <span class="page-indicator">
+              {{ deletedTerminalsPage().currentPage }}
+              /
+              {{ deletedTerminalsPage().totalPages || 1 }}
+            </span>
+
+            <button
+              type="button"
+              class="btn secondary-action compact-action"
+              [disabled]="!deletedTerminalsPage().hasNextPage || deletedLoading()"
+              (click)="nextDeletedPage()"
+            >
+              {{ translations().next }}
+            </button>
+          </div>
+        </footer>
+      </section>
+    }
+    <!-- Popup -->
+    @if (panelMode() !== 'closed') {
+      <div class="editor-backdrop app-popup-overlay" (click)="closePanel()"></div>
+
+      <aside class="terminal-editor-panel" role="dialog">
+        <!-- Header -->
+        <header class="terminal-editor-panel-header">
+          <h2>
+            {{ panelTitle() }}
+          </h2>
+
+          <button type="button" class="icon-action" (click)="closePanel()">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </header>
+
+        <!-- Details -->
+        @if (panelMode() === 'view' && selectedDetails()) {
+          <dl class="details-list">
+            <div>
+              <dt>{{ translations().terminalNumber }}</dt>
+              <dd>{{ selectedDetails()!.number }}</dd>
+            </div>
+
+            <div>
+              <dt>{{ translations().typeLabel }}</dt>
+              <dd>{{ formatText(selectedDetails()!.type) }}</dd>
+            </div>
+
+            <div>
+              <dt>{{ translations().ipAddress }}</dt>
+              <dd>{{ formatText(selectedDetails()!.ipAddress) }}</dd>
+            </div>
+
+            <div>
+              <dt>{{ translations().serialNumber }}</dt>
+              <dd>{{ formatText(selectedDetails()!.serialNo) }}</dd>
+            </div>
+
+            <div>
+              <dt>{{ translations().windowNumber }}</dt>
+              <dd>{{ selectedDetails()!.windowNumber }}</dd>
+            </div>
+
+            <div>
+              <dt>{{ translations().waitingAreaNumber }}</dt>
+              <dd>{{ selectedDetails()!.waitingAreaNumber }}</dd>
+            </div>
+
+            <div>
+              <dt>{{ translations().branch }}</dt>
+              <dd>
+                {{ branchLabel(selectedDetails()!.branchArabicName, selectedDetails()!.branchEnglishName) }}
+              </dd>
+            </div>
+
+            <div>
+              <dt>{{ translations().createdOn }}</dt>
+              <dd>{{ formatDate(selectedDetails()!.createdOnUtc) }}</dd>
+            </div>
+
+            <div>
+              <dt>{{ translations().modifiedOn }}</dt>
+              <dd>{{ formatDate(selectedDetails()!.modifiedOnUtc) }}</dd>
+            </div>
+          </dl>
+        }
+
+        @if (panelMode() === 'view' && !selectedDetails()) {
+          <p class="state-note">
+            <i class="bi bi-arrow-repeat"></i>
+            {{ translations().loading }}
+          </p>
+        }
+        <!-- Form -->
+        @if (panelMode() === 'create' || panelMode() === 'edit') {
+          <form
+            class="terminal-editor-form row g-3"
+            [formGroup]="terminalForm"
+            (ngSubmit)="saveTerminal()"
+            novalidate
+          >
+            <!-- Window -->
+            <div class="col-12">
+              <label class="form-field w-100">
+                <span>
+                  {{ translations().windowFilter }}
+                </span>
+
+                <select class="form-select" formControlName="windowId">
+                  <option [value]="0">
+                    {{ translations().selectWindow }}
+                  </option>
+
+                  @for (windowItem of windows(); track windowItem.id) {
+                    <option [value]="windowItem.id">
+                      {{ windowOptionLabel(windowItem) }}
+                    </option>
+                  }
+                </select>
+
+                @if (hasTerminalFormError('windowId')) {
+                  <small>{{ translations().requiredField }}</small>
+                }
+              </label>
+            </div>
+
+            <!-- Number -->
+            <div class="col-12 col-md-6 col-xl-3">
+              <label class="form-field w-100">
+                <span>
+                  {{ translations().terminalNumber }}
+                </span>
+
+                <input class="form-control" type="text" maxlength="20" formControlName="number" />
+
+                @if (hasTerminalFormError('number')) {
+                  <small>
+                    @if (numberControl.hasError('required') || numberControl.hasError('whitespace')) {
+                      {{ translations().requiredField }}
+                    } @else if (numberControl.hasError('maxlength')) {
+                      {{ translations().maxLength20 }}
+                    }
+                  </small>
+                }
+              </label>
+            </div>
+
+            <!-- IP -->
+            <div class="col-12 col-md-6 col-xl-3">
+              <label class="form-field w-100">
+                <span>
+                  {{ translations().ipAddress }}
+                </span>
+
+                <input class="form-control" type="text" maxlength="45" formControlName="ipAddress" />
+
+                @if (hasTerminalFormError('ipAddress')) {
+                  <small>
+                    @if (ipAddressControl.hasError('required')) {
+                      {{ translations().requiredField }}
+                    } @else if (ipAddressControl.hasError('maxlength')) {
+                      {{ translations().maxLength45 }}
+                    } @else if (ipAddressControl.hasError('ipAddress')) {
+                      {{ translations().invalidIp }}
+                    }
+                  </small>
+                }
+              </label>
+            </div>
+
+            <!-- Serial -->
+            <div class="col-12 col-md-6 col-xl-3">
+              <label class="form-field w-100">
+                <span>
+                  {{ translations().serialNumber }}
+                </span>
+
+                <input class="form-control" type="text" maxlength="100" formControlName="serialNo" />
+
+                @if (hasTerminalFormError('serialNo')) {
+                  <small>
+                    @if (serialNoControl.hasError('required') || serialNoControl.hasError('whitespace')) {
+                      {{ translations().requiredField }}
+                    } @else if (serialNoControl.hasError('maxlength')) {
+                      {{ translations().maxLength100 }}
+                    }
+                  </small>
+                }
+              </label>
+            </div>
+
+            <!-- Type -->
+            <div class="col-12 col-md-6 col-xl-3">
+              <label class="form-field w-100">
+                <span>
+                  {{ translations().typeLabel }}
+                </span>
+
+                <input class="form-control" type="text" maxlength="100" formControlName="type" />
+
+                @if (hasTerminalFormError('type')) {
+                  <small>
+                    @if (typeControl.hasError('required') || typeControl.hasError('whitespace')) {
+                      {{ translations().requiredField }}
+                    } @else if (typeControl.hasError('maxlength')) {
+                      {{ translations().maxLength100 }}
+                    }
+                  </small>
+                }
+              </label>
+            </div>
+
+            <!-- Actions -->
+            <div class="col-12 d-flex flex-column flex-sm-row justify-content-end gap-2 mt-2">
+              <button type="button" class="btn secondary-action" (click)="closePanel()">
+                {{ translations().cancel }}
+              </button>
+
+              <button type="submit" class="btn primary-action" [disabled]="saving()">
+                {{ translations().save }}
+              </button>
+            </div>
+          </form>
+        }
+      </aside>
+    }
+    @if (confirmDialog()) {
+      <div class="editor-backdrop app-popup-overlay" (click)="closeConfirmDialog()"></div>
+
+      <aside class="terminal-editor-panel terminal-confirm-panel" role="dialog">
+        <header class="terminal-editor-panel-header">
+          <h2>
+            @if (confirmDialog()?.kind === 'soft') {
+              {{ translations().deleteConfirm }}
+            } @else if (confirmDialog()?.kind === 'restore') {
+              {{ translations().restoreConfirm }}
+            } @else {
+              {{ translations().permanentDeleteConfirm }}
+            }
+          </h2>
+
+          <button type="button" class="icon-action" [disabled]="deleting()" (click)="closeConfirmDialog()">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </header>
+
+        <div class="dialog-content">
+          <p>
+            @if (confirmDialog()?.kind === 'soft') {
+              {{ translations().deleteConfirmBody }}
+            } @else if (confirmDialog()?.kind === 'restore') {
+              {{ translations().restoreConfirmBody }}
+            } @else {
+              {{ translations().permanentDeleteConfirmBody }}
+            }
+          </p>
+
+          <p>
+            {{ translations().terminalNumber }}:
+            <strong>{{ confirmDialog()?.terminalNumber }}</strong>
+          </p>
+        </div>
+
+        <footer class="d-flex flex-column flex-sm-row justify-content-end gap-2 mt-3">
+          <button
+            type="button"
+            class="btn secondary-action"
+            [disabled]="deleting()"
+            (click)="closeConfirmDialog()"
+          >
+            {{ translations().cancel }}
+          </button>
+
+          <button
+            type="button"
+            class="btn primary-action"
+            [class.danger-primary]="confirmDialog()?.kind === 'permanent'"
+            [disabled]="deleting()"
+            (click)="confirmAction()"
+          >
+            @if (confirmDialog()?.kind === 'soft') {
+              {{ translations().delete }}
+            } @else if (confirmDialog()?.kind === 'restore') {
+              {{ translations().restore }}
+            } @else {
+              {{ translations().permanentDelete }}
+            }
+          </button>
+        </footer>
+      </aside>
+    }
+  }
+</section>

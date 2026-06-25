@@ -1,0 +1,263 @@
+﻿.organization-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.page-hero {
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+}
+
+.eyebrow,
+.queue-preview > p {
+  margin: 0 0 8px;
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.page-hero h3 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: normal;
+  color: var(--text-primary);
+}
+
+.page-hero span {
+  display: block;
+  margin-top: 4px;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.calling-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 16px;
+}
+
+.settings-panel {
+  padding: 16px;
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+.form-field span,
+.counter-card p,
+.toggle-row strong {
+  color: var(--text-primary);
+  font-size: 0.85rem;
+}
+
+.form-field input {
+  width: 100%;
+  height: 36px;
+  padding: 0 8px;
+  color: var(--text-primary);
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  font-family: inherit;
+  font-size: 0.9rem;
+  outline: 0;
+}
+
+.form-field input:focus {
+  border-color: var(--primary-color);
+}
+
+.counter-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.counter-card {
+  padding: 12px;
+  background: #f8fafc;
+  border: 1px solid var(--border-color);
+}
+
+.counter-card p {
+  margin: 0 0 8px;
+  font-size: 0.85rem;
+}
+
+.counter-card span {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+
+.stepper {
+  display: flex;
+  height: 36px;
+  border: 1px solid var(--border-color);
+}
+
+.stepper button {
+  width: 36px;
+  background: #e2e8f0;
+  border: 0;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.stepper button:hover {
+  background: #cbd5e1;
+}
+
+.stepper input {
+  flex: 1;
+  width: 0;
+  border: 0;
+  border-left: 1px solid var(--border-color);
+  border-right: 1px solid var(--border-color);
+  text-align: center;
+  outline: 0;
+}
+
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px;
+  background: #f8fafc;
+  border: 1px solid var(--border-color);
+  margin-bottom: 16px;
+}
+
+.toggle-row span,
+.toggle-row small {
+  display: block;
+}
+
+.toggle-row small {
+  margin-top: 4px;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+}
+
+.toggle-row input {
+  margin: 0;
+  cursor: pointer;
+}
+
+.primary-action {
+  width: 100%;
+  height: 36px;
+  color: #fff;
+  font-size: 0.9rem;
+  background: var(--primary-color);
+  border: 0;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.primary-action:hover {
+  background: var(--primary-hover);
+}
+
+.queue-preview {
+  padding: 16px;
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+}
+
+.queue-preview h4 {
+  margin: 0 0 16px;
+  font-size: 1.25rem;
+  font-weight: normal;
+  color: var(--text-primary);
+}
+
+.queue-metrics {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.queue-metrics div {
+  padding: 12px;
+  background: #f8fafc;
+  border: 1px solid var(--border-color);
+}
+
+.queue-metrics span {
+  display: block;
+  font-size: 1.5rem;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.queue-metrics small {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+@media (max-width: 991.98px) {
+  .calling-grid,
+  .counter-grid {
+    grid-template-columns: 1fr;
+  }
+}
+/* Bootstrap breakpoint responsive refinements */
+.organization-page {
+  width: 100%;
+  max-width: 100%;
+}
+
+@media (min-width: 768px) {
+  .page-hero {
+    flex-direction: row;
+  }
+}
+
+@media (max-width: 1199.98px) {
+  .calling-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .counter-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .toggle-row {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .queue-metrics {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 575.98px) {
+  .page-hero,
+  .settings-panel,
+  .queue-preview {
+    padding: 14px;
+  }
+
+  .queue-metrics {
+    grid-template-columns: 1fr;
+  }
+}
+

@@ -1,0 +1,102 @@
+﻿<section class="organization-page container-fluid px-0 px-sm-2 px-xl-3">
+  <header class="page-hero d-flex align-items-start justify-content-between gap-3 flex-column flex-md-row">
+    <div>
+      <p class="eyebrow">{{ translations().voiceRulesLabel }}</p>
+      <h3>{{ translations().audioAnnouncementTitle }}</h3>
+      <span>{{ translations().audioAnnouncementDescription }}</span>
+    </div>
+
+    @if (saved()) {
+      <p class="save-chip">{{ translations().savedLabel }}</p>
+    }
+  </header>
+
+  <div class="audio-grid">
+    <section class="settings-panel">
+      <div class="field-grid">
+        <label class="form-field" for="voiceLanguage">
+          <span>{{ translations().voiceLanguageLabel }}</span>
+          <select
+            id="voiceLanguage"
+            [value]="configuration().voiceLanguage"
+            (change)="updateVoiceLanguage($event)"
+          >
+            @for (language of languages; track language) {
+              <option [value]="language">{{ languageOptionLabel(language) }}</option>
+            }
+          </select>
+        </label>
+
+        <label class="form-field" for="startingTone">
+          <span>{{ translations().startingToneLabel }}</span>
+          <select
+            id="startingTone"
+            [value]="configuration().startingTone"
+            (change)="updateStartingTone($event)"
+          >
+            @for (tone of tones; track tone) {
+              <option [value]="tone">{{ toneLabel(tone) }}</option>
+            }
+          </select>
+        </label>
+
+        <label class="form-field" for="customerType">
+          <span>{{ translations().customerTypeLabel }}</span>
+          <select
+            id="customerType"
+            [value]="configuration().customerType"
+            (change)="updateCustomerType($event)"
+          >
+            @for (customerType of customerTypes; track customerType) {
+              <option [value]="customerType">{{ customerTypeLabel(customerType) }}</option>
+            }
+          </select>
+        </label>
+      </div>
+
+      <label class="toggle-row" for="appendNumberWord">
+        <span>
+          <strong>{{ translations().appendWordNumberLabel }}</strong>
+          <small>{{ translations().appendWordNumberDescription }}</small>
+        </span>
+        <input
+          id="appendNumberWord"
+          type="checkbox"
+          [checked]="configuration().appendNumberWord"
+          (change)="updateAppendNumberWord($event)"
+        />
+      </label>
+
+      <div class="action-row">
+        <button type="button" class="secondary-action" (click)="previewTone()">
+          {{ translations().previewToneLabel }}
+        </button>
+        <button type="button" class="primary-action" (click)="save()">
+          {{ translations().saveAudioRulesLabel }}
+        </button>
+      </div>
+    </section>
+
+    <aside class="voice-preview">
+      <div class="sound-mark" aria-hidden="true">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+      <p>{{ translations().announcementScriptLabel }}</p>
+      <h4>
+        {{ customerTypeLabel(configuration().customerType) }}
+        @if (configuration().appendNumberWord) {
+          {{ translations().numberWordLabel }}
+        }
+        A102
+      </h4>
+      <small>
+        {{ languageOptionLabel(configuration().voiceLanguage) }}
+        {{ translations().voiceWithToneLabel }}
+        {{ toneLabel(configuration().startingTone) }}
+      </small>
+    </aside>
+  </div>
+</section>
+

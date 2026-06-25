@@ -1,0 +1,221 @@
+.login-shell .login-brand-panel .logo-panel {
+  margin-inline-start: auto;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.login-shell .login-brand-panel .animated-nile-logo {
+  display: block;
+  max-width: 15.5rem;
+  overflow: visible;
+  filter: drop-shadow(0 0.65rem 1.25rem rgba(0, 0, 0, 0.22));
+}
+
+.nile-core {
+  fill: #13b7c4;
+  filter: drop-shadow(0 0 0.45rem #13b7c4);
+  opacity: 0;
+  transform-origin: 150px 48px;
+  animation: nileCoreLoop 5.2s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
+.nile-logo-wrap {
+  opacity: 0;
+  transform-origin: 150px 48px;
+  clip-path: circle(0 at 50% 50%);
+  animation: nileRevealLoop 5.2s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
+.nile-tab-logo {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: nileMarkLoop 5.2s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
+.nile-brand-text-draw,
+.nile-brand-text-fill,
+.nile-brand-tagline {
+  direction: ltr;
+  font-family: Arial, Helvetica, sans-serif;
+  text-anchor: start;
+  unicode-bidi: isolate;
+  font-size: 29px;
+  font-weight: 900;
+  letter-spacing: 0.2px;
+}
+
+.nile-brand-tagline {
+  fill: rgba(255, 255, 255, 0.76);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.45px;
+  opacity: 0;
+  animation: nileTaglineLoop 5.2s ease-out infinite;
+}
+.nile-brand-text-draw {
+  fill: none;
+  stroke: #12a6cf;
+  stroke-width: 1.35;
+  stroke-dasharray: 360;
+  stroke-dashoffset: 360;
+  opacity: 0;
+  animation: nileTextDrawLoop 5.2s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
+.nile-brand-text-fill {
+  fill: url(#inlineNileTextGradient);
+  opacity: 0;
+  animation: nileTextFillLoop 5.2s ease-out infinite;
+}
+
+@keyframes nileCoreLoop {
+  0%,
+  7% {
+    opacity: 0;
+    transform: scale(0.18);
+  }
+  12%,
+  24% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  31% {
+    opacity: 0.8;
+    transform: scale(2.4);
+  }
+  42%,
+  100% {
+    opacity: 0;
+    transform: scale(26);
+  }
+}
+
+@keyframes nileRevealLoop {
+  0%,
+  23% {
+    opacity: 0;
+    clip-path: circle(0 at 50% 50%);
+    transform: scale(0.08);
+  }
+  31% {
+    opacity: 1;
+    clip-path: circle(7% at 50% 50%);
+    transform: scale(0.26);
+  }
+  46% {
+    opacity: 1;
+    clip-path: circle(72% at 50% 50%);
+    transform: scale(1.02);
+  }
+  54%,
+  88% {
+    opacity: 1;
+    clip-path: circle(72% at 50% 50%);
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    clip-path: circle(72% at 50% 50%);
+    transform: scale(0.98);
+  }
+}
+
+@keyframes nileMarkLoop {
+  0%,
+  28% {
+    opacity: 0;
+    transform: scale(0.35) rotate(-8deg);
+  }
+  40% {
+    opacity: 1;
+    transform: scale(1.08) rotate(0deg);
+  }
+  50%,
+  88% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.96) rotate(0deg);
+  }
+}
+
+@keyframes nileTextDrawLoop {
+  0%,
+  42% {
+    opacity: 0;
+    stroke-dashoffset: 360;
+  }
+  48% {
+    opacity: 1;
+    stroke-dashoffset: 360;
+  }
+  70%,
+  88% {
+    opacity: 1;
+    stroke-dashoffset: 0;
+  }
+  100% {
+    opacity: 0;
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes nileTextFillLoop {
+  0%,
+  66% {
+    opacity: 0;
+  }
+  76%,
+  88% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes nileTaglineLoop {
+  0%,
+  74% {
+    opacity: 0;
+    transform: translateY(-3px);
+  }
+  82%,
+  88% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nile-core,
+  .nile-logo-wrap,
+  .nile-tab-logo,
+  .nile-brand-text-draw,
+  .nile-brand-text-fill,
+  .nile-brand-tagline {
+    animation: none;
+  }
+
+  .nile-logo-wrap,
+  .nile-tab-logo,
+  .nile-brand-text-fill,
+  .nile-brand-tagline {
+    opacity: 1;
+    clip-path: circle(72% at 50% 50%);
+    transform: none;
+  }
+
+  .nile-brand-text-draw,
+  .nile-core {
+    opacity: 0;
+  }
+}

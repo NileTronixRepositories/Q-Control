@@ -1,0 +1,162 @@
+﻿<section class="organization-page container-fluid px-0 px-sm-2 px-xl-3">
+  <header class="page-hero">
+    <div class="hero-content d-flex align-items-start justify-content-between gap-3 flex-column flex-md-row">
+      <div class="hero-text">
+        <p class="eyebrow">
+          <i class="bi bi-gear-fill"></i> {{ translations().organizationSetupLabel }}
+        </p>
+        <h3>{{ translations().globalConfigurationsTitle }}</h3>
+        <span>{{ translations().globalConfigurationsDescription }}</span>
+      </div>
+      @if (saved()) {
+        <div class="save-chip fade-in">
+          <i class="bi bi-check-circle-fill"></i> {{ translations().savedSuccessfullyLabel }}
+        </div>
+      }
+    </div>
+  </header>
+
+  <div class="configuration-grid">
+    <section class="form-panel card">
+      <div class="field-grid">
+        <div class="form-group">
+          <label for="organizationName">{{ translations().organizationNameLabel }}</label>
+          <div class="input-wrapper">
+            <i class="bi bi-building"></i>
+            <input
+              id="organizationName"
+              type="text"
+              [value]="configuration().organizationName"
+              (input)="updateOrganizationName($event)"
+              [placeholder]="translations().organizationNamePlaceholder"
+            />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="defaultLanguage">{{ translations().defaultLanguageLabel }}</label>
+          <div class="input-wrapper">
+            <i class="bi bi-globe"></i>
+            <select
+              id="defaultLanguage"
+              [value]="configuration().defaultLanguage"
+              (change)="updateDefaultLanguage($event)"
+            >
+              @for (language of languages; track language) {
+                <option [value]="language">{{ languageOptionLabel(language) }}</option>
+              }
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="timezone">{{ translations().timezoneLabel }}</label>
+          <div class="input-wrapper">
+            <i class="bi bi-clock"></i>
+            <select
+              id="timezone"
+              [value]="configuration().timezone"
+              (change)="updateTimezone($event)"
+            >
+              @for (timezone of timezones; track timezone) {
+                <option [value]="timezone">{{ timezone }}</option>
+              }
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group logo-field-group">
+          <label>{{ translations().organizationLogoLabel }}</label>
+
+          <div class="logo-tabs">
+            <button
+              type="button"
+              class="logo-tab"
+              [class.active]="logoInputMode() === 'url'"
+              (click)="setLogoInputMode('url')"
+            >
+              <i class="bi bi-link-45deg"></i> {{ translations().urlLabel }}
+            </button>
+            <button
+              type="button"
+              class="logo-tab"
+              [class.active]="logoInputMode() === 'upload'"
+              (click)="setLogoInputMode('upload')"
+            >
+              <i class="bi bi-upload"></i> {{ translations().uploadFromDeviceLabel }}
+            </button>
+          </div>
+
+          @if (logoInputMode() === 'url') {
+            <div class="input-wrapper">
+              <i class="bi bi-image"></i>
+              <input
+                id="logoUrl"
+                type="text"
+                [value]="configuration().logoUrl"
+                (input)="updateLogoUrl($event)"
+                [placeholder]="translations().logoUrlPlaceholder"
+              />
+            </div>
+          }
+
+          @if (logoInputMode() === 'upload') {
+            <div
+              class="upload-dropzone"
+              [class.dragover]="isDragging()"
+              (click)="fileInput.click()"
+              (dragover)="onDragOver($event)"
+              (dragleave)="onDragLeave()"
+              (drop)="onDrop($event)"
+            >
+              <input
+                #fileInput
+                type="file"
+                accept="image/*"
+                style="display:none"
+                (change)="onFileSelected($event)"
+              />
+              @if (uploadedFileName()) {
+                <div class="upload-success">
+                  <i class="bi bi-check-circle-fill"></i>
+                  <span>{{ uploadedFileName() }}</span>
+                </div>
+              } @else {
+                <div class="upload-placeholder">
+                  <i class="bi bi-cloud-arrow-up"></i>
+                  <p>{{ translations().uploadImagePrompt }}</p>
+                  <span>{{ translations().uploadImageHint }}</span>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+
+      <button type="button" class="primary-action" (click)="save()">
+        <i class="bi bi-cloud-arrow-up-fill"></i> {{ translations().saveGlobalConfigurationLabel }}
+      </button>
+    </section>
+
+    <aside class="logo-preview-panel card">
+      <div class="panel-header">
+        <i class="bi bi-display"></i>
+        <p>{{ translations().liveLogoPreviewLabel }}</p>
+      </div>
+      <div class="logo-preview">
+        <img [src]="configuration().logoUrl" [alt]="configuration().organizationName" />
+      </div>
+      <div class="preview-details">
+        <div class="detail-row">
+          <span class="detail-label">{{ translations().tenantLabel }}</span>
+          <span class="detail-value">{{ configuration().organizationName || translations().notSetLabel }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">{{ translations().languageLabel }}</span>
+          <span class="detail-value">{{ languageOptionLabel(configuration().defaultLanguage) }}</span>
+        </div>
+      </div>
+    </aside>
+  </div>
+</section>
+

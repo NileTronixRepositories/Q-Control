@@ -1,0 +1,456 @@
+﻿<section class="branch-page container-fluid px-0 px-sm-2 px-xl-3">
+  <header
+    class="page-header d-flex align-items-start justify-content-between gap-3 flex-column flex-md-row"
+  >
+    <div>
+      <p class="eyebrow">{{ translations().branchManagementLabel }}</p>
+      <h1>{{ title() }}</h1>
+      <span>{{ description() }}</span>
+    </div>
+    @if (pageKey() === 'branch-editor') {
+      <button type="button" class="primary-action" (click)="openCreateBranch()">
+        <i class="bi bi-plus-lg" aria-hidden="true"></i>
+        {{ branchEditorTranslations().addBranch }}
+      </button>
+    }
+  </header>
+
+  @if (branchMessage(); as currentMessage) {
+    <p
+      class="message"
+      [class.message-success]="currentMessage.tone === 'success'"
+      [class.message-error]="currentMessage.tone === 'error'"
+      role="status"
+    >
+      {{ currentMessage.text }}
+    </p>
+  }
+
+  <section class="summary-grid" aria-label="Branch summary">
+    @for (summary of summaries(); track summary.label) {
+      <article class="summary-card" [class]="'summary-card tone-' + summary.tone">
+        <span>{{ summary.label }}</span>
+        <strong>{{ summary.value }}</strong>
+      </article>
+    }
+  </section>
+
+  @if (pageKey() === 'branch-editor') {
+    <section class="branch-editor-grid" [class.panel-open]="branchPanelMode() !== 'closed'">
+      <section class="content-panel">
+        <div class="panel-header">
+          <div>
+            <h2>{{ translations().branchesLabel }}</h2>
+            <p>{{ translations().branchRecordsHint }}</p>
+          </div>
+          <button
+            type="button"
+            class="secondary-action"
+            [disabled]="branchTableLoading()"
+            (click)="refreshBranches()"
+          >
+            <i class="bi bi-arrow-clockwise" aria-hidden="true"></i>
+            {{ translations().refreshLabel }}
+          </button>
+        </div>
+
+        <div class="filter-grid branch-api-filters">
+          <label>
+            <span>{{ translations().searchLabel }}</span>
+            <input
+              type="search"
+              [value]="branchSearchText()"
+              [attr.aria-label]="translations().searchLabel"
+              (change)="updateBranchSearch($event)"
+            />
+          </label>
+          <label>
+            <span>{{ translations().sortLabel }}</span>
+            <select
+              [value]="branchOrderSort()"
+              [attr.aria-label]="translations().sortLabel"
+              (change)="updateBranchOrderSort($event)"
+            >
+              <option value="Newest">{{ translations().newestLabel }}</option>
+              <option value="Oldest">{{ translations().oldestLabel }}</option>
+            </select>
+          </label>
+          <label>
+            <span>{{ translations().pageSizeLabel }}</span>
+            <select
+              [value]="branchPageSize()"
+              [attr.aria-label]="translations().pageSizeLabel"
+              (change)="updateBranchPageSize($event)"
+            >
+              <option value="10">10</option>
+              <option value="25">25</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+            </select>
+          </label>
+        </div>
+
+        @if (branchTableError()) {
+          <p class="api-note" role="status">
+            <i class="bi bi-wifi-off" aria-hidden="true"></i>
+            {{ translations().apiFallbackLabel }}
+          </p>
+        }
+
+        @if (branchTableLoading()) {
+          <p class="api-note loading-note" role="status">
+            <i class="bi bi-arrow-repeat" aria-hidden="true"></i>
+            {{ translations().loadingLabel }}
+          </p>
+        }
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>{{ translations().codeLabel }}</th>
+                <th>{{ translations().arabicNameLabel }}</th>
+                <th>{{ translations().englishNameLabel }}</th>
+                <th>{{ translations().ipAddressLabel }}</th>
+                <th>{{ translations().governorateLabel }}</th>
+                <th>{{ translations().cityLabel }}</th>
+                <th>{{ translations().updatesAvailableLabel }}</th>
+                <th>{{ translations().lastUpdatedLabel }}</th>
+                <th>{{ translations().createdByLabel }}</th>
+                <th>{{ branchEditorTranslations().actions }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (branch of branches(); track branch.id) {
+                <tr>
+                  <td>BR-{{ branch.id }}</td>
+                  <td>{{ branch.arabicName }}</td>
+                  <td>{{ branch.englishName }}</td>
+                  <td>{{ branch.ipAddress }}</td>
+                  <td>{{ branch.governorate }}</td>
+                  <td>{{ branch.city }}</td>
+                  <td>
+                    <span
+                      class="status-pill"
+                      [class.status-active]="branch.isUpdatesAvailable"
+                      [class.status-inactive]="!branch.isUpdatesAvailable"
+                    >
+                      {{
+                        branch.isUpdatesAvailable ? translations().yesLabel : translations().noLabel
+                      }}
+                    </span>
+                  </td>
+                  <td>{{ branch.lastUpdated }}</td>
+                  <td>{{ branch.createdBy }}</td>
+                  <td>
+                    <div class="action-group">
+                      <button
+                        type="button"
+                        class="icon-action"
+                        [title]="branchEditorTranslations().view"
+                        [attr.aria-label]="branchEditorTranslations().view"
+                        (click)="openViewBranch(branch.id)"
+                      >
+                        <i class="bi bi-eye" aria-hidden="true"></i>
+                      </button>
+                      <button
+                        type="button"
+                        class="icon-action"
+                        [title]="branchEditorTranslations().edit"
+                        [attr.aria-label]="branchEditorTranslations().edit"
+                        (click)="openEditBranch(branch.id)"
+                      >
+                        <i class="bi bi-pencil-square" aria-hidden="true"></i>
+                      </button>
+                      <button
+                        type="button"
+                        class="icon-action danger-action"
+                        [disabled]="deletingBranchId() === branch.id"
+                        [title]="branchEditorTranslations().delete"
+                        [attr.aria-label]="branchEditorTranslations().delete"
+                        (click)="deleteBranch(branch)"
+                      >
+                        <i class="bi bi-trash3" aria-hidden="true"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        @if (branches().length === 0 && !branchTableLoading()) {
+          <p class="empty-state">{{ translations().emptyBranchesLabel }}</p>
+        }
+
+        <div class="pagination-bar">
+          <span> {{ translations().totalItemsLabel }}: {{ branchTableMeta().totalItems }} </span>
+          <div>
+            <button
+              type="button"
+              class="secondary-action compact-action"
+              [disabled]="!branchTableMeta().hasPreviousPage || branchTableLoading()"
+              (click)="previousBranchPage()"
+            >
+              {{ translations().previousLabel }}
+            </button>
+            <span class="page-indicator">
+              {{ branchTableMeta().currentPage }} / {{ branchTableMeta().totalPages || 1 }}
+            </span>
+            <button
+              type="button"
+              class="secondary-action compact-action"
+              [disabled]="!branchTableMeta().hasNextPage || branchTableLoading()"
+              (click)="nextBranchPage()"
+            >
+              {{ translations().nextLabel }}
+            </button>
+          </div>
+        </div>
+      </section>
+
+      @if (branchPanelMode() !== 'closed') {
+        <div
+          class="editor-backdrop app-popup-overlay"
+          (click)="closeBranchPanel()"
+          aria-hidden="true"
+        ></div>
+        <aside
+          class="editor-panel app-popup-panel app-popup-wide"
+          role="dialog"
+          [attr.aria-label]="branchFormTitle()"
+        >
+          <header class="editor-panel-header">
+            <h2>{{ branchFormTitle() }}</h2>
+            <button
+              type="button"
+              class="icon-action"
+              [attr.aria-label]="branchEditorTranslations().close"
+              (click)="closeBranchPanel()"
+            >
+              <i class="bi bi-x-lg" aria-hidden="true"></i>
+            </button>
+          </header>
+
+          @if (branchPanelLoading()) {
+            <p class="api-note loading-note" role="status">{{ translations().loadingLabel }}</p>
+          }
+
+          @if (branchPanelMode() === 'view' && selectedBranchDetails(); as details) {
+            <dl class="details-list">
+              <div>
+                <dt>{{ translations().arabicNameLabel }}</dt>
+                <dd>{{ detailValue(details.arabicName) }}</dd>
+              </div>
+              <div>
+                <dt>{{ translations().englishNameLabel }}</dt>
+                <dd>{{ detailValue(details.englishName) }}</dd>
+              </div>
+              <div>
+                <dt>{{ translations().ipAddressLabel }}</dt>
+                <dd>{{ detailValue(details.ipAddress) }}</dd>
+              </div>
+              <div>
+                <dt>{{ branchEditorTranslations().license }}</dt>
+                <dd>{{ detailValue(details.license) }}</dd>
+              </div>
+              <div>
+                <dt>{{ translations().governorateLabel }}</dt>
+                <dd>{{ detailValue(details.location?.governorate) }}</dd>
+              </div>
+              <div>
+                <dt>{{ translations().cityLabel }}</dt>
+                <dd>{{ detailValue(details.location?.city) }}</dd>
+              </div>
+              <div>
+                <dt>{{ branchEditorTranslations().area }}</dt>
+                <dd>{{ detailValue(details.location?.area) }}</dd>
+              </div>
+              <div>
+                <dt>{{ branchEditorTranslations().address }}</dt>
+                <dd>{{ detailValue(details.location?.address) }}</dd>
+              </div>
+              <div>
+                <dt>{{ branchEditorTranslations().longitude }}</dt>
+                <dd>{{ detailValue(details.location?.longitude) }}</dd>
+              </div>
+              <div>
+                <dt>{{ branchEditorTranslations().latitude }}</dt>
+                <dd>{{ detailValue(details.location?.latitude) }}</dd>
+              </div>
+              <div>
+                <dt>{{ translations().createdByLabel }}</dt>
+                <dd>{{ userName(details.createdBy) }}</dd>
+              </div>
+              <div>
+                <dt>{{ branchEditorTranslations().createdOn }}</dt>
+                <dd>{{ formatNullableDate(details.createdOnUtc) }}</dd>
+              </div>
+              <div>
+                <dt>{{ branchEditorTranslations().lastModifiedBy }}</dt>
+                <dd>{{ userName(details.lastModifiedBy) }}</dd>
+              </div>
+              <div>
+                <dt>{{ branchEditorTranslations().modifiedOn }}</dt>
+                <dd>{{ formatNullableDate(details.modifiedOnUtc) }}</dd>
+              </div>
+            </dl>
+          }
+
+          @if (branchPanelMode() === 'create' || branchPanelMode() === 'edit') {
+            <form
+              class="branch-form row g-3"
+              [formGroup]="branchForm"
+              (ngSubmit)="saveBranch()"
+              novalidate
+            >
+              <label class="form-field col-12 col-md-6">
+                <span>{{ translations().arabicNameLabel }}</span>
+                <input type="text" maxlength="100" formControlName="arabicName" />
+                @if (hasBranchControlError('arabicName')) {
+                  <small>{{ branchEditorTranslations().max100 }}</small>
+                }
+              </label>
+
+              <label class="form-field col-12 col-md-6">
+                <span>{{ translations().englishNameLabel }}</span>
+                <input type="text" maxlength="100" formControlName="englishName" />
+                @if (hasBranchControlError('englishName')) {
+                  <small>{{ branchEditorTranslations().max100 }}</small>
+                }
+              </label>
+
+              @if (isBranchNameMissing()) {
+                <p class="form-warning col-12 mt-2 mb-0 text-danger fw-bold">
+                  {{ branchEditorTranslations().nameRequired }}
+                </p>
+              }
+
+              <label class="form-field col-12 col-md-6">
+                <span>{{ translations().ipAddressLabel }}</span>
+                <input type="text" maxlength="45" formControlName="ipAddress" />
+                @if (hasBranchControlError('ipAddress')) {
+                  <small>{{ branchEditorTranslations().requiredField }}</small>
+                }
+                @if (isIpAddressInvalid()) {
+                  <small>{{ branchEditorTranslations().invalidIp }}</small>
+                }
+              </label>
+
+              <label class="form-field col-12">
+                <span>{{ branchEditorTranslations().license }}</span>
+                <textarea rows="3" formControlName="license"></textarea>
+              </label>
+
+              <div class="form-section-title col-12">{{ branchEditorTranslations().location }}</div>
+
+              <label class="form-field col-12 col-md-6">
+                <span>{{ translations().governorateLabel }}</span>
+                <input type="text" maxlength="100" formControlName="governorate" />
+                @if (hasBranchControlError('governorate')) {
+                  <small>{{ branchEditorTranslations().max100 }}</small>
+                }
+              </label>
+
+              <label class="form-field col-12 col-md-6">
+                <span>{{ translations().cityLabel }}</span>
+                <input type="text" maxlength="100" formControlName="city" />
+                @if (hasBranchControlError('city')) {
+                  <small>{{ branchEditorTranslations().max100 }}</small>
+                }
+              </label>
+
+              <label class="form-field col-12 col-md-6">
+                <span>{{ branchEditorTranslations().area }}</span>
+                <input type="text" maxlength="100" formControlName="area" />
+                @if (hasBranchControlError('area')) {
+                  <small>{{ branchEditorTranslations().max100 }}</small>
+                }
+              </label>
+
+              <label class="form-field col-12">
+                <span>{{ branchEditorTranslations().address }}</span>
+                <input type="text" maxlength="500" formControlName="address" />
+                @if (hasBranchControlError('address')) {
+                  <small>{{ branchEditorTranslations().max500 }}</small>
+                }
+              </label>
+
+              <label class="form-field col-12 col-md-6">
+                <span>{{ branchEditorTranslations().longitude }}</span>
+                <input type="text" maxlength="50" formControlName="longitude" />
+              </label>
+
+              <label class="form-field col-12 col-md-6">
+                <span>{{ branchEditorTranslations().latitude }}</span>
+                <input type="text" maxlength="50" formControlName="latitude" />
+              </label>
+
+              <div class="editor-actions col-12">
+                <button type="button" class="secondary-action" (click)="closeBranchPanel()">
+                  {{ branchEditorTranslations().cancel }}
+                </button>
+                <button type="submit" class="primary-action" [disabled]="branchSaving()">
+                  {{ branchEditorTranslations().save }}
+                </button>
+              </div>
+            </form>
+          }
+        </aside>
+      }
+    </section>
+  }
+
+  @if (pageKey() === 'online-monitoring') {
+    <section class="content-panel">
+      <div class="panel-header">
+        <div>
+          <h2>{{ translations().liveBranchStatusLabel }}</h2>
+          <p>{{ translations().monitoringHint }}</p>
+        </div>
+        <button type="button" class="secondary-action">
+          <i class="bi bi-arrow-clockwise" aria-hidden="true"></i>
+          {{ translations().refreshLabel }}
+        </button>
+      </div>
+
+      <div class="monitor-grid">
+        @for (branch of monitoringRows; track branch.name) {
+          <article
+            class="monitor-card"
+            [class]="'monitor-card status-' + branch.status.toLowerCase()"
+          >
+            <div class="monitor-card-header">
+              <div>
+                <h3>{{ branch.name }}</h3>
+                <span>{{ branch.lastHeartbeat }}</span>
+              </div>
+              <span
+                class="status-pill"
+                [class]="'status-pill status-' + branch.status.toLowerCase()"
+              >
+                {{ branch.status }}
+              </span>
+            </div>
+
+            <div class="metric-grid">
+              <div>
+                <span>{{ translations().activeTicketsLabel }}</span
+                ><strong>{{ branch.activeTickets }}</strong>
+              </div>
+              <div>
+                <span>{{ translations().servedTodayLabel }}</span
+                ><strong>{{ branch.servedToday }}</strong>
+              </div>
+              <div>
+                <span>{{ translations().avgWaitLabel }}</span
+                ><strong>{{ branch.avgWait }}</strong>
+              </div>
+            </div>
+          </article>
+        }
+      </div>
+    </section>
+  }
+</section>

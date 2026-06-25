@@ -1,0 +1,529 @@
+<section class="window-management-page container-fluid px-0 px-sm-2 px-xl-3">
+  <header
+    class="page-header d-flex align-items-start justify-content-between gap-3 flex-column flex-md-row"
+  >
+    <div>
+      <p class="eyebrow">{{ translations().title }}</p>
+      <h1>{{ translations().title }}</h1>
+      <span>{{ translations().description }}</span>
+    </div>
+    @if (activeTab() === 'active' && canCreate() && canViewActive()) {
+      <button type="button" class="primary-action" (click)="openCreate()">
+        <i class="bi bi-plus-lg" aria-hidden="true"> </i> {{ translations().addWindow }}
+      </button>
+    }
+  </header>
+  @if (message(); as currentMessage) {
+    <p
+      class="message"
+      [class.message-success]="currentMessage.tone === 'success'"
+      [class.message-error]="currentMessage.tone === 'error'"
+      [class.message-info]="currentMessage.tone === 'info'"
+      role="status"
+    >
+      {{ currentMessage.text }}
+    </p>
+  }
+  @if (!hasWindowAccess()) {
+    <section class="empty-state">
+      <i class="bi bi-shield-lock" aria-hidden="true"> </i>
+      <p>{{ translations().accessDenied }}</p>
+      <p>{{ translations().noPermissionHint }}</p>
+    </section>
+  } @else {
+    <section
+      class="content-grid"
+      [class.panel-open]="panelMode() !== 'closed' || confirmDialog() !== null"
+    >
+      <div class="tabs">
+        @if (canViewActive()) {
+          <button
+            type="button"
+            class="secondary-action"
+            [class.primary-action]="activeTab() === 'active'"
+            (click)="switchTab('active')"
+          >
+            {{ translations().activeTab }}
+          </button>
+        }
+        @if (canViewDeleted()) {
+          <button
+            type="button"
+            class="secondary-action"
+            [class.primary-action]="activeTab() === 'deleted'"
+            (click)="switchTab('deleted')"
+          >
+            {{ translations().deletedTab }}
+          </button>
+        }
+      </div>
+      @if (activeTab() === 'active') {
+        <div class="list-panel mt-3">
+          <div class="toolbar">
+            <label class="filter-field search-field">
+              <span>{{ translations().searchPlaceholder }}</span>
+              <input
+                type="search"
+                [value]="activeSearch()"
+                [placeholder]="translations().searchPlaceholder"
+                (input)="updateActiveSearch($event)"
+              />
+            </label>
+            <label class="filter-field">
+              <span>{{ translations().waitingAreaFilter }}</span>
+              <select
+                [value]="activeWaitingAreaId() ?? ''"
+                (change)="updateActiveWaitingAreaFilter($event)"
+              >
+                <option value="">{{ translations().allWaitingAreas }}</option>
+                @for (area of waitingAreas(); track area.id) {
+                  <option [value]="area.id">{{ waitingAreaLabel(area) }}</option>
+                }
+              </select>
+            </label>
+            <label class="filter-field compact-field">
+              <span>{{ translations().pageSize }}</span>
+              <select [value]="activePageSize()" (change)="updateActivePageSize($event)">
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+              </select>
+            </label>
+            <button
+              type="button"
+              class="secondary-action toolbar-action"
+              [disabled]="activeLoading()"
+              (click)="refreshActive()"
+            >
+              <i class="bi bi-arrow-clockwise" aria-hidden="true"> </i> {{ translations().refresh }}
+            </button>
+          </div>
+          @if (activeLoading()) {
+            <p class="state-note" role="status">
+              <i class="bi bi-arrow-repeat" aria-hidden="true"> </i> {{ translations().loading }}
+            </p>
+          }
+          @if (activeWindowsPage().data.length > 0) {
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>{{ translations().windowNumber }}</th>
+                    <th>{{ translations().descriptiveName }}</th>
+                    <th>{{ translations().waitingAreaNumberLabel }}</th>
+                    <th>{{ translations().ipAddress }}</th>
+                    <th>{{ translations().ticketBooking }}</th>
+                    <th>{{ translations().directCall }}</th>
+                    <th>{{ translations().actions }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (item of activeWindowsPage().data; track item.id) {
+                    <tr>
+                      <td>
+                        <strong>{{ item.number }}</strong>
+                      </td>
+                      <td>{{ formatText(item.descriptiveName) }}</td>
+                      <td>
+                        {{ item.waitingAreaNumber }} -
+                        {{ formatText(item.waitingAreaDescriptiveName) }}
+                      </td>
+                      <td>{{ formatText(item.ipAddress) }}</td>
+                      <td>{{ displayBoolean(item.enableTicketBooking) }}</td>
+                      <td>{{ displayBoolean(item.enableDirectCall) }}</td>
+                      <td>
+                        <div class="action-group">
+                          @if (canViewDetails()) {
+                            <button
+                              type="button"
+                              class="icon-action"
+                              [attr.aria-label]="translations().view"
+                              [title]="translations().view"
+                              (click)="openView(item.id)"
+                            >
+                              <i class="bi bi-eye" aria-hidden="true"> </i>
+                            </button>
+                          }
+                          @if (canUpdate()) {
+                            <button
+                              type="button"
+                              class="icon-action"
+                              [attr.aria-label]="translations().edit"
+                              [title]="translations().edit"
+                              (click)="openEdit(item.id)"
+                            >
+                              <i class="bi bi-pencil-square" aria-hidden="true"> </i>
+                            </button>
+                          }
+                          @if (canDelete()) {
+                            <button
+                              type="button"
+                              class="icon-action danger-action"
+                              [attr.aria-label]="translations().delete"
+                              [title]="translations().delete"
+                              (click)="requestSoftDelete(item)"
+                            >
+                              <i class="bi bi-trash3" aria-hidden="true"> </i>
+                            </button>
+                          }
+                        </div>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          } @else if (!activeLoading()) {
+            <div class="empty-state">
+              <i class="bi bi-hourglass-split" aria-hidden="true"> </i>
+              <h2>{{ translations().noItems }}</h2>
+            </div>
+          }
+          <footer class="pagination-bar">
+            <span>{{ translations().totalItems }}: {{ activeWindowsPage().totalItems }}</span>
+            <div class="pager-actions">
+              <button
+                type="button"
+                class="secondary-action compact-action"
+                [disabled]="!activeWindowsPage().hasPreviousPage || activeLoading()"
+                (click)="previousActivePage()"
+              >
+                {{ translations().previous }}
+              </button>
+              <span class="page-indicator"
+                >{{ activeWindowsPage().currentPage }} /
+                {{ activeWindowsPage().totalPages || 1 }}</span
+              >
+              <button
+                type="button"
+                class="secondary-action compact-action"
+                [disabled]="!activeWindowsPage().hasNextPage || activeLoading()"
+                (click)="nextActivePage()"
+              >
+                {{ translations().next }}
+              </button>
+            </div>
+          </footer>
+        </div>
+      }
+      @if (activeTab() === 'deleted') {
+        <div class="list-panel mt-3">
+          <div class="toolbar">
+            <label class="filter-field search-field">
+              <span>{{ translations().searchPlaceholder }}</span>
+              <input
+                type="search"
+                [value]="deletedSearch()"
+                [placeholder]="translations().searchPlaceholder"
+                (input)="updateDeletedSearch($event)"
+              />
+            </label>
+            <label class="filter-field">
+              <span>{{ translations().waitingAreaFilter }}</span>
+              <select
+                [value]="deletedWaitingAreaId() ?? ''"
+                (change)="updateDeletedWaitingAreaFilter($event)"
+              >
+                <option value="">{{ translations().allWaitingAreas }}</option>
+                @for (area of waitingAreas(); track area.id) {
+                  <option [value]="area.id">{{ waitingAreaLabel(area) }}</option>
+                }
+              </select>
+            </label>
+            <label class="filter-field compact-field">
+              <span>{{ translations().pageSize }}</span>
+              <select [value]="deletedPageSize()" (change)="updateDeletedPageSize($event)">
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+              </select>
+            </label>
+            <button
+              type="button"
+              class="secondary-action toolbar-action"
+              [disabled]="deletedLoading()"
+              (click)="refreshDeleted()"
+            >
+              <i class="bi bi-arrow-clockwise" aria-hidden="true"> </i> {{ translations().refresh }}
+            </button>
+          </div>
+          @if (deletedLoading()) {
+            <p class="state-note" role="status">
+              <i class="bi bi-arrow-repeat" aria-hidden="true"> </i> {{ translations().loading }}
+            </p>
+          }
+          @if (deletedWindowsPage().data.length > 0) {
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>{{ translations().windowNumber }}</th>
+                    <th>{{ translations().descriptiveName }}</th>
+                    <th>{{ translations().waitingAreaNumberLabel }}</th>
+                    <th>{{ translations().ipAddress }}</th>
+                    <th>{{ translations().ticketBooking }}</th>
+                    <th>{{ translations().directCall }}</th>
+                    <th>{{ translations().deletedOn }}</th>
+                    <th>{{ translations().actions }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (item of deletedWindowsPage().data; track item.id) {
+                    <tr>
+                      <td>
+                        <strong>{{ item.number }}</strong>
+                      </td>
+                      <td>{{ formatText(item.descriptiveName) }}</td>
+                      <td>
+                        {{ item.waitingAreaNumber }} -
+                        {{ formatText(item.waitingAreaDescriptiveName) }}
+                      </td>
+                      <td>{{ formatText(item.ipAddress) }}</td>
+                      <td>{{ displayBoolean(item.enableTicketBooking) }}</td>
+                      <td>{{ displayBoolean(item.enableDirectCall) }}</td>
+                      <td>{{ formatDate(item.deletedOnUtc) }}</td>
+                      <td>
+                        <div class="action-group">
+                          @if (canDeletePermanent()) {
+                            <button
+                              type="button"
+                              class="icon-action danger-action"
+                              [attr.aria-label]="translations().permanentDelete"
+                              [title]="translations().permanentDelete"
+                              (click)="requestPermanentDelete(item)"
+                            >
+                              <i class="bi bi-trash3-fill" aria-hidden="true"> </i>
+                            </button>
+                          }
+                        </div>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          } @else if (!deletedLoading()) {
+            <div class="empty-state">
+              <i class="bi bi-hourglass-split" aria-hidden="true"> </i>
+              <h2>{{ translations().noItems }}</h2>
+            </div>
+          }
+          <footer class="pagination-bar">
+            <span>{{ translations().totalItems }}: {{ deletedWindowsPage().totalItems }}</span>
+            <div class="pager-actions">
+              <button
+                type="button"
+                class="secondary-action compact-action"
+                [disabled]="!deletedWindowsPage().hasPreviousPage || deletedLoading()"
+                (click)="previousDeletedPage()"
+              >
+                {{ translations().previous }}
+              </button>
+              <span class="page-indicator"
+                >{{ deletedWindowsPage().currentPage }} /
+                {{ deletedWindowsPage().totalPages || 1 }}</span
+              >
+              <button
+                type="button"
+                class="secondary-action compact-action"
+                [disabled]="!deletedWindowsPage().hasNextPage || deletedLoading()"
+                (click)="nextDeletedPage()"
+              >
+                {{ translations().next }}
+              </button>
+            </div>
+          </footer>
+        </div>
+      }
+      @if (panelMode() !== 'closed') {
+        <div class="editor-backdrop app-popup-overlay" (click)="closePanel()"></div>
+        <aside
+          class="editor-panel app-popup-panel window-editor-panel"
+          role="dialog"
+          [attr.aria-label]="panelTitle()"
+        >
+          <header class="panel-header window-editor-panel-header">
+            <h2>{{ panelTitle() }}</h2>
+            <button
+              type="button"
+              class="icon-action"
+              [attr.aria-label]="translations().close"
+              (click)="closePanel()"
+            >
+              <i class="bi bi-x-lg" aria-hidden="true"> </i>
+            </button>
+          </header>
+          @if (panelMode() === 'view' && selectedDetails()) {
+            <dl class="details-list">
+              <div>
+                <dt>{{ translations().windowNumber }}</dt>
+                <dd>{{ selectedDetails()!.number }}</dd>
+              </div>
+              <div>
+                <dt>{{ translations().descriptiveName }}</dt>
+                <dd>{{ formatText(selectedDetails()!.descriptiveName) }}</dd>
+              </div>
+              <div>
+                <dt>{{ translations().waitingArea }}</dt>
+                <dd>
+                  {{ selectedDetails()!.waitingAreaNumber }} -
+                  {{ formatText(selectedDetails()!.waitingAreaDescriptiveName) }}
+                </dd>
+              </div>
+              <div>
+                <dt>{{ translations().ipAddress }}</dt>
+                <dd>{{ formatText(selectedDetails()!.ipAddress) }}</dd>
+              </div>
+              <div>
+                <dt>{{ translations().ticketBooking }}</dt>
+                <dd>{{ displayBoolean(selectedDetails()!.enableTicketBooking) }}</dd>
+              </div>
+              <div>
+                <dt>{{ translations().directCall }}</dt>
+                <dd>{{ displayBoolean(selectedDetails()!.enableDirectCall) }}</dd>
+              </div>
+              <div>
+                <dt>{{ translations().createdOn }}</dt>
+                <dd>{{ formatDate(selectedDetails()!.createdOnUtc) }}</dd>
+              </div>
+              <div>
+                <dt>{{ translations().modifiedOn }}</dt>
+                <dd>{{ formatDate(selectedDetails()!.modifiedOnUtc) }}</dd>
+              </div>
+            </dl>
+          }
+          @if (panelMode() === 'create' || panelMode() === 'edit') {
+            <form
+              class="window-form window-editor-form row g-3"
+              [formGroup]="windowForm"
+              (ngSubmit)="saveWindow()"
+              novalidate
+            >
+              <label class="form-field col-12">
+                <span>{{ translations().waitingArea }}</span>
+                <select formControlName="waitingAreaId">
+                  <option [value]="0">{{ translations().selectWaitingArea }}</option>
+                  @for (area of waitingAreas(); track area.id) {
+                    <option [value]="area.id">{{ waitingAreaLabel(area) }}</option>
+                  }
+                </select>
+                @if (hasWindowFormError('waitingAreaId')) {
+                  <small>{{ translations().requiredField }}</small>
+                }
+              </label>
+              <label class="form-field col-12 col-md-3">
+                <span>{{ translations().windowNumber }}</span>
+                <input type="text" maxlength="20" formControlName="number" />
+                @if (hasWindowFormError('number')) {
+                  <small>
+                    @if (
+                      numberControl.hasError('required') || numberControl.hasError('whitespace')
+                    ) {
+                      {{ translations().requiredField }}
+                    } @else if (numberControl.hasError('maxlength')) {
+                      {{ translations().maxLength20 }}
+                    }
+                  </small>
+                }
+              </label>
+              <label class="form-field col-12 col-md-6">
+                <span>{{ translations().descriptiveName }}</span>
+                <input type="text" maxlength="100" formControlName="descriptiveName" />
+                @if (hasWindowFormError('descriptiveName')) {
+                  <small>{{ translations().maxLength100 }}</small>
+                }
+              </label>
+              <label class="form-field col-12 col-md-3">
+                <span>{{ translations().ipAddress }}</span>
+                <input type="text" maxlength="45" formControlName="ipAddress" />
+                @if (hasWindowFormError('ipAddress')) {
+                  <small>{{ translations().invalidIp }}</small>
+                }
+              </label>
+              <label class="form-field col-12 col-md-6 form-check">
+                <span>{{ translations().ticketBooking }}</span>
+                <input type="checkbox" formControlName="enableTicketBooking" />
+              </label>
+              <label class="form-field col-12 col-md-6 form-check">
+                <span>{{ translations().directCall }}</span>
+                <input type="checkbox" formControlName="enableDirectCall" />
+              </label>
+              <div class="panel-actions col-12">
+                <button type="button" class="secondary-action" (click)="closePanel()">
+                  {{ translations().cancel }}
+                </button>
+                <button type="submit" class="primary-action" [disabled]="saving()">
+                  {{ translations().save }}
+                </button>
+              </div>
+            </form>
+          }
+        </aside>
+      }
+      @if (confirmDialog()) {
+        <div class="editor-backdrop app-popup-overlay" (click)="closeConfirmDialog()"></div>
+        <aside
+          class="editor-panel app-popup-panel"
+          role="dialog"
+          [attr.aria-label]="confirmDialog()?.title ?? ''"
+        >
+          <header class="panel-header">
+            <h2>
+              @if (confirmDialog()?.kind === 'soft') {
+                {{ translations().deleteConfirm }}
+              } @else {
+                {{ translations().permanentDeleteConfirm }}
+              }
+            </h2>
+            <button
+              type="button"
+              class="icon-action"
+              [attr.aria-label]="translations().close"
+              (click)="closeConfirmDialog()"
+            >
+              <i class="bi bi-x-lg" aria-hidden="true"> </i>
+            </button>
+          </header>
+          <div class="dialog-content">
+            <p>
+              @if (confirmDialog()?.kind === 'soft') {
+                {{ translations().deleteConfirmBody }}
+              } @else {
+                {{ translations().permanentDeleteConfirmBody }}
+              }
+            </p>
+            @if (confirmDialog()?.kind === 'permanent') {
+              <p>{{ translations().permanentDeleteAdditionalBody }}</p>
+            }
+            <p>{{ translations().windowNumber }}: {{ confirmDialog()?.windowNumber }}</p>
+          </div>
+          <footer class="panel-actions">
+            <button
+              type="button"
+              class="secondary-action"
+              [disabled]="deleting()"
+              (click)="closeConfirmDialog()"
+            >
+              {{ translations().cancel }}
+            </button>
+            <button
+              type="button"
+              class="primary-action"
+              [class.danger-action]="confirmDialog()?.kind === 'permanent'"
+              [disabled]="deleting()"
+              (click)="confirmDelete()"
+            >
+              @if (confirmDialog()?.kind === 'soft') {
+                {{ translations().delete }}
+              } @else {
+                {{ translations().permanentDelete }}
+              }
+            </button>
+          </footer>
+        </aside>
+      }
+    </section>
+  }
+</section>

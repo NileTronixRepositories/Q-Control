@@ -1,0 +1,18 @@
+<app-shell
+  [navigationItems]='navigationItems()'
+  [direction]='i18nStore.direction()'
+  [language]='i18nStore.language()'
+  [closeSidebarLabel]='translations().closeSidebarLabel'
+  [openSidebarLabel]='translations().openSidebarLabel'
+  [navigationLabel]='translations().navigationLabel'
+  [accountActionsLabel]='translations().accountActionsLabel'
+  [topbarEyebrow]='translations().topbarEyebrow'
+  [topbarTitle]='translations().topbarTitle'
+  topbarLogoAlt='Hayah Clinic'
+  [languageButtonLabel]='translations().languageButtonLabel'
+  [logoutLabel]='translations().logoutLabel'
+  (languageToggle)='toggleLanguage()'
+  (logout)='logout()'
+>
+  <router-outlet />
+</app-shell>

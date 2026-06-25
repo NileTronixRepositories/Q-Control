@@ -1,0 +1,397 @@
+﻿<section class="waiting-areas-page container-fluid py-3 py-lg-4">
+  <!-- Header -->
+  <header
+    class="page-header d-flex flex-column flex-md-row align-items-start justify-content-between gap-3"
+  >
+    <div>
+      <p class="eyebrow mb-2">
+        {{ translations().branch }}
+      </p>
+
+      <h1 class="mb-2">
+        {{ translations().title }}
+      </h1>
+
+      <span class="header-description">
+        {{ translations().description }}
+      </span>
+    </div>
+
+    <button type="button" class="btn primary-action" (click)="openCreate()">
+      <i class="bi bi-plus-lg"></i>
+
+      {{ translations().addButton }}
+    </button>
+  </header>
+
+  <!-- Message -->
+  @if (message(); as currentMessage) {
+    <div
+      class="message"
+      [class.message-success]="currentMessage.tone === 'success'"
+      [class.message-error]="currentMessage.tone === 'error'"
+      role="status"
+    >
+      {{ currentMessage.text }}
+    </div>
+  }
+
+  <!-- Content -->
+  <section class="content-grid">
+    <div class="list-panel">
+      <!-- Toolbar -->
+      <div class="row g-3 align-items-end mb-4">
+        <!-- Search -->
+        <div class="col-12 col-lg-5">
+          <label class="filter-field w-100">
+            <span>
+              {{ translations().searchPlaceholder }}
+            </span>
+
+            <input
+              class="form-control"
+              type="search"
+              [value]="search()"
+              [placeholder]="translations().searchPlaceholder"
+              (input)="updateSearch($event)"
+            />
+          </label>
+        </div>
+
+        <!-- Branch -->
+        <div class="col-12 col-md-6 col-lg-3">
+          <label class="filter-field w-100">
+            <span>
+              {{ translations().branchFilter }}
+            </span>
+
+            <select
+              class="form-select"
+              [value]="selectedBranchId() ?? ''"
+              (change)="updateBranchFilter($event)"
+            >
+              <option value="">
+                {{ translations().allBranches }}
+              </option>
+
+              @for (branch of branchOptions(); track branch.id) {
+                <option [value]="branch.id">
+                  {{ optionName(branch) }}
+                </option>
+              }
+            </select>
+          </label>
+        </div>
+
+        <!-- Page Size -->
+        <div class="col-6 col-md-3 col-lg-2">
+          <label class="filter-field w-100">
+            <span>
+              {{ translations().pageSize }}
+            </span>
+
+            <select class="form-select" [value]="pageSize()" (change)="updatePageSize($event)">
+              <option value="10">10</option>
+              <option value="25">25</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+            </select>
+          </label>
+        </div>
+
+        <!-- Refresh -->
+        <div class="col-6 col-md-3 col-lg-2">
+          <button
+            type="button"
+            class="btn secondary-action w-100"
+            [disabled]="loading()"
+            (click)="refresh()"
+          >
+            <i class="bi bi-arrow-clockwise"></i>
+
+            {{ translations().refresh }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Loading -->
+      @if (loading()) {
+        <p class="state-note">
+          <i class="bi bi-arrow-repeat"></i>
+
+          {{ translations().loading }}
+        </p>
+      }
+
+      <!-- Table -->
+      @if (waitingAreaPage().data.length > 0) {
+        <div class="table-responsive">
+          <table class="table align-middle custom-table">
+            <thead>
+              <tr>
+                <th>{{ translations().number }}</th>
+
+                <th>{{ translations().descriptiveName }}</th>
+
+                <th>{{ translations().branch }}</th>
+
+                <th>{{ translations().audioDevice }}</th>
+
+                <th>{{ translations().controlDevice }}</th>
+
+                <th>{{ translations().windowsCount }}</th>
+
+                <th class="text-center">
+                  {{ translations().actions }}
+                </th>
+              </tr>
+            </thead>
+
+            <tbody>
+              @for (item of waitingAreaPage().data; track item.id) {
+                <tr>
+                  <td>
+                    <strong>{{ item.number }}</strong>
+                  </td>
+
+                  <td>
+                    {{ textOrFallback(item.descriptiveName) }}
+                  </td>
+
+                  <td>
+                    {{ branchName(item) }}
+                  </td>
+
+                  <td>
+                    {{ textOrFallback(item.audioDevice) }}
+                  </td>
+
+                  <td>
+                    {{ textOrFallback(item.controlDevice) }}
+                  </td>
+
+                  <td>
+                    {{ item.windowsCount }}
+                  </td>
+
+                  <td>
+                    <div class="d-flex align-items-center justify-content-center gap-2">
+                      <button type="button" class="icon-action" (click)="openView(item.id)">
+                        <i class="bi bi-eye"></i>
+                      </button>
+
+                      <button type="button" class="icon-action" (click)="openEdit(item.id)">
+                        <i class="bi bi-pencil-square"></i>
+                      </button>
+
+                      <button
+                        type="button"
+                        class="icon-action danger-action"
+                        [disabled]="deletingId() === item.id"
+                        (click)="deleteWaitingArea(item)"
+                      >
+                        <i class="bi bi-trash3"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+
+      <!-- Empty -->
+      @else if (!loading()) {
+        <div class="empty-state">
+          <i class="bi bi-hourglass-split"></i>
+
+          <h2>
+            {{ translations().emptyTitle }}
+          </h2>
+
+          <p>
+            {{ translations().emptyDescription }}
+          </p>
+        </div>
+      }
+
+      <!-- Pagination -->
+      <footer
+        class="pagination-bar d-flex flex-column flex-md-row align-items-center justify-content-between gap-3 mt-4"
+      >
+        <span>
+          {{ translations().totalItems }}:
+          {{ waitingAreaPage().totalItems }}
+        </span>
+
+        <div class="d-flex align-items-center gap-2">
+          <button
+            type="button"
+            class="btn secondary-action compact-action"
+            [disabled]="!waitingAreaPage().hasPreviousPage || loading()"
+            (click)="previousPage()"
+          >
+            {{ translations().previous }}
+          </button>
+
+          <span class="page-indicator">
+            {{ waitingAreaPage().currentPage }}
+            /
+            {{ waitingAreaPage().totalPages || 1 }}
+          </span>
+
+          <button
+            type="button"
+            class="btn secondary-action compact-action"
+            [disabled]="!waitingAreaPage().hasNextPage || loading()"
+            (click)="nextPage()"
+          >
+            {{ translations().next }}
+          </button>
+        </div>
+      </footer>
+    </div>
+
+    <!-- Popup -->
+    @if (panelMode() !== 'closed') {
+      <div class="editor-backdrop" (click)="closePanel()"></div>
+
+      <aside class="editor-panel" role="dialog">
+        <!-- Header -->
+        <header class="panel-header">
+          <h2>
+            {{ formTitle() }}
+          </h2>
+
+          <button type="button" class="icon-action" (click)="closePanel()">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </header>
+
+        <!-- Loading -->
+        @if (panelLoading()) {
+          <p class="state-note">
+            {{ translations().loading }}
+          </p>
+        }
+
+        <!-- View -->
+        @if (panelMode() === 'view' && selectedDetails(); as details) {
+          <dl class="details-list">
+            <div>
+              <dt>{{ translations().number }}</dt>
+              <dd>{{ details.number }}</dd>
+            </div>
+
+            <div>
+              <dt>{{ translations().descriptiveName }}</dt>
+              <dd>{{ textOrFallback(details.descriptiveName) }}</dd>
+            </div>
+
+            <div>
+              <dt>{{ translations().branch }}</dt>
+              <dd>{{ branchName(details) }}</dd>
+            </div>
+
+            <div>
+              <dt>{{ translations().audioDevice }}</dt>
+              <dd>{{ textOrFallback(details.audioDevice) }}</dd>
+            </div>
+
+            <div>
+              <dt>{{ translations().controlDevice }}</dt>
+              <dd>{{ textOrFallback(details.controlDevice) }}</dd>
+            </div>
+          </dl>
+        }
+
+        <!-- Form -->
+        @if (panelMode() === 'create' || panelMode() === 'edit') {
+          <form
+            class="waiting-area-form row g-3"
+            [formGroup]="waitingAreaForm"
+            (ngSubmit)="save()"
+            novalidate
+          >
+            <!-- Branch -->
+            <div class="col-12">
+              <label class="form-field w-100">
+                <span>
+                  {{ translations().branch }}
+                </span>
+
+                <select class="form-select" formControlName="branchId">
+                  <option [ngValue]="0">
+                    {{ translations().selectBranch }}
+                  </option>
+
+                  @for (branch of branchOptions(); track branch.id) {
+                    <option [ngValue]="branch.id">
+                      {{ optionName(branch) }}
+                    </option>
+                  }
+                </select>
+              </label>
+            </div>
+
+            <!-- Number -->
+            <div class="col-12 col-md-4">
+              <label class="form-field w-100">
+                <span>
+                  {{ translations().number }}
+                </span>
+
+                <input class="form-control" type="number" formControlName="number" />
+              </label>
+            </div>
+
+            <!-- Name -->
+            <div class="col-12 col-md-8">
+              <label class="form-field w-100">
+                <span>
+                  {{ translations().descriptiveName }}
+                </span>
+
+                <input class="form-control" type="text" formControlName="descriptiveName" />
+              </label>
+            </div>
+
+            <!-- Audio -->
+            <div class="col-12 col-md-6">
+              <label class="form-field w-100">
+                <span>
+                  {{ translations().audioDevice }}
+                </span>
+
+                <input class="form-control" type="text" formControlName="audioDevice" />
+              </label>
+            </div>
+
+            <!-- Control -->
+            <div class="col-12 col-md-6">
+              <label class="form-field w-100">
+                <span>
+                  {{ translations().controlDevice }}
+                </span>
+
+                <input class="form-control" type="text" formControlName="controlDevice" />
+              </label>
+            </div>
+
+            <!-- Actions -->
+            <div class="col-12 d-flex flex-column flex-sm-row justify-content-end gap-2 mt-2">
+              <button type="button" class="btn secondary-action" (click)="closePanel()">
+                {{ translations().cancel }}
+              </button>
+
+              <button type="submit" class="btn primary-action" [disabled]="saving()">
+                {{ translations().save }}
+              </button>
+            </div>
+          </form>
+        }
+      </aside>
+    }
+  </section>
+</section>
