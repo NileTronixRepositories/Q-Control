@@ -30,6 +30,7 @@ export interface LoginTranslations {
   readonly technicalSupport: string;
   readonly loginReadyMessage: string;
   readonly requiredCredentialsMessage: string;
+  readonly dismissNotificationLabel: string;
   readonly submittingButton: string;
   readonly submitButton: string;
 }

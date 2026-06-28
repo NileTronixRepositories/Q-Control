@@ -13,17 +13,34 @@
       </button>
     }
   </header>
+  <!-- Toast -->
   @if (message(); as currentMessage) {
-    <p
-      class="message"
-      [class.message-success]="currentMessage.tone === 'success'"
-      [class.message-error]="currentMessage.tone === 'error'"
-      [class.message-info]="currentMessage.tone === 'info'"
-      role="status"
-    >
-      {{ currentMessage.text }}
-    </p>
+    <div class="toast-stack" role="status" aria-live="polite" aria-atomic="true">
+      <div
+        class="toast-item"
+        [class.toast-success]="currentMessage.tone === 'success'"
+        [class.toast-error]="currentMessage.tone === 'error'"
+        [class.toast-info]="currentMessage.tone === 'info'"
+      >
+        <i
+          class="bi"
+          [class.bi-check-circle-fill]="currentMessage.tone === 'success'"
+          [class.bi-x-octagon-fill]="currentMessage.tone === 'error'"
+          [class.bi-info-circle-fill]="currentMessage.tone === 'info'"
+          aria-hidden="true"
+        ></i>
+
+        <p class="mb-0">
+          {{ currentMessage.text }}
+        </p>
+
+        <button type="button" class="toast-close" [attr.aria-label]="translations().close" (click)="clearMessage()">
+          <i class="bi bi-x-lg" aria-hidden="true"></i>
+        </button>
+      </div>
+    </div>
   }
+
   @if (!hasWindowAccess()) {
     <section class="empty-state">
       <i class="bi bi-shield-lock" aria-hidden="true"> </i>
@@ -156,15 +173,15 @@
                               <i class="bi bi-pencil-square" aria-hidden="true"> </i>
                             </button>
                           }
-                          @if (canDelete()) {
+                          @if (canDeactivate()) {
                             <button
                               type="button"
                               class="icon-action danger-action"
-                              [attr.aria-label]="translations().delete"
-                              [title]="translations().delete"
+                              [attr.aria-label]="translations().deactivate"
+                              [title]="translations().deactivate"
                               (click)="requestSoftDelete(item)"
                             >
-                              <i class="bi bi-trash3" aria-hidden="true"> </i>
+                              <i class="bi bi-pause-circle" aria-hidden="true"> </i>
                             </button>
                           }
                         </div>
@@ -265,7 +282,6 @@
                     <th>{{ translations().ipAddress }}</th>
                     <th>{{ translations().ticketBooking }}</th>
                     <th>{{ translations().directCall }}</th>
-                    <th>{{ translations().deletedOn }}</th>
                     <th>{{ translations().actions }}</th>
                   </tr>
                 </thead>
@@ -283,10 +299,19 @@
                       <td>{{ formatText(item.ipAddress) }}</td>
                       <td>{{ displayBoolean(item.enableTicketBooking) }}</td>
                       <td>{{ displayBoolean(item.enableDirectCall) }}</td>
-                      <td>{{ formatDate(item.deletedOnUtc) }}</td>
                       <td>
                         <div class="action-group">
-                          @if (canDeletePermanent()) {
+                          @if (canReactivate()) {
+                            <button
+                              type="button"
+                              class="icon-action success-action"
+                              [attr.aria-label]="translations().reactivate"
+                              [title]="translations().reactivate"
+                              (click)="requestReactivate(item)"
+                            >
+                              <i class="bi bi-play-circle" aria-hidden="true"> </i>
+                            </button>
+                          }                          @if (canDeletePermanent()) {
                             <button
                               type="button"
                               class="icon-action danger-action"
@@ -471,7 +496,7 @@
         >
           <header class="panel-header">
             <h2>
-              @if (confirmDialog()?.kind === 'soft') {
+              @if (confirmDialog()?.kind === 'deactivate') {
                 {{ translations().deleteConfirm }}
               } @else {
                 {{ translations().permanentDeleteConfirm }}
@@ -488,8 +513,10 @@
           </header>
           <div class="dialog-content">
             <p>
-              @if (confirmDialog()?.kind === 'soft') {
+              @if (confirmDialog()?.kind === 'deactivate') {
                 {{ translations().deleteConfirmBody }}
+              } @else if (confirmDialog()?.kind === 'reactivate') {
+                {{ translations().reactivate }}
               } @else {
                 {{ translations().permanentDeleteConfirmBody }}
               }
@@ -515,8 +542,10 @@
               [disabled]="deleting()"
               (click)="confirmDelete()"
             >
-              @if (confirmDialog()?.kind === 'soft') {
-                {{ translations().delete }}
+              @if (confirmDialog()?.kind === 'deactivate') {
+                {{ translations().deactivate }}
+              } @else if (confirmDialog()?.kind === 'reactivate') {
+                {{ translations().reactivate }}
               } @else {
                 {{ translations().permanentDelete }}
               }

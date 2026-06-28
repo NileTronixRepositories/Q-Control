@@ -5,6 +5,7 @@
   [class.is-mobile]="isMobile()"
   [class.app-shell-rtl]="direction() === 'rtl'"
   [class.app-shell-ltr]="direction() === 'ltr'"
+  [attr.dir]="direction()"
   [attr.lang]="language()"
 >
   @if (isMobile() && sidebarExpanded()) {
@@ -54,8 +55,8 @@
           @if (item.children) {
             <div
               class="sidebar-group-children"
-              [class.expanded]="item.expanded && sidebarExpanded()"
-              [attr.aria-hidden]="!(item.expanded && sidebarExpanded())"
+              [class.expanded]="item.expanded"
+              [attr.aria-hidden]="!item.expanded"
             >
               @for (child of item.children; track child.route ?? child.label) {
                 <a
@@ -63,7 +64,7 @@
                   [routerLink]="child.route"
                   routerLinkActive="sidebar-link-active"
                   [title]="child.label"
-                  [attr.tabindex]="item.expanded && sidebarExpanded() ? null : -1"
+                  [attr.tabindex]="item.expanded ? null : -1"
                   (click)="isMobile() && closeSidebar()"
                 >
                   @if (child.icon) {

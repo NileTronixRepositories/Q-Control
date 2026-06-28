@@ -1,4 +1,4 @@
-﻿import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
@@ -8,15 +8,14 @@ import { AuthSessionService } from '../../auth/services/auth-session.service';
 import {
   CreateWindowRequest,
   CreateWindowResponse,
-  DeleteWindowResponse,
   GetWindowsParams,
   PaginationResponse,
   PermanentDeleteWindowResponse,
   UpdateWindowRequest,
   UpdateWindowResponse,
   WindowDetailsResponse,
+  WindowLifecycleResponse,
   WindowListItemResponse,
-  DeletedWindowListItemResponse,
 } from '../models/window-management.model';
 
 const WINDOWS_PATH = 'api/windows';
@@ -37,18 +36,6 @@ export class WindowManagementApiService {
     });
   }
 
-  getDeletedWindows(
-    params: GetWindowsParams,
-  ): Observable<PaginationResponse<DeletedWindowListItemResponse>> {
-    return this.httpClient.get<PaginationResponse<DeletedWindowListItemResponse>>(
-      this.createDeletedUrl(),
-      {
-        headers: this.createHeaders(),
-        params: this.createParams(params),
-      },
-    );
-  }
-
   getWindowById(windowId: number): Observable<WindowDetailsResponse> {
     return this.httpClient.get<WindowDetailsResponse>(this.createItemUrl(windowId), {
       headers: this.createHeaders(),
@@ -67,16 +54,22 @@ export class WindowManagementApiService {
     });
   }
 
-  softDeleteWindow(windowId: number): Observable<DeleteWindowResponse> {
-    return this.httpClient.delete<DeleteWindowResponse>(this.createItemUrl(windowId), {
-      headers: this.createHeaders(),
+  deactivateWindow(windowId: number, rowVersion: string): Observable<WindowLifecycleResponse> {
+    return this.httpClient.post<WindowLifecycleResponse>(this.createLifecycleUrl(windowId, 'deactivate'), null, {
+      headers: this.createHeaders(rowVersion),
     });
   }
 
-  permanentlyDeleteWindow(windowId: number): Observable<PermanentDeleteWindowResponse> {
+  reactivateWindow(windowId: number, rowVersion: string): Observable<WindowLifecycleResponse> {
+    return this.httpClient.post<WindowLifecycleResponse>(this.createLifecycleUrl(windowId, 'reactivate'), null, {
+      headers: this.createHeaders(rowVersion),
+    });
+  }
+
+  permanentlyDeleteWindow(windowId: number, rowVersion: string): Observable<PermanentDeleteWindowResponse> {
     return this.httpClient.delete<PermanentDeleteWindowResponse>(
-      this.createPermanentDeleteUrl(windowId),
-      { headers: this.createHeaders() },
+      this.createLifecycleUrl(windowId, 'permanent'),
+      { headers: this.createHeaders(rowVersion) },
     );
   }
 
@@ -84,15 +77,11 @@ export class WindowManagementApiService {
     return new URL(String(windowId), `${this.windowsEndpoint}/`).toString();
   }
 
-  private createDeletedUrl(): string {
-    return `${this.windowsEndpoint}/deleted`;
+  private createLifecycleUrl(windowId: number, action: 'deactivate' | 'reactivate' | 'permanent'): string {
+    return `${this.createItemUrl(windowId)}/${action}`;
   }
 
-  private createPermanentDeleteUrl(windowId: number): string {
-    return `${this.createItemUrl(windowId)}/permanent`;
-  }
-
-  private createHeaders(): HttpHeaders {
+  private createHeaders(rowVersion?: string): HttpHeaders {
     let headers = new HttpHeaders({
       'Accept-Language': this.appLanguageStore.language(),
       'Content-Type': 'application/json',
@@ -101,6 +90,10 @@ export class WindowManagementApiService {
 
     if (token) {
       headers = headers.set('Authorization', `Bearer ${token}`);
+    }
+
+    if (rowVersion) {
+      headers = headers.set('If-Match', rowVersion);
     }
 
     return headers;
@@ -117,6 +110,10 @@ export class WindowManagementApiService {
 
     if (query.search?.trim()) {
       params = params.set('search', query.search.trim());
+    }
+
+    if (query.isActive !== undefined && query.isActive !== null) {
+      params = params.set('isActive', query.isActive);
     }
 
     return params;

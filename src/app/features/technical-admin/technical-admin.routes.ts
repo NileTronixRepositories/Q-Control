@@ -1,4 +1,4 @@
-﻿import { Routes } from '@angular/router';
+import { Routes } from '@angular/router';
 
 import { technicalAdminPermissionGuard } from './guards/technical-admin-permission.guard';
 import { TechnicalAdminStore } from './store/technical-admin.store';
@@ -54,7 +54,7 @@ export const TECHNICAL_ADMIN_ROUTES: Routes = [
         path: 'windows',
         canActivate: [technicalAdminPermissionGuard],
         data: {
-          requiredAnyPermissions: ['Windows.ViewAll', 'Windows.ViewDeleted'],
+          requiredAnyPermissions: ['Windows.ViewAll'],
         },
         loadComponent: () =>
           import('./pages/windows/windows.component').then(
@@ -65,7 +65,13 @@ export const TECHNICAL_ADMIN_ROUTES: Routes = [
         path: 'displays',
         canActivate: [technicalAdminPermissionGuard],
         data: {
-          requiredAnyPermissions: ['Displays.ViewAll', 'Displays.ViewDeleted'],
+          requiredAnyPermissions: [
+            'Displays.ViewAll',
+            'DisplayWindows.ViewLinked',
+            'DisplayWindows.ViewAvailable',
+            'DisplayWindows.Assign',
+            'DisplayWindows.Unassign',
+          ],
         },
         loadComponent: () =>
           import('./pages/displays/displays.component').then(
@@ -76,7 +82,7 @@ export const TECHNICAL_ADMIN_ROUTES: Routes = [
         path: 'terminals',
         canActivate: [technicalAdminPermissionGuard],
         data: {
-          requiredAnyPermissions: ['Terminals.ViewAll', 'Terminals.ViewDeleted'],
+          requiredAnyPermissions: ['Terminals.ViewAll'],
         },
         loadComponent: () =>
           import('./pages/terminals/terminals.component').then(

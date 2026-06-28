@@ -1,4 +1,4 @@
-﻿import { HttpErrorResponse } from '@angular/common/http';
+import { HttpErrorResponse } from '@angular/common/http';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -23,12 +23,10 @@ import { WaitingAreaApiService } from '../../services/waiting-area-api.service';
 import { WindowManagementApiService } from '../../services/window-management-api.service';
 import { WindowPermissionService } from '../../services/window-permission.service';
 import { TechnicalAdminI18nStore } from '../../store/technical-admin-i18n.store';
+import { formatTechnicalAdminApiError } from '../../utils/api-error-message.util';
 import {
-  ApiProblemDetails,
   CreateWindowRequest,
   CreateWindowResponse,
-  DeleteWindowResponse,
-  DeletedWindowListItemResponse,
   GetWindowsParams,
   PaginationResponse,
   PermanentDeleteWindowResponse,
@@ -39,8 +37,9 @@ import {
 
 type WindowTab = 'active' | 'deleted';
 type WindowPanelMode = 'closed' | 'create' | 'edit' | 'view';
+type DeletedWindowListItemResponse = WindowListItemResponse;
 type MessageTone = 'success' | 'error' | 'info';
-type DeleteDialogKind = 'soft' | 'permanent';
+type DeleteDialogKind = 'deactivate' | 'reactivate' | 'permanent';
 
 interface UiMessage {
   readonly tone: MessageTone;
@@ -73,7 +72,8 @@ interface WindowTranslations {
   readonly actions: string;
   readonly view: string;
   readonly edit: string;
-  readonly delete: string;
+  readonly deactivate: string;
+  readonly reactivate: string;
   readonly permanentDelete: string;
   readonly enabled: string;
   readonly disabled: string;
@@ -112,6 +112,7 @@ interface WindowConfirmState {
   readonly windowId: number;
   readonly title: string;
   readonly windowNumber: string;
+  readonly rowVersion: string;
 }
 
 interface WaitingAreaOption {
@@ -122,63 +123,64 @@ interface WaitingAreaOption {
 
 const WINDOW_TRANSLATIONS: Record<AppLanguage, WindowTranslations> = {
   ar: {
-    title: 'Ø¥Ø¯Ø§Ø±Ø© Ø§Ù„Ù†ÙˆØ§ÙØ°',
-    description: 'Ø¥Ø¯Ø§Ø±Ø© Ø¬Ù…ÙŠØ¹ Ø­Ø§Ù„Ø§Øª Ø§Ù„Ù†ÙˆØ§ÙØ°.',
-    activeTab: 'Ø§Ù„Ù†ÙˆØ§ÙØ° Ø§Ù„Ù†Ø´Ø·Ø©',
-    deletedTab: 'Ø§Ù„Ù†ÙˆØ§ÙØ° Ø§Ù„Ù…Ø­Ø°ÙˆÙØ©',
-    addWindow: 'Ø¥Ø¶Ø§ÙØ© Ù†Ø§ÙØ°Ø©',
-    searchPlaceholder: 'Ø¨Ø­Ø« Ø¨Ø§Ù„Ø±Ù‚Ù… Ø£Ùˆ Ø§Ù„Ø§Ø³Ù… Ø£Ùˆ Ø¹Ù†ÙˆØ§Ù† IP',
-    waitingAreaFilter: 'Ù…Ù†Ø·Ù‚Ø© Ø§Ù„Ø§Ù†ØªØ¸Ø§Ø±',
-    allWaitingAreas: 'Ø¬Ù…ÙŠØ¹ Ù…Ù†Ø§Ø·Ù‚ Ø§Ù„Ø§Ù†ØªØ¸Ø§Ø±',
-    pageSize: 'Ø­Ø¬Ù… Ø§Ù„ØµÙØ­Ø©',
-    loading: 'Ø¬Ø§Ø±ÙŠ Ø§Ù„ØªØ­Ù…ÙŠÙ„...',
-    noItems: 'Ù„Ø§ ÙŠÙˆØ¬Ø¯ Ù†ÙˆØ§ÙØ°.',
-    totalItems: 'Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø§Ù„Ø¹Ù†Ø§ØµØ±',
-    previous: 'Ø§Ù„Ø³Ø§Ø¨Ù‚',
-    next: 'Ø§Ù„ØªØ§Ù„ÙŠ',
-    windowNumber: 'Ø±Ù‚Ù… Ø§Ù„Ù†Ø§ÙØ°Ø©',
-    descriptiveName: 'Ø§Ù„Ø§Ø³Ù… Ø§Ù„ÙˆØµÙÙŠ',
-    waitingArea: 'Ù…Ù†Ø·Ù‚Ø© Ø§Ù„Ø§Ù†ØªØ¸Ø§Ø±',
-    ipAddress: 'IP Address',
-    waitingAreaNumberLabel: 'Ø±Ù‚Ù… Ù…Ù†Ø·Ù‚Ø© Ø§Ù„Ø§Ù†ØªØ¸Ø§Ø±',
-    ticketBooking: 'Ø­Ø¬Ø² Ø§Ù„ØªØ°ÙƒØ±Ø©',
-    directCall: 'Ø§Ù„Ø§ØªØµØ§Ù„ Ø§Ù„Ø³Ø±ÙŠØ¹',
-    deletedOn: 'ØªØ§Ø±ÙŠØ® Ø§Ù„Ø­Ø°Ù',
-    actions: 'Ø§Ù„Ø¥Ø¬Ø±Ø§Ø¡Ø§Øª',
-    view: 'Ø¹Ø±Ø¶',
-    edit: 'ØªØ¹Ø¯ÙŠÙ„',
-    delete: 'Ø­Ø°Ù',
-    permanentDelete: 'Ø­Ø°Ù Ø¯Ø§Ø¦Ù…',
-    enabled: 'Ù…ÙØ¹Ù„',
-    disabled: 'Ù…Ø¹Ø·Ù„',
-    yes: 'Ù†Ø¹Ù…',
-    no: 'Ù„Ø§',
-    details: 'ØªÙØ§ØµÙŠÙ„',
-    windowDetails: 'ØªÙØ§ØµÙŠÙ„ Ø§Ù„Ù†Ø§ÙØ°Ø©',
-    createTitle: 'Ø¥Ù†Ø´Ø§Ø¡ Ù†Ø§ÙØ°Ø©',
-    editTitle: 'ØªØ¹Ø¯ÙŠÙ„ Ù†Ø§ÙØ°Ø©',
-    close: 'Ø¥ØºÙ„Ø§Ù‚',
-    cancel: 'Ø¥Ù„ØºØ§Ø¡',
-    save: 'Ø­ÙØ¸',
-    requiredField: 'Ù‡Ø°Ø§ Ø§Ù„Ø­Ù‚Ù„ Ù…Ø·Ù„ÙˆØ¨.',
-    maxLength20: 'Ø§Ù„Ø­Ø¯ Ø§Ù„Ø£Ù‚ØµÙ‰ 20 Ø­Ø±Ù.',
-    maxLength100: 'Ø§Ù„Ø­Ø¯ Ø§Ù„Ø£Ù‚ØµÙ‰ 100 Ø­Ø±Ù.',
-    invalidIp: 'IP Address ØºÙŠØ± ØµØ­ÙŠØ­.',
-    selectWaitingArea: 'Ø­Ø¯Ø¯ Ù…Ù†Ø·Ù‚Ø© Ø§Ù„Ø§Ù†ØªØ¸Ø§Ø±',
-    refresh: 'ØªØ­Ø¯ÙŠØ«',
-    deleteConfirm: 'ØªØ£ÙƒÙŠØ¯ Ø­Ø°Ù Ø§Ù„Ù†Ø§ÙØ°Ø©',
-    permanentDeleteConfirm: 'ØªØ£ÙƒÙŠØ¯ Ø­Ø°Ù Ø§Ù„Ù†Ø§ÙØ°Ø© Ø¯Ø§Ø¦Ù…Ù‹Ø§',
-    deleteConfirmBody: 'Ù‡Ù„ ØªØ±ÙŠØ¯ Ø­Ø°Ù Ù‡Ø°Ù‡ Ø§Ù„Ù†Ø§ÙØ°Ø©ØŸ',
-    permanentDeleteConfirmBody: 'Ø³ÙŠØªÙ… Ø­Ø°Ù Ø§Ù„Ù†Ø§ÙØ°Ø© Ø¨Ø´ÙƒÙ„ Ø¯Ø§Ø¦Ù… ÙˆÙ„Ø§ ÙŠÙ…ÙƒÙ† Ø§Ù„ØªØ±Ø§Ø¬Ø¹ Ø¹Ù†Ù‡Ø§.',
+    title: '\u0625\u062f\u0627\u0631\u0629 \u0627\u0644\u0646\u0648\u0627\u0641\u0630',
+    description: '\u0625\u062f\u0627\u0631\u0629 \u0646\u0648\u0627\u0641\u0630 \u0642\u0648\u0627\u0626\u0645 \u0627\u0644\u0627\u0646\u062a\u0638\u0627\u0631 \u0648\u0639\u0645\u0644\u064a\u0627\u062a\u0647\u0627.',
+    activeTab: '\u0627\u0644\u0646\u0648\u0627\u0641\u0630 \u0627\u0644\u0646\u0634\u0637\u0629',
+    deletedTab: '\u0627\u0644\u0646\u0648\u0627\u0641\u0630 \u063a\u064a\u0631 \u0627\u0644\u0646\u0634\u0637\u0629',
+    addWindow: '\u0625\u0636\u0627\u0641\u0629 \u0646\u0627\u0641\u0630\u0629',
+    searchPlaceholder: '\u0627\u0628\u062d\u062b \u0628\u0631\u0642\u0645 \u0627\u0644\u0646\u0627\u0641\u0630\u0629 \u0623\u0648 \u0627\u0644\u0627\u0633\u0645 \u0623\u0648 \u0639\u0646\u0648\u0627\u0646 IP',
+    waitingAreaFilter: '\u0645\u0646\u0637\u0642\u0629 \u0627\u0644\u0627\u0646\u062a\u0638\u0627\u0631',
+    allWaitingAreas: '\u0643\u0644 \u0645\u0646\u0627\u0637\u0642 \u0627\u0644\u0627\u0646\u062a\u0638\u0627\u0631',
+    pageSize: '\u062d\u062c\u0645 \u0627\u0644\u0635\u0641\u062d\u0629',
+    loading: '\u062c\u0627\u0631\u064a \u0627\u0644\u062a\u062d\u0645\u064a\u0644...',
+    noItems: '\u0644\u0627 \u062a\u0648\u062c\u062f \u0646\u0648\u0627\u0641\u0630.',
+    totalItems: '\u0625\u062c\u0645\u0627\u0644\u064a \u0627\u0644\u0639\u0646\u0627\u0635\u0631',
+    previous: '\u0627\u0644\u0633\u0627\u0628\u0642',
+    next: '\u0627\u0644\u062a\u0627\u0644\u064a',
+    windowNumber: '\u0631\u0642\u0645 \u0627\u0644\u0646\u0627\u0641\u0630\u0629',
+    descriptiveName: '\u0627\u0644\u0627\u0633\u0645 \u0627\u0644\u0648\u0635\u0641\u064a',
+    waitingArea: '\u0645\u0646\u0637\u0642\u0629 \u0627\u0644\u0627\u0646\u062a\u0638\u0627\u0631',
+    ipAddress: '\u0639\u0646\u0648\u0627\u0646 IP',
+    waitingAreaNumberLabel: '\u0631\u0642\u0645 \u0645\u0646\u0637\u0642\u0629 \u0627\u0644\u0627\u0646\u062a\u0638\u0627\u0631',
+    ticketBooking: '\u062d\u062c\u0632 \u0627\u0644\u062a\u0630\u0627\u0643\u0631',
+    directCall: '\u0627\u0644\u0627\u062a\u0635\u0627\u0644 \u0627\u0644\u0645\u0628\u0627\u0634\u0631',
+    deletedOn: '\u0627\u0644\u062d\u0627\u0644\u0629',
+    actions: '\u0627\u0644\u0625\u062c\u0631\u0627\u0621\u0627\u062a',
+    view: '\u0639\u0631\u0636',
+    edit: '\u062a\u0639\u062f\u064a\u0644',
+    deactivate: '\u0625\u064a\u0642\u0627\u0641',
+    reactivate: '\u0625\u0639\u0627\u062f\u0629 \u062a\u0646\u0634\u064a\u0637',
+    permanentDelete: '\u062d\u0630\u0641 \u062f\u0627\u0626\u0645',
+    enabled: '\u0645\u0641\u0639\u0644',
+    disabled: '\u0645\u0639\u0637\u0644',
+    yes: '\u0646\u0639\u0645',
+    no: '\u0644\u0627',
+    details: '\u062a\u0641\u0627\u0635\u064a\u0644',
+    windowDetails: '\u062a\u0641\u0627\u0635\u064a\u0644 \u0627\u0644\u0646\u0627\u0641\u0630\u0629',
+    createTitle: '\u0625\u0646\u0634\u0627\u0621 \u0646\u0627\u0641\u0630\u0629',
+    editTitle: '\u062a\u0639\u062f\u064a\u0644 \u0646\u0627\u0641\u0630\u0629',
+    close: '\u0625\u063a\u0644\u0627\u0642',
+    cancel: '\u0625\u0644\u063a\u0627\u0621',
+    save: '\u062d\u0641\u0638',
+    requiredField: '\u0647\u0630\u0627 \u0627\u0644\u062d\u0642\u0644 \u0645\u0637\u0644\u0648\u0628.',
+    maxLength20: '\u0627\u0644\u062d\u062f \u0627\u0644\u0623\u0642\u0635\u0649 20 \u062d\u0631\u0641\u064b\u0627.',
+    maxLength100: '\u0627\u0644\u062d\u062f \u0627\u0644\u0623\u0642\u0635\u0649 100 \u062d\u0631\u0641.',
+    invalidIp: '\u0639\u0646\u0648\u0627\u0646 IP \u063a\u064a\u0631 \u0635\u062d\u064a\u062d.',
+    selectWaitingArea: '\u062d\u062f\u062f \u0645\u0646\u0637\u0642\u0629 \u0627\u0644\u0627\u0646\u062a\u0638\u0627\u0631',
+    refresh: '\u062a\u062d\u062f\u064a\u062b',
+    deleteConfirm: '\u062a\u0623\u0643\u064a\u062f \u0625\u064a\u0642\u0627\u0641 \u0627\u0644\u0646\u0627\u0641\u0630\u0629',
+    permanentDeleteConfirm: '\u062a\u0623\u0643\u064a\u062f \u062d\u0630\u0641 \u0627\u0644\u0646\u0627\u0641\u0630\u0629 \u0646\u0647\u0627\u0626\u064a\u064b\u0627',
+    deleteConfirmBody: '\u0647\u0644 \u062a\u0631\u064a\u062f \u0625\u064a\u0642\u0627\u0641 \u0647\u0630\u0647 \u0627\u0644\u0646\u0627\u0641\u0630\u0629\u061f',
+    permanentDeleteConfirmBody: '\u0633\u064a\u062a\u0645 \u062d\u0630\u0641 \u0627\u0644\u0646\u0627\u0641\u0630\u0629 \u0646\u0647\u0627\u0626\u064a\u064b\u0627 \u0648\u0644\u0627 \u064a\u0645\u0643\u0646 \u0627\u0644\u062a\u0631\u0627\u062c\u0639 \u0639\u0646 \u0630\u0644\u0643.',
     permanentDeleteAdditionalBody:
-      'Ù‚Ø¯ ØªÙØ´Ù„ Ø§Ù„Ø¹Ù…Ù„ÙŠØ© Ø¥Ø°Ø§ ÙƒØ§Ù†Øª Ø§Ù„Ù†Ø§ÙØ°Ø© Ù…Ø±ØªØ¨Ø·Ø© Ø¨Ø³Ø¬Ù„ terminal Ø£Ùˆ display window.',
-    fallbackSuccess: 'ØªÙ…Øª Ø§Ù„Ø¹Ù…Ù„ÙŠØ© Ø¨Ù†Ø¬Ø§Ø­.',
-    fallbackError: 'Ø­Ø¯Ø« Ø®Ø·Ø£ ØºÙŠØ± Ù…ØªÙˆÙ‚Ø¹.',
-    accessDenied: 'Ø§Ù„ØµÙ„Ø§Ø­ÙŠØ© Ø§Ù„Ù…Ø·Ù„ÙˆØ¨Ø© ØºÙŠØ± ÙƒØ§ÙÙŠØ©.',
-    noPermissionHint: 'Ù„Ø§ ÙŠÙˆØ¬Ø¯ ØµÙ„Ø§Ø­ÙŠØ§Øª Ø¨Ø·Ù„Ø¨ Ù„Ù‡Ø°Ø§ Ø§Ù„Ø¥Ø¬Ø±Ø§Ø¡.',
-    createdOn: 'ØªØ§Ø±ÙŠØ® Ø§Ù„Ø¥Ù†Ø´Ø§Ø¡',
-    modifiedOn: 'ØªØ§Ø±ÙŠØ® Ø¢Ø®Ø± ØªØ¹Ø¯ÙŠÙ„',
-    traceIdLabel: 'Ù…Ø¹Ø±Ù Ø§Ù„ØªØªØ¨Ø¹',
+      '\u0642\u062f \u062a\u0641\u0634\u0644 \u0627\u0644\u0639\u0645\u0644\u064a\u0629 \u0625\u0630\u0627 \u0643\u0627\u0646\u062a \u0627\u0644\u0646\u0627\u0641\u0630\u0629 \u0645\u0631\u062a\u0628\u0637\u0629 \u0628\u062c\u0647\u0627\u0632 \u0637\u0631\u0641\u064a \u0623\u0648 \u0646\u0627\u0641\u0630\u0629 \u0639\u0631\u0636.',
+    fallbackSuccess: '\u062a\u0645\u062a \u0627\u0644\u0639\u0645\u0644\u064a\u0629 \u0628\u0646\u062c\u0627\u062d.',
+    fallbackError: '\u062d\u062f\u062b \u062e\u0637\u0623 \u063a\u064a\u0631 \u0645\u062a\u0648\u0642\u0639.',
+    accessDenied: '\u0627\u0644\u0635\u0644\u0627\u062d\u064a\u0629 \u0627\u0644\u0645\u0637\u0644\u0648\u0628\u0629 \u063a\u064a\u0631 \u0643\u0627\u0641\u064a\u0629.',
+    noPermissionHint: '\u0644\u064a\u0633\u062a \u0644\u062f\u064a\u0643 \u0635\u0644\u0627\u062d\u064a\u0629 \u0644\u062a\u0646\u0641\u064a\u0630 \u0647\u0630\u0627 \u0627\u0644\u0625\u062c\u0631\u0627\u0621.',
+    createdOn: '\u062a\u0627\u0631\u064a\u062e \u0627\u0644\u0625\u0646\u0634\u0627\u0621',
+    modifiedOn: '\u062a\u0627\u0631\u064a\u062e \u0622\u062e\u0631 \u062a\u0639\u062f\u064a\u0644',
+    traceIdLabel: '\u0645\u0639\u0631\u0641 \u0627\u0644\u062a\u062a\u0628\u0639',
     notAvailable: '-',
   },
   en: {
@@ -203,11 +205,12 @@ const WINDOW_TRANSLATIONS: Record<AppLanguage, WindowTranslations> = {
     waitingAreaNumberLabel: 'Waiting Area Number',
     ticketBooking: 'Ticket Booking',
     directCall: 'Direct Call',
-    deletedOn: 'Deleted On',
+    deletedOn: 'Status',
     actions: 'Actions',
     view: 'View',
     edit: 'Edit',
-    delete: 'Delete',
+    deactivate: 'Deactivate',
+    reactivate: 'Reactivate',
     permanentDelete: 'Permanent Delete',
     enabled: 'Enabled',
     disabled: 'Disabled',
@@ -226,9 +229,9 @@ const WINDOW_TRANSLATIONS: Record<AppLanguage, WindowTranslations> = {
     invalidIp: 'IP Address is invalid.',
     selectWaitingArea: 'Select waiting area',
     refresh: 'Refresh',
-    deleteConfirm: 'Delete Window',
+    deleteConfirm: 'Deactivate Window',
     permanentDeleteConfirm: 'Permanently Delete Window',
-    deleteConfirmBody: 'Are you sure you want to delete this window?',
+    deleteConfirmBody: 'Are you sure you want to deactivate this window?',
     permanentDeleteConfirmBody: 'This action permanently deletes the window and cannot be undone.',
     permanentDeleteAdditionalBody:
       'Operation will fail when the window is linked to a terminal or display window.',
@@ -281,6 +284,8 @@ export class WindowsComponent implements OnInit, OnDestroy {
 
   private activeSearchDebounceId: ReturnType<typeof setTimeout> | null = null;
   private deletedSearchDebounceId: ReturnType<typeof setTimeout> | null = null;
+  private panelRequestId = 0;
+  private toastTimeoutId: ReturnType<typeof setTimeout> | null = null;
 
   protected readonly translations = computed(() => WINDOW_TRANSLATIONS[this.i18nStore.language()]);
 
@@ -288,9 +293,10 @@ export class WindowsComponent implements OnInit, OnDestroy {
   protected readonly canViewDetails = this.permissionService.canViewDetails;
   protected readonly canCreate = this.permissionService.canCreate;
   protected readonly canUpdate = this.permissionService.canUpdate;
-  protected readonly canDelete = this.permissionService.canDelete;
-  protected readonly canViewDeleted = this.permissionService.canViewDeleted;
+  protected readonly canDeactivate = this.permissionService.canDeactivate;
+  protected readonly canReactivate = this.permissionService.canReactivate;
   protected readonly canDeletePermanent = this.permissionService.canDeletePermanent;
+  protected readonly canViewDeleted = computed(() => this.canReactivate() || this.canDeletePermanent());
 
   protected readonly activeTab = signal<WindowTab>(this.canViewActive() ? 'active' : 'deleted');
   protected readonly hasWindowAccess = computed(
@@ -323,7 +329,7 @@ export class WindowsComponent implements OnInit, OnDestroy {
     waitingAreaId: [0, [Validators.required, Validators.min(1)]],
     number: ['', [Validators.required, Validators.maxLength(20), this.notWhitespaceValidator]],
     descriptiveName: ['', [Validators.maxLength(100)]],
-    ipAddress: ['', [Validators.maxLength(45), this.ipAddressValidator]],
+    ipAddress: ['', [Validators.maxLength(45), (control: AbstractControl<string>) => this.ipAddressValidator(control)]],
     enableTicketBooking: [false],
     enableDirectCall: [false],
   });
@@ -346,16 +352,28 @@ export class WindowsComponent implements OnInit, OnDestroy {
     if (this.deletedSearchDebounceId) {
       clearTimeout(this.deletedSearchDebounceId);
     }
+
+    if (this.toastTimeoutId) {
+      clearTimeout(this.toastTimeoutId);
+    }
   }
 
+  protected clearMessage(): void {
+    this.message.set(null);
+
+    if (this.toastTimeoutId) {
+      clearTimeout(this.toastTimeoutId);
+      this.toastTimeoutId = null;
+    }
+  }
   protected switchTab(tab: WindowTab): void {
     if (tab === 'active' && !this.canViewActive()) {
-      this.message.set({ tone: 'error', text: this.translations().noPermissionHint });
+      this.showMessage('error', this.translations().noPermissionHint);
       return;
     }
 
     if (tab === 'deleted' && !this.canViewDeleted()) {
-      this.message.set({ tone: 'error', text: this.translations().noPermissionHint });
+      this.showMessage('error', this.translations().noPermissionHint);
       return;
     }
 
@@ -364,7 +382,7 @@ export class WindowsComponent implements OnInit, OnDestroy {
     }
 
     this.activeTab.set(tab);
-    this.message.set(null);
+    this.clearMessage();
     this.confirmDialog.set(null);
 
     if (tab === 'active') {
@@ -443,15 +461,16 @@ export class WindowsComponent implements OnInit, OnDestroy {
 
   protected openCreate(): void {
     if (!this.canCreate()) {
-      this.message.set({ tone: 'error', text: this.translations().noPermissionHint });
+      this.showMessage('error', this.translations().noPermissionHint);
       return;
     }
 
+    this.panelRequestId += 1;
     this.panelMode.set('create');
     this.selectedEditId.set(null);
     this.selectedDetails.set(null);
     this.confirmDialog.set(null);
-    this.message.set(null);
+    this.clearMessage();
     this.windowForm.enable();
     this.windowForm.reset({
       waitingAreaId: this.activeWaitingAreaId() ?? 0,
@@ -465,7 +484,7 @@ export class WindowsComponent implements OnInit, OnDestroy {
 
   protected openView(windowId: number): void {
     if (!this.canViewDetails()) {
-      this.message.set({ tone: 'error', text: this.translations().noPermissionHint });
+      this.showMessage('error', this.translations().noPermissionHint);
       return;
     }
 
@@ -474,7 +493,7 @@ export class WindowsComponent implements OnInit, OnDestroy {
 
   protected openEdit(windowId: number): void {
     if (!this.canUpdate()) {
-      this.message.set({ tone: 'error', text: this.translations().noPermissionHint });
+      this.showMessage('error', this.translations().noPermissionHint);
       return;
     }
 
@@ -482,6 +501,7 @@ export class WindowsComponent implements OnInit, OnDestroy {
   }
 
   protected closePanel(): void {
+    this.panelRequestId += 1;
     this.panelMode.set('closed');
     this.selectedEditId.set(null);
     this.selectedDetails.set(null);
@@ -523,22 +543,38 @@ export class WindowsComponent implements OnInit, OnDestroy {
   }
 
   protected requestSoftDelete(item: WindowListItemResponse): void {
-    if (!this.canDelete()) {
-      this.message.set({ tone: 'error', text: this.translations().noPermissionHint });
+    if (!this.canDeactivate()) {
+      this.showMessage('error', this.translations().noPermissionHint);
       return;
     }
 
     this.confirmDialog.set({
-      kind: 'soft',
+      kind: 'deactivate',
       windowId: item.id,
       title: this.translations().deleteConfirm,
       windowNumber: item.number,
+      rowVersion: item.rowVersion,
+    });
+  }
+
+  protected requestReactivate(item: DeletedWindowListItemResponse): void {
+    if (!this.canReactivate()) {
+      this.showMessage('error', this.translations().noPermissionHint);
+      return;
+    }
+
+    this.confirmDialog.set({
+      kind: 'reactivate',
+      windowId: item.id,
+      title: this.translations().reactivate,
+      windowNumber: item.number,
+      rowVersion: item.rowVersion,
     });
   }
 
   protected requestPermanentDelete(item: DeletedWindowListItemResponse): void {
     if (!this.canDeletePermanent()) {
-      this.message.set({ tone: 'error', text: this.translations().noPermissionHint });
+      this.showMessage('error', this.translations().noPermissionHint);
       return;
     }
 
@@ -547,6 +583,7 @@ export class WindowsComponent implements OnInit, OnDestroy {
       windowId: item.id,
       title: this.translations().permanentDeleteConfirm,
       windowNumber: item.number,
+      rowVersion: item.rowVersion,
     });
   }
 
@@ -557,12 +594,17 @@ export class WindowsComponent implements OnInit, OnDestroy {
       return;
     }
 
-    if (state.kind === 'soft') {
-      this.deleteWindow(state.windowId);
+    if (state.kind === 'deactivate') {
+      this.deactivateWindow(state);
       return;
     }
 
-    this.permanentlyDeleteWindow(state.windowId);
+    if (state.kind === 'reactivate') {
+      this.reactivateWindow(state);
+      return;
+    }
+
+    this.permanentlyDeleteWindow(state);
   }
 
   protected closeConfirmDialog(): void {
@@ -620,7 +662,7 @@ export class WindowsComponent implements OnInit, OnDestroy {
 
   private initializeTab(): void {
     if (!this.hasWindowAccess()) {
-      this.message.set({ tone: 'error', text: this.translations().accessDenied });
+      this.showMessage('error', this.translations().accessDenied);
       return;
     }
 
@@ -642,17 +684,12 @@ export class WindowsComponent implements OnInit, OnDestroy {
 
     this.windowsApiService
       .getWindows(
-        this.buildQuery(
-          this.activeSearch(),
-          this.activeWaitingAreaId(),
-          pageNumber,
-          this.activePageSize(),
-        ),
+        this.buildQuery(this.activeSearch(), this.activeWaitingAreaId(), pageNumber, this.activePageSize(), true),
       )
       .subscribe({
         next: (response) => {
           this.activeWindowsPage.set(response);
-          this.message.set(null);
+          this.clearMessage();
         },
         error: (error: HttpErrorResponse) => this.handleApiError(error),
         complete: () => this.activeLoading.set(false),
@@ -668,13 +705,7 @@ export class WindowsComponent implements OnInit, OnDestroy {
     this.traceId.set(null);
 
     this.windowsApiService
-      .getDeletedWindows(
-        this.buildQuery(
-          this.deletedSearch(),
-          this.deletedWaitingAreaId(),
-          pageNumber,
-          this.deletedPageSize(),
-        ),
+      .getWindows(this.buildQuery(this.deletedSearch(), this.deletedWaitingAreaId(), pageNumber, this.deletedPageSize(), false),
       )
       .subscribe({
         next: (response) => this.deletedWindowsPage.set(response),
@@ -690,6 +721,7 @@ export class WindowsComponent implements OnInit, OnDestroy {
         search: '',
         pageNumber: 1,
         pageSize: 100,
+      isActive: true,
       })
       .subscribe({
         next: (response) => {
@@ -709,11 +741,13 @@ export class WindowsComponent implements OnInit, OnDestroy {
     windowId: number,
     mode: Extract<WindowPanelMode, 'view' | 'edit'>,
   ): void {
+    const requestId = ++this.panelRequestId;
+
     this.panelMode.set(mode);
     this.selectedEditId.set(mode === 'edit' ? windowId : null);
     this.selectedDetails.set(null);
     this.confirmDialog.set(null);
-    this.message.set(null);
+    this.clearMessage();
 
     this.windowForm.enable({ emitEvent: false });
 
@@ -723,6 +757,10 @@ export class WindowsComponent implements OnInit, OnDestroy {
 
     this.windowsApiService.getWindowById(windowId).subscribe({
       next: (response) => {
+        if (requestId !== this.panelRequestId || this.panelMode() !== mode) {
+          return;
+        }
+
         this.selectedDetails.set(response);
 
         this.windowForm.reset({
@@ -739,6 +777,10 @@ export class WindowsComponent implements OnInit, OnDestroy {
         }
       },
       error: (error: HttpErrorResponse) => {
+        if (requestId !== this.panelRequestId || this.panelMode() !== mode) {
+          return;
+        }
+
         this.handleApiError(error);
         this.closePanel();
       },
@@ -747,7 +789,7 @@ export class WindowsComponent implements OnInit, OnDestroy {
 
   private createWindow(): void {
     if (!this.canCreate()) {
-      this.message.set({ tone: 'error', text: this.translations().noPermissionHint });
+      this.showMessage('error', this.translations().noPermissionHint);
       return;
     }
 
@@ -775,13 +817,13 @@ export class WindowsComponent implements OnInit, OnDestroy {
     const windowId = this.selectedEditId();
 
     if (!windowId || !this.canUpdate()) {
-      this.message.set({ tone: 'error', text: this.translations().noPermissionHint });
+      this.showMessage('error', this.translations().noPermissionHint);
       return;
     }
 
     this.saving.set(true);
 
-    this.windowsApiService.updateWindow(windowId, this.mapUpdateRequest(windowId)).subscribe({
+    this.windowsApiService.updateWindow(windowId, this.mapUpdateRequest()).subscribe({
       next: (response) => {
         this.showMessage('success', response.message || this.translations().fallbackSuccess);
         this.closePanel();
@@ -795,16 +837,16 @@ export class WindowsComponent implements OnInit, OnDestroy {
     });
   }
 
-  private deleteWindow(windowId: number): void {
-    if (!this.canDelete()) {
-      this.message.set({ tone: 'error', text: this.translations().noPermissionHint });
+  private deactivateWindow(state: WindowConfirmState): void {
+    if (!this.canDeactivate()) {
+      this.showMessage('error', this.translations().noPermissionHint);
       return;
     }
 
     this.deleting.set(true);
 
-    this.windowsApiService.softDeleteWindow(windowId).subscribe({
-      next: (response: DeleteWindowResponse) => {
+    this.windowsApiService.deactivateWindow(state.windowId, state.rowVersion).subscribe({
+      next: (response) => {
         this.showMessage('success', response.message || this.translations().fallbackSuccess);
         this.confirmDialog.set(null);
         const currentPage = this.activeWindowsPage();
@@ -826,15 +868,43 @@ export class WindowsComponent implements OnInit, OnDestroy {
     });
   }
 
-  private permanentlyDeleteWindow(windowId: number): void {
-    if (!this.canDeletePermanent()) {
-      this.message.set({ tone: 'error', text: this.translations().noPermissionHint });
+  private reactivateWindow(state: WindowConfirmState): void {
+    if (!this.canReactivate()) {
+      this.showMessage('error', this.translations().noPermissionHint);
       return;
     }
 
     this.deleting.set(true);
 
-    this.windowsApiService.permanentlyDeleteWindow(windowId).subscribe({
+    this.windowsApiService.reactivateWindow(state.windowId, state.rowVersion).subscribe({
+      next: (response) => {
+        this.showMessage('success', response.message || this.translations().fallbackSuccess);
+        this.confirmDialog.set(null);
+        const currentPage = this.deletedWindowsPage();
+        const nextPage =
+          currentPage.data.length === 1 && currentPage.currentPage > 1
+            ? currentPage.currentPage - 1
+            : currentPage.currentPage;
+        this.loadDeletedWindows(nextPage);
+        this.loadActiveWindows(this.activeWindowsPage().currentPage);
+      },
+      error: (error: HttpErrorResponse) => {
+        this.handleApiError(error);
+        this.confirmDialog.set(null);
+      },
+      complete: () => this.deleting.set(false),
+    });
+  }
+
+  private permanentlyDeleteWindow(state: WindowConfirmState): void {
+    if (!this.canDeletePermanent()) {
+      this.showMessage('error', this.translations().noPermissionHint);
+      return;
+    }
+
+    this.deleting.set(true);
+
+    this.windowsApiService.permanentlyDeleteWindow(state.windowId, state.rowVersion).subscribe({
       next: (response: PermanentDeleteWindowResponse) => {
         this.showMessage('success', response.message || this.translations().fallbackSuccess);
         this.confirmDialog.set(null);
@@ -878,12 +948,14 @@ export class WindowsComponent implements OnInit, OnDestroy {
     waitingAreaId: number | null,
     pageNumber: number,
     pageSize: number,
+    isActive: boolean,
   ): GetWindowsParams {
     return {
       waitingAreaId: waitingAreaId ?? undefined,
       search: search.trim(),
       pageNumber,
       pageSize,
+      isActive,
     };
   }
 
@@ -912,16 +984,16 @@ export class WindowsComponent implements OnInit, OnDestroy {
     };
   }
 
-  private mapUpdateRequest(windowId: number): UpdateWindowRequest {
+  private mapUpdateRequest(): UpdateWindowRequest {
     const value = this.windowForm.getRawValue();
 
     return {
-      id: windowId,
       number: value.number.trim(),
       descriptiveName: this.toOptionalString(value.descriptiveName),
       ipAddress: this.toOptionalString(value.ipAddress),
       enableTicketBooking: value.enableTicketBooking,
       enableDirectCall: value.enableDirectCall,
+      rowVersion: this.selectedDetails()?.rowVersion ?? '',
     };
   }
 
@@ -941,7 +1013,7 @@ export class WindowsComponent implements OnInit, OnDestroy {
   }
 
   private handleApiError(error: HttpErrorResponse): void {
-    if (error.status === 401) {
+    if (this.authSessionService.shouldClearSessionForHttpStatus(error.status)) {
       this.authSessionService.clearSession();
       void this.router.navigateByUrl('/login');
       return;
@@ -957,39 +1029,20 @@ export class WindowsComponent implements OnInit, OnDestroy {
   }
 
   private extractApiMessage(error: HttpErrorResponse): string {
-    const body = error.error as ApiProblemDetails | string | null;
-
-    if (typeof body === 'string' && body.trim().length > 0) {
-      return body;
-    }
-
-    if (body && typeof body === 'object') {
-      if (body.traceId) {
-        this.traceId.set(body.traceId);
-      }
-
-      const firstError = body.errors?.[0];
-      if (firstError?.message?.trim().length) {
-        return firstError.message;
-      }
-
-      if (body.detail?.trim().length) {
-        return body.detail;
-      }
-
-      if (body.title?.trim().length) {
-        return body.title;
-      }
-    }
-
-    return this.translations().fallbackError;
+    return formatTechnicalAdminApiError(error, this.translations().fallbackError);
   }
 
   private showMessage(tone: MessageTone, text: string): void {
-    const traceId = this.traceId();
-    const suffix = traceId ? ` (${this.translations().traceIdLabel}: ${traceId})` : '';
+    if (this.toastTimeoutId) {
+      clearTimeout(this.toastTimeoutId);
+    }
 
-    this.message.set({ tone, text: `${text}${suffix}` });
+    this.message.set({ tone, text });
+
+    this.toastTimeoutId = setTimeout(() => {
+      this.message.set(null);
+      this.toastTimeoutId = null;
+    }, tone === 'error' ? 6500 : 4200);
   }
 
   private notWhitespaceValidator(control: AbstractControl<string>): ValidationErrors | null {

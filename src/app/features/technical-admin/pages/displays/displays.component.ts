@@ -23,16 +23,13 @@ import { BranchManagementApiService } from '../../services/branch-management-api
 import { DisplayManagementApiService } from '../../services/display-management-api.service';
 import { DisplayPermissionService } from '../../services/display-permission.service';
 import { TechnicalAdminI18nStore } from '../../store/technical-admin-i18n.store';
+import { formatTechnicalAdminApiError } from '../../utils/api-error-message.util';
 import {
-  ApiProblemDetails,
   CreateDisplayRequest,
   CreateDisplayResponse,
-  DeleteDisplayResponse,
-  DeletedDisplayListItemResponse,
   GetDisplaysParams,
   PaginationResponse,
   PermanentDeleteDisplayResponse,
-  RestoreDisplayResponse,
   DisplayDetailsResponse,
   DisplayListItemResponse,
   UpdateDisplayRequest,
@@ -42,8 +39,9 @@ import { BranchListItem } from '../../models/branch-management.model';
 
 type DisplayTab = 'active' | 'deleted';
 type DisplayPanelMode = 'closed' | 'create' | 'edit' | 'view';
+type DeletedDisplayListItemResponse = DisplayListItemResponse;
 type MessageTone = 'success' | 'error' | 'info';
-type DisplayDeleteAction = 'soft' | 'restore' | 'permanent';
+type DisplayDeleteAction = 'deactivate' | 'reactivate' | 'permanent';
 
 interface UiMessage {
   readonly tone: MessageTone;
@@ -113,6 +111,7 @@ interface DisplayConfirmState {
   readonly kind: DisplayDeleteAction;
   readonly displayId: number;
   readonly displayNumber: string;
+  readonly rowVersion: string;
 }
 
 interface BranchOption {
@@ -126,7 +125,7 @@ const DISPLAY_TRANSLATIONS: Record<AppLanguage, DisplayTranslations> = {
     title: '\u0625\u062f\u0627\u0631\u0629 \u0627\u0644\u0634\u0627\u0634\u0627\u062a',
     description: '\u0625\u062f\u0627\u0631\u0629 \u0634\u0627\u0634\u0627\u062a Display \u0627\u0644\u0645\u0631\u062a\u0628\u0637\u0629 \u0628\u0627\u0644\u0641\u0631\u0648\u0639 \u0648\u0639\u0645\u0644\u064a\u0627\u062a CRUD.',
     activeTab: '\u0627\u0644\u0634\u0627\u0634\u0627\u062a \u0627\u0644\u0646\u0634\u0637\u0629',
-    deletedTab: '\u0627\u0644\u0634\u0627\u0634\u0627\u062a \u0627\u0644\u0645\u062d\u0630\u0648\u0641\u0629',
+    deletedTab: '\u0627\u0644\u0634\u0627\u0634\u0627\u062a \u063a\u064a\u0631 \u0627\u0644\u0646\u0634\u0637\u0629',
     addDisplay: '\u0625\u0636\u0627\u0641\u0629 \u0634\u0627\u0634\u0629',
     searchPlaceholder: '\u0628\u062d\u062b \u0628\u0631\u0642\u0645 Display \u0623\u0648 IP \u0623\u0648 Serial \u0623\u0648 \u0627\u0644\u0646\u0648\u0639',
     branchFilter: '\u0627\u0644\u0641\u0631\u0639',
@@ -143,12 +142,12 @@ const DISPLAY_TRANSLATIONS: Record<AppLanguage, DisplayTranslations> = {
     ipAddress: '\u0639\u0646\u0648\u0627\u0646 IP',
     serialNumber: '\u0627\u0644\u0631\u0642\u0645 \u0627\u0644\u062a\u0633\u0644\u0633\u0644\u064a',
     branch: '\u0627\u0644\u0641\u0631\u0639',
-    deletedOn: '\u062a\u0627\u0631\u064a\u062e \u0627\u0644\u062d\u0630\u0641',
+    deletedOn: '\u0627\u0644\u062d\u0627\u0644\u0629',
     actions: '\u0627\u0644\u0625\u062c\u0631\u0627\u0621\u0627\u062a',
     view: '\u0639\u0631\u0636',
     edit: '\u062a\u0639\u062f\u064a\u0644',
-    delete: '\u062d\u0630\u0641',
-    restore: '\u0627\u0633\u062a\u0639\u0627\u062f\u0629',
+    delete: '\u0625\u064a\u0642\u0627\u0641',
+    restore: '\u0625\u0639\u0627\u062f\u0629 \u062a\u0646\u0634\u064a\u0637',
     permanentDelete: '\u062d\u0630\u0641 \u062f\u0627\u0626\u0645',
     createdOn: '\u062a\u0627\u0631\u064a\u062e \u0627\u0644\u0625\u0646\u0634\u0627\u0621',
     modifiedOn: '\u062a\u0627\u0631\u064a\u062e \u0622\u062e\u0631 \u062a\u0639\u062f\u064a\u0644',
@@ -167,11 +166,11 @@ const DISPLAY_TRANSLATIONS: Record<AppLanguage, DisplayTranslations> = {
     selectBranch: '\u0627\u062e\u062a\u0631 \u0641\u0631\u0639',
     refresh: '\u062a\u062d\u062f\u064a\u062b',
     loadingBranches: '\u062a\u062d\u0645\u064a\u0644 \u0627\u0644\u0641\u0631\u0648\u0639...',
-    deleteConfirm: '\u062a\u0623\u0643\u064a\u062f \u062d\u0630\u0641 \u0627\u0644\u062c\u0647\u0627\u0632',
-    restoreConfirm: '\u062a\u0623\u0643\u064a\u062f \u0627\u0633\u062a\u0639\u0627\u062f\u0629 \u0627\u0644\u062c\u0647\u0627\u0632',
+    deleteConfirm: '\u062a\u0623\u0643\u064a\u062f \u0625\u064a\u0642\u0627\u0641 \u0627\u0644\u062c\u0647\u0627\u0632',
+    restoreConfirm: '\u062a\u0623\u0643\u064a\u062f \u0625\u0639\u0627\u062f\u0629 \u062a\u0646\u0634\u064a\u0637 \u0627\u0644\u062c\u0647\u0627\u0632',
     permanentDeleteConfirm: '\u062a\u0623\u0643\u064a\u062f \u062d\u0630\u0641 \u0627\u0644\u062c\u0647\u0627\u0632 \u0646\u0647\u0627\u0626\u064a\u0627',
-    deleteConfirmBody: '\u0647\u0644 \u062a\u0631\u064a\u062f \u062d\u0630\u0641 \u0647\u0630\u0627 \u0627\u0644\u062c\u0647\u0627\u0632\u061f',
-    restoreConfirmBody: '\u0647\u0644 \u062a\u0631\u064a\u062f \u0627\u0633\u062a\u0639\u0627\u062f\u0629 \u0647\u0630\u0627 \u0627\u0644\u062c\u0647\u0627\u0632\u061f',
+    deleteConfirmBody: '\u0647\u0644 \u062a\u0631\u064a\u062f \u0625\u064a\u0642\u0627\u0641 \u0647\u0630\u0627 \u0627\u0644\u062c\u0647\u0627\u0632\u061f',
+    restoreConfirmBody: '\u0647\u0644 \u062a\u0631\u064a\u062f \u0625\u0639\u0627\u062f\u0629 \u062a\u0646\u0634\u064a\u0637 \u0647\u0630\u0627 \u0627\u0644\u062c\u0647\u0627\u0632\u061f',
     permanentDeleteConfirmBody: '\u0633\u064a\u062a\u0645 \u062d\u0630\u0641 \u0627\u0644\u062c\u0647\u0627\u0632 \u0628\u0634\u0643\u0644 \u062f\u0627\u0626\u0645 \u0648\u0644\u0627 \u064a\u0645\u0643\u0646 \u0627\u0644\u062a\u0631\u0627\u062c\u0639 \u0639\u0646\u0647.',
     fallbackSuccess: '\u062a\u0645\u062a \u0627\u0644\u0639\u0645\u0644\u064a\u0629 \u0628\u0646\u062c\u0627\u062d.',
     fallbackError: '\u062d\u062f\u062b \u062e\u0637\u0623 \u063a\u064a\u0631 \u0645\u062a\u0648\u0642\u0639.',
@@ -184,7 +183,7 @@ const DISPLAY_TRANSLATIONS: Record<AppLanguage, DisplayTranslations> = {
     title: 'Display Management',
     description: 'Manage display records and perform display CRUD operations.',
     activeTab: 'Active Displays',
-    deletedTab: 'Deleted Displays',
+    deletedTab: 'Inactive Displays',
     addDisplay: 'Add Display',
     searchPlaceholder: 'Search by display number, IP, serial number, or type',
     branchFilter: 'Branch',
@@ -201,12 +200,12 @@ const DISPLAY_TRANSLATIONS: Record<AppLanguage, DisplayTranslations> = {
     ipAddress: 'IP Address',
     serialNumber: 'Serial Number',
     branch: 'Branch',
-    deletedOn: 'Deleted On',
+    deletedOn: 'Status',
     actions: 'Actions',
     view: 'View',
     edit: 'Edit',
-    delete: 'Delete',
-    restore: 'Restore',
+    delete: 'Deactivate',
+    restore: 'Reactivate',
     permanentDelete: 'Permanent Delete',
     createdOn: 'Created On',
     modifiedOn: 'Modified On',
@@ -225,11 +224,11 @@ const DISPLAY_TRANSLATIONS: Record<AppLanguage, DisplayTranslations> = {
     selectBranch: 'Select branch',
     refresh: 'Refresh',
     loadingBranches: 'Loading branches...',
-    deleteConfirm: 'Delete Display',
-    restoreConfirm: 'Restore Display',
+    deleteConfirm: 'Deactivate Display',
+    restoreConfirm: 'Reactivate Display',
     permanentDeleteConfirm: 'Permanently Delete Display',
-    deleteConfirmBody: 'Are you sure you want to delete this display?',
-    restoreConfirmBody: 'Are you sure you want to restore this display?',
+    deleteConfirmBody: 'Are you sure you want to deactivate this display?',
+    restoreConfirmBody: 'Are you sure you want to reactivate this display?',
     permanentDeleteConfirmBody: 'This action permanently deletes the display and cannot be undone.',
     fallbackSuccess: 'Operation completed successfully.',
     fallbackError: 'Unexpected error occurred.',
@@ -279,6 +278,7 @@ export class DisplaysComponent implements OnInit, OnDestroy {
   private activeSearchDebounceId: ReturnType<typeof setTimeout> | null = null;
   private deletedSearchDebounceId: ReturnType<typeof setTimeout> | null = null;
   private activeDisplaysRequestSerial = 0;
+  private panelRequestId = 0;
   private readonly pendingCreatedDisplays = new Map<number, DisplayListItemResponse>();
 
   protected readonly translations = computed(() => DISPLAY_TRANSLATIONS[this.i18nStore.language()]);
@@ -287,10 +287,10 @@ export class DisplaysComponent implements OnInit, OnDestroy {
   protected readonly canViewDetails = this.permissionService.canViewDetails;
   protected readonly canCreate = this.permissionService.canCreate;
   protected readonly canUpdate = this.permissionService.canUpdate;
-  protected readonly canDelete = this.permissionService.canDelete;
-  protected readonly canViewDeleted = this.permissionService.canViewDeleted;
-  protected readonly canRestore = this.permissionService.canRestore;
+  protected readonly canDeactivate = this.permissionService.canDeactivate;
+  protected readonly canReactivate = this.permissionService.canReactivate;
   protected readonly canDeletePermanent = this.permissionService.canDeletePermanent;
+  protected readonly canViewDeleted = computed(() => this.canReactivate() || this.canDeletePermanent());
 
   protected readonly activeTab = signal<DisplayTab>(this.canViewActive() ? 'active' : 'deleted');
   protected readonly hasDisplayAccess = computed(() => this.canViewActive() || this.canViewDeleted());
@@ -322,7 +322,7 @@ export class DisplaysComponent implements OnInit, OnDestroy {
   protected readonly displayForm = this.formBuilder.group({
     branchId: [0, [Validators.required, Validators.min(1)]],
     number: ['', [Validators.required, Validators.maxLength(20), this.notWhitespaceValidator]],
-    ipAddress: ['', [Validators.required, Validators.maxLength(45), this.ipAddressValidator]],
+    ipAddress: ['', [Validators.required, Validators.maxLength(45), (control: AbstractControl<string>) => this.ipAddressValidator(control)]],
     serialNo: ['', [Validators.required, Validators.maxLength(100), this.notWhitespaceValidator]],
     type: ['', [Validators.required, Validators.maxLength(100), this.notWhitespaceValidator]],
   });
@@ -458,6 +458,7 @@ export class DisplaysComponent implements OnInit, OnDestroy {
       return;
     }
 
+    this.panelRequestId += 1;
     this.panelMode.set('create');
     this.selectedEditId.set(null);
     this.selectedDetails.set(null);
@@ -492,6 +493,7 @@ export class DisplaysComponent implements OnInit, OnDestroy {
   }
 
   protected closePanel(): void {
+    this.panelRequestId += 1;
     this.panelMode.set('closed');
     this.selectedEditId.set(null);
     this.selectedDetails.set(null);
@@ -533,28 +535,30 @@ export class DisplaysComponent implements OnInit, OnDestroy {
   }
 
   protected requestSoftDelete(item: DisplayListItemResponse): void {
-    if (!this.canDelete()) {
+    if (!this.canDeactivate()) {
       this.showMessage('error', this.translations().noPermissionHint);
       return;
     }
 
     this.confirmDialog.set({
-      kind: 'soft',
+      kind: 'deactivate',
       displayId: item.id,
       displayNumber: item.number,
+      rowVersion: item.rowVersion,
     });
   }
 
   protected requestRestore(item: DeletedDisplayListItemResponse): void {
-    if (!this.canRestore()) {
+    if (!this.canReactivate()) {
       this.showMessage('error', this.translations().noPermissionHint);
       return;
     }
 
     this.confirmDialog.set({
-      kind: 'restore',
+      kind: 'reactivate',
       displayId: item.id,
       displayNumber: item.number,
+      rowVersion: item.rowVersion,
     });
   }
 
@@ -568,6 +572,7 @@ export class DisplaysComponent implements OnInit, OnDestroy {
       kind: 'permanent',
       displayId: item.id,
       displayNumber: item.number,
+      rowVersion: item.rowVersion,
     });
   }
 
@@ -578,17 +583,17 @@ export class DisplaysComponent implements OnInit, OnDestroy {
       return;
     }
 
-    if (action.kind === 'soft') {
-      this.deleteDisplay(action.displayId);
+    if (action.kind === 'deactivate') {
+      this.deactivateDisplay(action);
       return;
     }
 
-    if (action.kind === 'restore') {
-      this.restoreDisplay(action.displayId);
+    if (action.kind === 'reactivate') {
+      this.reactivateDisplay(action);
       return;
     }
 
-    this.permanentlyDeleteDisplay(action.displayId);
+    this.permanentlyDeleteDisplay(action);
   }
 
   protected closeConfirmDialog(): void {
@@ -667,7 +672,7 @@ export class DisplaysComponent implements OnInit, OnDestroy {
     this.traceId.set(null);
 
     this.displayManagementApiService
-      .getDisplays(this.buildQuery(this.activeSearch(), this.activeBranchId(), pageNumber, this.activePageSize()))
+      .getDisplays(this.buildQuery(this.activeSearch(), this.activeBranchId(), pageNumber, this.activePageSize(), true))
       .subscribe({
         next: (response) => {
           if (requestSerial !== this.activeDisplaysRequestSerial) {
@@ -698,9 +703,7 @@ export class DisplaysComponent implements OnInit, OnDestroy {
     this.traceId.set(null);
 
     this.displayManagementApiService
-      .getDeletedDisplays(
-        this.buildQuery(this.deletedSearch(), this.deletedBranchId(), pageNumber, this.deletedPageSize())
-      )
+      .getDisplays(this.buildQuery(this.deletedSearch(), this.deletedBranchId(), pageNumber, this.deletedPageSize(), false))
       .subscribe({
         next: (response) => this.deletedDisplaysPage.set(response),
         error: (error: HttpErrorResponse) => this.handleApiError(error),
@@ -714,6 +717,7 @@ export class DisplaysComponent implements OnInit, OnDestroy {
       orderSort: 'Newest' as const,
       pageNumber: 1,
       pageSize: 100,
+      isActive: true,
     };
 
     this.branchManagementApiService.getBranches(query).subscribe({
@@ -734,6 +738,8 @@ export class DisplaysComponent implements OnInit, OnDestroy {
     displayId: number,
     mode: Extract<DisplayPanelMode, 'view' | 'edit'>,
   ): void {
+    const requestId = ++this.panelRequestId;
+
     this.panelMode.set(mode);
     this.selectedEditId.set(mode === 'edit' ? displayId : null);
     this.selectedDetails.set(null);
@@ -743,6 +749,10 @@ export class DisplaysComponent implements OnInit, OnDestroy {
 
     this.displayManagementApiService.getDisplayById(displayId).subscribe({
       next: (response) => {
+        if (requestId !== this.panelRequestId || this.panelMode() !== mode) {
+          return;
+        }
+
         this.selectedDetails.set(response);
         this.displayForm.reset({
           branchId: response.branchId,
@@ -757,6 +767,10 @@ export class DisplaysComponent implements OnInit, OnDestroy {
         }
       },
       error: (error: HttpErrorResponse) => {
+        if (requestId !== this.panelRequestId || this.panelMode() !== mode) {
+          return;
+        }
+
         this.handleApiError(error);
         this.closePanel();
       },
@@ -799,7 +813,7 @@ export class DisplaysComponent implements OnInit, OnDestroy {
 
     this.saving.set(true);
 
-    this.displayManagementApiService.updateDisplay(displayId, this.mapUpdateRequest(displayId)).subscribe({
+    this.displayManagementApiService.updateDisplay(displayId, this.mapUpdateRequest()).subscribe({
       next: (response: UpdateDisplayResponse) => {
         this.showMessage('success', response.message || this.translations().fallbackSuccess);
         this.closePanel();
@@ -813,16 +827,16 @@ export class DisplaysComponent implements OnInit, OnDestroy {
     });
   }
 
-  private deleteDisplay(displayId: number): void {
-    if (!this.canDelete()) {
+  private deactivateDisplay(action: DisplayConfirmState): void {
+    if (!this.canDeactivate()) {
       this.showMessage('error', this.translations().noPermissionHint);
       return;
     }
 
     this.deleting.set(true);
 
-    this.displayManagementApiService.softDeleteDisplay(displayId).subscribe({
-      next: (response: DeleteDisplayResponse) => {
+    this.displayManagementApiService.deactivateDisplay(action.displayId, action.rowVersion).subscribe({
+      next: (response) => {
         this.showMessage('success', response.message || this.translations().fallbackSuccess);
         this.confirmDialog.set(null);
         const currentPage = this.activeDisplaysPage();
@@ -831,6 +845,7 @@ export class DisplaysComponent implements OnInit, OnDestroy {
             ? currentPage.currentPage - 1
             : currentPage.currentPage;
         this.loadActiveDisplays(nextPage);
+        this.loadDeletedDisplays(this.deletedDisplaysPage().currentPage);
       },
       error: (error: HttpErrorResponse) => {
         this.handleApiError(error);
@@ -840,16 +855,16 @@ export class DisplaysComponent implements OnInit, OnDestroy {
     });
   }
 
-  private restoreDisplay(displayId: number): void {
-    if (!this.canRestore()) {
+  private reactivateDisplay(action: DisplayConfirmState): void {
+    if (!this.canReactivate()) {
       this.showMessage('error', this.translations().noPermissionHint);
       return;
     }
 
     this.deleting.set(true);
 
-    this.displayManagementApiService.restoreDisplay(displayId).subscribe({
-      next: (response: RestoreDisplayResponse) => {
+    this.displayManagementApiService.reactivateDisplay(action.displayId, action.rowVersion).subscribe({
+      next: (response) => {
         this.showMessage('success', response.message || this.translations().fallbackSuccess);
         this.confirmDialog.set(null);
         const currentPage = this.deletedDisplaysPage();
@@ -868,7 +883,7 @@ export class DisplaysComponent implements OnInit, OnDestroy {
     });
   }
 
-  private permanentlyDeleteDisplay(displayId: number): void {
+  private permanentlyDeleteDisplay(action: DisplayConfirmState): void {
     if (!this.canDeletePermanent()) {
       this.showMessage('error', this.translations().noPermissionHint);
       return;
@@ -876,7 +891,7 @@ export class DisplaysComponent implements OnInit, OnDestroy {
 
     this.deleting.set(true);
 
-    this.displayManagementApiService.permanentlyDeleteDisplay(displayId).subscribe({
+    this.displayManagementApiService.permanentlyDeleteDisplay(action.displayId, action.rowVersion).subscribe({
       next: (response: PermanentDeleteDisplayResponse) => {
         this.showMessage('success', response.message || this.translations().fallbackSuccess);
         this.confirmDialog.set(null);
@@ -927,6 +942,9 @@ export class DisplaysComponent implements OnInit, OnDestroy {
       ipAddress: responseFallback.ipAddress ?? request.ipAddress,
       serialNo: responseFallback.serialNo ?? request.serialNo,
       type: responseFallback.type ?? request.type,
+      isActive: responseFallback.isActive ?? true,
+      effectiveIsActive: responseFallback.effectiveIsActive ?? true,
+      rowVersion: responseFallback.rowVersion ?? '',
     };
 
     this.pendingCreatedDisplays.set(createdDisplay.id, createdDisplay);
@@ -1034,12 +1052,14 @@ export class DisplaysComponent implements OnInit, OnDestroy {
     branchId: number | null,
     pageNumber: number,
     pageSize: number,
+    isActive: boolean,
   ): GetDisplaysParams {
     return {
       branchId: branchId ?? undefined,
       search: search.trim(),
       pageNumber,
       pageSize,
+      isActive,
     };
   }
 
@@ -1063,15 +1083,15 @@ export class DisplaysComponent implements OnInit, OnDestroy {
     };
   }
 
-  private mapUpdateRequest(displayId: number): UpdateDisplayRequest {
+  private mapUpdateRequest(): UpdateDisplayRequest {
     const value = this.displayForm.getRawValue();
 
     return {
-      id: displayId,
       number: value.number.trim(),
       ipAddress: value.ipAddress.trim(),
       serialNo: value.serialNo.trim(),
       type: value.type.trim(),
+      rowVersion: this.selectedDetails()?.rowVersion ?? '',
     };
   }
 
@@ -1088,7 +1108,7 @@ export class DisplaysComponent implements OnInit, OnDestroy {
   private handleApiError(error: HttpErrorResponse): void {
     const message = this.extractApiMessage(error);
 
-    if (error.status === 401) {
+    if (this.authSessionService.shouldClearSessionForHttpStatus(error.status)) {
       this.authSessionService.clearSession();
       void this.router.navigateByUrl('/login');
       return;
@@ -1103,43 +1123,15 @@ export class DisplaysComponent implements OnInit, OnDestroy {
   }
 
   private extractApiMessage(error: HttpErrorResponse): string {
-    const body = error.error as ApiProblemDetails | string | null;
-
-    if (typeof body === 'string' && body.trim().length > 0) {
-      return body;
-    }
-
-    if (body && typeof body === 'object') {
-      if (body.traceId) {
-        this.traceId.set(body.traceId);
-      }
-
-      const firstError = body.errors?.[0];
-      if (firstError?.message?.trim().length) {
-        return firstError.message;
-      }
-
-      if (body.detail?.trim().length) {
-        return body.detail;
-      }
-
-      if (body.title?.trim().length) {
-        return body.title;
-      }
-    }
-
-    return this.translations().fallbackError;
+    return formatTechnicalAdminApiError(error, this.translations().fallbackError);
   }
 
   private showMessage(tone: MessageTone, text: string): void {
-    const traceId = this.traceId();
-    const suffix = traceId ? ` (${this.translations().traceIdLabel}: ${traceId})` : '';
-
     if (this.toastTimeoutId) {
       clearTimeout(this.toastTimeoutId);
     }
 
-    this.message.set({ tone, text: `${text}${suffix}` });
+    this.message.set({ tone, text });
 
     this.toastTimeoutId = setTimeout(() => {
       this.message.set(null);
@@ -1158,9 +1150,20 @@ export class DisplaysComponent implements OnInit, OnDestroy {
       return null;
     }
 
-    return this.isValidIpv4Address(value) ? null : { ipAddress: true };
+    return this.isIpAddressValid(value) ? null : { ipAddress: true };
   }
 
+  private isIpAddressValid(value: string): boolean {
+    if (value.length > 45) {
+      return false;
+    }
+
+    if (value.includes(':')) {
+      return this.isValidIpv6Address(value);
+    }
+
+    return this.isValidIpv4Address(value);
+  }
   private isValidIpv4Address(value: string): boolean {
     const octets = value.split('.');
     if (octets.length !== 4) {
@@ -1176,5 +1179,16 @@ export class DisplaysComponent implements OnInit, OnDestroy {
       return Number.isInteger(numeric) && numeric >= 0 && numeric <= 255;
     });
   }
-}
+  private isValidIpv6Address(value: string): boolean {
+    const ipv6Pattern =
+      /^(?:[0-9A-Fa-f]{1,4}:){7}[0-9A-Fa-f]{1,4}$|^(?:[0-9A-Fa-f]{1,4}:){1,7}:$|^:(?::[0-9A-Fa-f]{1,4}){1,7}$|^(?:[0-9A-Fa-f]{1,4}:){1,7}:[0-9A-Fa-f]{1,4}$|^(?:[0-9A-Fa-f]{1,4}:){0,7}(?:[0-9A-Fa-f]{1,4})?::(?:[0-9A-Fa-f]{1,4}:){0,7}(?:[0-9A-Fa-f]{1,4})?$/;
 
+    if (!ipv6Pattern.test(value)) {
+      return false;
+    }
+
+    return value.includes('::')
+      ? value.indexOf('::') === value.lastIndexOf('::')
+      : value.split(':').length <= 8;
+  }
+}

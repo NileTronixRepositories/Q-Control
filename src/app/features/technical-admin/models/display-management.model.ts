@@ -1,8 +1,18 @@
+import { LifecycleMutationResponse, OperationalEntityState, OperationalStatusFilter, PermanentDeleteResponse } from './operational-lifecycle.model';
+
 export interface GetDisplaysParams {
   readonly branchId?: number;
   readonly search?: string;
   readonly pageNumber?: number;
   readonly pageSize?: number;
+  readonly isActive?: OperationalStatusFilter;
+}
+
+export interface GetAvailableDisplayWindowsParams {
+  readonly search?: string;
+  readonly pageNumber?: number;
+  readonly pageSize?: number;
+  readonly isActive?: OperationalStatusFilter;
 }
 
 export interface PaginationResponse<TItem> {
@@ -15,7 +25,7 @@ export interface PaginationResponse<TItem> {
   readonly hasNextPage: boolean;
 }
 
-export interface DisplayListItemResponse {
+export interface DisplayListItemResponse extends OperationalEntityState {
   readonly id: number;
   readonly branchId: number;
   readonly branchArabicName: string | null;
@@ -24,11 +34,6 @@ export interface DisplayListItemResponse {
   readonly ipAddress: string;
   readonly serialNo: string;
   readonly type: string;
-}
-
-export interface DeletedDisplayListItemResponse extends DisplayListItemResponse {
-  readonly deletedOnUtc: string | null;
-  readonly restoredOnUtc: string | null;
 }
 
 export interface DisplayDetailsResponse extends DisplayListItemResponse {
@@ -44,7 +49,7 @@ export interface CreateDisplayRequest {
   readonly type: string;
 }
 
-export interface CreateDisplayResponse {
+export interface CreateDisplayResponse extends OperationalEntityState {
   readonly id: number;
   readonly branchId: number;
   readonly number: string;
@@ -57,14 +62,14 @@ export interface CreateDisplayResponse {
 }
 
 export interface UpdateDisplayRequest {
-  readonly id: number;
   readonly number: string;
   readonly ipAddress: string;
   readonly serialNo: string;
   readonly type: string;
+  readonly rowVersion: string;
 }
 
-export interface UpdateDisplayResponse {
+export interface UpdateDisplayResponse extends OperationalEntityState {
   readonly id: number;
   readonly branchId: number;
   readonly number: string;
@@ -76,25 +81,25 @@ export interface UpdateDisplayResponse {
   readonly message: string;
 }
 
-export interface DeleteDisplayResponse {
+export type DisplayLifecycleResponse = LifecycleMutationResponse;
+export type PermanentDeleteDisplayResponse = PermanentDeleteResponse;
+
+export interface DisplayWindowListItemResponse extends OperationalEntityState {
   readonly id: number;
-  readonly message: string;
+  readonly windowId: number;
+  readonly windowNumber: string;
+  readonly waitingAreaId: number;
+  readonly waitingAreaNumber: number;
+  readonly descriptiveName?: string | null;
 }
 
-export interface RestoreDisplayResponse {
+export interface AvailableDisplayWindowResponse extends OperationalEntityState {
   readonly id: number;
-  readonly branchId: number;
-  readonly number: string;
-  readonly ipAddress: string;
-  readonly serialNo: string;
-  readonly type: string;
-  readonly restoredOnUtc: string;
-  readonly message: string;
-}
-
-export interface PermanentDeleteDisplayResponse {
-  readonly id: number;
-  readonly message: string;
+  readonly windowId?: number;
+  readonly windowNumber: string;
+  readonly waitingAreaId: number;
+  readonly waitingAreaNumber: number;
+  readonly descriptiveName?: string | null;
 }
 
 export interface ApiError {
@@ -114,12 +119,18 @@ export interface ApiProblemDetails {
   readonly errors?: readonly ApiError[];
 }
 
+export type DisplayWindowPermission =
+  | 'DisplayWindows.ViewLinked'
+  | 'DisplayWindows.ViewAvailable'
+  | 'DisplayWindows.Assign'
+  | 'DisplayWindows.Unassign';
+
 export type DisplayPermission =
   | 'Displays.ViewAll'
   | 'Displays.ViewDetails'
   | 'Displays.Create'
   | 'Displays.Update'
-  | 'Displays.Delete'
-  | 'Displays.ViewDeleted'
-  | 'Displays.Restore'
-  | 'Displays.DeletePermanent';
+  | 'Displays.Deactivate'
+  | 'Displays.Reactivate'
+  | 'Displays.DeletePermanent'
+  | DisplayWindowPermission;

@@ -1,4 +1,4 @@
-﻿import { HttpErrorResponse } from '@angular/common/http';
+import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -7,7 +7,6 @@ import { AppLanguage } from '../../../../shared/models/app-language.model';
 import { AuthSessionService } from '../../../auth/services/auth-session.service';
 import { BranchListItem } from '../../models/branch-management.model';
 import {
-  ApiProblemDetails,
   CreateWaitingAreaRequest,
   Pagination,
   UpdateWaitingAreaRequest,
@@ -18,6 +17,7 @@ import {
 import { BranchManagementApiService } from '../../services/branch-management-api.service';
 import { WaitingAreaApiService } from '../../services/waiting-area-api.service';
 import { TechnicalAdminI18nStore } from '../../store/technical-admin-i18n.store';
+import { formatTechnicalAdminApiError } from '../../utils/api-error-message.util';
 
 type WaitingAreaPanelMode = 'closed' | 'create' | 'edit' | 'view';
 type MessageTone = 'success' | 'error' | 'info';
@@ -50,7 +50,15 @@ interface WaitingAreaPageTranslations {
   readonly actions: string;
   readonly view: string;
   readonly edit: string;
-  readonly delete: string;
+  readonly status: string;
+  readonly allStatuses: string;
+  readonly active: string;
+  readonly inactive: string;
+  readonly operationalStatus: string;
+  readonly operationalUnavailable: string;
+  readonly deactivate: string;
+  readonly reactivate: string;
+  readonly permanentDelete: string;
   readonly refresh: string;
   readonly loading: string;
   readonly emptyTitle: string;
@@ -92,7 +100,15 @@ const WAITING_AREA_TRANSLATIONS: Record<AppLanguage, WaitingAreaPageTranslations
     actions: '\u0627\u0644\u0625\u062c\u0631\u0627\u0621\u0627\u062a',
     view: '\u0639\u0631\u0636',
     edit: '\u062a\u0639\u062f\u064a\u0644',
-    delete: '\u062d\u0630\u0641',
+    status: '\u0627\u0644\u062d\u0627\u0644\u0629',
+    allStatuses: '\u0643\u0644 \u0627\u0644\u062d\u0627\u0644\u0627\u062a',
+    active: '\u0646\u0634\u0637',
+    inactive: '\u063a\u064a\u0631 \u0646\u0634\u0637',
+    operationalStatus: '\u0627\u0644\u062d\u0627\u0644\u0629 \u0627\u0644\u062a\u0634\u063a\u064a\u0644\u064a\u0629',
+    operationalUnavailable: '\u063a\u064a\u0631 \u0645\u062a\u0627\u062d \u0628\u0633\u0628\u0628 \u062d\u0627\u0644\u0629 \u0627\u0644\u0639\u0646\u0635\u0631 \u0627\u0644\u0623\u0628',
+    deactivate: '\u0625\u064a\u0642\u0627\u0641',
+    reactivate: '\u0625\u0639\u0627\u062f\u0629 \u062a\u0646\u0634\u064a\u0637',
+    permanentDelete: '\u062d\u0630\u0641 \u0646\u0647\u0627\u0626\u064a',
     refresh: '\u062a\u062d\u062f\u064a\u062b',
     loading: '\u062c\u0627\u0631\u064a \u0627\u0644\u062a\u062d\u0645\u064a\u0644...',
     emptyTitle: '\u0644\u0627 \u062a\u0648\u062c\u062f \u0645\u0646\u0627\u0637\u0642 \u0627\u0646\u062a\u0638\u0627\u0631',
@@ -132,7 +148,15 @@ const WAITING_AREA_TRANSLATIONS: Record<AppLanguage, WaitingAreaPageTranslations
     actions: 'Actions',
     view: 'View',
     edit: 'Edit',
-    delete: 'Delete',
+    status: 'Status',
+    allStatuses: 'All statuses',
+    active: 'Active',
+    inactive: 'Inactive',
+    operationalStatus: 'Operational Status',
+    operationalUnavailable: 'Unavailable because parent is inactive',
+    deactivate: 'Deactivate',
+    reactivate: 'Reactivate',
+    permanentDelete: 'Permanent Delete',
     refresh: 'Refresh',
     loading: 'Loading...',
     emptyTitle: 'No waiting areas found',
@@ -182,12 +206,15 @@ export class WaitingAreasComponent implements OnInit, OnDestroy {
   private readonly waitingAreaApiService = inject(WaitingAreaApiService);
   private readonly i18nStore = inject(TechnicalAdminI18nStore);
   private searchDebounceId: ReturnType<typeof setTimeout> | null = null;
+  private panelRequestId = 0;
+  private toastTimeoutId: ReturnType<typeof setTimeout> | null = null;
 
   protected readonly translations = computed(() => WAITING_AREA_TRANSLATIONS[this.i18nStore.language()]);
   protected readonly branchOptions = signal<readonly BranchOption[]>([]);
   protected readonly waitingAreaPage = signal<Pagination<WaitingAreaListItem>>(EMPTY_PAGE);
   protected readonly search = signal('');
   protected readonly selectedBranchId = signal<number | null>(null);
+  protected readonly statusFilter = signal<boolean | null>(null);
   protected readonly pageSize = signal(10);
   protected readonly loading = signal(false);
   protected readonly panelLoading = signal(false);
@@ -221,6 +248,19 @@ export class WaitingAreasComponent implements OnInit, OnDestroy {
     if (this.searchDebounceId) {
       clearTimeout(this.searchDebounceId);
     }
+
+    if (this.toastTimeoutId) {
+      clearTimeout(this.toastTimeoutId);
+    }
+  }
+
+  protected clearMessage(): void {
+    this.message.set(null);
+
+    if (this.toastTimeoutId) {
+      clearTimeout(this.toastTimeoutId);
+      this.toastTimeoutId = null;
+    }
   }
 
   protected branchName(branch: Pick<WaitingAreaListItem, 'branchArabicName' | 'branchEnglishName'>): string {
@@ -244,6 +284,12 @@ export class WaitingAreasComponent implements OnInit, OnDestroy {
   protected updateBranchFilter(event: Event): void {
     const value = this.readInputValue(event);
     this.selectedBranchId.set(value ? Number(value) : null);
+    this.loadWaitingAreas(1);
+  }
+
+  protected updateStatusFilter(event: Event): void {
+    const value = this.readInputValue(event);
+    this.statusFilter.set(value === '' ? null : value === 'true');
     this.loadWaitingAreas(1);
   }
 
@@ -274,10 +320,13 @@ export class WaitingAreasComponent implements OnInit, OnDestroy {
   }
 
   protected openCreate(): void {
-    this.message.set(null);
+    this.panelRequestId += 1;
+    this.panelLoading.set(false);
+    this.clearMessage();
     this.selectedDetails.set(null);
     this.selectedEditId.set(null);
     this.panelMode.set('create');
+    this.branchIdControl.enable({ emitEvent: false });
     this.waitingAreaForm.reset({
       branchId: this.selectedBranchId() ?? 0,
       number: 1,
@@ -296,10 +345,13 @@ export class WaitingAreasComponent implements OnInit, OnDestroy {
   }
 
   protected closePanel(): void {
+    this.panelRequestId += 1;
+    this.panelLoading.set(false);
     this.panelMode.set('closed');
     this.selectedDetails.set(null);
     this.selectedEditId.set(null);
     this.waitingAreaForm.markAsPristine();
+    this.branchIdControl.enable({ emitEvent: false });
   }
 
   protected save(): void {
@@ -320,29 +372,29 @@ export class WaitingAreasComponent implements OnInit, OnDestroy {
     }
   }
 
-  protected deleteWaitingArea(item: WaitingAreaListItem): void {
-    const label = item.descriptiveName || String(item.number);
-    const confirmed = window.confirm(this.translations().deleteConfirm + ': ' + label + '?');
-
-    if (!confirmed) {
+  protected deactivateWaitingArea(item: WaitingAreaListItem): void {
+    if (!window.confirm(`${this.translations().deactivate}: ${item.descriptiveName || item.number}?`)) {
       return;
     }
 
-    this.deletingId.set(item.id);
-    this.waitingAreaApiService.deleteWaitingArea(item.id).subscribe({
-      next: (response) => {
-        this.showSuccess(response);
-        const page = this.waitingAreaPage();
-        const nextPage = page.data.length === 1 && page.currentPage > 1
-          ? page.currentPage - 1
-          : page.currentPage;
-        this.loadWaitingAreas(nextPage);
-      },
-      error: (error: HttpErrorResponse) => this.handleApiError(error),
-      complete: () => this.deletingId.set(null)
-    });
+    this.runLifecycleAction(item, 'deactivate');
   }
 
+  protected reactivateWaitingArea(item: WaitingAreaListItem): void {
+    if (!window.confirm(`${this.translations().reactivate}: ${item.descriptiveName || item.number}?`)) {
+      return;
+    }
+
+    this.runLifecycleAction(item, 'reactivate');
+  }
+
+  protected permanentlyDeleteWaitingArea(item: WaitingAreaListItem): void {
+    if (!window.confirm(`${this.translations().permanentDelete}: ${item.descriptiveName || item.number}?`)) {
+      return;
+    }
+
+    this.runLifecycleAction(item, 'permanent');
+  }
   protected formTitle(): string {
     const translations = this.translations();
 
@@ -383,12 +435,13 @@ export class WaitingAreasComponent implements OnInit, OnDestroy {
         branchId: this.selectedBranchId(),
         search: this.search().trim(),
         pageNumber,
-        pageSize: this.pageSize()
+        pageSize: this.pageSize(),
+        isActive: this.statusFilter()
       })
       .subscribe({
         next: (page) => {
           this.waitingAreaPage.set(page);
-          this.message.set(null);
+          this.clearMessage();
         },
         error: (error: HttpErrorResponse) => this.handleApiError(error),
         complete: () => this.loading.set(false)
@@ -401,7 +454,8 @@ export class WaitingAreasComponent implements OnInit, OnDestroy {
         searchText: '',
         orderSort: 'Newest',
         pageNumber: 1,
-        pageSize: 100
+        pageSize: 100,
+        isActive: true
       })
       .subscribe({
         next: (page) => this.branchOptions.set(page.data.map((branch) => this.mapBranchOption(branch))),
@@ -410,6 +464,8 @@ export class WaitingAreasComponent implements OnInit, OnDestroy {
   }
 
   private openDetails(waitingAreaId: number, mode: Extract<WaitingAreaPanelMode, 'edit' | 'view'>): void {
+    const requestId = ++this.panelRequestId;
+
     this.panelLoading.set(true);
     this.panelMode.set(mode);
     this.selectedDetails.set(null);
@@ -417,8 +473,13 @@ export class WaitingAreasComponent implements OnInit, OnDestroy {
 
     this.waitingAreaApiService.getWaitingAreaDetails(waitingAreaId).subscribe({
       next: (details) => {
+        if (requestId !== this.panelRequestId || this.panelMode() !== mode) {
+          return;
+        }
+
         this.selectedDetails.set(details);
         if (mode === 'edit') {
+          this.branchIdControl.disable({ emitEvent: false });
           this.waitingAreaForm.reset({
             branchId: details.branchId,
             number: details.number,
@@ -429,10 +490,18 @@ export class WaitingAreasComponent implements OnInit, OnDestroy {
         }
       },
       error: (error: HttpErrorResponse) => {
+        if (requestId !== this.panelRequestId || this.panelMode() !== mode) {
+          return;
+        }
+
         this.handleApiError(error);
         this.closePanel();
       },
-      complete: () => this.panelLoading.set(false)
+      complete: () => {
+        if (requestId === this.panelRequestId && this.panelMode() === mode) {
+          this.panelLoading.set(false);
+        }
+      }
     });
   }
 
@@ -459,10 +528,7 @@ export class WaitingAreasComponent implements OnInit, OnDestroy {
 
     this.saving.set(true);
 
-    this.waitingAreaApiService.updateWaitingArea(waitingAreaId, {
-      id: waitingAreaId,
-      ...this.createRequest()
-    }).subscribe({
+    this.waitingAreaApiService.updateWaitingArea(waitingAreaId, this.createUpdateRequest()).subscribe({
       next: (response) => {
         this.showSuccess(response);
         this.closePanel();
@@ -473,6 +539,43 @@ export class WaitingAreasComponent implements OnInit, OnDestroy {
     });
   }
 
+  private createUpdateRequest(): UpdateWaitingAreaRequest {
+    const value = this.waitingAreaForm.getRawValue();
+    const rowVersion = this.selectedDetails()?.rowVersion ?? '';
+
+    return {
+      number: Number(value.number),
+      descriptiveName: this.toOptionalString(value.descriptiveName),
+      audioDevice: this.toOptionalString(value.audioDevice),
+      controlDevice: this.toOptionalString(value.controlDevice),
+      rowVersion
+    };
+  }
+
+  private runLifecycleAction(
+    item: WaitingAreaListItem,
+    action: 'deactivate' | 'reactivate' | 'permanent'
+  ): void {
+    this.deletingId.set(item.id);
+    const request = action === 'deactivate'
+      ? this.waitingAreaApiService.deactivateWaitingArea(item.id, item.rowVersion)
+      : action === 'reactivate'
+        ? this.waitingAreaApiService.reactivateWaitingArea(item.id, item.rowVersion)
+        : this.waitingAreaApiService.permanentlyDeleteWaitingArea(item.id, item.rowVersion);
+
+    request.subscribe({
+      next: (response) => {
+        this.showMessage('success', response.message || this.translations().fallbackSuccess);
+        const page = this.waitingAreaPage();
+        const nextPage = action === 'permanent' && page.data.length === 1 && page.currentPage > 1
+          ? page.currentPage - 1
+          : page.currentPage;
+        this.loadWaitingAreas(nextPage, true);
+      },
+      error: (error: HttpErrorResponse) => this.handleApiError(error),
+      complete: () => this.deletingId.set(null)
+    });
+  }
   private createRequest(): CreateWaitingAreaRequest {
     const value = this.waitingAreaForm.getRawValue();
 
@@ -506,51 +609,43 @@ export class WaitingAreasComponent implements OnInit, OnDestroy {
   }
 
   private showSuccess(response: WaitingAreaMutationResponse): void {
-    this.message.set({
-      tone: 'success',
-      text: response.message || this.translations().fallbackSuccess
-    });
+    this.showMessage('success', response.message || this.translations().fallbackSuccess);
   }
 
   private handleApiError(error: HttpErrorResponse, showMessage = true): void {
-    if (error.status === 401) {
+    if (this.authSessionService.shouldClearSessionForHttpStatus(error.status)) {
       this.authSessionService.clearSession();
       void this.router.navigateByUrl('/login');
       return;
     }
 
     if (showMessage) {
-      this.message.set({
-        tone: 'error',
-        text: this.extractApiMessage(error)
-      });
+      this.showMessage('error', this.extractApiMessage(error));
     }
   }
 
+  private showMessage(tone: MessageTone, text: string): void {
+    if (this.toastTimeoutId) {
+      clearTimeout(this.toastTimeoutId);
+    }
+
+    this.message.set({ tone, text });
+
+    this.toastTimeoutId = setTimeout(() => {
+      this.message.set(null);
+      this.toastTimeoutId = null;
+    }, tone === 'error' ? 6500 : 4200);
+  }
   private extractApiMessage(error: HttpErrorResponse): string {
-    const body = error.error as ApiProblemDetails | string | null;
+    return formatTechnicalAdminApiError(error, this.translations().fallbackError);
+  }
 
-    if (typeof body === 'string' && body.trim().length > 0) {
-      return body;
-    }
+  protected statusLabel(item: WaitingAreaListItem): string {
+    return item.isActive ? this.translations().active : this.translations().inactive;
+  }
 
-    if (body && typeof body === 'object') {
-      const firstError = body.errors?.[0];
-
-      if (firstError?.message) {
-        return firstError.message;
-      }
-
-      if (body.detail) {
-        return body.detail;
-      }
-
-      if (body.title) {
-        return body.title;
-      }
-    }
-
-    return this.translations().fallbackError;
+  protected showOperationalWarning(item: WaitingAreaListItem): boolean {
+    return item.isActive && !item.effectiveIsActive;
   }
 
   private readInputValue(event: Event): string {

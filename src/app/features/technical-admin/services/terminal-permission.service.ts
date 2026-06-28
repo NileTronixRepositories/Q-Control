@@ -21,9 +21,8 @@ export class TerminalPermissionService {
   readonly canViewDetails = computed(() => this.hasPermission('Terminals.ViewDetails'));
   readonly canCreate = computed(() => this.hasPermission('Terminals.Create'));
   readonly canUpdate = computed(() => this.hasPermission('Terminals.Update'));
-  readonly canDelete = computed(() => this.hasPermission('Terminals.Delete'));
-  readonly canViewDeleted = computed(() => this.hasPermission('Terminals.ViewDeleted'));
-  readonly canRestore = computed(() => this.hasPermission('Terminals.Restore'));
+  readonly canDeactivate = computed(() => this.hasPermission('Terminals.Deactivate'));
+  readonly canReactivate = computed(() => this.hasPermission('Terminals.Reactivate'));
   readonly canDeletePermanent = computed(() => this.hasPermission('Terminals.DeletePermanent'));
 
   private resolvePermissions(token: string | undefined): ReadonlySet<string> {

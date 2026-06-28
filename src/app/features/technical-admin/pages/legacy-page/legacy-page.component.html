@@ -1,4 +1,4 @@
-﻿<section class="branch-page container-fluid px-0 px-sm-2 px-xl-3">
+<section class="branch-page container-fluid px-0 px-sm-2 px-xl-3">
   <header
     class="page-header d-flex align-items-start justify-content-between gap-3 flex-column flex-md-row"
   >
@@ -15,15 +15,30 @@
     }
   </header>
 
+  <!-- Toast -->
   @if (branchMessage(); as currentMessage) {
-    <p
-      class="message"
-      [class.message-success]="currentMessage.tone === 'success'"
-      [class.message-error]="currentMessage.tone === 'error'"
-      role="status"
-    >
-      {{ currentMessage.text }}
-    </p>
+    <div class="toast-stack" role="status" aria-live="polite" aria-atomic="true">
+      <div
+        class="toast-item"
+        [class.toast-success]="currentMessage.tone === 'success'"
+        [class.toast-error]="currentMessage.tone === 'error'"
+      >
+        <i
+          class="bi"
+          [class.bi-check-circle-fill]="currentMessage.tone === 'success'"
+          [class.bi-x-octagon-fill]="currentMessage.tone === 'error'"
+          aria-hidden="true"
+        ></i>
+
+        <p class="mb-0">
+          {{ currentMessage.text }}
+        </p>
+
+        <button type="button" class="toast-close" [attr.aria-label]="branchEditorTranslations().close" (click)="clearBranchMessage()">
+          <i class="bi bi-x-lg" aria-hidden="true"></i>
+        </button>
+      </div>
+    </div>
   }
 
   <section class="summary-grid" aria-label="Branch summary">
@@ -75,6 +90,18 @@
               <option value="Oldest">{{ translations().oldestLabel }}</option>
             </select>
           </label>
+                    <label>
+            <span>{{ branchEditorTranslations().status }}</span>
+            <select
+              [value]="branchStatusFilter() === null ? '' : branchStatusFilter()"
+              [attr.aria-label]="branchEditorTranslations().status"
+              (change)="updateBranchStatusFilter($event)"
+            >
+              <option value="">{{ branchEditorTranslations().allStatuses }}</option>
+              <option value="true">{{ branchEditorTranslations().active }}</option>
+              <option value="false">{{ branchEditorTranslations().inactive }}</option>
+            </select>
+          </label>
           <label>
             <span>{{ translations().pageSizeLabel }}</span>
             <select
@@ -114,8 +141,8 @@
                 <th>{{ translations().ipAddressLabel }}</th>
                 <th>{{ translations().governorateLabel }}</th>
                 <th>{{ translations().cityLabel }}</th>
-                <th>{{ translations().updatesAvailableLabel }}</th>
-                <th>{{ translations().lastUpdatedLabel }}</th>
+                <th>{{ branchEditorTranslations().status }}</th>
+                <th>{{ branchEditorTranslations().operationalStatus }}</th>
                 <th>{{ translations().createdByLabel }}</th>
                 <th>{{ branchEditorTranslations().actions }}</th>
               </tr>
@@ -132,15 +159,26 @@
                   <td>
                     <span
                       class="status-pill"
-                      [class.status-active]="branch.isUpdatesAvailable"
-                      [class.status-inactive]="!branch.isUpdatesAvailable"
+                      [class.status-active]="branch.isActive"
+                      [class.status-inactive]="!branch.isActive"
                     >
-                      {{
-                        branch.isUpdatesAvailable ? translations().yesLabel : translations().noLabel
-                      }}
+                      {{ branchStatusLabel(branch) }}
                     </span>
                   </td>
-                  <td>{{ branch.lastUpdated }}</td>
+                  <td>
+                    <span
+                      class="status-pill"
+                      [class.status-active]="branch.effectiveIsActive"
+                      [class.status-inactive]="!branch.effectiveIsActive"
+                    >
+                      {{ branchOperationalLabel(branch) }}
+                    </span>
+                    @if (showBranchOperationalWarning(branch)) {
+                      <small class="d-block text-warning fw-bold mt-1">
+                        {{ branchEditorTranslations().operationalUnavailable }}
+                      </small>
+                    }
+                  </td>
                   <td>{{ branch.createdBy }}</td>
                   <td>
                     <div class="action-group">
@@ -162,16 +200,39 @@
                       >
                         <i class="bi bi-pencil-square" aria-hidden="true"></i>
                       </button>
-                      <button
-                        type="button"
-                        class="icon-action danger-action"
-                        [disabled]="deletingBranchId() === branch.id"
-                        [title]="branchEditorTranslations().delete"
-                        [attr.aria-label]="branchEditorTranslations().delete"
-                        (click)="deleteBranch(branch)"
-                      >
-                        <i class="bi bi-trash3" aria-hidden="true"></i>
-                      </button>
+                      @if (branch.isActive) {
+                        <button
+                          type="button"
+                          class="icon-action warning-action"
+                          [disabled]="deletingBranchId() === branch.id"
+                          [title]="branchEditorTranslations().deactivate"
+                          [attr.aria-label]="branchEditorTranslations().deactivate"
+                          (click)="deactivateBranch(branch)"
+                        >
+                          <i class="bi bi-pause-circle" aria-hidden="true"></i>
+                        </button>
+                      } @else {
+                        <button
+                          type="button"
+                          class="icon-action success-action"
+                          [disabled]="deletingBranchId() === branch.id"
+                          [title]="branchEditorTranslations().reactivate"
+                          [attr.aria-label]="branchEditorTranslations().reactivate"
+                          (click)="reactivateBranch(branch)"
+                        >
+                          <i class="bi bi-play-circle" aria-hidden="true"></i>
+                        </button>
+                        <button
+                          type="button"
+                          class="icon-action danger-action"
+                          [disabled]="deletingBranchId() === branch.id"
+                          [title]="branchEditorTranslations().permanentDelete"
+                          [attr.aria-label]="branchEditorTranslations().permanentDelete"
+                          (click)="permanentlyDeleteBranch(branch)"
+                        >
+                          <i class="bi bi-trash3" aria-hidden="true"></i>
+                        </button>
+                      }
                     </div>
                   </td>
                 </tr>
@@ -254,6 +315,14 @@
               <div>
                 <dt>{{ branchEditorTranslations().license }}</dt>
                 <dd>{{ detailValue(details.license) }}</dd>
+              </div>
+              <div>
+                <dt>{{ branchEditorTranslations().status }}</dt>
+                <dd>{{ details.isActive ? branchEditorTranslations().active : branchEditorTranslations().inactive }}</dd>
+              </div>
+              <div>
+                <dt>{{ branchEditorTranslations().operationalStatus }}</dt>
+                <dd>{{ details.effectiveIsActive ? branchEditorTranslations().operationalAvailable : branchEditorTranslations().operationalUnavailable }}</dd>
               </div>
               <div>
                 <dt>{{ translations().governorateLabel }}</dt>
@@ -379,12 +448,12 @@
 
               <label class="form-field col-12 col-md-6">
                 <span>{{ branchEditorTranslations().longitude }}</span>
-                <input type="text" maxlength="50" formControlName="longitude" />
+                <input type="number" min="-180" max="180" step="any" formControlName="longitude" />
               </label>
 
               <label class="form-field col-12 col-md-6">
                 <span>{{ branchEditorTranslations().latitude }}</span>
-                <input type="text" maxlength="50" formControlName="latitude" />
+                <input type="number" min="-90" max="90" step="any" formControlName="latitude" />
               </label>
 
               <div class="editor-actions col-12">

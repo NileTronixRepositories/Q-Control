@@ -19,8 +19,8 @@ export class WindowPermissionService {
   readonly canViewDetails = computed(() => this.hasPermission('Windows.ViewDetails'));
   readonly canCreate = computed(() => this.hasPermission('Windows.Create'));
   readonly canUpdate = computed(() => this.hasPermission('Windows.Update'));
-  readonly canDelete = computed(() => this.hasPermission('Windows.Delete'));
-  readonly canViewDeleted = computed(() => this.hasPermission('Windows.ViewDeleted'));
+  readonly canDeactivate = computed(() => this.hasPermission('Windows.Deactivate'));
+  readonly canReactivate = computed(() => this.hasPermission('Windows.Reactivate'));
   readonly canDeletePermanent = computed(() => this.hasPermission('Windows.DeletePermanent'));
 
   private resolvePermissions(token: string | undefined): ReadonlySet<string> {

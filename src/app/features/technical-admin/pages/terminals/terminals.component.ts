@@ -1,4 +1,4 @@
-﻿import { HttpErrorResponse } from '@angular/common/http';
+import { HttpErrorResponse } from '@angular/common/http';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -23,16 +23,13 @@ import { WindowManagementApiService } from '../../services/window-management-api
 import { TerminalManagementApiService } from '../../services/terminal-management-api.service';
 import { TerminalPermissionService } from '../../services/terminal-permission.service';
 import { TechnicalAdminI18nStore } from '../../store/technical-admin-i18n.store';
+import { formatTechnicalAdminApiError } from '../../utils/api-error-message.util';
 import {
-  ApiProblemDetails,
   CreateTerminalRequest,
   CreateTerminalResponse,
-  DeleteTerminalResponse,
-  DeletedTerminalListItemResponse,
   GetTerminalsParams,
   PaginationResponse,
   PermanentDeleteTerminalResponse,
-  RestoreTerminalResponse,
   TerminalDetailsResponse,
   TerminalListItemResponse,
   UpdateTerminalRequest,
@@ -42,8 +39,9 @@ import { GetWindowsParams, WindowListItemResponse } from '../../models/window-ma
 
 type TerminalTab = 'active' | 'deleted';
 type TerminalPanelMode = 'closed' | 'create' | 'edit' | 'view';
+type DeletedTerminalListItemResponse = TerminalListItemResponse;
 type MessageTone = 'success' | 'error' | 'info';
-type TerminalDeleteAction = 'soft' | 'restore' | 'permanent';
+type TerminalDeleteAction = 'deactivate' | 'reactivate' | 'permanent';
 
 interface UiMessage {
   readonly tone: MessageTone;
@@ -115,6 +113,7 @@ interface TerminalConfirmState {
   readonly kind: TerminalDeleteAction;
   readonly terminalId: number;
   readonly terminalNumber: string;
+  readonly rowVersion: string;
 }
 
 interface WindowOption {
@@ -129,7 +128,7 @@ const TERMINAL_TRANSLATIONS: Record<AppLanguage, TerminalTranslations> = {
     title: '\u0625\u062f\u0627\u0631\u0629 \u0627\u0644\u0623\u062c\u0647\u0632\u0629 \u0627\u0644\u0637\u0631\u0641\u064a\u0629',
     description: '\u0625\u062f\u0627\u0631\u0629 \u0623\u062c\u0647\u0632\u0629 Terminal \u0627\u0644\u0645\u0631\u062a\u0628\u0637\u0629 \u0628\u0627\u0644\u0646\u0648\u0627\u0641\u0630 \u0648\u0639\u0645\u0644\u064a\u0627\u062a CRUD.',
     activeTab: '\u0627\u0644\u0623\u062c\u0647\u0632\u0629 \u0627\u0644\u0646\u0634\u0637\u0629',
-    deletedTab: '\u0627\u0644\u0623\u062c\u0647\u0632\u0629 \u0627\u0644\u0645\u062d\u0630\u0648\u0641\u0629',
+    deletedTab: '\u0627\u0644\u0623\u062c\u0647\u0632\u0629 \u063a\u064a\u0631 \u0627\u0644\u0646\u0634\u0637\u0629',
     addTerminal: '\u0625\u0636\u0627\u0641\u0629 \u062c\u0647\u0627\u0632',
     searchPlaceholder: '\u0628\u062d\u062b \u0628\u0631\u0642\u0645 Terminal \u0623\u0648 IP \u0623\u0648 Serial \u0623\u0648 \u0627\u0644\u0646\u0648\u0639',
     windowFilter: '\u0627\u0644\u0646\u0627\u0641\u0630\u0629',
@@ -148,12 +147,12 @@ const TERMINAL_TRANSLATIONS: Record<AppLanguage, TerminalTranslations> = {
     windowNumber: '\u0631\u0642\u0645 \u0627\u0644\u0646\u0627\u0641\u0630\u0629',
     waitingAreaNumber: '\u0631\u0642\u0645 \u0645\u0646\u0637\u0642\u0629 \u0627\u0644\u0627\u0646\u062a\u0638\u0627\u0631',
     branch: '\u0627\u0644\u0641\u0631\u0639',
-    deletedOn: '\u062a\u0627\u0631\u064a\u062e \u0627\u0644\u062d\u0630\u0641',
+    deletedOn: '\u0627\u0644\u062d\u0627\u0644\u0629',
     actions: '\u0627\u0644\u0625\u062c\u0631\u0627\u0621\u0627\u062a',
     view: '\u0639\u0631\u0636',
     edit: '\u062a\u0639\u062f\u064a\u0644',
-    delete: '\u062d\u0630\u0641',
-    restore: '\u0627\u0633\u062a\u0639\u0627\u062f\u0629',
+    delete: '\u0625\u064a\u0642\u0627\u0641',
+    restore: '\u0625\u0639\u0627\u062f\u0629 \u062a\u0646\u0634\u064a\u0637',
     permanentDelete: '\u062d\u0630\u0641 \u062f\u0627\u0626\u0645',
     createdOn: '\u062a\u0627\u0631\u064a\u062e \u0627\u0644\u0625\u0646\u0634\u0627\u0621',
     modifiedOn: '\u062a\u0627\u0631\u064a\u062e \u0622\u062e\u0631 \u062a\u0639\u062f\u064a\u0644',
@@ -172,11 +171,11 @@ const TERMINAL_TRANSLATIONS: Record<AppLanguage, TerminalTranslations> = {
     selectWindow: '\u0627\u062e\u062a\u0631 \u0646\u0627\u0641\u0630\u0629',
     refresh: '\u062a\u062d\u062f\u064a\u062b',
     loadingWindows: '\u062a\u062d\u0645\u064a\u0644 \u0627\u0644\u0646\u0648\u0627\u0641\u0630...',
-    deleteConfirm: '\u062a\u0623\u0643\u064a\u062f \u062d\u0630\u0641 \u0627\u0644\u062c\u0647\u0627\u0632',
-    restoreConfirm: '\u062a\u0623\u0643\u064a\u062f \u0627\u0633\u062a\u0639\u0627\u062f\u0629 \u0627\u0644\u062c\u0647\u0627\u0632',
+    deleteConfirm: '\u062a\u0623\u0643\u064a\u062f \u0625\u064a\u0642\u0627\u0641 \u0627\u0644\u062c\u0647\u0627\u0632',
+    restoreConfirm: '\u062a\u0623\u0643\u064a\u062f \u0625\u0639\u0627\u062f\u0629 \u062a\u0646\u0634\u064a\u0637 \u0627\u0644\u062c\u0647\u0627\u0632',
     permanentDeleteConfirm: '\u062a\u0623\u0643\u064a\u062f \u062d\u0630\u0641 \u0627\u0644\u062c\u0647\u0627\u0632 \u0646\u0647\u0627\u0626\u064a\u0627',
-    deleteConfirmBody: '\u0647\u0644 \u062a\u0631\u064a\u062f \u062d\u0630\u0641 \u0647\u0630\u0627 \u0627\u0644\u062c\u0647\u0627\u0632\u061f',
-    restoreConfirmBody: '\u0647\u0644 \u062a\u0631\u064a\u062f \u0627\u0633\u062a\u0639\u0627\u062f\u0629 \u0647\u0630\u0627 \u0627\u0644\u062c\u0647\u0627\u0632\u061f',
+    deleteConfirmBody: '\u0647\u0644 \u062a\u0631\u064a\u062f \u0625\u064a\u0642\u0627\u0641 \u0647\u0630\u0627 \u0627\u0644\u062c\u0647\u0627\u0632\u061f',
+    restoreConfirmBody: '\u0647\u0644 \u062a\u0631\u064a\u062f \u0625\u0639\u0627\u062f\u0629 \u062a\u0646\u0634\u064a\u0637 \u0647\u0630\u0627 \u0627\u0644\u062c\u0647\u0627\u0632\u061f',
     permanentDeleteConfirmBody: '\u0633\u064a\u062a\u0645 \u062d\u0630\u0641 \u0627\u0644\u062c\u0647\u0627\u0632 \u0628\u0634\u0643\u0644 \u062f\u0627\u0626\u0645 \u0648\u0644\u0627 \u064a\u0645\u0643\u0646 \u0627\u0644\u062a\u0631\u0627\u062c\u0639 \u0639\u0646\u0647.',
     fallbackSuccess: '\u062a\u0645\u062a \u0627\u0644\u0639\u0645\u0644\u064a\u0629 \u0628\u0646\u062c\u0627\u062d.',
     fallbackError: '\u062d\u062f\u062b \u062e\u0637\u0623 \u063a\u064a\u0631 \u0645\u062a\u0648\u0642\u0639.',
@@ -189,7 +188,7 @@ const TERMINAL_TRANSLATIONS: Record<AppLanguage, TerminalTranslations> = {
     title: 'Terminal Management',
     description: 'Manage terminal records and perform terminal CRUD operations.',
     activeTab: 'Active Terminals',
-    deletedTab: 'Deleted Terminals',
+    deletedTab: 'Inactive Terminals',
     addTerminal: 'Add Terminal',
     searchPlaceholder: 'Search by terminal number, IP, serial number, or type',
     windowFilter: 'Window',
@@ -208,12 +207,12 @@ const TERMINAL_TRANSLATIONS: Record<AppLanguage, TerminalTranslations> = {
     windowNumber: 'Window Number',
     waitingAreaNumber: 'Waiting Area Number',
     branch: 'Branch',
-    deletedOn: 'Deleted On',
+    deletedOn: 'Status',
     actions: 'Actions',
     view: 'View',
     edit: 'Edit',
-    delete: 'Delete',
-    restore: 'Restore',
+    delete: 'Deactivate',
+    restore: 'Reactivate',
     permanentDelete: 'Permanent Delete',
     createdOn: 'Created On',
     modifiedOn: 'Modified On',
@@ -232,11 +231,11 @@ const TERMINAL_TRANSLATIONS: Record<AppLanguage, TerminalTranslations> = {
     selectWindow: 'Select window',
     refresh: 'Refresh',
     loadingWindows: 'Loading windows...',
-    deleteConfirm: 'Delete Terminal',
-    restoreConfirm: 'Restore Terminal',
+    deleteConfirm: 'Deactivate Terminal',
+    restoreConfirm: 'Reactivate Terminal',
     permanentDeleteConfirm: 'Permanently Delete Terminal',
-    deleteConfirmBody: 'Are you sure you want to delete this terminal?',
-    restoreConfirmBody: 'Are you sure you want to restore this terminal?',
+    deleteConfirmBody: 'Are you sure you want to deactivate this terminal?',
+    restoreConfirmBody: 'Are you sure you want to reactivate this terminal?',
     permanentDeleteConfirmBody: 'This action permanently deletes the terminal and cannot be undone.',
     fallbackSuccess: 'Operation completed successfully.',
     fallbackError: 'Unexpected error occurred.',
@@ -292,10 +291,10 @@ export class TerminalsComponent implements OnInit, OnDestroy {
   protected readonly canViewDetails = this.permissionService.canViewDetails;
   protected readonly canCreate = this.permissionService.canCreate;
   protected readonly canUpdate = this.permissionService.canUpdate;
-  protected readonly canDelete = this.permissionService.canDelete;
-  protected readonly canViewDeleted = this.permissionService.canViewDeleted;
-  protected readonly canRestore = this.permissionService.canRestore;
+  protected readonly canDeactivate = this.permissionService.canDeactivate;
+  protected readonly canReactivate = this.permissionService.canReactivate;
   protected readonly canDeletePermanent = this.permissionService.canDeletePermanent;
+  protected readonly canViewDeleted = computed(() => this.canReactivate() || this.canDeletePermanent());
 
   protected readonly activeTab = signal<TerminalTab>(this.canViewActive() ? 'active' : 'deleted');
   protected readonly hasTerminalAccess = computed(() => this.canViewActive() || this.canViewDeleted());
@@ -323,11 +322,12 @@ export class TerminalsComponent implements OnInit, OnDestroy {
   protected readonly traceId = signal<string | null>(null);
   protected readonly message = signal<UiMessage | null>(null);
   private toastTimeoutId: ReturnType<typeof setTimeout> | null = null;
+  private panelRequestId = 0;
 
   protected readonly terminalForm = this.formBuilder.group({
     windowId: [0, [Validators.required, Validators.min(1)]],
     number: ['', [Validators.required, Validators.maxLength(20), this.notWhitespaceValidator]],
-    ipAddress: ['', [Validators.required, Validators.maxLength(45), this.ipAddressValidator]],
+    ipAddress: ['', [Validators.required, Validators.maxLength(45), (control: AbstractControl<string>) => this.ipAddressValidator(control)]],
     serialNo: ['', [Validators.required, Validators.maxLength(100), this.notWhitespaceValidator]],
     type: ['', [Validators.required, Validators.maxLength(100), this.notWhitespaceValidator]],
   });
@@ -463,45 +463,55 @@ export class TerminalsComponent implements OnInit, OnDestroy {
       return;
     }
 
+    this.panelRequestId += 1;
     this.panelMode.set('create');
     this.selectedEditId.set(null);
     this.selectedDetails.set(null);
     this.confirmDialog.set(null);
     this.clearMessage();
-    this.terminalForm.enable();
-    this.terminalForm.reset({
-      windowId: this.activeWindowId() ?? 0,
-      number: '',
-      ipAddress: '',
-      serialNo: '',
-      type: '',
-    });
+    this.terminalForm.enable({ emitEvent: false });
+    this.resetTerminalForm(this.activeWindowId() ?? 0);
   }
 
-  protected openView(terminalId: number): void {
+  protected openView(item: TerminalListItemResponse): void {
     if (!this.canViewDetails()) {
       this.showMessage('error', this.translations().noPermissionHint);
+      return;
+    }
+
+    const terminalId = this.resolveTerminalId(item);
+
+    if (!terminalId) {
+      this.showMessage('error', this.translations().fallbackError);
       return;
     }
 
     this.openTerminalDetails(terminalId, 'view');
   }
 
-  protected openEdit(terminalId: number): void {
+  protected openEdit(item: TerminalListItemResponse): void {
     if (!this.canUpdate()) {
       this.showMessage('error', this.translations().noPermissionHint);
       return;
     }
 
-    this.openTerminalDetails(terminalId, 'edit');
+    const terminalId = this.resolveTerminalId(item);
+
+    if (!terminalId) {
+      this.showMessage('error', this.translations().fallbackError);
+      return;
+    }
+
+    this.openTerminalDetails(terminalId, 'edit', item);
   }
 
   protected closePanel(): void {
+    this.panelRequestId += 1;
     this.panelMode.set('closed');
     this.selectedEditId.set(null);
     this.selectedDetails.set(null);
-    this.terminalForm.markAsPristine();
-    this.terminalForm.enable();
+    this.terminalForm.enable({ emitEvent: false });
+    this.resetTerminalForm();
     this.confirmDialog.set(null);
   }
 
@@ -538,28 +548,44 @@ export class TerminalsComponent implements OnInit, OnDestroy {
   }
 
   protected requestSoftDelete(item: TerminalListItemResponse): void {
-    if (!this.canDelete()) {
+    if (!this.canDeactivate()) {
       this.showMessage('error', this.translations().noPermissionHint);
       return;
     }
 
+    const terminalId = this.resolveTerminalId(item);
+
+    if (!terminalId) {
+      this.showMessage('error', this.translations().fallbackError);
+      return;
+    }
+
     this.confirmDialog.set({
-      kind: 'soft',
-      terminalId: item.id,
+      kind: 'deactivate',
+      terminalId,
       terminalNumber: item.number,
+      rowVersion: item.rowVersion,
     });
   }
 
   protected requestRestore(item: DeletedTerminalListItemResponse): void {
-    if (!this.canRestore()) {
+    if (!this.canReactivate()) {
       this.showMessage('error', this.translations().noPermissionHint);
       return;
     }
 
+    const terminalId = this.resolveTerminalId(item);
+
+    if (!terminalId) {
+      this.showMessage('error', this.translations().fallbackError);
+      return;
+    }
+
     this.confirmDialog.set({
-      kind: 'restore',
-      terminalId: item.id,
+      kind: 'reactivate',
+      terminalId,
       terminalNumber: item.number,
+      rowVersion: item.rowVersion,
     });
   }
 
@@ -569,10 +595,18 @@ export class TerminalsComponent implements OnInit, OnDestroy {
       return;
     }
 
+    const terminalId = this.resolveTerminalId(item);
+
+    if (!terminalId) {
+      this.showMessage('error', this.translations().fallbackError);
+      return;
+    }
+
     this.confirmDialog.set({
       kind: 'permanent',
-      terminalId: item.id,
+      terminalId,
       terminalNumber: item.number,
+      rowVersion: item.rowVersion,
     });
   }
 
@@ -583,17 +617,17 @@ export class TerminalsComponent implements OnInit, OnDestroy {
       return;
     }
 
-    if (action.kind === 'soft') {
-      this.deleteTerminal(action.terminalId);
+    if (action.kind === 'deactivate') {
+      this.deactivateTerminal(action);
       return;
     }
 
-    if (action.kind === 'restore') {
-      this.restoreTerminal(action.terminalId);
+    if (action.kind === 'reactivate') {
+      this.reactivateTerminal(action);
       return;
     }
 
-    this.permanentlyDeleteTerminal(action.terminalId);
+    this.permanentlyDeleteTerminal(action);
   }
 
   protected closeConfirmDialog(): void {
@@ -618,6 +652,14 @@ export class TerminalsComponent implements OnInit, OnDestroy {
     );
 
     return `${windowLabel} - ${this.translations().waitingAreaNumber}: ${windowItem.waitingAreaNumber} ${waitingAreaLabel}`;
+  }
+
+  protected terminalIdentity(terminal: TerminalListItemResponse): number {
+    return this.resolveTerminalId(terminal) || Number.NEGATIVE_INFINITY;
+  }
+
+  protected hasTerminalIdentity(terminal: TerminalListItemResponse): boolean {
+    return this.resolveTerminalId(terminal) > 0;
   }
 
   protected terminalWindowLabel(terminal: TerminalListItemResponse): string {
@@ -683,10 +725,10 @@ export class TerminalsComponent implements OnInit, OnDestroy {
     this.traceId.set(null);
 
     this.terminalManagementApiService
-      .getTerminals(this.buildQuery(this.activeSearch(), this.activeWindowId(), pageNumber, this.activePageSize()))
+      .getTerminals(this.buildQuery(this.activeSearch(), this.activeWindowId(), pageNumber, this.activePageSize(), true))
       .subscribe({
         next: (response) => {
-          this.activeTerminalsPage.set(response);
+          this.activeTerminalsPage.set(this.normalizeTerminalPage(response));
         },
         error: (error: HttpErrorResponse) => this.handleApiError(error),
         complete: () => this.activeLoading.set(false),
@@ -702,11 +744,9 @@ export class TerminalsComponent implements OnInit, OnDestroy {
     this.traceId.set(null);
 
     this.terminalManagementApiService
-      .getDeletedTerminals(
-        this.buildQuery(this.deletedSearch(), this.deletedWindowId(), pageNumber, this.deletedPageSize())
-      )
+      .getTerminals(this.buildQuery(this.deletedSearch(), this.deletedWindowId(), pageNumber, this.deletedPageSize(), false))
       .subscribe({
-        next: (response) => this.deletedTerminalsPage.set(response),
+        next: (response) => this.deletedTerminalsPage.set(this.normalizeTerminalPage(response)),
         error: (error: HttpErrorResponse) => this.handleApiError(error),
         complete: () => this.deletedLoading.set(false),
       });
@@ -717,6 +757,7 @@ export class TerminalsComponent implements OnInit, OnDestroy {
       pageNumber: 1,
       pageSize: 100,
       search: '',
+      isActive: true,
     };
 
     this.windowManagementApiService.getWindows(query).subscribe({
@@ -734,37 +775,115 @@ export class TerminalsComponent implements OnInit, OnDestroy {
     });
   }
 
+  private resetTerminalForm(windowId = 0): void {
+    this.terminalForm.reset({
+      windowId,
+      number: '',
+      ipAddress: '',
+      serialNo: '',
+      type: '',
+    });
+    this.terminalForm.markAsPristine();
+    this.terminalForm.markAsUntouched();
+  }
+
   private openTerminalDetails(
     terminalId: number,
     mode: Extract<TerminalPanelMode, 'view' | 'edit'>,
+    sourceItem?: TerminalListItemResponse,
   ): void {
-    this.panelMode.set(mode);
+    const requestId = ++this.panelRequestId;
+
     this.selectedEditId.set(mode === 'edit' ? terminalId : null);
     this.selectedDetails.set(null);
     this.confirmDialog.set(null);
     this.clearMessage();
-    this.terminalForm.enable();
+    this.terminalForm.enable({ emitEvent: false });
+    this.resetTerminalForm();
+
+    if (mode === 'edit' && sourceItem) {
+      this.patchTerminalForm(sourceItem);
+      this.windowIdControl.disable({ emitEvent: false });
+    }
+
+    this.panelMode.set(mode);
 
     this.terminalManagementApiService.getTerminalById(terminalId).subscribe({
       next: (response) => {
+        if (requestId !== this.panelRequestId || this.panelMode() !== mode) {
+          return;
+        }
+
         this.selectedDetails.set(response);
-        this.terminalForm.reset({
-          windowId: response.windowId,
-          number: response.number,
-          ipAddress: response.ipAddress,
-          serialNo: response.serialNo,
-          type: response.type,
-        });
+        this.patchTerminalForm(response);
 
         if (mode === 'edit') {
           this.windowIdControl.disable({ emitEvent: false });
         }
       },
       error: (error: HttpErrorResponse) => {
+        if (requestId !== this.panelRequestId || this.panelMode() !== mode) {
+          return;
+        }
+
         this.handleApiError(error);
-        this.closePanel();
+
+        if (mode !== 'edit' || !sourceItem) {
+          this.closePanel();
+        }
       },
     });
+  }
+
+  private patchTerminalForm(terminal: TerminalListItemResponse): void {
+    this.terminalForm.reset({
+      windowId: terminal.windowId,
+      number: terminal.number,
+      ipAddress: terminal.ipAddress,
+      serialNo: terminal.serialNo,
+      type: terminal.type,
+    });
+  }
+
+  private normalizeTerminalPage<TItem extends TerminalListItemResponse>(
+    page: PaginationResponse<TItem>,
+  ): PaginationResponse<TItem> {
+    return {
+      ...page,
+      data: page.data.map((item) => this.normalizeTerminalItem(item)),
+    };
+  }
+
+  private normalizeTerminalItem<TItem extends TerminalListItemResponse>(item: TItem): TItem {
+    const terminalId = this.resolveTerminalId(item);
+
+    if (!terminalId || item.id === terminalId) {
+      return item;
+    }
+
+    return {
+      ...item,
+      id: terminalId,
+    };
+  }
+
+  private resolveTerminalId(item: TerminalListItemResponse): number {
+    const terminalId = [
+      item.id,
+      item.terminalId,
+      item.terminalID,
+      item.terminal_id,
+      item.Id,
+      item.ID,
+      item.TerminalId,
+      item.TerminalID,
+    ].find((value) => this.isPositiveNumber(value));
+
+    return terminalId ?? 0;
+  }
+
+  private isPositiveNumber(value: number | null | undefined): value is number {
+    return typeof value === 'number' && Number.isFinite(value) && value > 0;
   }
 
   private createTerminal(): void {
@@ -800,7 +919,7 @@ export class TerminalsComponent implements OnInit, OnDestroy {
 
     this.saving.set(true);
 
-    this.terminalManagementApiService.updateTerminal(terminalId, this.mapUpdateRequest(terminalId)).subscribe({
+    this.terminalManagementApiService.updateTerminal(terminalId, this.mapUpdateRequest()).subscribe({
       next: (response: UpdateTerminalResponse) => {
         this.showMessage('success', response.message || this.translations().fallbackSuccess);
         this.closePanel();
@@ -814,16 +933,16 @@ export class TerminalsComponent implements OnInit, OnDestroy {
     });
   }
 
-  private deleteTerminal(terminalId: number): void {
-    if (!this.canDelete()) {
+  private deactivateTerminal(action: TerminalConfirmState): void {
+    if (!this.canDeactivate()) {
       this.showMessage('error', this.translations().noPermissionHint);
       return;
     }
 
     this.deleting.set(true);
 
-    this.terminalManagementApiService.softDeleteTerminal(terminalId).subscribe({
-      next: (response: DeleteTerminalResponse) => {
+    this.terminalManagementApiService.deactivateTerminal(action.terminalId, action.rowVersion).subscribe({
+      next: (response) => {
         this.showMessage('success', response.message || this.translations().fallbackSuccess);
         this.confirmDialog.set(null);
         const currentPage = this.activeTerminalsPage();
@@ -832,6 +951,7 @@ export class TerminalsComponent implements OnInit, OnDestroy {
             ? currentPage.currentPage - 1
             : currentPage.currentPage;
         this.loadActiveTerminals(nextPage);
+        this.loadDeletedTerminals(this.deletedTerminalsPage().currentPage);
       },
       error: (error: HttpErrorResponse) => {
         this.handleApiError(error);
@@ -841,16 +961,16 @@ export class TerminalsComponent implements OnInit, OnDestroy {
     });
   }
 
-  private restoreTerminal(terminalId: number): void {
-    if (!this.canRestore()) {
+  private reactivateTerminal(action: TerminalConfirmState): void {
+    if (!this.canReactivate()) {
       this.showMessage('error', this.translations().noPermissionHint);
       return;
     }
 
     this.deleting.set(true);
 
-    this.terminalManagementApiService.restoreTerminal(terminalId).subscribe({
-      next: (response: RestoreTerminalResponse) => {
+    this.terminalManagementApiService.reactivateTerminal(action.terminalId, action.rowVersion).subscribe({
+      next: (response) => {
         this.showMessage('success', response.message || this.translations().fallbackSuccess);
         this.confirmDialog.set(null);
         const currentPage = this.deletedTerminalsPage();
@@ -869,7 +989,7 @@ export class TerminalsComponent implements OnInit, OnDestroy {
     });
   }
 
-  private permanentlyDeleteTerminal(terminalId: number): void {
+  private permanentlyDeleteTerminal(action: TerminalConfirmState): void {
     if (!this.canDeletePermanent()) {
       this.showMessage('error', this.translations().noPermissionHint);
       return;
@@ -877,7 +997,7 @@ export class TerminalsComponent implements OnInit, OnDestroy {
 
     this.deleting.set(true);
 
-    this.terminalManagementApiService.permanentlyDeleteTerminal(terminalId).subscribe({
+    this.terminalManagementApiService.permanentlyDeleteTerminal(action.terminalId, action.rowVersion).subscribe({
       next: (response: PermanentDeleteTerminalResponse) => {
         this.showMessage('success', response.message || this.translations().fallbackSuccess);
         this.confirmDialog.set(null);
@@ -920,12 +1040,14 @@ export class TerminalsComponent implements OnInit, OnDestroy {
     windowId: number | null,
     pageNumber: number,
     pageSize: number,
+    isActive: boolean,
   ): GetTerminalsParams {
     return {
       windowId: windowId ?? undefined,
       search: search.trim(),
       pageNumber,
       pageSize,
+      isActive,
     };
   }
 
@@ -949,15 +1071,15 @@ export class TerminalsComponent implements OnInit, OnDestroy {
     };
   }
 
-  private mapUpdateRequest(terminalId: number): UpdateTerminalRequest {
+  private mapUpdateRequest(): UpdateTerminalRequest {
     const value = this.terminalForm.getRawValue();
 
     return {
-      id: terminalId,
       number: value.number.trim(),
       ipAddress: value.ipAddress.trim(),
       serialNo: value.serialNo.trim(),
       type: value.type.trim(),
+      rowVersion: this.selectedDetails()?.rowVersion ?? '',
     };
   }
 
@@ -974,7 +1096,7 @@ export class TerminalsComponent implements OnInit, OnDestroy {
   private handleApiError(error: HttpErrorResponse): void {
     const message = this.extractApiMessage(error);
 
-    if (error.status === 401) {
+    if (this.authSessionService.shouldClearSessionForHttpStatus(error.status)) {
       this.authSessionService.clearSession();
       void this.router.navigateByUrl('/login');
       return;
@@ -989,43 +1111,15 @@ export class TerminalsComponent implements OnInit, OnDestroy {
   }
 
   private extractApiMessage(error: HttpErrorResponse): string {
-    const body = error.error as ApiProblemDetails | string | null;
-
-    if (typeof body === 'string' && body.trim().length > 0) {
-      return body;
-    }
-
-    if (body && typeof body === 'object') {
-      if (body.traceId) {
-        this.traceId.set(body.traceId);
-      }
-
-      const firstError = body.errors?.[0];
-      if (firstError?.message?.trim().length) {
-        return firstError.message;
-      }
-
-      if (body.detail?.trim().length) {
-        return body.detail;
-      }
-
-      if (body.title?.trim().length) {
-        return body.title;
-      }
-    }
-
-    return this.translations().fallbackError;
+    return formatTechnicalAdminApiError(error, this.translations().fallbackError);
   }
 
   private showMessage(tone: MessageTone, text: string): void {
-    const traceId = this.traceId();
-    const suffix = traceId ? ` (${this.translations().traceIdLabel}: ${traceId})` : '';
-
     if (this.toastTimeoutId) {
       clearTimeout(this.toastTimeoutId);
     }
 
-    this.message.set({ tone, text: `${text}${suffix}` });
+    this.message.set({ tone, text });
 
     this.toastTimeoutId = setTimeout(() => {
       this.message.set(null);
@@ -1044,9 +1138,20 @@ export class TerminalsComponent implements OnInit, OnDestroy {
       return null;
     }
 
-    return this.isValidIpv4Address(value) ? null : { ipAddress: true };
+    return this.isIpAddressValid(value) ? null : { ipAddress: true };
   }
 
+  private isIpAddressValid(value: string): boolean {
+    if (value.length > 45) {
+      return false;
+    }
+
+    if (value.includes(':')) {
+      return this.isValidIpv6Address(value);
+    }
+
+    return this.isValidIpv4Address(value);
+  }
   private isValidIpv4Address(value: string): boolean {
     const octets = value.split('.');
     if (octets.length !== 4) {
@@ -1062,5 +1167,16 @@ export class TerminalsComponent implements OnInit, OnDestroy {
       return Number.isInteger(numeric) && numeric >= 0 && numeric <= 255;
     });
   }
-}
+  private isValidIpv6Address(value: string): boolean {
+    const ipv6Pattern =
+      /^(?:[0-9A-Fa-f]{1,4}:){7}[0-9A-Fa-f]{1,4}$|^(?:[0-9A-Fa-f]{1,4}:){1,7}:$|^:(?::[0-9A-Fa-f]{1,4}){1,7}$|^(?:[0-9A-Fa-f]{1,4}:){1,7}:[0-9A-Fa-f]{1,4}$|^(?:[0-9A-Fa-f]{1,4}:){0,7}(?:[0-9A-Fa-f]{1,4})?::(?:[0-9A-Fa-f]{1,4}:){0,7}(?:[0-9A-Fa-f]{1,4})?$/;
 
+    if (!ipv6Pattern.test(value)) {
+      return false;
+    }
+
+    return value.includes('::')
+      ? value.indexOf('::') === value.lastIndexOf('::')
+      : value.split(':').length <= 8;
+  }
+}

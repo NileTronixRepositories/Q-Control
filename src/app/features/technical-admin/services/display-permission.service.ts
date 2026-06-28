@@ -21,10 +21,21 @@ export class DisplayPermissionService {
   readonly canViewDetails = computed(() => this.hasPermission('Displays.ViewDetails'));
   readonly canCreate = computed(() => this.hasPermission('Displays.Create'));
   readonly canUpdate = computed(() => this.hasPermission('Displays.Update'));
-  readonly canDelete = computed(() => this.hasPermission('Displays.Delete'));
-  readonly canViewDeleted = computed(() => this.hasPermission('Displays.ViewDeleted'));
-  readonly canRestore = computed(() => this.hasPermission('Displays.Restore'));
+  readonly canDeactivate = computed(() => this.hasPermission('Displays.Deactivate'));
+  readonly canReactivate = computed(() => this.hasPermission('Displays.Reactivate'));
   readonly canDeletePermanent = computed(() => this.hasPermission('Displays.DeletePermanent'));
+  readonly canViewLinkedWindows = computed(() => this.hasPermission('DisplayWindows.ViewLinked'));
+  readonly canViewAvailableWindows = computed(() =>
+    this.hasPermission('DisplayWindows.ViewAvailable'),
+  );
+  readonly canAssignWindow = computed(() => this.hasPermission('DisplayWindows.Assign'));
+  readonly canUnassignWindow = computed(() => this.hasPermission('DisplayWindows.Unassign'));
+  readonly canManageDisplayWindows = computed(() =>
+    this.canViewLinkedWindows() ||
+      this.canViewAvailableWindows() ||
+      this.canAssignWindow() ||
+      this.canUnassignWindow(),
+  );
 
   private resolvePermissions(token: string | undefined): ReadonlySet<string> {
     if (!token) {
@@ -66,6 +77,8 @@ export class DisplayPermissionService {
       'permission_names',
       'displaysPermissions',
       'displays_permissions',
+      'displayWindowsPermissions',
+      'display_windows_permissions',
       'scope',
       'scp',
     ];
@@ -81,7 +94,9 @@ export class DisplayPermissionService {
       }
     }
 
-    return permissions.filter((item) => item.startsWith('Displays.'));
+    return permissions.filter(
+      (item) => item.startsWith('Displays.') || item.startsWith('DisplayWindows.'),
+    );
   }
 
   private collectPermissionStrings(value: unknown, depth = 0): string[] {

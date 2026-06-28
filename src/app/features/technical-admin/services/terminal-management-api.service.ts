@@ -1,4 +1,4 @@
-﻿import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
@@ -8,14 +8,12 @@ import { AuthSessionService } from '../../auth/services/auth-session.service';
 import {
   CreateTerminalRequest,
   CreateTerminalResponse,
-  DeleteTerminalResponse,
   GetTerminalsParams,
   PaginationResponse,
   PermanentDeleteTerminalResponse,
-  RestoreTerminalResponse,
   TerminalDetailsResponse,
+  TerminalLifecycleResponse,
   TerminalListItemResponse,
-  DeletedTerminalListItemResponse,
   UpdateTerminalRequest,
   UpdateTerminalResponse,
 } from '../models/terminal-management.model';
@@ -23,7 +21,7 @@ import {
 const TERMINALS_PATH = 'api/terminals';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class TerminalManagementApiService {
   private readonly httpClient = inject(HttpClient);
@@ -38,69 +36,56 @@ export class TerminalManagementApiService {
     });
   }
 
-  getDeletedTerminals(
-    params: GetTerminalsParams
-  ): Observable<PaginationResponse<DeletedTerminalListItemResponse>> {
-    return this.httpClient.get<PaginationResponse<DeletedTerminalListItemResponse>>(
-      this.createDeletedUrl(),
-      {
-        headers: this.createHeaders(),
-        params: this.createParams(params),
-      }
-    );
-  }
-
   getTerminalById(terminalId: number): Observable<TerminalDetailsResponse> {
     return this.httpClient.get<TerminalDetailsResponse>(this.createItemUrl(terminalId), {
-      headers: this.createHeaders()
+      headers: this.createHeaders(),
     });
   }
 
   createTerminal(request: CreateTerminalRequest): Observable<CreateTerminalResponse> {
     return this.httpClient.post<CreateTerminalResponse>(this.terminalsEndpoint, request, {
-      headers: this.createHeaders()
+      headers: this.createHeaders(),
     });
   }
 
-  updateTerminal(
-    terminalId: number,
-    request: UpdateTerminalRequest
-  ): Observable<UpdateTerminalResponse> {
+  updateTerminal(terminalId: number, request: UpdateTerminalRequest): Observable<UpdateTerminalResponse> {
     return this.httpClient.put<UpdateTerminalResponse>(this.createItemUrl(terminalId), request, {
-      headers: this.createHeaders()
+      headers: this.createHeaders(),
     });
   }
 
-  softDeleteTerminal(terminalId: number): Observable<DeleteTerminalResponse> {
-    return this.httpClient.delete<DeleteTerminalResponse>(this.createItemUrl(terminalId), {
-      headers: this.createHeaders()
+  deactivateTerminal(terminalId: number, rowVersion: string): Observable<TerminalLifecycleResponse> {
+    return this.httpClient.post<TerminalLifecycleResponse>(this.createLifecycleUrl(terminalId, 'deactivate'), null, {
+      headers: this.createHeaders(rowVersion),
     });
   }
 
-  restoreTerminal(terminalId: number): Observable<RestoreTerminalResponse> {
-    return this.httpClient.post<RestoreTerminalResponse>(this.createRestoreUrl(terminalId), null, {
-      headers: this.createHeaders()
+  reactivateTerminal(terminalId: number, rowVersion: string): Observable<TerminalLifecycleResponse> {
+    return this.httpClient.post<TerminalLifecycleResponse>(this.createLifecycleUrl(terminalId, 'reactivate'), null, {
+      headers: this.createHeaders(rowVersion),
     });
   }
 
-  permanentlyDeleteTerminal(terminalId: number): Observable<PermanentDeleteTerminalResponse> {
+  permanentlyDeleteTerminal(terminalId: number, rowVersion: string): Observable<PermanentDeleteTerminalResponse> {
     return this.httpClient.delete<PermanentDeleteTerminalResponse>(
-      this.createPermanentDeleteUrl(terminalId),
-      {
-        headers: this.createHeaders(),
-      }
+      this.createLifecycleUrl(terminalId, 'permanent'),
+      { headers: this.createHeaders(rowVersion) },
     );
   }
 
-  private createHeaders(): HttpHeaders {
+  private createHeaders(rowVersion?: string): HttpHeaders {
     let headers = new HttpHeaders({
       'Accept-Language': this.appLanguageStore.language(),
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     });
     const token = this.authSessionService.currentSession()?.token;
 
     if (token) {
       headers = headers.set('Authorization', `Bearer ${token}`);
+    }
+
+    if (rowVersion) {
+      headers = headers.set('If-Match', rowVersion);
     }
 
     return headers;
@@ -119,6 +104,10 @@ export class TerminalManagementApiService {
       params = params.set('search', query.search.trim());
     }
 
+    if (query.isActive !== undefined && query.isActive !== null) {
+      params = params.set('isActive', query.isActive);
+    }
+
     return params;
   }
 
@@ -126,15 +115,7 @@ export class TerminalManagementApiService {
     return new URL(String(terminalId), `${this.terminalsEndpoint}/`).toString();
   }
 
-  private createDeletedUrl(): string {
-    return `${this.terminalsEndpoint}/deleted`;
-  }
-
-  private createRestoreUrl(terminalId: number): string {
-    return `${this.createItemUrl(terminalId)}/restore`;
-  }
-
-  private createPermanentDeleteUrl(terminalId: number): string {
-    return `${this.createItemUrl(terminalId)}/permanent`;
+  private createLifecycleUrl(terminalId: number, action: 'deactivate' | 'reactivate' | 'permanent'): string {
+    return `${this.createItemUrl(terminalId)}/${action}`;
   }
 }

@@ -3,6 +3,7 @@ import { Router, RouterOutlet } from '@angular/router';
 
 import { AppShellComponent } from '../../../shared/layouts/app-shell/app-shell.component';
 import { AppNavigationItem } from '../../../shared/models/navigation.model';
+import { AuthSessionService } from '../../auth/services/auth-session.service';
 import { OrganizationShellStore } from '../store/organization-shell.store';
 
 @Component({
@@ -14,6 +15,7 @@ import { OrganizationShellStore } from '../store/organization-shell.store';
 })
 export class OrganizationShellComponent {
   private readonly router = inject(Router);
+  private readonly authSessionService = inject(AuthSessionService);
 
   protected readonly shellStore = inject(OrganizationShellStore);
 
@@ -60,6 +62,7 @@ export class OrganizationShellComponent {
   }
 
   protected logout(): void {
+    this.authSessionService.clearSession();
     void this.router.navigateByUrl('/login');
   }
 }

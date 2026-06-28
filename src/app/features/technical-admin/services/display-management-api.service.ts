@@ -1,4 +1,4 @@
-﻿import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
@@ -6,16 +6,17 @@ import { environment } from '../../../../environments/environment';
 import { AppLanguageStore } from '../../../shared/store/app-language.store';
 import { AuthSessionService } from '../../auth/services/auth-session.service';
 import {
+  AvailableDisplayWindowResponse,
   CreateDisplayRequest,
   CreateDisplayResponse,
-  DeleteDisplayResponse,
-  DeletedDisplayListItemResponse,
   DisplayDetailsResponse,
+  DisplayLifecycleResponse,
   DisplayListItemResponse,
+  DisplayWindowListItemResponse,
+  GetAvailableDisplayWindowsParams,
   GetDisplaysParams,
   PaginationResponse,
   PermanentDeleteDisplayResponse,
-  RestoreDisplayResponse,
   UpdateDisplayRequest,
   UpdateDisplayResponse,
 } from '../models/display-management.model';
@@ -36,18 +37,6 @@ export class DisplayManagementApiService {
       headers: this.createHeaders(),
       params: this.createParams(params),
     });
-  }
-
-  getDeletedDisplays(
-    params: GetDisplaysParams,
-  ): Observable<PaginationResponse<DeletedDisplayListItemResponse>> {
-    return this.httpClient.get<PaginationResponse<DeletedDisplayListItemResponse>>(
-      this.createDeletedUrl(),
-      {
-        headers: this.createHeaders(),
-        params: this.createParams(params),
-      },
-    );
   }
 
   getDisplayById(displayId: number): Observable<DisplayDetailsResponse> {
@@ -71,26 +60,71 @@ export class DisplayManagementApiService {
     });
   }
 
-  softDeleteDisplay(displayId: number): Observable<DeleteDisplayResponse> {
-    return this.httpClient.delete<DeleteDisplayResponse>(this.createItemUrl(displayId), {
-      headers: this.createHeaders(),
-    });
-  }
-
-  restoreDisplay(displayId: number): Observable<RestoreDisplayResponse> {
-    return this.httpClient.post<RestoreDisplayResponse>(this.createRestoreUrl(displayId), null, {
-      headers: this.createHeaders(),
-    });
-  }
-
-  permanentlyDeleteDisplay(displayId: number): Observable<PermanentDeleteDisplayResponse> {
-    return this.httpClient.delete<PermanentDeleteDisplayResponse>(
-      this.createPermanentDeleteUrl(displayId),
-      { headers: this.createHeaders() },
+  deactivateDisplay(displayId: number, rowVersion: string): Observable<DisplayLifecycleResponse> {
+    return this.httpClient.post<DisplayLifecycleResponse>(
+      this.createLifecycleUrl(displayId, 'deactivate'),
+      null,
+      {
+        headers: this.createHeaders(rowVersion),
+      },
     );
   }
 
-  private createHeaders(): HttpHeaders {
+  reactivateDisplay(displayId: number, rowVersion: string): Observable<DisplayLifecycleResponse> {
+    return this.httpClient.post<DisplayLifecycleResponse>(
+      this.createLifecycleUrl(displayId, 'reactivate'),
+      null,
+      {
+        headers: this.createHeaders(rowVersion),
+      },
+    );
+  }
+
+  permanentlyDeleteDisplay(
+    displayId: number,
+    rowVersion: string,
+  ): Observable<PermanentDeleteDisplayResponse> {
+    return this.httpClient.delete<PermanentDeleteDisplayResponse>(
+      this.createLifecycleUrl(displayId, 'permanent'),
+      { headers: this.createHeaders(rowVersion) },
+    );
+  }
+
+  getLinkedWindows(displayId: number): Observable<readonly DisplayWindowListItemResponse[]> {
+    return this.httpClient.get<readonly DisplayWindowListItemResponse[]>(
+      this.createDisplayWindowsUrl(displayId),
+      {
+        headers: this.createHeaders(),
+      },
+    );
+  }
+
+  getAvailableWindows(
+    displayId: number,
+    params: GetAvailableDisplayWindowsParams,
+  ): Observable<PaginationResponse<AvailableDisplayWindowResponse>> {
+    return this.httpClient.get<PaginationResponse<AvailableDisplayWindowResponse>>(
+      this.createAvailableWindowsUrl(displayId),
+      {
+        headers: this.createHeaders(),
+        params: this.createAvailableWindowParams(params),
+      },
+    );
+  }
+
+  assignWindow(displayId: number, windowId: number): Observable<void> {
+    return this.httpClient.post<void>(this.createDisplayWindowUrl(displayId, windowId), null, {
+      headers: this.createHeaders(),
+    });
+  }
+
+  unassignWindow(displayId: number, windowId: number): Observable<void> {
+    return this.httpClient.delete<void>(this.createDisplayWindowUrl(displayId, windowId), {
+      headers: this.createHeaders(),
+    });
+  }
+
+  private createHeaders(rowVersion?: string): HttpHeaders {
     let headers = new HttpHeaders({
       'Accept-Language': this.appLanguageStore.language(),
       'Content-Type': 'application/json',
@@ -99,6 +133,10 @@ export class DisplayManagementApiService {
 
     if (token) {
       headers = headers.set('Authorization', `Bearer ${token}`);
+    }
+
+    if (rowVersion) {
+      headers = headers.set('If-Match', rowVersion);
     }
 
     return headers;
@@ -117,6 +155,26 @@ export class DisplayManagementApiService {
       params = params.set('search', query.search.trim());
     }
 
+    if (query.isActive !== undefined && query.isActive !== null) {
+      params = params.set('isActive', query.isActive);
+    }
+
+    return params;
+  }
+
+  private createAvailableWindowParams(query: GetAvailableDisplayWindowsParams): HttpParams {
+    let params = new HttpParams()
+      .set('pageNumber', query.pageNumber ?? 1)
+      .set('pageSize', Math.min(query.pageSize ?? 10, 100));
+
+    if (query.search?.trim()) {
+      params = params.set('search', query.search.trim());
+    }
+
+    if (query.isActive !== undefined && query.isActive !== null) {
+      params = params.set('isActive', query.isActive);
+    }
+
     return params;
   }
 
@@ -124,15 +182,22 @@ export class DisplayManagementApiService {
     return new URL(String(displayId), `${this.displaysEndpoint}/`).toString();
   }
 
-  private createDeletedUrl(): string {
-    return `${this.displaysEndpoint}/deleted`;
+  private createLifecycleUrl(
+    displayId: number,
+    action: 'deactivate' | 'reactivate' | 'permanent',
+  ): string {
+    return `${this.createItemUrl(displayId)}/${action}`;
   }
 
-  private createRestoreUrl(displayId: number): string {
-    return `${this.createItemUrl(displayId)}/restore`;
+  private createDisplayWindowsUrl(displayId: number): string {
+    return `${this.createItemUrl(displayId)}/windows`;
   }
 
-  private createPermanentDeleteUrl(displayId: number): string {
-    return `${this.createItemUrl(displayId)}/permanent`;
+  private createAvailableWindowsUrl(displayId: number): string {
+    return `${this.createItemUrl(displayId)}/available-windows`;
+  }
+
+  private createDisplayWindowUrl(displayId: number, windowId: number): string {
+    return `${this.createDisplayWindowsUrl(displayId)}/${windowId}`;
   }
 }

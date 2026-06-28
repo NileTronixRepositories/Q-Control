@@ -1,8 +1,9 @@
-﻿import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 
 import { AppShellComponent } from '../../../shared/layouts/app-shell/app-shell.component';
 import { AppNavigationItem } from '../../../shared/models/navigation.model';
+import { AuthSessionService } from '../../auth/services/auth-session.service';
 import { TechnicalAdminI18nStore } from '../store/technical-admin-i18n.store';
 
 @Component({
@@ -14,6 +15,7 @@ import { TechnicalAdminI18nStore } from '../store/technical-admin-i18n.store';
 })
 export class TechnicalAdminShellComponent {
   private readonly router = inject(Router);
+  private readonly authSessionService = inject(AuthSessionService);
 
   protected readonly i18nStore = inject(TechnicalAdminI18nStore);
   protected readonly translations = this.i18nStore.translations;
@@ -83,6 +85,7 @@ export class TechnicalAdminShellComponent {
   }
 
   protected logout(): void {
+    this.authSessionService.clearSession();
     void this.router.navigateByUrl('/login');
   }
 }

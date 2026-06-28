@@ -1,4 +1,4 @@
-﻿import { inject } from '@angular/core';
+import { inject } from '@angular/core';
 import { CanMatchFn, Router, UrlTree } from '@angular/router';
 
 import { AuthenticatedUserType } from '../models/login-credentials.model';
@@ -11,7 +11,7 @@ export const organizationAccessGuard: CanMatchFn = () => canAccessFeature('Organ
 function canAccessFeature(requiredUserType: AuthenticatedUserType): boolean | UrlTree {
   const authSessionService = inject(AuthSessionService);
   const router = inject(Router);
-  const session = authSessionService.currentSession();
+  const session = authSessionService.activeSession();
 
   if (session?.userType === requiredUserType) {
     return true;

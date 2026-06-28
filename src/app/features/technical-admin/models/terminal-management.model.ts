@@ -1,8 +1,11 @@
+import { LifecycleMutationResponse, OperationalEntityState, OperationalStatusFilter, PermanentDeleteResponse } from './operational-lifecycle.model';
+
 export interface GetTerminalsParams {
   readonly windowId?: number;
   readonly search?: string;
   readonly pageNumber?: number;
   readonly pageSize?: number;
+  readonly isActive?: OperationalStatusFilter;
 }
 
 export interface PaginationResponse<TItem> {
@@ -15,8 +18,15 @@ export interface PaginationResponse<TItem> {
   readonly hasNextPage: boolean;
 }
 
-export interface TerminalListItemResponse {
+export interface TerminalListItemResponse extends OperationalEntityState {
   readonly id: number;
+  readonly terminalId?: number;
+  readonly terminalID?: number;
+  readonly terminal_id?: number;
+  readonly Id?: number;
+  readonly ID?: number;
+  readonly TerminalId?: number;
+  readonly TerminalID?: number;
   readonly windowId: number;
   readonly windowNumber: string;
   readonly waitingAreaId: number;
@@ -28,10 +38,6 @@ export interface TerminalListItemResponse {
   readonly ipAddress: string;
   readonly serialNo: string;
   readonly type: string;
-}
-
-export interface DeletedTerminalListItemResponse extends TerminalListItemResponse {
-  readonly deletedOnUtc: string | null;
 }
 
 export interface TerminalDetailsResponse extends TerminalListItemResponse {
@@ -47,7 +53,7 @@ export interface CreateTerminalRequest {
   readonly type: string;
 }
 
-export interface CreateTerminalResponse {
+export interface CreateTerminalResponse extends OperationalEntityState {
   readonly id: number;
   readonly windowId: number;
   readonly number: string;
@@ -60,14 +66,14 @@ export interface CreateTerminalResponse {
 }
 
 export interface UpdateTerminalRequest {
-  readonly id: number;
   readonly number: string;
   readonly ipAddress: string;
   readonly serialNo: string;
   readonly type: string;
+  readonly rowVersion: string;
 }
 
-export interface UpdateTerminalResponse {
+export interface UpdateTerminalResponse extends OperationalEntityState {
   readonly id: number;
   readonly windowId: number;
   readonly number: string;
@@ -79,20 +85,8 @@ export interface UpdateTerminalResponse {
   readonly message: string;
 }
 
-export interface DeleteTerminalResponse {
-  readonly id: number;
-  readonly message: string;
-}
-
-export interface RestoreTerminalResponse {
-  readonly id: number;
-  readonly message: string;
-}
-
-export interface PermanentDeleteTerminalResponse {
-  readonly id: number;
-  readonly message: string;
-}
+export type TerminalLifecycleResponse = LifecycleMutationResponse;
+export type PermanentDeleteTerminalResponse = PermanentDeleteResponse;
 
 export interface ApiError {
   readonly code: string;
@@ -116,7 +110,6 @@ export type TerminalPermission =
   | 'Terminals.ViewDetails'
   | 'Terminals.Create'
   | 'Terminals.Update'
-  | 'Terminals.Delete'
-  | 'Terminals.ViewDeleted'
-  | 'Terminals.Restore'
+  | 'Terminals.Deactivate'
+  | 'Terminals.Reactivate'
   | 'Terminals.DeletePermanent';

@@ -14,6 +14,8 @@ const PERMISSION_CLAIM_KEYS = [
   'terminals_permissions',
   'displaysPermissions',
   'displays_permissions',
+  'displayWindowsPermissions',
+  'display_windows_permissions',
   'scope',
   'scp',
 ] as const;

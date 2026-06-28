@@ -1,8 +1,11 @@
+import { LifecycleMutationResponse, OperationalEntityState, OperationalStatusFilter, PermanentDeleteResponse } from './operational-lifecycle.model';
+
 export interface GetWindowsParams {
   readonly waitingAreaId?: number;
   readonly search?: string;
   readonly pageNumber?: number;
   readonly pageSize?: number;
+  readonly isActive?: OperationalStatusFilter;
 }
 
 export interface PaginationResponse<TItem> {
@@ -15,8 +18,9 @@ export interface PaginationResponse<TItem> {
   readonly hasNextPage: boolean;
 }
 
-export interface WindowListItemResponse {
+export interface WindowListItemResponse extends OperationalEntityState {
   readonly id: number;
+  readonly branchId: number;
   readonly waitingAreaId: number;
   readonly waitingAreaNumber: number;
   readonly waitingAreaDescriptiveName: string | null;
@@ -25,10 +29,6 @@ export interface WindowListItemResponse {
   readonly ipAddress: string | null;
   readonly enableTicketBooking: boolean;
   readonly enableDirectCall: boolean;
-}
-
-export interface DeletedWindowListItemResponse extends WindowListItemResponse {
-  readonly deletedOnUtc: string | null;
 }
 
 export interface WindowDetailsResponse extends WindowListItemResponse {
@@ -45,7 +45,7 @@ export interface CreateWindowRequest {
   readonly enableDirectCall: boolean;
 }
 
-export interface CreateWindowResponse {
+export interface CreateWindowResponse extends OperationalEntityState {
   readonly id: number;
   readonly waitingAreaId: number;
   readonly number: string;
@@ -59,15 +59,15 @@ export interface CreateWindowResponse {
 }
 
 export interface UpdateWindowRequest {
-  readonly id: number;
   readonly number: string;
   readonly descriptiveName: string | null;
   readonly ipAddress: string | null;
   readonly enableTicketBooking: boolean;
   readonly enableDirectCall: boolean;
+  readonly rowVersion: string;
 }
 
-export interface UpdateWindowResponse {
+export interface UpdateWindowResponse extends OperationalEntityState {
   readonly id: number;
   readonly waitingAreaId: number;
   readonly number: string;
@@ -80,15 +80,8 @@ export interface UpdateWindowResponse {
   readonly message: string;
 }
 
-export interface DeleteWindowResponse {
-  readonly id: number;
-  readonly message: string;
-}
-
-export interface PermanentDeleteWindowResponse {
-  readonly id: number;
-  readonly message: string;
-}
+export type WindowLifecycleResponse = LifecycleMutationResponse;
+export type PermanentDeleteWindowResponse = PermanentDeleteResponse;
 
 export interface ApiError {
   readonly code: string;
@@ -112,6 +105,6 @@ export type WindowPermission =
   | 'Windows.ViewDetails'
   | 'Windows.Create'
   | 'Windows.Update'
-  | 'Windows.Delete'
-  | 'Windows.ViewDeleted'
+  | 'Windows.Deactivate'
+  | 'Windows.Reactivate'
   | 'Windows.DeletePermanent';

@@ -1,11 +1,14 @@
+import { LifecycleMutationResponse, OperationalEntityState, OperationalStatusFilter, PermanentDeleteResponse } from './operational-lifecycle.model';
+
 export interface WaitingAreaListQuery {
   readonly branchId: number | null;
   readonly search: string;
   readonly pageNumber: number;
   readonly pageSize: number;
+  readonly isActive: OperationalStatusFilter;
 }
 
-export interface WaitingAreaListItem {
+export interface WaitingAreaListItem extends OperationalEntityState {
   readonly id: number;
   readonly branchId: number;
   readonly branchArabicName?: string | null;
@@ -17,16 +20,7 @@ export interface WaitingAreaListItem {
   readonly windowsCount: number;
 }
 
-export interface WaitingAreaDetails {
-  readonly id: number;
-  readonly branchId: number;
-  readonly branchArabicName?: string | null;
-  readonly branchEnglishName?: string | null;
-  readonly number: number;
-  readonly audioDevice?: string | null;
-  readonly controlDevice?: string | null;
-  readonly descriptiveName?: string | null;
-}
+export interface WaitingAreaDetails extends WaitingAreaListItem {}
 
 export interface CreateWaitingAreaRequest {
   readonly branchId: number;
@@ -36,11 +30,15 @@ export interface CreateWaitingAreaRequest {
   readonly descriptiveName?: string | null;
 }
 
-export interface UpdateWaitingAreaRequest extends CreateWaitingAreaRequest {
-  readonly id: number;
+export interface UpdateWaitingAreaRequest {
+  readonly number: number;
+  readonly audioDevice?: string | null;
+  readonly controlDevice?: string | null;
+  readonly descriptiveName?: string | null;
+  readonly rowVersion: string;
 }
 
-export interface WaitingAreaMutationResponse {
+export interface WaitingAreaMutationResponse extends OperationalEntityState {
   readonly id: number;
   readonly branchId?: number;
   readonly number?: number;
@@ -49,6 +47,9 @@ export interface WaitingAreaMutationResponse {
   readonly descriptiveName?: string | null;
   readonly message: string;
 }
+
+export type WaitingAreaLifecycleResponse = LifecycleMutationResponse;
+export type WaitingAreaPermanentDeleteResponse = PermanentDeleteResponse;
 
 export interface Pagination<TItem> {
   readonly currentPage: number;

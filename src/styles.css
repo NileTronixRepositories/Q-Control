@@ -1,4 +1,4 @@
-﻿@import 'bootstrap/dist/css/bootstrap.min.css';
+@import 'bootstrap/dist/css/bootstrap.min.css';
 @import './app/features/auth/pages/login/login-brand-animation.css';
 
 :root {
@@ -849,15 +849,8 @@ html {
     .window-management-page,
     .terminal-management-page
   )
-  :where(
-    label,
-    .form-label,
-    .filter-field span,
-    .form-field span,
-    .field-row label,
-    .number-field label,
-    dt
-  ) {
+  :where(label, .form-label, .filter-field span, .form-field span, .field-row label, .number-field label, dt) {
+
   color: #334155 !important;
   font-size: 0.78rem !important;
   font-weight: 800 !important;
@@ -1345,6 +1338,7 @@ html {
     .terminal-management-page
   )
   :where(label, .form-label, .filter-field span, .form-field span, .field-row label, .number-field label, dt) {
+
   color: var(--text-secondary) !important;
 }
 
@@ -1386,6 +1380,13 @@ html {
   border-color: var(--border-subtle) !important;
   border-radius: var(--radius-lg) !important;
   box-shadow: var(--shadow-raised) !important;
+}
+
+/* Popup overlays must avoid backdrop-filter. Chromium can skip the first paint of
+   form labels/values inside fixed dialogs until the user focuses a field. */
+:where(.editor-backdrop, .app-popup-overlay) {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
 }
 
 .app-popup-panel :where(.editor-panel-header, .panel-header) {

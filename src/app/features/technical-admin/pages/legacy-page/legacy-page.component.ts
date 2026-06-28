@@ -1,22 +1,23 @@
-﻿import { HttpErrorResponse } from '@angular/common/http';
-import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { AppLanguage } from '../../../../shared/models/app-language.model';
 import { AuthSessionService } from '../../../auth/services/auth-session.service';
 import {
-  ApiProblemDetails,
   BranchAuditUser,
   BranchDetails,
   BranchListItem,
   BranchLocation,
-  BranchMutationRequest,
+  CreateBranchRequest,
+  UpdateBranchRequest,
   BranchOrderSort,
   PagedBranchResponse
 } from '../../models/branch-management.model';
 import { BranchManagementApiService } from '../../services/branch-management-api.service';
 import { TechnicalAdminI18nStore } from '../../store/technical-admin-i18n.store';
+import { formatTechnicalAdminApiError } from '../../utils/api-error-message.util';
 
 type BranchManagementPageKey = 'branch-editor' | 'online-monitoring';
 type BranchPanelMode = 'closed' | 'create' | 'edit' | 'view';
@@ -35,8 +36,9 @@ interface BranchEditorRow {
   readonly ipAddress: string;
   readonly governorate: string;
   readonly city: string;
-  readonly isUpdatesAvailable: boolean;
-  readonly lastUpdated: string;
+  readonly isActive: boolean;
+  readonly effectiveIsActive: boolean;
+  readonly rowVersion: string;
   readonly createdBy: string;
 }
 
@@ -67,7 +69,16 @@ interface BranchEditorTranslations {
   readonly addBranch: string;
   readonly view: string;
   readonly edit: string;
-  readonly delete: string;
+  readonly status: string;
+  readonly active: string;
+  readonly inactive: string;
+  readonly operationalStatus: string;
+  readonly operationalAvailable: string;
+  readonly operationalUnavailable: string;
+  readonly deactivate: string;
+  readonly reactivate: string;
+  readonly permanentDelete: string;
+  readonly allStatuses: string;
   readonly actions: string;
   readonly createTitle: string;
   readonly editTitle: string;
@@ -100,7 +111,16 @@ const BRANCH_EDITOR_TRANSLATIONS: Record<AppLanguage, BranchEditorTranslations> 
     addBranch: '\u0625\u0636\u0627\u0641\u0629 \u0641\u0631\u0639',
     view: '\u0639\u0631\u0636',
     edit: '\u062a\u0639\u062f\u064a\u0644',
-    delete: '\u062d\u0630\u0641',
+    status: '\u0627\u0644\u062d\u0627\u0644\u0629',
+    active: '\u0646\u0634\u0637',
+    inactive: '\u063a\u064a\u0631 \u0646\u0634\u0637',
+    operationalStatus: '\u0627\u0644\u062d\u0627\u0644\u0629 \u0627\u0644\u062a\u0634\u063a\u064a\u0644\u064a\u0629',
+    operationalAvailable: '\u0645\u062a\u0627\u062d',
+    operationalUnavailable: '\u063a\u064a\u0631 \u0645\u062a\u0627\u062d \u0628\u0633\u0628\u0628 \u062d\u0627\u0644\u0629 \u0627\u0644\u0639\u0646\u0635\u0631 \u0627\u0644\u0623\u0628',
+    deactivate: '\u0625\u064a\u0642\u0627\u0641',
+    reactivate: '\u0625\u0639\u0627\u062f\u0629 \u062a\u0646\u0634\u064a\u0637',
+    permanentDelete: '\u062d\u0630\u0641 \u0646\u0647\u0627\u0626\u064a',
+    allStatuses: '\u0643\u0644 \u0627\u0644\u062d\u0627\u0644\u0627\u062a',
     actions: '\u0627\u0644\u0625\u062c\u0631\u0627\u0621\u0627\u062a',
     createTitle: '\u0625\u0636\u0627\u0641\u0629 \u0641\u0631\u0639',
     editTitle: '\u062a\u0639\u062f\u064a\u0644 \u0641\u0631\u0639',
@@ -118,7 +138,7 @@ const BRANCH_EDITOR_TRANSLATIONS: Record<AppLanguage, BranchEditorTranslations> 
     lastModifiedBy: '\u0622\u062e\u0631 \u062a\u0639\u062f\u064a\u0644 \u0628\u0648\u0627\u0633\u0637\u0629',
     modifiedOn: '\u062a\u0627\u0631\u064a\u062e \u0622\u062e\u0631 \u062a\u0639\u062f\u064a\u0644',
     requiredField: '\u0647\u0630\u0627 \u0627\u0644\u062d\u0642\u0644 \u0645\u0637\u0644\u0648\u0628.',
-    nameRequired: '\u0623\u062f\u062e\u0644 \u0627\u0644\u0627\u0633\u0645 \u0627\u0644\u0639\u0631\u0628\u064a \u0623\u0648 \u0627\u0644\u0625\u0646\u062c\u0644\u064a\u0632\u064a \u0639\u0644\u0649 \u0627\u0644\u0623\u0642\u0644.',
+    nameRequired: '\u0627\u0644\u0627\u0633\u0645 \u0627\u0644\u0639\u0631\u0628\u064a \u0648\u0627\u0644\u0625\u0646\u062c\u0644\u064a\u0632\u064a \u0645\u0637\u0644\u0648\u0628\u0627\u0646.',
     invalidIp: 'IP Address \u063a\u064a\u0631 \u0635\u062d\u064a\u062d.',
     max100: '\u0627\u0644\u062d\u062f \u0627\u0644\u0623\u0642\u0635\u0649 100 \u062d\u0631\u0641.',
     max500: '\u0627\u0644\u062d\u062f \u0627\u0644\u0623\u0642\u0635\u0649 500 \u062d\u0631\u0641.',
@@ -131,7 +151,16 @@ const BRANCH_EDITOR_TRANSLATIONS: Record<AppLanguage, BranchEditorTranslations> 
     addBranch: 'Add Branch',
     view: 'View',
     edit: 'Edit',
-    delete: 'Delete',
+    status: 'Status',
+    active: 'Active',
+    inactive: 'Inactive',
+    operationalStatus: 'Operational Status',
+    operationalAvailable: 'Available',
+    operationalUnavailable: 'Unavailable because parent is inactive',
+    deactivate: 'Deactivate',
+    reactivate: 'Reactivate',
+    permanentDelete: 'Permanent Delete',
+    allStatuses: 'All statuses',
     actions: 'Actions',
     createTitle: 'Add Branch',
     editTitle: 'Edit Branch',
@@ -149,7 +178,7 @@ const BRANCH_EDITOR_TRANSLATIONS: Record<AppLanguage, BranchEditorTranslations> 
     lastModifiedBy: 'Last Modified By',
     modifiedOn: 'Modified On',
     requiredField: 'This field is required.',
-    nameRequired: 'Arabic name or English name is required.',
+    nameRequired: 'Arabic name and English name are required.',
     invalidIp: 'IP Address is invalid.',
     max100: 'Maximum length is 100 characters.',
     max500: 'Maximum length is 500 characters.',
@@ -176,18 +205,21 @@ const EMPTY_BRANCH_TABLE_META: BranchTableMeta = {
   styleUrl: './legacy-page.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class LegacyPageComponent implements OnInit {
+export class LegacyPageComponent implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly formBuilder = inject(NonNullableFormBuilder);
   private readonly authSessionService = inject(AuthSessionService);
   private readonly branchManagementApiService = inject(BranchManagementApiService);
   private readonly i18nStore = inject(TechnicalAdminI18nStore);
+  private branchPanelRequestId = 0;
+  private toastTimeoutId: ReturnType<typeof setTimeout> | null = null;
 
   protected readonly translations = this.i18nStore.translations;
   protected readonly branchEditorTranslations = computed(() => BRANCH_EDITOR_TRANSLATIONS[this.i18nStore.language()]);
   protected readonly branchSearchText = signal('');
   protected readonly branchOrderSort = signal<BranchOrderSort>('Newest');
+  protected readonly branchStatusFilter = signal<boolean | null>(null);
   protected readonly branchPageSize = signal(10);
   protected readonly branchTableLoading = signal(false);
   protected readonly branchTableError = signal(false);
@@ -202,16 +234,16 @@ export class LegacyPageComponent implements OnInit {
   protected readonly branches = signal<readonly BranchEditorRow[]>([]);
 
   protected readonly branchForm = this.formBuilder.group({
-    arabicName: ['', [Validators.maxLength(100)]],
-    englishName: ['', [Validators.maxLength(100)]],
+    arabicName: ['', [Validators.required, Validators.maxLength(100)]],
+    englishName: ['', [Validators.required, Validators.maxLength(100)]],
     ipAddress: ['', [Validators.required, Validators.maxLength(45)]],
     license: [''],
-    governorate: ['', [Validators.maxLength(100)]],
-    city: ['', [Validators.maxLength(100)]],
-    area: ['', [Validators.maxLength(100)]],
-    address: ['', [Validators.maxLength(500)]],
-    longitude: ['', [Validators.maxLength(50)]],
-    latitude: ['', [Validators.maxLength(50)]]
+    governorate: ['', [Validators.required, Validators.maxLength(100)]],
+    city: ['', [Validators.required, Validators.maxLength(100)]],
+    area: ['', [Validators.required, Validators.maxLength(100)]],
+    address: ['', [Validators.required, Validators.maxLength(500)]],
+    longitude: ['', [Validators.required, Validators.min(-180), Validators.max(180)]],
+    latitude: ['', [Validators.required, Validators.min(-90), Validators.max(90)]]
   });
 
   protected readonly pageKey = computed<BranchManagementPageKey>(
@@ -236,16 +268,16 @@ export class LegacyPageComponent implements OnInit {
     const translations = this.translations();
     const meta = this.branchTableMeta();
     const rows = this.branches();
-    const updatesAvailable = rows.filter((branch) => branch.isUpdatesAvailable).length;
+    const activeCount = rows.filter((branch) => branch.isActive).length;
+    const inactiveCount = rows.length - activeCount;
 
     return [
       { label: translations.totalBranchesLabel, value: String(meta.totalItems), tone: 'default' },
       { label: translations.pageSizeLabel, value: String(meta.pageSize), tone: 'default' },
-      { label: translations.updatesAvailableLabel, value: String(updatesAvailable), tone: 'warning' },
-      { label: translations.totalItemsLabel, value: String(rows.length), tone: 'success' }
+      { label: this.branchEditorTranslations().active, value: String(activeCount), tone: 'success' },
+      { label: this.branchEditorTranslations().inactive, value: String(inactiveCount), tone: 'warning' }
     ];
   });
-
   protected readonly monitoringSummaries = computed<readonly BranchPageSummary[]>(() => {
     const translations = this.translations();
 
@@ -274,6 +306,21 @@ export class LegacyPageComponent implements OnInit {
     }
   }
 
+  ngOnDestroy(): void {
+    if (this.toastTimeoutId) {
+      clearTimeout(this.toastTimeoutId);
+    }
+  }
+
+  protected clearBranchMessage(): void {
+    this.branchMessage.set(null);
+
+    if (this.toastTimeoutId) {
+      clearTimeout(this.toastTimeoutId);
+      this.toastTimeoutId = null;
+    }
+  }
+
   protected updateBranchSearch(event: Event): void {
     this.branchSearchText.set(this.readInputValue(event));
     this.loadBranches(1);
@@ -282,6 +329,12 @@ export class LegacyPageComponent implements OnInit {
   protected updateBranchOrderSort(event: Event): void {
     const value = this.readInputValue(event);
     this.branchOrderSort.set(value === 'Oldest' ? 'Oldest' : 'Newest');
+    this.loadBranches(1);
+  }
+
+  protected updateBranchStatusFilter(event: Event): void {
+    const value = this.readInputValue(event);
+    this.branchStatusFilter.set(value === '' ? null : value === 'true');
     this.loadBranches(1);
   }
 
@@ -314,7 +367,9 @@ export class LegacyPageComponent implements OnInit {
   }
 
   protected openCreateBranch(): void {
-    this.branchMessage.set(null);
+    this.branchPanelRequestId += 1;
+    this.branchPanelLoading.set(false);
+    this.clearBranchMessage();
     this.selectedBranchId.set(null);
     this.selectedBranchDetails.set(null);
     this.branchPanelMode.set('create');
@@ -341,6 +396,8 @@ export class LegacyPageComponent implements OnInit {
   }
 
   protected closeBranchPanel(): void {
+    this.branchPanelRequestId += 1;
+    this.branchPanelLoading.set(false);
     this.branchPanelMode.set('closed');
     this.selectedBranchId.set(null);
     this.selectedBranchDetails.set(null);
@@ -363,32 +420,29 @@ export class LegacyPageComponent implements OnInit {
     }
   }
 
-  protected deleteBranch(branch: BranchEditorRow): void {
-    const label = branch.englishName !== '-' ? branch.englishName : branch.arabicName;
-    const confirmed = window.confirm(this.branchEditorTranslations().deleteConfirm + ': ' + label + '?');
-
-    if (!confirmed) {
+  protected deactivateBranch(branch: BranchEditorRow): void {
+    if (!window.confirm(`${this.branchEditorTranslations().deactivate}: ${branch.englishName}?`)) {
       return;
     }
 
-    this.deletingBranchId.set(branch.id);
-    this.branchManagementApiService.deleteBranch(branch.id).subscribe({
-      next: () => {
-        this.branchMessage.set({ tone: 'success', text: this.branchEditorTranslations().fallbackSuccess });
-        const meta = this.branchTableMeta();
-        const nextPage = this.branches().length === 1 && meta.currentPage > 1
-          ? meta.currentPage - 1
-          : meta.currentPage;
-        this.loadBranches(nextPage);
-      },
-      error: (error: HttpErrorResponse) => {
-        this.handleBranchApiError(error);
-        this.deletingBranchId.set(null);
-      },
-      complete: () => this.deletingBranchId.set(null)
-    });
+    this.runBranchLifecycleAction(branch, 'deactivate');
   }
 
+  protected reactivateBranch(branch: BranchEditorRow): void {
+    if (!window.confirm(`${this.branchEditorTranslations().reactivate}: ${branch.englishName}?`)) {
+      return;
+    }
+
+    this.runBranchLifecycleAction(branch, 'reactivate');
+  }
+
+  protected permanentlyDeleteBranch(branch: BranchEditorRow): void {
+    if (!window.confirm(`${this.branchEditorTranslations().permanentDelete}: ${branch.englishName}?`)) {
+      return;
+    }
+
+    this.runBranchLifecycleAction(branch, 'permanent');
+  }
   protected branchFormTitle(): string {
     const translations = this.branchEditorTranslations();
 
@@ -410,7 +464,7 @@ export class LegacyPageComponent implements OnInit {
 
   protected isBranchNameMissing(): boolean {
     const value = this.branchForm.getRawValue();
-    return value.arabicName.trim().length === 0 && value.englishName.trim().length === 0;
+    return value.arabicName.trim().length === 0 || value.englishName.trim().length === 0;
   }
 
   protected isIpAddressInvalid(): boolean {
@@ -418,8 +472,13 @@ export class LegacyPageComponent implements OnInit {
     return value.length > 0 && !this.isValidIpAddress(value);
   }
 
-  protected detailValue(value: string | null | undefined): string {
-    return value && value.trim().length > 0 ? value : this.branchEditorTranslations().emptyValue;
+  protected detailValue(value: string | number | null | undefined): string {
+    if (value === null || value === undefined) {
+      return this.branchEditorTranslations().emptyValue;
+    }
+
+    const text = String(value);
+    return text.trim().length > 0 ? text : this.branchEditorTranslations().emptyValue;
   }
 
   protected userName(user: BranchAuditUser | null): string {
@@ -443,7 +502,8 @@ export class LegacyPageComponent implements OnInit {
         searchText: this.branchSearchText().trim(),
         orderSort: this.branchOrderSort(),
         pageNumber,
-        pageSize: this.branchPageSize()
+        pageSize: this.branchPageSize(),
+        isActive: this.branchStatusFilter()
       })
       .subscribe({
         next: (response) => this.applyBranchResponse(response),
@@ -457,6 +517,8 @@ export class LegacyPageComponent implements OnInit {
   }
 
   private openBranchDetails(branchId: number, mode: Extract<BranchPanelMode, 'edit' | 'view'>): void {
+    const requestId = ++this.branchPanelRequestId;
+
     this.branchPanelLoading.set(true);
     this.branchPanelMode.set(mode);
     this.selectedBranchId.set(branchId);
@@ -464,12 +526,20 @@ export class LegacyPageComponent implements OnInit {
 
     this.branchManagementApiService.getBranchDetails(branchId).subscribe({
       next: (details) => {
+        if (requestId !== this.branchPanelRequestId || this.branchPanelMode() !== mode) {
+          return;
+        }
+
         this.selectedBranchDetails.set(details);
         if (mode === 'edit') {
           this.fillBranchForm(details);
         }
       },
       error: (error: HttpErrorResponse) => {
+        if (requestId !== this.branchPanelRequestId || this.branchPanelMode() !== mode) {
+          return;
+        }
+
         this.handleBranchApiError(error);
         this.branchPanelLoading.set(false);
         this.closeBranchPanel();
@@ -477,7 +547,11 @@ export class LegacyPageComponent implements OnInit {
           this.loadBranches(this.branchTableMeta().currentPage);
         }
       },
-      complete: () => this.branchPanelLoading.set(false)
+      complete: () => {
+        if (requestId === this.branchPanelRequestId && this.branchPanelMode() === mode) {
+          this.branchPanelLoading.set(false);
+        }
+      }
     });
   }
 
@@ -486,7 +560,7 @@ export class LegacyPageComponent implements OnInit {
 
     this.branchManagementApiService.createBranch(this.createBranchRequest()).subscribe({
       next: () => {
-        this.branchMessage.set({ tone: 'success', text: this.branchEditorTranslations().fallbackSuccess });
+        this.showBranchMessage('success', this.branchEditorTranslations().fallbackSuccess);
         this.closeBranchPanel();
         this.loadBranches(1, true);
       },
@@ -507,9 +581,9 @@ export class LegacyPageComponent implements OnInit {
 
     this.branchSaving.set(true);
 
-    this.branchManagementApiService.updateBranch(branchId, this.createBranchRequest()).subscribe({
+    this.branchManagementApiService.updateBranch(branchId, this.createUpdateBranchRequest()).subscribe({
       next: () => {
-        this.branchMessage.set({ tone: 'success', text: this.branchEditorTranslations().fallbackSuccess });
+        this.showBranchMessage('success', this.branchEditorTranslations().fallbackSuccess);
         this.closeBranchPanel();
         this.loadBranches(this.branchTableMeta().currentPage);
       },
@@ -531,32 +605,36 @@ export class LegacyPageComponent implements OnInit {
       city: details.location?.city ?? '',
       area: details.location?.area ?? '',
       address: details.location?.address ?? '',
-      longitude: details.location?.longitude ?? '',
-      latitude: details.location?.latitude ?? ''
+      longitude: details.location?.longitude?.toString() ?? '',
+      latitude: details.location?.latitude?.toString() ?? ''
     });
   }
 
-  private createBranchRequest(): BranchMutationRequest {
+  private createBranchRequest(): CreateBranchRequest {
     const value = this.branchForm.getRawValue();
-    const location = {
-      governorate: this.toOptionalString(value.governorate),
-      city: this.toOptionalString(value.city),
-      area: this.toOptionalString(value.area),
-      address: this.toOptionalString(value.address),
-      longitude: this.toOptionalString(value.longitude),
-      latitude: this.toOptionalString(value.latitude)
-    };
-    const hasLocation = Object.values(location).some((field) => field !== null);
 
     return {
-      arabicName: this.toOptionalString(value.arabicName),
-      englishName: this.toOptionalString(value.englishName),
+      arabicName: value.arabicName.trim(),
+      englishName: value.englishName.trim(),
       ipAddress: value.ipAddress.trim(),
       license: this.toOptionalString(value.license),
-      location: hasLocation ? location : null
+      location: {
+        governorate: value.governorate.trim(),
+        city: value.city.trim(),
+        area: value.area.trim(),
+        address: value.address.trim(),
+        longitude: Number(value.longitude),
+        latitude: Number(value.latitude)
+      }
     };
   }
 
+  private createUpdateBranchRequest(): UpdateBranchRequest {
+    return {
+      ...this.createBranchRequest(),
+      rowVersion: this.selectedBranchDetails()?.rowVersion ?? ''
+    };
+  }
   private isBranchFormValid(): boolean {
     return this.branchForm.valid && !this.isBranchNameMissing() && !this.isIpAddressInvalid();
   }
@@ -565,6 +643,43 @@ export class LegacyPageComponent implements OnInit {
     const ipv4Pattern = /^(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}$/;
     const ipv6Pattern = /^([0-9a-fA-F]{0,4}:){2,7}[0-9a-fA-F]{0,4}$/;
     return ipv4Pattern.test(value) || ipv6Pattern.test(value);
+  }
+
+  private toOptionalString(value: string): string | null {
+    const trimmedValue = value.trim();
+    return trimmedValue.length > 0 ? trimmedValue : null;
+  }
+
+  private withFallback(value: string | null | undefined): string {
+    return value && value.trim().length > 0 ? value : this.branchEditorTranslations().emptyValue;
+  }
+
+  private formatDate(value: string | null): string {
+    if (!value) {
+      return this.branchEditorTranslations().emptyValue;
+    }
+
+    const parsedDate = new Date(value);
+
+    if (Number.isNaN(parsedDate.getTime())) {
+      return value;
+    }
+
+    return new Intl.DateTimeFormat(this.i18nStore.language() === 'ar' ? 'ar-EG' : 'en-US', {
+      dateStyle: 'medium',
+      timeStyle: 'short'
+    }).format(parsedDate);
+  }
+
+  private resolveUserName(user: BranchAuditUser | null): string {
+    if (!user) {
+      return this.branchEditorTranslations().emptyValue;
+    }
+
+    const preferredName = this.i18nStore.language() === 'ar' ? user.nameAr : user.nameEn;
+    const fallbackName = this.i18nStore.language() === 'ar' ? user.nameEn : user.nameAr;
+    const fallbackUserName = user.userName.trim().length > 0 ? user.userName : user.applicationUserId;
+    return this.withFallback(preferredName ?? fallbackName ?? fallbackUserName);
   }
 
   private applyBranchResponse(response: PagedBranchResponse<BranchListItem>): void {
@@ -587,85 +702,75 @@ export class LegacyPageComponent implements OnInit {
       ipAddress: this.withFallback(branch.ipAddress),
       governorate: this.withFallback(branch.governorate),
       city: this.withFallback(branch.city),
-      isUpdatesAvailable: branch.isUpdatesAvailable,
-      lastUpdated: this.formatDate(branch.lastUpdated),
+      isActive: branch.isActive,
+      effectiveIsActive: branch.effectiveIsActive,
+      rowVersion: branch.rowVersion,
       createdBy: this.resolveUserName(branch.createdBy)
     };
   }
 
+  protected branchStatusLabel(branch: BranchEditorRow): string {
+    return branch.isActive ? this.branchEditorTranslations().active : this.branchEditorTranslations().inactive;
+  }
+
+  protected branchOperationalLabel(branch: BranchEditorRow): string {
+    return branch.effectiveIsActive
+      ? this.branchEditorTranslations().operationalAvailable
+      : this.branchEditorTranslations().operationalUnavailable;
+  }
+
+  protected showBranchOperationalWarning(branch: BranchEditorRow): boolean {
+    return branch.isActive && !branch.effectiveIsActive;
+  }
+
+  private runBranchLifecycleAction(
+    branch: BranchEditorRow,
+    action: 'deactivate' | 'reactivate' | 'permanent'
+  ): void {
+    this.deletingBranchId.set(branch.id);
+    const request = action === 'deactivate'
+      ? this.branchManagementApiService.deactivateBranch(branch.id, branch.rowVersion)
+      : action === 'reactivate'
+        ? this.branchManagementApiService.reactivateBranch(branch.id, branch.rowVersion)
+        : this.branchManagementApiService.permanentlyDeleteBranch(branch.id, branch.rowVersion);
+
+    request.subscribe({
+      next: (response) => {
+        this.showBranchMessage('success', response.message || this.branchEditorTranslations().fallbackSuccess);
+        const meta = this.branchTableMeta();
+        const nextPage = action === 'permanent' && this.branches().length === 1 && meta.currentPage > 1
+          ? meta.currentPage - 1
+          : meta.currentPage;
+        this.loadBranches(nextPage, true);
+      },
+      error: (error: HttpErrorResponse) => this.handleBranchApiError(error),
+      complete: () => this.deletingBranchId.set(null)
+    });
+  }
   private handleBranchApiError(error: HttpErrorResponse): void {
-    if (error.status === 401) {
+    if (this.authSessionService.shouldClearSessionForHttpStatus(error.status)) {
       this.authSessionService.clearSession();
       void this.router.navigateByUrl('/login');
       return;
     }
 
-    this.branchMessage.set({
-      tone: 'error',
-      text: this.extractApiMessage(error)
-    });
+    this.showBranchMessage('error', this.extractApiMessage(error));
   }
 
+  private showBranchMessage(tone: MessageTone, text: string): void {
+    if (this.toastTimeoutId) {
+      clearTimeout(this.toastTimeoutId);
+    }
+
+    this.branchMessage.set({ tone, text });
+
+    this.toastTimeoutId = setTimeout(() => {
+      this.branchMessage.set(null);
+      this.toastTimeoutId = null;
+    }, tone === 'error' ? 6500 : 4200);
+  }
   private extractApiMessage(error: HttpErrorResponse): string {
-    const body = error.error as ApiProblemDetails | string | null;
-
-    if (typeof body === 'string' && body.trim().length > 0) {
-      return body;
-    }
-
-    if (body && typeof body === 'object') {
-      const firstError = body.errors?.[0];
-
-      if (firstError?.message) {
-        return firstError.message;
-      }
-
-      if (body.detail) {
-        return body.detail;
-      }
-
-      if (body.title) {
-        return body.title;
-      }
-    }
-
-    return this.branchEditorTranslations().fallbackError;
-  }
-
-  private resolveUserName(user: BranchAuditUser | null): string {
-    if (!user) {
-      return this.branchEditorTranslations().emptyValue;
-    }
-
-    return this.i18nStore.language() === 'ar'
-      ? this.withFallback(user.nameAr ?? user.nameEn ?? user.userName)
-      : this.withFallback(user.nameEn ?? user.nameAr ?? user.userName);
-  }
-
-  private formatDate(value: string | null): string {
-    if (!value) {
-      return this.branchEditorTranslations().emptyValue;
-    }
-
-    const date = new Date(value);
-
-    if (Number.isNaN(date.getTime())) {
-      return value;
-    }
-
-    return new Intl.DateTimeFormat(this.i18nStore.language(), {
-      dateStyle: 'medium',
-      timeStyle: 'short'
-    }).format(date);
-  }
-
-  private withFallback(value: string | null): string {
-    return value && value.trim().length > 0 ? value : this.branchEditorTranslations().emptyValue;
-  }
-
-  private toOptionalString(value: string): string | null {
-    const trimmedValue = value.trim();
-    return trimmedValue.length > 0 ? trimmedValue : null;
+    return formatTechnicalAdminApiError(error, this.branchEditorTranslations().fallbackError);
   }
 
   private readInputValue(event: Event): string {

@@ -1,4 +1,4 @@
-﻿import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
@@ -6,19 +6,21 @@ import { environment } from '../../../../environments/environment';
 import { AppLanguageStore } from '../../../shared/store/app-language.store';
 import { AuthSessionService } from '../../auth/services/auth-session.service';
 import {
-  BranchDeleteResponse,
   BranchDetails,
+  BranchLifecycleResponse,
   BranchListItem,
   BranchListQuery,
-  BranchMutationRequest,
   BranchMutationResponse,
-  PagedBranchResponse
+  BranchPermanentDeleteResponse,
+  CreateBranchRequest,
+  PagedBranchResponse,
+  UpdateBranchRequest,
 } from '../models/branch-management.model';
 
 const BRANCHES_PATH = 'api/branches';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class BranchManagementApiService {
   private readonly httpClient = inject(HttpClient);
@@ -29,41 +31,58 @@ export class BranchManagementApiService {
   getBranches(query: BranchListQuery): Observable<PagedBranchResponse<BranchListItem>> {
     return this.httpClient.get<PagedBranchResponse<BranchListItem>>(this.branchesEndpoint, {
       headers: this.createHeaders(),
-      params: this.createParams(query)
+      params: this.createParams(query),
     });
   }
 
   getBranchDetails(branchId: number): Observable<BranchDetails> {
     return this.httpClient.get<BranchDetails>(this.createItemUrl(branchId), {
-      headers: this.createHeaders()
+      headers: this.createHeaders(),
     });
   }
 
-  createBranch(request: BranchMutationRequest): Observable<BranchMutationResponse> {
+  createBranch(request: CreateBranchRequest): Observable<BranchMutationResponse> {
     return this.httpClient.post<BranchMutationResponse>(this.branchesEndpoint, request, {
-      headers: this.createHeaders()
+      headers: this.createHeaders(),
     });
   }
 
-  updateBranch(branchId: number, request: BranchMutationRequest): Observable<BranchMutationResponse> {
+  updateBranch(branchId: number, request: UpdateBranchRequest): Observable<BranchMutationResponse> {
     return this.httpClient.put<BranchMutationResponse>(this.createItemUrl(branchId), request, {
-      headers: this.createHeaders()
+      headers: this.createHeaders(),
     });
   }
 
-  deleteBranch(branchId: number): Observable<BranchDeleteResponse> {
-    return this.httpClient.delete<BranchDeleteResponse>(this.createItemUrl(branchId), {
-      headers: this.createHeaders()
+  deactivateBranch(branchId: number, rowVersion: string): Observable<BranchLifecycleResponse> {
+    return this.httpClient.post<BranchLifecycleResponse>(this.createLifecycleUrl(branchId, 'deactivate'), null, {
+      headers: this.createHeaders(rowVersion),
     });
   }
+
+  reactivateBranch(branchId: number, rowVersion: string): Observable<BranchLifecycleResponse> {
+    return this.httpClient.post<BranchLifecycleResponse>(this.createLifecycleUrl(branchId, 'reactivate'), null, {
+      headers: this.createHeaders(rowVersion),
+    });
+  }
+
+  permanentlyDeleteBranch(branchId: number, rowVersion: string): Observable<BranchPermanentDeleteResponse> {
+    return this.httpClient.delete<BranchPermanentDeleteResponse>(this.createLifecycleUrl(branchId, 'permanent'), {
+      headers: this.createHeaders(rowVersion),
+    });
+  }
+
   private createItemUrl(branchId: number): string {
     return new URL(String(branchId), this.branchesEndpoint + '/').toString();
   }
 
-  private createHeaders(): HttpHeaders {
+  private createLifecycleUrl(branchId: number, action: 'deactivate' | 'reactivate' | 'permanent'): string {
+    return `${this.createItemUrl(branchId)}/${action}`;
+  }
+
+  private createHeaders(rowVersion?: string): HttpHeaders {
     let headers = new HttpHeaders({
       'Accept-Language': this.appLanguageStore.language(),
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     });
     const token = this.authSessionService.currentSession()?.token;
 
@@ -71,16 +90,24 @@ export class BranchManagementApiService {
       headers = headers.set('Authorization', `Bearer ${token}`);
     }
 
+    if (rowVersion) {
+      headers = headers.set('If-Match', rowVersion);
+    }
+
     return headers;
   }
 
   private createParams(query: BranchListQuery): HttpParams {
-    return new HttpParams()
+    let params = new HttpParams()
       .set('searchText', query.searchText)
       .set('orderSort', query.orderSort)
       .set('pageNumber', query.pageNumber)
       .set('pageSize', query.pageSize);
+
+    if (query.isActive !== null) {
+      params = params.set('isActive', query.isActive);
+    }
+
+    return params;
   }
 }
-
-

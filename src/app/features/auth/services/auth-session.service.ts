@@ -1,4 +1,4 @@
-﻿import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
 import { catchError, map, Observable, of } from 'rxjs';
 
@@ -65,6 +65,30 @@ export class AuthSessionService {
   );
 
   readonly currentSession = this.currentSessionSignal.asReadonly();
+
+  activeSession(): AuthenticatedSession | null {
+    const session = this.currentSessionSignal();
+
+    if (!session) {
+      return null;
+    }
+
+    if (this.isJwtExpired(session.token)) {
+      this.clearSession();
+      return null;
+    }
+
+    return session;
+  }
+
+  shouldClearSessionForHttpStatus(status: number): boolean {
+    return status === 401 || (status === 403 && this.isCurrentSessionExpired());
+  }
+
+  private isCurrentSessionExpired(): boolean {
+    const session = this.currentSessionSignal();
+    return !!session && this.isJwtExpired(session.token);
+  }
 
   submitLogin(credentials: LoginCredentials): Observable<LoginSubmissionResult> {
     const request: LoginApiRequest = {
@@ -246,10 +270,17 @@ export class AuthSessionService {
   }
 
   private readStoredSession(): AuthenticatedSession | null {
-    return (
+    const session =
       this.parseStoredSession(localStorage.getItem(this.sessionStorageKey)) ??
-      this.parseStoredSession(sessionStorage.getItem(this.sessionStorageKey))
-    );
+      this.parseStoredSession(sessionStorage.getItem(this.sessionStorageKey));
+
+    if (session && this.isJwtExpired(session.token)) {
+      this.removeStorageItem(localStorage);
+      this.removeStorageItem(sessionStorage);
+      return null;
+    }
+
+    return session;
   }
 
   private parseStoredSession(value: string | null): AuthenticatedSession | null {
@@ -284,6 +315,39 @@ export class AuthSessionService {
       typeof record['requiresBranchSelection'] === 'boolean' &&
       (record['activeBranchId'] === null || typeof record['activeBranchId'] === 'string')
     );
+  }
+
+  private isJwtExpired(token: string): boolean {
+    const payload = this.readJwtPayload(token);
+    const expiresAt = payload?.['exp'];
+    const expiresAtSeconds = typeof expiresAt === 'number' ? expiresAt : Number(expiresAt);
+
+    if (!Number.isFinite(expiresAtSeconds)) {
+      return false;
+    }
+
+    return Date.now() >= expiresAtSeconds * 1000;
+  }
+
+  private readJwtPayload(token: string): Record<string, unknown> | null {
+    const [, payload] = token.split('.');
+
+    if (!payload) {
+      return null;
+    }
+
+    try {
+      const normalizedPayload = payload.replace(/-/g, '+').replace(/_/g, '/');
+      const paddedPayload = normalizedPayload.padEnd(Math.ceil(normalizedPayload.length / 4) * 4, '=');
+      const decodedPayload = globalThis.atob(paddedPayload);
+      const parsedPayload = JSON.parse(decodedPayload) as unknown;
+
+      return parsedPayload && typeof parsedPayload === 'object'
+        ? (parsedPayload as Record<string, unknown>)
+        : null;
+    } catch {
+      return null;
+    }
   }
 
   private isLegacyLocalFallbackToken(token: string): boolean {

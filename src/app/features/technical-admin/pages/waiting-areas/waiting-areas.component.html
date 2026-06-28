@@ -1,4 +1,4 @@
-﻿<section class="waiting-areas-page container-fluid py-3 py-lg-4">
+<section class="waiting-areas-page container-fluid py-3 py-lg-4">
   <!-- Header -->
   <header
     class="page-header d-flex flex-column flex-md-row align-items-start justify-content-between gap-3"
@@ -24,15 +24,31 @@
     </button>
   </header>
 
-  <!-- Message -->
+  <!-- Toast -->
   @if (message(); as currentMessage) {
-    <div
-      class="message"
-      [class.message-success]="currentMessage.tone === 'success'"
-      [class.message-error]="currentMessage.tone === 'error'"
-      role="status"
-    >
-      {{ currentMessage.text }}
+    <div class="toast-stack" role="status" aria-live="polite" aria-atomic="true">
+      <div
+        class="toast-item"
+        [class.toast-success]="currentMessage.tone === 'success'"
+        [class.toast-error]="currentMessage.tone === 'error'"
+        [class.toast-info]="currentMessage.tone === 'info'"
+      >
+        <i
+          class="bi"
+          [class.bi-check-circle-fill]="currentMessage.tone === 'success'"
+          [class.bi-x-octagon-fill]="currentMessage.tone === 'error'"
+          [class.bi-info-circle-fill]="currentMessage.tone === 'info'"
+          aria-hidden="true"
+        ></i>
+
+        <p class="mb-0">
+          {{ currentMessage.text }}
+        </p>
+
+        <button type="button" class="toast-close" [attr.aria-label]="translations().close" (click)="clearMessage()">
+          <i class="bi bi-x-lg" aria-hidden="true"></i>
+        </button>
+      </div>
     </div>
   }
 
@@ -42,7 +58,7 @@
       <!-- Toolbar -->
       <div class="row g-3 align-items-end mb-4">
         <!-- Search -->
-        <div class="col-12 col-lg-5">
+        <div class="col-12 col-lg-4">
           <label class="filter-field w-100">
             <span>
               {{ translations().searchPlaceholder }}
@@ -59,7 +75,7 @@
         </div>
 
         <!-- Branch -->
-        <div class="col-12 col-md-6 col-lg-3">
+        <div class="col-12 col-md-6 col-lg-2">
           <label class="filter-field w-100">
             <span>
               {{ translations().branchFilter }}
@@ -83,6 +99,17 @@
           </label>
         </div>
 
+        <!-- Status -->
+        <div class="col-12 col-md-6 col-lg-2">
+          <label class="filter-field w-100">
+            <span>{{ translations().status }}</span>
+            <select class="form-select" [value]="statusFilter() === null ? '' : statusFilter()" (change)="updateStatusFilter($event)">
+              <option value="">{{ translations().allStatuses }}</option>
+              <option value="true">{{ translations().active }}</option>
+              <option value="false">{{ translations().inactive }}</option>
+            </select>
+          </label>
+        </div>
         <!-- Page Size -->
         <div class="col-6 col-md-3 col-lg-2">
           <label class="filter-field w-100">
@@ -141,6 +168,8 @@
 
                 <th>{{ translations().windowsCount }}</th>
 
+                <th>{{ translations().status }}</th>
+
                 <th class="text-center">
                   {{ translations().actions }}
                 </th>
@@ -175,6 +204,21 @@
                   </td>
 
                   <td>
+                    <span
+                      class="status-pill"
+                      [class.status-active]="item.isActive"
+                      [class.status-inactive]="!item.isActive"
+                    >
+                      {{ statusLabel(item) }}
+                    </span>
+                    @if (showOperationalWarning(item)) {
+                      <small class="d-block text-warning fw-bold mt-1">
+                        {{ translations().operationalUnavailable }}
+                      </small>
+                    }
+                  </td>
+
+                  <td>
                     <div class="d-flex align-items-center justify-content-center gap-2">
                       <button type="button" class="icon-action" (click)="openView(item.id)">
                         <i class="bi bi-eye"></i>
@@ -183,15 +227,40 @@
                       <button type="button" class="icon-action" (click)="openEdit(item.id)">
                         <i class="bi bi-pencil-square"></i>
                       </button>
+                      @if (item.isActive) {
+                        <button
+                          type="button"
+                          class="icon-action warning-action"
+                          [attr.aria-label]="translations().deactivate"
+                          [title]="translations().deactivate"
+                          [disabled]="deletingId() === item.id"
+                          (click)="deactivateWaitingArea(item)"
+                        >
+                          <i class="bi bi-pause-circle"></i>
+                        </button>
+                      } @else {
+                        <button
+                          type="button"
+                          class="icon-action success-action"
+                          [attr.aria-label]="translations().reactivate"
+                          [title]="translations().reactivate"
+                          [disabled]="deletingId() === item.id"
+                          (click)="reactivateWaitingArea(item)"
+                        >
+                          <i class="bi bi-play-circle"></i>
+                        </button>
 
-                      <button
-                        type="button"
-                        class="icon-action danger-action"
-                        [disabled]="deletingId() === item.id"
-                        (click)="deleteWaitingArea(item)"
-                      >
-                        <i class="bi bi-trash3"></i>
-                      </button>
+                        <button
+                          type="button"
+                          class="icon-action danger-action"
+                          [attr.aria-label]="translations().permanentDelete"
+                          [title]="translations().permanentDelete"
+                          [disabled]="deletingId() === item.id"
+                          (click)="permanentlyDeleteWaitingArea(item)"
+                        >
+                          <i class="bi bi-trash3"></i>
+                        </button>
+                      }
                     </div>
                   </td>
                 </tr>
@@ -255,9 +324,9 @@
 
     <!-- Popup -->
     @if (panelMode() !== 'closed') {
-      <div class="editor-backdrop" (click)="closePanel()"></div>
+      <div class="editor-backdrop app-popup-overlay" (click)="closePanel()"></div>
 
-      <aside class="editor-panel" role="dialog">
+      <aside class="editor-panel app-popup-panel" role="dialog">
         <!-- Header -->
         <header class="panel-header">
           <h2>
@@ -321,7 +390,7 @@
                   {{ translations().branch }}
                 </span>
 
-                <select class="form-select" formControlName="branchId">
+                <select class="form-select" formControlName="branchId" [disabled]="panelMode() === 'edit'">
                   <option [ngValue]="0">
                     {{ translations().selectBranch }}
                   </option>

@@ -198,7 +198,7 @@
               </thead>
 
               <tbody>
-                @for (item of activeTerminalsPage().data; track item.id) {
+                @for (item of activeTerminalsPage().data; track terminalIdentity(item)) {
                   <tr>
                     <td>
                       <strong>{{ item.number }}</strong>
@@ -221,24 +221,41 @@
                     <td>
                       <div class="d-flex align-items-center justify-content-center gap-2">
                         @if (canViewDetails()) {
-                          <button type="button" class="icon-action" (click)="openView(item.id)">
+                          <button
+                            type="button"
+                            class="icon-action"
+                            [attr.aria-label]="translations().view"
+                            [title]="translations().view"
+                            [disabled]="!hasTerminalIdentity(item)"
+                            (click)="openView(item)"
+                          >
                             <i class="bi bi-eye"></i>
                           </button>
                         }
 
                         @if (canUpdate()) {
-                          <button type="button" class="icon-action" (click)="openEdit(item.id)">
+                          <button
+                            type="button"
+                            class="icon-action"
+                            [attr.aria-label]="translations().edit"
+                            [title]="translations().edit"
+                            [disabled]="!hasTerminalIdentity(item)"
+                            (click)="openEdit(item)"
+                          >
                             <i class="bi bi-pencil-square"></i>
                           </button>
                         }
 
-                        @if (canDelete()) {
+                        @if (canDeactivate()) {
                           <button
                             type="button"
                             class="icon-action danger-action"
+                            [attr.aria-label]="translations().delete"
+                            [title]="translations().delete"
+                            [disabled]="!hasTerminalIdentity(item)"
                             (click)="requestSoftDelete(item)"
                           >
-                            <i class="bi bi-trash3"></i>
+                            <i class="bi bi-pause-circle"></i>
                           </button>
                         }
                       </div>
@@ -389,7 +406,6 @@
                   <th>{{ translations().windowNumber }}</th>
                   <th>{{ translations().waitingAreaNumber }}</th>
                   <th>{{ translations().branch }}</th>
-                  <th>{{ translations().deletedOn }}</th>
                   <th class="text-center">
                     {{ translations().actions }}
                   </th>
@@ -397,7 +413,7 @@
               </thead>
 
               <tbody>
-                @for (item of deletedTerminalsPage().data; track item.id) {
+                @for (item of deletedTerminalsPage().data; track terminalIdentity(item)) {
                   <tr>
                     <td>
                       <strong>{{ item.number }}</strong>
@@ -417,19 +433,19 @@
                       {{ branchLabel(item.branchArabicName, item.branchEnglishName) }}
                     </td>
 
-                    <td>{{ formatDate(item.deletedOnUtc) }}</td>
 
                     <td>
                       <div class="d-flex align-items-center justify-content-center gap-2">
-                        @if (canRestore()) {
+                        @if (canReactivate()) {
                           <button
                             type="button"
-                            class="icon-action restore-action"
+                            class="icon-action success-action"
                             [attr.aria-label]="translations().restore"
                             [title]="translations().restore"
+                            [disabled]="!hasTerminalIdentity(item)"
                             (click)="requestRestore(item)"
                           >
-                            <i class="bi bi-arrow-counterclockwise"></i>
+                            <i class="bi bi-play-circle"></i>
                           </button>
                         }
 
@@ -439,6 +455,7 @@
                             class="icon-action danger-action"
                             [attr.aria-label]="translations().permanentDelete"
                             [title]="translations().permanentDelete"
+                            [disabled]="!hasTerminalIdentity(item)"
                             (click)="requestPermanentDelete(item)"
                           >
                             <i class="bi bi-trash3-fill"></i>
@@ -501,7 +518,7 @@
     @if (panelMode() !== 'closed') {
       <div class="editor-backdrop app-popup-overlay" (click)="closePanel()"></div>
 
-      <aside class="terminal-editor-panel" role="dialog">
+      <aside class="editor-panel app-popup-panel terminal-editor-panel" role="dialog">
         <!-- Header -->
         <header class="terminal-editor-panel-header">
           <h2>
@@ -707,12 +724,12 @@
     @if (confirmDialog()) {
       <div class="editor-backdrop app-popup-overlay" (click)="closeConfirmDialog()"></div>
 
-      <aside class="terminal-editor-panel terminal-confirm-panel" role="dialog">
+      <aside class="editor-panel app-popup-panel terminal-editor-panel terminal-confirm-panel" role="dialog">
         <header class="terminal-editor-panel-header">
           <h2>
-            @if (confirmDialog()?.kind === 'soft') {
+            @if (confirmDialog()?.kind === 'deactivate') {
               {{ translations().deleteConfirm }}
-            } @else if (confirmDialog()?.kind === 'restore') {
+            } @else if (confirmDialog()?.kind === 'reactivate') {
               {{ translations().restoreConfirm }}
             } @else {
               {{ translations().permanentDeleteConfirm }}
@@ -726,9 +743,9 @@
 
         <div class="dialog-content">
           <p>
-            @if (confirmDialog()?.kind === 'soft') {
+            @if (confirmDialog()?.kind === 'deactivate') {
               {{ translations().deleteConfirmBody }}
-            } @else if (confirmDialog()?.kind === 'restore') {
+            } @else if (confirmDialog()?.kind === 'reactivate') {
               {{ translations().restoreConfirmBody }}
             } @else {
               {{ translations().permanentDeleteConfirmBody }}
@@ -758,9 +775,9 @@
             [disabled]="deleting()"
             (click)="confirmAction()"
           >
-            @if (confirmDialog()?.kind === 'soft') {
+            @if (confirmDialog()?.kind === 'deactivate') {
               {{ translations().delete }}
-            } @else if (confirmDialog()?.kind === 'restore') {
+            } @else if (confirmDialog()?.kind === 'reactivate') {
               {{ translations().restore }}
             } @else {
               {{ translations().permanentDelete }}

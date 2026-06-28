@@ -1,3 +1,5 @@
+import { LifecycleMutationResponse, OperationalEntityState, OperationalStatusFilter, PermanentDeleteResponse } from './operational-lifecycle.model';
+
 export type BranchOrderSort = 'Newest' | 'Oldest';
 
 export interface BranchListQuery {
@@ -5,6 +7,7 @@ export interface BranchListQuery {
   readonly orderSort: BranchOrderSort;
   readonly pageNumber: number;
   readonly pageSize: number;
+  readonly isActive: OperationalStatusFilter;
 }
 
 export interface BranchAuditUser {
@@ -14,13 +17,11 @@ export interface BranchAuditUser {
   readonly nameAr: string | null;
 }
 
-export interface BranchListItem {
+export interface BranchListItem extends OperationalEntityState {
   readonly branchId: number;
   readonly arabicName: string;
   readonly englishName: string;
   readonly ipAddress: string;
-  readonly isUpdatesAvailable: boolean;
-  readonly lastUpdated: string | null;
   readonly governorate: string | null;
   readonly city: string | null;
   readonly createdBy: BranchAuditUser | null;
@@ -39,15 +40,14 @@ export interface PagedBranchResponse<TItem> {
   readonly hasNextPage: boolean;
 }
 
-
 export interface BranchLocation {
   readonly id?: number;
-  readonly governorate: string | null;
-  readonly city: string | null;
-  readonly area: string | null;
-  readonly address: string | null;
-  readonly longitude: string | null;
-  readonly latitude: string | null;
+  readonly governorate: string;
+  readonly city: string;
+  readonly area: string;
+  readonly address: string;
+  readonly longitude: number;
+  readonly latitude: number;
 }
 
 export interface BranchDetails extends BranchListItem {
@@ -58,32 +58,34 @@ export interface BranchDetails extends BranchListItem {
   readonly modifiedOnUtc: string | null;
 }
 
-export interface BranchMutationRequest {
-  readonly arabicName: string | null;
-  readonly englishName: string | null;
+export interface CreateBranchRequest {
+  readonly arabicName: string;
+  readonly englishName: string;
   readonly ipAddress: string;
   readonly license: string | null;
-  readonly location: Omit<BranchLocation, 'id'> | null;
+  readonly location: Omit<BranchLocation, 'id'>;
 }
 
-export interface BranchMutationResponse {
+export interface UpdateBranchRequest extends CreateBranchRequest {
+  readonly rowVersion: string;
+}
+
+export interface BranchMutationResponse extends OperationalEntityState {
   readonly branchId: number;
   readonly arabicName: string | null;
   readonly englishName: string | null;
   readonly ipAddress: string;
-  readonly isUpdatesAvailable: boolean;
-  readonly lastUpdated: string | null;
   readonly license?: string | null;
   readonly location?: BranchLocation | null;
   readonly createdByApplicationUserId?: string;
   readonly createdOnUtc?: string | null;
   readonly lastModifiedByApplicationUserId?: string;
   readonly modifiedOnUtc?: string | null;
+  readonly message?: string;
 }
 
-export interface BranchDeleteResponse {
-  readonly branchId: number;
-}
+export type BranchLifecycleResponse = LifecycleMutationResponse;
+export type BranchPermanentDeleteResponse = PermanentDeleteResponse;
 
 export interface ApiProblemDetails {
   readonly type?: string;

@@ -46,6 +46,7 @@ export class LoginTranslationService {
         '\u062a\u0645 \u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u062f\u062e\u0648\u0644 \u0628\u0646\u062c\u0627\u062d.',
       requiredCredentialsMessage:
         '\u0627\u0633\u0645 \u0627\u0644\u0645\u0633\u062a\u062e\u062f\u0645 \u0623\u0648 \u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631 \u063a\u064a\u0631 \u0635\u062d\u064a\u062d\u0629.',
+      dismissNotificationLabel: '\u0625\u063a\u0644\u0627\u0642 \u0627\u0644\u062a\u0646\u0628\u064a\u0647',
       submittingButton: '\u062c\u0627\u0631\u064a \u0627\u0644\u062f\u062e\u0648\u0644...',
       submitButton:
         '\u062f\u062e\u0648\u0644 \u0644\u0648\u062d\u0629 \u0627\u0644\u062a\u062d\u0643\u0645',
@@ -78,6 +79,7 @@ export class LoginTranslationService {
       technicalSupport: 'Technical support',
       loginReadyMessage: 'Signed in successfully.',
       requiredCredentialsMessage: 'Invalid username or password.',
+      dismissNotificationLabel: 'Dismiss notification',
       submittingButton: 'Signing in...',
       submitButton: 'Sign in ',
     },
