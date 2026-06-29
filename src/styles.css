@@ -1,4 +1,7 @@
 @import 'bootstrap/dist/css/bootstrap.min.css';
+@import './app/shared/styles/design-tokens.css';
+@import './app/shared/styles/animations.css';
+@import './app/shared/styles/components-shared.css';
 @import './app/features/auth/pages/login/login-brand-animation.css';
 
 :root {

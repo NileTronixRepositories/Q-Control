@@ -1,0 +1,102 @@
+/*
+  Q-SYSTEM CSS Design Tokens (Shared Theme Customization)
+  Contains variable definitions for colors, typography, sizing, and shadows.
+  Overriding --nt- variables here propagates changes across the entire workspace.
+*/
+
+:root {
+  /* Brand Colors */
+  --q-primary: #0b8aa8;
+  --q-primary-hover: #056579;
+  --q-primary-soft: #e0f6f8;
+  --q-accent: #f22745;
+  --q-accent-soft: #fff0f3;
+  --q-success: #138a5b;
+  --q-success-soft: #ecfdf5;
+  --q-warning: #b7791f;
+  --q-warning-soft: #fff8eb;
+  --q-danger: #d21f35;
+  --q-danger-soft: #fff0f2;
+  
+  /* Sizing and Density Tokens */
+  --q-radius-sm: 6px;
+  --q-radius-md: 8px;
+  --q-radius-lg: 10px;
+  
+  --q-control-height: 34px;
+  --q-action-height: 34px;
+  --q-upload-height: 48px;
+  
+  --q-workspace-padding-y: 14px;
+  --q-workspace-padding-x: 16px;
+  --q-section-gap: 12px;
+  --q-form-gap-x: 16px;
+  --q-form-gap-y: 12px;
+  --q-panel-padding-y: 14px;
+  --q-panel-padding-x: 16px;
+  
+  /* Shadows */
+  --q-shadow-soft: 0 8px 22px rgba(20, 42, 58, 0.06);
+  --q-shadow-card: 0 14px 34px rgba(20, 42, 58, 0.08);
+  
+  /* Typography Scaling */
+  --q-font-size-base: 13px;
+  --q-font-size-heading: 1.15rem;
+  --q-font-size-label: 0.8rem;
+  --q-font-size-small: 0.72rem;
+
+  /* Neutral Surfaces & Text */
+  --q-bg-base: #eaf1f5;
+  --q-surface-card: #fbfdff;
+  --q-surface-muted: #edf6f8;
+  --q-border-subtle: #d8e5ec;
+  --q-border-strong: #bdd0db;
+  --q-surface-warm: #fff7ed;
+  --q-text-primary: #0f172a;
+  --q-text-secondary: #334155;
+  --q-text-muted: #64748b;
+
+  /* Utility */
+  --q-transition-base: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  --q-padding-md: 12px;
+  --q-shadow-md: 0 4px 12px rgba(15, 23, 42, 0.06);
+
+  /* Overriding Niletronix default theme variables for global compliance */
+  --nt-bg: var(--q-bg-base);
+  --nt-primary: var(--q-primary);
+  --nt-primary-dark: var(--q-primary-hover);
+  --nt-primary-soft: var(--q-primary-soft);
+  --nt-accent: var(--q-accent);
+  --nt-accent-soft: var(--q-accent-soft);
+  --nt-success: var(--q-success);
+  --nt-warning: var(--q-warning);
+  --nt-danger: var(--q-danger);
+  
+  --nt-radius-sm: var(--q-radius-sm);
+  --nt-radius-md: var(--q-radius-md);
+  --nt-radius-lg: var(--q-radius-lg);
+  
+  --nt-control-height: var(--q-control-height);
+  --nt-action-height: var(--q-action-height);
+  --nt-upload-height: var(--q-upload-height);
+  
+  --nt-workspace-padding-y: var(--q-workspace-padding-y);
+  --nt-workspace-padding-x: var(--q-workspace-padding-x);
+  --nt-workspace-padding-lg-y: var(--q-workspace-padding-y);
+  --nt-workspace-padding-lg-x: var(--q-workspace-padding-x);
+  --nt-workspace-padding-md: var(--q-workspace-padding-y);
+  
+  --nt-section-gap: var(--q-section-gap);
+  --nt-form-gap-x: var(--q-form-gap-x);
+  --nt-form-gap-y: var(--q-form-gap-y);
+  
+  --nt-panel-padding-y: var(--q-panel-padding-y);
+  --nt-panel-padding-x: var(--q-panel-padding-x);
+  
+  --nt-shadow-soft: var(--q-shadow-soft);
+  --nt-shadow-card: var(--q-shadow-card);
+  
+  --nt-hero-min-height: 80px;
+  --nt-hero-padding-y: var(--q-panel-padding-y);
+  --nt-hero-padding-x: var(--q-panel-padding-x);
+}

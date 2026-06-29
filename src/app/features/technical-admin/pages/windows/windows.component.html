@@ -34,7 +34,12 @@
           {{ currentMessage.text }}
         </p>
 
-        <button type="button" class="toast-close" [attr.aria-label]="translations().close" (click)="clearMessage()">
+        <button
+          type="button"
+          class="toast-close"
+          [attr.aria-label]="translations().close"
+          (click)="clearMessage()"
+        >
           <i class="bi bi-x-lg" aria-hidden="true"></i>
         </button>
       </div>
@@ -60,6 +65,7 @@
             [class.primary-action]="activeTab() === 'active'"
             (click)="switchTab('active')"
           >
+            <i class="bi bi-window-stack" aria-hidden="true"></i>
             {{ translations().activeTab }}
           </button>
         }
@@ -70,6 +76,7 @@
             [class.primary-action]="activeTab() === 'deleted'"
             (click)="switchTab('deleted')"
           >
+            <i class="bi bi-archive" aria-hidden="true"></i>
             {{ translations().deletedTab }}
           </button>
         }
@@ -79,6 +86,7 @@
           <div class="toolbar">
             <label class="filter-field search-field">
               <span>{{ translations().searchPlaceholder }}</span>
+              <i class="bi bi-search window-filter-icon" aria-hidden="true"></i>
               <input
                 type="search"
                 [value]="activeSearch()"
@@ -88,6 +96,7 @@
             </label>
             <label class="filter-field">
               <span>{{ translations().waitingAreaFilter }}</span>
+              <i class="bi bi-hourglass-split window-filter-icon" aria-hidden="true"></i>
               <select
                 [value]="activeWaitingAreaId() ?? ''"
                 (change)="updateActiveWaitingAreaFilter($event)"
@@ -100,6 +109,7 @@
             </label>
             <label class="filter-field compact-field">
               <span>{{ translations().pageSize }}</span>
+              <i class="bi bi-list-ol window-filter-icon" aria-hidden="true"></i>
               <select [value]="activePageSize()" (change)="updateActivePageSize($event)">
                 <option value="10">10</option>
                 <option value="25">25</option>
@@ -206,6 +216,7 @@
                 [disabled]="!activeWindowsPage().hasPreviousPage || activeLoading()"
                 (click)="previousActivePage()"
               >
+                <i class="bi bi-chevron-left" aria-hidden="true"></i>
                 {{ translations().previous }}
               </button>
               <span class="page-indicator"
@@ -219,6 +230,7 @@
                 (click)="nextActivePage()"
               >
                 {{ translations().next }}
+                <i class="bi bi-chevron-right" aria-hidden="true"></i>
               </button>
             </div>
           </footer>
@@ -229,6 +241,7 @@
           <div class="toolbar">
             <label class="filter-field search-field">
               <span>{{ translations().searchPlaceholder }}</span>
+              <i class="bi bi-search window-filter-icon" aria-hidden="true"></i>
               <input
                 type="search"
                 [value]="deletedSearch()"
@@ -238,6 +251,7 @@
             </label>
             <label class="filter-field">
               <span>{{ translations().waitingAreaFilter }}</span>
+              <i class="bi bi-hourglass-split window-filter-icon" aria-hidden="true"></i>
               <select
                 [value]="deletedWaitingAreaId() ?? ''"
                 (change)="updateDeletedWaitingAreaFilter($event)"
@@ -250,6 +264,7 @@
             </label>
             <label class="filter-field compact-field">
               <span>{{ translations().pageSize }}</span>
+              <i class="bi bi-list-ol window-filter-icon" aria-hidden="true"></i>
               <select [value]="deletedPageSize()" (change)="updateDeletedPageSize($event)">
                 <option value="10">10</option>
                 <option value="25">25</option>
@@ -311,7 +326,8 @@
                             >
                               <i class="bi bi-play-circle" aria-hidden="true"> </i>
                             </button>
-                          }                          @if (canDeletePermanent()) {
+                          }
+                          @if (canDeletePermanent()) {
                             <button
                               type="button"
                               class="icon-action danger-action"
@@ -344,6 +360,7 @@
                 [disabled]="!deletedWindowsPage().hasPreviousPage || deletedLoading()"
                 (click)="previousDeletedPage()"
               >
+                <i class="bi bi-chevron-left" aria-hidden="true"></i>
                 {{ translations().previous }}
               </button>
               <span class="page-indicator"
@@ -357,6 +374,7 @@
                 (click)="nextDeletedPage()"
               >
                 {{ translations().next }}
+                <i class="bi bi-chevron-right" aria-hidden="true"></i>
               </button>
             </div>
           </footer>
@@ -477,9 +495,11 @@
               </label>
               <div class="panel-actions col-12">
                 <button type="button" class="secondary-action" (click)="closePanel()">
+                  <i class="bi bi-x-lg" aria-hidden="true"></i>
                   {{ translations().cancel }}
                 </button>
                 <button type="submit" class="primary-action" [disabled]="saving()">
+                  <i class="bi bi-check2" aria-hidden="true"></i>
                   {{ translations().save }}
                 </button>
               </div>

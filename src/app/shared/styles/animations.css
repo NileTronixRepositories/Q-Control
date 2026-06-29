@@ -1,0 +1,84 @@
+/*
+  Q-SYSTEM CSS Animations (Shared Micro-Interactions)
+  Contains hardware-accelerated animations for components and cards.
+*/
+
+/* Card and Panel Entrance Animation */
+@keyframes qSlideUpFade {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Spin animation for buttons and loaders */
+@keyframes qSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Pulse animation for active highlights */
+@keyframes qPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(15, 125, 168, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 6px rgba(15, 125, 168, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(15, 125, 168, 0);
+  }
+}
+
+/* Slide in from right (for notifications/toasts) */
+@keyframes qSlideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Staggered entrance helper classes */
+.q-animate-fade-in {
+  animation: qSlideUpFade 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.q-delay-1 { animation-delay: 0.04s; }
+.q-delay-2 { animation-delay: 0.08s; }
+.q-delay-3 { animation-delay: 0.12s; }
+.q-delay-4 { animation-delay: 0.16s; }
+
+/* Interactive Hover States */
+.primary-action, .secondary-action, .icon-action, .btn {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.primary-action:hover, .btn-primary:hover {
+  transform: translateY(-1px) !important;
+}
+
+.primary-action:active, .btn-primary:active {
+  transform: translateY(0) !important;
+}
+
+.secondary-action:hover, .btn-secondary:hover {
+  transform: translateY(-1px) !important;
+}
+
+.icon-action:hover {
+  transform: translateY(-1px) !important;
+}
+
+/* Focus outline glow animation */
+input:focus, select:focus, textarea:focus, .form-control:focus, .form-select:focus {
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out !important;
+}

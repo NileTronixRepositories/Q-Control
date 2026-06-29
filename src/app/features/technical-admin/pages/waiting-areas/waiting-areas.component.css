@@ -1,438 +1,86 @@
-﻿:host {
+:host {
   display: block;
 }
 
-/* =========================================
-   Layout
-========================================= */
-
-.waiting-areas-page {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-/* =========================================
-   Shared Panels
-========================================= */
-
-.page-header,
-.list-panel,
-.editor-panel,
-.message {
-  background: #ffffff;
-
-  border: 1px solid #e2e8f0;
-
-  border-radius: 16px;
-
-  box-shadow: 0 8px 30px rgba(15, 23, 42, 0.05);
-}
-
-/* =========================================
-   Header
-========================================= */
-
-.page-header {
-  padding: 24px;
-}
-
-.eyebrow {
-  color: #2563eb;
-
-  font-size: 0.75rem;
-
-  font-weight: 800;
-
-  text-transform: uppercase;
-}
-
-.page-header h1 {
-  color: #0f172a;
-
-  font-size: clamp(1.4rem, 2vw, 2rem);
-
-  font-weight: 800;
-}
-
-.header-description {
-  color: #64748b;
-
-  font-size: 0.92rem;
-}
-
-/* =========================================
-   Buttons
-========================================= */
-
-.primary-action,
-.secondary-action {
-  min-height: 44px;
-
-  border-radius: 10px;
-
-  font-size: 0.88rem;
-
-  font-weight: 700;
-
-  padding-inline: 18px;
-}
-
-.primary-action {
-  color: #fff;
-
-  background: #2563eb;
-
-  border: 1px solid #2563eb;
-}
-
-.primary-action:hover {
-  background: #1d4ed8;
-
-  color: #fff;
-}
-
-.secondary-action {
-  color: #1e3a8a;
-
-  background: #eff6ff;
-
-  border: 1px solid #bfdbfe;
-}
-
-.secondary-action:hover {
-  background: #dbeafe;
-}
-
-.icon-action {
-  width: 36px;
-
-  height: 36px;
-
-  border-radius: 10px;
-
-  border: 1px solid #e2e8f0;
-
-  background: #f8fafc;
-
-  color: #475569;
-
-  display: inline-flex;
-
-  align-items: center;
-
-  justify-content: center;
-}
-
-.icon-action:hover {
-  background: #eff6ff;
-
-  color: #2563eb;
-}
-
-.danger-action:hover {
-  background: #fee2e2;
-
-  color: #dc2626;
-}
-
-/* =========================================
-   List Panel
-========================================= */
-
-.list-panel {
-  padding: 20px;
-}
-
-/* =========================================
-   Forms
-========================================= */
-
-.filter-field,
-.form-field {
-  display: flex;
-
-  flex-direction: column;
-
-  gap: 6px;
-}
-
-.filter-field span,
-.form-field span,
-dt {
-  color: #334155;
-
-  font-size: 0.82rem;
-
-  font-weight: 700;
-}
-
-.form-control,
-.form-select {
-  min-height: 44px;
-
-  border-radius: 10px;
-
-  border: 1px solid #dbe4ee;
-
-  background: #f8fafc;
-
-  font-size: 0.88rem;
-}
-
-.form-control:focus,
-.form-select:focus {
-  border-color: #2563eb;
-
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
-}
-
-/* =========================================
-   Messages
-========================================= */
-
-.message {
-  padding: 14px 16px;
-
-  font-size: 0.9rem;
-
-  font-weight: 700;
-}
-
-.message-success {
-  color: #047857;
-
-  background: #ecfdf5;
-
-  border-color: #bbf7d0;
-}
-
-.message-error {
-  color: #b91c1c;
-
-  background: #fef2f2;
-
-  border-color: #fecaca;
-}
-
-/* =========================================
-   Table
-========================================= */
-
-.custom-table {
-  margin-bottom: 0;
-}
-
-.custom-table thead th {
-  background: #f8fafc;
-
-  color: #475569;
-
-  font-size: 0.74rem;
-
-  font-weight: 800;
-
-  text-transform: uppercase;
-
-  white-space: nowrap;
-}
-
-.custom-table tbody td {
-  vertical-align: middle;
-
-  font-size: 0.86rem;
-}
-
-/* =========================================
-   Empty State
-========================================= */
-
-.empty-state {
-  display: flex;
-
-  flex-direction: column;
-
-  align-items: center;
-
-  justify-content: center;
-
-  gap: 10px;
-
-  min-height: 240px;
-
-  padding: 24px;
-
-  text-align: center;
-
-  border: 2px dashed #cbd5e1;
-
-  border-radius: 16px;
-}
-
-.empty-state i {
-  font-size: 2rem;
-
-  color: #94a3b8;
-}
-
-/* =========================================
-   Pagination
-========================================= */
-
-.pagination-bar {
-  font-size: 0.88rem;
-
-  font-weight: 700;
-}
-
-.page-indicator {
-  min-width: 60px;
-
-  text-align: center;
-}
-
-/* =========================================
-   Popup
-========================================= */
-
+/* === Unique: Fixed Modal === */
 .editor-backdrop {
-  position: fixed;
-
-  inset: 0;
-
-  background: rgba(15, 23, 42, 0.55);
-
-  backdrop-filter: blur(4px);
-
-  z-index: 1050;
+  position: fixed !important; inset: 0 !important;
+  background: rgba(15, 23, 42, 0.55) !important; backdrop-filter: blur(4px) !important; z-index: 1050 !important;
 }
 
 .editor-panel {
-  position: fixed;
-
-  top: 50%;
-
-  left: 50%;
-
-  transform: translate(-50%, -50%);
-
-  width: min(720px, calc(100vw - 32px));
-
-  max-height: 90vh;
-
-  overflow-y: auto;
-
-  padding: 22px;
-
-  z-index: 1060;
+  position: fixed !important; top: 50% !important; left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  width: min(720px, calc(100vw - 32px)) !important; max-height: 90vh !important; overflow-y: auto !important;
+  padding: var(--q-panel-padding-y) var(--q-panel-padding-x) !important; z-index: 1060 !important;
+  background: var(--q-surface-card) !important; border: 1px solid var(--q-border-subtle) !important;
+  border-radius: var(--q-radius-lg) !important; box-shadow: 0 24px 60px rgba(15, 23, 42, 0.18) !important;
 }
 
-.panel-header {
-  display: flex;
-
-  align-items: center;
-
-  justify-content: space-between;
-
-  margin-bottom: 20px;
-}
-
-.panel-header h2 {
-  margin: 0;
-
-  font-size: 1.1rem;
-
-  font-weight: 800;
-}
-
-/* =========================================
-   Details
-========================================= */
-
+/* === Unique: Details List === */
 .details-list {
-  display: grid;
-
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-
-  gap: 12px;
+  display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 10px !important;
 }
-
 .details-list div {
-  padding: 14px;
-
-  background: #f8fafc;
-
-  border: 1px solid #e2e8f0;
-
-  border-radius: 12px;
+  padding: 10px 12px !important; background: var(--q-surface-muted) !important;
+  border: 1px solid var(--q-border-subtle) !important; border-radius: var(--q-radius-md) !important;
 }
+dt { color: var(--q-text-muted) !important; font-size: var(--q-font-size-small) !important; font-weight: 700 !important; }
+dd { margin: 4px 0 0 !important; color: var(--q-text-primary) !important; font-size: var(--q-font-size-base) !important; font-weight: 600 !important; overflow-wrap: anywhere !important; }
 
-dd {
-  margin: 6px 0 0;
-
-  color: #0f172a;
-
-  font-size: 0.9rem;
-
-  font-weight: 700;
+/* === Unique: Message banners === */
+.message {
+  display: flex !important; align-items: center !important; gap: 10px !important;
+  padding: 10px 14px !important; border-radius: var(--q-radius-md) !important; border: 1px solid !important;
+  font-size: var(--q-font-size-base) !important; font-weight: 600 !important;
 }
+.message-success { color: var(--q-success) !important; background: var(--q-success-soft) !important; border-color: rgba(19,138,91,0.2) !important; }
+.message-error   { color: var(--q-danger) !important; background: var(--q-danger-soft) !important; border-color: rgba(210,31,53,0.2) !important; }
 
-/* =========================================
-   Loading
-========================================= */
-
+/* === Unique: State / Pagination === */
 .state-note {
-  display: flex;
+  display: flex !important; align-items: center !important; gap: 8px !important;
+  padding: 10px 12px !important; background: var(--q-surface-muted) !important;
+  border-radius: var(--q-radius-md) !important; font-size: var(--q-font-size-base) !important; font-weight: 600 !important;
+}
+.pagination-bar { font-size: var(--q-font-size-base) !important; font-weight: 600 !important; }
+.page-indicator { min-width: 50px !important; text-align: center !important; }
 
-  align-items: center;
-
-  gap: 8px;
-
-  padding: 12px 14px;
-
-  background: #f8fafc;
-
-  border-radius: 10px;
-
-  font-weight: 700;
+/* Mobile */
+@media (max-width: 767.98px) {
+  .editor-panel {
+    inset: 0 !important; width: 100% !important; height: 100dvh !important; max-height: 100dvh !important;
+    transform: none !important; border-radius: 0 !important; padding: 14px !important;
+  }
+  .details-list { grid-template-columns: 1fr !important; }
 }
 
-/* =========================================
-   Mobile
-========================================= */
+/* === Unique: Field Icons === */
+.filter-field,
+.has-field-icon {
+  position: relative !important;
+  display: block !important;
+}
 
-@media (max-width: 767.98px) {
-  .page-header,
-  .list-panel {
-    padding: 16px;
-  }
+.filter-icon,
+.form-field-icon {
+  position: absolute !important;
+  inset-inline-start: 14px !important;
+  bottom: 14px !important;
+  z-index: 2 !important;
+  color: var(--q-primary) !important;
+  font-size: 0.92rem !important;
+  line-height: 1 !important;
+  pointer-events: none !important;
+}
 
-  .primary-action,
-  .secondary-action {
-    width: 100%;
-  }
+.filter-field :where(.form-control, .form-select),
+.has-field-icon :where(.form-control, .form-select) {
+  padding-inline-start: 40px !important;
+}
 
-  .pagination-bar {
-    text-align: center;
-  }
-
-  .editor-panel {
-    inset: 0;
-
-    width: 100%;
-
-    height: 100dvh;
-
-    max-height: 100dvh;
-
-    transform: none;
-
-    border-radius: 0;
-
-    padding: 16px;
-  }
-
-  .details-list {
-    grid-template-columns: 1fr;
-  }
+:host-context([dir='rtl']) .filter-icon,
+:host-context([dir='rtl']) .form-field-icon {
+  inset-inline-start: auto !important;
+  inset-inline-end: 14px !important;
 }

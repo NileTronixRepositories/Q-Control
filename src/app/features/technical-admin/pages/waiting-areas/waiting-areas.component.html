@@ -64,6 +64,8 @@
               {{ translations().searchPlaceholder }}
             </span>
 
+            <i class="bi bi-search filter-icon" aria-hidden="true"></i>
+
             <input
               class="form-control"
               type="search"
@@ -80,6 +82,8 @@
             <span>
               {{ translations().branchFilter }}
             </span>
+
+            <i class="bi bi-diagram-3 filter-icon" aria-hidden="true"></i>
 
             <select
               class="form-select"
@@ -103,6 +107,7 @@
         <div class="col-12 col-md-6 col-lg-2">
           <label class="filter-field w-100">
             <span>{{ translations().status }}</span>
+            <i class="bi bi-toggle-on filter-icon" aria-hidden="true"></i>
             <select class="form-select" [value]="statusFilter() === null ? '' : statusFilter()" (change)="updateStatusFilter($event)">
               <option value="">{{ translations().allStatuses }}</option>
               <option value="true">{{ translations().active }}</option>
@@ -116,6 +121,8 @@
             <span>
               {{ translations().pageSize }}
             </span>
+
+            <i class="bi bi-list-ol filter-icon" aria-hidden="true"></i>
 
             <select class="form-select" [value]="pageSize()" (change)="updatePageSize($event)">
               <option value="10">10</option>
@@ -220,11 +227,11 @@
 
                   <td>
                     <div class="d-flex align-items-center justify-content-center gap-2">
-                      <button type="button" class="icon-action" (click)="openView(item.id)">
+                      <button type="button" class="icon-action" [attr.aria-label]="translations().view" [title]="translations().view" (click)="openView(item.id)">
                         <i class="bi bi-eye"></i>
                       </button>
 
-                      <button type="button" class="icon-action" (click)="openEdit(item.id)">
+                      <button type="button" class="icon-action" [attr.aria-label]="translations().edit" [title]="translations().edit" (click)="openEdit(item.id)">
                         <i class="bi bi-pencil-square"></i>
                       </button>
                       @if (item.isActive) {
@@ -301,6 +308,7 @@
             [disabled]="!waitingAreaPage().hasPreviousPage || loading()"
             (click)="previousPage()"
           >
+            <i class="bi bi-chevron-left" aria-hidden="true"></i>
             {{ translations().previous }}
           </button>
 
@@ -317,6 +325,7 @@
             (click)="nextPage()"
           >
             {{ translations().next }}
+            <i class="bi bi-chevron-right" aria-hidden="true"></i>
           </button>
         </div>
       </footer>
@@ -341,6 +350,7 @@
         <!-- Loading -->
         @if (panelLoading()) {
           <p class="state-note">
+            <i class="bi bi-arrow-repeat" aria-hidden="true"></i>
             {{ translations().loading }}
           </p>
         }
@@ -385,10 +395,12 @@
           >
             <!-- Branch -->
             <div class="col-12">
-              <label class="form-field w-100">
+              <label class="form-field has-field-icon w-100">
                 <span>
                   {{ translations().branch }}
                 </span>
+
+                <i class="bi bi-diagram-3 form-field-icon" aria-hidden="true"></i>
 
                 <select class="form-select" formControlName="branchId" [disabled]="panelMode() === 'edit'">
                   <option [ngValue]="0">
@@ -406,10 +418,12 @@
 
             <!-- Number -->
             <div class="col-12 col-md-4">
-              <label class="form-field w-100">
+              <label class="form-field has-field-icon w-100">
                 <span>
                   {{ translations().number }}
                 </span>
+
+                <i class="bi bi-hash form-field-icon" aria-hidden="true"></i>
 
                 <input class="form-control" type="number" formControlName="number" />
               </label>
@@ -417,10 +431,12 @@
 
             <!-- Name -->
             <div class="col-12 col-md-8">
-              <label class="form-field w-100">
+              <label class="form-field has-field-icon w-100">
                 <span>
                   {{ translations().descriptiveName }}
                 </span>
+
+                <i class="bi bi-card-text form-field-icon" aria-hidden="true"></i>
 
                 <input class="form-control" type="text" formControlName="descriptiveName" />
               </label>
@@ -428,10 +444,12 @@
 
             <!-- Audio -->
             <div class="col-12 col-md-6">
-              <label class="form-field w-100">
+              <label class="form-field has-field-icon w-100">
                 <span>
                   {{ translations().audioDevice }}
                 </span>
+
+                <i class="bi bi-volume-up form-field-icon" aria-hidden="true"></i>
 
                 <input class="form-control" type="text" formControlName="audioDevice" />
               </label>
@@ -439,10 +457,12 @@
 
             <!-- Control -->
             <div class="col-12 col-md-6">
-              <label class="form-field w-100">
+              <label class="form-field has-field-icon w-100">
                 <span>
                   {{ translations().controlDevice }}
                 </span>
+
+                <i class="bi bi-cpu form-field-icon" aria-hidden="true"></i>
 
                 <input class="form-control" type="text" formControlName="controlDevice" />
               </label>
@@ -451,10 +471,12 @@
             <!-- Actions -->
             <div class="col-12 d-flex flex-column flex-sm-row justify-content-end gap-2 mt-2">
               <button type="button" class="btn secondary-action" (click)="closePanel()">
+                <i class="bi bi-x-lg" aria-hidden="true"></i>
                 {{ translations().cancel }}
               </button>
 
               <button type="submit" class="btn primary-action" [disabled]="saving()">
+                <i class="bi bi-check2" aria-hidden="true"></i>
                 {{ translations().save }}
               </button>
             </div>

@@ -1,26 +1,17 @@
-﻿<section class="branch-branding-page technical-page container-fluid px-0 px-sm-2 px-xl-3">
-  <header class="page-header d-flex align-items-start justify-content-between gap-3 flex-column flex-lg-row">
+<section class="branch-branding-page technical-page container-fluid px-0 px-sm-2 px-xl-3 w-100">
+  <header
+    class="page-header d-flex align-items-start justify-content-between gap-3 flex-column flex-lg-row"
+  >
     <div>
       <p class="eyebrow">{{ copy().pageEyebrow }}</p>
       <h1>{{ copy().pageTitle }}</h1>
       <span class="header-description">{{ copy().pageDescription }}</span>
     </div>
-
-    <div class="branch-selector">
-      <label for="branchBrandingBranch">{{ copy().branchLabel }}</label>
-      <select
-        id="branchBrandingBranch"
-        [value]="selectedBranchId() ?? ''"
-        [disabled]="branchesLoading()"
-        (change)="selectBranch($event)"
-      >
-        <option value="">{{ copy().selectBranchPlaceholder }}</option>
-        @for (branch of branches(); track branch.id) {
-          <option [value]="branch.id">{{ branch.label }}</option>
-        }
-      </select>
-    </div>
   </header>
+
+  <!-- <div class="branch-context-bar fade-in">
+   
+  </div> -->
 
   @if (message(); as currentMessage) {
     <div class="toast-stack" role="status" aria-live="polite" aria-atomic="true">
@@ -38,7 +29,12 @@
           aria-hidden="true"
         ></i>
         <p>{{ currentMessage.text }}</p>
-        <button type="button" class="toast-close" [attr.aria-label]="copy().close" (click)="clearMessage()">
+        <button
+          type="button"
+          class="toast-close"
+          [attr.aria-label]="copy().close"
+          (click)="clearMessage()"
+        >
           <i class="bi bi-x-lg" aria-hidden="true"></i>
         </button>
       </div>
@@ -62,15 +58,37 @@
   @if (selectedBranchId()) {
     <section class="branding-grid">
       <article class="content-panel branding-panel">
-        <div class="panel-header">
+        <div
+          class="panel-header d-flex align-items-start justify-content-between gap-3 flex-column flex-md-row"
+        >
           <div>
             <h2>{{ copy().brandingSection }}</h2>
             <p>{{ selectedBranchLabel() }}</p>
           </div>
-          <button type="button" class="secondary-action" [disabled]="brandingLoading()" (click)="refreshSelectedBranch()">
-            <i class="bi bi-arrow-clockwise" aria-hidden="true"></i>
-            {{ copy().refreshLabel }}
-          </button>
+
+          <div class="branch-selector">
+            <!-- <label for="branchBrandingBranch">{{ copy().branchLabel }}</label> -->
+            <select
+              id="branchBrandingBranch"
+              [value]="selectedBranchId() ?? ''"
+              [disabled]="branchesLoading()"
+              (change)="selectBranch($event)"
+            >
+              <option value="">{{ copy().selectBranchPlaceholder }}</option>
+              @for (branch of branches(); track branch.id) {
+                <option [value]="branch.id">{{ branch.label }}</option>
+              }
+            </select>
+            <button
+              type="button"
+              class="secondary-action"
+              [disabled]="brandingLoading()"
+              (click)="refreshSelectedBranch()"
+            >
+              <i class="bi bi-arrow-clockwise" aria-hidden="true"></i>
+              {{ copy().refreshLabel }}
+            </button>
+          </div>
         </div>
 
         @if (brandingLoading()) {
@@ -81,8 +99,8 @@
           <p class="empty-state compact-empty">{{ copy().noBranding }}</p>
         }
 
-        <div class="branding-layout row g-3 align-items-start">
-          <section class="logo-block col-12 col-xl-4" [attr.aria-label]="copy().logoLabel">
+        <div class="branding-layout fade-in">
+          <section class="logo-block" [attr.aria-label]="copy().logoLabel">
             <div class="logo-preview">
               @if (logoPreviewUrl(); as logoUrl) {
                 <img [src]="logoUrl" [alt]="copy().logoLabel" (error)="markLogoPreviewFailed()" />
@@ -112,10 +130,11 @@
                 />
                 <button
                   type="button"
-                  class="primary-action compact-action"
+                  class="primary-action"
                   [disabled]="!selectedLogoFile() || logoUploading()"
                   (click)="uploadLogo()"
                 >
+                  <i class="bi bi-cloud-arrow-up" aria-hidden="true"></i>
                   {{ copy().uploadLogo }}
                 </button>
               </div>
@@ -130,86 +149,99 @@
             }
           </section>
 
-          <form class="theme-form col-12 col-xl-8 row g-3" [formGroup]="themeForm" (ngSubmit)="saveTheme()" novalidate>
-            <h3 class="col-12">{{ copy().themeColors }}</h3>
+          <form class="theme-form" [formGroup]="themeForm" (ngSubmit)="saveTheme()" novalidate>
+            <h3 class="theme-form-title">{{ copy().themeColors }}</h3>
 
-            <label class="color-field col-12 col-md-4">
-              <span>{{ copy().mainColor }}</span>
-              <div class="color-control" [class.invalid-control]="isThemeControlInvalid('mainColor')">
-                <input
-                  type="color"
-                  [value]="themePickerValue('mainColor')"
-                  [disabled]="!canUpdate()"
-                  [attr.aria-label]="copy().mainColor"
-                  (input)="updateThemePicker('mainColor', $event)"
-                />
-                <input
-                  type="text"
-                  maxlength="7"
-                  [value]="themeControlValue('mainColor')"
-                  [readonly]="!canUpdate()"
-                  placeholder="#A7060F"
-                  (input)="updateThemeText('mainColor', $event)"
-                />
-              </div>
-              @if (themeControlError('mainColor')) {
-                <small>{{ themeControlError('mainColor') }}</small>
-              }
-            </label>
+            <div class="colors-grid">
+              <label class="color-field">
+                <span>{{ copy().mainColor }}</span>
+                <div
+                  class="color-control"
+                  [class.invalid-control]="isThemeControlInvalid('mainColor')"
+                >
+                  <input
+                    type="color"
+                    [value]="themePickerValue('mainColor')"
+                    [disabled]="!canUpdate()"
+                    [attr.aria-label]="copy().mainColor"
+                    (input)="updateThemePicker('mainColor', $event)"
+                  />
+                  <input
+                    type="text"
+                    maxlength="7"
+                    [value]="themeControlValue('mainColor')"
+                    [readonly]="!canUpdate()"
+                    placeholder="#A7060F"
+                    (input)="updateThemeText('mainColor', $event)"
+                  />
+                </div>
+                @if (themeControlError('mainColor')) {
+                  <small>{{ themeControlError('mainColor') }}</small>
+                }
+              </label>
 
-            <label class="color-field col-12 col-md-4">
-              <span>{{ copy().secondaryColor }}</span>
-              <div class="color-control" [class.invalid-control]="isThemeControlInvalid('secondaryColor')">
-                <input
-                  type="color"
-                  [value]="themePickerValue('secondaryColor')"
-                  [disabled]="!canUpdate()"
-                  [attr.aria-label]="copy().secondaryColor"
-                  (input)="updateThemePicker('secondaryColor', $event)"
-                />
-                <input
-                  type="text"
-                  maxlength="7"
-                  [value]="themeControlValue('secondaryColor')"
-                  [readonly]="!canUpdate()"
-                  placeholder="#0070C4"
-                  (input)="updateThemeText('secondaryColor', $event)"
-                />
-              </div>
-              @if (themeControlError('secondaryColor')) {
-                <small>{{ themeControlError('secondaryColor') }}</small>
-              }
-            </label>
+              <label class="color-field">
+                <span>{{ copy().secondaryColor }}</span>
+                <div
+                  class="color-control"
+                  [class.invalid-control]="isThemeControlInvalid('secondaryColor')"
+                >
+                  <input
+                    type="color"
+                    [value]="themePickerValue('secondaryColor')"
+                    [disabled]="!canUpdate()"
+                    [attr.aria-label]="copy().secondaryColor"
+                    (input)="updateThemePicker('secondaryColor', $event)"
+                  />
+                  <input
+                    type="text"
+                    maxlength="7"
+                    [value]="themeControlValue('secondaryColor')"
+                    [readonly]="!canUpdate()"
+                    placeholder="#0070C4"
+                    (input)="updateThemeText('secondaryColor', $event)"
+                  />
+                </div>
+                @if (themeControlError('secondaryColor')) {
+                  <small>{{ themeControlError('secondaryColor') }}</small>
+                }
+              </label>
 
-            <label class="color-field col-12 col-md-4">
-              <span>{{ copy().backgroundColor }}</span>
-              <div class="color-control" [class.invalid-control]="isThemeControlInvalid('backgroundColor')">
-                <input
-                  type="color"
-                  [value]="themePickerValue('backgroundColor')"
-                  [disabled]="!canUpdate()"
-                  [attr.aria-label]="copy().backgroundColor"
-                  (input)="updateThemePicker('backgroundColor', $event)"
-                />
-                <input
-                  type="text"
-                  maxlength="7"
-                  [value]="themeControlValue('backgroundColor')"
-                  [readonly]="!canUpdate()"
-                  placeholder="#FFFFFF"
-                  (input)="updateThemeText('backgroundColor', $event)"
-                />
-              </div>
-              @if (themeControlError('backgroundColor')) {
-                <small>{{ themeControlError('backgroundColor') }}</small>
-              }
-            </label>
+              <label class="color-field">
+                <span>{{ copy().backgroundColor }}</span>
+                <div
+                  class="color-control"
+                  [class.invalid-control]="isThemeControlInvalid('backgroundColor')"
+                >
+                  <input
+                    type="color"
+                    [value]="themePickerValue('backgroundColor')"
+                    [disabled]="!canUpdate()"
+                    [attr.aria-label]="copy().backgroundColor"
+                    (input)="updateThemePicker('backgroundColor', $event)"
+                  />
+                  <input
+                    type="text"
+                    maxlength="7"
+                    [value]="themeControlValue('backgroundColor')"
+                    [readonly]="!canUpdate()"
+                    placeholder="#FFFFFF"
+                    (input)="updateThemeText('backgroundColor', $event)"
+                  />
+                </div>
+                @if (themeControlError('backgroundColor')) {
+                  <small>{{ themeControlError('backgroundColor') }}</small>
+                }
+              </label>
+            </div>
 
             @if (canUpdate()) {
-              <button type="submit" class="primary-action col-12" [disabled]="!canSaveTheme()">
-                <i class="bi bi-check-lg" aria-hidden="true"></i>
-                {{ copy().saveTheme }}
-              </button>
+              <div class="theme-form-actions">
+                <button type="submit" class="primary-action" [disabled]="!canSaveTheme()">
+                  <i class="bi bi-check-lg" aria-hidden="true"></i>
+                  {{ copy().saveTheme }}
+                </button>
+              </div>
             }
           </form>
         </div>
@@ -227,11 +259,11 @@
           @if (canUpdate()) {
             <button
               type="button"
-              class="primary-action compact-action"
+              class="primary-action"
               [disabled]="!orderDirty() || orderSaving()"
               (click)="saveAdvertisementOrder()"
             >
-              <i class="bi bi-sort-numeric-down" aria-hidden="true"></i>
+              <i class="bi bi-check2-all" aria-hidden="true"></i>
               {{ copy().saveOrder }}
             </button>
           }
@@ -242,46 +274,14 @@
         }
 
         @if (canUpdate()) {
-          <div class="advertisement-upload row g-2 align-items-stretch">
-            <label
-              class="upload-dropzone col-12 col-lg"
-              for="branchAdvertisementsInput"
-              [class.disabled-upload]="advertisementLimitReached() || advertisementsUploading()"
-            >
-              <i class="bi bi-images" aria-hidden="true"></i>
-              <span>
-                @if (advertisementLimitReached()) {
-                  {{ copy().maximumReached }}
-                } @else {
-                  {{ copy().chooseAdvertisements }}
-                }
-              </span>
-            </label>
-            <input
-              #advertisementsInput
-              id="branchAdvertisementsInput"
-              class="visually-hidden-input"
-              type="file"
-              accept="image/png,image/jpeg,image/webp,.png,.jpg,.jpeg,.webp"
-              multiple
-              [disabled]="advertisementLimitReached() || advertisementsUploading()"
-              (change)="selectAdvertisementFiles($event)"
-            />
-            <button
-              type="button"
-              class="primary-action compact-action col-12 col-lg-auto"
-              [disabled]="selectedAdvertisementFiles().length === 0 || advertisementsUploading() || advertisementLimitReached()"
-              (click)="uploadAdvertisements()"
-            >
-              {{ copy().uploadAdvertisements }}
-            </button>
-          </div>
-
           @if (selectedAdvertisementPreviews().length > 0) {
             <section class="pending-preview-panel" [attr.aria-label]="copy().selectedImages">
               <div class="pending-preview-header">
                 <strong>{{ copy().selectedImages }}</strong>
-                <span>{{ selectedAdvertisementPreviews().length }} / {{ remainingAdvertisementSlots() }}</span>
+                <span
+                  >{{ selectedAdvertisementPreviews().length }} /
+                  {{ remainingAdvertisementSlots() }}</span
+                >
               </div>
               <div class="pending-preview-grid">
                 @for (preview of selectedAdvertisementPreviews(); track preview.url) {
@@ -303,7 +303,46 @@
           <p class="empty-state">{{ copy().noAdvertisements }}</p>
         }
 
-        <div class="advertisement-grid">
+        <div class="advertisement-grid fade-in">
+          @if (canUpdate()) {
+            <div
+              class="advertisement-upload-card"
+              [class.disabled-upload]="advertisementLimitReached() || advertisementsUploading()"
+            >
+              <label class="upload-dropzone" for="branchAdvertisementsInput">
+                <i class="bi bi-images" aria-hidden="true"></i>
+                <span>
+                  @if (advertisementLimitReached()) {
+                    {{ copy().maximumReached }}
+                  } @else {
+                    {{ copy().chooseAdvertisements }}
+                  }
+                </span>
+              </label>
+              <input
+                #advertisementsInput
+                id="branchAdvertisementsInput"
+                class="visually-hidden-input"
+                type="file"
+                accept="image/png,image/jpeg,image/webp,.png,.jpg,.jpeg,.webp"
+                multiple
+                [disabled]="advertisementLimitReached() || advertisementsUploading()"
+                (change)="selectAdvertisementFiles($event)"
+              />
+              @if (selectedAdvertisementFiles().length > 0) {
+                <button
+                  type="button"
+                  class="primary-action compact-action upload-submit-btn"
+                  [disabled]="advertisementsUploading() || advertisementLimitReached()"
+                  (click)="uploadAdvertisements()"
+                >
+                  <i class="bi bi-cloud-arrow-up-fill" aria-hidden="true"></i>
+                  {{ copy().uploadAdvertisements }} ({{ selectedAdvertisementFiles().length }})
+                </button>
+              }
+            </div>
+          }
+
           @for (advertisement of advertisements(); track advertisement.id; let index = $index) {
             <article
               class="advertisement-card"
@@ -319,7 +358,9 @@
                 <span class="drag-handle" [class.disabled-drag]="!canUpdate() || orderSaving()">
                   <i class="bi bi-grip-vertical" aria-hidden="true"></i>
                 </span>
-                <span class="order-badge">{{ copy().orderLabel }} {{ advertisement.displayOrder }}</span>
+                <span class="order-badge"
+                  >{{ copy().orderLabel }} {{ advertisement.displayOrder }}</span
+                >
                 <strong
                   class="status-badge"
                   [class.status-active]="advertisement.isActive"
@@ -391,7 +432,9 @@
                       type="button"
                       class="icon-action"
                       [disabled]="mutatingAdvertisementId() === advertisement.id"
-                      [attr.aria-label]="advertisement.isActive ? copy().deactivate : copy().activate"
+                      [attr.aria-label]="
+                        advertisement.isActive ? copy().deactivate : copy().activate
+                      "
                       (click)="toggleAdvertisementState(advertisement)"
                     >
                       <i
@@ -422,5 +465,3 @@
     <p class="empty-state">{{ copy().selectBranchPlaceholder }}</p>
   }
 </section>
-
-

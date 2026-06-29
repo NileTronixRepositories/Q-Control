@@ -1547,3 +1547,416 @@ body .toast-info > .bi {
     width: auto !important;
   }
 }
+
+/* Q-SYSTEM color refresh: additive overrides only. */
+:root {
+  --q-primary: #0b8aa8;
+  --q-primary-hover: #056579;
+  --q-primary-soft: #e0f6f8;
+  --q-accent: #f22745;
+  --q-accent-soft: #fff0f3;
+  --q-bg-base: #eaf1f5;
+  --q-surface-card: #fbfdff;
+  --q-surface-muted: #edf6f8;
+  --q-surface-warm: #fff7ed;
+  --q-border-subtle: #d8e5ec;
+  --q-border-strong: #bdd0db;
+  --q-shadow-soft: 0 8px 22px rgba(20, 42, 58, 0.06);
+  --q-shadow-card: 0 14px 34px rgba(20, 42, 58, 0.08);
+  --nt-primary: var(--q-primary);
+  --nt-primary-dark: var(--q-primary-hover);
+  --nt-primary-soft: var(--q-primary-soft);
+  --nt-accent: var(--q-accent);
+  --nt-accent-soft: var(--q-accent-soft);
+  --nt-bg: var(--q-bg-base);
+  --nt-card: var(--q-surface-card);
+  --nt-border: var(--q-border-subtle);
+  --nt-border-strong: var(--q-border-strong);
+  --nt-shadow-soft: var(--q-shadow-soft);
+  --nt-shadow-card: var(--q-shadow-card);
+  --bg-base: var(--q-bg-base);
+  --surface-card: var(--q-surface-card);
+  --surface-muted: var(--q-surface-muted);
+  --surface-soft: var(--q-primary-soft);
+  --primary-color: var(--q-primary);
+  --primary-hover: var(--q-primary-hover);
+  --primary-soft: var(--q-primary-soft);
+  --accent-color: var(--q-accent);
+  --accent-soft: var(--q-accent-soft);
+  --border-subtle: var(--q-border-subtle);
+  --border-strong: var(--q-border-strong);
+}
+
+body {
+  background: linear-gradient(135deg, #eaf1f5 0%, #f5fbfc 52%, #fff7f0 100%) !important;
+}
+
+body .app-shell {
+  background: transparent !important;
+}
+
+body .app-shell .sidebar {
+  background: linear-gradient(180deg, #fbfdff 0%, #f3fafb 58%, #fff6f7 100%) !important;
+  border-inline-end-color: rgba(11, 138, 168, 0.18) !important;
+}
+
+body .app-shell .sidebar-header,
+body .app-shell .sidebar-actions,
+body .app-shell .nav-group + .nav-group {
+  border-color: rgba(11, 138, 168, 0.14) !important;
+}
+
+body .app-shell .sidebar-link .child-icon,
+body .app-shell .sidebar-link .child-dot,
+body .app-shell.sidebar-collapsed .group-icon {
+  width: 26px !important;
+  height: 26px !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: #edf6f8 !important;
+  border: 1px solid rgba(11, 138, 168, 0.14) !important;
+  border-radius: 8px !important;
+}
+
+body .app-shell .sidebar-link-active .child-icon,
+body .app-shell .sidebar-link-active .child-dot,
+body .app-shell.sidebar-collapsed .sidebar-group-header:hover .group-icon {
+  color: #ffffff !important;
+  background: linear-gradient(135deg, var(--q-accent), #d91d38) !important;
+  border-color: rgba(242, 39, 69, 0.28) !important;
+}
+
+body :where(.page-header, .page-hero) {
+  background:
+    linear-gradient(90deg, rgba(251, 253, 255, 0.98) 0%, rgba(239, 248, 250, 0.94) 62%, rgba(255, 240, 243, 0.76) 100%),
+    var(--q-surface-card) !important;
+  border-color: rgba(11, 138, 168, 0.18) !important;
+}
+
+body :where(.settings-panel, .content-panel, .list-panel, .form-panel, .logo-preview-panel, .status-list, .empty-state, .card, .summary-card, .monitor-card, .voice-preview, .queue-preview, .table-wrap, .table-responsive) {
+  background: linear-gradient(180deg, #fbfdff 0%, #f8fcfd 100%) !important;
+  border-color: var(--q-border-subtle) !important;
+  box-shadow: var(--q-shadow-soft) !important;
+}
+
+body :where(input:not([type='checkbox']):not([type='radio']):not([type='color']), select, textarea, .form-control, .form-select) {
+  background-color: #f7fbfc !important;
+  border-color: var(--q-border-strong) !important;
+}
+
+body :where(input:not([type='checkbox']):not([type='radio']):not([type='color']):focus, select:focus, textarea:focus, .form-control:focus, .form-select:focus) {
+  background-color: #ffffff !important;
+  border-color: rgba(11, 138, 168, 0.58) !important;
+  box-shadow: 0 0 0 3px rgba(11, 138, 168, 0.13) !important;
+}
+
+body th,
+body .custom-table thead th {
+  background: #eaf4f7 !important;
+  color: #385063 !important;
+}
+
+body tbody tr:nth-child(even) td,
+body .custom-table tbody tr:nth-child(even) td {
+  background: rgba(224, 246, 248, 0.32) !important;
+}
+
+body .icon-action.success-action:hover:not(:disabled) {
+  color: var(--q-success) !important;
+  background: var(--q-success-soft) !important;
+  border-color: rgba(19, 138, 91, 0.28) !important;
+}
+
+body .icon-action.warning-action:hover:not(:disabled) {
+  color: var(--q-warning) !important;
+  background: var(--q-warning-soft) !important;
+  border-color: rgba(183, 121, 31, 0.28) !important;
+}
+
+/* Q-SYSTEM comfort alignment layer. */
+body :where(.primary-action, .secondary-action, .toolbar-action, .compact-action, .sidebar-action-button) {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  min-height: 44px !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+}
+
+body :where(.primary-action, .secondary-action, .toolbar-action, .compact-action, .sidebar-action-button) > .bi,
+body :where(.icon-action) > .bi {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex: 0 0 auto !important;
+  line-height: 1 !important;
+}
+
+body :where(.icon-action) {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+/* Q-SYSTEM toolbar comfort layer. */
+body :where(.waiting-areas-page, .window-management-page) {
+  --q-admin-control-height: 44px;
+  --q-admin-control-radius: 10px;
+  --q-admin-toolbar-gap-x: 18px;
+  --q-admin-toolbar-gap-y: 14px;
+}
+
+body .waiting-areas-page .list-panel > .row:first-child {
+  display: grid !important;
+  grid-template-columns: minmax(320px, 2fr) minmax(180px, 1fr) minmax(180px, 1fr) minmax(150px, 0.75fr) minmax(150px, auto) !important;
+  align-items: end !important;
+  gap: var(--q-admin-toolbar-gap-y) var(--q-admin-toolbar-gap-x) !important;
+  margin: 0 0 18px !important;
+}
+
+body .waiting-areas-page .list-panel > .row:first-child > [class*='col-'] {
+  width: auto !important;
+  max-width: none !important;
+  padding: 0 !important;
+}
+
+body .window-management-page .toolbar {
+  grid-template-columns: minmax(320px, 2fr) minmax(220px, 1.1fr) minmax(150px, 0.65fr) minmax(150px, auto) !important;
+  gap: var(--q-admin-toolbar-gap-y) var(--q-admin-toolbar-gap-x) !important;
+  margin-bottom: 18px !important;
+}
+
+body :where(.waiting-areas-page, .window-management-page) :where(.filter-field, .has-field-icon) {
+  position: relative !important;
+  display: flex !important;
+  min-width: 0 !important;
+  flex-direction: column !important;
+  justify-content: flex-end !important;
+  gap: 7px !important;
+  margin: 0 !important;
+}
+
+body :where(.waiting-areas-page, .window-management-page) :where(.filter-field span, .form-field span) {
+  display: flex !important;
+  min-height: 16px !important;
+  align-items: center !important;
+  overflow: hidden !important;
+  color: var(--q-text-secondary) !important;
+  font-size: var(--q-font-size-small) !important;
+  font-weight: 850 !important;
+  line-height: 1.2 !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+body :where(.waiting-areas-page, .window-management-page) :where(.filter-field, .has-field-icon) :where(input, select, .form-control, .form-select) {
+  width: 100% !important;
+  min-width: 0 !important;
+  height: var(--q-admin-control-height) !important;
+  min-height: var(--q-admin-control-height) !important;
+  padding-block: 0 !important;
+  padding-inline-start: 40px !important;
+  border-radius: var(--q-admin-control-radius) !important;
+  line-height: var(--q-admin-control-height) !important;
+}
+
+body :where(.waiting-areas-page, .window-management-page) :where(.filter-icon, .form-field-icon, .window-filter-icon) {
+  position: absolute !important;
+  inset-block-end: 16px !important;
+  inset-inline-start: 14px !important;
+  bottom: auto !important;
+  z-index: 2 !important;
+  display: inline-flex !important;
+  width: 16px !important;
+  height: 16px !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: var(--q-primary) !important;
+  font-size: 0.9rem !important;
+  line-height: 1 !important;
+  pointer-events: none !important;
+}
+
+body :where(.waiting-areas-page, .window-management-page) :where(.primary-action, .secondary-action, .toolbar-action, .compact-action) {
+  min-height: var(--q-admin-control-height) !important;
+  padding: 0 18px !important;
+  border-radius: var(--q-admin-control-radius) !important;
+}
+
+body :where(.waiting-areas-page, .window-management-page) :where(.toolbar-action, .list-panel > .row:first-child .secondary-action) {
+  width: 100% !important;
+  min-width: 150px !important;
+}
+
+body .window-management-page .tabs :where(.primary-action, .secondary-action) {
+  min-width: 132px !important;
+}
+
+body :where(.waiting-areas-page, .window-management-page) :where(.pagination-bar) {
+  justify-content: space-between !important;
+  margin-top: 18px !important;
+  padding-top: 12px !important;
+}
+
+body :where(.waiting-areas-page, .window-management-page) :where(.pager-actions, .pagination-bar > div) {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 10px !important;
+}
+
+body :where(.waiting-areas-page, .window-management-page) :where(.compact-action) {
+  min-width: 110px !important;
+}
+
+body :where(.waiting-areas-page, .window-management-page) :where(.page-indicator, .status-pill) {
+  display: inline-flex !important;
+  min-width: 52px !important;
+  align-items: center !important;
+  justify-content: center !important;
+  line-height: 1 !important;
+}
+
+body :where(.waiting-areas-page, .window-management-page) :where(.icon-action) {
+  width: 36px !important;
+  min-width: 36px !important;
+  height: 36px !important;
+  min-height: 36px !important;
+  border-radius: 10px !important;
+}
+
+body :where(.waiting-areas-page, .window-management-page) :where(th, td) {
+  vertical-align: middle !important;
+}
+
+body .app-shell-rtl :where(.waiting-areas-page, .window-management-page) :where(.filter-icon, .form-field-icon, .window-filter-icon) {
+  inset-inline-start: auto !important;
+  inset-inline-end: 14px !important;
+}
+
+@media (max-width: 1199.98px) {
+  body .waiting-areas-page .list-panel > .row:first-child,
+  body .window-management-page .toolbar {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 767.98px) {
+  body .waiting-areas-page .list-panel > .row:first-child,
+  body .window-management-page .toolbar {
+    grid-template-columns: 1fr !important;
+  }
+
+  body :where(.waiting-areas-page, .window-management-page) :where(.toolbar-action, .tabs .primary-action, .tabs .secondary-action, .compact-action, .pagination-bar, .pager-actions, .pagination-bar > div) {
+    width: 100% !important;
+  }
+}
+/* Q-SYSTEM full admin toolbar alignment fix. */
+body :where(.waiting-areas-page, .window-management-page, .display-management-page, .terminal-management-page) {
+  --q-admin-control-height: 44px;
+  --q-admin-control-radius: 10px;
+  --q-admin-toolbar-gap-x: 18px;
+  --q-admin-toolbar-gap-y: 14px;
+}
+
+body :where(.display-management-page, .terminal-management-page) .list-panel > .row:first-child {
+  display: grid !important;
+  grid-template-columns: minmax(320px, 2fr) minmax(220px, 1.1fr) minmax(150px, 0.65fr) minmax(150px, auto) !important;
+  align-items: end !important;
+  gap: var(--q-admin-toolbar-gap-y) var(--q-admin-toolbar-gap-x) !important;
+  margin: 0 0 18px !important;
+}
+
+body :where(.display-management-page, .terminal-management-page) .list-panel > .row:first-child > [class*='col-'] {
+  width: auto !important;
+  max-width: none !important;
+  padding: 0 !important;
+}
+
+body :where(.display-management-page, .terminal-management-page) .filter-field {
+  position: relative !important;
+  display: flex !important;
+  min-width: 0 !important;
+  flex-direction: column !important;
+  justify-content: flex-end !important;
+  gap: 7px !important;
+  margin: 0 !important;
+}
+
+body :where(.display-management-page, .terminal-management-page) .filter-field span {
+  display: flex !important;
+  min-height: 16px !important;
+  align-items: center !important;
+  overflow: hidden !important;
+  font-size: var(--q-font-size-small) !important;
+  font-weight: 850 !important;
+  line-height: 1.2 !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+body :where(.display-management-page, .terminal-management-page) .filter-field :where(input, select, .form-control, .form-select) {
+  height: var(--q-admin-control-height) !important;
+  min-height: var(--q-admin-control-height) !important;
+  padding-block: 0 !important;
+  border-radius: var(--q-admin-control-radius) !important;
+  line-height: var(--q-admin-control-height) !important;
+}
+
+body :where(.waiting-areas-page, .window-management-page, .display-management-page, .terminal-management-page) .filter-field:has(:where(.filter-icon, .window-filter-icon, .form-field-icon)) :where(input, select, .form-control, .form-select) {
+  padding-inline-start: 40px !important;
+}
+
+body :where(.display-management-page, .terminal-management-page) .list-panel > .row:first-child > div:last-child {
+  display: flex !important;
+  align-self: end !important;
+}
+
+body :where(.display-management-page, .terminal-management-page) .list-panel > .row:first-child > div:last-child > :where(button, .btn) {
+  width: 100% !important;
+  min-width: 150px !important;
+  height: var(--q-admin-control-height) !important;
+  min-height: var(--q-admin-control-height) !important;
+  align-self: end !important;
+}
+
+body :where(.display-management-page, .terminal-management-page) :where(.pagination-bar) {
+  justify-content: space-between !important;
+  margin-top: 18px !important;
+  padding-top: 12px !important;
+}
+
+body :where(.display-management-page, .terminal-management-page) :where(.pagination-bar > div) {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 10px !important;
+}
+
+body :where(.display-management-page, .terminal-management-page) :where(.compact-action) {
+  min-width: 110px !important;
+}
+
+body :where(.display-management-page, .terminal-management-page) :where(.page-indicator) {
+  display: inline-flex !important;
+  min-width: 52px !important;
+  align-items: center !important;
+  justify-content: center !important;
+  line-height: 1 !important;
+}
+
+@media (max-width: 1199.98px) {
+  body :where(.display-management-page, .terminal-management-page) .list-panel > .row:first-child {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 767.98px) {
+  body :where(.display-management-page, .terminal-management-page) .list-panel > .row:first-child {
+    grid-template-columns: 1fr !important;
+  }
+
+  body :where(.display-management-page, .terminal-management-page) :where(.list-panel > .row:first-child > div:last-child, .compact-action, .pagination-bar, .pagination-bar > div) {
+    width: 100% !important;
+  }
+}
