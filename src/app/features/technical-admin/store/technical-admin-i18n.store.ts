@@ -17,6 +17,7 @@ interface TechnicalAdminTranslations {
   readonly serviceRequestLabel: string;
   readonly branchManagementLabel: string;
   readonly branchEditorLabel: string;
+  readonly branchBrandingLabel: string;
   readonly waitingAreasLabel: string;
   readonly windowsManagementLabel: string;
   readonly terminalsManagementLabel: string;
@@ -119,6 +120,7 @@ const TECHNICAL_ADMIN_TRANSLATIONS: Record<AppLanguage, TechnicalAdminTranslatio
     serviceRequestLabel: '\u0637\u0644\u0628 \u0627\u0644\u062e\u062f\u0645\u0629',
     branchManagementLabel: '\u0625\u062f\u0627\u0631\u0629 \u0627\u0644\u0641\u0631\u0648\u0639',
     branchEditorLabel: '\u0645\u062d\u0631\u0631 \u0627\u0644\u0641\u0631\u0648\u0639',
+    branchBrandingLabel: '\u0627\u0644\u0647\u0648\u064a\u0629 \u0648\u0627\u0644\u0625\u0639\u0644\u0627\u0646\u0627\u062a',
     waitingAreasLabel: '\u0645\u0646\u0627\u0637\u0642 \u0627\u0644\u0627\u0646\u062a\u0638\u0627\u0631',
     windowsManagementLabel: '\u0627\u0644\u0646\u0627\u0648\u0627\u0641\u0630',
     terminalsManagementLabel: '\u0627\u0644\u062c\u0647\u0627\u0632\u0627\u062a \u0627\u0644\u0637\u0631\u0641\u064a\u0629',
@@ -219,6 +221,7 @@ const TECHNICAL_ADMIN_TRANSLATIONS: Record<AppLanguage, TechnicalAdminTranslatio
     serviceRequestLabel: 'Service Request',
     branchManagementLabel: 'Branch Management',
     branchEditorLabel: 'Branch Editor',
+    branchBrandingLabel: 'Branding & Advertisements',
     waitingAreasLabel: 'Waiting Areas',
     windowsManagementLabel: 'Windows',
     terminalsManagementLabel: 'Terminals',

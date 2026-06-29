@@ -44,6 +44,17 @@ export const TECHNICAL_ADMIN_ROUTES: Routes = [
           ),
       },
       {
+        path: 'branch-branding',
+        canActivate: [technicalAdminPermissionGuard],
+        data: {
+          requiredAnyPermissions: ['Branches.ViewDetails'],
+        },
+        loadComponent: () =>
+          import('./pages/branch-branding/branch-branding.component').then(
+            (component) => component.BranchBrandingComponent,
+          ),
+      },
+      {
         path: 'waiting-areas',
         loadComponent: () =>
           import('./pages/waiting-areas/waiting-areas.component').then(

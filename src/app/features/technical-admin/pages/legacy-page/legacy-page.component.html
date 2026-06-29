@@ -200,6 +200,15 @@
                       >
                         <i class="bi bi-pencil-square" aria-hidden="true"></i>
                       </button>
+                      <button
+                        type="button"
+                        class="icon-action"
+                        [title]="branchEditorTranslations().branding"
+                        [attr.aria-label]="branchEditorTranslations().branding"
+                        (click)="openBranchBranding(branch.id)"
+                      >
+                        <i class="bi bi-brush" aria-hidden="true"></i>
+                      </button>
                       @if (branch.isActive) {
                         <button
                           type="button"

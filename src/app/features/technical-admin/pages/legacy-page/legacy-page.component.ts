@@ -69,6 +69,7 @@ interface BranchEditorTranslations {
   readonly addBranch: string;
   readonly view: string;
   readonly edit: string;
+  readonly branding: string;
   readonly status: string;
   readonly active: string;
   readonly inactive: string;
@@ -111,6 +112,7 @@ const BRANCH_EDITOR_TRANSLATIONS: Record<AppLanguage, BranchEditorTranslations> 
     addBranch: '\u0625\u0636\u0627\u0641\u0629 \u0641\u0631\u0639',
     view: '\u0639\u0631\u0636',
     edit: '\u062a\u0639\u062f\u064a\u0644',
+    branding: '\u0627\u0644\u0647\u0648\u064a\u0629 \u0648\u0627\u0644\u0625\u0639\u0644\u0627\u0646\u0627\u062a',
     status: '\u0627\u0644\u062d\u0627\u0644\u0629',
     active: '\u0646\u0634\u0637',
     inactive: '\u063a\u064a\u0631 \u0646\u0634\u0637',
@@ -151,6 +153,7 @@ const BRANCH_EDITOR_TRANSLATIONS: Record<AppLanguage, BranchEditorTranslations> 
     addBranch: 'Add Branch',
     view: 'View',
     edit: 'Edit',
+    branding: 'Branding & Ads',
     status: 'Status',
     active: 'Active',
     inactive: 'Inactive',
@@ -393,6 +396,12 @@ export class LegacyPageComponent implements OnInit, OnDestroy {
 
   protected openEditBranch(branchId: number): void {
     this.openBranchDetails(branchId, 'edit');
+  }
+
+  protected openBranchBranding(branchId: number): void {
+    void this.router.navigate(['/technical-admin/branch-branding'], {
+      queryParams: { branchId },
+    });
   }
 
   protected closeBranchPanel(): void {

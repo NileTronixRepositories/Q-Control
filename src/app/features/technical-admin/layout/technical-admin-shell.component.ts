@@ -51,6 +51,11 @@ export class TechnicalAdminShellComponent {
             icon: 'bi-building-gear'
           },
           {
+            label: translations.branchBrandingLabel,
+            route: '/technical-admin/branch-branding',
+            icon: 'bi-brush'
+          },
+          {
             label: translations.waitingAreasLabel,
             route: '/technical-admin/waiting-areas',
             icon: 'bi-hourglass-split'

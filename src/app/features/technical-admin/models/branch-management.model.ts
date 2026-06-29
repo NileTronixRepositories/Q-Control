@@ -1,4 +1,9 @@
-import { LifecycleMutationResponse, OperationalEntityState, OperationalStatusFilter, PermanentDeleteResponse } from './operational-lifecycle.model';
+import {
+  LifecycleMutationResponse,
+  OperationalEntityState,
+  OperationalStatusFilter,
+  PermanentDeleteResponse,
+} from './operational-lifecycle.model';
 
 export type BranchOrderSort = 'Newest' | 'Oldest';
 
