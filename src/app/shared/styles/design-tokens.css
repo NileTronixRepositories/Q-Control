@@ -24,7 +24,10 @@
   --q-radius-lg: 10px;
   
   --q-control-height: 34px;
-  --q-action-height: 34px;
+  --q-action-height: 44px;
+  --q-compact-action-height: 38px;
+  --q-icon-action-size: 36px;
+  --q-icon-action-radius: 8px;
   --q-upload-height: 48px;
   
   --q-workspace-padding-y: 14px;
@@ -38,7 +41,27 @@
   /* Shadows */
   --q-shadow-soft: 0 8px 22px rgba(20, 42, 58, 0.06);
   --q-shadow-card: 0 14px 34px rgba(20, 42, 58, 0.08);
+
+  /* Shared Button Tokens */
+  --q-button-bg: linear-gradient(135deg, #0b7fa3 0%, #086b8d 100%);
+  --q-button-hover-bg: linear-gradient(135deg, #086f92 0%, #075d7b 100%);
+  --q-button-disabled-bg: linear-gradient(135deg, #7aa6b7 0%, #688d9b 100%);
+  --q-button-text: #ffffff;
+  --q-button-border: rgba(8, 107, 141, 0.72);
+  --q-button-shadow: 0 8px 18px rgba(8, 107, 141, 0.14);
+  --q-button-hover-shadow: 0 10px 22px rgba(8, 107, 141, 0.18);
+  --q-secondary-button-text: #075d7b;
+  --q-secondary-button-bg: #ffffff;
+  --q-secondary-button-hover-bg: rgba(8, 107, 141, 0.08);
+  --q-secondary-button-border: rgba(8, 107, 141, 0.22);
+  --q-icon-button-text: #075d7b;
+  --q-icon-button-bg: #ffffff;
+  --q-icon-button-hover-bg: rgba(8, 107, 141, 0.08);
+  --q-icon-button-border: rgba(8, 107, 141, 0.2);
   
+  /* Typography */
+  --q-font-family: 'Cairo', Arial, sans-serif;
+
   /* Typography Scaling */
   --q-font-size-base: 13px;
   --q-font-size-heading: 1.15rem;
@@ -78,6 +101,8 @@
   
   --nt-control-height: var(--q-control-height);
   --nt-action-height: var(--q-action-height);
+  --nt-compact-action-height: var(--q-compact-action-height);
+  --nt-icon-action-size: var(--q-icon-action-size);
   --nt-upload-height: var(--q-upload-height);
   
   --nt-workspace-padding-y: var(--q-workspace-padding-y);
@@ -100,3 +125,4 @@
   --nt-hero-padding-y: var(--q-panel-padding-y);
   --nt-hero-padding-x: var(--q-panel-padding-x);
 }
+

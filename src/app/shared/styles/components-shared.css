@@ -18,7 +18,8 @@ body {
 .branch-page,
 .waiting-areas-page,
 .window-management-page,
-.terminal-management-page {
+.terminal-management-page,
+.display-management-page {
   display: flex !important;
   flex-direction: column !important;
   gap: var(--q-section-gap) !important;
@@ -265,44 +266,140 @@ select,
 
 /* Buttons and Actions */
 .primary-action,
-.secondary-action {
+.secondary-action,
+.toolbar-action,
+.compact-action {
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-  gap: 6px !important;
+  gap: 8px !important;
   min-height: var(--q-action-height) !important;
-  padding: 0 14px !important;
-  border-radius: var(--q-radius-sm) !important;
-  font-size: var(--q-font-size-base) !important;
-  font-weight: 600 !important;
-  cursor: pointer !important;
-  text-decoration: none !important;
+  padding: 0 16px !important;
   border: 1px solid transparent !important;
+  border-radius: var(--q-radius-md) !important;
+  font-size: var(--q-font-size-base) !important;
+  font-weight: 800 !important;
+  line-height: 1 !important;
+  text-align: center !important;
+  text-decoration: none !important;
+  white-space: nowrap !important;
+  cursor: pointer !important;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    color 160ms ease !important;
 }
 
 .primary-action {
-  color: #ffffff !important;
-  background: linear-gradient(135deg, var(--q-primary), #006e9f) !important;
-  border-color: rgba(15, 125, 168, 0.8) !important;
-  box-shadow: 0 4px 10px rgba(15, 125, 168, 0.12) !important;
+  color: var(--q-button-text) !important;
+  background: var(--q-button-bg) !important;
+  border-color: var(--q-button-border) !important;
+  box-shadow: var(--q-button-shadow) !important;
 }
 
-.primary-action:hover:not(:disabled) {
-  color: #ffffff !important;
-  background: linear-gradient(135deg, var(--q-primary-hover), var(--q-primary)) !important;
-  box-shadow: 0 6px 14px rgba(15, 125, 168, 0.18) !important;
+.primary-action:hover:not(:disabled),
+.primary-action:focus-visible:not(:disabled) {
+  color: var(--q-button-text) !important;
+  background: var(--q-button-hover-bg) !important;
+  border-color: var(--q-button-border) !important;
+  box-shadow: var(--q-button-hover-shadow) !important;
+  outline: 0 !important;
 }
 
 .secondary-action {
-  color: var(--q-primary-hover) !important;
-  background: #ffffff !important;
-  border-color: rgba(15, 125, 168, 0.2) !important;
+  color: var(--q-secondary-button-text) !important;
+  background: var(--q-secondary-button-bg) !important;
+  border-color: var(--q-secondary-button-border) !important;
+  box-shadow: 0 7px 16px rgba(8, 107, 141, 0.07) !important;
 }
 
-.secondary-action:hover:not(:disabled) {
-  color: var(--q-accent) !important;
-  background: var(--q-accent-soft) !important;
-  border-color: rgba(243, 24, 45, 0.2) !important;
+.secondary-action:hover:not(:disabled),
+.secondary-action:focus-visible:not(:disabled) {
+  color: var(--q-secondary-button-text) !important;
+  background: var(--q-secondary-button-hover-bg) !important;
+  border-color: var(--q-secondary-button-border) !important;
+  box-shadow: 0 8px 18px rgba(8, 107, 141, 0.08) !important;
+  outline: 0 !important;
+}
+
+.compact-action {
+  min-height: var(--q-compact-action-height) !important;
+  padding-inline: 14px !important;
+}
+
+.primary-action:disabled,
+.secondary-action:disabled,
+.toolbar-action:disabled,
+.compact-action:disabled {
+  color: rgba(255, 255, 255, 0.78) !important;
+  background: var(--q-button-disabled-bg) !important;
+  border-color: rgba(104, 141, 155, 0.36) !important;
+  box-shadow: none !important;
+  cursor: not-allowed !important;
+  opacity: 0.72 !important;
+}
+
+.icon-action {
+  display: inline-flex !important;
+  width: var(--q-icon-action-size) !important;
+  min-width: var(--q-icon-action-size) !important;
+  height: var(--q-icon-action-size) !important;
+  min-height: var(--q-icon-action-size) !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  color: var(--q-icon-button-text) !important;
+  background: var(--q-icon-button-bg) !important;
+  border: 1px solid var(--q-icon-button-border) !important;
+  border-radius: var(--q-icon-action-radius) !important;
+  box-shadow: 0 7px 16px rgba(8, 107, 141, 0.07) !important;
+  line-height: 1 !important;
+  cursor: pointer !important;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    color 160ms ease !important;
+}
+
+.icon-action > .bi,
+.primary-action > .bi,
+.secondary-action > .bi,
+.toolbar-action > .bi,
+.compact-action > .bi {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex: 0 0 auto !important;
+  font-size: 1rem !important;
+  line-height: 1 !important;
+}
+
+.icon-action:hover:not(:disabled),
+.icon-action:focus-visible:not(:disabled) {
+  color: var(--q-icon-button-text) !important;
+  background: var(--q-icon-button-hover-bg) !important;
+  border-color: var(--q-icon-button-border) !important;
+  box-shadow: 0 8px 18px rgba(8, 107, 141, 0.08) !important;
+  outline: 0 !important;
+}
+
+.icon-action.danger-action {
+  color: var(--q-danger) !important;
+  border-color: rgba(210, 31, 53, 0.2) !important;
+}
+
+.icon-action.danger-action:hover:not(:disabled) {
+  color: var(--q-danger) !important;
+  background: var(--q-danger-soft) !important;
+  border-color: rgba(210, 31, 53, 0.24) !important;
+}
+
+.icon-action.success-action:hover:not(:disabled) {
+  color: var(--q-success) !important;
+  background: var(--q-success-soft) !important;
+  border-color: rgba(19, 138, 91, 0.24) !important;
 }
 
 .panel-actions {
@@ -329,7 +426,6 @@ select,
   background: var(--q-accent) !important;
   border-radius: 0 var(--q-radius-sm) var(--q-radius-sm) 0 !important;
 }
-
 /* Upload Dropzone Styles */
 .upload-control,
 .upload-dropzone {
@@ -468,6 +564,10 @@ select,
 /* Custom Table Spacings */
 .table-wrap,
 .table-responsive {
+  max-width: 100% !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  -webkit-overflow-scrolling: touch !important;
   background: #ffffff !important;
   border: 1px solid var(--q-border-subtle) !important;
   border-radius: var(--q-radius-md) !important;
@@ -478,6 +578,7 @@ table,
 .table,
 .custom-table {
   width: 100% !important;
+  min-width: var(--q-table-min-width, 760px) !important;
   margin-bottom: 0 !important;
 }
 
@@ -505,3 +606,4 @@ tbody tr:hover td,
 .custom-table tbody tr:hover td {
   background: rgba(15, 125, 168, 0.02) !important;
 }
+

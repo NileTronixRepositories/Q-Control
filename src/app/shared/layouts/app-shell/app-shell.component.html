@@ -1,4 +1,4 @@
-﻿<main
+<main
   class="app-shell"
   [class.sidebar-expanded]="sidebarExpanded()"
   [class.sidebar-collapsed]="!sidebarExpanded()"
@@ -19,6 +19,7 @@
         <div class="logo-container">
           <img src="/images/nile.png" alt="" class="sidebar-logo" />
         </div>
+        <app-theme-switcher></app-theme-switcher>
       }
       <button
         type="button"
@@ -133,3 +134,5 @@
     </div>
   </section>
 </main>
+
+

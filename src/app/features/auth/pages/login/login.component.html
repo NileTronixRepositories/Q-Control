@@ -13,6 +13,32 @@
     (languageChange)="setLanguage($event)"
   />
 
+  @if (loginFeedback()) {
+    <div class="login-toast-stack" role="status" aria-live="polite" aria-atomic="true">
+      <div
+        class="login-toast"
+        [class.login-toast-success]="loginStore.status() === 'success'"
+        [class.login-toast-error]="loginStore.status() === 'error'"
+      >
+        <i
+          class="bi"
+          [class.bi-check-circle-fill]="loginStore.status() === 'success'"
+          [class.bi-x-octagon-fill]="loginStore.status() === 'error'"
+          aria-hidden="true"
+        ></i>
+        <p>{{ loginFeedback() }}</p>
+        <button
+          type="button"
+          class="login-toast-close"
+          [attr.aria-label]="translations().dismissNotificationLabel"
+          (click)="dismissToast()"
+        >
+          <i class="bi bi-x-lg" aria-hidden="true"></i>
+        </button>
+      </div>
+    </div>
+  }
+
   <section class="login-stage" aria-labelledby="login-title">
     <div class="login-stage-grid">
       <aside class="login-experience" aria-hidden="true">
@@ -169,7 +195,7 @@
                 }
               </div>
 
-              <div class="login-options">
+              <!-- <div class="login-options">
                 <div class="form-check">
                   <input
                     id="rememberSession"
@@ -185,33 +211,7 @@
                 <a class="support-link" href="mailto:support@q-system.local">
                   {{ translations().technicalSupport }}
                 </a>
-              </div>
-
-              @if (loginFeedback()) {
-                <div class="login-toast-stack" role="status" aria-live="polite" aria-atomic="true">
-                  <div
-                    class="login-toast"
-                    [class.login-toast-success]="loginStore.status() === 'success'"
-                    [class.login-toast-error]="loginStore.status() === 'error'"
-                  >
-                    <i
-                      class="bi"
-                      [class.bi-check-circle-fill]="loginStore.status() === 'success'"
-                      [class.bi-x-octagon-fill]="loginStore.status() === 'error'"
-                      aria-hidden="true"
-                    ></i>
-                    <p>{{ loginFeedback() }}</p>
-                    <button
-                      type="button"
-                      class="login-toast-close"
-                      [attr.aria-label]="translations().dismissNotificationLabel"
-                      (click)="dismissToast()"
-                    >
-                      <i class="bi bi-x-lg" aria-hidden="true"></i>
-                    </button>
-                  </div>
-                </div>
-              }
+              </div> -->
 
               <button type="submit" class="submit-button" [disabled]="loginStore.isSubmitting()">
                 @if (loginStore.isSubmitting()) {

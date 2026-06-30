@@ -1,4 +1,4 @@
-﻿import {
+import {
   ChangeDetectionStrategy,
   Component,
   HostListener,
@@ -9,12 +9,14 @@
 } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 
+import { ThemeSwitcherComponent } from '../../components/theme-switcher/theme-switcher.component';
+
 import { AppDirection, AppLanguage } from '../../models/app-language.model';
 import { AppNavigationItem } from '../../models/navigation.model';
 
 @Component({
   selector: 'app-shell',
-  imports: [RouterLink, RouterLinkActive],
+  imports: [RouterLink, RouterLinkActive, ThemeSwitcherComponent],
   templateUrl: './app-shell.component.html',
   styleUrl: './app-shell.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -85,5 +87,6 @@ export class AppShellComponent implements OnInit {
     this.logout.emit();
   }
 }
+
 
 

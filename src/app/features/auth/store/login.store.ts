@@ -20,15 +20,17 @@ export class LoginStore {
 
   submit(credentials: LoginCredentials): void {
     this.statusSignal.set('submitting');
+    this.messageSignal.set('');
     this.userTypeSignal.set(null);
 
     this.authSessionService
       .submitLogin(credentials)
       .pipe(take(1))
       .subscribe((result) => {
-        this.statusSignal.set(result.accepted ? 'success' : 'error');
         this.messageSignal.set(result.message);
         this.userTypeSignal.set(result.session?.userType ?? null);
+        this.statusSignal.set(result.accepted ? 'success' : 'error');
       });
   }
 }
+

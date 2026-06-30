@@ -49,8 +49,16 @@ dd { margin: 4px 0 0 !important; color: var(--q-text-primary) !important; font-s
 /* Mobile */
 @media (max-width: 767.98px) {
   .editor-panel {
-    inset: 0 !important; width: 100% !important; height: 100dvh !important; max-height: 100dvh !important;
-    transform: none !important; border-radius: 0 !important; padding: 14px !important;
+    inset: auto auto max(10px, env(safe-area-inset-bottom)) 50% !important;
+    width: min(420px, calc(100dvw - 24px)) !important;
+    max-width: min(420px, calc(100dvw - 24px)) !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: min(82dvh, calc(100dvh - 18px)) !important;
+    padding: 0 !important;
+    transform: translateX(-50%) !important;
+    border-radius: 18px !important;
+    z-index: 2147483010 !important;
   }
   .details-list { grid-template-columns: 1fr !important; }
 }

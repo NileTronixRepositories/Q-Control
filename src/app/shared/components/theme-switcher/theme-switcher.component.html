@@ -1,0 +1,43 @@
+<div class="theme-switcher" [class.theme-switcher-open]="isOpen()">
+  <button
+    type="button"
+    class="theme-trigger"
+    aria-label="Choose theme"
+    [attr.aria-expanded]="isOpen()"
+    aria-haspopup="dialog"
+    (click)="togglePanel($event)"
+  >
+    <i class="bi bi-palette" aria-hidden="true"></i>
+  </button>
+
+  @if (isOpen()) {
+    <div
+      class="theme-panel py-3"
+      role="dialog"
+      aria-label="Theme selector"
+      [style.top]="panelPosition().top"
+      [style.left]="panelPosition().left"
+      [style.width]="panelPosition().width"
+      (click)="$event.stopPropagation()"
+    >
+      @for (theme of themeStore.themes; track theme.id) {
+        <button
+          type="button"
+          class="theme-option"
+          [class.theme-option-active]="themeStore.selectedTheme() === theme.id"
+          [attr.aria-pressed]="themeStore.selectedTheme() === theme.id"
+          [attr.title]="theme.label"
+          (click)="selectTheme(theme.id)"
+        >
+          <span class="theme-radio" aria-hidden="true"></span>
+          <span class="theme-swatch" aria-hidden="true">
+            @for (swatch of theme.swatches; track swatch) {
+              <span class="theme-color" [style.background]="swatch"></span>
+            }
+          </span>
+          <span class="theme-name">{{ theme.label }}</span>
+        </button>
+      }
+    </div>
+  }
+</div>

@@ -132,8 +132,8 @@
             </p>
           }
           @if (activeWindowsPage().data.length > 0) {
-            <div class="table-wrap">
-              <table>
+            <div class="table-responsive table-wrap">
+              <table class="table align-middle custom-table">
                 <thead>
                   <tr>
                     <th>{{ translations().windowNumber }}</th>
@@ -287,8 +287,8 @@
             </p>
           }
           @if (deletedWindowsPage().data.length > 0) {
-            <div class="table-wrap">
-              <table>
+            <div class="table-responsive table-wrap">
+              <table class="table align-middle custom-table">
                 <thead>
                   <tr>
                     <th>{{ translations().windowNumber }}</th>
@@ -444,61 +444,90 @@
               (ngSubmit)="saveWindow()"
               novalidate
             >
-              <label class="form-field col-12">
-                <span>{{ translations().waitingArea }}</span>
-                <select formControlName="waitingAreaId">
-                  <option [value]="0">{{ translations().selectWaitingArea }}</option>
-                  @for (area of waitingAreas(); track area.id) {
-                    <option [value]="area.id">{{ waitingAreaLabel(area) }}</option>
-                  }
-                </select>
-                @if (hasWindowFormError('waitingAreaId')) {
-                  <small>{{ translations().requiredField }}</small>
-                }
-              </label>
-              <label class="form-field col-12 col-md-3">
-                <span>{{ translations().windowNumber }}</span>
-                <input type="text" maxlength="20" formControlName="number" />
-                @if (hasWindowFormError('number')) {
-                  <small>
-                    @if (
-                      numberControl.hasError('required') || numberControl.hasError('whitespace')
-                    ) {
-                      {{ translations().requiredField }}
-                    } @else if (numberControl.hasError('maxlength')) {
-                      {{ translations().maxLength20 }}
+              <div class="col-12">
+                <label class="form-field has-field-icon w-100">
+                  <span>{{ translations().waitingArea }}</span>
+                  <i class="bi bi-hourglass-split form-field-icon" aria-hidden="true"></i>
+                  <select class="form-select" formControlName="waitingAreaId">
+                    <option [value]="0">{{ translations().selectWaitingArea }}</option>
+                    @for (area of waitingAreas(); track area.id) {
+                      <option [value]="area.id">{{ waitingAreaLabel(area) }}</option>
                     }
-                  </small>
-                }
-              </label>
-              <label class="form-field col-12 col-md-6">
-                <span>{{ translations().descriptiveName }}</span>
-                <input type="text" maxlength="100" formControlName="descriptiveName" />
-                @if (hasWindowFormError('descriptiveName')) {
-                  <small>{{ translations().maxLength100 }}</small>
-                }
-              </label>
-              <label class="form-field col-12 col-md-3">
-                <span>{{ translations().ipAddress }}</span>
-                <input type="text" maxlength="45" formControlName="ipAddress" />
-                @if (hasWindowFormError('ipAddress')) {
-                  <small>{{ translations().invalidIp }}</small>
-                }
-              </label>
-              <label class="form-field col-12 col-md-6 form-check">
-                <span>{{ translations().ticketBooking }}</span>
-                <input type="checkbox" formControlName="enableTicketBooking" />
-              </label>
-              <label class="form-field col-12 col-md-6 form-check">
-                <span>{{ translations().directCall }}</span>
-                <input type="checkbox" formControlName="enableDirectCall" />
-              </label>
-              <div class="panel-actions col-12">
-                <button type="button" class="secondary-action" (click)="closePanel()">
+                  </select>
+                  @if (hasWindowFormError('waitingAreaId')) {
+                    <small>{{ translations().requiredField }}</small>
+                  }
+                </label>
+              </div>
+              <div class="col-12 col-md-3">
+                <label class="form-field has-field-icon w-100">
+                  <span>{{ translations().windowNumber }}</span>
+                  <i class="bi bi-hash form-field-icon" aria-hidden="true"></i>
+                  <input class="form-control" type="text" maxlength="20" formControlName="number" />
+                  @if (hasWindowFormError('number')) {
+                    <small>
+                      @if (
+                        numberControl.hasError('required') || numberControl.hasError('whitespace')
+                      ) {
+                        {{ translations().requiredField }}
+                      } @else if (numberControl.hasError('maxlength')) {
+                        {{ translations().maxLength20 }}
+                      }
+                    </small>
+                  }
+                </label>
+              </div>
+              <div class="col-12 col-md-6">
+                <label class="form-field has-field-icon w-100">
+                  <span>{{ translations().descriptiveName }}</span>
+                  <i class="bi bi-card-text form-field-icon" aria-hidden="true"></i>
+                  <input
+                    class="form-control"
+                    type="text"
+                    maxlength="100"
+                    formControlName="descriptiveName"
+                  />
+                  @if (hasWindowFormError('descriptiveName')) {
+                    <small>{{ translations().maxLength100 }}</small>
+                  }
+                </label>
+              </div>
+              <div class="col-12 col-md-3">
+                <label class="form-field has-field-icon w-100">
+                  <span>{{ translations().ipAddress }}</span>
+                  <i class="bi bi-hdd-network form-field-icon" aria-hidden="true"></i>
+                  <input class="form-control" type="text" maxlength="45" formControlName="ipAddress" />
+                  @if (hasWindowFormError('ipAddress')) {
+                    <small>{{ translations().invalidIp }}</small>
+                  }
+                </label>
+              </div>
+              <div class="col-12 col-md-6">
+                <label class="check-row window-check-field">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    formControlName="enableTicketBooking"
+                  />
+                  <span>{{ translations().ticketBooking }}</span>
+                </label>
+              </div>
+              <div class="col-12 col-md-6">
+                <label class="check-row window-check-field">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    formControlName="enableDirectCall"
+                  />
+                  <span>{{ translations().directCall }}</span>
+                </label>
+              </div>
+              <div class="panel-actions col-12 window-popup-actions">
+                <button type="button" class="btn secondary-action" (click)="closePanel()">
                   <i class="bi bi-x-lg" aria-hidden="true"></i>
                   {{ translations().cancel }}
                 </button>
-                <button type="submit" class="primary-action" [disabled]="saving()">
+                <button type="submit" class="btn primary-action" [disabled]="saving()">
                   <i class="bi bi-check2" aria-hidden="true"></i>
                   {{ translations().save }}
                 </button>
@@ -510,7 +539,7 @@
       @if (confirmDialog()) {
         <div class="editor-backdrop app-popup-overlay" (click)="closeConfirmDialog()"></div>
         <aside
-          class="editor-panel app-popup-panel"
+          class="editor-panel app-popup-panel window-confirm-panel"
           role="dialog"
           [attr.aria-label]="confirmDialog()?.title ?? ''"
         >

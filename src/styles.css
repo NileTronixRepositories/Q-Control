@@ -44,7 +44,7 @@ body {
 body {
   margin: 0;
   font-size: 13px;
-  font-family: 'Cairo', sans-serif;
+  font-family: var(--q-font-family, 'Cairo', Arial, sans-serif);
   background-color: var(--bg-base);
   color: var(--text-primary);
   line-height: 1.5;
@@ -293,7 +293,7 @@ html {
 }
 
 :where(
-  .configuration-grid,
+
   .field-grid,
   .summary-grid,
   .monitor-grid,
@@ -336,7 +336,7 @@ html {
 }
 
 :where(
-  .form-control.form-control-lg,
+
   .input-wrapper input,
   .input-wrapper select,
   .color-control,
@@ -348,7 +348,7 @@ html {
   height: 38px !important;
 }
 
-:where(.primary-action, .secondary-action, .btn.btn-lg) {
+:where(.primary-action, .secondary-action) {
   min-height: 38px !important;
   padding-inline: 14px !important;
 }
@@ -588,11 +588,7 @@ html {
     .empty-state,
     .terminal-editor-panel
   ) {
-  color: var(--text-primary) !important;
-  background: var(--surface-card) !important;
-  border: 1px solid var(--border-subtle) !important;
   border-radius: var(--radius-md) !important;
-  box-shadow: var(--shadow-card) !important;
 }
 
 :where(
@@ -627,7 +623,6 @@ html {
   )
   :where(.eyebrow) {
   margin-block: 0 6px !important;
-  color: var(--primary-color) !important;
   font-size: 0.68rem !important;
   font-weight: 800 !important;
   text-transform: uppercase;
@@ -658,7 +653,6 @@ html {
     .terminal-management-page
   )
   :where(.page-header span, .page-hero span, .header-description, .panel-header p) {
-  color: var(--text-muted) !important;
   font-size: 0.82rem !important;
   line-height: 1.6 !important;
 }
@@ -678,7 +672,6 @@ html {
   gap: 8px !important;
   min-height: 38px !important;
   padding: 0 14px !important;
-  border-radius: var(--radius-md) !important;
   font: inherit !important;
   font-size: 0.82rem !important;
   font-weight: 800 !important;
@@ -699,8 +692,6 @@ html {
     .terminal-management-page
   )
   :where(.primary-action) {
-  color: #ffffff !important;
-  background: var(--primary-color) !important;
   border: 1px solid var(--primary-color) !important;
 }
 
@@ -714,8 +705,6 @@ html {
   )
   :where(.primary-action:hover:not(:disabled)) {
   color: #ffffff !important;
-  background: var(--primary-hover) !important;
-  border-color: var(--primary-hover) !important;
   box-shadow: 0 6px 16px rgba(37, 99, 235, 0.16) !important;
 }
 
@@ -729,7 +718,6 @@ html {
   )
   :where(.secondary-action) {
   color: #1e3a8a !important;
-  background: var(--primary-soft) !important;
   border: 1px solid var(--primary-border) !important;
 }
 
@@ -742,7 +730,6 @@ html {
     .terminal-management-page
   )
   :where(.secondary-action:hover:not(:disabled)) {
-  color: var(--primary-color) !important;
   background: #dbeafe !important;
   border-color: #93c5fd !important;
 }
@@ -764,9 +751,7 @@ html {
   height: 34px !important;
   padding: 0 !important;
   color: #475569 !important;
-  background: var(--surface-muted) !important;
   border: 1px solid var(--border-subtle) !important;
-  border-radius: var(--radius-md) !important;
   box-shadow: none !important;
 }
 
@@ -778,23 +763,7 @@ html {
     .window-management-page,
     .terminal-management-page
   )
-  :where(.icon-action:hover:not(:disabled)) {
-  color: var(--primary-color) !important;
-  background: var(--primary-soft) !important;
-  border-color: var(--primary-border) !important;
-}
-
-:where(
-    .organization-page,
-    .technical-page,
-    .branch-page,
-    .waiting-areas-page,
-    .window-management-page,
-    .terminal-management-page
-  )
   :where(.danger-action:hover:not(:disabled)) {
-  color: var(--danger-color) !important;
-  background: var(--danger-soft) !important;
   border-color: #fecaca !important;
 }
 
@@ -814,34 +783,11 @@ html {
     .form-select
   ) {
   min-height: 38px !important;
-  color: var(--text-primary) !important;
-  background: var(--surface-muted) !important;
   border: 1px solid #d7e1ec !important;
-  border-radius: var(--radius-md) !important;
   font: inherit !important;
   font-size: 0.82rem !important;
   outline: 0 !important;
   box-shadow: none !important;
-}
-
-:where(
-    .organization-page,
-    .technical-page,
-    .branch-page,
-    .waiting-areas-page,
-    .window-management-page,
-    .terminal-management-page
-  )
-  :where(
-    input:not([type='checkbox']):not([type='radio']):not([type='color']):focus,
-    select:focus,
-    textarea:focus,
-    .form-control:focus,
-    .form-select:focus
-  ) {
-  background: #ffffff !important;
-  border-color: var(--primary-color) !important;
-  box-shadow: var(--focus-ring) !important;
 }
 
 :where(
@@ -914,21 +860,6 @@ html {
   white-space: nowrap !important;
 }
 
-:where(.status-pill.status-active, .status-pill.status-online) {
-  color: var(--success-color) !important;
-  background: var(--success-soft) !important;
-}
-
-:where(.status-pill.status-maintenance, .status-pill.status-delayed) {
-  color: var(--warning-color) !important;
-  background: var(--warning-soft) !important;
-}
-
-:where(.status-pill.status-inactive, .status-pill.status-offline) {
-  color: var(--danger-color) !important;
-  background: var(--danger-soft) !important;
-}
-
 :where(.summary-grid) {
   grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
 }
@@ -971,7 +902,7 @@ html {
 }
 
 @media (max-width: 1199.98px) {
-  :where(.configuration-grid, .audio-grid, .calling-grid) {
+  :where(.audio-grid, .calling-grid) {
     grid-template-columns: 1fr !important;
   }
 

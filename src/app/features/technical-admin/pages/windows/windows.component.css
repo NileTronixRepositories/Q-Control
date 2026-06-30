@@ -2,25 +2,15 @@
   display: block;
 }
 
-/* === Unique: Fixed Modal Overlay === */
-.editor-backdrop {
-  position: fixed !important; inset: 0 !important;
-  background: rgba(15, 23, 42, 0.58) !important; backdrop-filter: blur(6px) !important;
-  z-index: 1040 !important; animation: fadeIn 0.2s ease !important;
-}
-
-.editor-panel {
-  position: fixed !important; top: 50% !important; left: 50% !important;
-  transform: translate(-50%, -50%) !important;
-  width: min(860px, calc(100vw - 2rem)) !important; max-height: 90vh !important; overflow-y: auto !important;
-  padding: var(--q-panel-padding-y) var(--q-panel-padding-x) !important; z-index: 1050 !important;
-  background: var(--q-surface-card) !important; border: 1px solid var(--q-border-subtle) !important;
-  border-radius: var(--q-radius-lg) !important; box-shadow: 0 24px 60px rgba(15, 23, 42, 0.18) !important;
-  animation: popupIn 0.22s ease !important;
-}
-
+/* === Popup shell: shared app popup sizing === */
 .window-editor-panel {
-  width: min(920px, calc(100vw - 2rem)) !important;
+  width: min(900px, calc(100dvw - 96px)) !important;
+  max-width: min(900px, calc(100dvw - 96px)) !important;
+}
+
+.window-confirm-panel {
+  width: min(560px, calc(100dvw - 96px)) !important;
+  max-width: min(560px, calc(100dvw - 96px)) !important;
 }
 
 /* === Unique: Details List === */
@@ -46,8 +36,33 @@ table {
 .message-error   { color: var(--q-danger) !important; background: var(--q-danger-soft) !important; border-color: rgba(210,31,53,0.2) !important; }
 .message-info    { color: var(--q-primary) !important; background: var(--q-primary-soft) !important; border-color: rgba(15,125,168,0.2) !important; }
 
-/* === Unique: Window Form gutter === */
-.window-editor-form { --bs-gutter-x: 14px !important; --bs-gutter-y: 12px !important; }
+/* === Unique: Window Form layout === */
+.window-editor-form {
+  --bs-gutter-x: 14px !important;
+  --bs-gutter-y: 12px !important;
+}
+
+
+
+.window-check-field {
+  display: flex !important;
+  min-height: var(--q-admin-control-height, 44px) !important;
+  align-items: center !important;
+  gap: 10px !important;
+  margin: 0 !important;
+  padding: 10px 12px !important;
+}
+
+.window-check-field .form-check-input {
+  flex: 0 0 auto !important;
+  margin: 0 !important;
+}
+.window-popup-actions {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 8px !important;
+}
 
 /* === Unique: State / Pagination === */
 .state-note {
@@ -67,18 +82,19 @@ table {
 .dialog-content { display: flex !important; flex-direction: column !important; gap: 10px !important; margin-bottom: 14px !important; }
 .dialog-content p { margin: 0 !important; color: var(--q-text-secondary) !important; line-height: 1.6 !important; font-size: var(--q-font-size-base) !important; }
 
-/* === Unique: Animations === */
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-@keyframes popupIn {
-  from { opacity: 0; transform: translate(-50%, -48%); }
-  to   { opacity: 1; transform: translate(-50%, -50%); }
-}
-
 /* Mobile */
 @media (max-width: 767.98px) {
-  .editor-panel, .window-editor-panel {
-    inset: 0 !important; width: 100% !important; height: 100dvh !important; max-height: 100dvh !important;
-    border-radius: 0 !important; transform: none !important; padding: 14px !important;
+  .editor-panel, .window-editor-panel, .window-confirm-panel {
+    inset: auto auto max(10px, env(safe-area-inset-bottom)) 50% !important;
+    width: min(420px, calc(100dvw - 24px)) !important;
+    max-width: min(420px, calc(100dvw - 24px)) !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: min(82dvh, calc(100dvh - 18px)) !important;
+    padding: 0 !important;
+    border-radius: 18px !important;
+    transform: translateX(-50%) !important;
+    z-index: 2147483010 !important;
   }
   .details-list { grid-template-columns: 1fr !important; }
   table { min-width: 700px !important; }

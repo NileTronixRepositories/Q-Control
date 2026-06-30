@@ -37,8 +37,14 @@ export class LoginComponent {
       return;
     }
 
+    const userType = this.loginStore.userType();
+
+    if (!userType) {
+      return;
+    }
+
     const route =
-      this.loginStore.userType() === 'TechnicalAdmin'
+      userType === 'TechnicalAdmin'
         ? '/technical-admin/general'
         : '/organization/global-configurations';
 
@@ -128,3 +134,4 @@ export class LoginComponent {
     this.loginStore.submit(credentials);
   }
 }
+

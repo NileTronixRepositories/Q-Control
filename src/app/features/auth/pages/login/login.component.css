@@ -147,7 +147,7 @@
 .input-shell .form-control {
   min-width: 0;
   min-height: 46px !important;
-  padding: 0 0.9rem 0 0 !important;
+  padding: 0.9rem !important;
   color: var(--text-primary) !important;
   background: transparent !important;
   border: 0 !important;
