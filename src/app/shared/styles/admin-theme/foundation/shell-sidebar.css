@@ -1,0 +1,232 @@
+/* Shell and sidebar */
+body .app-shell {
+  --sidebar-width: var(--nt-sidebar-width) !important;
+  --sidebar-collapsed-width: var(--nt-sidebar-collapsed-width) !important;
+  --sidebar-bg: #ffffff;
+  --sidebar-border: var(--nt-border);
+  --sidebar-text: var(--nt-text);
+  --sidebar-muted: #344760;
+  --sidebar-active: var(--nt-accent);
+  --sidebar-hover: #f8fbfd;
+  --sidebar-selected: #fbfdff;
+  --sidebar-accent: var(--nt-accent);
+  --sidebar-danger: var(--nt-accent);
+  --sidebar-overlay: rgba(27, 36, 48, 0.32);
+  background: var(--nt-bg) !important;
+}
+
+body .app-shell .sidebar {
+  flex-basis: var(--sidebar-width) !important;
+  width: var(--sidebar-width) !important;
+  color: var(--nt-text) !important;
+  background: rgba(255, 255, 255, 0.98) !important;
+  border-inline-end: 1px solid #dfe7f0 !important;
+  box-shadow: var(--nt-shadow-sidebar) !important;
+}
+
+body .app-shell-rtl .sidebar {
+  box-shadow: -18px 0 42px rgba(27, 36, 48, 0.065) !important;
+}
+
+body .app-shell.sidebar-collapsed .sidebar {
+  flex-basis: var(--sidebar-collapsed-width) !important;
+  width: var(--sidebar-collapsed-width) !important;
+  overflow-x: hidden !important;
+}
+
+body .app-shell .sidebar-header {
+  min-height: var(--nt-sidebar-header-height) !important;
+  padding: var(--nt-sidebar-header-padding) !important;
+  align-items: center !important;
+  gap: 14px !important;
+  border-bottom: 1px solid var(--nt-border) !important;
+}
+
+body .app-shell .logo-container {
+  display: flex !important;
+  flex: 1 1 auto !important;
+  min-height: var(--nt-sidebar-logo-height) !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+}
+
+body .app-shell .sidebar-logo {
+  width: var(--nt-sidebar-logo-width) !important;
+  height: var(--nt-sidebar-logo-height) !important;
+  object-fit: contain !important;
+  object-position: left center !important;
+}
+
+body .app-shell.app-shell-rtl .sidebar-logo {
+  object-position: right center !important;
+}
+
+body .app-shell .sidebar-toggle {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 38px !important;
+  height: 38px !important;
+  min-width: 38px !important;
+  min-height: 38px !important;
+  padding: 0 !important;
+  color: #52627a !important;
+  background: #ffffff !important;
+  border: 1px solid #dbe4ef !important;
+  border-radius: 12px !important;
+  box-shadow: 0 8px 18px rgba(27, 36, 48, 0.06) !important;
+}
+
+body .app-shell .sidebar-toggle:hover,
+body .app-shell .sidebar-toggle:focus-visible {
+  color: #ffffff !important;
+  background: var(--nt-primary) !important;
+  border-color: var(--nt-primary) !important;
+  box-shadow: var(--nt-focus) !important;
+}
+
+body .app-shell .sidebar-nav {
+  padding: var(--nt-sidebar-nav-padding) !important;
+}
+
+body .app-shell .nav-group + .nav-group {
+  margin-top: var(--nt-sidebar-group-gap) !important;
+  padding-top: var(--nt-sidebar-group-gap) !important;
+  border-top: 1px solid var(--nt-border) !important;
+}
+
+body .app-shell .sidebar-group-header {
+  min-height: 32px !important;
+  padding: 0 4px !important;
+  color: var(--nt-text) !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+body .app-shell .sidebar-group-header:hover {
+  color: var(--nt-accent) !important;
+  background: transparent !important;
+}
+
+body .app-shell .sidebar-group-header.active {
+  color: var(--nt-text) !important;
+  background: transparent !important;
+}
+
+body .app-shell .group-icon {
+  display: none !important;
+}
+
+body .app-shell .group-text {
+  color: inherit !important;
+  font-size: 0.9rem !important;
+  font-weight: 900 !important;
+  letter-spacing: 0 !important;
+}
+
+body .app-shell .chevron-icon {
+  color: currentColor !important;
+}
+
+body .app-shell .sidebar-group-children.expanded {
+  gap: 8px !important;
+  padding-top: 14px !important;
+}
+
+body .app-shell .sidebar-link {
+  min-height: var(--nt-sidebar-link-height) !important;
+  padding: 0 var(--nt-sidebar-link-padding-end) 0 var(--nt-sidebar-link-padding-start) !important;
+  color: var(--nt-text) !important;
+  border: 1px solid transparent !important;
+  border-radius: 12px !important;
+  font-size: 0.95rem !important;
+  font-weight: 650 !important;
+}
+
+body .app-shell.app-shell-rtl .sidebar-link {
+  padding: 0 var(--nt-sidebar-link-padding-start) 0 var(--nt-sidebar-link-padding-end) !important;
+}
+
+body .app-shell .sidebar-link .child-icon,
+body .app-shell .sidebar-link .child-dot {
+  position: absolute !important;
+  inset-inline-start: var(--nt-sidebar-icon-offset) !important;
+  color: currentColor !important;
+  font-size: 1.1rem !important;
+}
+
+body .app-shell.app-shell-rtl .sidebar-link .child-icon,
+body .app-shell.app-shell-rtl .sidebar-link .child-dot {
+  inset-inline-start: auto !important;
+  inset-inline-end: var(--nt-sidebar-icon-offset) !important;
+}
+
+body .app-shell .sidebar-link::before {
+  inset-block: 0 !important;
+  inset-inline-start: 0 !important;
+  width: 4px !important;
+  height: auto !important;
+  border-radius: 999px !important;
+}
+
+body .app-shell .sidebar-link:hover {
+  color: var(--nt-accent) !important;
+  background: #f8fbfd !important;
+}
+
+body .app-shell .sidebar-link-active {
+  color: var(--nt-accent) !important;
+  background: linear-gradient(
+    90deg,
+    rgba(15, 125, 168, 0.055),
+    rgba(255, 255, 255, 0.88)
+  ) !important;
+  border-color: #eef3f8 !important;
+  box-shadow: 0 12px 26px rgba(27, 36, 48, 0.045) !important;
+}
+
+body .app-shell .sidebar-link-active::before {
+  background: var(--nt-accent) !important;
+}
+
+body .app-shell .sidebar-link-active .child-icon,
+body .app-shell .sidebar-link-active .child-dot {
+  color: var(--nt-accent) !important;
+}
+
+body .app-shell .link-text strong {
+  font-weight: 760 !important;
+}
+
+body .app-shell .sidebar-actions {
+  gap: 12px !important;
+  padding: var(--nt-sidebar-actions-padding) !important;
+  border-top: 1px solid var(--nt-border) !important;
+}
+
+body .app-shell .sidebar-action-button {
+  min-height: var(--nt-sidebar-action-height) !important;
+  padding: 0 18px !important;
+  color: #22314a !important;
+  background: #ffffff !important;
+  border: 1px solid #dfe7f0 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 10px 24px rgba(27, 36, 48, 0.045) !important;
+  font-size: 0.95rem !important;
+  font-weight: 750 !important;
+}
+
+body .app-shell .sidebar-action-button:hover {
+  color: var(--nt-primary) !important;
+  background: #f8fbfd !important;
+}
+
+body .app-shell .sidebar-logout-button {
+  color: var(--nt-accent) !important;
+}
+
+body .app-shell .sidebar-logout-button:hover {
+  background: linear-gradient(135deg, var(--nt-accent), #c91124) !important;
+  border-color: rgba(243, 24, 45, 0.38) !important;
+}

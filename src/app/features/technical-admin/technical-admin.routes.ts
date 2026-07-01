@@ -1,12 +1,10 @@
 import { Routes } from '@angular/router';
 
 import { technicalAdminPermissionGuard } from './guards/technical-admin-permission.guard';
-import { TechnicalAdminStore } from './store/technical-admin.store';
 
 export const TECHNICAL_ADMIN_ROUTES: Routes = [
   {
     path: '',
-    providers: [TechnicalAdminStore],
     loadComponent: () =>
       import('./layout/technical-admin-shell.component').then(
         (component) => component.TechnicalAdminShellComponent,
@@ -15,21 +13,7 @@ export const TECHNICAL_ADMIN_ROUTES: Routes = [
       {
         path: '',
         pathMatch: 'full',
-        redirectTo: 'general',
-      },
-      {
-        path: 'general',
-        loadComponent: () =>
-          import('./pages/general-theme/general-theme.component').then(
-            (component) => component.GeneralThemeComponent,
-          ),
-      },
-      {
-        path: 'service-request',
-        loadComponent: () =>
-          import('./pages/service-request-layout/service-request-layout.component').then(
-            (component) => component.ServiceRequestLayoutComponent,
-          ),
+        redirectTo: 'branch-editor',
       },
       {
         path: 'branch-editor',
@@ -98,18 +82,6 @@ export const TECHNICAL_ADMIN_ROUTES: Routes = [
         loadComponent: () =>
           import('./pages/terminals/terminals.component').then(
             (component) => component.TerminalsComponent,
-          ),
-      },
-      {
-        path: 'online-monitoring',
-        data: {
-          pageKey: 'online-monitoring',
-          title: 'Online Monitoring',
-          description: 'Track branch connectivity, active tickets, and service availability.',
-        },
-        loadComponent: () =>
-          import('./pages/legacy-page/legacy-page.component').then(
-            (component) => component.LegacyPageComponent,
           ),
       },
     ],

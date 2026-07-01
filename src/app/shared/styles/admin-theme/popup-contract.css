@@ -1,0 +1,377 @@
+/* Popup backdrop: keep underlying content visible with only a light blur. */
+html:has(body[data-admin-theme] .app-popup-overlay),
+body[data-admin-theme]:has(.app-popup-overlay) {
+  overflow: hidden !important;
+}
+
+body[data-admin-theme]:has(.app-popup-overlay)::before {
+  content: none !important;
+  display: none !important;
+}
+
+/* Q-SYSTEM unified popup contract. */
+html body[data-admin-theme]:has(.app-popup-overlay) {
+  --q-popup-width: min(900px, calc(100dvw - 96px));
+  --q-popup-wide-width: min(960px, calc(100dvw - 96px));
+  --q-popup-confirm-width: min(560px, calc(100dvw - 96px));
+  --q-popup-max-height: min(82dvh, 720px);
+  --q-popup-radius: 12px;
+  --q-popup-x: 18px;
+  --q-popup-y: 16px;
+}
+
+html
+  body[data-admin-theme]:has(.app-popup-overlay)
+  :where(.editor-backdrop.app-popup-overlay, .app-popup-overlay.editor-backdrop) {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 2147482991 !important;
+  width: 100dvw !important;
+  height: 100dvh !important;
+  min-width: 100dvw !important;
+  min-height: 100dvh !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: var(--q-popup-overlay-bg, rgb(15 23 42 / 0.16)) !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  backdrop-filter: blur(var(--q-popup-overlay-blur, 1.4px)) saturate(103%) !important;
+  -webkit-backdrop-filter: blur(var(--q-popup-overlay-blur, 1.4px)) saturate(103%) !important;
+}
+
+html
+  body[data-admin-theme]:has(.app-popup-overlay)
+  :where(
+    .editor-panel.app-popup-panel,
+    .app-popup-panel.editor-panel,
+    .app-popup-panel.app-popup-wide,
+    .app-popup-panel.terminal-editor-panel,
+    .app-popup-panel.display-editor-panel,
+    .app-popup-panel.window-editor-panel,
+    .app-popup-panel.display-confirm-panel,
+    .app-popup-panel.terminal-confirm-panel,
+    .app-popup-panel.window-confirm-panel
+  ) {
+  position: fixed !important;
+  inset: auto !important;
+  top: 50% !important;
+  right: auto !important;
+  bottom: auto !important;
+  left: 50% !important;
+  z-index: 2147483010 !important;
+  display: flex !important;
+  width: var(--q-popup-width) !important;
+  max-width: var(--q-popup-width) !important;
+  max-height: var(--q-popup-max-height) !important;
+  max-block-size: var(--q-popup-max-height) !important;
+  min-height: 0 !important;
+  flex-direction: column !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  color: var(--q-text-primary) !important;
+  background: var(--q-popup-panel-bg, #ffffff) !important;
+  border: 1px solid var(--q-popup-border, var(--q-border-subtle)) !important;
+  border-radius: var(--q-popup-radius) !important;
+  box-shadow: var(--q-popup-shadow, 0 22px 56px rgb(15 23 42 / 0.14)) !important;
+  transform: translate(-50%, -50%) !important;
+  animation: none !important;
+  isolation: isolate !important;
+}
+
+html body[data-admin-theme]:has(.app-popup-overlay) :where(.app-popup-panel.app-popup-wide) {
+  width: var(--q-popup-wide-width) !important;
+  max-width: var(--q-popup-wide-width) !important;
+}
+
+html
+  body[data-admin-theme]:has(.app-popup-overlay)
+  :where(
+    .app-popup-panel.display-confirm-panel,
+    .app-popup-panel.terminal-confirm-panel,
+    .app-popup-panel.window-confirm-panel
+  ) {
+  width: var(--q-popup-confirm-width) !important;
+  max-width: var(--q-popup-confirm-width) !important;
+}
+html
+  body[data-admin-theme]:has(.branch-page .app-popup-overlay)
+  .branch-page
+  :where(.app-popup-panel.app-popup-wide) {
+  top: 64px !important;
+  bottom: auto !important;
+  max-height: min(78dvh, calc(100dvh - 128px)) !important;
+  transform: translateX(-50%) !important;
+}
+
+html
+  body[data-admin-theme]:has(.app-popup-overlay)
+  .app-popup-panel
+  :where(
+    .editor-panel-header,
+    .panel-header,
+    .terminal-editor-panel-header,
+    .display-editor-panel-header,
+    .window-editor-panel-header
+  ) {
+  position: relative !important;
+  top: auto !important;
+  z-index: 3 !important;
+  display: flex !important;
+  min-height: 56px !important;
+  flex: 0 0 auto !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  margin: 0 !important;
+  padding: 14px var(--q-popup-x) !important;
+  background: var(--q-popup-header-bg, #ffffff) !important;
+  border-bottom: 1px solid rgb(var(--q-primary-rgb) / 0.14) !important;
+}
+
+html
+  body[data-admin-theme]:has(.app-popup-overlay)
+  .app-popup-panel
+  :where(
+    .editor-panel-header h2,
+    .panel-header h2,
+    .terminal-editor-panel-header h2,
+    .display-editor-panel-header h2,
+    .window-editor-panel-header h2
+  ) {
+  margin: 0 !important;
+  color: var(--q-text-primary) !important;
+  font-size: 0.96rem !important;
+  font-weight: 850 !important;
+  line-height: 1.25 !important;
+  letter-spacing: 0 !important;
+}
+
+html
+  body[data-admin-theme]:has(.app-popup-overlay)
+  .app-popup-panel
+  > :where(form, .details-list, .dialog-content, .api-note.loading-note, .state-note) {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  margin: 0 !important;
+  padding: var(--q-popup-y) var(--q-popup-x) !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain !important;
+}
+
+html body[data-admin-theme]:has(.app-popup-overlay) .app-popup-panel > :where(form.row) {
+  --bs-gutter-x: 14px !important;
+  --bs-gutter-y: 14px !important;
+  align-content: start !important;
+}
+
+html
+  body[data-admin-theme]:has(.app-popup-overlay)
+  .app-popup-panel
+  :where(.form-field, .field-row, .number-field) {
+  display: flex !important;
+  min-width: 0 !important;
+  flex-direction: column !important;
+  gap: 7px !important;
+  margin: 0 !important;
+}
+
+html
+  body[data-admin-theme]:has(.app-popup-overlay)
+  .app-popup-panel
+  :where(.form-field span, .form-field label, dt, .form-section-title) {
+  margin: 0 !important;
+  color: var(--q-text-secondary) !important;
+  font-size: var(--q-font-size-small) !important;
+  font-weight: 850 !important;
+  line-height: 1.25 !important;
+}
+
+html
+  body[data-admin-theme]:has(.app-popup-overlay)
+  .app-popup-panel
+  :where(
+    input:not([type='checkbox']):not([type='radio']):not([type='color']),
+    select,
+    textarea,
+    .form-control,
+    .form-select
+  ) {
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 44px !important;
+  color: var(--q-text-primary) !important;
+  background: #ffffff !important;
+  border: 1px solid var(--q-border-subtle) !important;
+  border-radius: 9px !important;
+}
+
+html
+  body[data-admin-theme]:has(.app-popup-overlay)
+  .app-popup-panel
+  :where(.editor-actions, .panel-actions, form > .col-12.d-flex:last-child) {
+  grid-column: 1 / -1 !important;
+  position: sticky !important;
+  bottom: calc(var(--q-popup-y) * -1) !important;
+  z-index: 4 !important;
+  display: flex !important;
+  flex: 0 0 auto !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 8px !important;
+  width: 100% !important;
+  margin: 4px 0 0 !important;
+  padding: 14px 0 0 !important;
+  background: linear-gradient(180deg, rgb(255 255 255 / 0.88), #ffffff 32%) !important;
+  border-top: 1px solid var(--q-border-subtle) !important;
+}
+
+html
+  body[data-admin-theme]:has(.app-popup-overlay)
+  .app-popup-panel
+  :where(.editor-actions, .panel-actions, form > .col-12.d-flex:last-child)
+  > :where(button, .btn) {
+  min-width: 104px !important;
+  min-height: 44px !important;
+}
+
+@media (max-width: 767.98px) {
+  html body[data-admin-theme]:has(.app-popup-overlay) {
+    --q-popup-mobile-bottom: max(10px, env(safe-area-inset-bottom));
+    --q-popup-mobile-width: min(420px, calc(100dvw - 24px));
+    --q-popup-mobile-max-height: min(86dvh, calc(100dvh - 18px));
+    --q-popup-radius: 18px;
+    --q-popup-x: 16px;
+    --q-popup-y: 14px;
+  }
+
+  html
+    body[data-admin-theme]:has(.app-popup-overlay)
+    :where(
+      .editor-panel.app-popup-panel,
+      .app-popup-panel.editor-panel,
+      .app-popup-panel.app-popup-wide,
+      .app-popup-panel.terminal-editor-panel,
+      .app-popup-panel.display-editor-panel,
+      .app-popup-panel.window-editor-panel,
+      .app-popup-panel.display-confirm-panel,
+      .app-popup-panel.terminal-confirm-panel,
+      .app-popup-panel.window-confirm-panel
+    ) {
+    top: auto !important;
+    right: auto !important;
+    bottom: var(--q-popup-mobile-bottom) !important;
+    left: 50% !important;
+    width: var(--q-popup-mobile-width) !important;
+    max-width: var(--q-popup-mobile-width) !important;
+    max-height: var(--q-popup-mobile-max-height) !important;
+    transform: translateX(-50%) !important;
+  }
+  html
+    body[data-admin-theme]:has(.branch-page .app-popup-overlay)
+    .branch-page
+    :where(.app-popup-panel.app-popup-wide) {
+    top: auto !important;
+    bottom: var(--q-popup-mobile-bottom) !important;
+    max-height: var(--q-popup-mobile-max-height) !important;
+  }
+
+  html body[data-admin-theme]:has(.app-popup-overlay) .app-popup-panel::before {
+    content: '' !important;
+    display: block !important;
+    width: 40px !important;
+    height: 4px !important;
+    flex: 0 0 auto !important;
+    margin: 10px auto 0 !important;
+    border-radius: 999px !important;
+    background: rgb(15 23 42 / 0.1) !important;
+  }
+
+  html
+    body[data-admin-theme]:has(.app-popup-overlay)
+    .app-popup-panel
+    :where(
+      .editor-panel-header,
+      .panel-header,
+      .terminal-editor-panel-header,
+      .display-editor-panel-header,
+      .window-editor-panel-header
+    ) {
+    min-height: 52px !important;
+    padding: 12px var(--q-popup-x) 14px !important;
+  }
+
+  html
+    body[data-admin-theme]:has(.app-popup-overlay)
+    .app-popup-panel
+    > :where(form, .details-list, .dialog-content, .api-note.loading-note, .state-note) {
+    padding: var(--q-popup-y) var(--q-popup-x) !important;
+  }
+
+  html body[data-admin-theme]:has(.app-popup-overlay) .app-popup-panel > :where(form.row) {
+    --bs-gutter-x: 0 !important;
+    --bs-gutter-y: 12px !important;
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    margin: 0 !important;
+  }
+
+  html
+    body[data-admin-theme]:has(.app-popup-overlay)
+    .app-popup-panel
+    :where(form.row)
+    > :where([class*='col-'], .form-field) {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 !important;
+  }
+
+  html
+    body[data-admin-theme]:has(.app-popup-overlay)
+    .app-popup-panel
+    :where(footer.d-flex) {
+    grid-column: 1 / -1 !important;
+    position: static !important;
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+    width: 100% !important;
+    margin: 2px 0 0 !important;
+    padding: 0 !important;
+    border-top: 0 !important;
+    background: transparent !important;
+  }
+
+  html
+    body[data-admin-theme]:has(.app-popup-overlay)
+    .app-popup-panel
+    :where(.editor-actions, .panel-actions, form > .col-12.d-flex:last-child) {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+  }
+
+  html
+    body[data-admin-theme]:has(.app-popup-overlay)
+    .app-popup-panel
+    :where(footer.d-flex)
+    > :where(button, .btn) {
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 44px !important;
+  }
+
+  html
+    body[data-admin-theme]:has(.app-popup-overlay)
+    .app-popup-panel
+    :where(.editor-actions, .panel-actions, form > .col-12.d-flex:last-child)
+    > :where(button, .btn) {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+}
+/* End Q-SYSTEM unified popup contract. */
+

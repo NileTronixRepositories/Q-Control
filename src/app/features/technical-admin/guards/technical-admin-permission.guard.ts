@@ -35,7 +35,7 @@ export const technicalAdminPermissionGuard: CanActivateFn = (route) => {
     userPermissions.has(permission),
   );
 
-  return hasRequiredPermission ? true : router.createUrlTree(['/technical-admin/general']);
+  return hasRequiredPermission ? true : router.createUrlTree(['/technical-admin/branch-editor']);
 };
 
 function readRequiredPermissions(route: ActivatedRouteSnapshot): readonly string[] {

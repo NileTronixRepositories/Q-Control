@@ -1,7 +1,5 @@
 /*
   Q-SYSTEM CSS Design Tokens (Shared Theme Customization)
-  Contains variable definitions for colors, typography, sizing, and shadows.
-  Overriding --nt- variables here propagates changes across the entire workspace.
 */
 
 :root {

@@ -1,0 +1,68 @@
+/* Responsive */
+@media (max-width: 1399.98px) {
+  body .app-shell {
+    --sidebar-width: var(--nt-sidebar-width-lg) !important;
+  }
+
+  body .app-shell .sidebar-logo {
+    width: var(--nt-sidebar-logo-width-lg) !important;
+  }
+
+  body .workspace-content {
+    padding: var(--nt-workspace-padding-lg-y) var(--nt-workspace-padding-lg-x) !important;
+  }
+}
+
+@media (max-width: 991.98px) {
+  body .app-shell {
+    --sidebar-width: var(--nt-sidebar-width-md) !important;
+  }
+
+  body .workspace-content {
+    padding: var(--nt-workspace-padding-md) !important;
+  }
+
+  body :where(.page-header, .page-hero) {
+    min-height: 118px !important;
+    padding: 20px 22px !important;
+  }
+
+  body :where(.settings-panel, .content-panel, .list-panel, .form-panel, .logo-preview-panel) {
+    padding: 20px !important;
+  }
+}
+
+@media (max-width: 767.98px) {
+  :root {
+    --nt-sidebar-header-height: 76px;
+    --nt-sidebar-header-padding: 14px 16px;
+  }
+
+  body .workspace-content {
+    padding: 14px !important;
+  }
+
+  body .app-shell .sidebar-header {
+    min-height: var(--nt-sidebar-header-height) !important;
+    padding: var(--nt-sidebar-header-padding) !important;
+  }
+
+  body :where(.page-header, .page-hero) {
+    min-height: 112px !important;
+    padding: 18px !important;
+  }
+
+  body :where(.page-header h1, .page-hero h1, .page-hero h2, .page-hero h3) {
+    font-size: 1.2rem !important;
+  }
+
+  body :where(.content-panel, .list-panel, .settings-panel, .form-panel, .logo-preview-panel) {
+    padding: 18px !important;
+  }
+
+  body .panel-actions .primary-action,
+  body .panel-actions .btn.primary-action {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+}

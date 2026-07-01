@@ -248,18 +248,24 @@
       </article>
 
       <article class="content-panel advertisements-panel">
-        <div class="panel-header d-flex align-items-start justify-content-between">
-          <div>
-            <h2>{{ copy().advertisementsSection }}</h2>
-            <p>
-              {{ copy().advertisementsCounter }}: {{ advertisementCount() }} / 20 |
-              {{ copy().remainingSlots }}: {{ remainingAdvertisementSlots() }}
-            </p>
+        <div class="panel-header advertisements-header">
+          <div class="advertisements-heading">
+            <span class="advertisements-icon" aria-hidden="true">
+              <i class="bi bi-images"></i>
+            </span>
+            <div class="advertisements-title-block">
+              <h2>{{ copy().advertisementsSection }}</h2>
+              <p>
+                <span>{{ copy().advertisementsCounter }}: {{ advertisementCount() }} / 20</span>
+                <span>{{ copy().remainingSlots }}: {{ remainingAdvertisementSlots() }}</span>
+              </p>
+            </div>
           </div>
           @if (canUpdate()) {
             <button
               type="button"
-              class="primary-action"
+              class="primary-action save-order-action"
+              [class.save-order-action-dirty]="orderDirty()"
               [disabled]="!orderDirty() || orderSaving()"
               (click)="saveAdvertisementOrder()"
             >
@@ -268,6 +274,24 @@
             </button>
           }
         </div>
+
+        @if (canUpdate() && advertisements().length > 0) {
+          <section class="advertisement-order-strip" [class.order-strip-dirty]="orderDirty()">
+            <div class="order-strip-copy">
+              <i class="bi bi-grip-horizontal" aria-hidden="true"></i>
+              <div>
+                <strong>{{ copy().orderLabel }}</strong>
+                <span>{{ copy().orderLabel }} / {{ copy().saveOrder }}</span>
+              </div>
+            </div>
+            @if (orderDirty()) {
+              <span class="order-dirty-chip">
+                <i class="bi bi-exclamation-circle" aria-hidden="true"></i>
+                {{ copy().saveOrder }}
+              </span>
+            }
+          </section>
+        }
 
         @if (advertisementsLoading()) {
           <p class="api-note loading-note" role="status">{{ copy().loading }}</p>
@@ -348,15 +372,26 @@
               class="advertisement-card"
               [class.inactive-advertisement]="!advertisement.isActive"
               [class.advertisement-card-dragging]="draggingAdvertisementId() === advertisement.id"
+              [class.advertisement-card-drop-before]="
+                dragOverAdvertisementId() === advertisement.id && dragOverPlacement() === 'before'
+              "
+              [class.advertisement-card-drop-after]="
+                dragOverAdvertisementId() === advertisement.id && dragOverPlacement() === 'after'
+              "
               [attr.draggable]="canUpdate() && !orderSaving() ? 'true' : null"
               (dragstart)="onAdvertisementDragStart($event, advertisement.id)"
               (dragover)="onAdvertisementDragOver($event, index)"
               (drop)="onAdvertisementDrop($event, index)"
+              (dragleave)="onAdvertisementDragLeave(advertisement.id)"
               (dragend)="onAdvertisementDragEnd()"
             >
               <div class="advertisement-preview-shell">
-                <span class="drag-handle" [class.disabled-drag]="!canUpdate() || orderSaving()">
-                  <i class="bi bi-grip-vertical" aria-hidden="true"></i>
+                <span
+                  class="drag-handle"
+                  [class.disabled-drag]="!canUpdate() || orderSaving()"
+                  [attr.title]="copy().orderLabel"
+                >
+                  <i class="bi bi-grip-horizontal" aria-hidden="true"></i>
                 </span>
                 <span class="order-badge"
                   >{{ copy().orderLabel }} {{ advertisement.displayOrder }}</span
@@ -391,11 +426,16 @@
               </div>
 
               <div class="advertisement-footer">
+                <div class="order-position-indicator">
+                  <span>{{ index + 1 }}</span>
+                  <small>/ {{ advertisements().length }}</small>
+                </div>
                 <div class="order-summary">
                   <span>{{ copy().orderLabel }}</span>
                   @if (canUpdate()) {
                     <input
                       class="order-input"
+                      [attr.aria-label]="copy().orderLabel"
                       type="number"
                       min="1"
                       [max]="advertisements().length"
@@ -417,7 +457,7 @@
                       [attr.aria-label]="copy().moveUp"
                       (click)="moveAdvertisement(index, -1)"
                     >
-                      <i class="bi bi-arrow-up" aria-hidden="true"></i>
+                      <i class="bi bi-arrow-left" aria-hidden="true"></i>
                     </button>
                     <button
                       type="button"
@@ -426,7 +466,7 @@
                       [attr.aria-label]="copy().moveDown"
                       (click)="moveAdvertisement(index, 1)"
                     >
-                      <i class="bi bi-arrow-down" aria-hidden="true"></i>
+                      <i class="bi bi-arrow-right" aria-hidden="true"></i>
                     </button>
                     <button
                       type="button"

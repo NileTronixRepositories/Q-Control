@@ -1,0 +1,38 @@
+/* State colors must win over the generic themed surface. */
+body[data-admin-theme] :where(.message-success, .toast-success) {
+  color: var(--q-success) !important;
+  background: var(--q-success-soft) !important;
+  border-color: rgba(19, 138, 91, 0.2) !important;
+}
+
+body[data-admin-theme] :where(.message-error, .toast-error) {
+  color: var(--q-danger) !important;
+  background: var(--q-danger-soft) !important;
+  border-color: rgba(210, 31, 53, 0.2) !important;
+}
+
+body[data-admin-theme] :where(.message-info, .toast-info) {
+  color: var(--q-primary-hover) !important;
+  background: var(--q-primary-soft) !important;
+  border-color: var(--q-primary-border) !important;
+}
+
+body[data-admin-theme] :where(.toast-success::before) {
+  background: var(--q-success) !important;
+}
+
+body[data-admin-theme] :where(.toast-error::before) {
+  background: var(--q-danger) !important;
+}
+
+body[data-admin-theme] :where(.status-pill.status-active, .status-badge.status-active) {
+  color: var(--q-success) !important;
+  background: var(--q-success-soft) !important;
+  border-color: rgba(19, 138, 91, 0.2) !important;
+}
+
+body[data-admin-theme] :where(.status-pill.status-inactive, .status-badge.status-inactive) {
+  color: var(--q-danger) !important;
+  background: var(--q-danger-soft) !important;
+  border-color: rgba(210, 31, 53, 0.2) !important;
+}

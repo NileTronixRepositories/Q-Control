@@ -1,0 +1,75 @@
+/* Action color tokens. Structural button rules live in foundation/actions.css. */
+body[data-admin-theme] {
+  --q-button-bg: linear-gradient(135deg, #0b7fa3 0%, #086b8d 100%);
+  --q-button-hover-bg: linear-gradient(135deg, #086f92 0%, #075d7b 100%);
+  --q-button-disabled-bg: linear-gradient(135deg, #7aa6b7 0%, #688d9b 100%);
+  --q-button-text: #ffffff;
+  --q-button-border: rgba(8, 107, 141, 0.72);
+  --q-button-shadow: 0 8px 18px rgba(8, 107, 141, 0.14);
+  --q-button-hover-shadow: 0 10px 22px rgba(8, 107, 141, 0.18);
+  --q-secondary-button-text: #075d7b;
+  --q-secondary-button-bg: #ffffff;
+  --q-secondary-button-hover-bg: rgba(8, 107, 141, 0.08);
+  --q-secondary-button-border: rgba(8, 107, 141, 0.22);
+  --q-secondary-button-hover-border: rgba(8, 107, 141, 0.22);
+  --q-icon-button-text: #075d7b;
+  --q-icon-button-bg: #ffffff;
+  --q-icon-button-hover-bg: rgba(8, 107, 141, 0.08);
+  --q-icon-button-border: rgba(8, 107, 141, 0.2);
+  --q-icon-button-hover-border: rgba(8, 107, 141, 0.2);
+  --q-action-accent: var(--q-accent);
+}
+
+body[data-admin-theme='niletronix-admin'] {
+  --q-button-bg: linear-gradient(135deg, #0b8aa8 0%, #006e9f 100%);
+  --q-button-hover-bg: linear-gradient(135deg, #056579 0%, #0b8aa8 100%);
+  --q-button-disabled-bg: linear-gradient(135deg, #88b3c0 0%, #739baa 100%);
+  --q-button-border: rgba(11, 138, 168, 0.72);
+  --q-button-shadow: 0 9px 20px rgba(11, 138, 168, 0.16);
+  --q-button-hover-shadow: 0 10px 22px rgba(11, 138, 168, 0.18);
+  --q-secondary-button-text: #056579;
+  --q-secondary-button-hover-bg: rgba(11, 138, 168, 0.075);
+  --q-secondary-button-border: rgba(11, 138, 168, 0.22);
+  --q-secondary-button-hover-border: rgba(11, 138, 168, 0.22);
+  --q-icon-button-text: #056579;
+  --q-icon-button-hover-bg: rgba(11, 138, 168, 0.075);
+  --q-icon-button-border: rgba(11, 138, 168, 0.2);
+  --q-icon-button-hover-border: rgba(11, 138, 168, 0.2);
+}
+
+body[data-admin-theme='beach-sunset'] {
+  --q-button-bg: linear-gradient(135deg, #1b4965 0%, #5fa8d3 100%);
+  --q-button-hover-bg: linear-gradient(135deg, #12364d 0%, #1b4965 100%);
+  --q-button-disabled-bg: linear-gradient(135deg, #8eb6c8 0%, #78a5b8 100%);
+  --q-button-border: rgba(27, 73, 101, 0.68);
+  --q-button-shadow: 0 10px 22px rgba(27, 73, 101, 0.18);
+  --q-button-hover-shadow: 0 10px 22px rgba(27, 73, 101, 0.18);
+  --q-secondary-button-text: #1b4965;
+  --q-secondary-button-bg: rgba(255, 255, 255, 0.94);
+  --q-secondary-button-hover-bg: rgba(95, 168, 211, 0.14);
+  --q-secondary-button-border: rgba(95, 168, 211, 0.34);
+  --q-secondary-button-hover-border: rgba(95, 168, 211, 0.34);
+  --q-icon-button-text: #1b4965;
+  --q-icon-button-bg: rgba(255, 255, 255, 0.94);
+  --q-icon-button-hover-bg: rgba(95, 168, 211, 0.14);
+  --q-icon-button-border: rgba(95, 168, 211, 0.28);
+  --q-icon-button-hover-border: rgba(95, 168, 211, 0.28);
+}
+
+body[data-admin-theme='niletronix-brand'] {
+  --q-button-bg: linear-gradient(135deg, #1a1d21 0%, #0d78a6 100%);
+  --q-button-hover-bg: linear-gradient(135deg, #0d78a6 0%, #075f86 100%);
+  --q-button-disabled-bg: linear-gradient(135deg, #82919c 0%, #6d7a84 100%);
+  --q-button-border: rgba(26, 29, 33, 0.72);
+  --q-button-shadow: 0 10px 22px rgba(26, 29, 33, 0.16);
+  --q-button-hover-shadow: 0 10px 22px rgba(13, 120, 166, 0.18);
+  --q-secondary-button-text: #0d78a6;
+  --q-secondary-button-hover-bg: rgba(13, 120, 166, 0.09);
+  --q-secondary-button-border: rgba(13, 120, 166, 0.24);
+  --q-secondary-button-hover-border: rgba(13, 120, 166, 0.24);
+  --q-icon-button-text: #0d78a6;
+  --q-icon-button-hover-bg: rgba(13, 120, 166, 0.09);
+  --q-icon-button-border: rgba(13, 120, 166, 0.22);
+  --q-icon-button-hover-border: rgba(13, 120, 166, 0.22);
+  --q-action-accent: #e31e24;
+}

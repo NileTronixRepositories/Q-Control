@@ -1,0 +1,15 @@
+/* Login */
+body .login-shell {
+  background:
+    radial-gradient(circle at 10% 10%, rgba(15, 125, 168, 0.1), transparent 28rem),
+    radial-gradient(circle at 92% 24%, rgba(243, 24, 45, 0.06), transparent 22rem), var(--nt-bg) !important;
+}
+
+body .login-card,
+body .login-toast {
+  background: rgba(255, 255, 255, 0.92) !important;
+  border: 1px solid var(--nt-border) !important;
+  border-radius: 14px !important;
+  box-shadow: var(--nt-shadow-card) !important;
+  backdrop-filter: blur(12px);
+}

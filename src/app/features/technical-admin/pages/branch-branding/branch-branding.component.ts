@@ -30,6 +30,7 @@ import { formatTechnicalAdminApiError } from '../../utils/api-error-message.util
 
 type ThemeColorControl = 'mainColor' | 'secondaryColor' | 'backgroundColor';
 type UiMessageTone = 'success' | 'error' | 'info';
+type DropPlacement = 'before' | 'after';
 
 interface BranchBrandingPageTranslations {
   readonly pageEyebrow: string;
@@ -255,6 +256,8 @@ export class BranchBrandingComponent implements OnInit, OnDestroy {
   protected readonly mutatingAdvertisementId = signal<number | null>(null);
   protected readonly deletingAdvertisementId = signal<number | null>(null);
   protected readonly draggingAdvertisementId = signal<number | null>(null);
+  protected readonly dragOverAdvertisementId = signal<number | null>(null);
+  protected readonly dragOverPlacement = signal<DropPlacement>('before');
 
   protected readonly themeForm = this.formBuilder.group({
     mainColor: ['', [Validators.required, Validators.pattern(HEX_COLOR_PATTERN)]],
@@ -544,6 +547,7 @@ export class BranchBrandingComponent implements OnInit, OnDestroy {
     }
 
     this.draggingAdvertisementId.set(advertisementId);
+    this.dragOverAdvertisementId.set(null);
 
     if (event.dataTransfer) {
       event.dataTransfer.effectAllowed = 'move';
@@ -570,12 +574,16 @@ export class BranchBrandingComponent implements OnInit, OnDestroy {
 
     const current = this.advertisements();
     const draggedIndex = current.findIndex((advertisement) => advertisement.id === draggedId);
+    const targetAdvertisement = current[targetIndex];
 
-    if (draggedIndex < 0 || draggedIndex === targetIndex) {
+    if (draggedIndex < 0 || !targetAdvertisement || draggedIndex === targetIndex) {
+      this.dragOverAdvertisementId.set(null);
       return;
     }
 
     this.draggingAdvertisementId.set(draggedId);
+    this.dragOverAdvertisementId.set(targetAdvertisement.id);
+    this.dragOverPlacement.set(this.resolveDropPlacement(event));
   }
 
   protected onAdvertisementDrop(event: DragEvent, targetIndex: number): void {
@@ -601,13 +609,8 @@ export class BranchBrandingComponent implements OnInit, OnDestroy {
     const targetElement = event.currentTarget as HTMLElement | null;
     let insertIndex = targetIndex;
 
-    if (targetElement) {
-      const rect = targetElement.getBoundingClientRect();
-      const isAfterMiddle = event.clientY > rect.top + rect.height / 2;
-
-      if (isAfterMiddle) {
-        insertIndex = targetIndex + 1;
-      }
+    if (targetElement && this.resolveDropPlacement(event) === 'after') {
+      insertIndex = targetIndex + 1;
     }
 
     if (insertIndex > current.length) {
@@ -619,17 +622,24 @@ export class BranchBrandingComponent implements OnInit, OnDestroy {
     }
 
     if (insertIndex === draggedIndex) {
+      this.clearAdvertisementDragState();
       return;
     }
 
     const [draggedItem] = current.splice(draggedIndex, 1);
     current.splice(insertIndex, 0, draggedItem);
     this.advertisements.set(this.withContiguousOrders(current));
-    this.draggingAdvertisementId.set(null);
+    this.clearAdvertisementDragState();
+  }
+
+  protected onAdvertisementDragLeave(advertisementId: number): void {
+    if (this.dragOverAdvertisementId() === advertisementId) {
+      this.dragOverAdvertisementId.set(null);
+    }
   }
 
   protected onAdvertisementDragEnd(): void {
-    this.draggingAdvertisementId.set(null);
+    this.clearAdvertisementDragState();
   }
 
   protected moveAdvertisementToOrder(event: Event, advertisementId: number): void {
@@ -660,6 +670,22 @@ export class BranchBrandingComponent implements OnInit, OnDestroy {
     this.advertisements.set(this.withContiguousOrders(current));
   }
 
+  private resolveDropPlacement(event: DragEvent): DropPlacement {
+    const targetElement = event.currentTarget as HTMLElement | null;
+
+    if (!targetElement) {
+      return 'before';
+    }
+
+    const rect = targetElement.getBoundingClientRect();
+    return event.clientX > rect.left + rect.width / 2 ? 'after' : 'before';
+  }
+
+  private clearAdvertisementDragState(): void {
+    this.draggingAdvertisementId.set(null);
+    this.dragOverAdvertisementId.set(null);
+    this.dragOverPlacement.set('before');
+  }
   private reorderAdvertisementByIndex(advertisementId: number, targetOrder: number): void {
     const current = [...this.advertisements()];
     const currentIndex = current.findIndex((advertisement) => advertisement.id === advertisementId);
@@ -880,7 +906,7 @@ export class BranchBrandingComponent implements OnInit, OnDestroy {
 
   private removeAdvertisement(advertisementId: number): void {
     const remove = (items: readonly BranchAdvertisementResponse[]) =>
-      items.filter((item) => item.id !== advertisementId);
+      this.withContiguousOrders(items.filter((item) => item.id !== advertisementId));
 
     this.advertisements.set(remove(this.advertisements()));
     this.confirmedAdvertisements.set(remove(this.confirmedAdvertisements()));

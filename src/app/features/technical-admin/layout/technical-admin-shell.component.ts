@@ -11,7 +11,7 @@ import { TechnicalAdminI18nStore } from '../store/technical-admin-i18n.store';
   imports: [AppShellComponent, RouterOutlet],
   templateUrl: './technical-admin-shell.component.html',
   styleUrl: './technical-admin-shell.component.css',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TechnicalAdminShellComponent {
   private readonly router = inject(Router);
@@ -24,23 +24,6 @@ export class TechnicalAdminShellComponent {
 
     return [
       {
-        label: translations.themeConfigurationLabel,
-        icon: 'bi-sliders',
-        expanded: true,
-        children: [
-          {
-            label: translations.generalLabel,
-            route: '/technical-admin/general',
-            icon: 'bi-palette'
-          },
-          {
-            label: translations.serviceRequestLabel,
-            route: '/technical-admin/service-request',
-            icon: 'bi-ui-checks-grid'
-          }
-        ]
-      },
-      {
         label: translations.branchManagementLabel,
         icon: 'bi-diagram-3',
         expanded: true,
@@ -48,40 +31,35 @@ export class TechnicalAdminShellComponent {
           {
             label: translations.branchEditorLabel,
             route: '/technical-admin/branch-editor',
-            icon: 'bi-building-gear'
+            icon: 'bi-building-gear',
           },
           {
             label: translations.branchBrandingLabel,
             route: '/technical-admin/branch-branding',
-            icon: 'bi-brush'
+            icon: 'bi-brush',
           },
           {
             label: translations.waitingAreasLabel,
             route: '/technical-admin/waiting-areas',
-            icon: 'bi-hourglass-split'
+            icon: 'bi-hourglass-split',
           },
           {
             label: translations.windowsManagementLabel,
             route: '/technical-admin/windows',
-            icon: 'bi-window'
+            icon: 'bi-window',
           },
           {
             label: translations.terminalsManagementLabel,
             route: '/technical-admin/terminals',
-            icon: 'bi-terminal'
+            icon: 'bi-terminal',
           },
           {
             label: translations.displaysManagementLabel,
             route: '/technical-admin/displays',
-            icon: 'bi-display'
+            icon: 'bi-display',
           },
-          {
-            label: translations.onlineMonitoringLabel,
-            route: '/technical-admin/online-monitoring',
-            icon: 'bi-activity'
-          }
-        ]
-      }
+        ],
+      },
     ];
   });
 
@@ -94,4 +72,3 @@ export class TechnicalAdminShellComponent {
     void this.router.navigateByUrl('/login');
   }
 }
-

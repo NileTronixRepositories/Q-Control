@@ -1,0 +1,192 @@
+/* Final readability pass: stronger text and quieter hover states. */
+body[data-admin-theme='niletronix-admin'] {
+  --q-readable-heading: #101828;
+  --q-readable-body: #1f2a37;
+  --q-readable-label: #123f4f;
+  --q-readable-muted: #475467;
+  --q-readable-placeholder: #667085;
+  --q-hover-soft-bg: rgba(11, 138, 168, 0.075);
+  --q-hover-soft-border: rgba(11, 138, 168, 0.24);
+}
+
+body[data-admin-theme='beach-sunset'] {
+  --q-readable-heading: #102f43;
+  --q-readable-body: #183f52;
+  --q-readable-label: #1b4965;
+  --q-readable-muted: #446a7d;
+  --q-readable-placeholder: #607f90;
+  --q-hover-soft-bg: rgba(95, 168, 211, 0.14);
+  --q-hover-soft-border: rgba(27, 73, 101, 0.26);
+}
+
+body[data-admin-theme='niletronix-brand'] {
+  --q-readable-heading: #101418;
+  --q-readable-body: #202a33;
+  --q-readable-label: #0a526f;
+  --q-readable-muted: #4b5865;
+  --q-readable-placeholder: #66727e;
+  --q-hover-soft-bg: rgba(13, 120, 166, 0.09);
+  --q-hover-soft-border: rgba(13, 120, 166, 0.28);
+}
+
+body[data-admin-theme] :where(.workspace, .workspace-content, .main-content, .main-contact) {
+  color: var(--q-readable-body) !important;
+}
+
+body[data-admin-theme]
+  :where(.workspace, .workspace-content, .main-content, .main-contact)
+  :where(
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    .theme-form-title,
+    .page-title,
+    .panel-title,
+    .section-title,
+    strong
+  ) {
+  color: var(--q-readable-heading) !important;
+}
+
+body[data-admin-theme]
+  :where(.workspace, .workspace-content, .main-content, .main-contact)
+  :where(
+    p,
+    td,
+    dd,
+    .detail-value,
+    .pagination-bar,
+    .page-indicator,
+    .order-input,
+    .color-control input[type='text']
+  ) {
+  color: var(--q-readable-body) !important;
+}
+
+body[data-admin-theme]
+  :where(.workspace, .workspace-content, .main-content, .main-contact)
+  :where(
+    label,
+    .form-label,
+    .filter-field span,
+    .form-field span,
+    .color-field span,
+    .branch-selector label,
+    .order-summary span,
+    .detail-label,
+    dt,
+    th,
+    .eyebrow,
+    .panel-header h2,
+    .panel-header p
+  ) {
+  color: var(--q-readable-label) !important;
+  font-weight: 800 !important;
+}
+
+body[data-admin-theme]
+  :where(.workspace, .workspace-content, .main-content, .main-contact)
+  :where(
+    .header-description,
+    .field-hint,
+    .logo-empty,
+    .api-note,
+    .permission-note,
+    .upload-placeholder span
+  ) {
+  color: var(--q-readable-muted) !important;
+}
+
+body[data-admin-theme]
+  :where(input::placeholder, textarea::placeholder, .form-control::placeholder) {
+  color: var(--q-readable-placeholder) !important;
+  opacity: 1 !important;
+}
+
+body[data-admin-theme]
+  :where(
+    input:not([type='checkbox']):not([type='radio']):not([type='color']),
+    select,
+    textarea,
+    .form-control,
+    .form-select,
+    .color-control,
+    .order-input
+  ) {
+  color: var(--q-readable-body) !important;
+  background: rgba(255, 255, 255, 0.96) !important;
+  border-color: var(--q-border-strong) !important;
+}
+
+body[data-admin-theme]
+  :where(
+    input:not([type='checkbox']):not([type='radio']):not([type='color']):hover,
+    select:hover,
+    textarea:hover,
+    .form-control:hover,
+    .form-select:hover,
+    .color-control:hover,
+    .order-input:hover
+  ) {
+  border-color: var(--q-hover-soft-border) !important;
+  box-shadow: none !important;
+}
+
+body[data-admin-theme]
+  :where(
+    input:not([type='checkbox']):not([type='radio']):not([type='color']):focus,
+    select:focus,
+    textarea:focus,
+    .form-control:focus,
+    .form-select:focus,
+    .order-input:focus
+  ) {
+  color: var(--q-readable-heading) !important;
+  background: #ffffff !important;
+  border-color: var(--q-primary) !important;
+  box-shadow: var(--nt-focus) !important;
+}
+
+body[data-admin-theme]
+  :where(
+    .upload-control:hover,
+    .upload-dropzone:hover,
+    .advertisement-upload-card:hover:not(.disabled-upload)
+  ) {
+  color: var(--q-primary-hover) !important;
+  background: var(--q-hover-soft-bg) !important;
+  border-color: var(--q-hover-soft-border) !important;
+  box-shadow: 0 8px 18px rgb(var(--q-primary-rgb) / 0.08) !important;
+  transform: none !important;
+}
+
+body[data-admin-theme] :where(.advertisement-card:hover) {
+  border-color: var(--q-hover-soft-border) !important;
+  box-shadow: 0 12px 26px rgb(var(--q-primary-rgb) / 0.08) !important;
+  transform: none !important;
+}
+
+body[data-admin-theme]
+  :where(.drag-handle, .order-badge, .status-badge, .status-pill, .save-status, .save-chip) {
+  font-weight: 800 !important;
+}
+
+body[data-admin-theme] :where(.toast-item p, .message, .state-note) {
+  color: var(--q-readable-body) !important;
+  font-weight: 800 !important;
+}
+
+body[data-admin-theme] :where(.message-success, .toast-success) {
+  color: #0b6f49 !important;
+}
+
+body[data-admin-theme] :where(.message-error, .toast-error) {
+  color: #b42318 !important;
+}
+
+body[data-admin-theme='niletronix-brand'] :where(th, .custom-table thead th, .table thead th) {
+  color: #ffffff !important;
+}

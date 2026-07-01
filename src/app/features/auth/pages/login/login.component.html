@@ -40,9 +40,11 @@
   }
 
   <section class="login-stage" aria-labelledby="login-title">
-    <div class="login-stage-grid">
-      <aside class="login-experience" aria-hidden="true">
-        <div class="experience-grid"></div>
+    <div class="login-card-shell">
+      <aside class="login-welcome-panel">
+        <span class="welcome-orb welcome-orb-large" aria-hidden="true"></span>
+        <span class="welcome-orb welcome-orb-medium" aria-hidden="true"></span>
+        <span class="welcome-orb welcome-orb-small" aria-hidden="true"></span>
 
         <div class="brand-lockup">
           <span class="brand-mark">
@@ -54,38 +56,6 @@
           </div>
         </div>
 
-        <div class="experience-visual">
-          <div class="brand-device">
-            <img src="/images/nile.png" [alt]="translations().clinicLogoAlt" class="nile-logo" />
-            <div class="device-lines">
-              <span></span>
-              <span></span>
-              <span></span>
-            </div>
-          </div>
-
-          <div class="queue-map">
-            <span class="queue-node node-a"></span>
-            <span class="queue-node node-b"></span>
-            <span class="queue-node node-c"></span>
-            <span class="queue-node node-d"></span>
-            <span class="queue-route route-a"></span>
-            <span class="queue-route route-b"></span>
-            <span class="queue-route route-c"></span>
-          </div>
-
-          <div class="status-tile tile-main">
-            <i class="bi bi-hospital" aria-hidden="true"></i>
-            <span></span>
-            <strong></strong>
-          </div>
-          <div class="status-tile tile-secondary">
-            <i class="bi bi-activity" aria-hidden="true"></i>
-            <span></span>
-            <strong></strong>
-          </div>
-        </div>
-
         <div class="brand-message">
           <p class="eyebrow">{{ translations().brandEyebrow }}</p>
           <h1>{{ translations().brandHeading }}</h1>
@@ -94,136 +64,114 @@
       </aside>
 
       <section class="login-form-panel" aria-labelledby="login-title">
-        <div class="login-card-shell">
-          <div class="login-card-glow" aria-hidden="true"></div>
+        <div class="login-card">
+          <div class="mobile-brand-lockup">
+            <span class="brand-mark">
+              <img src="/images/Tab-logo.png" alt="" class="brand-icon" />
+            </span>
+            <div class="brand-copy-lockup">
+              <p class="brand-name">{{ translations().brandName }}</p>
+              <p class="brand-subtitle">{{ translations().brandSubtitle }}</p>
+            </div>
+          </div>
 
-          <div class="login-card">
-            <div class="mobile-brand-lockup">
-              <span class="brand-mark">
-                <img src="/images/Tab-logo.png" alt="" class="brand-icon" />
-              </span>
-              <div class="brand-copy-lockup">
-                <p class="brand-name">{{ translations().brandName }}</p>
-                <p class="brand-subtitle">{{ translations().brandSubtitle }}</p>
+          <header class="login-card-header">
+            <p class="eyebrow">{{ translations().loginEyebrow }}</p>
+            <h2 id="login-title">{{ translations().loginTitle }}</h2>
+            <p>{{ translations().loginDescription }}</p>
+          </header>
+
+          <form
+            class="login-form"
+            [formGroup]="loginForm"
+            [attr.aria-busy]="loginStore.isSubmitting()"
+            (ngSubmit)="submitLogin()"
+            novalidate
+          >
+            <div class="field-group">
+              <label for="username" class="form-label required-field">
+                {{ translations().usernameLabel }}
+              </label>
+              <div class="input-shell" [class.input-invalid]="hasUsernameError()">
+                <i class="bi bi-person-circle" aria-hidden="true"></i>
+                <input
+                  id="username"
+                  type="text"
+                  class="form-control"
+                  [class.is-invalid]="hasUsernameError()"
+                  formControlName="username"
+                  autocomplete="username"
+                  required
+                  [placeholder]="translations().usernamePlaceholder"
+                  [attr.aria-describedby]="hasUsernameError() ? 'username-error' : null"
+                />
               </div>
+
+              @if (usernameErrorMessage()) {
+                <div id="username-error" class="invalid-feedback d-block">
+                  {{ usernameErrorMessage() }}
+                </div>
+              }
             </div>
 
-            <header class="login-card-header">
-              <p class="eyebrow">{{ translations().loginEyebrow }}</p>
-              <h2 id="login-title">{{ translations().loginTitle }}</h2>
-              <p>{{ translations().loginDescription }}</p>
-            </header>
-
-            <form
-              class="login-form"
-              [formGroup]="loginForm"
-              [attr.aria-busy]="loginStore.isSubmitting()"
-              (ngSubmit)="submitLogin()"
-              novalidate
-            >
-              <div class="field-group">
-                <label for="username" class="form-label required-field">
-                  {{ translations().usernameLabel }}
-                </label>
-                <div class="input-shell" [class.input-invalid]="hasUsernameError()">
-                  <i class="bi bi-person" aria-hidden="true"></i>
-                  <input
-                    id="username"
-                    type="text"
-                    class="form-control"
-                    [class.is-invalid]="hasUsernameError()"
-                    formControlName="username"
-                    autocomplete="username"
-                    required
-                    [placeholder]="translations().usernamePlaceholder"
-                    [attr.aria-describedby]="hasUsernameError() ? 'username-error' : null"
-                  />
-                </div>
-
-                @if (usernameErrorMessage()) {
-                  <div id="username-error" class="invalid-feedback d-block">
-                    {{ usernameErrorMessage() }}
-                  </div>
-                }
+            <div class="field-group">
+              <label for="password" class="form-label required-field">
+                {{ translations().passwordLabel }}
+              </label>
+              <div class="input-shell password-shell" [class.input-invalid]="hasPasswordError()">
+                <i class="bi bi-key" aria-hidden="true"></i>
+                <input
+                  id="password"
+                  [type]="passwordVisible() ? 'text' : 'password'"
+                  class="form-control"
+                  [class.is-invalid]="hasPasswordError()"
+                  formControlName="password"
+                  autocomplete="current-password"
+                  required
+                  [placeholder]="translations().passwordPlaceholder"
+                  [attr.aria-describedby]="hasPasswordError() ? 'password-error' : null"
+                />
+                <button
+                  type="button"
+                  class="password-toggle"
+                  [attr.aria-label]="
+                    passwordVisible()
+                      ? translations().hidePasswordLabel
+                      : translations().showPasswordLabel
+                  "
+                  [attr.title]="
+                    passwordVisible()
+                      ? translations().hidePasswordLabel
+                      : translations().showPasswordLabel
+                  "
+                  (click)="togglePasswordVisibility()"
+                >
+                  <i
+                    class="bi"
+                    [class.bi-eye-slash]="passwordVisible()"
+                    [class.bi-eye]="!passwordVisible()"
+                    aria-hidden="true"
+                  ></i>
+                </button>
               </div>
 
-              <div class="field-group">
-                <label for="password" class="form-label required-field">
-                  {{ translations().passwordLabel }}
-                </label>
-                <div class="input-shell password-shell" [class.input-invalid]="hasPasswordError()">
-                  <i class="bi bi-shield-lock" aria-hidden="true"></i>
-                  <input
-                    id="password"
-                    [type]="passwordVisible() ? 'text' : 'password'"
-                    class="form-control"
-                    [class.is-invalid]="hasPasswordError()"
-                    formControlName="password"
-                    autocomplete="current-password"
-                    required
-                    [placeholder]="translations().passwordPlaceholder"
-                    [attr.aria-describedby]="hasPasswordError() ? 'password-error' : null"
-                  />
-                  <button
-                    type="button"
-                    class="password-toggle"
-                    [attr.aria-label]="
-                      passwordVisible()
-                        ? translations().hidePasswordLabel
-                        : translations().showPasswordLabel
-                    "
-                    [attr.title]="
-                      passwordVisible()
-                        ? translations().hidePasswordLabel
-                        : translations().showPasswordLabel
-                    "
-                    (click)="togglePasswordVisibility()"
-                  >
-                    <i
-                      class="bi"
-                      [class.bi-eye-slash]="passwordVisible()"
-                      [class.bi-eye]="!passwordVisible()"
-                      aria-hidden="true"
-                    ></i>
-                  </button>
+              @if (passwordErrorMessage()) {
+                <div id="password-error" class="invalid-feedback d-block">
+                  {{ passwordErrorMessage() }}
                 </div>
+              }
+            </div>
 
-                @if (passwordErrorMessage()) {
-                  <div id="password-error" class="invalid-feedback d-block">
-                    {{ passwordErrorMessage() }}
-                  </div>
-                }
-              </div>
-
-              <!-- <div class="login-options">
-                <div class="form-check">
-                  <input
-                    id="rememberSession"
-                    type="checkbox"
-                    class="form-check-input"
-                    formControlName="rememberSession"
-                  />
-                  <label for="rememberSession" class="form-check-label">
-                    {{ translations().rememberSession }}
-                  </label>
-                </div>
-
-                <a class="support-link" href="mailto:support@q-system.local">
-                  {{ translations().technicalSupport }}
-                </a>
-              </div> -->
-
-              <button type="submit" class="submit-button" [disabled]="loginStore.isSubmitting()">
-                @if (loginStore.isSubmitting()) {
-                  <span class="button-spinner" aria-hidden="true"></span>
-                  <span>{{ translations().submittingButton }}</span>
-                } @else {
-                  <i class="bi bi-box-arrow-in-right" aria-hidden="true"></i>
-                  <span>{{ translations().submitButton }}</span>
-                }
-              </button>
-            </form>
-          </div>
+            <button type="submit" class="submit-button" [disabled]="loginStore.isSubmitting()">
+              @if (loginStore.isSubmitting()) {
+                <span class="button-spinner" aria-hidden="true"></span>
+                <span>{{ translations().submittingButton }}</span>
+              } @else {
+                <i class="bi bi-box-arrow-in-right" aria-hidden="true"></i>
+                <span>{{ translations().submitButton }}</span>
+              }
+            </button>
+          </form>
         </div>
       </section>
     </div>

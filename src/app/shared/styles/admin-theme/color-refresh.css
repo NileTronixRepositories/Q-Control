@@ -1,0 +1,86 @@
+/* Q-SYSTEM color refresh: additive overrides only. */
+:root {
+  --q-primary: #0b8aa8;
+  --q-primary-hover: #056579;
+  --q-primary-soft: #e0f6f8;
+  --q-accent: #f22745;
+  --q-accent-soft: #fff0f3;
+  --q-bg-base: #eaf1f5;
+  --q-surface-card: #fbfdff;
+  --q-surface-muted: #edf6f8;
+  --q-surface-warm: #fff7ed;
+  --q-border-subtle: #d8e5ec;
+  --q-border-strong: #bdd0db;
+  --q-shadow-soft: 0 8px 22px rgba(20, 42, 58, 0.06);
+  --q-shadow-card: 0 14px 34px rgba(20, 42, 58, 0.08);
+}
+
+body {
+  background: linear-gradient(135deg, #eaf1f5 0%, #f5fbfc 52%, #fff7f0 100%) !important;
+}
+
+body .app-shell .sidebar {
+  background: linear-gradient(180deg, #83a5c7 0%, #bfddfa 58%, #80c494 100%) !important;
+  border-inline-end-color: rgba(11, 138, 168, 0.18) !important;
+}
+
+body .app-shell .sidebar-header,
+body .app-shell .sidebar-actions,
+body .app-shell .nav-group + .nav-group {
+  border-color: rgba(11, 138, 168, 0.14) !important;
+}
+
+body .app-shell .sidebar-link .child-icon,
+body .app-shell .sidebar-link .child-dot,
+body .app-shell.sidebar-collapsed .group-icon {
+  width: 26px !important;
+  height: 26px !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: #edf6f8 !important;
+  border: 1px solid rgba(11, 138, 168, 0.14) !important;
+  border-radius: 8px !important;
+}
+
+body .app-shell .sidebar-link-active .child-icon,
+body .app-shell .sidebar-link-active .child-dot,
+body .app-shell.sidebar-collapsed .sidebar-group-header:hover .group-icon {
+  background: linear-gradient(135deg, var(--q-accent), #d91d38) !important;
+  border-color: rgba(242, 39, 69, 0.28) !important;
+}
+
+body
+  :where(
+    input:not([type='checkbox']):not([type='radio']):not([type='color']),
+    select,
+    textarea,
+    .form-control,
+    .form-select
+  ) {
+  background-color: #f7fbfc !important;
+}
+
+body
+  :where(
+    input:not([type='checkbox']):not([type='radio']):not([type='color']):focus,
+    select:focus,
+    textarea:focus,
+    .form-control:focus,
+    .form-select:focus
+  ) {
+  background-color: #ffffff !important;
+  border-color: rgba(11, 138, 168, 0.58) !important;
+  box-shadow: 0 0 0 3px rgba(11, 138, 168, 0.13) !important;
+}
+
+body th,
+body .custom-table thead th {
+  background: #eaf4f7 !important;
+  color: #385063 !important;
+}
+
+body tbody tr:nth-child(even) td,
+body .custom-table tbody tr:nth-child(even) td {
+  background: rgba(224, 246, 248, 0.32) !important;
+}
+

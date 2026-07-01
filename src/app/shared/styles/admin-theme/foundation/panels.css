@@ -1,0 +1,230 @@
+/* Cards and panels */
+body
+  :where(
+    .settings-panel,
+    .content-panel,
+    .list-panel,
+    .form-panel,
+    .logo-preview-panel,
+    .status-list,
+    .empty-state,
+    .card,
+    .summary-card,
+    .monitor-card,
+    .voice-preview,
+    .queue-preview,
+    .table-wrap,
+    .table-responsive,
+    .editor-panel:not(.app-popup-panel),
+    .terminal-editor-panel:not(.app-popup-panel),
+    .display-editor-panel:not(.app-popup-panel),
+    .window-editor-panel:not(.app-popup-panel)
+  ) {
+  color: var(--q-panel-text, var(--nt-text)) !important;
+  background: var(--q-panel-bg, var(--nt-card)) !important;
+  border: 1px solid var(--q-panel-border, var(--nt-border)) !important;
+  border-radius: var(--q-panel-radius, 12px) !important;
+  box-shadow: var(--q-panel-shadow, 0 10px 28px rgba(27, 36, 48, 0.052)) !important;
+}
+
+body
+  :where(
+    .settings-panel,
+    .content-panel,
+    .list-panel,
+    .form-panel,
+    .logo-preview-panel,
+    .status-list,
+    .empty-state
+  ) {
+  padding: var(--nt-panel-padding-y) var(--nt-panel-padding-x) !important;
+}
+
+body :where(.summary-card, .monitor-card, .card) {
+  min-height: 78px !important;
+  padding: 16px !important;
+}
+
+body .summary-card::before,
+body .monitor-card::before {
+  background: var(--q-summary-accent-bg, linear-gradient(180deg, var(--nt-primary), rgba(15, 125, 168, 0.18))) !important;
+}
+
+body .summary-card.tone-danger::before,
+body .monitor-card.status-offline::before {
+  background: var(--q-summary-danger-bg, linear-gradient(180deg, var(--nt-accent), rgba(243, 24, 45, 0.18))) !important;
+}
+
+body .summary-card.tone-warning::before,
+body .monitor-card.status-delayed::before {
+  background: var(--q-summary-warning-bg, linear-gradient(180deg, #d97706, rgba(217, 119, 6, 0.16))) !important;
+}
+
+body
+  :where(
+    .summary-card strong,
+    .monitor-card h3,
+    .panel-header h2,
+    .editor-panel-header h2,
+    .display-editor-panel-header h2,
+    .terminal-editor-panel-header h2,
+    .window-editor-panel-header h2,
+    .settings-panel h2
+  ) {
+  margin: 0 !important;
+  color: var(--q-panel-text, var(--nt-text)) !important;
+  font-size: 1.05rem !important;
+  font-weight: 850 !important;
+}
+
+body
+  :where(
+    .panel-header,
+    .editor-panel-header,
+    .display-editor-panel-header,
+    .terminal-editor-panel-header,
+    .window-editor-panel-header
+  ) {
+  min-height: 56px !important;
+  padding: 14px 18px !important;
+  color: var(--q-panel-text, var(--nt-text)) !important;
+  background: var(--q-panel-header-bg, linear-gradient(180deg, #ffffff, #f8fbfd)) !important;
+  border-bottom: 1px solid var(--q-panel-border, var(--nt-border)) !important;
+}
+
+body .panel-header {
+  gap: 16px !important;
+  margin-bottom: 18px !important;
+}
+
+body
+  :where(
+    .layout-form,
+    .field-grid,
+    .summary-grid,
+    .monitor-grid,
+    .check-grid,
+    .metric-grid,
+    .button-group-row,
+    .filter-grid,
+    .audio-grid,
+    .calling-grid
+  ) {
+  gap: var(--nt-form-gap-y) !important;
+}
+
+body :where(.summary-grid, .monitor-grid, .filter-grid, .metric-grid) {
+  gap: 16px !important;
+}
+
+body .save-status,
+body .save-chip {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  min-height: var(--nt-color-swatch-size) !important;
+  padding: 0 12px !important;
+  color: var(--nt-success) !important;
+  background: #eefbf5 !important;
+  border: 1px solid rgba(19, 138, 91, 0.16) !important;
+  border-radius: 999px !important;
+  font-size: 0.78rem !important;
+  font-weight: 850 !important;
+}
+/* Shared detail, message, and compact workflow blocks */
+body :where(.details-list) {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+  margin: 0 !important;
+}
+
+body :where(.details-list div) {
+  padding: 10px 12px !important;
+  background: var(--q-surface-muted) !important;
+  border: 1px solid var(--q-border-subtle) !important;
+  border-radius: var(--q-radius-md) !important;
+}
+
+body :where(.details-list dt) {
+  color: var(--q-text-muted) !important;
+  font-size: var(--q-font-size-small) !important;
+  font-weight: 700 !important;
+}
+
+body :where(.details-list dd) {
+  margin: 4px 0 0 !important;
+  color: var(--q-text-primary) !important;
+  font-size: var(--q-font-size-base) !important;
+  font-weight: 600 !important;
+  overflow-wrap: anywhere !important;
+}
+
+body :where(.message) {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  padding: 10px 14px !important;
+  border: 1px solid !important;
+  border-radius: var(--q-radius-md) !important;
+  font-size: var(--q-font-size-base) !important;
+  font-weight: 600 !important;
+}
+
+body :where(.message-success) {
+  color: var(--q-success) !important;
+  background: var(--q-success-soft) !important;
+  border-color: rgba(19, 138, 91, 0.2) !important;
+}
+
+body :where(.message-error) {
+  color: var(--q-danger) !important;
+  background: var(--q-danger-soft) !important;
+  border-color: rgba(210, 31, 53, 0.2) !important;
+}
+
+body :where(.message-info) {
+  color: var(--q-primary) !important;
+  background: var(--q-primary-soft) !important;
+  border-color: rgba(15, 125, 168, 0.2) !important;
+}
+
+body :where(.state-note) {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 10px 12px !important;
+  background: var(--q-surface-muted) !important;
+  border-radius: var(--q-radius-md) !important;
+  font-size: var(--q-font-size-base) !important;
+  font-weight: 600 !important;
+}
+
+body :where(.dialog-content) {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+}
+
+body :where(.dialog-content p) {
+  margin: 0 !important;
+  color: var(--q-text-secondary) !important;
+  font-size: var(--q-font-size-base) !important;
+  line-height: 1.6 !important;
+}
+
+body :where(.pagination-bar) {
+  font-size: var(--q-font-size-base) !important;
+  font-weight: 600 !important;
+}
+
+body :where(.page-indicator) {
+  min-width: 50px !important;
+  text-align: center !important;
+}
+
+@media (max-width: 767.98px) {
+  body :where(.details-list) {
+    grid-template-columns: 1fr !important;
+  }
+}

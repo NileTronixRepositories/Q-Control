@@ -1,0 +1,406 @@
+/* Runtime theme selector: Niletronix Admin option. */
+body[data-admin-theme='niletronix-admin'] {
+  --q-primary: #0b8aa8;
+  --q-primary-hover: #056579;
+  --q-primary-soft: #e0f6f8;
+  --q-primary-border: rgba(11, 138, 168, 0.24);
+  --q-accent: #f22745;
+  --q-accent-soft: #fff0f3;
+  --q-bg-base: #eaf1f5;
+  --q-surface-card: #fbfdff;
+  --q-surface-muted: #edf6f8;
+  --q-border-subtle: #d8e5ec;
+  --q-border-strong: #bdd0db;
+  --q-text-primary: #0f172a;
+  --q-text-secondary: #334155;
+  --q-text-muted: #64748b;
+  --q-shadow-soft: 0 8px 22px rgba(20, 42, 58, 0.06);
+  --q-shadow-card: 0 14px 34px rgba(20, 42, 58, 0.08);
+  --q-shadow-button: 0 8px 18px rgba(11, 138, 168, 0.12);
+  --q-shadow-button-hover: 0 12px 24px rgba(11, 138, 168, 0.18);
+
+  --nt-primary: var(--q-primary);
+  --nt-primary-dark: var(--q-primary-hover);
+  --nt-primary-soft: var(--q-primary-soft);
+  --nt-accent: var(--q-accent);
+  --nt-accent-soft: var(--q-accent-soft);
+  --nt-bg: var(--q-bg-base);
+  --nt-card: var(--q-surface-card);
+  --nt-border: var(--q-border-subtle);
+  --nt-border-strong: var(--q-border-strong);
+  --nt-text: var(--q-text-primary);
+  --nt-text-soft: var(--q-text-muted);
+  --nt-shadow-soft: var(--q-shadow-soft);
+  --nt-shadow-card: var(--q-shadow-card);
+  --nt-focus: 0 0 0 4px rgba(11, 138, 168, 0.14);
+
+  --bg-base: var(--q-bg-base);
+  --surface-card: var(--q-surface-card);
+  --surface-muted: var(--q-surface-muted);
+  --surface-soft: var(--q-primary-soft);
+  --text-primary: var(--q-text-primary);
+  --text-heading: var(--q-text-primary);
+  --text-secondary: var(--q-text-secondary);
+  --text-muted: var(--q-text-muted);
+  --border-color: var(--q-border-subtle);
+  --border-subtle: var(--q-border-subtle);
+  --border-strong: var(--q-border-strong);
+  --primary-color: var(--q-primary);
+  --primary-hover: var(--q-primary-hover);
+  --primary-soft: var(--q-primary-soft);
+  --primary-border: var(--q-primary-border);
+  --accent-color: var(--q-accent);
+  --accent-soft: var(--q-accent-soft);
+  --shadow-card: var(--q-shadow-soft);
+  --shadow-raised: var(--q-shadow-card);
+  --focus-ring: var(--nt-focus);
+
+  color: var(--q-text-primary) !important;
+  background:
+    linear-gradient(135deg, #eaf1f5 0%, #f5fbfc 52%, #fff7f0 100%), var(--q-bg-base) !important;
+}
+
+body[data-admin-theme='niletronix-admin'] .app-shell {
+  --sidebar-bg: #ffffff;
+  --sidebar-border: rgba(11, 138, 168, 0.16);
+  --sidebar-text: #22314a;
+  --sidebar-muted: #52627a;
+  --sidebar-active: var(--q-accent);
+  --sidebar-hover: rgba(11, 138, 168, 0.08);
+  --sidebar-selected: rgba(11, 138, 168, 0.1);
+  --sidebar-accent: var(--q-accent);
+  --sidebar-danger: var(--q-accent);
+  background: transparent !important;
+}
+
+body[data-admin-theme='niletronix-admin'] .workspace,
+body[data-admin-theme='niletronix-admin'] .main-content,
+body[data-admin-theme='niletronix-admin'] .main-contact {
+  background:
+    radial-gradient(circle at 14% 10%, rgba(11, 138, 168, 0.1), transparent 28rem),
+    radial-gradient(circle at 88% 4%, rgba(242, 39, 69, 0.08), transparent 26rem),
+    linear-gradient(135deg, #eaf1f5 0%, #f5fbfc 52%, #fff7f0 100%) !important;
+}
+
+body[data-admin-theme='niletronix-admin'] .workspace-content,
+body[data-admin-theme='niletronix-admin'] .main-content,
+body[data-admin-theme='niletronix-admin'] .main-contact {
+  background:
+    linear-gradient(
+      135deg,
+      rgba(234, 241, 245, 0.9) 0%,
+      rgba(245, 251, 252, 0.82) 54%,
+      rgba(255, 247, 240, 0.72) 100%
+    ),
+    #f5fbfc !important;
+}
+
+body[data-admin-theme='niletronix-admin'] .app-shell .sidebar {
+  color: #22314a !important;
+  background:
+    radial-gradient(circle at 15% 0%, rgba(11, 138, 168, 0.1), transparent 11rem),
+    radial-gradient(circle at 92% 100%, rgba(242, 39, 69, 0.08), transparent 13rem),
+    linear-gradient(180deg, #fbfdff 0%, #f3fafb 58%, #fff6f7 100%) !important;
+  border-inline-end-color: rgba(11, 138, 168, 0.16) !important;
+  box-shadow: 16px 0 34px rgba(20, 42, 58, 0.08) !important;
+}
+
+body[data-admin-theme='niletronix-admin'] .app-shell-rtl .sidebar {
+  box-shadow: -16px 0 34px rgba(20, 42, 58, 0.08) !important;
+}
+
+body[data-admin-theme='niletronix-admin'] .app-shell .sidebar-header,
+body[data-admin-theme='niletronix-admin'] .app-shell .sidebar-actions,
+body[data-admin-theme='niletronix-admin'] .app-shell .nav-group + .nav-group {
+  border-color: rgba(11, 138, 168, 0.14) !important;
+}
+
+body[data-admin-theme='niletronix-admin'] .app-shell .sidebar-group-header,
+body[data-admin-theme='niletronix-admin'] .app-shell .sidebar-group-header.active,
+body[data-admin-theme='niletronix-admin'] .app-shell .sidebar-link {
+  color: #22314a !important;
+}
+
+body[data-admin-theme='niletronix-admin'] .app-shell .sidebar-group-header:hover,
+body[data-admin-theme='niletronix-admin'] .app-shell .sidebar-link:hover {
+  color: var(--q-primary-hover) !important;
+  background: rgba(11, 138, 168, 0.07) !important;
+  border-color: rgba(11, 138, 168, 0.14) !important;
+}
+
+body[data-admin-theme='niletronix-admin'] .app-shell .sidebar-link .child-icon,
+body[data-admin-theme='niletronix-admin'] .app-shell .sidebar-link .child-dot,
+body[data-admin-theme='niletronix-admin'] .app-shell.sidebar-collapsed .group-icon {
+  color: currentColor !important;
+  background: #edf6f8 !important;
+  border-color: rgba(11, 138, 168, 0.14) !important;
+  box-shadow: none !important;
+}
+
+body[data-admin-theme='niletronix-admin'] .app-shell .sidebar-link-active {
+  color: var(--q-primary-hover) !important;
+  background:
+    linear-gradient(90deg, rgba(11, 138, 168, 0.11), rgba(255, 255, 255, 0.82)), #fbfdff !important;
+  border-color: rgba(11, 138, 168, 0.2) !important;
+  box-shadow: 0 10px 22px rgba(20, 42, 58, 0.06) !important;
+}
+
+body[data-admin-theme='niletronix-admin'] .app-shell .sidebar-link-active::before {
+  width: 4px !important;
+  background: var(--q-primary) !important;
+  box-shadow: 0 0 10px rgba(11, 138, 168, 0.2) !important;
+}
+
+body[data-admin-theme='niletronix-admin'] .app-shell .sidebar-link-active .child-icon,
+body[data-admin-theme='niletronix-admin'] .app-shell .sidebar-link-active .child-dot {
+  color: #ffffff !important;
+  background: linear-gradient(135deg, var(--q-primary), var(--q-primary-hover)) !important;
+  border-color: rgba(11, 138, 168, 0.28) !important;
+  box-shadow: 0 6px 14px rgba(11, 138, 168, 0.12) !important;
+}
+
+body[data-admin-theme='niletronix-admin'] .app-shell .sidebar-toggle,
+body[data-admin-theme='niletronix-admin'] .app-shell .sidebar-action-button {
+  color: #22314a !important;
+  background: #ffffff !important;
+  border-color: rgba(11, 138, 168, 0.16) !important;
+  box-shadow: 0 8px 18px rgba(20, 42, 58, 0.06) !important;
+}
+
+body[data-admin-theme='niletronix-admin'] .app-shell .sidebar-toggle:hover,
+body[data-admin-theme='niletronix-admin'] .app-shell .sidebar-toggle:focus-visible,
+body[data-admin-theme='niletronix-admin'] .app-shell .sidebar-action-button:hover {
+  color: #ffffff !important;
+  background: var(--q-primary) !important;
+  border-color: var(--q-primary) !important;
+  box-shadow: var(--q-shadow-button-hover) !important;
+}
+
+body[data-admin-theme='niletronix-admin'] th,
+body[data-admin-theme='niletronix-admin'] .custom-table thead th {
+  background: #eaf4f7 !important;
+}
+
+body[data-admin-theme='niletronix-admin'] tbody tr:nth-child(even) td,
+body[data-admin-theme='niletronix-admin'] .custom-table tbody tr:nth-child(even) td {
+  background: rgba(224, 246, 248, 0.32) !important;
+}
+
+body[data-admin-theme='niletronix-admin'] tbody tr:hover td,
+body[data-admin-theme='niletronix-admin'] .custom-table tbody tr:hover td {
+  background: rgba(11, 138, 168, 0.07) !important;
+}
+
+/* Runtime theme selector: Niletronix Brand option. */
+body[data-admin-theme='niletronix-brand'] {
+  --q-brand-blue: #0d78a6;
+  --q-brand-blue-soft: #4fa5c9;
+  --q-brand-red: #e31e24;
+  --q-brand-bg: #f4f6f8;
+  --q-brand-ink: #1a1d21;
+
+  --q-primary: var(--q-brand-blue);
+  --q-primary-hover: #075f86;
+  --q-primary-soft: rgba(79, 165, 201, 0.14);
+  --q-primary-border: rgba(13, 120, 166, 0.22);
+  --q-accent: var(--q-brand-red);
+  --q-accent-soft: rgba(227, 30, 36, 0.09);
+  --q-bg-base: var(--q-brand-bg);
+  --q-surface-card: #ffffff;
+  --q-surface-muted: #eef4f7;
+  --q-border-subtle: rgba(13, 120, 166, 0.18);
+  --q-border-strong: rgba(13, 120, 166, 0.32);
+  --q-text-primary: var(--q-brand-ink);
+  --q-text-secondary: #314252;
+  --q-text-muted: #6a7784;
+  --q-shadow-soft: 0 10px 26px rgba(26, 29, 33, 0.07);
+  --q-shadow-card: 0 18px 42px rgba(26, 29, 33, 0.09);
+  --q-shadow-button: 0 9px 20px rgba(13, 120, 166, 0.16);
+  --q-shadow-button-hover: 0 13px 28px rgba(13, 120, 166, 0.22);
+
+  --nt-primary: var(--q-primary);
+  --nt-primary-dark: var(--q-primary-hover);
+  --nt-primary-soft: var(--q-primary-soft);
+  --nt-accent: var(--q-accent);
+  --nt-accent-soft: var(--q-accent-soft);
+  --nt-bg: var(--q-bg-base);
+  --nt-card: var(--q-surface-card);
+  --nt-border: var(--q-border-subtle);
+  --nt-border-strong: var(--q-border-strong);
+  --nt-text: var(--q-text-primary);
+  --nt-text-soft: var(--q-text-muted);
+  --nt-shadow-soft: var(--q-shadow-soft);
+  --nt-shadow-card: var(--q-shadow-card);
+  --nt-focus: 0 0 0 4px rgba(13, 120, 166, 0.16);
+
+  --bg-base: var(--q-bg-base);
+  --surface-card: var(--q-surface-card);
+  --surface-muted: var(--q-surface-muted);
+  --surface-soft: var(--q-primary-soft);
+  --text-primary: var(--q-text-primary);
+  --text-heading: var(--q-text-primary);
+  --text-secondary: var(--q-text-secondary);
+  --text-muted: var(--q-text-muted);
+  --border-color: var(--q-border-subtle);
+  --border-subtle: var(--q-border-subtle);
+  --border-strong: var(--q-border-strong);
+  --primary-color: var(--q-primary);
+  --primary-hover: var(--q-primary-hover);
+  --primary-soft: var(--q-primary-soft);
+  --primary-border: var(--q-primary-border);
+  --accent-color: var(--q-accent);
+  --accent-soft: var(--q-accent-soft);
+  --shadow-card: var(--q-shadow-soft);
+  --shadow-raised: var(--q-shadow-card);
+  --focus-ring: var(--nt-focus);
+
+  color: var(--q-text-primary) !important;
+  background:
+    radial-gradient(circle at 12% 8%, rgba(79, 165, 201, 0.12), transparent 28rem),
+    radial-gradient(circle at 90% 8%, rgba(79, 165, 201, 0.1), transparent 26rem),
+    linear-gradient(135deg, #f4f6f8 0%, #ffffff 56%, #eef5f8 100%) !important;
+}
+
+body[data-admin-theme='niletronix-brand'] .app-shell {
+  --sidebar-bg: #1a1d21;
+  --sidebar-border: rgba(79, 165, 201, 0.2);
+  --sidebar-text: #f4f6f8;
+  --sidebar-muted: rgba(244, 246, 248, 0.64);
+  --sidebar-active: var(--q-brand-red);
+  --sidebar-hover: rgba(79, 165, 201, 0.14);
+  --sidebar-selected: rgba(79, 165, 201, 0.18);
+  --sidebar-accent: var(--q-brand-red);
+  --sidebar-danger: var(--q-brand-red);
+  background: transparent !important;
+}
+
+body[data-admin-theme='niletronix-brand'] .workspace,
+body[data-admin-theme='niletronix-brand'] .main-content,
+body[data-admin-theme='niletronix-brand'] .main-contact {
+  background:
+    radial-gradient(circle at 16% 10%, rgba(79, 165, 201, 0.15), transparent 27rem),
+    radial-gradient(circle at 88% 0%, rgba(79, 165, 201, 0.12), transparent 24rem),
+    linear-gradient(135deg, #f4f6f8 0%, #ffffff 58%, #eef6fa 100%) !important;
+}
+
+body[data-admin-theme='niletronix-brand'] .workspace-content,
+body[data-admin-theme='niletronix-brand'] .main-content,
+body[data-admin-theme='niletronix-brand'] .main-contact {
+  background:
+    linear-gradient(
+      135deg,
+      rgba(244, 246, 248, 0.96) 0%,
+      rgba(255, 255, 255, 0.88) 54%,
+      rgba(238, 246, 250, 0.82) 100%
+    ),
+    #f4f6f8 !important;
+}
+
+body[data-admin-theme='niletronix-brand'] .app-shell .sidebar {
+  color: #f4f6f8 !important;
+  background:
+    radial-gradient(circle at 22% 0%, rgba(79, 165, 201, 0.24), transparent 11rem),
+    radial-gradient(circle at 100% 100%, rgba(79, 165, 201, 0.16), transparent 13rem),
+    linear-gradient(180deg, #1a1d21 0%, #12384a 54%, #0d78a6 100%) !important;
+  border-inline-end-color: rgba(79, 165, 201, 0.2) !important;
+  box-shadow: 16px 0 36px rgba(26, 29, 33, 0.16) !important;
+}
+
+body[data-admin-theme='niletronix-brand'] .app-shell-rtl .sidebar {
+  box-shadow: -16px 0 36px rgba(26, 29, 33, 0.16) !important;
+}
+
+body[data-admin-theme='niletronix-brand'] .app-shell .sidebar-header,
+body[data-admin-theme='niletronix-brand'] .app-shell .sidebar-actions,
+body[data-admin-theme='niletronix-brand'] .app-shell .nav-group + .nav-group {
+  border-color: rgba(244, 246, 248, 0.14) !important;
+}
+
+body[data-admin-theme='niletronix-brand'] .app-shell .sidebar-group-header,
+body[data-admin-theme='niletronix-brand'] .app-shell .sidebar-group-header.active,
+body[data-admin-theme='niletronix-brand'] .app-shell .sidebar-link {
+  color: rgba(244, 246, 248, 0.92) !important;
+}
+
+body[data-admin-theme='niletronix-brand'] .app-shell .sidebar-group-header:hover,
+body[data-admin-theme='niletronix-brand'] .app-shell .sidebar-link:hover {
+  color: #ffffff !important;
+  background: linear-gradient(
+    90deg,
+    rgba(79, 165, 201, 0.18),
+    rgba(255, 255, 255, 0.05)
+  ) !important;
+  border-color: rgba(79, 165, 201, 0.26) !important;
+}
+
+body[data-admin-theme='niletronix-brand'] .app-shell .sidebar-link .child-icon,
+body[data-admin-theme='niletronix-brand'] .app-shell .sidebar-link .child-dot,
+body[data-admin-theme='niletronix-brand'] .app-shell.sidebar-collapsed .group-icon {
+  color: rgba(244, 246, 248, 0.92) !important;
+  background: rgba(79, 165, 201, 0.16) !important;
+  border-color: rgba(79, 165, 201, 0.24) !important;
+  box-shadow: none !important;
+}
+
+body[data-admin-theme='niletronix-brand'] .app-shell .sidebar-link:hover .child-icon,
+body[data-admin-theme='niletronix-brand'] .app-shell .sidebar-link:hover .child-dot {
+  color: #ffffff !important;
+  background: rgba(79, 165, 201, 0.25) !important;
+  border-color: rgba(79, 165, 201, 0.34) !important;
+}
+
+body[data-admin-theme='niletronix-brand'] .app-shell .sidebar-link-active {
+  color: #ffffff !important;
+  background:
+    linear-gradient(90deg, rgba(79, 165, 201, 0.28), rgba(255, 255, 255, 0.055) 68%),
+    rgba(79, 165, 201, 0.1) !important;
+  border-color: rgba(79, 165, 201, 0.34) !important;
+  box-shadow: 0 10px 22px rgba(26, 29, 33, 0.12) !important;
+}
+
+body[data-admin-theme='niletronix-brand'] .app-shell .sidebar-link-active::before {
+  width: 4px !important;
+  background: linear-gradient(180deg, #6ec8e8, #4fa5c9) !important;
+  box-shadow: 0 0 12px rgba(79, 165, 201, 0.28) !important;
+}
+
+body[data-admin-theme='niletronix-brand'] .app-shell .sidebar-link-active .child-icon,
+body[data-admin-theme='niletronix-brand'] .app-shell .sidebar-link-active .child-dot {
+  color: #12384a !important;
+  background: linear-gradient(135deg, #dceef5, #8fd4ea) !important;
+  border-color: rgba(244, 246, 248, 0.38) !important;
+  box-shadow: 0 6px 14px rgba(79, 165, 201, 0.14) !important;
+}
+
+body[data-admin-theme='niletronix-brand'] .app-shell .sidebar-toggle,
+body[data-admin-theme='niletronix-brand'] .app-shell .sidebar-action-button {
+  color: #f4f6f8 !important;
+  background: rgba(244, 246, 248, 0.08) !important;
+  border-color: rgba(244, 246, 248, 0.18) !important;
+  box-shadow: 0 8px 18px rgba(26, 29, 33, 0.12) !important;
+}
+
+body[data-admin-theme='niletronix-brand'] .app-shell .sidebar-toggle:hover,
+body[data-admin-theme='niletronix-brand'] .app-shell .sidebar-toggle:focus-visible,
+body[data-admin-theme='niletronix-brand'] .app-shell .sidebar-action-button:hover {
+  color: #1a1d21 !important;
+  background: linear-gradient(180deg, #f4f6f8, #dceef5) !important;
+  border-color: rgba(244, 246, 248, 0.34) !important;
+  box-shadow: 0 12px 26px rgba(26, 29, 33, 0.18) !important;
+}
+
+body[data-admin-theme='niletronix-brand'] th,
+body[data-admin-theme='niletronix-brand'] .custom-table thead th {
+  color: #1a1d21 !important;
+  background: #e7f1f5 !important;
+}
+
+body[data-admin-theme='niletronix-brand'] tbody tr:nth-child(even) td,
+body[data-admin-theme='niletronix-brand'] .custom-table tbody tr:nth-child(even) td {
+  background: rgba(79, 165, 201, 0.08) !important;
+}
+
+body[data-admin-theme='niletronix-brand'] tbody tr:hover td,
+body[data-admin-theme='niletronix-brand'] .custom-table tbody tr:hover td {
+  background: rgba(13, 120, 166, 0.09) !important;
+}

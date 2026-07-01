@@ -1,0 +1,397 @@
+/* Theme-aware component harmonization for admin pages. */
+body[data-admin-theme='beach-sunset'] {
+  --q-primary-rgb: 27 73 101;
+  --q-primary-hover-rgb: 18 54 77;
+  --q-accent-rgb: 95 168 211;
+  --q-surface-card-rgb: 255 255 255;
+  --q-component-page-bg: linear-gradient(135deg, #f8fdff 0%, #edf9fb 48%, #dff3ff 100%);
+  --q-component-panel-bg: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.98) 0%,
+    rgba(248, 253, 255, 0.95) 100%
+  );
+  --q-component-hero-bg: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.98) 0%,
+    rgba(202, 233, 255, 0.7) 62%,
+    rgba(190, 233, 232, 0.62) 100%
+  );
+  --q-component-strip-bg: rgba(202, 233, 255, 0.45);
+  --q-component-tab-active-bg: linear-gradient(135deg, #1b4965, #347f9b);
+  --q-component-table-head-bg: rgba(202, 233, 255, 0.54);
+  --q-component-table-row-alt-bg: rgba(190, 233, 232, 0.18);
+  --q-component-table-row-hover-bg: rgba(98, 182, 203, 0.18);
+  --q-component-soft-shadow: 0 12px 28px rgba(27, 73, 101, 0.075);
+}
+
+body[data-admin-theme='niletronix-admin'] {
+  --q-primary-rgb: 11 138 168;
+  --q-primary-hover-rgb: 5 101 121;
+  --q-accent-rgb: 242 39 69;
+  --q-surface-card-rgb: 255 255 255;
+  --q-component-page-bg: linear-gradient(135deg, #eaf1f5 0%, #f5fbfc 52%, #fff7f0 100%);
+  --q-component-panel-bg: linear-gradient(180deg, #fbfdff 0%, #f8fcfd 100%);
+  --q-component-hero-bg: linear-gradient(
+    90deg,
+    rgba(251, 253, 255, 0.98) 0%,
+    rgba(239, 248, 250, 0.94) 62%,
+    rgba(255, 240, 243, 0.72) 100%
+  );
+  --q-component-strip-bg: rgba(11, 138, 168, 0.08);
+  --q-component-tab-active-bg: linear-gradient(135deg, #0b8aa8, #006e9f);
+  --q-component-table-head-bg: #eaf4f7;
+  --q-component-table-row-alt-bg: rgba(224, 246, 248, 0.32);
+  --q-component-table-row-hover-bg: rgba(11, 138, 168, 0.07);
+  --q-component-soft-shadow: 0 10px 24px rgba(20, 42, 58, 0.065);
+}
+
+body[data-admin-theme='niletronix-brand'] {
+  --q-primary-rgb: 13 120 166;
+  --q-primary-hover-rgb: 7 95 134;
+  --q-accent-rgb: 227 30 36;
+  --q-surface-card-rgb: 255 255 255;
+  --q-component-page-bg: linear-gradient(135deg, #f4f6f8 0%, #ffffff 58%, #eef6fa 100%);
+  --q-component-panel-bg: linear-gradient(180deg, #ffffff 0%, #f8fbfc 100%);
+  --q-component-hero-bg: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.98) 0%,
+    rgba(244, 246, 248, 0.95) 60%,
+    rgba(227, 30, 36, 0.07) 100%
+  );
+  --q-component-strip-bg: rgba(79, 165, 201, 0.13);
+  --q-component-tab-active-bg: linear-gradient(135deg, #0d78a6, #075f86);
+  --q-component-table-head-bg: #e7f1f5;
+  --q-component-table-row-alt-bg: rgba(79, 165, 201, 0.08);
+  --q-component-table-row-hover-bg: rgba(13, 120, 166, 0.09);
+  --q-component-soft-shadow: 0 10px 26px rgba(26, 29, 33, 0.07);
+}
+
+body[data-admin-theme] :where(.workspace, .workspace-content, .main-content, .main-contact) {
+  color: var(--q-text-primary) !important;
+}
+
+body[data-admin-theme]
+  :where(
+    .organization-page,
+    .technical-page,
+    .branch-page,
+    .waiting-areas-page,
+    .window-management-page,
+    .terminal-management-page,
+    .display-management-page
+  ) {
+  color: var(--q-text-primary) !important;
+}
+
+body[data-admin-theme]
+  :where(.eyebrow, .panel-header i, .filter-icon, .form-field-icon, .window-filter-icon) {
+  color: var(--q-primary) !important;
+}
+
+body[data-admin-theme]
+  :where(
+    .header-description,
+    .page-header span,
+    .page-hero span,
+    .filter-field span,
+    .form-field span,
+    .form-label,
+    label,
+    .detail-label,
+    dt
+  ) {
+  color: var(--q-text-secondary) !important;
+}
+
+body[data-admin-theme] :where(.tabs) {
+  display: inline-flex !important;
+  width: fit-content !important;
+  max-width: 100% !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  gap: 4px !important;
+  padding: 4px !important;
+  background: var(--q-component-strip-bg) !important;
+  border: 1px solid var(--q-border-subtle) !important;
+  border-radius: var(--q-radius-md) !important;
+  box-shadow: 0 8px 18px rgb(var(--q-primary-rgb) / 0.06) !important;
+}
+
+body[data-admin-theme] :where(.logo-tabs) {
+  background: var(--q-component-strip-bg) !important;
+  border: 1px solid var(--q-border-subtle) !important;
+}
+
+body[data-admin-theme]
+  :where(.tabs .btn, .tabs .primary-action, .tabs .secondary-action, .logo-tab) {
+  min-height: 38px !important;
+  border-radius: var(--q-radius-sm) !important;
+  box-shadow: none !important;
+}
+
+body[data-admin-theme]
+  :where(
+    input:not([type='checkbox']):not([type='radio']):not([type='color']),
+    select,
+    textarea,
+    .form-control,
+    .form-select,
+    .color-control
+  ) {
+  color: var(--q-text-primary) !important;
+  background: rgb(var(--q-surface-card-rgb) / 0.92) !important;
+  border-color: var(--q-border-strong) !important;
+  box-shadow: none !important;
+}
+
+body[data-admin-theme]
+  :where(
+    input:not([type='checkbox']):not([type='radio']):not([type='color']):hover,
+    select:hover,
+    textarea:hover,
+    .form-control:hover,
+    .form-select:hover,
+    .color-control:hover
+  ) {
+  border-color: rgb(var(--q-primary-rgb) / 0.36) !important;
+}
+
+body[data-admin-theme]
+  :where(
+    input:not([type='checkbox']):not([type='radio']):not([type='color']):focus,
+    select:focus,
+    textarea:focus,
+    .form-control:focus,
+    .form-select:focus
+  ) {
+  background: #ffffff !important;
+  border-color: var(--q-primary) !important;
+  box-shadow: var(--nt-focus) !important;
+}
+
+body[data-admin-theme] :where(.input-wrapper i) {
+  color: var(--q-primary) !important;
+}
+
+body[data-admin-theme] :where(.table-wrap, .table-responsive) {
+  background: var(--q-component-panel-bg) !important;
+  border-color: var(--q-border-subtle) !important;
+}
+
+body[data-admin-theme] :where(table, .table, .custom-table) {
+  color: var(--q-text-primary) !important;
+  border-color: var(--q-border-subtle) !important;
+}
+
+body[data-admin-theme]
+  :where(.table > :not(caption) > * > *, .custom-table > :not(caption) > * > *) {
+  color: var(--q-text-primary) !important;
+  background-color: transparent !important;
+  border-color: var(--q-border-subtle) !important;
+  box-shadow: none !important;
+}
+
+body[data-admin-theme] :where(th, .custom-table thead th, .table thead th) {
+  color: var(--q-text-secondary) !important;
+  background: var(--q-component-table-head-bg) !important;
+  border-bottom-color: var(--q-border-subtle) !important;
+}
+
+body[data-admin-theme] :where(td, .custom-table tbody td, .table tbody td) {
+  color: var(--q-text-primary) !important;
+  border-bottom-color: rgb(var(--q-primary-rgb) / 0.08) !important;
+}
+
+body[data-admin-theme]
+  :where(
+    tbody tr:nth-child(even) td,
+    .custom-table tbody tr:nth-child(even) td,
+    .table tbody tr:nth-child(even) td
+  ) {
+  background: var(--q-component-table-row-alt-bg) !important;
+}
+
+body[data-admin-theme]
+  :where(tbody tr:hover td, .custom-table tbody tr:hover td, .table tbody tr:hover td) {
+  background: var(--q-component-table-row-hover-bg) !important;
+}
+
+body[data-admin-theme] :where(.api-note:not(.loading-note)) {
+  color: var(--q-primary-hover) !important;
+  background: var(--q-primary-soft) !important;
+  border: 1px solid var(--q-primary-border) !important;
+}
+
+body[data-admin-theme] :where(.state-note, .api-note.loading-note) {
+  position: relative !important;
+  isolation: isolate !important;
+  display: flex !important;
+  width: 96px !important;
+  height: 96px !important;
+  min-width: 96px !important;
+  min-height: 96px !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 auto 18px !important;
+  padding: 0 !important;
+  overflow: visible !important;
+  color: transparent !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+  box-shadow: none !important;
+  font-size: 0 !important;
+  line-height: 0 !important;
+  text-align: center !important;
+}
+
+body[data-admin-theme] :where(.state-note, .api-note.loading-note)::before,
+body[data-admin-theme] :where(.state-note, .api-note.loading-note)::after {
+  display: none !important;
+}
+
+body[data-admin-theme] :where(.state-note, .api-note.loading-note) > :where(i, .bi) {
+  position: absolute !important;
+  inset: 0 !important;
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  margin: 0 !important;
+  color: transparent !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  font-size: 0 !important;
+  line-height: 0 !important;
+}
+
+body[data-admin-theme] :where(.state-note, .api-note.loading-note) > :where(i, .bi)::before {
+  position: absolute !important;
+  inset-block-start: 20px !important;
+  inset-inline-start: 50% !important;
+  width: 17px !important;
+  height: 17px !important;
+  content: '' !important;
+  background: var(--q-primary) !important;
+  border-radius: 999px !important;
+  box-shadow:
+    17px 8px 0 -1px rgb(var(--q-primary-rgb) / 0.9),
+    23px 26px 0 0 rgb(var(--q-primary-rgb) / 0.8),
+    13px 43px 0 -1px rgb(var(--q-primary-rgb) / 0.66),
+    -8px 48px 0 -3px rgb(var(--q-primary-rgb) / 0.44),
+    -28px 36px 0 -4px rgb(var(--q-primary-rgb) / 0.38),
+    -33px 15px 0 -3px rgb(var(--q-primary-rgb) / 0.48),
+    -20px -1px 0 -1px rgb(var(--q-primary-rgb) / 0.72) !important;
+  transform: translateX(-50%) !important;
+  transform-origin: 50% 36px !important;
+}
+
+body[data-admin-theme] :where(.list-panel, .content-panel):has(> :where(.state-note, .api-note.loading-note)) {
+  min-height: clamp(360px, calc(100dvh - 300px), 620px) !important;
+}
+
+body[data-admin-theme] :where(.list-panel, .content-panel) > :where(.state-note, .api-note.loading-note) {
+  margin: clamp(88px, 18vh, 180px) auto !important;
+}
+
+body[data-admin-theme] :where(.app-popup-panel, .editor-panel) > :where(.state-note, .api-note.loading-note) {
+  width: 88px !important;
+  height: 88px !important;
+  min-width: 88px !important;
+  min-height: 88px !important;
+  margin: 8px auto 18px !important;
+}
+
+
+body[data-admin-theme] :where(.app-popup-panel, .editor-panel) > :where(.state-note, .api-note.loading-note) > :where(i, .bi)::before {
+  inset-block-start: 15px !important;
+  transform-origin: 50% 30px !important;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  body[data-admin-theme] :where(.state-note, .api-note.loading-note) > :where(i, .bi)::before {
+    animation: qDotLoaderSpin 1.05s linear infinite !important;
+  }
+}
+
+@keyframes qDotLoaderSpin {
+  to {
+    transform: translateX(-50%) rotate(1turn);
+  }
+}
+
+body[data-admin-theme] :where(.empty-state) {
+  color: var(--q-text-secondary) !important;
+}
+
+body[data-admin-theme] :where(.empty-state i) {
+  color: var(--q-primary) !important;
+  background: var(--q-primary-soft) !important;
+}
+
+body[data-admin-theme] :where(.save-status, .save-chip, .status-pill, .status-badge, .order-badge) {
+  color: var(--q-primary-hover) !important;
+  background: var(--q-primary-soft) !important;
+  border: 1px solid var(--q-primary-border) !important;
+}
+
+body[data-admin-theme] :where(.status-active, .message-success, .toast-success > .bi) {
+  color: var(--q-success) !important;
+}
+
+body[data-admin-theme] :where(.status-inactive, .message-error, .toast-error > .bi) {
+  color: var(--q-danger) !important;
+}
+
+body[data-admin-theme] :where(.message, .toast-item) {
+  color: var(--q-text-primary) !important;
+  background: rgb(var(--q-surface-card-rgb) / 0.98) !important;
+  border-color: var(--q-border-subtle) !important;
+  box-shadow: var(--q-component-soft-shadow) !important;
+}
+
+body[data-admin-theme] :where(.toast-info::before, .toast-item::before) {
+  background: var(--q-primary) !important;
+}
+
+body[data-admin-theme] :where(.toast-info > .bi) {
+  color: var(--q-primary) !important;
+  background: var(--q-primary-soft) !important;
+}
+
+body[data-admin-theme] :where(.editor-backdrop:not(.app-popup-overlay)) {
+  background: rgb(15 23 42 / 0.5) !important;
+}
+
+body[data-admin-theme] :where(.dialog-content p, .detail-row, .detail-value, dd) {
+  color: var(--q-text-primary) !important;
+}
+
+body[data-admin-theme] :where(.pagination-bar, .page-indicator) {
+  color: var(--q-text-primary) !important;
+}
+
+body[data-admin-theme] :where(.upload-control, .upload-dropzone) {
+  color: var(--q-primary-hover) !important;
+  background: var(--q-primary-soft) !important;
+  border-color: var(--q-primary-border) !important;
+  box-shadow: 0 7px 16px rgb(var(--q-primary-rgb) / 0.07) !important;
+}
+
+body[data-admin-theme] :where(.upload-control:hover, .upload-dropzone:hover) {
+  color: var(--q-accent) !important;
+  background: var(--q-accent-soft) !important;
+  border-color: rgb(var(--q-accent-rgb) / 0.24) !important;
+}
+
+@media (max-width: 767.98px) {
+  body[data-admin-theme] :where(.tabs) {
+    display: flex !important;
+    width: 100% !important;
+  }
+
+  body[data-admin-theme] :where(.tabs .btn, .tabs .primary-action, .tabs .secondary-action) {
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+  }
+}

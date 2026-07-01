@@ -19,7 +19,8 @@ import { BranchManagementApiService } from '../../services/branch-management-api
 import { TechnicalAdminI18nStore } from '../../store/technical-admin-i18n.store';
 import { formatTechnicalAdminApiError } from '../../utils/api-error-message.util';
 
-type BranchManagementPageKey = 'branch-editor' | 'online-monitoring';
+type BranchManagementPageKey = 'branch-editor';
+type BranchFormValidationError = 'required' | 'maxlength' | 'min' | 'max';
 type BranchPanelMode = 'closed' | 'create' | 'edit' | 'view';
 type MessageTone = 'success' | 'error';
 
@@ -49,15 +50,6 @@ interface BranchTableMeta {
   readonly totalItems: number;
   readonly hasPreviousPage: boolean;
   readonly hasNextPage: boolean;
-}
-
-interface MonitoringRow {
-  readonly name: string;
-  readonly status: 'Online' | 'Delayed' | 'Offline';
-  readonly activeTickets: number;
-  readonly servedToday: number;
-  readonly avgWait: string;
-  readonly lastHeartbeat: string;
 }
 
 interface UiMessage {
@@ -252,20 +244,8 @@ export class LegacyPageComponent implements OnInit, OnDestroy {
   protected readonly pageKey = computed<BranchManagementPageKey>(
     () => this.route.snapshot.data['pageKey'] as BranchManagementPageKey
   );
-  protected readonly title = computed(() => {
-    const translations = this.translations();
-
-    return this.pageKey() === 'branch-editor'
-      ? translations.branchEditorLabel
-      : translations.onlineMonitoringLabel;
-  });
-  protected readonly description = computed(() => {
-    const translations = this.translations();
-
-    return this.pageKey() === 'branch-editor'
-      ? translations.branchEditorDescription
-      : translations.monitoringDescription;
-  });
+  protected readonly title = computed(() => this.translations().branchEditorLabel);
+  protected readonly description = computed(() => this.translations().branchEditorDescription);
 
   protected readonly branchSummaries = computed<readonly BranchPageSummary[]>(() => {
     const translations = this.translations();
@@ -281,32 +261,11 @@ export class LegacyPageComponent implements OnInit, OnDestroy {
       { label: this.branchEditorTranslations().inactive, value: String(inactiveCount), tone: 'warning' }
     ];
   });
-  protected readonly monitoringSummaries = computed<readonly BranchPageSummary[]>(() => {
-    const translations = this.translations();
 
-    return [
-      { label: translations.onlineBranchesLabel, value: '9', tone: 'success' },
-      { label: translations.delayedHeartbeatLabel, value: '2', tone: 'warning' },
-      { label: translations.offlineBranchesLabel, value: '1', tone: 'danger' },
-      { label: translations.ticketsWaitingLabel, value: '84', tone: 'default' }
-    ];
-  });
-
-  protected readonly monitoringRows: readonly MonitoringRow[] = [
-    { name: 'Hayah Main Branch', status: 'Online', activeTickets: 31, servedToday: 218, avgWait: '06:20', lastHeartbeat: '12 sec ago' },
-    { name: 'New Cairo Clinic', status: 'Online', activeTickets: 22, servedToday: 174, avgWait: '05:45', lastHeartbeat: '18 sec ago' },
-    { name: 'Alexandria Center', status: 'Delayed', activeTickets: 19, servedToday: 143, avgWait: '09:10', lastHeartbeat: '3 min ago' },
-    { name: 'Mansoura Branch', status: 'Offline', activeTickets: 0, servedToday: 41, avgWait: '--', lastHeartbeat: '28 min ago' }
-  ];
-
-  protected readonly summaries = computed(() =>
-    this.pageKey() === 'branch-editor' ? this.branchSummaries() : this.monitoringSummaries()
-  );
+  protected readonly summaries = this.branchSummaries;
 
   ngOnInit(): void {
-    if (this.pageKey() === 'branch-editor') {
-      this.loadBranches();
-    }
+    this.loadBranches();
   }
 
   ngOnDestroy(): void {
@@ -469,6 +428,14 @@ export class LegacyPageComponent implements OnInit, OnDestroy {
   protected hasBranchControlError(controlName: keyof typeof this.branchForm.controls): boolean {
     const control = this.branchForm.controls[controlName];
     return control.touched && control.invalid;
+  }
+
+  protected hasBranchControlValidationError(
+    controlName: keyof typeof this.branchForm.controls,
+    errorCode: BranchFormValidationError
+  ): boolean {
+    const control = this.branchForm.controls[controlName];
+    return control.touched && control.hasError(errorCode);
   }
 
   protected isBranchNameMissing(): boolean {

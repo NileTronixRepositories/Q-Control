@@ -1,0 +1,24 @@
+/* Base */
+html,
+body {
+  min-height: 100%;
+  background: var(--nt-bg) !important;
+}
+
+body {
+  color: var(--nt-text);
+  background:
+    radial-gradient(circle at 12% 8%, rgba(15, 125, 168, 0.055), transparent 29rem),
+    radial-gradient(circle at 92% 0%, rgba(243, 24, 45, 0.04), transparent 25rem), var(--nt-bg) !important;
+  font-family: var(--q-font-family, 'Cairo', Arial, sans-serif) !important;
+  text-rendering: geometricPrecision;
+}
+
+body :where(button, a, input, select, textarea) {
+  transition:
+    color var(--nt-motion-base) var(--nt-motion-ease),
+    background-color var(--nt-motion-base) var(--nt-motion-ease),
+    border-color var(--nt-motion-base) var(--nt-motion-ease),
+    box-shadow var(--nt-motion-base) var(--nt-motion-ease),
+    opacity var(--nt-motion-base) var(--nt-motion-ease) !important;
+}

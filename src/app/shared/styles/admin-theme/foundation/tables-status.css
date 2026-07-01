@@ -1,0 +1,58 @@
+/* Tables and status */
+body .table-wrap,
+body .table-responsive {
+  background: #ffffff !important;
+  border: 1px solid var(--nt-border) !important;
+  border-radius: 12px !important;
+  box-shadow: var(--nt-shadow-soft) !important;
+}
+
+body table,
+body .table,
+body .custom-table {
+  color: var(--nt-text) !important;
+  background: transparent !important;
+}
+
+body th,
+body .custom-table thead th {
+  color: #536175 !important;
+  background: #f8fbfd !important;
+  border-bottom: 1px solid var(--nt-border) !important;
+  font-size: 0.72rem !important;
+  font-weight: 900 !important;
+  letter-spacing: 0 !important;
+}
+
+body td,
+body .custom-table tbody td {
+  color: var(--nt-text) !important;
+  border-color: #eef2f6 !important;
+  font-size: 0.86rem !important;
+}
+
+body tbody tr:hover td,
+body .custom-table tbody tr:hover td {
+  background: rgba(15, 125, 168, 0.035) !important;
+}
+
+body .status-pill.status-active,
+body .status-pill.status-online {
+  color: var(--nt-success) !important;
+  background: #ecfdf5 !important;
+  border: 1px solid rgba(19, 138, 91, 0.14) !important;
+}
+
+body .status-pill.status-maintenance,
+body .status-pill.status-delayed {
+  color: var(--nt-warning) !important;
+  background: #fff8eb !important;
+  border: 1px solid rgba(183, 121, 31, 0.16) !important;
+}
+
+body .status-pill.status-inactive,
+body .status-pill.status-offline {
+  color: var(--nt-danger) !important;
+  background: var(--nt-accent-soft) !important;
+  border: 1px solid rgba(243, 24, 45, 0.16) !important;
+}

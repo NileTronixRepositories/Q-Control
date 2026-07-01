@@ -2,47 +2,17 @@
   display: block;
 }
 
-/* === Popup shell: shared app popup sizing === */
-.window-editor-panel {
-  width: min(900px, calc(100dvw - 96px)) !important;
-  max-width: min(900px, calc(100dvw - 96px)) !important;
-}
-
-.window-confirm-panel {
-  width: min(560px, calc(100dvw - 96px)) !important;
-  max-width: min(560px, calc(100dvw - 96px)) !important;
-}
-
-/* === Unique: Details List === */
-.details-list {
-  display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 10px !important;
-}
-.details-list div {
-  padding: 10px 12px !important; background: var(--q-surface-muted) !important;
-  border: 1px solid var(--q-border-subtle) !important; border-radius: var(--q-radius-md) !important;
-}
-dt { color: var(--q-text-muted) !important; font-size: var(--q-font-size-small) !important; font-weight: 700 !important; }
-dd { margin: 4px 0 0 !important; color: var(--q-text-primary) !important; font-size: var(--q-font-size-base) !important; font-weight: 600 !important; overflow-wrap: anywhere !important; }
-
-/* === Unique: Table min-width (needed to handle dense columns) === */
+/* Dense window columns need a wider table than the shared table shell. */
 table {
   min-width: 960px !important;
   border-collapse: separate !important;
   border-spacing: 0 !important;
 }
 
-/* === Unique: Message banners === */
-.message-success { color: var(--q-success) !important; background: var(--q-success-soft) !important; border-color: rgba(19,138,91,0.2) !important; }
-.message-error   { color: var(--q-danger) !important; background: var(--q-danger-soft) !important; border-color: rgba(210,31,53,0.2) !important; }
-.message-info    { color: var(--q-primary) !important; background: var(--q-primary-soft) !important; border-color: rgba(15,125,168,0.2) !important; }
-
-/* === Unique: Window Form layout === */
 .window-editor-form {
   --bs-gutter-x: 14px !important;
   --bs-gutter-y: 12px !important;
 }
-
-
 
 .window-check-field {
   display: flex !important;
@@ -57,6 +27,7 @@ table {
   flex: 0 0 auto !important;
   margin: 0 !important;
 }
+
 .window-popup-actions {
   display: flex !important;
   align-items: center !important;
@@ -64,194 +35,17 @@ table {
   gap: 8px !important;
 }
 
-/* === Unique: State / Pagination === */
-.state-note {
-  display: inline-flex !important; align-items: center !important; gap: 0.6rem !important;
-  margin: 0 0 10px !important; padding: 8px 12px !important;
-  color: var(--q-primary) !important; background: var(--q-primary-soft) !important;
-  border: 1px solid rgba(15,125,168,0.2) !important; border-radius: var(--q-radius-md) !important;
-  font-size: var(--q-font-size-base) !important; font-weight: 600 !important;
-}
-.pagination-bar { font-size: var(--q-font-size-base) !important; font-weight: 600 !important; }
-.page-indicator { min-width: 50px !important; text-align: center !important; font-weight: 700 !important; }
 
-/* === Unique: Form field validation === */
-.form-field small { color: var(--q-danger) !important; font-size: var(--q-font-size-small) !important; font-weight: 600 !important; }
-
-/* === Unique: Dialog === */
-.dialog-content { display: flex !important; flex-direction: column !important; gap: 10px !important; margin-bottom: 14px !important; }
-.dialog-content p { margin: 0 !important; color: var(--q-text-secondary) !important; line-height: 1.6 !important; font-size: var(--q-font-size-base) !important; }
-
-/* Mobile */
-@media (max-width: 767.98px) {
-  .editor-panel, .window-editor-panel, .window-confirm-panel {
-    inset: auto auto max(10px, env(safe-area-inset-bottom)) 50% !important;
-    width: min(420px, calc(100dvw - 24px)) !important;
-    max-width: min(420px, calc(100dvw - 24px)) !important;
-    height: auto !important;
-    min-height: 0 !important;
-    max-height: min(82dvh, calc(100dvh - 18px)) !important;
-    padding: 0 !important;
-    border-radius: 18px !important;
-    transform: translateX(-50%) !important;
-    z-index: 2147483010 !important;
-  }
-  .details-list { grid-template-columns: 1fr !important; }
-  table { min-width: 700px !important; }
+.window-management-page .page-indicator {
+  font-weight: 700 !important;
 }
 
-/* === Unique: Toolbar Alignment & Spacing === */
-.window-management-page .tabs {
-  display: inline-flex !important;
-  flex-wrap: wrap !important;
-  align-items: center !important;
-  gap: 8px !important;
-}
-
-.window-management-page .tabs :where(.primary-action, .secondary-action),
-.window-management-page :where(.primary-action, .secondary-action, .toolbar-action, .compact-action),
-.window-management-page .action-group,
-.window-management-page .pager-actions,
-.window-management-page .pagination-bar {
-  display: flex !important;
-  align-items: center !important;
-}
-
-.window-management-page :where(.primary-action, .secondary-action, .toolbar-action, .compact-action) {
-  justify-content: center !important;
-  gap: 8px !important;
-  line-height: 1 !important;
-  white-space: nowrap !important;
-}
-
-.window-management-page :where(.primary-action, .secondary-action, .toolbar-action, .compact-action) > .bi {
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  flex: 0 0 auto !important;
-  line-height: 1 !important;
-}
-
-.window-management-page .toolbar {
-  display: grid !important;
-  grid-template-columns: minmax(280px, 1.8fr) minmax(210px, 1fr) minmax(112px, 0.45fr) minmax(132px, auto) !important;
-  align-items: end !important;
-  gap: 14px 18px !important;
+.window-management-page .dialog-content {
   margin-bottom: 14px !important;
 }
 
-.window-management-page .filter-field {
-  position: relative !important;
-  display: flex !important;
-  min-width: 0 !important;
-  flex-direction: column !important;
-  gap: 7px !important;
-  margin: 0 !important;
-}
-
-.window-management-page .filter-field span {
-  display: block !important;
-  min-height: 16px !important;
-  overflow: hidden !important;
-  color: var(--q-text-secondary) !important;
-  font-size: var(--q-font-size-small) !important;
-  font-weight: 850 !important;
-  line-height: 1.25 !important;
-  text-overflow: ellipsis !important;
-  white-space: nowrap !important;
-}
-
-.window-management-page .filter-field :where(input, select) {
-  width: 100% !important;
-  min-width: 0 !important;
-  padding-inline-start: 40px !important;
-}
-
-.window-management-page .window-filter-icon {
-  position: absolute !important;
-  inset-block-end: 14px !important;
-  inset-inline-start: 14px !important;
-  z-index: 2 !important;
-  display: inline-flex !important;
-  width: 16px !important;
-  height: 16px !important;
-  align-items: center !important;
-  justify-content: center !important;
-  color: var(--q-primary) !important;
-  font-size: 0.88rem !important;
-  line-height: 1 !important;
-  pointer-events: none !important;
-}
-
-:host-context([dir='rtl']) .window-management-page .window-filter-icon {
-  inset-inline-start: auto !important;
-  inset-inline-end: 14px !important;
-}
-
-.window-management-page .toolbar-action {
-  align-self: end !important;
-  min-width: 132px !important;
-  /* min-height: var(--q-control-height) !important; */
-}
-
-.window-management-page .pagination-bar {
-  justify-content: space-between !important;
-  gap: 14px !important;
-  margin-top: 14px !important;
-  padding-top: 12px !important;
-}
-
-.window-management-page .pager-actions {
-  justify-content: flex-end !important;
-  gap: 10px !important;
-}
-
-.window-management-page .page-indicator {
-  display: inline-flex !important;
-  min-width: 54px !important;
-  align-items: center !important;
-  justify-content: center !important;
-  line-height: 1 !important;
-}
-
-.window-management-page .action-group {
-  justify-content: center !important;
-  gap: 8px !important;
-}
-
-.window-management-page .icon-action {
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-}
-
-.window-management-page .icon-action .bi {
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  line-height: 1 !important;
-}
-
-@media (max-width: 1199.98px) {
-  .window-management-page .toolbar {
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-  }
-}
-
 @media (max-width: 767.98px) {
-  .window-management-page .toolbar {
-    grid-template-columns: 1fr !important;
-  }
-
-  .window-management-page .toolbar-action,
-  .window-management-page .tabs :where(.primary-action, .secondary-action),
-  .window-management-page .pager-actions,
-  .window-management-page .pagination-bar {
-    width: 100% !important;
-  }
-
-  .window-management-page .pagination-bar,
-  .window-management-page .pager-actions {
-    align-items: stretch !important;
+  table {
+    min-width: 700px !important;
   }
 }

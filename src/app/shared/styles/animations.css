@@ -52,33 +52,43 @@
   animation: qSlideUpFade 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-.q-delay-1 { animation-delay: 0.04s; }
-.q-delay-2 { animation-delay: 0.08s; }
-.q-delay-3 { animation-delay: 0.12s; }
-.q-delay-4 { animation-delay: 0.16s; }
+.q-delay-1 {
+  animation-delay: 0.04s;
+}
+.q-delay-2 {
+  animation-delay: 0.08s;
+}
+.q-delay-3 {
+  animation-delay: 0.12s;
+}
+.q-delay-4 {
+  animation-delay: 0.16s;
+}
 
 /* Interactive Hover States */
-.primary-action, .secondary-action, .icon-action, .btn {
+.btn {
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
-.primary-action:hover, .btn-primary:hover {
+.btn-primary:hover {
   transform: translateY(-1px) !important;
 }
 
-.primary-action:active, .btn-primary:active {
+.btn-primary:active {
   transform: translateY(0) !important;
 }
 
-.secondary-action:hover, .btn-secondary:hover {
-  transform: translateY(-1px) !important;
-}
-
-.icon-action:hover {
+.btn-secondary:hover {
   transform: translateY(-1px) !important;
 }
 
 /* Focus outline glow animation */
-input:focus, select:focus, textarea:focus, .form-control:focus, .form-select:focus {
-  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out !important;
+input:focus,
+select:focus,
+textarea:focus,
+.form-control:focus,
+.form-select:focus {
+  transition:
+    border-color 0.15s ease-in-out,
+    box-shadow 0.15s ease-in-out !important;
 }

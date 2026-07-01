@@ -1,0 +1,117 @@
+/* Dialogs */
+body :where(.editor-backdrop:not(.app-popup-overlay)) {
+  background: var(--nt-overlay-bg) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  animation: none !important;
+}
+
+body
+  :where(
+    .editor-panel:not(.app-popup-panel),
+    .display-editor-panel:not(.app-popup-panel),
+    .terminal-editor-panel:not(.app-popup-panel),
+    .window-editor-panel:not(.app-popup-panel)
+  ) {
+  opacity: 1 !important;
+  border-radius: 14px !important;
+  box-shadow: 0 24px 70px rgba(27, 36, 48, 0.18) !important;
+  animation: none !important;
+  backface-visibility: visible !important;
+  transform-style: flat !important;
+  will-change: auto !important;
+  contain: none !important;
+  isolation: isolate !important;
+  visibility: visible !important;
+}
+
+body
+  :where(
+    .editor-panel:not(.app-popup-panel),
+    .display-editor-panel:not(.app-popup-panel),
+    .terminal-editor-panel:not(.app-popup-panel),
+    .window-editor-panel:not(.app-popup-panel)
+  )
+  :where(
+    .details-list,
+    .dialog-content,
+    form,
+    label,
+    .form-field,
+    .form-field > span,
+    input,
+    select,
+    textarea,
+    dt,
+    dd
+  ) {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+body
+  :where(
+    .editor-panel:not(.app-popup-panel),
+    .display-editor-panel:not(.app-popup-panel),
+    .terminal-editor-panel:not(.app-popup-panel),
+    .window-editor-panel:not(.app-popup-panel)
+  )
+  :where(form, .details-list, .dialog-content, .panel-actions, .editor-actions) {
+  position: relative !important;
+  z-index: 1 !important;
+  transform: translateZ(0) !important;
+  backface-visibility: hidden !important;
+}
+
+body
+  :where(
+    .editor-panel:not(.app-popup-panel),
+    .display-editor-panel:not(.app-popup-panel),
+    .terminal-editor-panel:not(.app-popup-panel),
+    .window-editor-panel:not(.app-popup-panel)
+  )
+  :where(.form-field > span, .form-field label, dt, dd, .dialog-content, .state-note) {
+  color: var(--nt-text) !important;
+  -webkit-text-fill-color: var(--nt-text) !important;
+  text-shadow: 0 0 0 currentColor !important;
+}
+
+body
+  :where(
+    .editor-panel:not(.app-popup-panel),
+    .display-editor-panel:not(.app-popup-panel),
+    .terminal-editor-panel:not(.app-popup-panel),
+    .window-editor-panel:not(.app-popup-panel)
+  )
+  :where(input, select, textarea, option) {
+  color: var(--nt-text) !important;
+  -webkit-text-fill-color: var(--nt-text) !important;
+  text-shadow: 0 0 0 currentColor !important;
+}
+
+body
+  :where(
+    .editor-panel:not(.app-popup-panel),
+    .display-editor-panel:not(.app-popup-panel),
+    .terminal-editor-panel:not(.app-popup-panel),
+    .window-editor-panel:not(.app-popup-panel)
+  )
+  :where(.primary-action, .btn.primary-action) {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  text-shadow: 0 0 0 #ffffff !important;
+}
+
+body
+  :where(
+    .editor-panel:not(.app-popup-panel),
+    .display-editor-panel:not(.app-popup-panel),
+    .terminal-editor-panel:not(.app-popup-panel),
+    .window-editor-panel:not(.app-popup-panel)
+  )
+  :where(.secondary-action, .btn.secondary-action) {
+  color: var(--nt-primary-dark) !important;
+  -webkit-text-fill-color: var(--nt-primary-dark) !important;
+  text-shadow: 0 0 0 currentColor !important;
+}
+

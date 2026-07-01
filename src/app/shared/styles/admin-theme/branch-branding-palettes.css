@@ -1,0 +1,208 @@
+/* Catchy branch theme color palettes. */
+body[data-admin-theme] .branch-branding-page .theme-form {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 92% 10%, rgb(var(--q-primary-rgb, 15 125 168) / 0.08), transparent 180px),
+    linear-gradient(135deg, #ffffff 0%, #f8fcfe 100%) !important;
+  border-color: rgb(var(--q-primary-rgb, 15 125 168) / 0.16) !important;
+  box-shadow: 0 14px 36px rgba(15, 23, 42, 0.055) !important;
+}
+
+body[data-admin-theme] .branch-branding-page .theme-form-title {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  margin-bottom: 18px !important;
+  font-weight: 900 !important;
+}
+
+body[data-admin-theme] .branch-branding-page .theme-form-title::before {
+  width: 10px;
+  height: 10px;
+  flex: 0 0 auto;
+  content: '';
+  background: var(--q-primary);
+  border-radius: 999px;
+  box-shadow:
+    16px 0 0 rgb(var(--q-primary-rgb, 15 125 168) / 0.32),
+    32px 0 0 rgb(var(--q-primary-rgb, 15 125 168) / 0.16);
+}
+
+body[data-admin-theme] .branch-branding-page .colors-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 18px !important;
+}
+
+body[data-admin-theme] .branch-branding-page .color-field {
+  position: relative !important;
+  min-width: 0 !important;
+  gap: 12px !important;
+  overflow: hidden !important;
+  padding: 16px !important;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(248, 252, 254, 0.94)),
+    radial-gradient(circle at 20% 0%, rgb(var(--q-primary-rgb, 15 125 168) / 0.1), transparent 120px) !important;
+  border-color: rgb(var(--q-primary-rgb, 15 125 168) / 0.14) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.04) !important;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms ease !important;
+}
+
+body[data-admin-theme] .branch-branding-page .color-field::before {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  content: '';
+  background: linear-gradient(180deg, var(--q-primary), rgb(var(--q-primary-rgb, 15 125 168) / 0.18));
+  opacity: 0.72;
+}
+
+body[data-admin-theme] .app-shell-rtl .branch-branding-page .color-field::before {
+  inset: 0 0 0 auto;
+}
+
+body[data-admin-theme] .branch-branding-page .color-field:hover,
+body[data-admin-theme] .branch-branding-page .color-field:focus-within {
+  border-color: rgb(var(--q-primary-rgb, 15 125 168) / 0.34) !important;
+  box-shadow: 0 16px 32px rgb(var(--q-primary-rgb, 15 125 168) / 0.09) !important;
+  transform: translateY(-1px);
+}
+
+body[data-admin-theme] .branch-branding-page .color-field > span {
+  position: relative;
+  z-index: 1;
+  display: flex !important;
+  min-height: 20px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  color: var(--q-text-primary) !important;
+  font-weight: 900 !important;
+}
+
+body[data-admin-theme] .branch-branding-page .color-field > span::after {
+  width: 34px;
+  height: 10px;
+  flex: 0 0 auto;
+  content: '';
+  background: linear-gradient(90deg, var(--q-primary), rgb(var(--q-primary-rgb, 15 125 168) / 0.16));
+  border-radius: 999px;
+  opacity: 0.78;
+}
+
+body[data-admin-theme] .branch-branding-page .color-control {
+  position: relative;
+  z-index: 1;
+  grid-template-columns: 58px 1fr !important;
+  align-items: stretch !important;
+  min-height: 48px;
+  overflow: hidden;
+  gap: 0 !important;
+  background: #ffffff;
+  border: 1px solid rgb(var(--q-primary-rgb, 15 125 168) / 0.18);
+  border-radius: 12px;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.74);
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+body[data-admin-theme] .branch-branding-page .color-control:focus-within {
+  border-color: var(--q-primary);
+  box-shadow: 0 0 0 4px rgb(var(--q-primary-rgb, 15 125 168) / 0.1);
+}
+
+body[data-admin-theme] .branch-branding-page .color-control.invalid-control {
+  border-color: rgba(210, 31, 53, 0.48) !important;
+  box-shadow: 0 0 0 4px rgba(210, 31, 53, 0.07) !important;
+}
+
+body[data-admin-theme] .branch-branding-page .color-control input[type='color'] {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 48px;
+  padding: 8px !important;
+  background:
+    linear-gradient(45deg, #eef5f8 25%, transparent 25%),
+    linear-gradient(-45deg, #eef5f8 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #eef5f8 75%),
+    linear-gradient(-45deg, transparent 75%, #eef5f8 75%),
+    #ffffff !important;
+  background-position: 0 0, 0 8px, 8px -8px, -8px 0 !important;
+  background-size: 16px 16px !important;
+  border: 0 !important;
+  border-inline-end: 1px solid rgb(var(--q-primary-rgb, 15 125 168) / 0.14) !important;
+  border-radius: 0 !important;
+}
+
+body[data-admin-theme] .branch-branding-page .color-control input[type='color']::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+body[data-admin-theme] .branch-branding-page .color-control input[type='color']::-webkit-color-swatch,
+body[data-admin-theme] .branch-branding-page .color-control input[type='color']::-moz-color-swatch {
+  border: 0;
+  border-radius: 9px;
+  box-shadow: 0 8px 16px rgba(15, 23, 42, 0.13);
+}
+
+body[data-admin-theme] .branch-branding-page .color-control input[type='text'] {
+  min-width: 0;
+  height: 48px !important;
+  padding: 0 16px !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
+  font-size: 0.88rem !important;
+  font-weight: 900 !important;
+  letter-spacing: 0;
+  outline: none;
+  text-transform: uppercase;
+}
+
+body[data-admin-theme] .branch-branding-page .color-control input[type='text']::placeholder {
+  color: var(--q-text-muted);
+  opacity: 0.62;
+}
+
+body[data-admin-theme] .branch-branding-page .color-field small {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  color: var(--q-danger);
+  font-size: 0.72rem;
+  font-weight: 850;
+}
+
+body[data-admin-theme] .branch-branding-page .color-field small::before {
+  width: 6px;
+  height: 6px;
+  flex: 0 0 auto;
+  content: '';
+  background: var(--q-danger);
+  border-radius: 999px;
+}
+
+body[data-admin-theme] .branch-branding-page .theme-form-actions {
+  border-top-color: rgb(var(--q-primary-rgb, 15 125 168) / 0.14) !important;
+}
+
+@media (max-width: 1199px) {
+  body[data-admin-theme] .branch-branding-page .colors-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 767px) {
+  body[data-admin-theme] .branch-branding-page .colors-grid {
+    grid-template-columns: 1fr !important;
+  }
+}

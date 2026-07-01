@@ -56,10 +56,10 @@
   <section class="content-grid">
     <div class="list-panel">
       <!-- Toolbar -->
-      <div class="row g-3 align-items-end mb-4">
+      <div class="admin-filter-toolbar">
         <!-- Search -->
-        <div class="col-12 col-lg-4">
-          <label class="filter-field w-100">
+        <div class="admin-filter-cell admin-filter-cell-search">
+          <label class="filter-field admin-filter-field">
             <span>
               {{ translations().searchPlaceholder }}
             </span>
@@ -77,13 +77,13 @@
         </div>
 
         <!-- Branch -->
-        <div class="col-12 col-md-6 col-lg-2">
-          <label class="filter-field w-100">
+        <div class="admin-filter-cell">
+          <label class="filter-field admin-filter-field">
             <span>
               {{ translations().branchFilter }}
             </span>
 
-            <i class="bi bi-diagram-3 filter-icon" aria-hidden="true"></i>
+            <i class="bi bi-building filter-icon" aria-hidden="true"></i>
 
             <select
               class="form-select"
@@ -104,10 +104,10 @@
         </div>
 
         <!-- Status -->
-        <div class="col-12 col-md-6 col-lg-2">
-          <label class="filter-field w-100">
+        <div class="admin-filter-cell">
+          <label class="filter-field admin-filter-field">
             <span>{{ translations().status }}</span>
-            <i class="bi bi-toggle-on filter-icon" aria-hidden="true"></i>
+            <i class="bi bi-check2-circle filter-icon" aria-hidden="true"></i>
             <select class="form-select" [value]="statusFilter() === null ? '' : statusFilter()" (change)="updateStatusFilter($event)">
               <option value="">{{ translations().allStatuses }}</option>
               <option value="true">{{ translations().active }}</option>
@@ -116,13 +116,13 @@
           </label>
         </div>
         <!-- Page Size -->
-        <div class="col-6 col-md-3 col-lg-2">
-          <label class="filter-field w-100">
+        <div class="admin-filter-cell admin-filter-cell-compact">
+          <label class="filter-field admin-filter-field">
             <span>
               {{ translations().pageSize }}
             </span>
 
-            <i class="bi bi-list-ol filter-icon" aria-hidden="true"></i>
+            <i class="bi bi-list-ul filter-icon" aria-hidden="true"></i>
 
             <select class="form-select" [value]="pageSize()" (change)="updatePageSize($event)">
               <option value="10">10</option>
@@ -134,14 +134,14 @@
         </div>
 
         <!-- Refresh -->
-        <div class="col-6 col-md-3 col-lg-2">
+        <div class="admin-filter-cell admin-filter-cell-compact">
           <button
             type="button"
-            class="btn secondary-action w-100"
+            class="btn secondary-action toolbar-action"
             [disabled]="loading()"
             (click)="refresh()"
           >
-            <i class="bi bi-arrow-clockwise"></i>
+            <i class="bi bi-arrow-repeat"></i>
 
             {{ translations().refresh }}
           </button>
@@ -151,7 +151,7 @@
       <!-- Loading -->
       @if (loading()) {
         <p class="state-note">
-          <i class="bi bi-arrow-repeat"></i>
+          <i class="bi bi-arrow-clockwise"></i>
 
           {{ translations().loading }}
         </p>
@@ -335,7 +335,7 @@
     @if (panelMode() !== 'closed') {
       <div class="editor-backdrop app-popup-overlay" (click)="closePanel()"></div>
 
-      <aside class="editor-panel app-popup-panel" role="dialog">
+      <aside class="editor-panel app-popup-panel waiting-area-editor-panel" role="dialog">
         <!-- Header -->
         <header class="panel-header">
           <h2>
@@ -350,7 +350,7 @@
         <!-- Loading -->
         @if (panelLoading()) {
           <p class="state-note">
-            <i class="bi bi-arrow-repeat" aria-hidden="true"></i>
+            <i class="bi bi-arrow-clockwise" aria-hidden="true"></i>
             {{ translations().loading }}
           </p>
         }
@@ -417,7 +417,7 @@
             </div>
 
             <!-- Number -->
-            <div class="col-12 col-md-4">
+            <div class="col-12 col-md-6">
               <label class="form-field has-field-icon w-100">
                 <span>
                   {{ translations().number }}
@@ -430,7 +430,7 @@
             </div>
 
             <!-- Name -->
-            <div class="col-12 col-md-8">
+            <div class="col-12 col-md-6">
               <label class="form-field has-field-icon w-100">
                 <span>
                   {{ translations().descriptiveName }}

@@ -1,0 +1,90 @@
+/* Branch editor popup form layout and validation. */
+body[data-admin-theme] .branch-page .branch-form.row {
+  --bs-gutter-x: 18px;
+  --bs-gutter-y: 14px;
+  align-items: flex-start !important;
+}
+
+body[data-admin-theme] .branch-page .branch-field {
+  display: flex !important;
+  min-width: 0 !important;
+  flex-direction: column !important;
+  gap: 7px !important;
+  margin: 0 !important;
+}
+
+body[data-admin-theme] .branch-page .branch-form .branch-field input,
+body[data-admin-theme] .branch-page .branch-form .branch-field textarea,
+body[data-admin-theme] .branch-page .branch-form .branch-field .form-control {
+  min-height: 46px !important;
+  color: var(--q-text-primary) !important;
+  background-color: #ffffff !important;
+  border-color: rgb(var(--q-primary-rgb) / 0.18) !important;
+  border-radius: 10px !important;
+  box-shadow: none !important;
+  transition:
+    border-color var(--nt-motion-base, 160ms) var(--nt-motion-ease, ease),
+    box-shadow var(--nt-motion-base, 160ms) var(--nt-motion-ease, ease),
+    background-color var(--nt-motion-base, 160ms) var(--nt-motion-ease, ease) !important;
+}
+
+body[data-admin-theme] .branch-page .branch-form .branch-field textarea {
+  resize: vertical !important;
+}
+
+body[data-admin-theme] .branch-page .branch-form .branch-field input:focus,
+body[data-admin-theme] .branch-page .branch-form .branch-field textarea:focus,
+body[data-admin-theme] .branch-page .branch-form .branch-field .form-control:focus {
+  border-color: var(--q-primary) !important;
+  box-shadow: 0 0 0 3px rgb(var(--q-primary-rgb) / 0.12) !important;
+}
+
+body[data-admin-theme] .branch-page .branch-form .branch-field .form-control.is-invalid {
+  padding-inline-end: var(--nt-control-padding-x, 14px) !important;
+  border-color: rgba(210, 31, 53, 0.48) !important;
+  background-image: none !important;
+  box-shadow: 0 0 0 3px rgba(210, 31, 53, 0.06) !important;
+}
+
+body[data-admin-theme] .branch-page .branch-feedback.invalid-feedback {
+  display: flex !important;
+  width: auto !important;
+  max-width: 100% !important;
+  align-items: center !important;
+  gap: 6px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  color: #b42332 !important;
+  background: transparent !important;
+  border: 0 !important;
+  font-size: 0.72rem !important;
+  font-weight: 800 !important;
+  line-height: 1.25 !important;
+}
+
+body[data-admin-theme] .branch-page .branch-feedback::before {
+  width: 6px !important;
+  height: 6px !important;
+  flex: 0 0 auto !important;
+  content: '' !important;
+  background: #d21f35 !important;
+  border-radius: 999px !important;
+  box-shadow: 0 0 0 3px rgba(210, 31, 53, 0.08) !important;
+}
+
+body[data-admin-theme] .branch-page .form-section-title,
+body[data-admin-theme] .branch-page .branch-section-title {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  padding-top: 2px !important;
+  border-top: 0 !important;
+  margin: 8px 0 0 !important;
+  color: var(--q-primary-hover) !important;
+  font-size: 0.78rem !important;
+  font-weight: 900 !important;
+}
+
+body[data-admin-theme] .branch-page .branch-form-actions {
+  margin-top: 4px !important;
+}

@@ -34,7 +34,12 @@
           {{ currentMessage.text }}
         </p>
 
-        <button type="button" class="toast-close" [attr.aria-label]="branchEditorTranslations().close" (click)="clearBranchMessage()">
+        <button
+          type="button"
+          class="toast-close"
+          [attr.aria-label]="branchEditorTranslations().close"
+          (click)="clearBranchMessage()"
+        >
           <i class="bi bi-x-lg" aria-hidden="true"></i>
         </button>
       </div>
@@ -53,7 +58,7 @@
   @if (pageKey() === 'branch-editor') {
     <section class="branch-editor-grid" [class.panel-open]="branchPanelMode() !== 'closed'">
       <section class="content-panel">
-        <div class="panel-header">
+        <div class="panel-header d-flex align-items-center justify-content-between">
           <div>
             <h2>{{ translations().branchesLabel }}</h2>
             <p>{{ translations().branchRecordsHint }}</p>
@@ -90,7 +95,7 @@
               <option value="Oldest">{{ translations().oldestLabel }}</option>
             </select>
           </label>
-                    <label>
+          <label>
             <span>{{ branchEditorTranslations().status }}</span>
             <select
               [value]="branchStatusFilter() === null ? '' : branchStatusFilter()"
@@ -327,11 +332,23 @@
               </div>
               <div>
                 <dt>{{ branchEditorTranslations().status }}</dt>
-                <dd>{{ details.isActive ? branchEditorTranslations().active : branchEditorTranslations().inactive }}</dd>
+                <dd>
+                  {{
+                    details.isActive
+                      ? branchEditorTranslations().active
+                      : branchEditorTranslations().inactive
+                  }}
+                </dd>
               </div>
               <div>
                 <dt>{{ branchEditorTranslations().operationalStatus }}</dt>
-                <dd>{{ details.effectiveIsActive ? branchEditorTranslations().operationalAvailable : branchEditorTranslations().operationalUnavailable }}</dd>
+                <dd>
+                  {{
+                    details.effectiveIsActive
+                      ? branchEditorTranslations().operationalAvailable
+                      : branchEditorTranslations().operationalUnavailable
+                  }}
+                </dd>
               </div>
               <div>
                 <dt>{{ translations().governorateLabel }}</dt>
@@ -378,94 +395,163 @@
 
           @if (branchPanelMode() === 'create' || branchPanelMode() === 'edit') {
             <form
-              class="branch-form row g-3"
+              class="branch-form row g-3 align-items-start"
               [formGroup]="branchForm"
               (ngSubmit)="saveBranch()"
               novalidate
             >
-              <label class="form-field col-12 col-md-6">
+              <label class="form-field branch-field col-12 col-md-6">
                 <span>{{ translations().arabicNameLabel }}</span>
-                <input type="text" maxlength="100" formControlName="arabicName" />
-                @if (hasBranchControlError('arabicName')) {
-                  <small>{{ branchEditorTranslations().max100 }}</small>
+                <input
+                  class="form-control"
+                  [class.is-invalid]="hasBranchControlError('arabicName')"
+                  type="text"
+                  maxlength="100"
+                  formControlName="arabicName"
+                />
+                @if (hasBranchControlValidationError('arabicName', 'required')) {
+                  <small class="invalid-feedback branch-feedback">{{ branchEditorTranslations().requiredField }}</small>
+                } @else if (hasBranchControlValidationError('arabicName', 'maxlength')) {
+                  <small class="invalid-feedback branch-feedback">{{ branchEditorTranslations().max100 }}</small>
                 }
               </label>
 
-              <label class="form-field col-12 col-md-6">
+              <label class="form-field branch-field col-12 col-md-6">
                 <span>{{ translations().englishNameLabel }}</span>
-                <input type="text" maxlength="100" formControlName="englishName" />
-                @if (hasBranchControlError('englishName')) {
-                  <small>{{ branchEditorTranslations().max100 }}</small>
+                <input
+                  class="form-control"
+                  [class.is-invalid]="hasBranchControlError('englishName')"
+                  type="text"
+                  maxlength="100"
+                  formControlName="englishName"
+                />
+                @if (hasBranchControlValidationError('englishName', 'required')) {
+                  <small class="invalid-feedback branch-feedback">{{ branchEditorTranslations().requiredField }}</small>
+                } @else if (hasBranchControlValidationError('englishName', 'maxlength')) {
+                  <small class="invalid-feedback branch-feedback">{{ branchEditorTranslations().max100 }}</small>
                 }
               </label>
 
-              @if (isBranchNameMissing()) {
-                <p class="form-warning col-12 mt-2 mb-0 text-danger fw-bold">
-                  {{ branchEditorTranslations().nameRequired }}
-                </p>
-              }
-
-              <label class="form-field col-12 col-md-6">
+              <label class="form-field branch-field col-12 col-md-6">
                 <span>{{ translations().ipAddressLabel }}</span>
-                <input type="text" maxlength="45" formControlName="ipAddress" />
-                @if (hasBranchControlError('ipAddress')) {
-                  <small>{{ branchEditorTranslations().requiredField }}</small>
-                }
-                @if (isIpAddressInvalid()) {
-                  <small>{{ branchEditorTranslations().invalidIp }}</small>
+                <input
+                  class="form-control"
+                  [class.is-invalid]="hasBranchControlError('ipAddress') || isIpAddressInvalid()"
+                  type="text"
+                  maxlength="45"
+                  formControlName="ipAddress"
+                />
+                @if (hasBranchControlValidationError('ipAddress', 'required')) {
+                  <small class="invalid-feedback branch-feedback">{{ branchEditorTranslations().requiredField }}</small>
+                } @else if (isIpAddressInvalid()) {
+                  <small class="invalid-feedback branch-feedback">{{ branchEditorTranslations().invalidIp }}</small>
                 }
               </label>
 
-              <label class="form-field col-12">
+              <label class="form-field branch-field col-12 col-md-6">
                 <span>{{ branchEditorTranslations().license }}</span>
-                <textarea rows="3" formControlName="license"></textarea>
+                <textarea class="form-control" rows="1" formControlName="license"></textarea>
               </label>
 
-              <div class="form-section-title col-12">{{ branchEditorTranslations().location }}</div>
+              <div class="form-section-title branch-section-title col-12">{{ branchEditorTranslations().location }}</div>
 
-              <label class="form-field col-12 col-md-6">
+              <label class="form-field branch-field col-12 col-md-6">
                 <span>{{ translations().governorateLabel }}</span>
-                <input type="text" maxlength="100" formControlName="governorate" />
-                @if (hasBranchControlError('governorate')) {
-                  <small>{{ branchEditorTranslations().max100 }}</small>
+                <input
+                  class="form-control"
+                  [class.is-invalid]="hasBranchControlError('governorate')"
+                  type="text"
+                  maxlength="100"
+                  formControlName="governorate"
+                />
+                @if (hasBranchControlValidationError('governorate', 'required')) {
+                  <small class="invalid-feedback branch-feedback">{{ branchEditorTranslations().requiredField }}</small>
+                } @else if (hasBranchControlValidationError('governorate', 'maxlength')) {
+                  <small class="invalid-feedback branch-feedback">{{ branchEditorTranslations().max100 }}</small>
                 }
               </label>
 
-              <label class="form-field col-12 col-md-6">
+              <label class="form-field branch-field col-12 col-md-6">
                 <span>{{ translations().cityLabel }}</span>
-                <input type="text" maxlength="100" formControlName="city" />
-                @if (hasBranchControlError('city')) {
-                  <small>{{ branchEditorTranslations().max100 }}</small>
+                <input
+                  class="form-control"
+                  [class.is-invalid]="hasBranchControlError('city')"
+                  type="text"
+                  maxlength="100"
+                  formControlName="city"
+                />
+                @if (hasBranchControlValidationError('city', 'required')) {
+                  <small class="invalid-feedback branch-feedback">{{ branchEditorTranslations().requiredField }}</small>
+                } @else if (hasBranchControlValidationError('city', 'maxlength')) {
+                  <small class="invalid-feedback branch-feedback">{{ branchEditorTranslations().max100 }}</small>
                 }
               </label>
 
-              <label class="form-field col-12 col-md-6">
+              <label class="form-field branch-field col-12 col-md-6">
                 <span>{{ branchEditorTranslations().area }}</span>
-                <input type="text" maxlength="100" formControlName="area" />
-                @if (hasBranchControlError('area')) {
-                  <small>{{ branchEditorTranslations().max100 }}</small>
+                <input
+                  class="form-control"
+                  [class.is-invalid]="hasBranchControlError('area')"
+                  type="text"
+                  maxlength="100"
+                  formControlName="area"
+                />
+                @if (hasBranchControlValidationError('area', 'required')) {
+                  <small class="invalid-feedback branch-feedback">{{ branchEditorTranslations().requiredField }}</small>
+                } @else if (hasBranchControlValidationError('area', 'maxlength')) {
+                  <small class="invalid-feedback branch-feedback">{{ branchEditorTranslations().max100 }}</small>
                 }
               </label>
 
-              <label class="form-field col-12">
+              <label class="form-field branch-field col-12 col-md-6">
                 <span>{{ branchEditorTranslations().address }}</span>
-                <input type="text" maxlength="500" formControlName="address" />
-                @if (hasBranchControlError('address')) {
-                  <small>{{ branchEditorTranslations().max500 }}</small>
+                <input
+                  class="form-control"
+                  [class.is-invalid]="hasBranchControlError('address')"
+                  type="text"
+                  maxlength="500"
+                  formControlName="address"
+                />
+                @if (hasBranchControlValidationError('address', 'required')) {
+                  <small class="invalid-feedback branch-feedback">{{ branchEditorTranslations().requiredField }}</small>
+                } @else if (hasBranchControlValidationError('address', 'maxlength')) {
+                  <small class="invalid-feedback branch-feedback">{{ branchEditorTranslations().max500 }}</small>
                 }
               </label>
 
-              <label class="form-field col-12 col-md-6">
+              <label class="form-field branch-field col-12 col-md-6">
                 <span>{{ branchEditorTranslations().longitude }}</span>
-                <input type="number" min="-180" max="180" step="any" formControlName="longitude" />
+                <input
+                  class="form-control"
+                  [class.is-invalid]="hasBranchControlError('longitude')"
+                  type="number"
+                  min="-180"
+                  max="180"
+                  step="any"
+                  formControlName="longitude"
+                />
+                @if (hasBranchControlValidationError('longitude', 'required')) {
+                  <small class="invalid-feedback branch-feedback">{{ branchEditorTranslations().requiredField }}</small>
+                }
               </label>
 
-              <label class="form-field col-12 col-md-6">
+              <label class="form-field branch-field col-12 col-md-6">
                 <span>{{ branchEditorTranslations().latitude }}</span>
-                <input type="number" min="-90" max="90" step="any" formControlName="latitude" />
+                <input
+                  class="form-control"
+                  [class.is-invalid]="hasBranchControlError('latitude')"
+                  type="number"
+                  min="-90"
+                  max="90"
+                  step="any"
+                  formControlName="latitude"
+                />
+                @if (hasBranchControlValidationError('latitude', 'required')) {
+                  <small class="invalid-feedback branch-feedback">{{ branchEditorTranslations().requiredField }}</small>
+                }
               </label>
 
-              <div class="editor-actions col-12">
+              <div class="editor-actions branch-form-actions col-12">
                 <button type="button" class="secondary-action" (click)="closeBranchPanel()">
                   {{ branchEditorTranslations().cancel }}
                 </button>
@@ -477,58 +563,6 @@
           }
         </aside>
       }
-    </section>
-  }
-
-  @if (pageKey() === 'online-monitoring') {
-    <section class="content-panel">
-      <div class="panel-header">
-        <div>
-          <h2>{{ translations().liveBranchStatusLabel }}</h2>
-          <p>{{ translations().monitoringHint }}</p>
-        </div>
-        <button type="button" class="secondary-action">
-          <i class="bi bi-arrow-clockwise" aria-hidden="true"></i>
-          {{ translations().refreshLabel }}
-        </button>
-      </div>
-
-      <div class="monitor-grid">
-        @for (branch of monitoringRows; track branch.name) {
-          <article
-            class="monitor-card"
-            [class]="'monitor-card status-' + branch.status.toLowerCase()"
-          >
-            <div class="monitor-card-header">
-              <div>
-                <h3>{{ branch.name }}</h3>
-                <span>{{ branch.lastHeartbeat }}</span>
-              </div>
-              <span
-                class="status-pill"
-                [class]="'status-pill status-' + branch.status.toLowerCase()"
-              >
-                {{ branch.status }}
-              </span>
-            </div>
-
-            <div class="metric-grid">
-              <div>
-                <span>{{ translations().activeTicketsLabel }}</span
-                ><strong>{{ branch.activeTickets }}</strong>
-              </div>
-              <div>
-                <span>{{ translations().servedTodayLabel }}</span
-                ><strong>{{ branch.servedToday }}</strong>
-              </div>
-              <div>
-                <span>{{ translations().avgWaitLabel }}</span
-                ><strong>{{ branch.avgWait }}</strong>
-              </div>
-            </div>
-          </article>
-        }
-      </div>
     </section>
   }
 </section>

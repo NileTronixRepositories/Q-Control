@@ -1,0 +1,19 @@
+/* Mobile popup compatibility: popup-contract.css owns geometry and sizing. */
+@media (max-width: 767.98px) {
+  html body:has(.app-popup-overlay) {
+    overflow: hidden !important;
+  }
+
+  html body:has(.app-popup-overlay) .app-shell .workspace,
+  html body:has(.app-popup-overlay) .app-shell.app-shell-rtl .workspace {
+    padding-inline: 0 !important;
+  }
+
+  html body:has(.app-popup-overlay) .app-shell .sidebar,
+  html body:has(.app-popup-overlay) .app-shell .sidebar-backdrop {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    z-index: 0 !important;
+  }
+}

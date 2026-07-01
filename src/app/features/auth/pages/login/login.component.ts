@@ -45,7 +45,7 @@ export class LoginComponent {
 
     const route =
       userType === 'TechnicalAdmin'
-        ? '/technical-admin/general'
+        ? '/technical-admin/branch-editor'
         : '/organization/global-configurations';
 
     void this.router.navigateByUrl(route);
