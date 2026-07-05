@@ -1,20 +1,2 @@
-/* Niletronix admin theme: Deep Ocean legacy tokens and scrollbar fallback. */
-:root {
-  --q-ocean-950: #0a1128;
-  --q-ocean-900: #001f54;
-  --q-ocean-800: #034078;
-  --q-ocean-500: #1282a2;
-  --q-ocean-50: #fefcfb;
-}
-
-::-webkit-scrollbar-track {
-  background: #eef5f8 !important;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #9eb8ca !important;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--q-ocean-500) !important;
-}
+/* This file has been merged into design-tokens.css.
+   It is intentionally empty and safe to delete. */

@@ -1,10 +1,9 @@
 @import './app/shared/styles/admin-theme/foundation.css';
-@import './app/shared/styles/admin-theme/color-refresh.css';
-@import './app/shared/styles/admin-theme/comfort-alignment.css';
+
 @import './app/shared/styles/admin-theme/admin-toolbar.css';
-@import './app/shared/styles/admin-theme/deep-ocean.css';
+
 @import './app/shared/styles/admin-theme/beach-sunset.css';
-@import './app/shared/styles/admin-theme/sidebar-polish.css';
+
 @import './app/shared/styles/admin-theme/sidebar-final.css';
 @import './app/shared/styles/admin-theme/runtime-themes.css';
 @import './app/shared/styles/admin-theme/theme-harmonization.css';
@@ -16,7 +15,7 @@
 @import './app/shared/styles/admin-theme/tables-responsive.css';
 @import './app/shared/styles/admin-theme/branch-branding-ads.css';
 @import './app/shared/styles/admin-theme/branch-branding-palettes.css';
-@import './app/shared/styles/admin-theme/popup-mobile-layer.css';
+
 @import './app/shared/styles/admin-theme/popup-contract.css';
 @import './app/shared/styles/admin-theme/popup-form-refinement.css';
 @import './app/shared/styles/admin-theme/branch-editor-form.css';

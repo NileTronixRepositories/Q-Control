@@ -301,11 +301,22 @@
           @if (selectedAdvertisementPreviews().length > 0) {
             <section class="pending-preview-panel" [attr.aria-label]="copy().selectedImages">
               <div class="pending-preview-header">
-                <strong>{{ copy().selectedImages }}</strong>
-                <span
-                  >{{ selectedAdvertisementPreviews().length }} /
-                  {{ remainingAdvertisementSlots() }}</span
+                <div class="pending-preview-title">
+                  <strong>{{ copy().selectedImages }}</strong>
+                  <span
+                    >{{ selectedAdvertisementPreviews().length }} /
+                    {{ remainingAdvertisementSlots() }}</span
+                  >
+                </div>
+                <button
+                  type="button"
+                  class="secondary-action compact-action pending-cancel-btn"
+                  [disabled]="advertisementsUploading()"
+                  (click)="cancelAdvertisementSelection()"
                 >
+                  <i class="bi bi-x-lg" aria-hidden="true"></i>
+                  {{ copy().cancelAdvertisements }}
+                </button>
               </div>
               <div class="pending-preview-grid">
                 @for (preview of selectedAdvertisementPreviews(); track preview.url) {
@@ -354,15 +365,26 @@
                 (change)="selectAdvertisementFiles($event)"
               />
               @if (selectedAdvertisementFiles().length > 0) {
-                <button
-                  type="button"
-                  class="primary-action compact-action upload-submit-btn"
-                  [disabled]="advertisementsUploading() || advertisementLimitReached()"
-                  (click)="uploadAdvertisements()"
-                >
-                  <i class="bi bi-cloud-arrow-up-fill" aria-hidden="true"></i>
-                  {{ copy().uploadAdvertisements }} ({{ selectedAdvertisementFiles().length }})
-                </button>
+                <div class="advertisement-selection-actions">
+                  <button
+                    type="button"
+                    class="primary-action compact-action upload-submit-btn"
+                    [disabled]="advertisementsUploading() || advertisementLimitReached()"
+                    (click)="uploadAdvertisements()"
+                  >
+                    <i class="bi bi-cloud-arrow-up-fill" aria-hidden="true"></i>
+                    {{ copy().uploadAdvertisements }} ({{ selectedAdvertisementFiles().length }})
+                  </button>
+                  <button
+                    type="button"
+                    class="secondary-action compact-action upload-cancel-btn"
+                    [disabled]="advertisementsUploading()"
+                    (click)="cancelAdvertisementSelection()"
+                  >
+                    <i class="bi bi-x-lg" aria-hidden="true"></i>
+                    {{ copy().cancelAdvertisements }}
+                  </button>
+                </div>
               }
             </div>
           }

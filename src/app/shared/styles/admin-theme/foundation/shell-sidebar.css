@@ -18,9 +18,9 @@ body .app-shell {
 body .app-shell .sidebar {
   flex-basis: var(--sidebar-width) !important;
   width: var(--sidebar-width) !important;
-  color: var(--nt-text) !important;
-  background: rgba(255, 255, 255, 0.98) !important;
-  border-inline-end: 1px solid #dfe7f0 !important;
+  color: var(--sidebar-text) !important;
+  background: var(--sidebar-bg) !important;
+  border-inline-end: 1px solid var(--sidebar-border) !important;
   box-shadow: var(--nt-shadow-sidebar) !important;
 }
 
@@ -98,19 +98,19 @@ body .app-shell .nav-group + .nav-group {
 body .app-shell .sidebar-group-header {
   min-height: 32px !important;
   padding: 0 4px !important;
-  color: var(--nt-text) !important;
+  color: var(--sidebar-text) !important;
   background: transparent !important;
   border: 0 !important;
   box-shadow: none !important;
 }
 
 body .app-shell .sidebar-group-header:hover {
-  color: var(--nt-accent) !important;
+  color: var(--sidebar-accent) !important;
   background: transparent !important;
 }
 
 body .app-shell .sidebar-group-header.active {
-  color: var(--nt-text) !important;
+  color: var(--sidebar-text) !important;
   background: transparent !important;
 }
 
@@ -137,7 +137,7 @@ body .app-shell .sidebar-group-children.expanded {
 body .app-shell .sidebar-link {
   min-height: var(--nt-sidebar-link-height) !important;
   padding: 0 var(--nt-sidebar-link-padding-end) 0 var(--nt-sidebar-link-padding-start) !important;
-  color: var(--nt-text) !important;
+  color: var(--sidebar-text) !important;
   border: 1px solid transparent !important;
   border-radius: 12px !important;
   font-size: 0.95rem !important;
@@ -152,6 +152,12 @@ body .app-shell .sidebar-link .child-icon,
 body .app-shell .sidebar-link .child-dot {
   position: absolute !important;
   inset-inline-start: var(--nt-sidebar-icon-offset) !important;
+  width: 26px !important;
+  height: 26px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 8px !important;
   color: currentColor !important;
   font-size: 1.1rem !important;
 }
@@ -171,28 +177,25 @@ body .app-shell .sidebar-link::before {
 }
 
 body .app-shell .sidebar-link:hover {
-  color: var(--nt-accent) !important;
-  background: #f8fbfd !important;
+  color: var(--sidebar-hover-text, var(--sidebar-accent)) !important;
+  background: var(--sidebar-hover) !important;
+  border-color: var(--sidebar-hover-border, transparent) !important;
 }
 
 body .app-shell .sidebar-link-active {
-  color: var(--nt-accent) !important;
-  background: linear-gradient(
-    90deg,
-    rgba(15, 125, 168, 0.055),
-    rgba(255, 255, 255, 0.88)
-  ) !important;
-  border-color: #eef3f8 !important;
-  box-shadow: 0 12px 26px rgba(27, 36, 48, 0.045) !important;
+  color: var(--sidebar-active-text, var(--sidebar-active)) !important;
+  background: var(--sidebar-selected) !important;
+  border-color: var(--sidebar-active-border, var(--sidebar-border)) !important;
+  box-shadow: var(--sidebar-active-shadow, none) !important;
 }
 
 body .app-shell .sidebar-link-active::before {
-  background: var(--nt-accent) !important;
+  background: var(--sidebar-accent) !important;
 }
 
 body .app-shell .sidebar-link-active .child-icon,
 body .app-shell .sidebar-link-active .child-dot {
-  color: var(--nt-accent) !important;
+  color: var(--sidebar-active) !important;
 }
 
 body .app-shell .link-text strong {
@@ -208,25 +211,44 @@ body .app-shell .sidebar-actions {
 body .app-shell .sidebar-action-button {
   min-height: var(--nt-sidebar-action-height) !important;
   padding: 0 18px !important;
-  color: #22314a !important;
-  background: #ffffff !important;
-  border: 1px solid #dfe7f0 !important;
+  color: var(--sidebar-text) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid var(--sidebar-border) !important;
   border-radius: 12px !important;
-  box-shadow: 0 10px 24px rgba(27, 36, 48, 0.045) !important;
+  box-shadow: none !important;
   font-size: 0.95rem !important;
   font-weight: 750 !important;
 }
 
 body .app-shell .sidebar-action-button:hover {
-  color: var(--nt-primary) !important;
-  background: #f8fbfd !important;
+  color: var(--sidebar-active) !important;
+  background: var(--sidebar-hover) !important;
 }
 
 body .app-shell .sidebar-logout-button {
-  color: var(--nt-accent) !important;
+  color: var(--sidebar-danger) !important;
 }
 
 body .app-shell .sidebar-logout-button:hover {
   background: linear-gradient(135deg, var(--nt-accent), #c91124) !important;
   border-color: rgba(243, 24, 45, 0.38) !important;
+}
+
+/* Comfort alignment (merged from comfort-alignment.css). */
+body :where(.sidebar-action-button) {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  min-height: 44px !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+}
+
+body :where(.sidebar-action-button) > .bi {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex: 0 0 auto !important;
+  line-height: 1 !important;
 }

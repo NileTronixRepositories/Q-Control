@@ -37,7 +37,11 @@
     .empty-state,
     .terminal-editor-panel
   ) {
-  border-radius: var(--radius-md) !important;
+  border-radius: var(--q-radius-lg) !important;
+  box-shadow: var(--q-shadow-premium) !important;
+  background: var(--q-surface-card) !important;
+  border: 1px solid var(--q-border-subtle) !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 :where(
@@ -88,9 +92,10 @@
   :where(.page-header h1, .page-hero h3, .page-hero h2) {
   margin-block: 0 6px !important;
   color: var(--text-heading) !important;
-  font-size: 1.25rem !important;
+  font-size: 1.5rem !important;
   font-weight: 800 !important;
   line-height: 1.25 !important;
+  letter-spacing: -0.02em;
 }
 
 :where(
@@ -142,6 +147,8 @@
   )
   :where(.primary-action) {
   border: 1px solid var(--primary-color) !important;
+  background: var(--primary-color) !important;
+  color: #ffffff !important;
 }
 
 :where(
@@ -154,7 +161,8 @@
   )
   :where(.primary-action:hover:not(:disabled)) {
   color: #ffffff !important;
-  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.16) !important;
+  box-shadow: var(--q-shadow-button-hover) !important;
+  transform: translateY(-1px) !important;
 }
 
 :where(
@@ -299,14 +307,18 @@
   vertical-align: middle;
 }
 
-:where(.status-pill) {
-  min-height: 22px !important;
-  padding-inline: 9px !important;
+:where(.status-pill, .status-badge) {
+  min-height: 24px !important;
+  padding-inline: 12px !important;
   border-radius: 999px !important;
   font-size: 0.72rem !important;
   font-weight: 800 !important;
-  line-height: 1.2 !important;
+  line-height: 22px !important;
   white-space: nowrap !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  letter-spacing: 0.02em;
 }
 
 :where(.summary-grid) {
@@ -445,6 +457,39 @@
     padding: 14px !important;
     border-radius: 0 !important;
     transform: none !important;
+  }
+
+  /* Responsive Stacked Tables (SaaS Mobile View) */
+  :where(table, .table, .custom-table) {
+    display: block !important;
+  }
+  :where(table thead, .table thead, .custom-table thead) {
+    display: none !important;
+  }
+  :where(table tbody, .table tbody, .custom-table tbody) {
+    display: block !important;
+  }
+  :where(table tr, .table tr, .custom-table tr) {
+    display: flex !important;
+    flex-direction: column !important;
+    margin-bottom: 1rem !important;
+    padding: 1rem !important;
+    background: #ffffff !important;
+    border-radius: var(--q-radius-lg) !important;
+    box-shadow: var(--q-shadow-soft) !important;
+    border: 1px solid var(--border-subtle) !important;
+  }
+  :where(table td, .table td, .custom-table td) {
+    display: flex !important;
+    justify-content: flex-end !important;
+    align-items: center !important;
+    padding: 8px 0 !important;
+    border-bottom: 1px solid var(--border-subtle) !important;
+  }
+  :where(table td:last-child, .table td:last-child, .custom-table td:last-child) {
+    border-bottom: none !important;
+    justify-content: center !important;
+    padding-top: 12px !important;
   }
 }
 

@@ -60,6 +60,7 @@ interface BranchBrandingPageTranslations {
   readonly remainingSlots: string;
   readonly uploadAdvertisements: string;
   readonly chooseAdvertisements: string;
+  readonly cancelAdvertisements: string;
   readonly selectedImages: string;
   readonly maximumReached: string;
   readonly noAdvertisements: string;
@@ -133,6 +134,7 @@ const PAGE_TRANSLATIONS: Record<AppLanguage, BranchBrandingPageTranslations> = {
     remainingSlots: 'Ø§Ù„Ù…ØªØ§Ø­',
     uploadAdvertisements: 'Ø±ÙØ¹ Ø§Ù„Ø¥Ø¹Ù„Ø§Ù†Ø§Øª',
     chooseAdvertisements: 'Ø§Ø®ØªÙŠØ§Ø± ØµÙˆØ± Ø§Ù„Ø¥Ø¹Ù„Ø§Ù†Ø§Øª',
+    cancelAdvertisements: 'Cancel selection',
     selectedImages: 'Ø§Ù„ØµÙˆØ± Ø§Ù„Ù…Ø­Ø¯Ø¯Ø©',
     maximumReached: 'ØªÙ… Ø§Ù„ÙˆØµÙˆÙ„ Ù„Ù„Ø­Ø¯ Ø§Ù„Ø£Ù‚ØµÙ‰ 20 Ø¥Ø¹Ù„Ø§Ù†.',
     noAdvertisements: 'Ù„Ù… ØªØªÙ… Ø¥Ø¶Ø§ÙØ© Ø¥Ø¹Ù„Ø§Ù†Ø§Øª Ù„Ù‡Ø°Ø§ Ø§Ù„ÙØ±Ø¹ Ø¨Ø¹Ø¯.',
@@ -184,6 +186,7 @@ const PAGE_TRANSLATIONS: Record<AppLanguage, BranchBrandingPageTranslations> = {
     remainingSlots: 'Remaining',
     uploadAdvertisements: 'Upload advertisements',
     chooseAdvertisements: 'Choose advertisement images',
+    cancelAdvertisements: 'Cancel selection',
     selectedImages: 'Selected images',
     maximumReached: 'The maximum of 20 advertisements has been reached.',
     noAdvertisements: 'No advertisements have been added for this branch.',
@@ -521,6 +524,10 @@ export class BranchBrandingComponent implements OnInit, OnDestroy {
       error: (error: HttpErrorResponse) => this.handleApiError(error, () => this.loadAdvertisements()),
       complete: () => this.advertisementsUploading.set(false),
     });
+  }
+
+  protected cancelAdvertisementSelection(): void {
+    this.clearAdvertisementSelection();
   }
 
   protected advertisementPreviewUrl(advertisement: BranchAdvertisementResponse): string | null {

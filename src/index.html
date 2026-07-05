@@ -12,6 +12,107 @@
     <link rel="icon" type="image/png" href="/images/Tab-logo.png" />
   </head>
   <body>
-    <app-root></app-root>
+    <app-root>
+      <!-- Premium Bootstrap Loader — removed automatically by Angular -->
+      <style>
+        .q-boot-loader {
+          position: fixed;
+          inset: 0;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          background: #0f172a;
+          z-index: 99999;
+          gap: 32px;
+          font-family: 'Cairo', sans-serif;
+        }
+        .q-boot-orb-wrap {
+          position: relative;
+          width: 80px;
+          height: 80px;
+        }
+        .q-boot-orb {
+          position: absolute;
+          inset: 50%;
+          width: 24px;
+          height: 24px;
+          transform: translate(-50%, -50%);
+          border-radius: 50%;
+          background: linear-gradient(135deg, #06b6d4, #f43f5e);
+          box-shadow: 0 0 20px rgba(6, 182, 212, 0.5), 0 0 50px rgba(6, 182, 212, 0.2);
+          animation: qBootBreath 2s ease-in-out infinite;
+        }
+        .q-boot-ring {
+          position: absolute;
+          inset: 0;
+          border-radius: 50%;
+          border: 2px solid transparent;
+          border-top-color: #06b6d4;
+          animation: qBootSpin 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+        }
+        .q-boot-ring-inner {
+          position: absolute;
+          inset: 12px;
+          border-radius: 50%;
+          border: 2px solid transparent;
+          border-top-color: #f43f5e;
+          opacity: 0.6;
+          animation: qBootSpin 1.8s cubic-bezier(0.5, 0, 0.5, 1) infinite reverse;
+        }
+        .q-boot-pulse {
+          position: absolute;
+          inset: 50%;
+          width: 24px;
+          height: 24px;
+          transform: translate(-50%, -50%) scale(1);
+          border-radius: 50%;
+          border: 2px solid #06b6d4;
+          animation: qBootPulse 1.6s ease-out infinite;
+        }
+        .q-boot-text {
+          color: #94a3b8;
+          font-size: 0.85rem;
+          font-weight: 600;
+          letter-spacing: 0.15em;
+          text-transform: uppercase;
+        }
+        .q-boot-brand {
+          color: #f8fafc;
+          font-size: 1.1rem;
+          font-weight: 800;
+          letter-spacing: 0.08em;
+        }
+        @keyframes qBootSpin {
+          to { transform: rotate(360deg); }
+        }
+        @keyframes qBootBreath {
+          0%, 100% {
+            transform: translate(-50%, -50%) scale(1);
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.5), 0 0 50px rgba(6, 182, 212, 0.2);
+          }
+          50% {
+            transform: translate(-50%, -50%) scale(1.2);
+            box-shadow: 0 0 28px rgba(6, 182, 212, 0.7), 0 0 60px rgba(6, 182, 212, 0.3);
+          }
+        }
+        @keyframes qBootPulse {
+          0% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; }
+          100% { transform: translate(-50%, -50%) scale(3.5); opacity: 0; }
+        }
+      </style>
+      <div class="q-boot-loader">
+        <div class="q-boot-orb-wrap">
+          <div class="q-boot-ring"></div>
+          <div class="q-boot-ring-inner"></div>
+          <div class="q-boot-orb"></div>
+          <div class="q-boot-pulse"></div>
+        </div>
+        <div>
+          <div class="q-boot-brand">Q — SYSTEM</div>
+          <div class="q-boot-text">Loading...</div>
+        </div>
+      </div>
+    </app-root>
   </body>
 </html>

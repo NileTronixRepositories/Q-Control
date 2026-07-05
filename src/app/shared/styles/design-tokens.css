@@ -17,9 +17,9 @@
   --q-danger-soft: #fff0f2;
   
   /* Sizing and Density Tokens */
-  --q-radius-sm: 6px;
-  --q-radius-md: 8px;
-  --q-radius-lg: 10px;
+  --q-radius-sm: 8px;
+  --q-radius-md: 12px;
+  --q-radius-lg: 16px;
   
   --q-control-height: 34px;
   --q-action-height: 44px;
@@ -37,8 +37,9 @@
   --q-panel-padding-x: 16px;
   
   /* Shadows */
-  --q-shadow-soft: 0 8px 22px rgba(20, 42, 58, 0.06);
-  --q-shadow-card: 0 14px 34px rgba(20, 42, 58, 0.08);
+  --q-shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.03);
+  --q-shadow-card: 0 10px 24px rgba(15, 23, 42, 0.06);
+  --q-shadow-premium: 0 20px 40px -15px rgba(15, 23, 42, 0.08);
 
   /* Shared Button Tokens */
   --q-button-bg: linear-gradient(135deg, #0b7fa3 0%, #086b8d 100%);
@@ -122,5 +123,49 @@
   --nt-hero-min-height: 80px;
   --nt-hero-padding-y: var(--q-panel-padding-y);
   --nt-hero-padding-x: var(--q-panel-padding-x);
+
+  /* Legacy variable mappings (from various themes) */
+  --bg-base: var(--q-bg-base);
+  --surface-card: var(--q-surface-card);
+  --surface-muted: var(--q-surface-muted);
+  --surface-soft: var(--q-primary-soft);
+  --text-primary: var(--q-text-primary);
+  --text-heading: var(--q-text-primary);
+  --text-secondary: var(--q-text-secondary);
+  --text-muted: var(--q-text-muted);
+  --border-color: var(--q-border-subtle);
+  --border-subtle: var(--q-border-subtle);
+  --border-strong: var(--q-border-strong);
+  --primary-color: var(--q-primary);
+  --primary-hover: var(--q-primary-hover);
+  --primary-soft: var(--q-primary-soft);
+  --primary-border: var(--q-primary-border);
+  --accent-color: var(--q-accent);
+  --accent-soft: var(--q-accent-soft);
+  --shadow-card: var(--q-shadow-soft);
+  --shadow-raised: var(--q-shadow-card);
+  --focus-ring: 0 0 0 4px rgba(11, 138, 168, 0.14);
 }
 
+
+/* Legacy deep-ocean color tokens (merged from deep-ocean.css). */
+:root {
+  --q-ocean-950: #0a1128;
+  --q-ocean-900: #001f54;
+  --q-ocean-800: #034078;
+  --q-ocean-500: #1282a2;
+  --q-ocean-50: #fefcfb;
+}
+
+/* Scrollbar theming (merged from deep-ocean.css). */
+::-webkit-scrollbar-track {
+  background: #eef5f8 !important;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #9eb8ca !important;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--q-ocean-500) !important;
+}

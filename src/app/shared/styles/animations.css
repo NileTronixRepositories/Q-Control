@@ -92,3 +92,40 @@ textarea:focus,
     border-color 0.15s ease-in-out,
     box-shadow 0.15s ease-in-out !important;
 }
+
+/* Modern SaaS Hover Animations */
+.q-table-row-hover {
+  transition: all 0.2s ease-in-out !important;
+}
+
+.q-table-row-hover:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: var(--q-shadow-soft) !important;
+  z-index: 10;
+  position: relative;
+}
+
+.q-btn-glow-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.q-btn-glow-hover:hover {
+  box-shadow: 0 0 16px rgba(6, 182, 212, 0.4) !important;
+}
+
+/* Staggered Grid/List Animations */
+.q-animate-stagger > * {
+  opacity: 0;
+  animation: qSlideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.q-animate-stagger > *:nth-child(1) { animation-delay: 0.05s; }
+.q-animate-stagger > *:nth-child(2) { animation-delay: 0.10s; }
+.q-animate-stagger > *:nth-child(3) { animation-delay: 0.15s; }
+.q-animate-stagger > *:nth-child(4) { animation-delay: 0.20s; }
+.q-animate-stagger > *:nth-child(5) { animation-delay: 0.25s; }
+.q-animate-stagger > *:nth-child(6) { animation-delay: 0.30s; }
+.q-animate-stagger > *:nth-child(7) { animation-delay: 0.35s; }
+.q-animate-stagger > *:nth-child(8) { animation-delay: 0.40s; }
+.q-animate-stagger > *:nth-child(9) { animation-delay: 0.45s; }
+.q-animate-stagger > *:nth-child(10) { animation-delay: 0.50s; }

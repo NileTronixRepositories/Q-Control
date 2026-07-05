@@ -151,7 +151,7 @@ const BRANCH_EDITOR_TRANSLATIONS: Record<AppLanguage, BranchEditorTranslations> 
     inactive: 'Inactive',
     operationalStatus: 'Operational Status',
     operationalAvailable: 'Available',
-    operationalUnavailable: 'Unavailable because parent is inactive',
+    operationalUnavailable: 'Unavailable',
     deactivate: 'Deactivate',
     reactivate: 'Reactivate',
     permanentDelete: 'Permanent Delete',

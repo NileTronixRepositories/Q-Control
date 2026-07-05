@@ -66,11 +66,11 @@ body[data-admin-theme='niletronix-brand'] {
   --q-component-soft-shadow: 0 10px 26px rgba(26, 29, 33, 0.07);
 }
 
-body[data-admin-theme] :where(.workspace, .workspace-content, .main-content, .main-contact) {
+:where(body[data-admin-theme]) :where(.workspace, .workspace-content, .main-content, .main-contact) {
   color: var(--q-text-primary) !important;
 }
 
-body[data-admin-theme]
+:where(body[data-admin-theme])
   :where(
     .organization-page,
     .technical-page,
@@ -83,12 +83,12 @@ body[data-admin-theme]
   color: var(--q-text-primary) !important;
 }
 
-body[data-admin-theme]
+:where(body[data-admin-theme])
   :where(.eyebrow, .panel-header i, .filter-icon, .form-field-icon, .window-filter-icon) {
   color: var(--q-primary) !important;
 }
 
-body[data-admin-theme]
+:where(body[data-admin-theme])
   :where(
     .header-description,
     .page-header span,
@@ -103,7 +103,7 @@ body[data-admin-theme]
   color: var(--q-text-secondary) !important;
 }
 
-body[data-admin-theme] :where(.tabs) {
+:where(body[data-admin-theme]) :where(.tabs) {
   display: inline-flex !important;
   width: fit-content !important;
   max-width: 100% !important;
@@ -117,19 +117,19 @@ body[data-admin-theme] :where(.tabs) {
   box-shadow: 0 8px 18px rgb(var(--q-primary-rgb) / 0.06) !important;
 }
 
-body[data-admin-theme] :where(.logo-tabs) {
+:where(body[data-admin-theme]) :where(.logo-tabs) {
   background: var(--q-component-strip-bg) !important;
   border: 1px solid var(--q-border-subtle) !important;
 }
 
-body[data-admin-theme]
+:where(body[data-admin-theme])
   :where(.tabs .btn, .tabs .primary-action, .tabs .secondary-action, .logo-tab) {
   min-height: 38px !important;
   border-radius: var(--q-radius-sm) !important;
   box-shadow: none !important;
 }
 
-body[data-admin-theme]
+:where(body[data-admin-theme])
   :where(
     input:not([type='checkbox']):not([type='radio']):not([type='color']),
     select,
@@ -144,7 +144,7 @@ body[data-admin-theme]
   box-shadow: none !important;
 }
 
-body[data-admin-theme]
+:where(body[data-admin-theme])
   :where(
     input:not([type='checkbox']):not([type='radio']):not([type='color']):hover,
     select:hover,
@@ -156,7 +156,7 @@ body[data-admin-theme]
   border-color: rgb(var(--q-primary-rgb) / 0.36) !important;
 }
 
-body[data-admin-theme]
+:where(body[data-admin-theme])
   :where(
     input:not([type='checkbox']):not([type='radio']):not([type='color']):focus,
     select:focus,
@@ -169,21 +169,21 @@ body[data-admin-theme]
   box-shadow: var(--nt-focus) !important;
 }
 
-body[data-admin-theme] :where(.input-wrapper i) {
+:where(body[data-admin-theme]) :where(.input-wrapper i) {
   color: var(--q-primary) !important;
 }
 
-body[data-admin-theme] :where(.table-wrap, .table-responsive) {
+:where(body[data-admin-theme]) :where(.table-wrap, .table-responsive) {
   background: var(--q-component-panel-bg) !important;
   border-color: var(--q-border-subtle) !important;
 }
 
-body[data-admin-theme] :where(table, .table, .custom-table) {
+:where(body[data-admin-theme]) :where(table, .table, .custom-table) {
   color: var(--q-text-primary) !important;
   border-color: var(--q-border-subtle) !important;
 }
 
-body[data-admin-theme]
+:where(body[data-admin-theme])
   :where(.table > :not(caption) > * > *, .custom-table > :not(caption) > * > *) {
   color: var(--q-text-primary) !important;
   background-color: transparent !important;
@@ -191,18 +191,18 @@ body[data-admin-theme]
   box-shadow: none !important;
 }
 
-body[data-admin-theme] :where(th, .custom-table thead th, .table thead th) {
+:where(body[data-admin-theme]) :where(th, .custom-table thead th, .table thead th) {
   color: var(--q-text-secondary) !important;
   background: var(--q-component-table-head-bg) !important;
   border-bottom-color: var(--q-border-subtle) !important;
 }
 
-body[data-admin-theme] :where(td, .custom-table tbody td, .table tbody td) {
+:where(body[data-admin-theme]) :where(td, .custom-table tbody td, .table tbody td) {
   color: var(--q-text-primary) !important;
   border-bottom-color: rgb(var(--q-primary-rgb) / 0.08) !important;
 }
 
-body[data-admin-theme]
+:where(body[data-admin-theme])
   :where(
     tbody tr:nth-child(even) td,
     .custom-table tbody tr:nth-child(even) td,
@@ -211,18 +211,18 @@ body[data-admin-theme]
   background: var(--q-component-table-row-alt-bg) !important;
 }
 
-body[data-admin-theme]
+:where(body[data-admin-theme])
   :where(tbody tr:hover td, .custom-table tbody tr:hover td, .table tbody tr:hover td) {
   background: var(--q-component-table-row-hover-bg) !important;
 }
 
-body[data-admin-theme] :where(.api-note:not(.loading-note)) {
+:where(body[data-admin-theme]) :where(.api-note:not(.loading-note)) {
   color: var(--q-primary-hover) !important;
   background: var(--q-primary-soft) !important;
   border: 1px solid var(--q-primary-border) !important;
 }
 
-body[data-admin-theme] :where(.state-note, .api-note.loading-note) {
+:where(body[data-admin-theme]) :where(.state-note, .api-note.loading-note) {
   position: relative !important;
   isolation: isolate !important;
   display: flex !important;
@@ -245,12 +245,25 @@ body[data-admin-theme] :where(.state-note, .api-note.loading-note) {
   text-align: center !important;
 }
 
-body[data-admin-theme] :where(.state-note, .api-note.loading-note)::before,
-body[data-admin-theme] :where(.state-note, .api-note.loading-note)::after {
-  display: none !important;
+:where(body[data-admin-theme]) :where(.state-note, .api-note.loading-note)::before,
+:where(body[data-admin-theme]) :where(.state-note, .api-note.loading-note)::after {
+  content: '' !important;
+  display: block !important;
+  position: absolute !important;
+  inset: 0 !important;
+  border-radius: 999px !important;
+  border: 2px solid transparent !important;
+  border-top-color: var(--q-primary) !important;
+  opacity: 0.7;
 }
 
-body[data-admin-theme] :where(.state-note, .api-note.loading-note) > :where(i, .bi) {
+:where(body[data-admin-theme]) :where(.state-note, .api-note.loading-note)::before {
+  inset: 8px !important;
+  border-top-color: var(--q-accent) !important;
+  opacity: 0.5;
+}
+
+:where(body[data-admin-theme]) :where(.state-note, .api-note.loading-note) > :where(i, .bi) {
   position: absolute !important;
   inset: 0 !important;
   display: block !important;
@@ -265,36 +278,45 @@ body[data-admin-theme] :where(.state-note, .api-note.loading-note) > :where(i, .
   line-height: 0 !important;
 }
 
-body[data-admin-theme] :where(.state-note, .api-note.loading-note) > :where(i, .bi)::before {
+/* Glowing Core Orb */
+:where(body[data-admin-theme]) :where(.state-note, .api-note.loading-note) > :where(i, .bi)::before {
   position: absolute !important;
-  inset-block-start: 20px !important;
-  inset-inline-start: 50% !important;
-  width: 17px !important;
-  height: 17px !important;
   content: '' !important;
-  background: var(--q-primary) !important;
+  inset: 50% auto auto 50% !important;
+  width: 22px !important;
+  height: 22px !important;
   border-radius: 999px !important;
+  background: linear-gradient(135deg, var(--q-primary), var(--q-accent)) !important;
   box-shadow:
-    17px 8px 0 -1px rgb(var(--q-primary-rgb) / 0.9),
-    23px 26px 0 0 rgb(var(--q-primary-rgb) / 0.8),
-    13px 43px 0 -1px rgb(var(--q-primary-rgb) / 0.66),
-    -8px 48px 0 -3px rgb(var(--q-primary-rgb) / 0.44),
-    -28px 36px 0 -4px rgb(var(--q-primary-rgb) / 0.38),
-    -33px 15px 0 -3px rgb(var(--q-primary-rgb) / 0.48),
-    -20px -1px 0 -1px rgb(var(--q-primary-rgb) / 0.72) !important;
-  transform: translateX(-50%) !important;
-  transform-origin: 50% 36px !important;
+    0 0 18px rgba(6, 182, 212, 0.5),
+    0 0 40px rgba(6, 182, 212, 0.2) !important;
+  transform: translate(-50%, -50%) !important;
+  transform-origin: center !important;
 }
 
-body[data-admin-theme] :where(.list-panel, .content-panel):has(> :where(.state-note, .api-note.loading-note)) {
+/* Expanding Pulse Ring */
+:where(body[data-admin-theme]) :where(.state-note, .api-note.loading-note) > :where(i, .bi)::after {
+  position: absolute !important;
+  content: '' !important;
+  inset: 50% auto auto 50% !important;
+  width: 22px !important;
+  height: 22px !important;
+  border-radius: 999px !important;
+  border: 2px solid var(--q-primary) !important;
+  background: transparent !important;
+  transform: translate(-50%, -50%) scale(1) !important;
+  opacity: 1;
+}
+
+:where(body[data-admin-theme]) :where(.list-panel, .content-panel):has(> :where(.state-note, .api-note.loading-note)) {
   min-height: clamp(360px, calc(100dvh - 300px), 620px) !important;
 }
 
-body[data-admin-theme] :where(.list-panel, .content-panel) > :where(.state-note, .api-note.loading-note) {
+:where(body[data-admin-theme]) :where(.list-panel, .content-panel) > :where(.state-note, .api-note.loading-note) {
   margin: clamp(88px, 18vh, 180px) auto !important;
 }
 
-body[data-admin-theme] :where(.app-popup-panel, .editor-panel) > :where(.state-note, .api-note.loading-note) {
+:where(body[data-admin-theme]) :where(.app-popup-panel, .editor-panel) > :where(.state-note, .api-note.loading-note) {
   width: 88px !important;
   height: 88px !important;
   min-width: 88px !important;
@@ -303,94 +325,136 @@ body[data-admin-theme] :where(.app-popup-panel, .editor-panel) > :where(.state-n
 }
 
 
-body[data-admin-theme] :where(.app-popup-panel, .editor-panel) > :where(.state-note, .api-note.loading-note) > :where(i, .bi)::before {
+:where(body[data-admin-theme]) :where(.app-popup-panel, .editor-panel) > :where(.state-note, .api-note.loading-note) > :where(i, .bi)::before {
   inset-block-start: 15px !important;
   transform-origin: 50% 30px !important;
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  body[data-admin-theme] :where(.state-note, .api-note.loading-note) > :where(i, .bi)::before {
-    animation: qDotLoaderSpin 1.05s linear infinite !important;
+  /* Outer ring spins clockwise */
+  :where(body[data-admin-theme]) :where(.state-note, .api-note.loading-note)::after {
+    animation: qRingSpin 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite !important;
+  }
+
+  /* Inner ring spins counter-clockwise */
+  :where(body[data-admin-theme]) :where(.state-note, .api-note.loading-note)::before {
+    animation: qRingSpin 1.8s cubic-bezier(0.5, 0, 0.5, 1) infinite reverse !important;
+  }
+
+  /* Core orb breathes */
+  :where(body[data-admin-theme]) :where(.state-note, .api-note.loading-note) > :where(i, .bi)::before {
+    animation: qOrbBreath 2s ease-in-out infinite !important;
+  }
+
+  /* Pulse ring expands */
+  :where(body[data-admin-theme]) :where(.state-note, .api-note.loading-note) > :where(i, .bi)::after {
+    animation: qPulseExpand 1.6s ease-out infinite !important;
   }
 }
 
-@keyframes qDotLoaderSpin {
+@keyframes qRingSpin {
   to {
-    transform: translateX(-50%) rotate(1turn);
+    transform: rotate(1turn);
   }
 }
 
-body[data-admin-theme] :where(.empty-state) {
+@keyframes qOrbBreath {
+  0%, 100% {
+    transform: translate(-50%, -50%) scale(1);
+    box-shadow:
+      0 0 18px rgba(6, 182, 212, 0.5),
+      0 0 40px rgba(6, 182, 212, 0.2);
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.15);
+    box-shadow:
+      0 0 24px rgba(6, 182, 212, 0.7),
+      0 0 56px rgba(6, 182, 212, 0.3);
+  }
+}
+
+@keyframes qPulseExpand {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(3.5);
+    opacity: 0;
+  }
+}
+
+:where(body[data-admin-theme]) :where(.empty-state) {
   color: var(--q-text-secondary) !important;
 }
 
-body[data-admin-theme] :where(.empty-state i) {
+:where(body[data-admin-theme]) :where(.empty-state i) {
   color: var(--q-primary) !important;
   background: var(--q-primary-soft) !important;
 }
 
-body[data-admin-theme] :where(.save-status, .save-chip, .status-pill, .status-badge, .order-badge) {
+:where(body[data-admin-theme]) :where(.save-status, .save-chip, .status-pill, .status-badge, .order-badge) {
   color: var(--q-primary-hover) !important;
   background: var(--q-primary-soft) !important;
   border: 1px solid var(--q-primary-border) !important;
 }
 
-body[data-admin-theme] :where(.status-active, .message-success, .toast-success > .bi) {
+:where(body[data-admin-theme]) :where(.status-active, .message-success, .toast-success > .bi) {
   color: var(--q-success) !important;
 }
 
-body[data-admin-theme] :where(.status-inactive, .message-error, .toast-error > .bi) {
+:where(body[data-admin-theme]) :where(.status-inactive, .message-error, .toast-error > .bi) {
   color: var(--q-danger) !important;
 }
 
-body[data-admin-theme] :where(.message, .toast-item) {
+:where(body[data-admin-theme]) :where(.message, .toast-item) {
   color: var(--q-text-primary) !important;
   background: rgb(var(--q-surface-card-rgb) / 0.98) !important;
   border-color: var(--q-border-subtle) !important;
   box-shadow: var(--q-component-soft-shadow) !important;
 }
 
-body[data-admin-theme] :where(.toast-info::before, .toast-item::before) {
+:where(body[data-admin-theme]) :where(.toast-info::before, .toast-item::before) {
   background: var(--q-primary) !important;
 }
 
-body[data-admin-theme] :where(.toast-info > .bi) {
+:where(body[data-admin-theme]) :where(.toast-info > .bi) {
   color: var(--q-primary) !important;
   background: var(--q-primary-soft) !important;
 }
 
-body[data-admin-theme] :where(.editor-backdrop:not(.app-popup-overlay)) {
+:where(body[data-admin-theme]) :where(.editor-backdrop:not(.app-popup-overlay)) {
   background: rgb(15 23 42 / 0.5) !important;
 }
 
-body[data-admin-theme] :where(.dialog-content p, .detail-row, .detail-value, dd) {
+:where(body[data-admin-theme]) :where(.dialog-content p, .detail-row, .detail-value, dd) {
   color: var(--q-text-primary) !important;
 }
 
-body[data-admin-theme] :where(.pagination-bar, .page-indicator) {
+:where(body[data-admin-theme]) :where(.pagination-bar, .page-indicator) {
   color: var(--q-text-primary) !important;
 }
 
-body[data-admin-theme] :where(.upload-control, .upload-dropzone) {
+:where(body[data-admin-theme]) :where(.upload-control, .upload-dropzone) {
   color: var(--q-primary-hover) !important;
   background: var(--q-primary-soft) !important;
   border-color: var(--q-primary-border) !important;
   box-shadow: 0 7px 16px rgb(var(--q-primary-rgb) / 0.07) !important;
 }
 
-body[data-admin-theme] :where(.upload-control:hover, .upload-dropzone:hover) {
+:where(body[data-admin-theme]) :where(.upload-control:hover, .upload-dropzone:hover) {
   color: var(--q-accent) !important;
   background: var(--q-accent-soft) !important;
   border-color: rgb(var(--q-accent-rgb) / 0.24) !important;
 }
 
 @media (max-width: 767.98px) {
-  body[data-admin-theme] :where(.tabs) {
+  :where(body[data-admin-theme]) :where(.tabs) {
     display: flex !important;
     width: 100% !important;
   }
 
-  body[data-admin-theme] :where(.tabs .btn, .tabs .primary-action, .tabs .secondary-action) {
+  :where(body[data-admin-theme]) :where(.tabs .btn, .tabs .primary-action, .tabs .secondary-action) {
     flex: 1 1 0 !important;
     min-width: 0 !important;
   }

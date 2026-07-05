@@ -1,5 +1,5 @@
 /* Niletronix admin theme: Beach Sunset additive override. */
-:root {
+body[data-admin-theme='beach-sunset'] {
   --q-beach-mint: #bee9e8;
   --q-beach-teal: #62b6cb;
   --q-beach-navy: #1b4965;
@@ -26,53 +26,16 @@
   --q-shadow-button: 0 8px 18px rgba(27, 73, 101, 0.13);
   --q-shadow-button-hover: 0 12px 24px rgba(27, 73, 101, 0.18);
 
-  --nt-primary: var(--q-primary);
-  --nt-primary-dark: var(--q-primary-hover);
-  --nt-primary-soft: var(--q-primary-soft);
-  --nt-accent: var(--q-accent);
-  --nt-accent-soft: var(--q-accent-soft);
-  --nt-bg: var(--q-bg-base);
-  --nt-card: var(--q-surface-card);
-  --nt-border: var(--q-border-subtle);
-  --nt-border-strong: var(--q-border-strong);
-  --nt-text: var(--q-text-primary);
-  --nt-text-soft: var(--q-text-muted);
-  --nt-muted: #7694a4;
-  --nt-shadow-soft: var(--q-shadow-soft);
-  --nt-shadow-card: var(--q-shadow-card);
-  --nt-shadow-sidebar: 18px 0 42px rgba(27, 73, 101, 0.13);
-  --nt-focus: 0 0 0 4px rgba(95, 168, 211, 0.18);
-  --nt-overlay-bg: rgba(27, 73, 101, 0.38);
 
-  --bg-base: var(--q-bg-base);
-  --surface-card: var(--q-surface-card);
-  --surface-muted: var(--q-surface-muted);
-  --surface-soft: var(--q-primary-soft);
-  --text-primary: var(--q-text-primary);
-  --text-heading: var(--q-beach-navy);
-  --text-secondary: var(--q-text-secondary);
-  --text-muted: var(--q-text-muted);
-  --border-color: var(--q-border-subtle);
-  --border-subtle: var(--q-border-subtle);
-  --border-strong: var(--q-border-strong);
-  --primary-color: var(--q-primary);
-  --primary-hover: var(--q-primary-hover);
-  --primary-soft: var(--q-primary-soft);
-  --primary-border: var(--q-primary-border);
-  --accent-color: var(--q-accent);
-  --accent-soft: var(--q-accent-soft);
-  --shadow-card: var(--q-shadow-soft);
-  --shadow-raised: var(--q-shadow-card);
-  --focus-ring: var(--nt-focus);
 }
 
-body {
+body[data-admin-theme='beach-sunset'] {
   color: var(--q-text-primary) !important;
   background:
     linear-gradient(135deg, #f8fdff 0%, #ecf9fb 48%, #dff3ff 100%), var(--q-bg-base) !important;
 }
 
-body .app-shell {
+body[data-admin-theme='beach-sunset'] .app-shell {
   --sidebar-bg: var(--q-beach-navy);
   --sidebar-border: rgba(202, 233, 255, 0.22);
   --sidebar-text: #f4fbff;
@@ -86,194 +49,139 @@ body .app-shell {
   background: transparent !important;
 }
 
-body .app-shell .sidebar {
-  color: #f4fbff !important;
-  background: linear-gradient(180deg, #1b4965 0%, #2d7894 56%, #62b6cb 100%) !important;
-  border-inline-end-color: rgba(202, 233, 255, 0.22) !important;
-  box-shadow: 18px 0 42px rgba(27, 73, 101, 0.14) !important;
+
+
+body[data-admin-theme='beach-sunset'] .workspace,
+body[data-admin-theme='beach-sunset'] .main-content,
+body[data-admin-theme='beach-sunset'] .main-contact {
+  background: var(--q-bg-base) !important;
 }
 
-body .app-shell-rtl .sidebar {
-  box-shadow: -18px 0 42px rgba(27, 73, 101, 0.14) !important;
+body[data-admin-theme='beach-sunset'] .workspace-content,
+body[data-admin-theme='beach-sunset'] .main-content,
+body[data-admin-theme='beach-sunset'] .main-contact {
+  background: transparent !important;
 }
 
-body .workspace,
-body .main-content,
-body .main-contact {
-  background:
-    radial-gradient(circle at 14% 10%, rgba(190, 233, 232, 0.72), transparent 28rem),
-    radial-gradient(circle at 88% 4%, rgba(202, 233, 255, 0.8), transparent 26rem),
-    linear-gradient(135deg, #f8fdff 0%, #edf9fb 42%, #dff3ff 100%) !important;
-}
-
-body .workspace-content,
-body .main-content,
-body .main-contact {
-  background:
-    linear-gradient(
-      135deg,
-      rgba(202, 233, 255, 0.72) 0%,
-      rgba(190, 233, 232, 0.52) 46%,
-      rgba(95, 168, 211, 0.2) 100%
-    ),
-    #f8fdff !important;
-}
-
-body .app-shell .sidebar-header,
-body .app-shell .sidebar-actions,
-body .app-shell .nav-group + .nav-group {
+body[data-admin-theme='beach-sunset'] .app-shell .sidebar-header,
+body[data-admin-theme='beach-sunset'] .app-shell .sidebar-actions,
+body[data-admin-theme='beach-sunset'] .app-shell .nav-group + .nav-group {
   border-color: rgba(202, 233, 255, 0.22) !important;
 }
 
-body .app-shell .sidebar-group-header,
-body .app-shell .sidebar-group-header.active,
-body .app-shell .sidebar-link {
+body[data-admin-theme='beach-sunset'] .app-shell .sidebar-group-header,
+body[data-admin-theme='beach-sunset'] .app-shell .sidebar-group-header.active,
+body[data-admin-theme='beach-sunset'] .app-shell .sidebar-link {
   color: #e9f7fb !important;
 }
 
-body .app-shell .sidebar-group-header:hover,
-body .app-shell .sidebar-link:hover {
+body[data-admin-theme='beach-sunset'] .app-shell .sidebar-group-header:hover,
+body[data-admin-theme='beach-sunset'] .app-shell .sidebar-link:hover {
   color: #ffffff !important;
   background: rgba(190, 233, 232, 0.16) !important;
   border-color: rgba(202, 233, 255, 0.24) !important;
 }
 
-body .app-shell .sidebar-link-active {
+body[data-admin-theme='beach-sunset'] .app-shell .sidebar-link-active {
   background: linear-gradient(90deg, rgba(95, 168, 211, 0.38), rgba(27, 73, 101, 0.72)) !important;
   box-shadow: 0 12px 24px rgba(27, 73, 101, 0.16) !important;
 }
 
-body .app-shell .sidebar-link-active::before {
+body[data-admin-theme='beach-sunset'] .app-shell .sidebar-link-active::before {
   background: var(--q-beach-sky) !important;
 }
 
-body .app-shell .sidebar-link .child-icon,
-body .app-shell .sidebar-link .child-dot,
-body .app-shell.sidebar-collapsed .group-icon {
+body[data-admin-theme='beach-sunset'] .app-shell .sidebar-link .child-icon,
+body[data-admin-theme='beach-sunset'] .app-shell .sidebar-link .child-dot,
+body[data-admin-theme='beach-sunset'] .app-shell.sidebar-collapsed .group-icon {
   color: currentColor !important;
   background: rgba(202, 233, 255, 0.16) !important;
   border-color: rgba(202, 233, 255, 0.22) !important;
 }
 
-body .app-shell .sidebar-link-active .child-icon,
-body .app-shell .sidebar-link-active .child-dot,
-body .app-shell.sidebar-collapsed .sidebar-group-header:hover .group-icon {
+body[data-admin-theme='beach-sunset'] .app-shell .sidebar-link-active .child-icon,
+body[data-admin-theme='beach-sunset'] .app-shell .sidebar-link-active .child-dot,
+body[data-admin-theme='beach-sunset'] .app-shell.sidebar-collapsed .sidebar-group-header:hover .group-icon {
   color: var(--q-beach-navy) !important;
   background: var(--q-beach-sky) !important;
   border-color: rgba(255, 255, 255, 0.34) !important;
 }
 
-body .app-shell .sidebar-toggle,
-body .app-shell .sidebar-action-button {
+body[data-admin-theme='beach-sunset'] .app-shell .sidebar-toggle,
+body[data-admin-theme='beach-sunset'] .app-shell .sidebar-action-button {
   color: #e9f7fb !important;
   box-shadow: var(--q-shadow-button) !important;
 }
 
-body .app-shell .sidebar-toggle:hover,
-body .app-shell .sidebar-toggle:focus-visible,
-body .app-shell .sidebar-action-button:hover {
+body[data-admin-theme='beach-sunset'] .app-shell .sidebar-toggle:hover,
+body[data-admin-theme='beach-sunset'] .app-shell .sidebar-toggle:focus-visible,
+body[data-admin-theme='beach-sunset'] .app-shell .sidebar-action-button:hover {
   color: var(--q-beach-navy) !important;
   background: var(--q-beach-sky) !important;
   border-color: rgba(255, 255, 255, 0.38) !important;
   box-shadow: var(--q-shadow-button-hover) !important;
 }
 
-body .app-shell .sidebar-logout-button {
+body[data-admin-theme='beach-sunset'] .app-shell .sidebar-logout-button {
   color: #fff1f2 !important;
 }
 
-body .app-shell .sidebar-logout-button:hover {
+body[data-admin-theme='beach-sunset'] .app-shell .sidebar-logout-button:hover {
   color: #ffffff !important;
   background: #b91c1c !important;
   border-color: rgba(254, 202, 202, 0.36) !important;
 }
 
-body
-  :where(
-    input:not([type='checkbox']):not([type='radio']):not([type='color']),
-    select,
-    textarea,
-    .form-control,
-    .form-select
-  ) {
+body[data-admin-theme='beach-sunset'] :where(input:not([type='checkbox']):not([type='radio']):not([type='color']), select, textarea, .form-control, .form-select) {
   color: var(--q-text-primary) !important;
   background: rgba(255, 255, 255, 0.78) !important;
   border-color: var(--q-border-strong) !important;
 }
 
-body
-  :where(
-    input:not([type='checkbox']):not([type='radio']):not([type='color']):hover,
-    select:hover,
-    textarea:hover,
-    .form-control:hover,
-    .form-select:hover
-  ) {
+body[data-admin-theme='beach-sunset'] :where(input:not([type='checkbox']):not([type='radio']):not([type='color']):hover, select:hover, textarea:hover, .form-control:hover, .form-select:hover) {
   border-color: rgba(95, 168, 211, 0.52) !important;
 }
 
-body
-  :where(
-    input:not([type='checkbox']):not([type='radio']):not([type='color']):focus,
-    select:focus,
-    textarea:focus,
-    .form-control:focus,
-    .form-select:focus
-  ) {
+body[data-admin-theme='beach-sunset'] :where(input:not([type='checkbox']):not([type='radio']):not([type='color']):focus, select:focus, textarea:focus, .form-control:focus, .form-select:focus) {
   background: #ffffff !important;
   border-color: var(--q-beach-blue) !important;
   box-shadow: var(--nt-focus) !important;
 }
 
-body :where(.upload-control, .upload-dropzone) {
+body[data-admin-theme='beach-sunset'] :where(.upload-control, .upload-dropzone) {
   color: var(--q-beach-navy) !important;
   background: rgba(202, 233, 255, 0.72) !important;
   border-color: rgba(95, 168, 211, 0.5) !important;
   box-shadow: 0 7px 16px rgba(27, 73, 101, 0.09) !important;
 }
 
-body :where(.upload-control:hover, .upload-dropzone:hover) {
+body[data-admin-theme='beach-sunset'] :where(.upload-control:hover, .upload-dropzone:hover) {
   color: var(--q-beach-navy) !important;
   background: var(--q-beach-mint) !important;
   border-color: var(--q-beach-teal) !important;
   box-shadow: var(--q-shadow-button-hover) !important;
 }
 
-body :where(.logo-tabs, .tabs) {
+body[data-admin-theme='beach-sunset'] :where(.logo-tabs, .tabs) {
   background: rgba(202, 233, 255, 0.56) !important;
   border-color: var(--q-border-subtle) !important;
 }
 
-body :where(.logo-tab.active, .tabs > button.active, .tabs > .active) {
+body[data-admin-theme='beach-sunset'] :where(.logo-tab.active, .tabs > button.active, .tabs > .active) {
   color: #ffffff !important;
   background: var(--q-beach-navy) !important;
   border-color: var(--q-beach-navy) !important;
   box-shadow: var(--q-shadow-button) !important;
 }
 
-body th,
-body .custom-table thead th {
-  color: var(--q-text-secondary) !important;
-  background: rgba(202, 233, 255, 0.52) !important;
-  border-bottom-color: var(--q-border-subtle) !important;
-}
 
-body tbody tr:nth-child(even) td,
-body .custom-table tbody tr:nth-child(even) td {
-  background: rgba(190, 233, 232, 0.18) !important;
-}
 
-body tbody tr:hover td,
-body .custom-table tbody tr:hover td {
-  background: rgba(98, 182, 203, 0.18) !important;
-}
-
-body .toast-item::before,
-body .toast-info::before {
+body[data-admin-theme='beach-sunset'] .toast-item::before,
+body[data-admin-theme='beach-sunset'] .toast-info::before {
   background: var(--q-beach-blue) !important;
 }
 
-body .toast-info > .bi {
+body[data-admin-theme='beach-sunset'] .toast-info > .bi {
   color: var(--q-beach-navy) !important;
   background: var(--q-primary-soft) !important;
 }

@@ -1,18 +1,1 @@
-/* Q-SYSTEM comfort alignment layer. Action buttons are owned by foundation/actions.css. */
-body :where(.sidebar-action-button) {
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  gap: 8px !important;
-  min-height: 44px !important;
-  line-height: 1 !important;
-  white-space: nowrap !important;
-}
-
-body :where(.sidebar-action-button) > .bi {
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  flex: 0 0 auto !important;
-  line-height: 1 !important;
-}
+ 

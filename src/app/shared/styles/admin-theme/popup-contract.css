@@ -226,7 +226,7 @@ html
   margin: 4px 0 0 !important;
   padding: 14px 0 0 !important;
   background: linear-gradient(180deg, rgb(255 255 255 / 0.88), #ffffff 32%) !important;
-  border-top: 1px solid var(--q-border-subtle) !important;
+  /* border-top: 1px solid var(--q-border-subtle) !important; */
 }
 
 html
@@ -371,6 +371,25 @@ html
     > :where(button, .btn) {
     width: 100% !important;
     min-width: 0 !important;
+  }
+}
+/* Mobile popup compatibility layer (merged from popup-mobile-layer.css). */
+@media (max-width: 767.98px) {
+  html body:has(.app-popup-overlay) {
+    overflow: hidden !important;
+  }
+
+  html body:has(.app-popup-overlay) .app-shell .workspace,
+  html body:has(.app-popup-overlay) .app-shell.app-shell-rtl .workspace {
+    padding-inline: 0 !important;
+  }
+
+  html body:has(.app-popup-overlay) .app-shell .sidebar,
+  html body:has(.app-popup-overlay) .app-shell .sidebar-backdrop {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    z-index: 0 !important;
   }
 }
 /* End Q-SYSTEM unified popup contract. */
