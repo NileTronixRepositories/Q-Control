@@ -1,0 +1,28 @@
+<header class="kiosk-header">
+  <div class="kiosk-header__brand" aria-label="Application logo">
+    <span class="kiosk-header__mark">
+      Q
+    </span>
+
+    <span class="kiosk-header__brand-text">
+      {{ logoLabel() }}
+    </span>
+  </div>
+
+  <div class="kiosk-header__title">
+    <h1>
+      {{ title() }}
+    </h1>
+
+    <p>
+      {{ subtitle() }}
+    </p>
+  </div>
+
+  <app-service-request-language-selector
+    [label]="languageLabel()"
+    [languages]="languages()"
+    [selectedLanguage]="selectedLanguage()"
+    (languageChange)="changeLanguage($event)"
+  />
+</header>

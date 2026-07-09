@@ -1,0 +1,130 @@
+@container (max-width: 860px) {
+  .workflow-card-main {
+    flex-basis: 100%;
+  }
+
+  .workflow-card-side {
+    min-width: 72px;
+  }
+}
+
+@container (max-width: 680px) {
+  .workflow-hero-main,
+  .workflow-details-head,
+  .workflow-section-title,
+  .workflow-selection-head,
+  .workflow-start-option-title {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .workflow-card {
+    align-items: stretch;
+  }
+
+  .workflow-primary-btn,
+  .workflow-secondary-btn,
+  .workflow-danger-btn,
+  .workflow-success-btn {
+    width: 100%;
+  }
+
+  .workflow-card-actions,
+  .workflow-step-tools,
+  .workflow-actions.end {
+    justify-content: stretch;
+    margin-inline-start: 0;
+  }
+
+  .workflow-step-tools .workflow-icon-btn,
+  .workflow-card-actions .workflow-icon-btn {
+    flex: 1 1 32px;
+  }
+
+  .workflow-step-card,
+  .workflow-step-card.editable {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .workflow-step-card:before {
+    display: none;
+  }
+
+  .workflow-candidates .workflow-input,
+  .workflow-candidate-search,
+  .workflow-section-title .workflow-input {
+    max-width: none;
+    width: 100%;
+  }
+}
+
+.workflow-toast {
+  position: fixed;
+  right: 20px;
+  top: 20px;
+  z-index: 1200;
+}
+
+.workflow-dialog-backdrop {
+  background: #0f172a66;
+  inset: 0;
+  position: fixed;
+  z-index: 1000;
+}
+
+.workflow-dialog {
+  left: 50%;
+  max-width: calc(100vw - 32px);
+  position: fixed;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 480px;
+  z-index: 1001;
+}
+
+.dialog-actions {
+  border-top: 1px solid #e2e8f0;
+  padding: 8px;
+}
+
+@media (max-width: 1199.98px) {
+  .workflow-empty-details {
+    min-height: 120px;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .workflow-step-card,
+  .workflow-step-card.editable,
+  .workflow-builder-step-card {
+    grid-template-columns: 1fr;
+  }
+
+  .workflow-step-card:before {
+    display: none;
+  }
+
+  .workflow-step-index {
+    height: 28px;
+    width: 28px;
+  }
+
+  .workflow-candidates .workflow-input,
+  .workflow-section-title .workflow-input {
+    max-width: none;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .workflow-card-actions {
+    justify-content: flex-end;
+  }
+
+  .workflow-card-side {
+    justify-items: start;
+  }
+
+  .workflow-path-step em {
+    max-width: 120px;
+  }
+}

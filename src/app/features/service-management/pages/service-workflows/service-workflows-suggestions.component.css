@@ -1,0 +1,123 @@
+.workflow-suggestions {
+  background: #f8fbff;
+  border: 1px solid #dbeafe;
+  border-radius: 10px;
+  grid-column: 1 / -1;
+  padding: 12px;
+}
+.workflow-suggestions-header,
+.workflow-suggestion-title {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+.workflow-suggestions-header h3,
+.workflow-suggestion-title strong {
+  color: #0f172a;
+  font-size: 15px;
+  font-weight: 900;
+  margin: 0;
+}
+.workflow-suggestions-header p,
+.workflow-suggestion-title small {
+  color: #64748b;
+  font-size: 12px;
+  margin: 0;
+}
+.workflow-suggestion-list {
+  display: grid;
+  gap: 12px;
+}
+.workflow-suggestion-card {
+  background: #fff;
+  border: 1px solid #dbeafe;
+  border-radius: 10px;
+  padding: 12px;
+}
+.workflow-suggestion-card-selected {
+  background: #eff6ff;
+  border-color: #7dd3fc;
+}
+.workflow-suggestion-path {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+  overflow-x: auto;
+padding-bottom: 4px;
+}
+.workflow-suggested-step-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.workflow-suggested-step-chip {
+  align-items: center;
+  background: #f0f9ff;
+  border: 1px solid #bae6fd;
+  border-radius: 999px;
+  color: #075985;
+  cursor: grab;
+  display: inline-flex;
+  font-size: 12px;
+  font-weight: 800;
+  gap: 6px;
+  min-height: 28px;
+  padding: 4px 10px;
+}
+.workflow-suggested-step-chip b {
+  background: #0284c7;
+  border-radius: 999px;
+  color: #fff;
+  display: grid;
+  font-size: 11px;
+  height: 20px;
+  min-width: 20px;
+  place-items: center;
+}
+.workflow-suggested-step-chip em {
+  font-style: normal;
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.workflow-suggested-step-chip.matched {
+  background: #fff7ed;
+  border-color: #fdba74;
+  color: #c2410c;
+}
+.workflow-suggested-step-chip.invalid {
+  border-color: #fecaca;
+  color: #be123c;
+}
+.workflow-suggested-step-add {
+  align-items: center;
+  background: #eff6ff;
+  border: 1px solid #93c5fd;
+  border-radius: 999px;
+  color: #0369a1;
+  display: inline-flex;
+  height: 26px;
+  justify-content: center;
+  flex: 0 0 26px;
+  width: 26px;
+}
+@container (max-width: 680px) {
+  .workflow-suggestions-header,
+  .workflow-suggestion-title {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .workflow-suggestion-title .workflow-secondary-btn {
+    width: 100%;
+  }
+  .workflow-suggestion-path {
+    flex-wrap: nowrap;
+  }
+  .workflow-suggested-step-chip em {
+    max-width: 110px;
+  }
+}

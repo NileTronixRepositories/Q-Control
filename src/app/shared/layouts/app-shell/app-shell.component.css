@@ -413,3 +413,42 @@
     background: var(--sidebar-overlay);
   }
 }
+.app-shell-ltr .sidebar-group-header,
+.app-shell-ltr .sidebar-link,
+.app-shell-ltr .sidebar-action-button {
+  direction: ltr;
+  text-align: left;
+}
+
+.app-shell-rtl .sidebar-group-header,
+.app-shell-rtl .sidebar-link,
+.app-shell-rtl .sidebar-action-button {
+  direction: rtl;
+  text-align: right;
+}
+
+.app-shell-ltr .sidebar-link::before {
+  right: auto;
+  left: 0;
+}
+
+.app-shell-rtl .sidebar-link::before {
+  right: 0;
+  left: auto;
+}
+
+.app-shell-ltr .child-icon,
+.app-shell-ltr .child-dot {
+  right: auto;
+  left: var(--nt-sidebar-icon-offset, 24px);
+}
+
+.app-shell-rtl .child-icon,
+.app-shell-rtl .child-dot {
+  right: var(--nt-sidebar-icon-offset, 24px);
+  left: auto;
+}
+
+.app-shell-rtl .sidebar-link-active {
+  background-position: right center;
+}

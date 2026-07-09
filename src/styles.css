@@ -1,4 +1,7 @@
 ﻿@import 'bootstrap/dist/css/bootstrap.min.css';
+@layer theme, base, components, utilities;
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/utilities.css' layer(utilities);
 @import './app/shared/styles/design-tokens.css';
 @import './app/shared/styles/animations.css';
 @import './app/shared/styles/components-shared.css';

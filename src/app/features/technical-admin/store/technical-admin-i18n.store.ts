@@ -1,4 +1,4 @@
-import { computed, inject, Injectable } from '@angular/core';
+﻿import { computed, inject, Injectable } from '@angular/core';
 
 import { AppLanguage } from '../../../shared/models/app-language.model';
 import { AppLanguageStore } from '../../../shared/store/app-language.store';
@@ -77,6 +77,8 @@ interface TechnicalAdminTranslations {
   readonly branchLabel: string;
   readonly countersLabel: string;
   readonly servicesLabel: string;
+  readonly serviceManagementLabel: string;
+  readonly serviceWorkflowsLabel: string;
   readonly managerLabel: string;
   readonly liveBranchStatusLabel: string;
   readonly monitoringHint: string;
@@ -180,6 +182,8 @@ const TECHNICAL_ADMIN_TRANSLATIONS: Record<AppLanguage, TechnicalAdminTranslatio
     branchLabel: '\u0627\u0644\u0641\u0631\u0639',
     countersLabel: '\u0627\u0644\u0634\u0628\u0627\u0628\u064a\u0643',
     servicesLabel: '\u0627\u0644\u062e\u062f\u0645\u0627\u062a',
+    serviceManagementLabel: '\u0625\u062f\u0627\u0631\u0629 \u0627\u0644\u062e\u062f\u0645\u0627\u062a',
+    serviceWorkflowsLabel: '\u0645\u0633\u0627\u0631\u0627\u062a \u0627\u0644\u062e\u062f\u0645\u0627\u062a',
     managerLabel: '\u0627\u0644\u0645\u062f\u064a\u0631',
     liveBranchStatusLabel: '\u062d\u0627\u0644\u0629 \u0627\u0644\u0641\u0631\u0648\u0639 \u0627\u0644\u062d\u064a\u0629',
     monitoringHint: '\u0644\u0642\u0637\u0629 \u062a\u062c\u0631\u064a\u0628\u064a\u0629 \u0644\u0627\u062a\u0635\u0627\u0644 \u0627\u0644\u0641\u0631\u0648\u0639 \u0648\u0646\u0634\u0627\u0637 \u0627\u0644\u0637\u0648\u0627\u0628\u064a\u0631. ',
@@ -284,6 +288,8 @@ const TECHNICAL_ADMIN_TRANSLATIONS: Record<AppLanguage, TechnicalAdminTranslatio
     branchLabel: 'Branch',
     countersLabel: 'Counters',
     servicesLabel: 'Services',
+    serviceManagementLabel: 'Service Management',
+    serviceWorkflowsLabel: 'Service Workflows',
     managerLabel: 'Manager',
     liveBranchStatusLabel: 'Live branch status',
     monitoringHint:
@@ -326,3 +332,4 @@ export class TechnicalAdminI18nStore {
     this.appLanguageStore.toggleLanguage();
   }
 }
+

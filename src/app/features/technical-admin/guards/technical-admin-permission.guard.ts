@@ -1,4 +1,4 @@
-import { inject } from '@angular/core';
+﻿import { inject } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivateFn, Router } from '@angular/router';
 
 import { AuthSessionService } from '../../auth/services/auth-session.service';
@@ -148,3 +148,4 @@ function base64UrlToBase64(value: string): string {
 
   return padded;
 }
+

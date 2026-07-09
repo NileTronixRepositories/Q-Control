@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   HostListener,
+  computed,
   input,
   OnInit,
   output,
@@ -42,6 +43,9 @@ export class AppShellComponent implements OnInit {
   protected readonly sidebarExpanded = signal(true);
 
   protected readonly isMobile = signal(false);
+  protected readonly logoutIconClass = computed(() =>
+    this.direction() === 'rtl' ? 'bi bi-box-arrow-left' : 'bi bi-box-arrow-right',
+  );
 
   ngOnInit(): void {
     this.checkBreakpoint();

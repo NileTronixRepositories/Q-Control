@@ -278,6 +278,8 @@ export class WindowsComponent implements OnInit, OnDestroy {
   private readonly router = inject(Router);
   private readonly authSessionService = inject(AuthSessionService);
   private readonly i18nStore = inject(TechnicalAdminI18nStore);
+  protected readonly language = this.i18nStore.language;
+  protected readonly direction = this.i18nStore.direction;
   private readonly permissionService = inject(WindowPermissionService);
   private readonly waitingAreaApiService = inject(WaitingAreaApiService);
   private readonly windowsApiService = inject(WindowManagementApiService);

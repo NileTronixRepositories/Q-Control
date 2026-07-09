@@ -39,7 +39,7 @@ body .app-shell.sidebar-collapsed .nav-group + .nav-group::before {
   height: 1px !important;
   margin: -16px auto 14px !important;
   content: '' !important;
-  background: var(--nt-border) !important;
+  background: var(--sidebar-border) !important;
 }
 
 body .app-shell.sidebar-collapsed .sidebar-group-header {
@@ -47,13 +47,13 @@ body .app-shell.sidebar-collapsed .sidebar-group-header {
   width: 44px !important;
   min-height: 36px !important;
   padding: 0 !important;
-  color: var(--nt-text) !important;
+  color: var(--sidebar-muted, var(--nt-text)) !important;
   border-radius: 12px !important;
 }
 
 body .app-shell.sidebar-collapsed .sidebar-group-header:hover {
-  color: var(--nt-accent) !important;
-  background: #fff5f6 !important;
+  color: var(--sidebar-accent, var(--nt-accent)) !important;
+  background: var(--sidebar-hover, #fff5f6) !important;
   transform: translateY(-1px) !important;
 }
 
@@ -77,23 +77,28 @@ body .app-shell.sidebar-collapsed .sidebar-link {
   width: 44px !important;
   min-height: 44px !important;
   padding: 0 !important;
-  color: var(--nt-text) !important;
+  color: var(--sidebar-muted, var(--nt-text)) !important;
   background: transparent !important;
   border-radius: 14px !important;
 }
 
 body .app-shell.sidebar-collapsed .sidebar-link:hover {
-  color: var(--nt-accent) !important;
-  background: #fff5f6 !important;
-  border-color: rgba(243, 24, 45, 0.12) !important;
+  color: var(--sidebar-accent, var(--nt-accent)) !important;
+  background: var(--sidebar-hover, #fff5f6) !important;
+  border-color: var(--sidebar-hover-border, rgba(243, 24, 45, 0.12)) !important;
   transform: translateY(-1px) !important;
 }
 
 body .app-shell.sidebar-collapsed .sidebar-link-active {
-  color: var(--nt-accent) !important;
-  background: rgba(243, 24, 45, 0.075) !important;
-  border-color: rgba(243, 24, 45, 0.14) !important;
-  box-shadow: 0 10px 22px rgba(243, 24, 45, 0.08) !important;
+  color: var(--sidebar-accent, var(--nt-accent)) !important;
+  background: var(--sidebar-selected, rgba(243, 24, 45, 0.075)) !important;
+  border-color: var(--sidebar-active-border, rgba(243, 24, 45, 0.14)) !important;
+  box-shadow: var(--sidebar-active-shadow, 0 10px 22px rgba(243, 24, 45, 0.08)) !important;
+}
+
+body .app-shell.sidebar-collapsed .sidebar-link-active .child-icon,
+body .app-shell.sidebar-collapsed .sidebar-link-active .child-dot {
+  color: var(--sidebar-active-text, var(--sidebar-accent)) !important;
 }
 
 body .app-shell.sidebar-collapsed .sidebar-link .child-icon,
@@ -121,10 +126,17 @@ body .app-shell.sidebar-collapsed .sidebar-actions {
 
 body .app-shell.sidebar-collapsed .sidebar-action-button {
   justify-content: center !important;
+  color: var(--sidebar-text) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-color: var(--sidebar-border) !important;
   width: 44px !important;
   min-height: 44px !important;
   padding: 0 !important;
   border-radius: 14px !important;
+}
+
+body .app-shell.sidebar-collapsed .sidebar-logout-button {
+  color: var(--sidebar-danger) !important;
 }
 
 body .app-shell.sidebar-collapsed .sidebar-action-button:hover {

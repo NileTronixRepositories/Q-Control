@@ -1,0 +1,134 @@
+<section
+  class="service-request-kiosk"
+  [attr.dir]="store.direction()"
+  [attr.lang]="store.language()"
+>
+  <div class="service-request-kiosk__shell container-fluid">
+    <app-service-request-kiosk-header
+      [logoLabel]="store.translations().logoLabel"
+      [title]="store.translations().kioskTitle"
+      [subtitle]="store.translations().kioskSubtitle"
+      [languageLabel]="store.translations().languageLabel"
+      [languages]="store.languages"
+      [selectedLanguage]="store.language()"
+      (languageChange)="store.setLanguage($event)"
+    />
+
+    @if (canGoBack() || showRestart()) {
+      <section class="service-request-actions" aria-label="Request actions">
+        <div class="service-request-actions__side service-request-actions__side--start">
+          @if (canGoBack()) {
+            <button type="button" class="service-request-actions__button service-request-actions__button--secondary" (click)="goBack()">
+              <i class="bi bi-chevron-left" aria-hidden="true"></i>
+              <span>{{ store.translations().backLabel }}</span>
+            </button>
+          }
+        </div>
+
+        <div class="service-request-actions__side service-request-actions__side--end">
+          @if (showRestart()) {
+            <button type="button" class="service-request-actions__button service-request-actions__button--primary" [disabled]="store.loadingTicket()" (click)="restart()">
+              <i class="bi bi-arrow-clockwise" aria-hidden="true"></i>
+              <span>{{ store.translations().restartLabel }}</span>
+            </button>
+          }
+        </div>
+      </section>
+    }
+
+    <main class="service-request-kiosk__main">
+      <ol class="service-request-stepper" aria-label="Request progress">
+        @for (stepItem of store.stepItems(); track stepItem.id) {
+          <li
+            class="service-request-stepper__item"
+            [class.is-active]="stepItem.status === 'active'"
+            [class.is-completed]="stepItem.status === 'completed'"
+          >
+            <span class="service-request-stepper__marker">
+              @if (stepItem.status === 'completed') {
+                <i class="bi bi-check2" aria-hidden="true"></i>
+              }
+            </span>
+
+            <span class="service-request-stepper__label">
+              {{ stepItem.label }}
+            </span>
+          </li>
+        }
+      </ol>
+
+      <section class="service-request-panel">
+        <div class="service-request-panel__heading">
+          <h2>
+            {{ pageTitle() }}
+          </h2>
+
+          <p>
+            {{ pageDescription() }}
+          </p>
+        </div>
+
+        @if (store.loadingTicket()) {
+          <div class="service-request-loading" role="status" aria-live="polite">
+            <span class="service-request-loading__spinner" aria-hidden="true"></span>
+            <strong>{{ store.translations().loadingTitle }}</strong>
+            <span>{{ store.translations().loadingDescription }}</span>
+          </div>
+        } @else {
+          @switch (store.currentStep()) {
+            @case (step.ServiceType) {
+              <div class="row g-2 g-lg-3 justify-content-center">
+                @for (card of serviceCards(); track card.id) {
+                  <div class="col-12 col-sm-6 col-lg-4">
+                    <app-service-request-service-card
+                      [card]="card"
+                      (selected)="selectServiceType($event)"
+                    />
+                  </div>
+                }
+              </div>
+            }
+
+            @case (step.Specialty) {
+              <div class="row g-2 g-lg-3 justify-content-center">
+                @for (card of specialtyCards(); track card.id) {
+                  <div class="col-12 col-sm-6 col-lg-4">
+                    <app-service-request-specialty-card
+                      [card]="card"
+                      (selected)="selectSpecialty($event)"
+                    />
+                  </div>
+                }
+              </div>
+            }
+
+            @case (step.SubSpecialty) {
+              <div class="row g-2 g-lg-3 justify-content-center">
+                @for (card of subSpecialtyCards(); track card.id) {
+                  <div class="col-12 col-sm-6 col-lg-4">
+                    <app-service-request-specialty-card
+                      [card]="card"
+                      (selected)="selectSubSpecialty($event)"
+                    />
+                  </div>
+                }
+              </div>
+            }
+
+            @case (step.Ticket) {
+              @if (store.ticket(); as ticket) {
+                <app-service-request-ticket-preview
+                  [ticket]="ticket"
+                  [language]="store.language()"
+                  [translations]="store.translations()"
+                />
+              }
+            }
+          }
+        }
+      </section>
+    </main>
+  </div>
+
+  <app-service-request-kiosk-footer [caption]="footerCaption()" />
+</section>

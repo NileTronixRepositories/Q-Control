@@ -1,4 +1,4 @@
-﻿import { Routes } from '@angular/router';
+import { Routes } from '@angular/router';
 
 import {
   organizationAccessGuard,
@@ -31,6 +31,13 @@ export const routes: Routes = [
     loadChildren: () =>
       import('./features/technical-admin/technical-admin.routes').then(
         (routes) => routes.TECHNICAL_ADMIN_ROUTES
+      )
+  },
+  {
+    path: 'service-request',
+    loadChildren: () =>
+      import('./features/service-request/service-request.routes').then(
+        (routes) => routes.SERVICE_REQUEST_ROUTES
       )
   },
   {

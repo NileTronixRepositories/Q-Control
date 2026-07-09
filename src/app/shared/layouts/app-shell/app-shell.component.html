@@ -13,7 +13,7 @@
   }
 
   <!-- Sidebar -->
-  <aside class="sidebar" [attr.dir]="direction()">
+  <aside class="sidebar" [attr.dir]="direction()" [attr.lang]="language()">
     <div class="sidebar-header">
       @if (sidebarExpanded()) {
         <div class="logo-container">
@@ -35,13 +35,15 @@
       </button>
     </div>
 
-    <nav class="sidebar-nav" [attr.aria-label]="navigationLabel()">
+    <nav class="sidebar-nav" [attr.aria-label]="navigationLabel()" [attr.dir]="direction()" [attr.lang]="language()">
       @for (item of navigationItems(); track item.label) {
         <div class="nav-group">
           <button
             type="button"
             class="sidebar-group-header"
             [class.active]="item.expanded"
+            [attr.dir]="direction()"
+            [attr.lang]="language()"
             (click)="toggleGroup(item)"
           >
             @if (item.icon) {
@@ -60,26 +62,86 @@
               [attr.aria-hidden]="!item.expanded"
             >
               @for (child of item.children; track child.route ?? child.label) {
-                <a
-                  class="sidebar-link"
-                  [routerLink]="child.route"
-                  routerLinkActive="sidebar-link-active"
-                  [title]="child.label"
-                  [attr.tabindex]="item.expanded ? null : -1"
-                  (click)="isMobile() && closeSidebar()"
-                >
-                  @if (child.icon) {
-                    <i class="bi {{ child.icon }} child-icon" aria-hidden="true"></i>
-                  }
-                  @if (!child.icon) {
-                    <span class="child-dot" aria-hidden="true"></span>
-                  }
-                  @if (sidebarExpanded()) {
-                    <span class="link-text">
-                      <strong>{{ child.label }}</strong>
-                    </span>
-                  }
-                </a>
+                @if (child.children) {
+                  <button
+                    type="button"
+                    class="sidebar-link sidebar-nested-toggle"
+                    [class.sidebar-link-active]="child.expanded"
+                    [title]="child.label"
+                    [attr.aria-expanded]="child.expanded"
+                    [attr.dir]="direction()"
+                    [attr.lang]="language()"
+                    [attr.tabindex]="item.expanded ? null : -1"
+                    (click)="toggleGroup(child)"
+                  >
+                    @if (child.icon) {
+                      <i class="bi {{ child.icon }} child-icon" aria-hidden="true"></i>
+                    }
+                    @if (!child.icon) {
+                      <span class="child-dot" aria-hidden="true"></span>
+                    }
+                    @if (sidebarExpanded()) {
+                      <span class="link-text">
+                        <strong>{{ child.label }}</strong>
+                      </span>
+                      <i class="bi bi-chevron-down nested-chevron-icon" [class.rotated]="child.expanded"></i>
+                    }
+                  </button>
+
+                  <div
+                    class="sidebar-nested-children"
+                    [class.expanded]="child.expanded"
+                    [attr.aria-hidden]="!child.expanded"
+                  >
+                    @for (nestedChild of child.children; track nestedChild.route ?? nestedChild.label) {
+                      <a
+                        class="sidebar-link sidebar-nested-link"
+                        [routerLink]="nestedChild.route"
+                        routerLinkActive="sidebar-link-active"
+                        [title]="nestedChild.label"
+                        [attr.dir]="direction()"
+                        [attr.lang]="language()"
+                        [attr.tabindex]="item.expanded && child.expanded ? null : -1"
+                        (click)="isMobile() && closeSidebar()"
+                      >
+                        @if (nestedChild.icon) {
+                          <i class="bi {{ nestedChild.icon }} child-icon" aria-hidden="true"></i>
+                        }
+                        @if (!nestedChild.icon) {
+                          <span class="child-dot" aria-hidden="true"></span>
+                        }
+                        @if (sidebarExpanded()) {
+                          <span class="link-text">
+                            <strong>{{ nestedChild.label }}</strong>
+                          </span>
+                        }
+                      </a>
+                    }
+                  </div>
+                } @else {
+                  <a
+                    class="sidebar-link"
+                    [routerLink]="child.route"
+                    routerLinkActive="sidebar-link-active"
+                    [title]="child.label"
+                    [attr.dir]="direction()"
+                    [attr.lang]="language()"
+                    [attr.tabindex]="item.expanded ? null : -1"
+                    (click)="isMobile() && closeSidebar()"
+                  >
+                    @if (child.icon) {
+                      <i class="bi {{ child.icon }} child-icon" aria-hidden="true"></i>
+                    }
+                    @if (!child.icon) {
+                      <span class="child-dot" aria-hidden="true"></span>
+                    }
+                    @if (sidebarExpanded()) {
+                      <span class="link-text">
+                        <strong>{{ child.label }}</strong>
+                      </span>
+                    }
+                  </a>
+                }
               }
             </div>
           }
@@ -94,6 +156,8 @@
           class="sidebar-action-button"
           [attr.aria-label]="languageButtonLabel()"
           [attr.title]="languageButtonLabel()"
+          [attr.dir]="direction()"
+          [attr.lang]="language()"
           (click)="toggleLanguage()"
         >
           <i class="bi bi-translate" aria-hidden="true"></i>
@@ -107,9 +171,11 @@
         class="sidebar-action-button sidebar-logout-button"
         [attr.aria-label]="logoutLabel()"
         [attr.title]="logoutLabel()"
+        [attr.dir]="direction()"
+        [attr.lang]="language()"
         (click)="logoutRequested()"
       >
-        <i class="bi bi-box-arrow-right" aria-hidden="true"></i>
+        <i [class]="logoutIconClass()" aria-hidden="true"></i>
         @if (sidebarExpanded()) {
           <span>{{ logoutLabel() }}</span>
         }
@@ -118,7 +184,7 @@
   </aside>
 
   <!-- Main workspace -->
-  <section class="workspace" [attr.dir]="direction()">
+  <section class="workspace" [attr.dir]="direction()" [attr.lang]="language()">
     <!-- <header class="topbar">
       <div class="topbar-title">
         <p>{{ topbarEyebrow() }}</p>
@@ -134,5 +200,3 @@
     </div>
   </section>
 </main>
-
-

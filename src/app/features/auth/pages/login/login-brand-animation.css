@@ -1,4 +1,4 @@
-body .login-shell {
+﻿body .login-shell {
   --login-primary: var(--q-primary, var(--primary-color, #0b8aa8));
   --login-primary-strong: var(--q-primary-hover, var(--primary-hover, #056579));
   --login-primary-soft: var(--q-primary-soft, var(--primary-soft, #e0f6f8));
@@ -702,17 +702,89 @@ body .login-shell[dir='rtl'] .mobile-brand-lockup {
 }
 
 body .login-shell[dir='rtl'] .login-welcome-panel {
-  padding: clamp(2.25rem, 4vw, 3.5rem) clamp(2.25rem, 4vw, 3.5rem) clamp(2.4rem, 4vw, 3.5rem)
-    clamp(8rem, 10vw, 10rem);
+  padding: clamp(2.25rem, 4vw, 3.5rem) clamp(8rem, 10vw, 10rem) clamp(2.4rem, 4vw, 3.5rem)
+    clamp(2.25rem, 4vw, 3.5rem);
 }
 
 body .login-shell[dir='rtl'] .login-welcome-panel::after {
-  inset-inline: -15.4rem auto;
-  border-radius: 0 999px 999px 0;
+  inset-inline: auto -24.4rem;
+  border-radius: 999px 0 0 999px;
 }
 
 body .login-shell[dir='rtl'] .input-shell .form-control {
   padding-inline: 0.9rem !important;
+}
+
+
+body .login-shell[dir='ltr'] .login-card-shell,
+body .login-shell[dir='rtl'] .login-card-shell {
+  direction: ltr;
+  grid-template-columns: var(--login-welcome-width) var(--login-form-width);
+}
+
+body .login-shell[dir='ltr'] .login-card,
+body .login-shell[dir='ltr'] .login-form,
+body .login-shell[dir='ltr'] .field-group,
+body .login-shell[dir='ltr'] .login-card-header {
+  direction: ltr;
+  text-align: left;
+}
+
+body .login-shell[dir='ltr'] .input-shell {
+  direction: ltr;
+  grid-template-columns: 3.15rem minmax(0, 1fr);
+}
+
+body .login-shell[dir='ltr'] .password-shell {
+  grid-template-columns: 3.15rem minmax(0, 1fr) 3rem;
+}
+
+body .login-shell[dir='ltr'] .input-shell .form-control {
+  direction: ltr;
+  text-align: left;
+}
+
+body .login-shell[dir='rtl'] .login-card,
+body .login-shell[dir='rtl'] .login-form,
+body .login-shell[dir='rtl'] .field-group,
+body .login-shell[dir='rtl'] .login-card-header {
+  direction: rtl;
+  text-align: right;
+}
+
+body .login-shell[dir='rtl'] .input-shell {
+  direction: ltr;
+  grid-template-columns: minmax(0, 1fr) 3.15rem;
+}
+
+body .login-shell[dir='rtl'] .password-shell {
+  grid-template-columns: 3rem minmax(0, 1fr) 3.15rem;
+}
+
+body .login-shell[dir='rtl'] .input-shell > .bi {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+body .login-shell[dir='rtl'] .input-shell .form-control {
+  direction: rtl;
+  grid-column: 1;
+  grid-row: 1;
+  padding-inline: 0.9rem !important;
+  text-align: right;
+}
+
+body .login-shell[dir='rtl'] .password-shell > .bi {
+  grid-column: 3;
+}
+
+body .login-shell[dir='rtl'] .password-shell .form-control {
+  grid-column: 2;
+}
+
+body .login-shell[dir='rtl'] .password-toggle {
+  grid-column: 1;
+  grid-row: 1;
 }
 
 @keyframes loginCardIn {
@@ -932,3 +1004,4 @@ body .login-shell[dir='rtl'] .input-shell .form-control {
     transition-duration: 1ms !important;
   }
 }
+

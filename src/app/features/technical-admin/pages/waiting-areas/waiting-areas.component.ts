@@ -205,6 +205,8 @@ export class WaitingAreasComponent implements OnInit, OnDestroy {
   private readonly branchManagementApiService = inject(BranchManagementApiService);
   private readonly waitingAreaApiService = inject(WaitingAreaApiService);
   private readonly i18nStore = inject(TechnicalAdminI18nStore);
+  protected readonly language = this.i18nStore.language;
+  protected readonly direction = this.i18nStore.direction;
   private searchDebounceId: ReturnType<typeof setTimeout> | null = null;
   private panelRequestId = 0;
   private toastTimeoutId: ReturnType<typeof setTimeout> | null = null;

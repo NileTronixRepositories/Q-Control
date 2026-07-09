@@ -1,0 +1,60 @@
+:host {
+  display: block;
+}
+
+.language-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.language-selector__label {
+  color: #64748b;
+  font-size: 0.65rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.language-selector__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.language-selector__button {
+  align-items: center;
+  background: #ffffff;
+  border: 2px solid #dbeafe;
+  border-radius: 0.7rem;
+  box-shadow: 0 0.45rem 1.1rem rgba(15, 23, 42, 0.08);
+  color: #0f172a;
+  display: inline-flex;
+  gap: 0.25rem;
+  min-height: 2.35rem;
+  padding: 0.32rem 0.55rem;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms ease;
+}
+
+.language-selector__button:hover,
+.language-selector__button:focus-visible,
+.language-selector__button.is-active {
+  border-color: #0f75bc;
+  box-shadow: 0 0.75rem 1.5rem rgba(15, 117, 188, 0.18);
+  transform: translateY(-1px);
+}
+
+.language-selector__flag {
+  border-radius: 0.45rem;
+  box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.08);
+  height: 1.35rem;
+  object-fit: cover;
+  width: 2.1rem;
+}
+
+.language-selector__text {
+  font-size: 0.78rem;
+  font-weight: 800;
+}

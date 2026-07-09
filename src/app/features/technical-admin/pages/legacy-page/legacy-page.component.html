@@ -1,4 +1,8 @@
-<section class="branch-page container-fluid px-0 px-sm-2 px-xl-3">
+<section
+  class="branch-page container-fluid px-0 px-sm-2 px-xl-3"
+  [attr.dir]="direction()"
+  [attr.lang]="language()"
+>
   <header
     class="page-header d-flex align-items-start justify-content-between gap-3 flex-column flex-md-row"
   >
@@ -260,7 +264,9 @@
         }
 
         <div class="pagination-bar">
-          <span class="total-items"> {{ translations().totalItemsLabel }}: {{ branchTableMeta().totalItems }} </span>
+          <span class="total-items">
+            {{ translations().totalItemsLabel }}: {{ branchTableMeta().totalItems }}
+          </span>
           <div>
             <button
               type="button"
@@ -410,9 +416,13 @@
                   formControlName="arabicName"
                 />
                 @if (hasBranchControlValidationError('arabicName', 'required')) {
-                  <small class="invalid-feedback branch-feedback">{{ branchEditorTranslations().requiredField }}</small>
+                  <small class="invalid-feedback branch-feedback">{{
+                    branchEditorTranslations().requiredField
+                  }}</small>
                 } @else if (hasBranchControlValidationError('arabicName', 'maxlength')) {
-                  <small class="invalid-feedback branch-feedback">{{ branchEditorTranslations().max100 }}</small>
+                  <small class="invalid-feedback branch-feedback">{{
+                    branchEditorTranslations().max100
+                  }}</small>
                 }
               </label>
 
@@ -426,9 +436,13 @@
                   formControlName="englishName"
                 />
                 @if (hasBranchControlValidationError('englishName', 'required')) {
-                  <small class="invalid-feedback branch-feedback">{{ branchEditorTranslations().requiredField }}</small>
+                  <small class="invalid-feedback branch-feedback">{{
+                    branchEditorTranslations().requiredField
+                  }}</small>
                 } @else if (hasBranchControlValidationError('englishName', 'maxlength')) {
-                  <small class="invalid-feedback branch-feedback">{{ branchEditorTranslations().max100 }}</small>
+                  <small class="invalid-feedback branch-feedback">{{
+                    branchEditorTranslations().max100
+                  }}</small>
                 }
               </label>
 
@@ -442,9 +456,13 @@
                   formControlName="ipAddress"
                 />
                 @if (hasBranchControlValidationError('ipAddress', 'required')) {
-                  <small class="invalid-feedback branch-feedback">{{ branchEditorTranslations().requiredField }}</small>
+                  <small class="invalid-feedback branch-feedback">{{
+                    branchEditorTranslations().requiredField
+                  }}</small>
                 } @else if (isIpAddressInvalid()) {
-                  <small class="invalid-feedback branch-feedback">{{ branchEditorTranslations().invalidIp }}</small>
+                  <small class="invalid-feedback branch-feedback">{{
+                    branchEditorTranslations().invalidIp
+                  }}</small>
                 }
               </label>
 
@@ -453,7 +471,9 @@
                 <textarea class="form-control" rows="1" formControlName="license"></textarea>
               </label>
 
-              <div class="form-section-title branch-section-title col-12">{{ branchEditorTranslations().location }}</div>
+              <div class="form-section-title branch-section-title col-12">
+                {{ branchEditorTranslations().location }}
+              </div>
 
               <label class="form-field branch-field col-12 col-md-6">
                 <span>{{ translations().governorateLabel }}</span>
@@ -465,9 +485,13 @@
                   formControlName="governorate"
                 />
                 @if (hasBranchControlValidationError('governorate', 'required')) {
-                  <small class="invalid-feedback branch-feedback">{{ branchEditorTranslations().requiredField }}</small>
+                  <small class="invalid-feedback branch-feedback">{{
+                    branchEditorTranslations().requiredField
+                  }}</small>
                 } @else if (hasBranchControlValidationError('governorate', 'maxlength')) {
-                  <small class="invalid-feedback branch-feedback">{{ branchEditorTranslations().max100 }}</small>
+                  <small class="invalid-feedback branch-feedback">{{
+                    branchEditorTranslations().max100
+                  }}</small>
                 }
               </label>
 
@@ -481,9 +505,13 @@
                   formControlName="city"
                 />
                 @if (hasBranchControlValidationError('city', 'required')) {
-                  <small class="invalid-feedback branch-feedback">{{ branchEditorTranslations().requiredField }}</small>
+                  <small class="invalid-feedback branch-feedback">{{
+                    branchEditorTranslations().requiredField
+                  }}</small>
                 } @else if (hasBranchControlValidationError('city', 'maxlength')) {
-                  <small class="invalid-feedback branch-feedback">{{ branchEditorTranslations().max100 }}</small>
+                  <small class="invalid-feedback branch-feedback">{{
+                    branchEditorTranslations().max100
+                  }}</small>
                 }
               </label>
 
@@ -497,9 +525,13 @@
                   formControlName="area"
                 />
                 @if (hasBranchControlValidationError('area', 'required')) {
-                  <small class="invalid-feedback branch-feedback">{{ branchEditorTranslations().requiredField }}</small>
+                  <small class="invalid-feedback branch-feedback">{{
+                    branchEditorTranslations().requiredField
+                  }}</small>
                 } @else if (hasBranchControlValidationError('area', 'maxlength')) {
-                  <small class="invalid-feedback branch-feedback">{{ branchEditorTranslations().max100 }}</small>
+                  <small class="invalid-feedback branch-feedback">{{
+                    branchEditorTranslations().max100
+                  }}</small>
                 }
               </label>
 
@@ -513,9 +545,13 @@
                   formControlName="address"
                 />
                 @if (hasBranchControlValidationError('address', 'required')) {
-                  <small class="invalid-feedback branch-feedback">{{ branchEditorTranslations().requiredField }}</small>
+                  <small class="invalid-feedback branch-feedback">{{
+                    branchEditorTranslations().requiredField
+                  }}</small>
                 } @else if (hasBranchControlValidationError('address', 'maxlength')) {
-                  <small class="invalid-feedback branch-feedback">{{ branchEditorTranslations().max500 }}</small>
+                  <small class="invalid-feedback branch-feedback">{{
+                    branchEditorTranslations().max500
+                  }}</small>
                 }
               </label>
 
@@ -531,7 +567,9 @@
                   formControlName="longitude"
                 />
                 @if (hasBranchControlValidationError('longitude', 'required')) {
-                  <small class="invalid-feedback branch-feedback">{{ branchEditorTranslations().requiredField }}</small>
+                  <small class="invalid-feedback branch-feedback">{{
+                    branchEditorTranslations().requiredField
+                  }}</small>
                 }
               </label>
 
@@ -547,7 +585,9 @@
                   formControlName="latitude"
                 />
                 @if (hasBranchControlValidationError('latitude', 'required')) {
-                  <small class="invalid-feedback branch-feedback">{{ branchEditorTranslations().requiredField }}</small>
+                  <small class="invalid-feedback branch-feedback">{{
+                    branchEditorTranslations().requiredField
+                  }}</small>
                 }
               </label>
 

@@ -1,0 +1,19 @@
+<button type="button" [class]="cardClass()" (click)="selectCard()">
+  <span class="service-card__icon">
+    <i class="bi {{ card().icon }}" aria-hidden="true"></i>
+  </span>
+
+  <span class="service-card__content">
+    <span class="service-card__title">
+      {{ card().title }}
+    </span>
+
+    <span class="service-card__description">
+      {{ card().description }}
+    </span>
+  </span>
+
+  <span class="service-card__meta">
+    {{ card().meta }}
+  </span>
+</button>

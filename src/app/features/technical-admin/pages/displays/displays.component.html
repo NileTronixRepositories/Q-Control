@@ -1,14 +1,14 @@
-<section class="display-management-page container-fluid py-3 py-lg-4">
+<section class="display-management-page" [attr.dir]="direction()" [attr.lang]="language()">
   <!-- Header -->
   <header
-    class="page-header d-flex flex-column flex-md-row align-items-start justify-content-between gap-3"
+    class="page-header"
   >
     <div>
-      <p class="eyebrow mb-2">
+      <p class="eyebrow">
         {{ translations().title }}
       </p>
 
-      <h1 class="mb-2">
+      <h1>
         {{ translations().title }}
       </h1>
 
@@ -18,7 +18,7 @@
     </div>
 
     @if (activeTab() === 'active' && canCreate() && canViewActive()) {
-      <button type="button" class="btn primary-action" (click)="openCreate()">
+      <button type="button" class="primary-action" (click)="openCreate()">
         <i class="bi bi-plus-lg"></i>
 
         {{ translations().addDisplay }}
@@ -42,7 +42,7 @@
           [class.bi-info-circle-fill]="currentMessage.tone === 'info'"
         ></i>
 
-        <p class="mb-0">
+        <p>
           {{ currentMessage.text }}
         </p>
 
@@ -55,7 +55,7 @@
 
   <!-- No Access -->
   @if (!hasDisplayAccess()) {
-    <section class="empty-state mt-4">
+    <section class="empty-state">
       <i class="bi bi-shield-lock"></i>
 
       <h2>
@@ -68,11 +68,11 @@
     </section>
   } @else {
     <!-- Tabs -->
-    <div class="tabs mt-4">
+    <div class="tabs">
       @if (canViewActive()) {
         <button
           type="button"
-          class="btn"
+          
           [class.primary-action]="activeTab() === 'active'"
           [class.secondary-action]="activeTab() !== 'active'"
           (click)="switchTab('active')"
@@ -84,7 +84,7 @@
       @if (canViewDeleted()) {
         <button
           type="button"
-          class="btn"
+          
           [class.primary-action]="activeTab() === 'deleted'"
           [class.secondary-action]="activeTab() !== 'deleted'"
           (click)="switchTab('deleted')"
@@ -96,16 +96,16 @@
 
     <!-- Active -->
     @if (activeTab() === 'active') {
-      <section class="list-panel mt-3">
+      <section class="list-panel">
         <!-- Toolbar -->
-        <div class="row g-3 align-items-end mb-4">
+        <div class="filters-grid">
           <!-- Search -->
-          <div class="col-12 col-lg-5">
-            <label class="filter-field w-100">
+          <div class="filter-cell filter-cell-wide">
+            <label class="filter-field">
               <span>{{ translations().searchPlaceholder }}</span>
 
               <input
-                class="form-control"
+                class="field-control"
                 type="search"
                 [value]="activeSearch()"
                 [placeholder]="translations().searchPlaceholder"
@@ -115,12 +115,12 @@
           </div>
 
           <!-- Branch -->
-          <div class="col-12 col-md-6 col-lg-3">
-            <label class="filter-field w-100">
+          <div class="filter-cell">
+            <label class="filter-field">
               <span>{{ translations().branchFilter }}</span>
 
               <select
-                class="form-select"
+                class="field-control"
                 [value]="activeBranchId() ?? ''"
                 (change)="updateActiveBranchFilter($event)"
               >
@@ -138,12 +138,12 @@
           </div>
 
           <!-- Page Size -->
-          <div class="col-6 col-md-3 col-lg-2">
-            <label class="filter-field w-100">
+          <div class="filter-cell filter-cell-small">
+            <label class="filter-field">
               <span>{{ translations().pageSize }}</span>
 
               <select
-                class="form-select"
+                class="field-control"
                 [value]="activePageSize()"
                 (change)="updateActivePageSize($event)"
               >
@@ -156,10 +156,10 @@
           </div>
 
           <!-- Refresh -->
-          <div class="col-6 col-md-3 col-lg-2">
+          <div class="filter-cell filter-cell-small">
             <button
               type="button"
-              class="btn secondary-action w-100"
+              class="secondary-action"
               [disabled]="activeLoading()"
               (click)="refreshActive()"
             >
@@ -180,8 +180,8 @@
 
         <!-- Table -->
         @if (activeDisplaysPage().data.length > 0) {
-          <div class="table-responsive">
-            <table class="table align-middle custom-table">
+          <div class="table-wrap">
+            <table class="custom-table">
               <thead>
                 <tr>
                   <th>{{ translations().displayNumber }}</th>
@@ -213,7 +213,7 @@
                     </td>
 
                     <td>
-                      <div class="d-flex align-items-center justify-content-center gap-2">
+                      <div class="row-actions">
                         @if (canViewDetails()) {
                           <button type="button" class="icon-action" (click)="openView(item.id)">
                             <i class="bi bi-eye"></i>
@@ -257,17 +257,17 @@
 
         <!-- Pagination -->
         <footer
-          class="pagination-bar d-flex flex-column flex-md-row align-items-center justify-content-between gap-3 mt-4"
+          class="pagination-bar"
         >
           <span>
             {{ translations().totalItems }}:
             {{ activeDisplaysPage().totalItems }}
           </span>
 
-          <div class="d-flex align-items-center gap-2">
+          <div class="pagination-actions">
             <button
               type="button"
-              class="btn secondary-action compact-action"
+              class="secondary-action compact-action"
               [disabled]="!activeDisplaysPage().hasPreviousPage"
               (click)="previousActivePage()"
             >
@@ -282,7 +282,7 @@
 
             <button
               type="button"
-              class="btn secondary-action compact-action"
+              class="secondary-action compact-action"
               [disabled]="!activeDisplaysPage().hasNextPage"
               (click)="nextActivePage()"
             >
@@ -295,14 +295,14 @@
 
     <!-- Deleted -->
     @if (activeTab() === 'deleted') {
-      <section class="list-panel mt-3">
-        <div class="row g-3 align-items-end mb-4">
-          <div class="col-12 col-lg-5">
-            <label class="filter-field w-100">
+      <section class="list-panel">
+        <div class="filters-grid">
+          <div class="filter-cell filter-cell-wide">
+            <label class="filter-field">
               <span>{{ translations().searchPlaceholder }}</span>
 
               <input
-                class="form-control"
+                class="field-control"
                 type="search"
                 [value]="deletedSearch()"
                 [placeholder]="translations().searchPlaceholder"
@@ -311,12 +311,12 @@
             </label>
           </div>
 
-          <div class="col-12 col-md-6 col-lg-3">
-            <label class="filter-field w-100">
+          <div class="filter-cell">
+            <label class="filter-field">
               <span>{{ translations().branchFilter }}</span>
 
               <select
-                class="form-select"
+                class="field-control"
                 [value]="deletedBranchId() ?? ''"
                 (change)="updateDeletedBranchFilter($event)"
               >
@@ -333,12 +333,12 @@
             </label>
           </div>
 
-          <div class="col-6 col-md-3 col-lg-2">
-            <label class="filter-field w-100">
+          <div class="filter-cell filter-cell-small">
+            <label class="filter-field">
               <span>{{ translations().pageSize }}</span>
 
               <select
-                class="form-select"
+                class="field-control"
                 [value]="deletedPageSize()"
                 (change)="updateDeletedPageSize($event)"
               >
@@ -350,10 +350,10 @@
             </label>
           </div>
 
-          <div class="col-6 col-md-3 col-lg-2">
+          <div class="filter-cell filter-cell-small">
             <button
               type="button"
-              class="btn secondary-action w-100"
+              class="secondary-action"
               [disabled]="deletedLoading()"
               (click)="refreshDeleted()"
             >
@@ -372,8 +372,8 @@
         }
 
         @if (deletedDisplaysPage().data.length > 0) {
-          <div class="table-responsive">
-            <table class="table align-middle custom-table">
+          <div class="table-wrap">
+            <table class="custom-table">
               <thead>
                 <tr>
                   <th>{{ translations().displayNumber }}</th>
@@ -406,7 +406,7 @@
 
 
                     <td>
-                      <div class="d-flex align-items-center justify-content-center gap-2">
+                      <div class="row-actions">
                         @if (canReactivate()) {
                           <button
                             type="button"
@@ -448,17 +448,17 @@
         }
 
         <footer
-          class="pagination-bar d-flex flex-column flex-md-row align-items-center justify-content-between gap-3 mt-4"
+          class="pagination-bar"
         >
           <span>
             {{ translations().totalItems }}:
             {{ deletedDisplaysPage().totalItems }}
           </span>
 
-          <div class="d-flex align-items-center gap-2">
+          <div class="pagination-actions">
             <button
               type="button"
-              class="btn secondary-action compact-action"
+              class="secondary-action compact-action"
               [disabled]="!deletedDisplaysPage().hasPreviousPage || deletedLoading()"
               (click)="previousDeletedPage()"
             >
@@ -473,7 +473,7 @@
 
             <button
               type="button"
-              class="btn secondary-action compact-action"
+              class="secondary-action compact-action"
               [disabled]="!deletedDisplaysPage().hasNextPage || deletedLoading()"
               (click)="nextDeletedPage()"
             >
@@ -550,19 +550,19 @@
         <!-- Form -->
         @if (panelMode() === 'create' || panelMode() === 'edit') {
           <form
-            class="display-editor-form row g-3"
+            class="editor-form display-editor-form"
             [formGroup]="displayForm"
             (ngSubmit)="saveDisplay()"
             novalidate
           >
             <!-- Branch -->
-            <div class="col-12">
-              <label class="form-field w-100">
+            <div class="form-cell form-cell-full">
+              <label class="form-field">
                 <span>
                   {{ translations().branchFilter }}
                 </span>
 
-                <select class="form-select" formControlName="branchId">
+                <select class="field-control" formControlName="branchId">
                   <option [value]="0">
                     {{ translations().selectBranch }}
                   </option>
@@ -581,13 +581,13 @@
             </div>
 
             <!-- Number -->
-            <div class="col-12 col-md-6">
-              <label class="form-field w-100">
+            <div class="form-cell">
+              <label class="form-field">
                 <span>
                   {{ translations().displayNumber }}
                 </span>
 
-                <input class="form-control" type="text" maxlength="20" formControlName="number" />
+                <input class="field-control" type="text" maxlength="20" formControlName="number" />
 
                 @if (hasDisplayFormError('number')) {
                   <small>
@@ -602,13 +602,13 @@
             </div>
 
             <!-- IP -->
-            <div class="col-12 col-md-6">
-              <label class="form-field w-100">
+            <div class="form-cell">
+              <label class="form-field">
                 <span>
                   {{ translations().ipAddress }}
                 </span>
 
-                <input class="form-control" type="text" maxlength="45" formControlName="ipAddress" />
+                <input class="field-control" type="text" maxlength="45" formControlName="ipAddress" />
 
                 @if (hasDisplayFormError('ipAddress')) {
                   <small>
@@ -625,13 +625,13 @@
             </div>
 
             <!-- Serial -->
-            <div class="col-12 col-md-6">
-              <label class="form-field w-100">
+            <div class="form-cell">
+              <label class="form-field">
                 <span>
                   {{ translations().serialNumber }}
                 </span>
 
-                <input class="form-control" type="text" maxlength="100" formControlName="serialNo" />
+                <input class="field-control" type="text" maxlength="100" formControlName="serialNo" />
 
                 @if (hasDisplayFormError('serialNo')) {
                   <small>
@@ -646,13 +646,13 @@
             </div>
 
             <!-- Type -->
-            <div class="col-12 col-md-6">
-              <label class="form-field w-100">
+            <div class="form-cell">
+              <label class="form-field">
                 <span>
                   {{ translations().typeLabel }}
                 </span>
 
-                <input class="form-control" type="text" maxlength="100" formControlName="type" />
+                <input class="field-control" type="text" maxlength="100" formControlName="type" />
 
                 @if (hasDisplayFormError('type')) {
                   <small>
@@ -667,12 +667,12 @@
             </div>
 
             <!-- Actions -->
-            <div class="col-12 d-flex flex-column flex-sm-row justify-content-end gap-2 mt-2">
-              <button type="button" class="btn secondary-action" (click)="closePanel()">
+            <div class="form-actions">
+              <button type="button" class="secondary-action" (click)="closePanel()">
                 {{ translations().cancel }}
               </button>
 
-              <button type="submit" class="btn primary-action" [disabled]="saving()">
+              <button type="submit" class="primary-action" [disabled]="saving()">
                 {{ translations().save }}
               </button>
             </div>
@@ -717,10 +717,10 @@
           </p>
         </div>
 
-        <footer class="d-flex flex-column flex-sm-row justify-content-end gap-2 mt-3">
+        <footer class="dialog-actions">
           <button
             type="button"
-            class="btn secondary-action"
+            class="secondary-action"
             [disabled]="deleting()"
             (click)="closeConfirmDialog()"
           >
@@ -729,7 +729,7 @@
 
           <button
             type="button"
-            class="btn primary-action"
+            class="primary-action"
             [class.danger-primary]="confirmDialog()?.kind === 'permanent'"
             [disabled]="deleting()"
             (click)="confirmAction()"

@@ -1,6 +1,8 @@
 <section class="organization-page container-fluid px-0 px-sm-2 px-xl-3">
   <header class="page-hero">
-    <div class="hero-content d-flex align-items-start justify-content-between gap-3 flex-column flex-md-row">
+    <div
+      class="hero-content d-flex align-items-start justify-content-between gap-3 flex-column flex-md-row"
+    >
       <div class="hero-text">
         <p class="eyebrow">
           <i class="bi bi-gear-fill"></i> {{ translations().organizationSetupLabel }}
@@ -114,7 +116,7 @@
                   #fileInput
                   type="file"
                   accept="image/*"
-                  style="display:none"
+                  style="display: none"
                   (change)="onFileSelected($event)"
                 />
                 @if (uploadedFileName()) {
@@ -135,7 +137,8 @@
         </div>
 
         <button type="button" class="primary-action align-self-start" (click)="save()">
-          <i class="bi bi-cloud-arrow-up-fill"></i> {{ translations().saveGlobalConfigurationLabel }}
+          <i class="bi bi-cloud-arrow-up-fill"></i>
+          {{ translations().saveGlobalConfigurationLabel }}
         </button>
       </section>
     </div>
@@ -152,15 +155,18 @@
         <div class="preview-details">
           <div class="detail-row">
             <span class="detail-label">{{ translations().tenantLabel }}</span>
-            <span class="detail-value">{{ configuration().organizationName || translations().notSetLabel }}</span>
+            <span class="detail-value">{{
+              configuration().organizationName || translations().notSetLabel
+            }}</span>
           </div>
           <div class="detail-row">
             <span class="detail-label">{{ translations().languageLabel }}</span>
-            <span class="detail-value">{{ languageOptionLabel(configuration().defaultLanguage) }}</span>
+            <span class="detail-value">{{
+              languageOptionLabel(configuration().defaultLanguage)
+            }}</span>
           </div>
         </div>
       </aside>
     </div>
   </div>
 </section>
-

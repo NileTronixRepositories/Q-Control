@@ -1,0 +1,29 @@
+<div class="language-selector" role="group" [attr.aria-label]="label()">
+  <span class="language-selector__label">
+    {{ label() }}
+  </span>
+
+  <div class="language-selector__actions">
+    @for (language of languages(); track language.code) {
+      <button
+        type="button"
+        class="language-selector__button"
+        [class.is-active]="language.code === selectedLanguage()"
+        [attr.aria-label]="language.ariaLabel"
+        [attr.aria-pressed]="language.code === selectedLanguage()"
+        (click)="selectLanguage(language)"
+      >
+        <img
+          class="language-selector__flag"
+          [src]="language.flagImageUrl"
+          alt=""
+          aria-hidden="true"
+        />
+
+        <span class="language-selector__text">
+          {{ language.nativeLabel }}
+        </span>
+      </button>
+    }
+  </div>
+</div>

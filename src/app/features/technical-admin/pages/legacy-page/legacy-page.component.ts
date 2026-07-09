@@ -207,6 +207,8 @@ export class LegacyPageComponent implements OnInit, OnDestroy {
   private readonly authSessionService = inject(AuthSessionService);
   private readonly branchManagementApiService = inject(BranchManagementApiService);
   private readonly i18nStore = inject(TechnicalAdminI18nStore);
+  protected readonly language = this.i18nStore.language;
+  protected readonly direction = this.i18nStore.direction;
   private branchPanelRequestId = 0;
   private toastTimeoutId: ReturnType<typeof setTimeout> | null = null;
 

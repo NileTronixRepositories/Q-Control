@@ -1,0 +1,597 @@
+<section class="service-management-page" [attr.dir]="direction()" [attr.lang]="language()">
+  <header class="svc-hero">
+    <div>
+      <p class="svc-eyebrow">{{ translations().title }}</p>
+      <h1>{{ translations().title }}</h1>
+      <span>{{ translations().description }}</span>
+    </div>
+
+    @if (canCreate() && canViewAll()) {
+      <button type="button" class="svc-primary-btn" (click)="openCreateRoot()">
+        <i class="bi bi-plus-lg" aria-hidden="true"></i>
+        {{ translations().addRootService }}
+      </button>
+    }
+  </header>
+
+  @if (store.message(); as currentMessage) {
+    <div class="toast-stack" role="status" aria-live="polite" aria-atomic="true">
+      <div
+        class="toast-item"
+        [class.toast-success]="currentMessage.tone === 'success'"
+        [class.toast-error]="currentMessage.tone === 'error'"
+        [class.toast-info]="currentMessage.tone === 'info'"
+      >
+        <i
+          class="bi"
+          [class.bi-check-circle-fill]="currentMessage.tone === 'success'"
+          [class.bi-x-octagon-fill]="currentMessage.tone === 'error'"
+          [class.bi-info-circle-fill]="currentMessage.tone === 'info'"
+          aria-hidden="true"
+        ></i>
+        <p>{{ currentMessage.text }}</p>
+        <button
+          type="button"
+          class="toast-close"
+          [attr.aria-label]="translations().close"
+          (click)="clearMessage()"
+        >
+          <i class="bi bi-x-lg" aria-hidden="true"></i>
+        </button>
+      </div>
+    </div>
+  }
+
+  @if (!canViewAll()) {
+    <section class="svc-empty svc-access-denied">
+      <i class="bi bi-shield-lock" aria-hidden="true"></i>
+      <h2>{{ translations().accessDenied }}</h2>
+      <p>{{ translations().noPermissionHint }}</p>
+    </section>
+  } @else {
+    <section class="svc-workspace">
+      <article class="svc-editor">
+        <header class="svc-panel-header">
+          <div>
+            <p class="svc-eyebrow">{{ translations().selectedService }}</p>
+            <h2>{{ panelTitle() }}</h2>
+            @if (store.panelMode() === 'create') {
+              <span>{{ translations().createUnder }}: {{ createParentLabel() }}</span>
+            }
+          </div>
+
+          @if (store.isPanelOpen()) {
+            <button
+              type="button"
+              class="svc-icon-btn"
+              [attr.aria-label]="translations().close"
+              (click)="closePanel()"
+            >
+              <i class="bi bi-x-lg" aria-hidden="true"></i>
+            </button>
+          }
+        </header>
+
+        <div class="svc-panel-body">
+          @if (store.detailsLoading()) {
+            <p class="svc-note svc-note-info" role="status">
+              <i class="bi bi-arrow-repeat" aria-hidden="true"></i>
+              {{ translations().loading }}
+            </p>
+          }
+
+          @if (store.panelMode() === 'closed') {
+            <section class="svc-empty">
+              <i class="bi bi-diagram-3" aria-hidden="true"></i>
+              <h2>{{ translations().editorEmptyTitle }}</h2>
+              <p>{{ translations().editorEmptyBody }}</p>
+              @if (canCreate()) {
+                <button type="button" class="svc-primary-btn" (click)="openCreateRoot()">
+                  <i class="bi bi-plus-lg" aria-hidden="true"></i>
+                  {{ translations().addRootService }}
+                </button>
+              }
+            </section>
+          }
+
+          @if (store.panelMode() === 'view') {
+            @if (store.selectedDetails(); as details) {
+              <section class="svc-details-view">
+                <div class="svc-logo-summary">
+                  @if (logoUrl(details.logoUrl); as url) {
+                    <img class="svc-logo" [src]="url" [alt]="serviceName(details)" />
+                  } @else {
+                    <span class="svc-logo svc-logo-empty">
+                      <i class="bi bi-grid" aria-hidden="true"></i>
+                    </span>
+                  }
+                  <div>
+                    <h3>{{ serviceName(details) }}</h3>
+                    <p>{{ translations().parent }}: {{ parentName(details) }}</p>
+                  </div>
+                </div>
+
+                @if (!details.effectiveIsActive) {
+                  <p class="svc-note svc-note-danger">
+                    <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
+                    {{ translations().operationallyDisabled }}
+                  </p>
+                }
+
+                <dl class="svc-details-grid">
+                  <div>
+                    <dt>{{ translations().arabicName }}</dt>
+                    <dd>{{ details.arabicName }}</dd>
+                  </div>
+                  <div>
+                    <dt>{{ translations().englishName }}</dt>
+                    <dd>{{ details.englishName }}</dd>
+                  </div>
+                  <div>
+                    <dt>{{ translations().status }}</dt>
+                    <dd>{{ statusLabel(details) }}</dd>
+                  </div>
+                  <div>
+                    <dt>{{ translations().effectiveActive }}</dt>
+                    <dd>{{ effectiveStatusLabel(details) }}</dd>
+                  </div>
+                  <div>
+                    <dt>{{ translations().ticketIssuable }}</dt>
+                    <dd>{{ displayBoolean(details.isTicketIssuable) }}</dd>
+                  </div>
+                  <div>
+                    <dt>{{ translations().canIssueTicket }}</dt>
+                    <dd>{{ displayBoolean(details.canIssueTicket) }}</dd>
+                  </div>
+                  <div>
+                    <dt>{{ translations().clientInputRequired }}</dt>
+                    <dd>{{ displayBoolean(details.isClientInputRequired) }}</dd>
+                  </div>
+                  <div>
+                    <dt>{{ translations().hasReservation }}</dt>
+                    <dd>{{ displayBoolean(details.hasReservation) }}</dd>
+                  </div>
+                  <div>
+                    <dt>{{ translations().rangePrefix }}</dt>
+                    <dd>{{ details.rangePrefix }}</dd>
+                  </div>
+                  <div>
+                    <dt>{{ translations().rangeStartNumber }}</dt>
+                    <dd>{{ details.rangeStartNumber }}</dd>
+                  </div>
+                  <div>
+                    <dt>{{ translations().rangeEndNumber }}</dt>
+                    <dd>{{ details.rangeEndNumber }}</dd>
+                  </div>
+                  <div>
+                    <dt>{{ translations().noOfTicketCopies }}</dt>
+                    <dd>{{ details.noOfTicketCopies }}</dd>
+                  </div>
+                </dl>
+
+                
+                @if (canViewServiceWorkflows()) {
+                  <section class="svc-workflow-context">
+                    <header class="svc-workflow-context-header">
+                      <div>
+                        <p class="svc-eyebrow">{{ workflowTranslations().title }}</p>
+                        <h3>Related Workflows</h3>
+                      </div>
+                      @if (relatedWorkflowsLoading()) {
+                        <span class="svc-mini-loading">{{ workflowTranslations().loading }}</span>
+                      }
+                    </header>
+                    @if (relatedWorkflows().length > 0) {
+                      <div class="svc-related-workflows">
+                        @for (workflow of relatedWorkflows(); track workflow.id ?? workflow.workflowId) {
+                          <article class="svc-related-workflow-card">
+                            <div class="svc-related-workflow-title">
+                              <strong>{{ relatedWorkflowName(workflow) }}</strong>
+                              <span>{{ workflow.containsServiceOccurrenceCount }}x</span>
+                            </div>
+                            <small>{{ workflowTranslations().steps }}: {{ workflowStepOrders(workflow) }}</small>
+                            <div class="svc-workflow-path">
+                              @for (step of sortedWorkflowSteps(workflow); track step.stepOrder) {
+                                <span [class.matched]="step.isMatchedService">{{ workflowStepName(step) }}</span>
+                              }
+                            </div>
+                          </article>
+                        }
+                      </div>
+                    } @else if (!relatedWorkflowsLoading()) {
+                      <p class="svc-note svc-note-info">{{ workflowTranslations().noWorkflows }}</p>
+                    }
+                  </section>
+                }
+
+                @if (canViewStartOptions()) {
+                  <section class="svc-workflow-start-options">
+                    <header class="svc-workflow-context-header">
+                      <div>
+                        <p class="svc-eyebrow">Workflow Start Options</p>
+                        <h3>{{ startModeLabel() }}</h3>
+                      </div>
+                      @if (startOptionsLoading()) {
+                        <span class="svc-mini-loading">{{ workflowTranslations().loading }}</span>
+                      }
+                    </header>
+                    @if (workflowStartOptions(); as options) {
+                      <div class="svc-start-option-summary">
+                        <span>{{ options.requiresWorkflowSelection ? 'Selection Required' : 'No Selection Required' }}</span>
+                        <strong>{{ options.workflows.length }} {{ workflowTranslations().steps }}</strong>
+                      </div>
+                      @if (options.workflows.length > 0) {
+                        <div class="svc-start-option-list">
+                          @for (workflow of options.workflows; track workflow.workflowId) {
+                            <span>{{ language() === 'ar' ? workflow.arabicName : workflow.englishName }}</span>
+                          }
+                        </div>
+                      }
+                    }
+                  </section>
+                }
+                <footer class="svc-actions">
+                  @if (canUpdate() && !details.isDeleted) {
+                    <button type="button" class="svc-secondary-btn" (click)="openEdit(details.id)">
+                      <i class="bi bi-pencil-square" aria-hidden="true"></i>
+                      {{ translations().edit }}
+                    </button>
+                  }
+                  @if (canDelete() && !details.isDeleted) {
+                    <button type="button" class="svc-danger-btn" (click)="requestDelete(details)">
+                      <i class="bi bi-trash3" aria-hidden="true"></i>
+                      {{ translations().delete }}
+                    </button>
+                  }
+                  @if (canRestore() && details.isDeleted) {
+                    <button type="button" class="svc-success-btn" (click)="requestRestore(details)">
+                      <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
+                      {{ translations().restore }}
+                    </button>
+                  }
+                </footer>
+              </section>
+            }
+          }
+
+          @if (store.panelMode() === 'create' || store.panelMode() === 'edit') {
+            @if (store.panelMode() === 'edit') {
+              @if (store.selectedDetails(); as details) {
+                <section class="svc-logo-summary svc-edit-logo">
+                  @if (logoUrl(details.logoUrl); as url) {
+                    <img class="svc-logo" [src]="url" [alt]="serviceName(details)" />
+                  } @else {
+                    <span class="svc-logo svc-logo-empty">
+                      <i class="bi bi-grid" aria-hidden="true"></i>
+                    </span>
+                  }
+                  <div class="svc-logo-tools">
+                    <div>
+                      <strong>{{ translations().logo }}</strong>
+                      <p>{{ selectedLogoName() || translations().allowedLogoTypes }}</p>
+                    </div>
+                    @if (canUpdate() && !details.isDeleted) {
+                      <label class="svc-secondary-btn svc-file-btn">
+                        <i class="bi bi-upload" aria-hidden="true"></i>
+                        {{ translations().uploadLogo }}
+                        <input
+                          type="file"
+                          accept="image/png,image/jpeg,image/webp"
+                          [disabled]="store.uploadingLogo()"
+                          (change)="uploadLogo($event)"
+                        />
+                      </label>
+                      @if (details.logoUrl) {
+                        <button
+                          type="button"
+                          class="svc-danger-btn"
+                          [disabled]="store.uploadingLogo()"
+                          (click)="requestRemoveLogo(details)"
+                        >
+                          <i class="bi bi-trash3" aria-hidden="true"></i>
+                          {{ translations().removeLogo }}
+                        </button>
+                      }
+                    }
+                  </div>
+                </section>
+              }
+            }
+
+            @if (formError(); as error) {
+              <p class="svc-note svc-note-danger">
+                <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
+                {{ error }}
+              </p>
+            }
+
+            <form class="svc-form svc-compact-form" [formGroup]="serviceForm" (ngSubmit)="saveService()" novalidate>
+  <section class="svc-form-section svc-basic-section">
+    <h3>{{ translations().basicInfo }}</h3>
+    <div class="svc-form-grid two-cols svc-basic-grid">
+      <label class="svc-field">
+        <span>{{ translations().arabicName }}</span>
+        <input class="svc-input" type="text" maxlength="100" formControlName="arabicName" />
+        @if (hasControlError('arabicName')) {
+          <small>{{
+            arabicNameControl.hasError('maxlength')
+              ? translations().maxLength100
+              : translations().requiredField
+          }}</small>
+        }
+      </label>
+      <label class="svc-field">
+        <span>{{ translations().englishName }}</span>
+        <input class="svc-input" type="text" maxlength="100" formControlName="englishName" />
+        @if (hasControlError('englishName')) {
+          <small>{{
+            englishNameControl.hasError('maxlength')
+              ? translations().maxLength100
+              : translations().requiredField
+          }}</small>
+        }
+      </label>
+      <label class="svc-field">
+        <span>{{ translations().arabicUserMessage }}</span>
+        <textarea
+          class="svc-input compact-textarea"
+          maxlength="500"
+          rows="1"
+          formControlName="arabicUserMessage"
+        ></textarea>
+        @if (hasControlError('arabicUserMessage')) {
+          <small>{{ translations().maxLength500 }}</small>
+        }
+      </label>
+      <label class="svc-field">
+        <span>{{ translations().englishUserMessage }}</span>
+        <textarea
+          class="svc-input compact-textarea"
+          maxlength="500"
+          rows="1"
+          formControlName="englishUserMessage"
+        ></textarea>
+        @if (hasControlError('englishUserMessage')) {
+          <small>{{ translations().maxLength500 }}</small>
+        }
+      </label>
+    </div>
+  </section>
+
+  <div class="svc-form-row svc-form-row-support">
+    <section class="svc-form-section svc-hierarchy-section">
+      <h3>{{ translations().hierarchy }}</h3>
+      @if (store.panelMode() === 'create') {
+        <div class="svc-parent-lock">
+          <span>{{ translations().createUnder }}</span>
+          <strong>{{ createParentLabel() }}</strong>
+        </div>
+      } @else {
+        <label class="svc-field">
+          <span>{{ translations().parent }}</span>
+          <select class="svc-input" formControlName="parentServiceId">
+            <option [value]="0">{{ translations().noParent }}</option>
+            @for (parent of store.parentOptions(); track parent.id) {
+              <option [value]="parent.id">{{ serviceName(parent) }}</option>
+            }
+          </select>
+        </label>
+      }
+    </section>
+
+    <section class="svc-form-section svc-ticket-section">
+      <h3>{{ translations().ticketBehavior }}</h3>
+      <div class="svc-ticket-grid">
+        <div class="svc-segment-switch" role="radiogroup" [attr.aria-label]="translations().ticketBehavior">
+          <label class="svc-segment-option">
+            <input
+              type="radio"
+              value="true"
+              formControlName="isTicketIssuable"
+              [disabled]="store.selectedDetails()?.hasChildren === true"
+            />
+            <span class="svc-segment-control">
+              <span class="svc-segment-indicator" aria-hidden="true"></span>
+              <span>{{ translations().ticketIssuable }}</span>
+            </span>
+          </label>
+          <label class="svc-segment-option">
+            <input type="radio" value="false" formControlName="isTicketIssuable" />
+            <span class="svc-segment-control">
+              <span class="svc-segment-indicator" aria-hidden="true"></span>
+              <span>{{ translations().categoryOnly }}</span>
+            </span>
+          </label>
+        </div>
+
+        <div class="svc-toggle-grid">
+          <label class="svc-switch-option">
+            <input type="checkbox" formControlName="isClientInputRequired" />
+            <span class="svc-switch-control">
+              <span class="svc-switch-track" aria-hidden="true">
+                <span class="svc-switch-thumb"></span>
+              </span>
+              <span>{{ translations().clientInputRequired }}</span>
+            </span>
+          </label>
+          <label class="svc-switch-option">
+            <input type="checkbox" formControlName="hasReservation" />
+            <span class="svc-switch-control">
+              <span class="svc-switch-track" aria-hidden="true">
+                <span class="svc-switch-thumb"></span>
+              </span>
+              <span>{{ translations().hasReservation }}</span>
+            </span>
+          </label>
+        </div>
+
+        @if (hasControlError('isTicketIssuable')) {
+          <small class="svc-field-error wide">{{ translations().ticketRequired }}</small>
+        }
+        @if (store.selectedDetails()?.hasChildren) {
+          <small class="svc-field-help wide">{{ translations().childTicketDisabled }}</small>
+        }
+      </div>
+    </section>
+  </div>
+
+  <div class="svc-form-row svc-form-row-metrics">
+    <section class="svc-form-section svc-ordering-section">
+      <h3>{{ translations().ordering }}</h3>
+      <div class="svc-form-grid three-cols compact-number-grid">
+        <label class="svc-field">
+          <span>{{ translations().orderNo }}</span>
+          <input class="svc-input" type="number" min="0" formControlName="orderNo" />
+        </label>
+        <label class="svc-field">
+          <span>{{ translations().priority }}</span>
+          <input class="svc-input" type="number" min="0" formControlName="priority" />
+        </label>
+        <label class="svc-field">
+          <span>{{ translations().weight }}</span>
+          <input class="svc-input" type="number" min="0" formControlName="weight" />
+        </label>
+      </div>
+    </section>
+
+    <section class="svc-form-section svc-ticket-numbers-section">
+      <h3>{{ translations().ticketNumbers }}</h3>
+      <div class="svc-form-grid five-cols compact-number-grid">
+        <label class="svc-field">
+          <span>{{ translations().rangePrefix }}</span>
+          <input class="svc-input" type="text" maxlength="10" formControlName="rangePrefix" />
+          @if (hasControlError('rangePrefix')) {
+            <small>{{
+              rangePrefixControl.hasError('maxlength')
+                ? translations().maxLength10
+                : translations().requiredField
+            }}</small>
+          }
+        </label>
+        <label class="svc-field">
+          <span>{{ translations().noOfTicketCopies }}</span>
+          <input class="svc-input" type="number" min="1" formControlName="noOfTicketCopies" />
+          @if (hasControlError('noOfTicketCopies')) {
+            <small>{{ translations().copiesMin }}</small>
+          }
+        </label>
+        <label class="svc-field">
+          <span>{{ translations().waitingDuration }}</span>
+          <input class="svc-input" type="number" min="0" formControlName="waitingDuration" />
+        </label>
+        <label class="svc-field">
+          <span>{{ translations().rangeStartNumber }}</span>
+          <input class="svc-input" type="number" min="0" formControlName="rangeStartNumber" />
+          @if (hasControlError('rangeStartNumber')) {
+            <small>{{ translations().minZero }}</small>
+          }
+        </label>
+        <label class="svc-field">
+          <span>{{ translations().rangeEndNumber }}</span>
+          <input class="svc-input" type="number" min="0" formControlName="rangeEndNumber" />
+          @if (hasControlError('rangeEndNumber')) {
+            <small>{{ translations().minZero }}</small>
+          }
+        </label>
+      </div>
+      @if (hasRangeError()) {
+        <small class="svc-field-error">{{ translations().rangeInvalid }}</small>
+      }
+    </section>
+  </div>
+
+  <footer class="svc-actions svc-form-actions">
+    <button type="button" class="svc-secondary-btn" (click)="closePanel()">
+      <i class="bi bi-x-lg" aria-hidden="true"></i>
+      {{ translations().cancel }}
+    </button>
+    <button type="submit" class="svc-primary-btn" [disabled]="store.saving()">
+      <i class="bi bi-check2" aria-hidden="true"></i>
+      {{ translations().save }}
+    </button>
+  </footer>
+</form>
+          }
+        </div>
+      </article>
+
+      <app-service-hierarchy-tree
+        [nodes]="store.serviceTree()"
+        [expandedNodeIds]="store.expandedTreeNodeIds()"
+        [selectedServiceId]="store.selectedTreeServiceId()"
+        [translations]="translations()"
+        [language]="language()"
+        [direction]="direction()"
+        [loading]="store.treeLoading()"
+        [includeInactive]="includeInactiveTree()"
+        [includeDeleted]="includeDeletedTree()"
+        [canCreate]="canCreate()"
+        [canViewDetails]="canViewDetails()"
+        [canUpdate]="canUpdate()"
+        [canDelete]="canDelete()"
+        [canRestore]="canRestore()"
+        (refresh)="refresh()"
+        (includeInactiveChange)="updateTreeToggle('inactive', $event)"
+        (includeDeletedChange)="updateTreeToggle('deleted', $event)"
+        (toggleNode)="toggleTreeNode($event)"
+        (selectNode)="selectTreeNode($event)"
+        (createRoot)="openCreateRoot()"
+        (createChild)="openCreateChild($event)"
+        (viewNode)="openViewFromTree($event)"
+        (editNode)="openEditFromTree($event)"
+        (deleteNode)="requestTreeDelete($event)"
+        (restoreNode)="requestTreeRestore($event)"
+      />
+    </section>
+  }
+
+  @if (store.confirmState(); as state) {
+    <div class="svc-dialog-backdrop" (click)="closeConfirmDialog()"></div>
+    <aside class="svc-dialog" role="dialog" [attr.aria-label]="confirmTitle(state)">
+      <header class="svc-panel-header">
+        <h2>{{ confirmTitle(state) }}</h2>
+        <button
+          type="button"
+          class="svc-icon-btn"
+          [attr.aria-label]="translations().close"
+          (click)="closeConfirmDialog()"
+        >
+          <i class="bi bi-x-lg" aria-hidden="true"></i>
+        </button>
+      </header>
+      <div class="svc-panel-body">
+        <p>{{ confirmBody(state) }}</p>
+        <strong>{{ state.serviceName }}</strong>
+        @if (state.action === 'delete' && state.hasChildren) {
+          <p class="svc-note svc-note-warning">
+            <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
+            {{ translations().deleteChildrenWarning }}
+          </p>
+        }
+      </div>
+      <footer class="svc-dialog-actions">
+        <button
+          type="button"
+          class="svc-secondary-btn"
+          [disabled]="store.mutating()"
+          (click)="closeConfirmDialog()"
+        >
+          {{ translations().cancel }}
+        </button>
+        <button
+          type="button"
+          class="svc-primary-btn"
+          [class.svc-danger-fill]="state.action !== 'restore'"
+          [class.svc-success-fill]="state.action === 'restore'"
+          [disabled]="store.mutating()"
+          (click)="confirmAction()"
+        >
+          {{ confirmButtonLabel(state) }}
+        </button>
+      </footer>
+    </aside>
+  }
+</section>
+
+
+

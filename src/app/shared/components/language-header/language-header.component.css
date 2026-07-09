@@ -1,4 +1,4 @@
-﻿:host {
+:host {
   display: block;
 }
 
@@ -15,6 +15,18 @@
   border-bottom: 1px solid var(--border-subtle);
   box-shadow: 0 8px 24px rgba(16, 24, 32, 0.06);
   pointer-events: auto;
+}
+
+.app-header-navbar > .container-fluid {
+  justify-content: flex-start;
+}
+
+:host-context(.login-shell[dir='rtl']) .app-header-navbar > .container-fluid {
+  justify-content: flex-end;
+}
+
+:host-context(.login-shell[dir='ltr']) .app-header-navbar > .container-fluid {
+  justify-content: flex-start;
 }
 
 .navbar-brand {

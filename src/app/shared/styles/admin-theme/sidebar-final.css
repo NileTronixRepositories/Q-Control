@@ -86,3 +86,39 @@ body .app-shell .sidebar-action-button:hover {
   ) !important;
   box-shadow: 0 10px 20px rgba(27, 73, 101, 0.12) !important;
 }
+body .app-shell.app-shell-rtl .sidebar-link:hover {
+  background: linear-gradient(
+    270deg,
+    rgba(202, 233, 255, 0.1),
+    rgba(255, 255, 255, 0.035)
+  ) !important;
+}
+
+body .app-shell.app-shell-rtl .sidebar-link-active {
+  background:
+    linear-gradient(270deg, rgba(202, 233, 255, 0.18), rgba(255, 255, 255, 0.045) 68%),
+    rgba(255, 255, 255, 0.035) !important;
+}
+body .app-shell .sidebar-nested-link.sidebar-link-active {
+  background:
+    linear-gradient(90deg, rgba(202, 233, 255, 0.12), rgba(255, 255, 255, 0.03) 72%),
+    rgba(255, 255, 255, 0.025) !important;
+  border-color: rgba(202, 233, 255, 0.16) !important;
+  box-shadow: none !important;
+}
+
+body .app-shell.app-shell-rtl .sidebar-nested-link.sidebar-link-active {
+  background:
+    linear-gradient(270deg, rgba(202, 233, 255, 0.12), rgba(255, 255, 255, 0.03) 72%),
+    rgba(255, 255, 255, 0.025) !important;
+}
+
+body .app-shell .sidebar-nested-link.sidebar-link-active::before {
+  width: 3px !important;
+  opacity: 0.76 !important;
+}
+
+body .app-shell .sidebar-nested-link.sidebar-link-active .child-icon,
+body .app-shell .sidebar-nested-link.sidebar-link-active .child-dot {
+  box-shadow: none !important;
+}

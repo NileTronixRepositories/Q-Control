@@ -1,0 +1,359 @@
+:host {
+  display: block;
+}
+
+.svc-tree-panel {
+  background: #fff;
+  border: 1px solid #d7e8ff;
+  border-radius: 8px;
+  box-shadow: 0 8px 18px #0f172a0d;
+  min-height: 420px;
+  overflow: hidden;
+}
+
+.svc-tree-header,
+.svc-tree-toolbar,
+.svc-tree-meta,
+.svc-tree-chips,
+.svc-tree-actions {
+  align-items: center;
+  display: flex;
+}
+
+.svc-tree-header,
+.svc-tree-toolbar {
+  justify-content: space-between;
+}
+
+.svc-tree-header {
+  background: #fff;
+  border-bottom: 1px solid #dbeafe;
+  min-height: 44px;
+  padding: 7px 10px;
+}
+
+.svc-tree-title,
+.svc-tree-content {
+  min-width: 0;
+}
+
+.svc-tree-eyebrow {
+  color: #0369a1;
+  font-size: 9px;
+  font-weight: 900;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.svc-tree-title h2 {
+  color: #0f172a;
+  font-size: 18px;
+  font-weight: 900;
+  line-height: 1.05;
+  margin: 1px 0 0;
+}
+
+.svc-tree-primary-btn,
+.svc-tree-refresh-btn,
+.svc-tree-action-btn,
+.svc-tree-toggle {
+  align-items: center;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  display: inline-flex;
+  font-size: 11px;
+  font-weight: 850;
+  gap: 5px;
+  justify-content: center;
+  min-height: 29px;
+  white-space: nowrap;
+}
+
+.svc-tree-primary-btn {
+  background: #0284c7;
+  border-color: #0284c7;
+  color: #fff;
+  padding: 0 10px;
+}
+
+.svc-tree-refresh-btn {
+  background: #fff;
+  border-color: #bae6fd;
+  color: #0369a1;
+  padding: 0 9px;
+}
+
+.svc-tree-toolbar {
+  background: #f8fbff;
+  border-bottom: 1px solid #e2e8f0;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px;
+}
+
+.svc-tree-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.svc-tree-filter {
+  align-items: center;
+  color: #334155;
+  display: inline-flex;
+  font-size: 10px;
+  font-weight: 800;
+  gap: 4px;
+  margin: 0;
+}
+
+.svc-tree-filter-input {
+  margin: 0;
+}
+
+.svc-tree-body {
+  display: grid;
+  gap: 8px;
+  max-height: calc(100vh - 220px);
+  overflow: auto;
+  padding: 8px;
+}
+
+.svc-tree-note {
+  background: #f0f9ff;
+  border: 1px solid #bae6fd;
+  border-radius: 7px;
+  color: #0369a1;
+  display: inline-flex;
+  font-size: 10px;
+  font-weight: 800;
+  gap: 5px;
+  margin: 0 0 6px;
+  padding: 5px 7px;
+}
+
+.svc-tree-list {
+  display: grid;
+  gap: 8px;
+}
+
+.svc-tree-node {
+  --tree-offset: 0px;
+  --tree-toggle-size: 30px;
+  --tree-guide-start: calc(var(--tree-offset) - 4px);
+  align-items: center;
+  background: #fff;
+  border: 1px solid #dbeafe;
+  border-radius: 8px;
+  cursor: pointer;
+  display: grid;
+  gap: 8px;
+  grid-template-columns: var(--tree-toggle-size) minmax(0, 1fr) auto;
+  min-height: 58px;
+  padding: 7px 8px;
+  padding-inline-start: calc(var(--tree-offset) + 8px);
+  position: relative;
+}
+
+.svc-tree-node::before,
+.svc-tree-node::after {
+  background: #bfdbfe;
+  content: '';
+  position: absolute;
+}
+
+.svc-tree-node::before {
+  inset-block: -8px 50%;
+  inset-inline-start: var(--tree-guide-start);
+  width: 2px;
+}
+
+.svc-tree-node::after {
+  height: 2px;
+  inset-block-start: 50%;
+  inset-inline-start: var(--tree-guide-start);
+  width: 18px;
+}
+
+.svc-tree-node[data-level='1']::before,
+.svc-tree-node[data-level='1']::after {
+  display: none;
+}
+
+.svc-tree-node:hover,
+.svc-tree-node--selected {
+  background: #eff6ff;
+  border-color: #7dd3fc;
+}
+
+.svc-tree-toggle {
+  background: #fff;
+  color: #0369a1;
+  height: var(--tree-toggle-size);
+  min-height: var(--tree-toggle-size);
+  padding: 0;
+  width: var(--tree-toggle-size);
+  z-index: 1;
+}
+
+.svc-tree-toggle--enabled {
+  border-color: #bae6fd;
+}
+
+.svc-tree-toggle--disabled {
+  border-color: #e2e8f0;
+  cursor: default;
+}
+
+.svc-tree-toggle--disabled i {
+  display: none;
+}
+
+.svc-tree-toggle--disabled::before {
+  background: #93c5fd;
+  border-radius: 999px;
+  content: '';
+  height: 6px;
+  width: 6px;
+}
+
+.svc-tree-meta {
+  gap: 8px;
+  min-width: 0;
+}
+
+.svc-tree-name {
+  color: #0f172a;
+  font-size: 12px;
+  font-weight: 900;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.svc-tree-order {
+  color: #64748b;
+  flex: 0 0 auto;
+  font-size: 10px;
+}
+
+.svc-tree-chips {
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 5px;
+}
+
+.svc-tree-chip {
+  border-radius: 999px;
+  display: inline-flex;
+  font-size: 9px;
+  font-weight: 850;
+  line-height: 1;
+  padding: 4px 7px;
+}
+
+.svc-tree-chip--active {
+  background: #ecfdf5;
+  color: #15803d;
+}
+
+.svc-tree-chip--inactive {
+  background: #fff1f2;
+  color: #e11d48;
+}
+
+.svc-tree-chip--deleted {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.svc-tree-chip--info {
+  background: #eff6ff;
+  color: #0369a1;
+}
+
+.svc-tree-chip--children {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.svc-tree-actions {
+  background: #f8fbff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  gap: 4px;
+  padding: 4px;
+}
+
+.svc-tree-action-btn {
+  background: #fff;
+  border-color: #dbeafe;
+  color: #0369a1;
+  height: 28px;
+  min-height: 28px;
+  padding: 0;
+  width: 28px;
+}
+
+.svc-tree-action-btn--danger {
+  border-color: #fecdd3;
+  color: #e11d48;
+}
+
+.svc-tree-action-btn--success {
+  border-color: #bbf7d0;
+  color: #047857;
+}
+
+.svc-tree-empty {
+  align-content: center;
+  background: #f8fbff;
+  border: 1px dashed #bae6fd;
+  border-radius: 8px;
+  display: grid;
+  justify-items: center;
+  min-height: 180px;
+  padding: 20px;
+  text-align: center;
+}
+
+.svc-tree-empty-icon {
+  color: #0369a1;
+  font-size: 22px;
+  margin-bottom: 8px;
+}
+
+.svc-tree-empty h3 {
+  color: #0f172a;
+  font-size: 17px;
+  font-weight: 800;
+  margin: 0 0 8px;
+}
+
+:where(button):disabled {
+  opacity: 0.55;
+}
+
+@media (max-width: 767.98px) {
+  .svc-tree-header,
+  .svc-tree-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .svc-tree-filter,
+  .svc-tree-refresh-btn,
+  .svc-tree-primary-btn {
+    width: 100%;
+  }
+
+  .svc-tree-node {
+    grid-template-columns: 28px minmax(0, 1fr);
+  }
+
+  .svc-tree-actions {
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+    margin-inline-start: calc(var(--tree-offset) + 38px);
+  }
+}

@@ -1,4 +1,4 @@
-﻿import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 
 import { OrganizationLanguage } from '../../models/organization.model';
 import { OrganizationStore } from '../../store/organization.store';
@@ -8,7 +8,7 @@ import { OrganizationShellStore } from '../../store/organization-shell.store';
   selector: 'app-global-configurations',
   templateUrl: './global-configurations.component.html',
   styleUrl: './global-configurations.component.css',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GlobalConfigurationsComponent {
   private readonly organizationStore = inject(OrganizationStore);
@@ -17,7 +17,7 @@ export class GlobalConfigurationsComponent {
   protected readonly configuration = this.organizationStore.globalConfiguration;
   protected readonly translations = this.shellStore.translations;
   protected readonly saved = computed(
-    () => this.organizationStore.savedSection() === 'Global Configurations'
+    () => this.organizationStore.savedSection() === 'Global Configurations',
   );
 
   protected readonly languages: readonly OrganizationLanguage[] = ['Arabic', 'English'];
@@ -25,13 +25,19 @@ export class GlobalConfigurationsComponent {
     'Africa/Cairo',
     'Asia/Riyadh',
     'Asia/Dubai',
-    'Europe/London'
+    'Europe/London',
   ];
 
-  // Logo upload state
   protected readonly logoInputMode = signal<'url' | 'upload'>('url');
   protected readonly uploadedFileName = signal<string | null>(null);
   protected readonly isDragging = signal(false);
+
+  protected languageOptionLabel(language: OrganizationLanguage): string {
+    const translations = this.translations();
+    return language === 'Arabic'
+      ? translations.arabicLanguageOption
+      : translations.englishLanguageOption;
+  }
 
   protected setLogoInputMode(mode: 'url' | 'upload'): void {
     this.logoInputMode.set(mode);
@@ -72,31 +78,26 @@ export class GlobalConfigurationsComponent {
 
   protected updateOrganizationName(event: Event): void {
     this.organizationStore.updateGlobalConfiguration({
-      organizationName: this.readInputValue(event)
+      organizationName: this.readInputValue(event),
     });
   }
 
   protected updateLogoUrl(event: Event): void {
     this.organizationStore.updateGlobalConfiguration({
-      logoUrl: this.readInputValue(event)
+      logoUrl: this.readInputValue(event),
     });
   }
 
   protected updateTimezone(event: Event): void {
     this.organizationStore.updateGlobalConfiguration({
-      timezone: this.readSelectValue(event)
+      timezone: this.readSelectValue(event),
     });
   }
 
   protected updateDefaultLanguage(event: Event): void {
     this.organizationStore.updateGlobalConfiguration({
-      defaultLanguage: this.readSelectValue(event) as OrganizationLanguage
+      defaultLanguage: this.readSelectValue(event) as OrganizationLanguage,
     });
-  }
-
-  protected languageOptionLabel(language: OrganizationLanguage): string {
-    const translations = this.translations();
-    return language === 'Arabic' ? translations.arabicLanguageOption : translations.englishLanguageOption;
   }
 
   protected save(): void {
@@ -111,4 +112,3 @@ export class GlobalConfigurationsComponent {
     return (event.target as HTMLSelectElement).value;
   }
 }
-

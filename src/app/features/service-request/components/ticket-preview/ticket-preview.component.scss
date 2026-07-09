@@ -1,0 +1,118 @@
+:host {
+  display: block;
+}
+
+.ticket-preview {
+  background: #ffffff;
+  border: 1px solid #dbeafe;
+  border-radius: 1.1rem;
+  box-shadow: 0 1rem 2rem rgba(15, 23, 42, 0.1);
+  margin-inline: auto;
+  max-width: 34rem;
+  padding: clamp(0.65rem, 1.2vw, 0.9rem);
+  text-align: center;
+}
+
+.ticket-preview__success {
+  align-items: center;
+  color: #16875a;
+  display: inline-flex;
+  font-size: 0.76rem;
+  font-weight: 900;
+  gap: 0.45rem;
+  margin-bottom: 0.7rem;
+}
+
+.ticket-preview__check {
+  align-items: center;
+  animation: success-pop 520ms ease both;
+  background: #dcfce7;
+  border-radius: 999px;
+  display: inline-flex;
+  font-size: 0.9rem;
+  height: 1.7rem;
+  justify-content: center;
+  width: 1.7rem;
+}
+
+.ticket-preview__number-block {
+  border-block: 1px dashed #bfdbfe;
+  display: grid;
+  gap: 0.3rem;
+  margin-bottom: 0.55rem;
+  padding: 0.45rem 0;
+}
+
+.ticket-preview__number-block span {
+  color: #64748b;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.ticket-preview__number-block strong {
+  color: #0f3f68;
+  font-size: clamp(2.5rem, 5.6vw, 4.2rem);
+  font-weight: 950;
+  letter-spacing: 0;
+  line-height: 0.95;
+}
+
+.ticket-preview__detail {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 1rem;
+  display: grid;
+  gap: 0.35rem;
+  height: 100%;
+  padding: 0.48rem 0.58rem;
+  text-align: start;
+}
+
+.ticket-preview__detail span {
+  color: #64748b;
+  font-size: 0.68rem;
+  font-weight: 800;
+}
+
+.ticket-preview__detail strong {
+  color: #0f172a;
+  font-size: 0.82rem;
+  font-weight: 900;
+  overflow-wrap: anywhere;
+}
+
+.ticket-preview__qr {
+  align-items: center;
+  color: #334155;
+  display: inline-flex;
+  flex-direction: column;
+  font-size: 0.8rem;
+  font-weight: 900;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+}
+
+.ticket-preview__qr-grid {
+  background:
+    linear-gradient(90deg, #0f172a 18%, transparent 18% 38%, #0f172a 38% 58%, transparent 58%),
+    linear-gradient(#0f172a 18%, transparent 18% 38%, #0f172a 38% 58%, transparent 58%);
+  background-color: #ffffff;
+  background-size: 0.88rem 0.88rem;
+  border: 0.35rem solid #ffffff;
+  box-shadow: 0 0 0 1px #cbd5e1;
+  display: block;
+  height: 4.2rem;
+  width: 4.2rem;
+}
+
+@keyframes success-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.72);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

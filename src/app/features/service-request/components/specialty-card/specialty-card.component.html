@@ -1,0 +1,19 @@
+<button type="button" [class]="cardClass()" (click)="selectCard()">
+  <span class="specialty-card__icon">
+    <i class="bi {{ card().icon }}" aria-hidden="true"></i>
+  </span>
+
+  <span class="specialty-card__body">
+    <span class="specialty-card__title">
+      {{ card().title }}
+    </span>
+
+    <span class="specialty-card__description">
+      {{ card().description }}
+    </span>
+  </span>
+
+  <span class="specialty-card__meta">
+    {{ card().meta }}
+  </span>
+</button>

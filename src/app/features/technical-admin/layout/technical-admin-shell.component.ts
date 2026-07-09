@@ -1,9 +1,10 @@
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+﻿import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 
 import { AppShellComponent } from '../../../shared/layouts/app-shell/app-shell.component';
 import { AppNavigationItem } from '../../../shared/models/navigation.model';
 import { AuthSessionService } from '../../auth/services/auth-session.service';
+import { ServiceManagementPermissionService } from '../../service-management/services/service-management-permission.service';
 import { TechnicalAdminI18nStore } from '../store/technical-admin-i18n.store';
 
 @Component({
@@ -16,11 +17,40 @@ import { TechnicalAdminI18nStore } from '../store/technical-admin-i18n.store';
 export class TechnicalAdminShellComponent {
   private readonly router = inject(Router);
   private readonly authSessionService = inject(AuthSessionService);
+  private readonly servicePermissionService = inject(ServiceManagementPermissionService);
 
   protected readonly i18nStore = inject(TechnicalAdminI18nStore);
   protected readonly translations = this.i18nStore.translations;
   protected readonly navigationItems = computed<readonly AppNavigationItem[]>(() => {
     const translations = this.translations();
+    const serviceNavChildren: AppNavigationItem[] = [];
+
+    if (this.servicePermissionService.canViewAll()) {
+      serviceNavChildren.push({
+        label: translations.serviceManagementLabel,
+        route: '/technical-admin/services/catalog',
+        icon: 'bi-list-check',
+      });
+    }
+
+    if (this.servicePermissionService.canViewWorkflows()) {
+      serviceNavChildren.push({
+        label: translations.serviceWorkflowsLabel,
+        route: '/technical-admin/services/workflows',
+        icon: 'bi-diagram-3',
+      });
+    }
+
+    const serviceChildren: AppNavigationItem[] = serviceNavChildren.length
+      ? [
+          {
+            label: translations.servicesLabel,
+            icon: 'bi-ui-checks-grid',
+            expanded: this.router.url.startsWith('/technical-admin/services'),
+            children: serviceNavChildren,
+          },
+        ]
+      : [];
 
     return [
       {
@@ -38,6 +68,7 @@ export class TechnicalAdminShellComponent {
             route: '/technical-admin/branch-branding',
             icon: 'bi-brush',
           },
+          ...serviceChildren,
           {
             label: translations.waitingAreasLabel,
             route: '/technical-admin/waiting-areas',
@@ -72,3 +103,4 @@ export class TechnicalAdminShellComponent {
     void this.router.navigateByUrl('/login');
   }
 }
+

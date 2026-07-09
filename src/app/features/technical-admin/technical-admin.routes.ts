@@ -1,4 +1,4 @@
-import { Routes } from '@angular/router';
+﻿import { Routes } from '@angular/router';
 
 import { technicalAdminPermissionGuard } from './guards/technical-admin-permission.guard';
 
@@ -36,6 +36,17 @@ export const TECHNICAL_ADMIN_ROUTES: Routes = [
         loadComponent: () =>
           import('./pages/branch-branding/branch-branding.component').then(
             (component) => component.BranchBrandingComponent,
+          ),
+      },
+      {
+        path: 'services',
+        canActivate: [technicalAdminPermissionGuard],
+        data: {
+          requiredAnyPermissions: ['Services.ViewAll', 'ServiceWorkflows.ViewAll'],
+        },
+        loadChildren: () =>
+          import('../service-management/service-management.routes').then(
+            (routes) => routes.SERVICE_MANAGEMENT_ROUTES,
           ),
       },
       {
@@ -87,3 +98,4 @@ export const TECHNICAL_ADMIN_ROUTES: Routes = [
     ],
   },
 ];
+
