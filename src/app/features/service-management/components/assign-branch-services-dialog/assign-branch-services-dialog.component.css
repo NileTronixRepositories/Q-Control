@@ -1,0 +1,196 @@
+.branch-services-backdrop {
+  background: #0f172a66;
+  inset: 0;
+  position: fixed;
+  z-index: 1000;
+}
+
+.branch-services-dialog {
+  background: #fff;
+  border: 1px solid #d7e8ff;
+  border-radius: 8px;
+  box-shadow: 0 24px 60px #0f172a40;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  left: 50%;
+  max-height: calc(100vh - 64px);
+  overflow: hidden;
+  position: fixed;
+  top: 32px;
+  transform: translateX(-50%);
+  width: min(760px, calc(100vw - 40px));
+  z-index: 1001;
+}
+
+.branch-services-dialog-header,
+.branch-services-dialog-actions {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+  justify-content: space-between;
+  padding: 8px 10px;
+}
+
+.branch-services-dialog-header {
+  background: #f8fbff;
+  border-bottom: 1px solid #dbeafe;
+}
+
+.branch-services-dialog-header > div {
+  min-width: 0;
+}
+
+.branch-services-dialog-header p,
+.branch-services-dialog-header span,
+.branch-services-dialog-actions span {
+  color: #64748b;
+  font-size: 10px;
+  font-weight: 800;
+  margin: 0;
+}
+
+.branch-services-dialog-header h2 {
+  color: #0f172a;
+  font-size: 16px;
+  font-weight: 900;
+  line-height: 1.1;
+  margin: 1px 0;
+}
+
+.branch-services-dialog-header span {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.branch-services-dialog-body {
+  min-height: 0;
+  overflow: auto;
+  padding: 8px;
+}
+
+.branch-services-dialog-actions {
+  background: #fff;
+  border-top: 1px solid #e2e8f0;
+  justify-content: flex-end;
+}
+
+.branch-services-dialog-actions span {
+  margin-inline-end: auto;
+}
+
+.branch-services-primary-btn,
+.branch-services-secondary-btn,
+.branch-services-icon-btn {
+  align-items: center;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  display: inline-flex;
+  font-size: 11px;
+  font-weight: 850;
+  gap: 5px;
+  justify-content: center;
+  min-height: 30px;
+  padding: 0 10px;
+}
+
+.branch-services-primary-btn {
+  background: #0284c7;
+  border-color: #0284c7;
+  color: #fff;
+}
+
+.branch-services-secondary-btn,
+.branch-services-icon-btn {
+  background: #fff;
+  border-color: #bae6fd;
+  color: #0369a1;
+}
+
+.branch-services-icon-btn {
+  flex: 0 0 auto;
+  padding: 0;
+  width: 30px;
+}
+
+.branch-services-dialog-tree ::ng-deep .svc-tree-panel {
+  border-radius: 7px;
+  box-shadow: none;
+  min-height: 0;
+}
+
+.branch-services-dialog-tree ::ng-deep .svc-tree-header,
+.branch-services-dialog-tree ::ng-deep .svc-tree-toolbar {
+  min-height: 36px;
+  padding: 6px 8px;
+}
+
+.branch-services-dialog-tree ::ng-deep .svc-tree-title h2 {
+  font-size: 16px;
+}
+
+.branch-services-dialog-tree ::ng-deep .svc-tree-body {
+  gap: 6px;
+  max-height: none;
+  padding: 7px;
+}
+
+.branch-services-dialog-tree ::ng-deep .svc-tree-list {
+  gap: 6px;
+}
+
+.branch-services-dialog-tree ::ng-deep .svc-tree-node {
+  --tree-toggle-size: 26px;
+  gap: 6px;
+  min-height: 48px;
+  padding: 6px 7px;
+  padding-inline-start: calc(var(--tree-offset) + 7px);
+}
+
+.branch-services-dialog-tree ::ng-deep .svc-tree-name {
+  font-size: 11px;
+}
+
+.branch-services-dialog-tree ::ng-deep .svc-tree-order,
+.branch-services-dialog-tree ::ng-deep .svc-tree-filter {
+  font-size: 9px;
+}
+
+.branch-services-dialog-tree ::ng-deep .svc-tree-chip {
+  font-size: 8px;
+  padding: 3px 6px;
+}
+
+.branch-services-dialog-tree ::ng-deep .svc-tree-actions {
+  padding: 3px;
+}
+
+.branch-services-dialog-tree ::ng-deep .svc-tree-action-btn,
+.branch-services-dialog-tree ::ng-deep .svc-tree-refresh-btn {
+  min-height: 26px;
+}
+
+@media (max-width: 767.98px) {
+  .branch-services-dialog {
+    max-height: calc(100vh - 20px);
+    top: 10px;
+    width: calc(100vw - 20px);
+  }
+
+  .branch-services-dialog-header,
+  .branch-services-dialog-actions {
+    align-items: stretch;
+    flex-wrap: wrap;
+  }
+
+  .branch-services-dialog-header span {
+    white-space: normal;
+  }
+
+  .branch-services-dialog-actions span,
+  .branch-services-primary-btn,
+  .branch-services-secondary-btn {
+    width: 100%;
+  }
+}

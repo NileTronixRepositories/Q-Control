@@ -4,36 +4,62 @@ import { catchError, map, Observable, of } from 'rxjs';
 
 import { environment } from '../../../../environments/environment';
 import { AppLanguageStore } from '../../../shared/store/app-language.store';
+import { decodeJwtPayload } from '../utils/auth-permissions.util';
 
 import {
+  AuthenticatedBranch,
   AuthenticatedSession,
   AuthenticatedUserType,
+  ChangeInitialPasswordSubmissionResult,
   LoginCredentials,
   LoginSubmissionResult,
 } from '../models/login-credentials.model';
 
 const LOGIN_PATH = 'api/auth/login';
+const CHANGE_INITIAL_PASSWORD_PATH = 'api/auth/change-initial-password';
 
 interface LoginApiRequest {
   readonly userNameOrEmail: string;
   readonly password: string;
 }
 
-interface LoginApiResult {
+interface ChangeInitialPasswordApiRequest {
+  readonly newPassword: string;
+}
+
+interface UserTokenApiResult {
   readonly isSuccess?: boolean;
-  readonly value?: LoginApiValue;
+  readonly value?: UserTokenApiValue;
   readonly token?: string;
   readonly userType?: string;
   readonly requiresBranchSelection?: boolean;
-  readonly activeBranchId?: string | null;
+  readonly activeBranchId?: number | string | null;
+  readonly branches?: readonly LoginBranchApiValue[];
+  readonly firstLoginFlag?: boolean;
+  readonly passwordExpiredFlag?: boolean;
+  readonly passwordChangedOnUtc?: string | null;
+  readonly passwordExpiresOnUtc?: string | null;
 }
 
-interface LoginApiValue {
+interface UserTokenApiValue {
   readonly token: string;
   readonly userType: string;
   readonly requiresBranchSelection: boolean;
-  readonly activeBranchId: string | null;
+  readonly activeBranchId: number | string | null;
+  readonly branches?: readonly LoginBranchApiValue[];
+  readonly firstLoginFlag?: boolean;
+  readonly passwordExpiredFlag?: boolean;
+  readonly passwordChangedOnUtc?: string | null;
+  readonly passwordExpiresOnUtc?: string | null;
 }
+
+interface LoginBranchApiValue {
+  readonly branchId: number | string;
+  readonly englishName: string;
+  readonly arabicName: string;
+  readonly isActive: boolean;
+}
+
 interface LoginApiError {
   readonly code?: string;
   readonly message?: string;
@@ -58,6 +84,10 @@ export class AuthSessionService {
   private readonly httpClient = inject(HttpClient);
   private readonly appLanguageStore = inject(AppLanguageStore);
   private readonly loginEndpoint = new URL(LOGIN_PATH, environment.apiBaseUrl).toString();
+  private readonly changeInitialPasswordEndpoint = new URL(
+    CHANGE_INITIAL_PASSWORD_PATH,
+    environment.apiBaseUrl,
+  ).toString();
   private readonly sessionStorageKey = 'q-system.auth.session';
 
   private readonly currentSessionSignal = signal<AuthenticatedSession | null>(
@@ -81,13 +111,12 @@ export class AuthSessionService {
     return session;
   }
 
-  shouldClearSessionForHttpStatus(status: number): boolean {
-    return status === 401 || (status === 403 && this.isCurrentSessionExpired());
+  isFirstLoginSession(): boolean {
+    return this.activeSession()?.firstLoginFlag === true;
   }
 
-  private isCurrentSessionExpired(): boolean {
-    const session = this.currentSessionSignal();
-    return !!session && this.isJwtExpired(session.token);
+  shouldClearSessionForHttpStatus(status: number): boolean {
+    return status === 401 || (status === 403 && this.isCurrentSessionExpired());
   }
 
   submitLogin(credentials: LoginCredentials): Observable<LoginSubmissionResult> {
@@ -97,10 +126,25 @@ export class AuthSessionService {
     };
 
     return this.httpClient
-      .post<LoginApiResult>(this.loginEndpoint, request, { headers: this.createHeaders() })
+      .post<UserTokenApiResult>(this.loginEndpoint, request, { headers: this.createJsonHeaders() })
       .pipe(
-        map((response) => this.mapLoginResponse(response, credentials.rememberSession)),
-        catchError((error: HttpErrorResponse) => of(this.resolveLoginError(error))),
+        map((response) => this.mapTokenResponse(response, credentials.rememberSession)),
+        catchError((error: HttpErrorResponse) => of(this.resolveAuthError(error))),
+      );
+  }
+
+  changeInitialPassword(
+    newPassword: string,
+  ): Observable<ChangeInitialPasswordSubmissionResult> {
+    const request: ChangeInitialPasswordApiRequest = { newPassword };
+
+    return this.httpClient
+      .post<UserTokenApiResult>(this.changeInitialPasswordEndpoint, request, {
+        headers: this.createJsonHeaders(),
+      })
+      .pipe(
+        map((response) => this.mapTokenResponse(response, this.shouldRememberCurrentSession())),
+        catchError((error: HttpErrorResponse) => of(this.resolveAuthError(error))),
       );
   }
 
@@ -110,26 +154,20 @@ export class AuthSessionService {
     this.removeStorageItem(sessionStorage);
   }
 
-  private mapLoginResponse(
-    response: LoginApiResult,
+  private mapTokenResponse(
+    response: UserTokenApiResult,
     rememberSession: boolean,
   ): LoginSubmissionResult {
-    const loginValue = this.resolveLoginValue(response);
+    const tokenValue = this.resolveTokenValue(response);
 
-    if (!loginValue) {
+    if (!tokenValue) {
       return {
         accepted: false,
         message: 'Invalid username or password.',
       };
     }
 
-    const session: AuthenticatedSession = {
-      token: loginValue.token,
-      userType: this.resolveUserType(loginValue.userType),
-      requiresBranchSelection: loginValue.requiresBranchSelection,
-      activeBranchId: loginValue.activeBranchId,
-    };
-
+    const session = this.createSession(tokenValue);
     this.storeSession(session, rememberSession);
 
     return {
@@ -139,8 +177,8 @@ export class AuthSessionService {
     };
   }
 
-  private resolveLoginValue(response: LoginApiResult): LoginApiValue | null {
-    if (this.isLoginApiValue(response)) {
+  private resolveTokenValue(response: UserTokenApiResult): UserTokenApiValue | null {
+    if (this.isTokenApiValue(response)) {
       return response;
     }
 
@@ -148,10 +186,10 @@ export class AuthSessionService {
       return null;
     }
 
-    return this.isLoginApiValue(response.value) ? response.value : null;
+    return this.isTokenApiValue(response.value) ? response.value : null;
   }
 
-  private isLoginApiValue(value: unknown): value is LoginApiValue {
+  private isTokenApiValue(value: unknown): value is UserTokenApiValue {
     if (!value || typeof value !== 'object') {
       return false;
     }
@@ -163,17 +201,49 @@ export class AuthSessionService {
       !this.isLegacyLocalFallbackToken(record['token']) &&
       typeof record['userType'] === 'string' &&
       typeof record['requiresBranchSelection'] === 'boolean' &&
-      (record['activeBranchId'] === null || typeof record['activeBranchId'] === 'string')
+      (record['activeBranchId'] === null ||
+        typeof record['activeBranchId'] === 'number' ||
+        typeof record['activeBranchId'] === 'string')
     );
   }
 
-  private resolveLoginError(error: HttpErrorResponse): LoginSubmissionResult {
-    const apiMessage = this.extractApiMessage(error);
+  private createSession(value: UserTokenApiValue): AuthenticatedSession {
+    return {
+      token: value.token,
+      userType: this.resolveUserType(value.userType),
+      requiresBranchSelection: value.requiresBranchSelection,
+      activeBranchId: this.toNullableNumber(value.activeBranchId),
+      branches: this.resolveBranches(value.branches),
+      firstLoginFlag: value.firstLoginFlag ?? this.resolvePasswordChangeRequired(value.token),
+      passwordExpiredFlag: value.passwordExpiredFlag ?? false,
+      passwordChangedOnUtc: value.passwordChangedOnUtc ?? null,
+      passwordExpiresOnUtc: value.passwordExpiresOnUtc ?? null,
+    };
+  }
 
-    if (apiMessage) {
+  private resolveBranches(value: readonly LoginBranchApiValue[] | undefined): readonly AuthenticatedBranch[] {
+    if (!Array.isArray(value)) {
+      return [];
+    }
+
+    return value
+      .map((branch) => ({
+        branchId: this.toNullableNumber(branch.branchId),
+        englishName: branch.englishName,
+        arabicName: branch.arabicName,
+        isActive: branch.isActive,
+      }))
+      .filter((branch): branch is AuthenticatedBranch => branch.branchId !== null);
+  }
+
+  private resolveAuthError(error: HttpErrorResponse): LoginSubmissionResult {
+    const apiError = this.extractApiError(error);
+
+    if (apiError.message) {
       return {
         accepted: false,
-        message: apiMessage,
+        message: apiError.message,
+        errorCode: apiError.code,
       };
     }
 
@@ -181,6 +251,7 @@ export class AuthSessionService {
       return {
         accepted: false,
         message: this.translateFallback('unavailable'),
+        errorCode: apiError.code,
       };
     }
 
@@ -188,48 +259,62 @@ export class AuthSessionService {
       return {
         accepted: false,
         message: this.translateFallback('notFound'),
+        errorCode: apiError.code,
       };
     }
 
     return {
       accepted: false,
       message: this.translateFallback('invalid'),
+      errorCode: apiError.code,
     };
   }
-  private createHeaders(): HttpHeaders {
-    return new HttpHeaders({
+
+  private createJsonHeaders(): HttpHeaders {
+    let headers = new HttpHeaders({
       'Accept-Language': this.appLanguageStore.language(),
       'Content-Type': 'application/json',
     });
+
+    const token = this.currentSessionSignal()?.token;
+
+    if (token) {
+      headers = headers.set('Authorization', `Bearer ${token}`);
+    }
+
+    return headers;
   }
 
-  private extractApiMessage(error: HttpErrorResponse): string | null {
+  private extractApiError(error: HttpErrorResponse): { readonly code?: string; readonly message?: string } {
     const body = error.error as LoginProblemDetails | string | null;
 
     if (typeof body === 'string') {
       const message = body.trim();
-      return message.length > 0 ? message : null;
+      return { message: message.length > 0 ? message : undefined };
     }
 
     if (!body || typeof body !== 'object') {
-      return null;
+      return {};
     }
 
-    const firstError = body.errors?.find((item) => item.message?.trim().length);
+    const firstError = body.errors?.find((item) => item.message?.trim().length || item.code?.trim().length);
 
-    if (firstError?.message) {
-      return firstError.message;
+    if (firstError) {
+      return {
+        code: firstError.code,
+        message: firstError.message,
+      };
     }
 
     if (body.detail?.trim().length) {
-      return body.detail;
+      return { message: body.detail };
     }
 
     if (body.title?.trim().length) {
-      return body.title;
+      return { message: body.title };
     }
 
-    return null;
+    return {};
   }
 
   private translateFallback(key: 'unavailable' | 'notFound' | 'invalid'): string {
@@ -256,8 +341,13 @@ export class AuthSessionService {
 
     return englishMessages[key];
   }
+
   private resolveUserType(userType: string): AuthenticatedUserType {
-    return userType === 'TechnicalAdmin' ? 'TechnicalAdmin' : 'OrganizationAdmin';
+    if (userType === 'TechnicalAdmin' || userType === 'BranchAdmin') {
+      return userType;
+    }
+
+    return 'OrganizationAdmin';
   }
 
   private storeSession(session: AuthenticatedSession, rememberSession: boolean): void {
@@ -267,6 +357,10 @@ export class AuthSessionService {
 
     this.removeStorageItem(staleStorage);
     targetStorage.setItem(this.sessionStorageKey, JSON.stringify(session));
+  }
+
+  private shouldRememberCurrentSession(): boolean {
+    return localStorage.getItem(this.sessionStorageKey) !== null;
   }
 
   private readStoredSession(): AuthenticatedSession | null {
@@ -311,14 +405,26 @@ export class AuthSessionService {
     return (
       typeof record['token'] === 'string' &&
       !this.isLegacyLocalFallbackToken(record['token']) &&
-      (record['userType'] === 'TechnicalAdmin' || record['userType'] === 'OrganizationAdmin') &&
+      (record['userType'] === 'TechnicalAdmin' ||
+        record['userType'] === 'OrganizationAdmin' ||
+        record['userType'] === 'BranchAdmin') &&
       typeof record['requiresBranchSelection'] === 'boolean' &&
-      (record['activeBranchId'] === null || typeof record['activeBranchId'] === 'string')
+      (record['activeBranchId'] === null || typeof record['activeBranchId'] === 'number') &&
+      Array.isArray(record['branches']) &&
+      typeof record['firstLoginFlag'] === 'boolean' &&
+      typeof record['passwordExpiredFlag'] === 'boolean' &&
+      (record['passwordChangedOnUtc'] === null || typeof record['passwordChangedOnUtc'] === 'string') &&
+      (record['passwordExpiresOnUtc'] === null || typeof record['passwordExpiresOnUtc'] === 'string')
     );
   }
 
+  private isCurrentSessionExpired(): boolean {
+    const session = this.currentSessionSignal();
+    return !!session && this.isJwtExpired(session.token);
+  }
+
   private isJwtExpired(token: string): boolean {
-    const payload = this.readJwtPayload(token);
+    const payload = decodeJwtPayload(token);
     const expiresAt = payload?.['exp'];
     const expiresAtSeconds = typeof expiresAt === 'number' ? expiresAt : Number(expiresAt);
 
@@ -329,25 +435,27 @@ export class AuthSessionService {
     return Date.now() >= expiresAtSeconds * 1000;
   }
 
-  private readJwtPayload(token: string): Record<string, unknown> | null {
-    const [, payload] = token.split('.');
+  private resolvePasswordChangeRequired(token: string): boolean {
+    const payload = decodeJwtPayload(token);
 
     if (!payload) {
+      return false;
+    }
+
+    return this.toBoolean(payload['password_change_required']) || this.toBoolean(payload['firstLoginFlag']);
+  }
+
+  private toBoolean(value: unknown): boolean {
+    return value === true || value === 'true' || value === 'True' || value === '1' || value === 1;
+  }
+
+  private toNullableNumber(value: number | string | null | undefined): number | null {
+    if (value === null || value === undefined || value === '') {
       return null;
     }
 
-    try {
-      const normalizedPayload = payload.replace(/-/g, '+').replace(/_/g, '/');
-      const paddedPayload = normalizedPayload.padEnd(Math.ceil(normalizedPayload.length / 4) * 4, '=');
-      const decodedPayload = globalThis.atob(paddedPayload);
-      const parsedPayload = JSON.parse(decodedPayload) as unknown;
-
-      return parsedPayload && typeof parsedPayload === 'object'
-        ? (parsedPayload as Record<string, unknown>)
-        : null;
-    } catch {
-      return null;
-    }
+    const numberValue = typeof value === 'number' ? value : Number(value);
+    return Number.isFinite(numberValue) ? numberValue : null;
   }
 
   private isLegacyLocalFallbackToken(token: string): boolean {

@@ -198,3 +198,100 @@
   line-height: 1.5 !important;
   text-transform: uppercase !important;
 }
+
+/* Scoped compact layout for create/edit branch popup only. */
+.branch-mutation-dialog {
+  --q-popup-wide-width: min(820px, calc(100dvw - 48px));
+  --q-popup-x: 18px;
+  --q-popup-y: 14px;
+}
+
+.branch-mutation-dialog .editor-panel-header {
+  min-height: 52px !important;
+  padding-block: 12px !important;
+}
+
+.branch-mutation-form.branch-form.row {
+  --bs-gutter-x: 0 !important;
+  --bs-gutter-y: 0 !important;
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 12px 16px !important;
+  padding-block: 14px !important;
+}
+
+.branch-mutation-form > :where(.branch-field, .branch-section-title, .branch-form-actions) {
+  width: auto !important;
+  max-width: none !important;
+  flex: initial !important;
+  padding: 0 !important;
+}
+
+.branch-mutation-form > :where(.branch-section-title, .branch-form-actions) {
+  grid-column: 1 / -1 !important;
+}
+
+.branch-mutation-form .branch-field {
+  gap: 5px !important;
+}
+
+.branch-mutation-form .branch-field span {
+  font-size: 0.72rem !important;
+  line-height: 1.2 !important;
+}
+
+.branch-mutation-form .branch-field :where(input, textarea, .form-control) {
+  min-height: 40px !important;
+  height: 40px !important;
+  padding: 0 12px !important;
+  border-radius: 9px !important;
+  font-size: 0.82rem !important;
+}
+
+.branch-mutation-form .branch-field textarea.form-control {
+  padding-block: 8px !important;
+  resize: none !important;
+}
+
+.branch-mutation-form .branch-section-title {
+  margin: 4px 0 0 !important;
+  padding: 8px 0 0 !important;
+  border-top: 1px solid rgb(var(--q-primary-rgb) / 0.12) !important;
+  font-size: 0.74rem !important;
+}
+
+.branch-mutation-form .branch-feedback.invalid-feedback {
+  min-height: 14px !important;
+  font-size: 0.68rem !important;
+  line-height: 1.2 !important;
+}
+
+.branch-mutation-form .branch-form-actions {
+  justify-content: flex-end !important;
+  margin-top: 2px !important;
+  padding-top: 12px !important;
+}
+
+.branch-mutation-form .branch-form-actions :where(.primary-action, .secondary-action) {
+  min-width: 104px !important;
+  min-height: 40px !important;
+}
+
+@media (max-width: 767.98px) {
+  .branch-mutation-dialog {
+    --q-popup-wide-width: min(100dvw - 24px, 720px);
+  }
+
+  .branch-mutation-form.branch-form.row {
+    grid-template-columns: 1fr !important;
+  }
+
+  .branch-mutation-form .branch-form-actions {
+    align-items: stretch !important;
+    flex-direction: column-reverse !important;
+  }
+
+  .branch-mutation-form .branch-form-actions :where(.primary-action, .secondary-action) {
+    width: 100% !important;
+  }
+}

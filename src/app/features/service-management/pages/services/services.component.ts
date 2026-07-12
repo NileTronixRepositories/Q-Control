@@ -1,4 +1,4 @@
-﻿import { HttpErrorResponse } from '@angular/common/http';
+import { HttpErrorResponse } from '@angular/common/http';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -33,6 +33,7 @@ import {
   ServiceManagementTab,
   ServiceParentOption,
   ServicePanelMode,
+  ServiceScope,
   ServiceTreeNode,
   UpdateServiceRequest,
 } from '../../models/service-management.model';
@@ -41,6 +42,7 @@ import {
   ServiceWorkflowStep,
   WorkflowStartOptions,
 } from '../../models/service-workflow.model';
+import { BranchServicesApiService } from '../../services/branch-services-api.service';
 import { ServiceManagementApiService } from '../../services/service-management-api.service';
 import { ServiceManagementPermissionService } from '../../services/service-management-permission.service';
 import { ServiceWorkflowApiService } from '../../services/service-workflow-api.service';
@@ -48,6 +50,7 @@ import { ServiceManagementStore } from '../../store/service-management.store';
 
 type BooleanSelectValue = 'all' | 'true' | 'false';
 type TicketIssuableValue = '' | 'true' | 'false';
+type ServiceScopeFilterValue = 'all' | ServiceScope;
 type TreeMutationAction = 'delete' | 'restore';
 type FormControlName =
   | 'arabicName'
@@ -77,6 +80,7 @@ export class ServicesComponent implements OnInit, OnDestroy {
   private readonly authSessionService = inject(AuthSessionService);
   private readonly i18nStore = inject(TechnicalAdminI18nStore);
   private readonly apiService = inject(ServiceManagementApiService);
+  private readonly branchServicesApiService = inject(BranchServicesApiService);
   private readonly workflowApiService = inject(ServiceWorkflowApiService);
   private readonly permissionService = inject(ServiceManagementPermissionService);
 
@@ -95,6 +99,19 @@ export class ServicesComponent implements OnInit, OnDestroy {
   public readonly canUpdate = this.permissionService.canUpdate;
   public readonly canDelete = this.permissionService.canDelete;
   public readonly canRestore = this.permissionService.canRestore;
+  public readonly canAssignBranchServices = this.permissionService.canAssignBranchServices;
+  public readonly isBranchAdmin = computed(
+    () => this.authSessionService.currentSession()?.userType === 'BranchAdmin',
+  );
+  public readonly activeBranchId = computed(() => this.authSessionService.currentSession()?.activeBranchId ?? null);
+  public readonly canUseBranchAssignment = computed(
+    () => this.isBranchAdmin() && this.canAssignBranchServices() && this.activeBranchId() !== null,
+  );
+  public readonly canUseCatalog = computed(() => this.canViewAll() || this.canUseBranchAssignment());
+  public readonly isTechnicalAdmin = computed(
+    () => this.authSessionService.currentSession()?.userType === 'TechnicalAdmin',
+  );
+  public readonly canCreateGlobal = computed(() => this.isTechnicalAdmin() && this.canCreate());
   public readonly canViewServiceWorkflows = this.permissionService.canViewServiceWorkflows;
   public readonly canViewStartOptions = this.permissionService.canViewStartOptions;
 
@@ -148,8 +165,16 @@ export class ServicesComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.store.activeTab.set('tree');
-    this.loadParentOptions();
+
+    if (this.canViewAll()) {
+      this.loadParentOptions();
+    }
+
     this.loadTree();
+
+    if (this.canUseBranchAssignment()) {
+      this.loadAssignedBranchTree();
+    }
   }
 
   ngOnDestroy(): void {
@@ -243,7 +268,14 @@ export class ServicesComponent implements OnInit, OnDestroy {
 
   public refresh(): void {
     this.loadTree();
-    this.loadParentOptions();
+
+    if (this.canViewAll()) {
+      this.loadParentOptions();
+    }
+
+    if (this.canUseBranchAssignment()) {
+      this.loadAssignedBranchTree();
+    }
   }
 
   public openCreate(): void {
@@ -288,7 +320,47 @@ export class ServicesComponent implements OnInit, OnDestroy {
 
   public selectTreeNode(node: ServiceTreeNode): void {
     this.store.selectTreeNode(node.id);
-    this.openView(node.id);
+
+    if (this.canViewDetails()) {
+      this.openView(node.id);
+    }
+  }
+
+  public toggleAssignedBranchNode(node: ServiceTreeNode): void {
+    if (node.children.length > 0) {
+      this.store.toggleAssignedBranchNode(node.id);
+    }
+  }
+
+  public selectAssignedBranchNode(node: ServiceTreeNode): void {
+    this.store.selectTreeNode(node.id);
+  }
+
+  public startBranchAssignmentDrag(node: ServiceTreeNode): void {
+    this.store.draggedBranchAssignmentNode.set(node);
+  }
+
+  public clearBranchAssignmentDrag(): void {
+    this.store.draggedBranchAssignmentNode.set(null);
+  }
+
+  public dropBranchAssignment(serviceId: number): void {
+    const draggedNode = this.store.draggedBranchAssignmentNode();
+    const node = draggedNode?.id === serviceId ? draggedNode : this.findTreeNode(this.store.serviceTree(), serviceId);
+
+    if (!node || !this.isAssignableBranchService(node)) {
+      this.showMessage('error', this.translations().branchAssignmentInvalidLeaf);
+      this.clearBranchAssignmentDrag();
+      return;
+    }
+
+    if (node.isAssignedToCurrentBranch === true) {
+      this.showMessage('info', this.translations().branchAssignmentAlreadyAssigned);
+      this.clearBranchAssignmentDrag();
+      return;
+    }
+
+    this.assignBranchService(node);
   }
 
   public closePanel(): void {
@@ -424,7 +496,7 @@ export class ServicesComponent implements OnInit, OnDestroy {
       return;
     }
 
-    if (!this.canUpdate() || details.isDeleted) {
+    if (!this.canUpdate() || !details.canEditDefinition || details.isDeleted) {
       this.showMessage('error', this.translations().noPermissionHint);
       input.value = '';
       return;
@@ -468,6 +540,10 @@ export class ServicesComponent implements OnInit, OnDestroy {
     }
 
     this.loadTree();
+
+    if (this.canUseBranchAssignment()) {
+      this.loadAssignedBranchTree();
+    }
   }
 
   public toggleTreeNode(node: ServiceTreeNode): void {
@@ -623,8 +699,54 @@ export class ServicesComponent implements OnInit, OnDestroy {
     return this.toBooleanSelectValue(this.store.listQuery().isTicketIssuable);
   }
 
+  public scopeFilterValue(): ServiceScopeFilterValue {
+    return this.store.listQuery().scope ?? 'all';
+  }
+
+  public assignedFilterValue(): BooleanSelectValue {
+    return this.toBooleanSelectValue(this.store.listQuery().isAssignedToCurrentBranch);
+  }
+
+  public updateScopeFilter(event: Event): void {
+    const value = this.readInputValue(event);
+    this.store.updateQuery({
+      scope: value === 'Global' || value === 'BranchScoped' ? value : null,
+      pageNumber: 1,
+    });
+    this.loadServices();
+    this.loadTree();
+  }
+
+  public updateOwnerBranchFilter(event: Event): void {
+    this.store.updateQuery({
+      ownerBranchId: this.toOptionalNumber(this.readInputValue(event)),
+      pageNumber: 1,
+    });
+    this.loadServices();
+    this.loadTree();
+  }
+
+  public updateAssignedFilter(event: Event): void {
+    this.store.updateQuery({
+      isAssignedToCurrentBranch: this.toBooleanFilter(this.readInputValue(event)),
+      pageNumber: 1,
+    });
+    this.loadServices();
+    this.loadTree();
+  }
+
+  public ownerBranchLabel(
+    item: ServiceListItem | ServiceDetails | ServiceTreeNode | ServiceParentOption,
+  ): string {
+    const value = this.language() === 'ar' ? item.ownerBranchArabicName : item.ownerBranchEnglishName;
+    return this.formatText(value);
+  }
+
+  public scopeLabel(scope: ServiceScope): string {
+    return scope === 'Global' ? this.translations().globalScope : this.translations().branchScopedScope;
+  }
   private openCreateForParent(parentServiceId: number | null, parentName: string): void {
-    if (!this.canCreate()) {
+    if (!this.canCreateGlobal()) {
       this.showMessage('error', this.translations().noPermissionHint);
       return;
     }
@@ -676,7 +798,7 @@ export class ServicesComponent implements OnInit, OnDestroy {
   }
 
   private loadTree(): void {
-    if (!this.canViewAll() || this.store.treeLoading()) {
+    if (!this.canUseCatalog() || this.store.treeLoading()) {
       return;
     }
 
@@ -686,6 +808,9 @@ export class ServicesComponent implements OnInit, OnDestroy {
       .getServiceTree({
         includeInactive: this.includeInactiveTree(),
         includeDeleted: this.includeDeletedTree(),
+        scope: this.store.listQuery().scope,
+        ownerBranchId: this.store.listQuery().ownerBranchId,
+        isAssignedToCurrentBranch: this.store.listQuery().isAssignedToCurrentBranch,
       })
       .subscribe({
         next: (response) => {
@@ -701,6 +826,61 @@ export class ServicesComponent implements OnInit, OnDestroy {
       });
   }
 
+  private loadAssignedBranchTree(expandServiceId?: number): void {
+    const branchId = this.activeBranchId();
+
+    if (!branchId || !this.canUseBranchAssignment() || this.store.assignedBranchTreeLoading()) {
+      return;
+    }
+
+    this.store.assignedBranchTreeLoading.set(true);
+    this.branchServicesApiService
+      .getBranchServicesTree(branchId, {
+        includeInactive: this.includeInactiveTree(),
+        includeDeleted: this.includeDeletedTree(),
+      })
+      .pipe(finalize(() => this.store.assignedBranchTreeLoading.set(false)))
+      .subscribe({
+        next: (response) => {
+          this.store.assignedBranchServiceTree.set(response);
+
+          if (expandServiceId) {
+            this.expandAssignedPathFor(expandServiceId);
+          }
+        },
+        error: (error: HttpErrorResponse) => this.handleApiError(error),
+      });
+  }
+
+  private assignBranchService(node: ServiceTreeNode): void {
+    const branchId = this.activeBranchId();
+
+    if (!branchId || !this.canUseBranchAssignment()) {
+      this.showMessage('error', this.translations().branchAssignmentMissingBranch);
+      this.clearBranchAssignmentDrag();
+      return;
+    }
+
+    this.store.branchAssigning.set(true);
+    this.branchServicesApiService
+      .assignServices(branchId, { serviceIds: [node.id] })
+      .pipe(finalize(() => this.store.branchAssigning.set(false)))
+      .subscribe({
+        next: (response) => {
+          this.showMessage(
+            response.createdAssignmentsCount > 0 ? 'success' : 'info',
+            response.message || this.translations().fallbackSuccess,
+          );
+          this.clearBranchAssignmentDrag();
+          this.loadTree();
+          this.loadAssignedBranchTree(node.id);
+        },
+        error: (error: HttpErrorResponse) => {
+          this.clearBranchAssignmentDrag();
+          this.handleApiError(error);
+        },
+      });
+  }
   private loadParentOptions(excludeServiceId?: number): void {
     if (!this.canViewAll()) {
       return;
@@ -1056,6 +1236,62 @@ export class ServicesComponent implements OnInit, OnDestroy {
     );
   }
 
+  private findTreeNode(nodes: readonly ServiceTreeNode[], serviceId: number): ServiceTreeNode | null {
+    for (const node of nodes) {
+      if (node.id === serviceId) {
+        return node;
+      }
+
+      const child = this.findTreeNode(node.children, serviceId);
+
+      if (child) {
+        return child;
+      }
+    }
+
+    return null;
+  }
+
+  private isAssignableBranchService(node: ServiceTreeNode): boolean {
+    return (
+      node.children.length === 0 &&
+      !node.hasChildren &&
+      !node.isDeleted &&
+      node.isActive &&
+      node.effectiveIsActive
+    );
+  }
+
+  private expandAssignedPathFor(serviceId: number): void {
+    const path = this.findTreePath(this.store.assignedBranchServiceTree(), serviceId);
+
+    if (path.length > 1) {
+      this.store.expandAssignedBranchNodes(path.slice(0, -1));
+    }
+  }
+
+  private findTreePath(
+    nodes: readonly ServiceTreeNode[],
+    serviceId: number,
+    currentPath: readonly number[] = [],
+  ): readonly number[] {
+    for (const node of nodes) {
+      const nextPath = [...currentPath, node.id];
+
+      if (node.id === serviceId) {
+        return nextPath;
+      }
+
+      const childPath = this.findTreePath(node.children, serviceId, nextPath);
+
+      if (childPath.length > 0) {
+        return childPath;
+      }
+    }
+
+    return [];
+  }
+
   private handleApiError(error: HttpErrorResponse): void {
     if (this.authSessionService.shouldClearSessionForHttpStatus(error.status)) {
       this.authSessionService.clearSession();
@@ -1123,10 +1359,3 @@ export class ServicesComponent implements OnInit, OnDestroy {
     return end >= start ? null : { rangeOrder: true };
   }
 }
-
-
-
-
-
-
-

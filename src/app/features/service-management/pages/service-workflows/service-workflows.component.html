@@ -42,85 +42,81 @@
     </div>
 
     @if (canViewAll()) {
-      <div
-        id="workflowFilters"
-        class="workflow-filters p-2 mt-1"
-        [hidden]="!filtersExpanded()"
-      >
+      <div id="workflowFilters" class="workflow-filters p-2 mt-1" [hidden]="!filtersExpanded()">
         <div class="row g-2 align-items-end mx-0">
-        <label class="workflow-field col-12 col-lg-4">
-          <span><i class="bi bi-search" aria-hidden="true"></i> {{ translations().search }}</span>
-          <input
-            class="workflow-input"
-            type="search"
-            [placeholder]="translations().search"
-            [value]="store.query().searchText"
-            (input)="updateSearch($event)"
-          />
-        </label>
+          <label class="workflow-field col-12 col-lg-4">
+            <span><i class="bi bi-search" aria-hidden="true"></i> {{ translations().search }}</span>
+            <input
+              class="workflow-input"
+              type="search"
+              [placeholder]="translations().search"
+              [value]="store.query().searchText"
+              (input)="updateSearch($event)"
+            />
+          </label>
 
-        <label class="workflow-field col-6 col-lg-2">
-          <span><i class="bi bi-funnel" aria-hidden="true"></i> {{ translations().status }}</span>
-          <select
-            class="workflow-input"
-            [value]="isActiveFilterValue()"
-            (change)="updateStatusFilter($event)"
-          >
-            <option value="all">{{ translations().all }}</option>
-            <option value="true">{{ translations().active }}</option>
-            <option value="false">{{ translations().inactive }}</option>
-          </select>
-        </label>
+          <label class="workflow-field col-6 col-lg-2">
+            <span><i class="bi bi-funnel" aria-hidden="true"></i> {{ translations().status }}</span>
+            <select
+              class="workflow-input"
+              [value]="isActiveFilterValue()"
+              (change)="updateStatusFilter($event)"
+            >
+              <option value="all">{{ translations().all }}</option>
+              <option value="true">{{ translations().active }}</option>
+              <option value="false">{{ translations().inactive }}</option>
+            </select>
+          </label>
 
-        <label class="workflow-field col-12 col-lg-3">
-          <span
-            ><i class="bi bi-signpost-2" aria-hidden="true"></i>
-            {{ translations().startService }}</span
-          >
-          <select
-            class="workflow-input"
-            [value]="store.query().startServiceId ?? 0"
-            (change)="updateStartServiceFilter($event)"
-          >
-            <option [value]="0">{{ translations().all }}</option>
-            @for (candidate of candidateOptions(); track candidateId(candidate)) {
-              <option [value]="candidateId(candidate)">{{ serviceName(candidate) }}</option>
-            }
-          </select>
-        </label>
+          <label class="workflow-field col-12 col-lg-3">
+            <span
+              ><i class="bi bi-signpost-2" aria-hidden="true"></i>
+              {{ translations().startService }}</span
+            >
+            <select
+              class="workflow-input"
+              [value]="store.query().startServiceId ?? 0"
+              (change)="updateStartServiceFilter($event)"
+            >
+              <option [value]="0">{{ translations().all }}</option>
+              @for (candidate of candidateOptions(); track candidateId(candidate)) {
+                <option [value]="candidateId(candidate)">{{ serviceName(candidate) }}</option>
+              }
+            </select>
+          </label>
 
-        <label class="workflow-field col-6 col-lg-1">
-          <span
-            ><i class="bi bi-list-ol" aria-hidden="true"></i> {{ translations().pageSize }}</span
-          >
-          <select
-            class="workflow-input"
-            [value]="store.query().pageSize"
-            (change)="updatePageSize($event)"
-          >
-            <option [value]="10">10</option>
-            <option [value]="25">25</option>
-            <option [value]="50">50</option>
-          </select>
-        </label>
+          <label class="workflow-field col-6 col-lg-1">
+            <span
+              ><i class="bi bi-list-ol" aria-hidden="true"></i> {{ translations().pageSize }}</span
+            >
+            <select
+              class="workflow-input"
+              [value]="store.query().pageSize"
+              (change)="updatePageSize($event)"
+            >
+              <option [value]="10">10</option>
+              <option [value]="25">25</option>
+              <option [value]="50">50</option>
+            </select>
+          </label>
 
-        <div class="workflow-field col-12 col-lg-2">
-          <!-- <span class="invisible" aria-hidden="true">&nbsp;</span> -->
-          <button
-            type="button"
-            class="workflow-refresh-btn"
-            [disabled]="store.listLoading()"
-            (click)="refresh()"
-          >
-            <i class="bi bi-arrow-clockwise" aria-hidden="true"></i>
-            {{ translations().refresh }}
-          </button>
+          <div class="workflow-field col-12 col-lg-2">
+            <!-- <span class="invisible" aria-hidden="true">&nbsp;</span> -->
+            <button
+              type="button"
+              class="workflow-refresh-btn"
+              [disabled]="store.listLoading()"
+              (click)="refresh()"
+            >
+              <i class="bi bi-arrow-clockwise" aria-hidden="true"></i>
+              {{ translations().refresh }}
+            </button>
+          </div>
         </div>
-      </div>
       </div>
     }
   </header>
-  @if (isEditorMode()) {
+  @if (canCreate()) {
     <section class="workflow-selection-bar d-grid gap-2 p-2 p-lg-3">
       <header
         class="workflow-selection-head d-flex align-items-center justify-content-between flex-wrap gap-2"
@@ -325,140 +321,7 @@
     </section>
   } @else {
     <section class="workflow-grid row g-2 g-xl-3 align-items-start">
-      <div class="col-12 col-xl-4">
-        <article class="workflow-list-panel h-100 d-flex flex-column">
-          <div class="workflow-list d-grid gap-2 p-2">
-            @if (store.listLoading()) {
-              <p class="workflow-note">
-                <i class="bi bi-arrow-repeat" aria-hidden="true"></i>{{ translations().loading }}
-              </p>
-            }
-
-            @if (hasWorkflows()) {
-              @for (workflow of workflows(); track workflowId(workflow)) {
-                <article
-                  class="workflow-card d-flex align-items-center flex-wrap gap-2 p-2"
-                  [class.workflow-card-inactive]="!workflow.isActive"
-                >
-                  <div class="workflow-card-main flex-grow-1">
-                    <div
-                      class="workflow-card-title-row d-flex align-items-center justify-content-between gap-2"
-                    >
-                      <h2>{{ workflowName(workflow) }}</h2>
-                      <span
-                        [class]="
-                          workflow.isActive ? 'workflow-badge active' : 'workflow-badge inactive'
-                        "
-                      >
-                        {{ workflow.isActive ? translations().active : translations().inactive }}
-                      </span>
-                    </div>
-                    <p>{{ translations().start }}: {{ startServiceName(workflow) }}</p>
-                    <div class="workflow-path-preview">
-                      @for (
-                        step of previewSteps(workflow);
-                        track step.stepOrder;
-                        let index = $index
-                      ) {
-                        <span
-                          class="workflow-path-step"
-                          [class.workflow-path-step-invalid]="isInvalidWorkflowStep(step)"
-                          [title]="isInvalidWorkflowStep(step) ? translations().invalidStep : null"
-                        >
-                          <b>{{ index + 1 }}</b>
-                          <em>{{ serviceName(step) }}</em>
-                        </span>
-                      }
-                      @if (workflowStepCount(workflow) > 5) {
-                        <span class="workflow-path-step workflow-path-more">
-                          <b>+</b>
-                          <em>{{ workflowStepCount(workflow) - 5 }}</em>
-                        </span>
-                      }
-                    </div>
-                  </div>
-                  <div class="workflow-card-side flex-shrink-0 px-2 py-1">
-                    <strong>{{ workflowStepCount(workflow) }}</strong>
-                    <span>{{ translations().steps }}</span>
-                  </div>
-                  <div class="workflow-card-actions d-flex flex-wrap gap-1 p-1 flex-shrink-0">
-                    @if (canViewDetails()) {
-                      <button
-                        type="button"
-                        class="workflow-icon-btn"
-                        [title]="translations().view"
-                        (click)="openView(workflow)"
-                      >
-                        <i class="bi bi-eye" aria-hidden="true"></i>
-                      </button>
-                    }
-                    @if (canUpdate() && workflow.isActive) {
-                      <button
-                        type="button"
-                        class="workflow-icon-btn"
-                        [title]="translations().edit"
-                        (click)="openEdit(workflow)"
-                      >
-                        <i class="bi bi-pencil-square" aria-hidden="true"></i>
-                      </button>
-                    }
-                    @if (canDeactivate() && workflow.isActive) {
-                      <button
-                        type="button"
-                        class="workflow-icon-btn danger"
-                        [title]="translations().deactivate"
-                        (click)="requestDeactivate(workflow)"
-                      >
-                        <i class="bi bi-pause-circle" aria-hidden="true"></i>
-                      </button>
-                    }
-                    @if (canReactivate() && !workflow.isActive) {
-                      <button
-                        type="button"
-                        class="workflow-icon-btn success"
-                        [title]="translations().reactivate"
-                        (click)="requestReactivate(workflow)"
-                      >
-                        <i class="bi bi-play-circle" aria-hidden="true"></i>
-                      </button>
-                    }
-                  </div>
-                </article>
-              }
-            } @else if (!store.listLoading()) {
-              <section class="workflow-empty">
-                <i class="bi bi-diagram-3" aria-hidden="true"></i>
-                <h2>{{ translations().noWorkflows }}</h2>
-              </section>
-            }
-          </div>
-          <footer
-            class="workflow-pagination d-flex align-items-center justify-content-between flex-wrap gap-2 p-2 mt-auto"
-          >
-            <span>{{ translations().totalItems }}: {{ store.page().totalItems }}</span>
-            <div class="d-flex align-items-center gap-2">
-              <button
-                type="button"
-                class="workflow-secondary-btn"
-                [disabled]="!store.page().hasPreviousPage"
-                (click)="previousPage()"
-              >
-                {{ translations().previous }}
-              </button>
-              <span>{{ store.page().currentPage }} / {{ store.page().totalPages || 1 }}</span>
-              <button
-                type="button"
-                class="workflow-secondary-btn"
-                [disabled]="!store.page().hasNextPage"
-                (click)="nextPage()"
-              >
-                {{ translations().next }}
-              </button>
-            </div>
-          </footer>
-        </article>
-      </div>
-      <div class="col-12 col-xl-8">
+      <div class="col-12">
         <article class="workflow-editor-panel h-100 d-flex flex-column">
           <header
             class="workflow-panel-header d-flex align-items-center justify-content-between gap-2 p-2"
@@ -826,6 +689,155 @@
                 </footer>
               </form>
             }
+
+            <section class="workflow-embedded-list-section d-grid gap-2">
+              <div class="workflow-list workflow-embedded-list d-grid gap-2 p-2">
+                @if (store.listLoading()) {
+                  <p class="workflow-note">
+                    <i class="bi bi-arrow-repeat" aria-hidden="true"></i
+                    >{{ translations().loading }}
+                  </p>
+                }
+
+                @if (hasWorkflows()) {
+                  @for (workflow of workflows(); track workflowId(workflow)) {
+                    <article
+                      class="workflow-embedded-card d-flex align-items-center gap-2 p-2"
+                      [class.workflow-card-inactive]="!workflow.isActive"
+                    >
+                      <div
+                        class="workflow-details-path workflow-embedded-details-path"
+                        [attr.aria-label]="workflowName(workflow)"
+                      >
+                        @for (
+                          step of workflowListSteps(workflow);
+                          track step.stepOrder;
+                          let index = $index;
+                          let isLast = $last
+                        ) {
+                          <article
+                            class="workflow-flow-step"
+                            [class.workflow-flow-step-matched]="isMatchedWorkflowStep(step)"
+                            [class.workflow-flow-step-invalid]="isInvalidWorkflowStep(step)"
+                            [title]="
+                              isInvalidWorkflowStep(step) ? translations().invalidStep : null
+                            "
+                          >
+                            <span class="workflow-step-index">{{ index + 1 }}</span>
+                            <div>
+                              <strong>{{ serviceName(step) }}</strong>
+                              <small>{{ translations().parent }}: {{ parentName(step) }}</small>
+                              <div class="workflow-step-badges">
+                                @if (step.isTicketIssuable) {
+                                  <span class="workflow-badge info">{{
+                                    translations().ticketIssuable
+                                  }}</span>
+                                }
+                                @if (step.isDeleted) {
+                                  <span class="workflow-badge danger">{{
+                                    translations().deleted
+                                  }}</span>
+                                }
+                              </div>
+                            </div>
+                          </article>
+                          @if (!isLast) {
+                            <i
+                              [class]="
+                                direction() === 'rtl'
+                                  ? 'workflow-flow-arrow bi bi-arrow-left'
+                                  : 'workflow-flow-arrow bi bi-arrow-right'
+                              "
+                              aria-hidden="true"
+                            ></i>
+                          }
+                        }
+                      </div>
+
+                      <div
+                        class="workflow-embedded-tools d-flex align-items-center flex-wrap gap-2 flex-shrink-0"
+                      >
+                        <div class="workflow-card-actions d-flex flex-wrap gap-1 p-1 flex-shrink-0">
+                          @if (canViewDetails()) {
+                            <button
+                              type="button"
+                              class="workflow-icon-btn"
+                              [title]="translations().view"
+                              (click)="openView(workflow)"
+                            >
+                              <i class="bi bi-eye" aria-hidden="true"></i>
+                            </button>
+                          }
+                          @if (canUpdate() && workflow.isActive) {
+                            <button
+                              type="button"
+                              class="workflow-icon-btn"
+                              [title]="translations().edit"
+                              (click)="openEdit(workflow)"
+                            >
+                              <i class="bi bi-pencil-square" aria-hidden="true"></i>
+                            </button>
+                          }
+                          @if (canDeactivate() && workflow.isActive) {
+                            <button
+                              type="button"
+                              class="workflow-icon-btn danger"
+                              [title]="translations().deactivate"
+                              (click)="requestDeactivate(workflow)"
+                            >
+                              <i class="bi bi-pause-circle" aria-hidden="true"></i>
+                            </button>
+                          }
+                          @if (canReactivate() && !workflow.isActive) {
+                            <button
+                              type="button"
+                              class="workflow-icon-btn success"
+                              [title]="translations().reactivate"
+                              (click)="requestReactivate(workflow)"
+                            >
+                              <i class="bi bi-play-circle" aria-hidden="true"></i>
+                            </button>
+                          }
+                        </div>
+                        <div class="workflow-card-side flex-shrink-0 px-2 py-1">
+                          <strong>{{ workflowStepCount(workflow) }}</strong>
+                          <span>{{ translations().steps }}</span>
+                        </div>
+                      </div>
+                    </article>
+                  }
+                } @else if (!store.listLoading()) {
+                  <section class="workflow-empty workflow-embedded-empty">
+                    <i class="bi bi-diagram-3" aria-hidden="true"></i>
+                    <h2>{{ translations().noWorkflows }}</h2>
+                  </section>
+                }
+              </div>
+              <footer
+                class="workflow-pagination workflow-embedded-pagination d-flex align-items-center justify-content-between flex-wrap gap-2 p-2"
+              >
+                <span>{{ translations().totalItems }}: {{ store.page().totalItems }}</span>
+                <div class="d-flex align-items-center gap-2">
+                  <button
+                    type="button"
+                    class="workflow-secondary-btn"
+                    [disabled]="!store.page().hasPreviousPage"
+                    (click)="previousPage()"
+                  >
+                    {{ translations().previous }}
+                  </button>
+                  <span>{{ store.page().currentPage }} / {{ store.page().totalPages || 1 }}</span>
+                  <button
+                    type="button"
+                    class="workflow-secondary-btn"
+                    [disabled]="!store.page().hasNextPage"
+                    (click)="nextPage()"
+                  >
+                    {{ translations().next }}
+                  </button>
+                </div>
+              </footer>
+            </section>
           </div>
         </article>
       </div>

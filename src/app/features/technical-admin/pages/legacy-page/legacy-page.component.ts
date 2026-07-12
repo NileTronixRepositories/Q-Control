@@ -4,18 +4,20 @@ import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angula
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { AppLanguage } from '../../../../shared/models/app-language.model';
+import { CreateBranchAdminDialogComponent } from '../../../branch-admins/components/create-branch-admin-dialog/create-branch-admin-dialog.component';
+import { BRANCH_ADMINS_TRANSLATIONS } from '../../../branch-admins/i18n/branch-admins.translations';
 import { AuthSessionService } from '../../../auth/services/auth-session.service';
 import {
   BranchAuditUser,
   BranchDetails,
   BranchListItem,
-  BranchLocation,
   CreateBranchRequest,
   UpdateBranchRequest,
   BranchOrderSort,
   PagedBranchResponse
 } from '../../models/branch-management.model';
 import { BranchManagementApiService } from '../../services/branch-management-api.service';
+import { BranchPermissionService } from '../../services/branch-permission.service';
 import { TechnicalAdminI18nStore } from '../../store/technical-admin-i18n.store';
 import { formatTechnicalAdminApiError } from '../../utils/api-error-message.util';
 
@@ -41,6 +43,11 @@ interface BranchEditorRow {
   readonly effectiveIsActive: boolean;
   readonly rowVersion: string;
   readonly createdBy: string;
+}
+
+interface BranchAdminDialogTarget {
+  readonly branchId: number;
+  readonly branchLabel: string;
 }
 
 interface BranchTableMeta {
@@ -195,7 +202,7 @@ const EMPTY_BRANCH_TABLE_META: BranchTableMeta = {
 
 @Component({
   selector: 'app-legacy-page',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, CreateBranchAdminDialogComponent],
   templateUrl: './legacy-page.component.html',
   styleUrl: './legacy-page.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -206,6 +213,7 @@ export class LegacyPageComponent implements OnInit, OnDestroy {
   private readonly formBuilder = inject(NonNullableFormBuilder);
   private readonly authSessionService = inject(AuthSessionService);
   private readonly branchManagementApiService = inject(BranchManagementApiService);
+  private readonly branchPermissionService = inject(BranchPermissionService);
   private readonly i18nStore = inject(TechnicalAdminI18nStore);
   protected readonly language = this.i18nStore.language;
   protected readonly direction = this.i18nStore.direction;
@@ -214,6 +222,7 @@ export class LegacyPageComponent implements OnInit, OnDestroy {
 
   protected readonly translations = this.i18nStore.translations;
   protected readonly branchEditorTranslations = computed(() => BRANCH_EDITOR_TRANSLATIONS[this.i18nStore.language()]);
+  protected readonly branchAdminTranslations = computed(() => BRANCH_ADMINS_TRANSLATIONS[this.i18nStore.language()]);
   protected readonly branchSearchText = signal('');
   protected readonly branchOrderSort = signal<BranchOrderSort>('Newest');
   protected readonly branchStatusFilter = signal<boolean | null>(null);
@@ -226,9 +235,12 @@ export class LegacyPageComponent implements OnInit, OnDestroy {
   protected readonly branchPanelMode = signal<BranchPanelMode>('closed');
   protected readonly selectedBranchId = signal<number | null>(null);
   protected readonly selectedBranchDetails = signal<BranchDetails | null>(null);
+  protected readonly selectedBranchForAdmin = signal<BranchAdminDialogTarget | null>(null);
   protected readonly branchMessage = signal<UiMessage | null>(null);
   protected readonly branchTableMeta = signal<BranchTableMeta>(EMPTY_BRANCH_TABLE_META);
   protected readonly branches = signal<readonly BranchEditorRow[]>([]);
+  protected readonly canCreateBranchAdmin = this.branchPermissionService.canCreateBranchAdmin;
+
 
   protected readonly branchForm = this.formBuilder.group({
     arabicName: ['', [Validators.required, Validators.maxLength(100)]],
@@ -364,7 +376,25 @@ export class LegacyPageComponent implements OnInit, OnDestroy {
       queryParams: { branchId },
     });
   }
+  protected openCreateBranchAdmin(branch: BranchEditorRow): void {
+    if (!this.canCreateBranchAdmin() || !branch.isActive) {
+      return;
+    }
 
+    this.selectedBranchForAdmin.set({
+      branchId: branch.id,
+      branchLabel: `BR-${branch.id} - ${branch.englishName}`,
+    });
+  }
+
+  protected closeCreateBranchAdminDialog(): void {
+    this.selectedBranchForAdmin.set(null);
+  }
+
+  protected handleBranchAdminCreated(message: string): void {
+    this.selectedBranchForAdmin.set(null);
+    this.showBranchMessage('success', message);
+  }
   protected closeBranchPanel(): void {
     this.branchPanelRequestId += 1;
     this.branchPanelLoading.set(false);
@@ -466,6 +496,7 @@ export class LegacyPageComponent implements OnInit, OnDestroy {
   protected formatNullableDate(value: string | null | undefined): string {
     return this.formatDate(value ?? null);
   }
+
 
   private loadBranches(pageNumber = this.branchTableMeta().currentPage, force = false): void {
     if (this.branchTableLoading() && !force) {
@@ -728,7 +759,7 @@ export class LegacyPageComponent implements OnInit, OnDestroy {
   private handleBranchApiError(error: HttpErrorResponse): void {
     if (this.authSessionService.shouldClearSessionForHttpStatus(error.status)) {
       this.authSessionService.clearSession();
-      void this.router.navigateByUrl('/login');
+      void this.router.navigateByUrl('/auth/login');
       return;
     }
 
@@ -755,4 +786,3 @@ export class LegacyPageComponent implements OnInit, OnDestroy {
     return (event.target as HTMLInputElement | HTMLSelectElement).value;
   }
 }
-

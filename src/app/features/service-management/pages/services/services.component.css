@@ -80,6 +80,19 @@
   grid-template-columns: minmax(470px, 1fr) minmax(390px, .82fr);
 }
 
+
+.svc-branch-assignment-workspace {
+  align-items: start;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+
+.svc-branch-assignment-column {
+  overflow: hidden;
+}
+
+
 .svc-editor {
   overflow: visible;
 }
@@ -526,6 +539,7 @@ textarea.svc-input,
 
 @media (max-width: 1199.98px) {
   .svc-workspace,
+  .svc-branch-assignment-workspace,
   .svc-form-row-support,
   .svc-form-row-metrics {
     grid-template-columns: 1fr;
@@ -568,5 +582,21 @@ textarea.svc-input,
   .svc-actions,
   .svc-dialog-actions {
     justify-content: stretch;
+  }
+}
+.svc-central-filters {
+  background: #fff;
+  border: 1px solid #d7e8ff;
+  border-radius: 8px;
+  box-shadow: 0 8px 18px #0f172a0d;
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(3, minmax(160px, 1fr));
+  padding: 9px 12px;
+}
+
+@media (max-width: 767.98px) {
+  .svc-central-filters {
+    grid-template-columns: 1fr;
   }
 }

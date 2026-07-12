@@ -4,9 +4,13 @@ export type ServicePermission =
   | 'Services.Create'
   | 'Services.Update'
   | 'Services.Delete'
-  | 'Services.Restore';
+  | 'Services.Restore'
+  | 'BranchServices.View'
+  | 'BranchServices.Assign'
+  | 'BranchServiceTrees.Create';
 
 export type ServiceBooleanFilter = boolean | null;
+export type ServiceScope = 'Global' | 'BranchScoped';
 
 export interface ServiceListQuery {
   readonly pageNumber: number;
@@ -16,6 +20,9 @@ export interface ServiceListQuery {
   readonly isDeleted: ServiceBooleanFilter;
   readonly isTicketIssuable: ServiceBooleanFilter;
   readonly parentServiceId: number | null;
+  readonly scope: ServiceScope | null;
+  readonly ownerBranchId: number | null;
+  readonly isAssignedToCurrentBranch: ServiceBooleanFilter;
   readonly orderSort?: string;
 }
 
@@ -32,6 +39,13 @@ export interface PagedServiceResponse<TItem> {
 export interface ServiceListItem {
   readonly id: number;
   readonly parentServiceId: number | null;
+  readonly scope: ServiceScope;
+  readonly ownerBranchId: number | null;
+  readonly ownerBranchArabicName: string | null;
+  readonly ownerBranchEnglishName: string | null;
+  readonly isOwnedByCurrentBranch: boolean;
+  readonly isAssignedToCurrentBranch: boolean | null;
+  readonly canEditDefinition: boolean;
   readonly arabicName: string;
   readonly englishName: string;
   readonly parentServiceNameAr?: string | null;
@@ -66,6 +80,13 @@ export interface ServiceDetails extends ServiceListItem {
 export interface ServiceTreeNode {
   readonly id: number;
   readonly parentServiceId: number | null;
+  readonly scope: ServiceScope;
+  readonly ownerBranchId: number | null;
+  readonly ownerBranchArabicName: string | null;
+  readonly ownerBranchEnglishName: string | null;
+  readonly isOwnedByCurrentBranch: boolean;
+  readonly isAssignedToCurrentBranch: boolean | null;
+  readonly canEditDefinition: boolean;
   readonly arabicName: string;
   readonly englishName: string;
   readonly isActive: boolean;
@@ -81,6 +102,10 @@ export interface ServiceTreeNode {
 export interface ServiceParentOption {
   readonly id: number;
   readonly parentServiceId: number | null;
+  readonly scope?: ServiceScope;
+  readonly ownerBranchId?: number | null;
+  readonly ownerBranchArabicName?: string | null;
+  readonly ownerBranchEnglishName?: string | null;
   readonly arabicName: string;
   readonly englishName: string;
   readonly effectiveIsActive: boolean;
@@ -117,6 +142,9 @@ export interface ServiceSelectionOption {
 export interface ServiceTreeQuery {
   readonly includeInactive: boolean;
   readonly includeDeleted: boolean;
+  readonly scope?: ServiceScope | null;
+  readonly ownerBranchId?: number | null;
+  readonly isAssignedToCurrentBranch?: ServiceBooleanFilter;
 }
 
 export interface ServiceParentQuery {

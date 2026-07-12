@@ -1,0 +1,75 @@
+:host {
+  display: block;
+}
+
+.access-state-page {
+  display: grid;
+  min-height: 100vh;
+  place-items: center;
+  padding: 24px;
+  background: var(--q-surface-muted, #f6f8fb);
+}
+
+.access-state-card {
+  width: min(100%, 520px);
+  padding: 28px;
+  text-align: center;
+  background: var(--q-surface-card, #fff);
+  border: 1px solid var(--q-border-subtle, #dfe5ef);
+  border-radius: 8px;
+}
+
+.access-state-card > i {
+  display: inline-grid;
+  width: 54px;
+  height: 54px;
+  place-items: center;
+  margin-bottom: 18px;
+  color: var(--q-warning, #f59f00);
+  background: rgb(245 159 0 / 12%);
+  border-radius: 50%;
+  font-size: 1.5rem;
+}
+
+.access-state-card h1 {
+  margin: 0 0 10px;
+  font-size: 1.5rem;
+  font-weight: 800;
+}
+
+.access-state-card p {
+  margin: 0;
+  color: var(--q-text-muted, #5b6472);
+}
+
+.access-state-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 22px;
+}
+
+.primary-action,
+.secondary-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 0 16px;
+  border-radius: 8px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.primary-action {
+  color: #fff;
+  background: var(--q-primary, #1f6feb);
+  border: 1px solid var(--q-primary, #1f6feb);
+}
+
+.secondary-action {
+  color: var(--q-text-primary, #162033);
+  background: var(--q-surface-card, #fff);
+  border: 1px solid var(--q-border-subtle, #dfe5ef);
+}

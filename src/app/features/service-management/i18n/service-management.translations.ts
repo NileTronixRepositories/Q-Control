@@ -108,6 +108,25 @@ export interface ServiceManagementTranslations {
   readonly yes: string;
   readonly no: string;
   readonly notAvailable: string;
+  readonly scope: string;
+  readonly globalScope: string;
+  readonly branchScopedScope: string;
+  readonly ownerBranch: string;
+  readonly assignedToCurrentBranch: string;
+  readonly notAssignedToCurrentBranch: string;
+  readonly ownedByCurrentBranch: string;
+  readonly serviceCentral: string;
+  readonly scopeFilter: string;
+  readonly ownerBranchFilter: string;
+  readonly assignedFilter: string;
+  readonly branchAssignmentTitle: string;
+  readonly branchAssignmentDescription: string;
+  readonly branchAssignmentSourceTitle: string;
+  readonly branchAssignmentTargetTitle: string;
+  readonly branchAssignmentDropHint: string;
+  readonly branchAssignmentInvalidLeaf: string;
+  readonly branchAssignmentMissingBranch: string;
+  readonly branchAssignmentAlreadyAssigned: string;
 }
 
 export const SERVICE_MANAGEMENT_TRANSLATIONS: Record<AppLanguage, ServiceManagementTranslations> = {
@@ -219,6 +238,25 @@ export const SERVICE_MANAGEMENT_TRANSLATIONS: Record<AppLanguage, ServiceManagem
     yes: 'نعم',
     no: 'لا',
     notAvailable: '-',
+    scope: 'النطاق',
+    globalScope: 'عام',
+    branchScopedScope: 'مملوك لفرع',
+    ownerBranch: 'الفرع المالك',
+    assignedToCurrentBranch: 'مسند للفرع الحالي',
+    notAssignedToCurrentBranch: 'غير مسند للفرع الحالي',
+    ownedByCurrentBranch: 'مملوك للفرع الحالي',
+    serviceCentral: 'Service Central',
+    scopeFilter: 'نطاق الخدمة',
+    ownerBranchFilter: 'كود الفرع المالك',
+    assignedFilter: 'الإسناد للفرع الحالي',
+    branchAssignmentTitle: 'Branch service assignment',
+    branchAssignmentDescription: 'Drag active leaf services into the branch tree to assign them.',
+    branchAssignmentSourceTitle: 'Service Central',
+    branchAssignmentTargetTitle: 'Assigned branch services',
+    branchAssignmentDropHint: 'Drop a service here to assign it to the branch.',
+    branchAssignmentInvalidLeaf: 'Only active leaf services can be assigned.',
+    branchAssignmentMissingBranch: 'No active branch is available for assignment.',
+    branchAssignmentAlreadyAssigned: 'This service is already assigned to the branch.',
   },
   en: {
     title: 'Service Management',
@@ -328,5 +366,24 @@ export const SERVICE_MANAGEMENT_TRANSLATIONS: Record<AppLanguage, ServiceManagem
     yes: 'Yes',
     no: 'No',
     notAvailable: '-',
+    scope: 'Scope',
+    globalScope: 'Global',
+    branchScopedScope: 'Branch Scoped',
+    ownerBranch: 'Owner Branch',
+    assignedToCurrentBranch: 'Assigned to current branch',
+    notAssignedToCurrentBranch: 'Not assigned to current branch',
+    ownedByCurrentBranch: 'Owned by current branch',
+    serviceCentral: 'Service Central',
+    scopeFilter: 'Service Scope',
+    ownerBranchFilter: 'Owner Branch ID',
+    assignedFilter: 'Assigned to current branch',
+    branchAssignmentTitle: 'Branch service assignment',
+    branchAssignmentDescription: 'Drag active leaf services into the branch tree to assign them.',
+    branchAssignmentSourceTitle: 'Service Central',
+    branchAssignmentTargetTitle: 'Assigned branch services',
+    branchAssignmentDropHint: 'Drop a service here to assign it to the branch.',
+    branchAssignmentInvalidLeaf: 'Only active leaf services can be assigned.',
+    branchAssignmentMissingBranch: 'No active branch is available for assignment.',
+    branchAssignmentAlreadyAssigned: 'This service is already assigned to the branch.',
   },
 };

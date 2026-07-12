@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
 
 import { AppDirection, AppLanguage } from '../../../../shared/models/app-language.model';
 import { ServiceManagementTranslations } from '../../i18n/service-management.translations';
@@ -22,6 +22,13 @@ interface ServiceHierarchyTreeEntry {
   readonly showOperationalBadge: boolean;
   readonly ticketClassList: string;
   readonly ticketLabel: string;
+  readonly scopeLabel: string;
+  readonly ownerLabel: string | null;
+  readonly assignedLabel: string | null;
+  readonly ownedLabel: string | null;
+  readonly canSelectLeaf: boolean;
+  readonly isSelectedLeaf: boolean;
+  readonly canDragLeaf: boolean;
 }
 
 const ROW_BASE_CLASSES = 'svc-tree-node';
@@ -59,6 +66,11 @@ export class ServiceHierarchyTreeComponent {
   readonly canUpdate = input.required<boolean>();
   readonly canDelete = input.required<boolean>();
   readonly canRestore = input.required<boolean>();
+  readonly canCreateChildFor = input<(node: ServiceTreeNode) => boolean>(() => true);
+  readonly selectableLeaves = input(false);
+  readonly selectedLeafIds = input<ReadonlySet<number>>(new Set());
+  readonly draggableLeaves = input(false);
+  readonly dropTarget = input(false);
 
   readonly refresh = output<void>();
   readonly includeInactiveChange = output<boolean>();
@@ -71,6 +83,12 @@ export class ServiceHierarchyTreeComponent {
   readonly editNode = output<ServiceTreeNode>();
   readonly deleteNode = output<ServiceTreeNode>();
   readonly restoreNode = output<ServiceTreeNode>();
+  readonly leafSelectionChange = output<{ readonly node: ServiceTreeNode; readonly selected: boolean }>();
+  readonly leafDragStarted = output<ServiceTreeNode>();
+  readonly leafDragEnded = output<void>();
+  readonly leafDropped = output<number>();
+
+  public readonly isDropActive = signal(false);
 
   public readonly flatNodes = computed(() =>
     this.flattenNodes(this.nodes(), this.expandedNodeIds(), this.selectedServiceId()),
@@ -92,6 +110,82 @@ export class ServiceHierarchyTreeComponent {
   public requestCreateChild(node: ServiceTreeNode, event: MouseEvent): void {
     event.stopPropagation();
     this.createChild.emit(node);
+  }
+
+  public onLeafSelectionChange(node: ServiceTreeNode, event: Event): void {
+    const checked = (event.target as HTMLInputElement).checked;
+    this.leafSelectionChange.emit({ node, selected: checked });
+  }
+
+  public onLeafDragStart(node: ServiceTreeNode, event: DragEvent): void {
+    if (!this.canDragLeaf(node)) {
+      event.preventDefault();
+      return;
+    }
+
+    event.stopPropagation();
+    event.dataTransfer?.setData('text/plain', String(node.id));
+    event.dataTransfer?.setData('application/x-qsystem-service-id', String(node.id));
+
+    if (event.dataTransfer) {
+      event.dataTransfer.effectAllowed = 'copy';
+    }
+
+    this.leafDragStarted.emit(node);
+  }
+
+  public onLeafDragEnd(): void {
+    this.leafDragEnded.emit();
+  }
+
+  public onDropTargetDragOver(event: DragEvent): void {
+    if (!this.dropTarget()) {
+      return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (event.dataTransfer) {
+      event.dataTransfer.dropEffect = 'copy';
+    }
+
+    this.isDropActive.set(true);
+  }
+
+  public onDropTargetDragLeave(event: DragEvent): void {
+    if (!this.dropTarget()) {
+      return;
+    }
+
+    const current = event.currentTarget as HTMLElement | null;
+    const related = event.relatedTarget as Node | null;
+
+    if (!current || (related && current.contains(related))) {
+      return;
+    }
+
+    this.isDropActive.set(false);
+  }
+
+  public onDropTargetDrop(event: DragEvent): void {
+    if (!this.dropTarget()) {
+      return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDropActive.set(false);
+
+    const rawId =
+      event.dataTransfer?.getData('application/x-qsystem-service-id') ||
+      event.dataTransfer?.getData('text/plain') ||
+      '';
+    const serviceId = Number(rawId);
+
+    if (Number.isInteger(serviceId) && serviceId > 0) {
+      this.leafDropped.emit(serviceId);
+    }
   }
 
   public requestView(node: ServiceTreeNode, event: MouseEvent): void {
@@ -162,7 +256,52 @@ export class ServiceHierarchyTreeComponent {
       showOperationalBadge: node.isActive !== node.effectiveIsActive && !node.isDeleted,
       ticketClassList: `${BADGE_BASE_CLASSES} ${node.canIssueTicket ? INFO_STATUS_CLASSES : INACTIVE_STATUS_CLASSES}`,
       ticketLabel: node.canIssueTicket ? translations.canIssueTicket : translations.cannotIssueTicket,
+      scopeLabel: node.scope === 'Global' ? translations.globalScope : translations.branchScopedScope,
+      ownerLabel: node.scope === 'BranchScoped' ? this.ownerLabel(node) : null,
+      assignedLabel: this.assignmentLabel(node),
+      ownedLabel: node.isOwnedByCurrentBranch ? translations.ownedByCurrentBranch : null,
+      canSelectLeaf: this.canSelectLeaf(node),
+      isSelectedLeaf: this.selectedLeafIds().has(node.id),
+      canDragLeaf: this.canDragLeaf(node),
     };
+  }
+
+  private canSelectLeaf(node: ServiceTreeNode): boolean {
+    return (
+      this.selectableLeaves() &&
+      node.children.length === 0 &&
+      !node.hasChildren &&
+      !node.isDeleted &&
+      node.isActive &&
+      node.effectiveIsActive
+    );
+  }
+
+  private canDragLeaf(node: ServiceTreeNode): boolean {
+    return (
+      this.draggableLeaves() &&
+      node.children.length === 0 &&
+      !node.hasChildren &&
+      !node.isDeleted &&
+      node.isActive &&
+      node.effectiveIsActive &&
+      node.isAssignedToCurrentBranch !== true
+    );
+  }
+
+  private ownerLabel(node: ServiceTreeNode): string | null {
+    const value = this.language() === 'ar' ? node.ownerBranchArabicName : node.ownerBranchEnglishName;
+    return value?.trim() || null;
+  }
+
+  private assignmentLabel(node: ServiceTreeNode): string | null {
+    if (node.isAssignedToCurrentBranch === null) {
+      return null;
+    }
+
+    return node.isAssignedToCurrentBranch
+      ? this.translations().assignedToCurrentBranch
+      : this.translations().notAssignedToCurrentBranch;
   }
 
   private statusClasses(node: ServiceTreeNode): string {

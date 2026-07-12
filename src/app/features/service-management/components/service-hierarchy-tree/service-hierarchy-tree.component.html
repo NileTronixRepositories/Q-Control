@@ -1,4 +1,4 @@
-<section class="svc-tree-panel">
+<section class="svc-tree-panel" [class.svc-tree-panel--drop-target]="dropTarget()" [class.svc-tree-panel--drop-active]="isDropActive()" (dragover)="onDropTargetDragOver($event)" (dragleave)="onDropTargetDragLeave($event)" (drop)="onDropTargetDrop($event)">
   <header class="svc-tree-header">
     <div class="svc-tree-title">
       <p class="svc-tree-eyebrow">{{ translations().hierarchy }}</p>
@@ -60,11 +60,16 @@
         @for (entry of flatNodes(); track entry.node.id) {
           <article
             [class]="entry.rowClassList"
+            [class.svc-tree-node--draggable]="entry.canDragLeaf"
+            [class.svc-tree-node--selectable]="selectableLeaves()"
             [style.--tree-offset]="entry.offset + 'px'"
             [attr.data-level]="entry.level"
             role="treeitem"
             [attr.aria-level]="entry.level"
             [attr.aria-expanded]="entry.hasChildren ? entry.isExpanded : null"
+            [attr.draggable]="entry.canDragLeaf ? 'true' : null"
+            (dragstart)="onLeafDragStart(entry.node, $event)"
+            (dragend)="onLeafDragEnd()"
             (click)="selectNode.emit(entry.node)"
           >
             <button
@@ -77,6 +82,17 @@
               <i [class]="entry.toggleIconClass" aria-hidden="true"></i>
             </button>
 
+            @if (selectableLeaves()) {
+              <label class="svc-tree-select" (click)="$event.stopPropagation()">
+                <input
+                  type="checkbox"
+                  [checked]="entry.isSelectedLeaf"
+                  [disabled]="!entry.canSelectLeaf"
+                  (change)="onLeafSelectionChange(entry.node, $event)"
+                />
+              </label>
+            }
+
             <div class="svc-tree-content">
               <div class="svc-tree-meta">
                 <strong class="svc-tree-name">{{ entry.name }}</strong>
@@ -86,6 +102,16 @@
               </div>
 
               <div class="svc-tree-chips">
+                <span class="svc-tree-chip svc-tree-chip--scope">{{ entry.scopeLabel }}</span>
+                @if (entry.ownerLabel) {
+                  <span class="svc-tree-chip svc-tree-chip--owner">{{ entry.ownerLabel }}</span>
+                }
+                @if (entry.assignedLabel) {
+                  <span class="svc-tree-chip svc-tree-chip--assigned">{{ entry.assignedLabel }}</span>
+                }
+                @if (entry.ownedLabel) {
+                  <span class="svc-tree-chip svc-tree-chip--owned">{{ entry.ownedLabel }}</span>
+                }
                 <span [class]="entry.statusClassList">{{ entry.statusLabel }}</span>
                 @if (entry.showOperationalBadge) {
                   <span [class]="entry.operationalClassList">{{ entry.operationalLabel }}</span>
@@ -100,7 +126,7 @@
             </div>
 
             <div class="svc-tree-actions">
-              @if (canCreate()) {
+              @if (canCreate() && canCreateChildFor()(entry.node)) {
                 <button
                   type="button"
                   class="svc-tree-action-btn"
@@ -122,7 +148,7 @@
                   <i class="bi bi-eye" aria-hidden="true"></i>
                 </button>
               }
-              @if (canUpdate() && !entry.node.isDeleted) {
+              @if (canUpdate() && entry.node.canEditDefinition && !entry.node.isDeleted) {
                 <button
                   type="button"
                   class="svc-tree-action-btn"

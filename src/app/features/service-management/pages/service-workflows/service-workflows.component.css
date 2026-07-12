@@ -13,7 +13,6 @@
   overflow-x: clip;
 }
 .workflow-hero,
-.workflow-list-panel,
 .workflow-editor-panel,
 .workflow-dialog {
   background: var(--q-surface-card, #fff);
@@ -59,7 +58,6 @@
   /* max-width: 100%; */
   min-width: 0;
 }
-.workflow-list-panel,
 .workflow-editor-panel {
   max-width: 100%;
   min-width: 0;
@@ -304,3 +302,60 @@
   color: inherit;
   cursor: pointer;
 }
+.workflow-embedded-list-section {
+  background: var(--q-surface-muted, #f8fafc);
+  border: 1px solid var(--q-border-subtle, #e2e8f0);
+  border-radius: 10px;
+  margin-top: 8px;
+  overflow: hidden;
+}
+
+.workflow-embedded-list {
+  background: transparent;
+}
+
+.workflow-embedded-card {
+  background: var(--q-surface-card, #fff);
+  border: 1px solid var(--q-border-subtle, #dbeafe);
+  border-radius: 8px;
+  min-height: 56px;
+  transition: background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.workflow-embedded-card:hover {
+  background: var(--q-surface-muted, #f8fafc);
+  border-color: var(--q-primary-border, #bae6fd);
+  box-shadow: 0 8px 18px #0284c712;
+}
+
+.workflow-embedded-tools {
+  min-width: 0;
+}
+.workflow-embedded-details-path {
+  flex: 1 1 auto;
+  flex-wrap: nowrap;
+  margin: 0;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 4px 2px;
+  scrollbar-width: thin;
+}
+
+.workflow-embedded-details-path .workflow-flow-step {
+  flex: 0 0 auto;
+  min-width: 190px;
+}
+
+.workflow-embedded-pagination {
+  background: var(--q-surface-card, #fff);
+  margin-top: 0;
+}
+
+.workflow-embedded-empty {
+  background: var(--q-surface-card, #fff);
+}
+
+
+

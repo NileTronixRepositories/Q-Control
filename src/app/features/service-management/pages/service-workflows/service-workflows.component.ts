@@ -128,6 +128,8 @@ export class ServiceWorkflowsComponent implements OnInit, OnDestroy {
     if (this.canViewCandidates()) {
       this.loadCandidates();
     }
+
+    this.openCreateBlockOnPageLoad();
   }
 
   ngOnDestroy(): void {
@@ -164,6 +166,14 @@ export class ServiceWorkflowsComponent implements OnInit, OnDestroy {
     this.initializeServiceSelection();
   }
 
+  private openCreateBlockOnPageLoad(): void {
+    if (!this.canCreate() || this.store.isPanelOpen()) {
+      return;
+    }
+
+    this.openCreate();
+  }
+
   openView(item: ServiceWorkflowListItem): void {
     if (!this.canViewDetails()) {
       this.showMessage('error', this.translations().noPermissionHint);
@@ -188,6 +198,10 @@ export class ServiceWorkflowsComponent implements OnInit, OnDestroy {
     this.formError.set(null);
     this.clearServiceSelection();
     this.workflowForm.reset({ arabicName: '', englishName: '' });
+
+    if (this.canCreate()) {
+      this.initializeServiceSelection();
+    }
   }
 
   saveWorkflow(): void {
@@ -808,6 +822,27 @@ export class ServiceWorkflowsComponent implements OnInit, OnDestroy {
     return [...details.steps].sort((a, b) => a.stepOrder - b.stepOrder);
   }
 
+  workflowListSteps(item: ServiceWorkflowListItem): readonly ServiceWorkflowStep[] {
+    const steps = [...(item.steps ?? [])].sort((a, b) => a.stepOrder - b.stepOrder);
+
+    if (steps.length > 0) {
+      return steps;
+    }
+
+    if (!item.startServiceId && !item.startServiceArabicName && !item.startServiceEnglishName) {
+      return [];
+    }
+
+    return [
+      {
+        serviceId: item.startServiceId ?? 0,
+        stepOrder: 1,
+        serviceArabicName: item.startServiceArabicName ?? null,
+        serviceEnglishName: item.startServiceEnglishName ?? null,
+      },
+    ];
+  }
+
   previewSteps(
     item: ServiceWorkflowListItem | ServiceWorkflowDetails,
   ): readonly ServiceWorkflowStep[] {
@@ -1022,6 +1057,8 @@ export class ServiceWorkflowsComponent implements OnInit, OnDestroy {
   }
 
   private commitServiceAsStep(service: WorkflowCandidateService): void {
+    this.openCreatePanelForSelectionIfNeeded();
+
     const mode = this.selectionMode();
     this.formError.set(null);
 
@@ -1037,6 +1074,8 @@ export class ServiceWorkflowsComponent implements OnInit, OnDestroy {
   }
 
   private applyWorkflowSteps(steps: readonly ServiceWorkflowStep[]): void {
+    this.openCreatePanelForSelectionIfNeeded();
+
     const builderSteps = steps.map((step) => ({
       uid: this.createStepUid(),
       service: this.candidateFromStep(step),
@@ -1046,6 +1085,19 @@ export class ServiceWorkflowsComponent implements OnInit, OnDestroy {
     this.builderSteps.update((currentSteps) => [...currentSteps, ...builderSteps]);
   }
 
+  private openCreatePanelForSelectionIfNeeded(): void {
+    if (this.isEditorMode()) {
+      return;
+    }
+
+    this.store.selectedDetails.set(null);
+    this.store.clearSuggestions();
+    this.store.openPanel('create');
+    this.formError.set(null);
+    this.workflowForm.reset({ arabicName: '', englishName: '' });
+    this.builderSteps.set([]);
+    this.selectionMode.set({ kind: 'add' });
+  }
   private clearWorkflowStartOptions(): void {
     this.workflowStartOptions.set(null);
     this.workflowStartOptionsLoading.set(false);

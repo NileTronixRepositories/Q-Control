@@ -1,4 +1,4 @@
-﻿import { computed, Injectable, signal } from '@angular/core';
+import { computed, Injectable, signal } from '@angular/core';
 
 import {
   PagedServiceResponse,
@@ -31,6 +31,9 @@ const DEFAULT_QUERY: ServiceListQuery = {
   isDeleted: false,
   isTicketIssuable: null,
   parentServiceId: null,
+  scope: null,
+  ownerBranchId: null,
+  isAssignedToCurrentBranch: null,
   orderSort: 'orderNo',
 };
 
@@ -40,6 +43,7 @@ export class ServiceManagementStore {
   readonly listQuery = signal<ServiceListQuery>(DEFAULT_QUERY);
   readonly servicePage = signal<PagedServiceResponse<ServiceListItem>>(EMPTY_SERVICE_PAGE);
   readonly serviceTree = signal<readonly ServiceTreeNode[]>([]);
+  readonly assignedBranchServiceTree = signal<readonly ServiceTreeNode[]>([]);
   readonly parentOptions = signal<readonly ServiceParentOption[]>([]);
   readonly selectedDetails = signal<ServiceDetails | null>(null);
   readonly selectedTreeServiceId = signal<number | null>(null);
@@ -49,9 +53,13 @@ export class ServiceManagementStore {
   readonly confirmState = signal<ServiceConfirmState | null>(null);
   readonly message = signal<ServiceUiMessage | null>(null);
   readonly expandedTreeNodeIds = signal<ReadonlySet<number>>(new Set());
+  readonly expandedAssignedBranchNodeIds = signal<ReadonlySet<number>>(new Set());
+  readonly draggedBranchAssignmentNode = signal<ServiceTreeNode | null>(null);
 
   readonly listLoading = signal(false);
   readonly treeLoading = signal(false);
+  readonly assignedBranchTreeLoading = signal(false);
+  readonly branchAssigning = signal(false);
   readonly detailsLoading = signal(false);
   readonly parentsLoading = signal(false);
   readonly saving = signal(false);
@@ -122,11 +130,36 @@ export class ServiceManagementStore {
     });
   }
 
+  toggleAssignedBranchNode(nodeId: number): void {
+    this.expandedAssignedBranchNodeIds.update((current) => this.toggleSetItem(current, nodeId));
+  }
+
+  expandAssignedBranchNodes(nodeIds: readonly number[]): void {
+    this.expandedAssignedBranchNodeIds.update((current) => {
+      const next = new Set(current);
+      nodeIds.forEach((nodeId) => next.add(nodeId));
+      return next;
+    });
+  }
+
+  private toggleSetItem(current: ReadonlySet<number>, nodeId: number): ReadonlySet<number> {
+    const next = new Set(current);
+
+    if (next.has(nodeId)) {
+      next.delete(nodeId);
+    } else {
+      next.add(nodeId);
+    }
+
+    return next;
+  }
+
   reset(): void {
     this.activeTab.set('tree');
     this.listQuery.set(DEFAULT_QUERY);
     this.servicePage.set(EMPTY_SERVICE_PAGE);
     this.serviceTree.set([]);
+    this.assignedBranchServiceTree.set([]);
     this.parentOptions.set([]);
     this.selectedDetails.set(null);
     this.selectedTreeServiceId.set(null);
@@ -135,8 +168,12 @@ export class ServiceManagementStore {
     this.confirmState.set(null);
     this.message.set(null);
     this.expandedTreeNodeIds.set(new Set());
+    this.expandedAssignedBranchNodeIds.set(new Set());
+    this.draggedBranchAssignmentNode.set(null);
     this.listLoading.set(false);
     this.treeLoading.set(false);
+    this.assignedBranchTreeLoading.set(false);
+    this.branchAssigning.set(false);
     this.detailsLoading.set(false);
     this.parentsLoading.set(false);
     this.saving.set(false);

@@ -18,7 +18,11 @@
       <section class="service-request-actions" aria-label="Request actions">
         <div class="service-request-actions__side service-request-actions__side--start">
           @if (canGoBack()) {
-            <button type="button" class="service-request-actions__button service-request-actions__button--secondary" (click)="goBack()">
+            <button
+              type="button"
+              class="service-request-actions__button service-request-actions__button--secondary"
+              (click)="goBack()"
+            >
               <i class="bi bi-chevron-left" aria-hidden="true"></i>
               <span>{{ store.translations().backLabel }}</span>
             </button>
@@ -27,7 +31,12 @@
 
         <div class="service-request-actions__side service-request-actions__side--end">
           @if (showRestart()) {
-            <button type="button" class="service-request-actions__button service-request-actions__button--primary" [disabled]="store.loadingTicket()" (click)="restart()">
+            <button
+              type="button"
+              class="service-request-actions__button service-request-actions__button--primary"
+              [disabled]="store.loadingTicket()"
+              (click)="restart()"
+            >
               <i class="bi bi-arrow-clockwise" aria-hidden="true"></i>
               <span>{{ store.translations().restartLabel }}</span>
             </button>

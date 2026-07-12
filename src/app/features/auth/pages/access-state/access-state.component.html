@@ -1,0 +1,13 @@
+<main class="access-state-page" [attr.dir]="i18nStore.direction()" [attr.lang]="i18nStore.language()">
+  <section class="access-state-card" aria-labelledby="access-state-title">
+    <i class="bi" [class.bi-shield-lock]="isDenied()" [class.bi-shield-exclamation]="!isDenied()" aria-hidden="true"></i>
+    <h1 id="access-state-title">{{ copy().title }}</h1>
+    <p>{{ copy().description }}</p>
+    <div class="access-state-actions">
+      @if (availableRoute() !== '/no-access') {
+        <a class="primary-action" [routerLink]="availableRoute()">{{ copy().home }}</a>
+      }
+      <button type="button" class="secondary-action" (click)="logout()">{{ copy().logout }}</button>
+    </div>
+  </section>
+</main>

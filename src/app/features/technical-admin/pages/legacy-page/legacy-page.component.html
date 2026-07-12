@@ -218,6 +218,17 @@
                       >
                         <i class="bi bi-brush" aria-hidden="true"></i>
                       </button>
+                      @if (canCreateBranchAdmin() && branch.isActive) {
+                        <button
+                          type="button"
+                          class="icon-action success-action"
+                          [title]="branchAdminTranslations().addBranchAdmin"
+                          [attr.aria-label]="branchAdminTranslations().addBranchAdmin"
+                          (click)="openCreateBranchAdmin(branch)"
+                        >
+                          <i class="bi bi-person-plus" aria-hidden="true"></i>
+                        </button>
+                      }
                       @if (branch.isActive) {
                         <button
                           type="button"
@@ -299,6 +310,7 @@
         ></div>
         <aside
           class="editor-panel app-popup-panel app-popup-wide"
+          [class.branch-mutation-dialog]="branchPanelMode() === 'create' || branchPanelMode() === 'edit'"
           role="dialog"
           [attr.aria-label]="branchFormTitle()"
         >
@@ -401,7 +413,7 @@
 
           @if (branchPanelMode() === 'create' || branchPanelMode() === 'edit') {
             <form
-              class="branch-form row g-3 align-items-start"
+              class="branch-form branch-mutation-form row align-items-start"
               [formGroup]="branchForm"
               (ngSubmit)="saveBranch()"
               novalidate
@@ -603,6 +615,15 @@
           }
         </aside>
       }
+      <app-create-branch-admin-dialog
+        [open]="selectedBranchForAdmin() !== null"
+        [branchId]="selectedBranchForAdmin()?.branchId ?? null"
+        [branchLabel]="selectedBranchForAdmin()?.branchLabel ?? ''"
+        [language]="language()"
+        [direction]="direction()"
+        (closed)="closeCreateBranchAdminDialog()"
+        (created)="handleBranchAdminCreated($event)"
+      />
     </section>
   }
 </section>

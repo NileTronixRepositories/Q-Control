@@ -6,7 +6,7 @@
       <span>{{ translations().description }}</span>
     </div>
 
-    @if (canCreate() && canViewAll()) {
+    @if (canCreateGlobal() && canViewAll()) {
       <button type="button" class="svc-primary-btn" (click)="openCreateRoot()">
         <i class="bi bi-plus-lg" aria-hidden="true"></i>
         {{ translations().addRootService }}
@@ -42,13 +42,119 @@
     </div>
   }
 
-  @if (!canViewAll()) {
+  @if (!canUseCatalog()) {
     <section class="svc-empty svc-access-denied">
       <i class="bi bi-shield-lock" aria-hidden="true"></i>
       <h2>{{ translations().accessDenied }}</h2>
       <p>{{ translations().noPermissionHint }}</p>
     </section>
   } @else {
+    <section class="svc-central-filters">
+      <label class="svc-field">
+        <span>{{ translations().scopeFilter }}</span>
+        <select class="svc-input" [value]="scopeFilterValue()" (change)="updateScopeFilter($event)">
+          <option value="all">{{ translations().all }}</option>
+          <option value="Global">{{ translations().globalScope }}</option>
+          <option value="BranchScoped">{{ translations().branchScopedScope }}</option>
+        </select>
+      </label>
+      <label class="svc-field">
+        <span>{{ translations().ownerBranchFilter }}</span>
+        <input class="svc-input" type="number" min="1" [value]="store.listQuery().ownerBranchId ?? ''" (change)="updateOwnerBranchFilter($event)" />
+      </label>
+      @if (!isTechnicalAdmin()) {
+        <label class="svc-field">
+          <span>{{ translations().assignedFilter }}</span>
+          <select class="svc-input" [value]="assignedFilterValue()" (change)="updateAssignedFilter($event)">
+            <option value="all">{{ translations().all }}</option>
+            <option value="true">{{ translations().yes }}</option>
+            <option value="false">{{ translations().no }}</option>
+          </select>
+        </label>
+      }
+    </section>
+
+    @if (canUseBranchAssignment()) {
+      <section class="svc-hero">
+        <div>
+          <p class="svc-eyebrow">{{ translations().branchAssignmentTitle }}</p>
+          <h1>{{ translations().branchAssignmentTitle }}</h1>
+          <span>{{ translations().branchAssignmentDescription }}</span>
+        </div>
+        @if (store.branchAssigning()) {
+          <span class="svc-mini-loading">{{ translations().loading }}</span>
+        }
+      </section>
+
+      <section class="svc-branch-assignment-workspace">
+        <div class="svc-branch-assignment-column">
+          <header class="svc-panel-header">
+            <div>
+              <p class="svc-eyebrow">{{ translations().serviceCentral }}</p>
+              <h2>{{ translations().branchAssignmentSourceTitle }}</h2>
+            </div>
+          </header>
+          <app-service-hierarchy-tree
+            [nodes]="store.serviceTree()"
+            [expandedNodeIds]="store.expandedTreeNodeIds()"
+            [selectedServiceId]="store.selectedTreeServiceId()"
+            [translations]="translations()"
+            [language]="language()"
+            [direction]="direction()"
+            [loading]="store.treeLoading()"
+            [includeInactive]="includeInactiveTree()"
+            [includeDeleted]="includeDeletedTree()"
+            [canCreate]="false"
+            [canViewDetails]="canViewDetails()"
+            [canUpdate]="false"
+            [canDelete]="false"
+            [canRestore]="false"
+            [draggableLeaves]="canUseBranchAssignment() && !store.branchAssigning()"
+            (refresh)="refresh()"
+            (includeInactiveChange)="updateTreeToggle('inactive', $event)"
+            (includeDeletedChange)="updateTreeToggle('deleted', $event)"
+            (toggleNode)="toggleTreeNode($event)"
+            (selectNode)="selectTreeNode($event)"
+            (viewNode)="openViewFromTree($event)"
+            (leafDragStarted)="startBranchAssignmentDrag($event)"
+            (leafDragEnded)="clearBranchAssignmentDrag()"
+          />
+        </div>
+
+        <div class="svc-branch-assignment-column">
+          <header class="svc-panel-header">
+            <div>
+              <p class="svc-eyebrow">{{ translations().branchAssignmentTargetTitle }}</p>
+              <h2>{{ translations().branchAssignmentTargetTitle }}</h2>
+              <span>{{ translations().branchAssignmentDropHint }}</span>
+            </div>
+          </header>
+          <app-service-hierarchy-tree
+            [nodes]="store.assignedBranchServiceTree()"
+            [expandedNodeIds]="store.expandedAssignedBranchNodeIds()"
+            [selectedServiceId]="store.selectedTreeServiceId()"
+            [translations]="translations()"
+            [language]="language()"
+            [direction]="direction()"
+            [loading]="store.assignedBranchTreeLoading() || store.branchAssigning()"
+            [includeInactive]="includeInactiveTree()"
+            [includeDeleted]="includeDeletedTree()"
+            [canCreate]="false"
+            [canViewDetails]="false"
+            [canUpdate]="false"
+            [canDelete]="false"
+            [canRestore]="false"
+            [dropTarget]="canUseBranchAssignment() && !store.branchAssigning()"
+            (refresh)="refresh()"
+            (includeInactiveChange)="updateTreeToggle('inactive', $event)"
+            (includeDeletedChange)="updateTreeToggle('deleted', $event)"
+            (toggleNode)="toggleAssignedBranchNode($event)"
+            (selectNode)="selectAssignedBranchNode($event)"
+            (leafDropped)="dropBranchAssignment($event)"
+          />
+        </div>
+      </section>
+    } @else {
     <section class="svc-workspace">
       <article class="svc-editor">
         <header class="svc-panel-header">
@@ -85,7 +191,7 @@
               <i class="bi bi-diagram-3" aria-hidden="true"></i>
               <h2>{{ translations().editorEmptyTitle }}</h2>
               <p>{{ translations().editorEmptyBody }}</p>
-              @if (canCreate()) {
+              @if (canCreateGlobal()) {
                 <button type="button" class="svc-primary-btn" (click)="openCreateRoot()">
                   <i class="bi bi-plus-lg" aria-hidden="true"></i>
                   {{ translations().addRootService }}
@@ -126,6 +232,14 @@
                   <div>
                     <dt>{{ translations().englishName }}</dt>
                     <dd>{{ details.englishName }}</dd>
+                  </div>
+                  <div>
+                    <dt>{{ translations().scope }}</dt>
+                    <dd>{{ scopeLabel(details.scope) }}</dd>
+                  </div>
+                  <div>
+                    <dt>{{ translations().ownerBranch }}</dt>
+                    <dd>{{ ownerBranchLabel(details) }}</dd>
                   </div>
                   <div>
                     <dt>{{ translations().status }}</dt>
@@ -231,7 +345,7 @@
                   </section>
                 }
                 <footer class="svc-actions">
-                  @if (canUpdate() && !details.isDeleted) {
+                  @if (canUpdate() && details.canEditDefinition && !details.isDeleted) {
                     <button type="button" class="svc-secondary-btn" (click)="openEdit(details.id)">
                       <i class="bi bi-pencil-square" aria-hidden="true"></i>
                       {{ translations().edit }}
@@ -270,7 +384,7 @@
                       <strong>{{ translations().logo }}</strong>
                       <p>{{ selectedLogoName() || translations().allowedLogoTypes }}</p>
                     </div>
-                    @if (canUpdate() && !details.isDeleted) {
+                    @if (canUpdate() && details.canEditDefinition && !details.isDeleted) {
                       <label class="svc-secondary-btn svc-file-btn">
                         <i class="bi bi-upload" aria-hidden="true"></i>
                         {{ translations().uploadLogo }}
@@ -525,7 +639,7 @@
         [loading]="store.treeLoading()"
         [includeInactive]="includeInactiveTree()"
         [includeDeleted]="includeDeletedTree()"
-        [canCreate]="canCreate()"
+        [canCreate]="canCreateGlobal()"
         [canViewDetails]="canViewDetails()"
         [canUpdate]="canUpdate()"
         [canDelete]="canDelete()"
@@ -543,6 +657,7 @@
         (restoreNode)="requestTreeRestore($event)"
       />
     </section>
+    }
   }
 
   @if (store.confirmState(); as state) {
@@ -592,6 +707,3 @@
     </aside>
   }
 </section>
-
-
-

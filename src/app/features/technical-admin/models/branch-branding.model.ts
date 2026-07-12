@@ -50,4 +50,4 @@ export interface ReorderBranchAdvertisementsRequest {
   readonly items: readonly ReorderBranchAdvertisementItemRequest[];
 }
 
-export type BranchBrandingPermission = 'Branches.ViewDetails' | 'Branches.Update';
+export type BranchBrandingPermission = 'Branches.ViewDetails' | 'Branches.Update' | 'BranchAdmins.Create';

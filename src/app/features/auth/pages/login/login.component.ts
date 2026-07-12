@@ -12,6 +12,7 @@ import { Router } from '@angular/router';
 import { LanguageHeaderComponent } from '../../../../shared/components/language-header/language-header.component';
 import { LoginCredentials } from '../../models/login-credentials.model';
 import { LoginLanguage } from '../../models/login-translations.model';
+import { AuthNavigationService } from '../../services/auth-navigation.service';
 import { LoginI18nStore } from '../../store/login-i18n.store';
 import { LoginStore } from '../../store/login.store';
 
@@ -26,6 +27,7 @@ import { LoginStore } from '../../store/login.store';
 export class LoginComponent {
   private readonly formBuilder = inject(NonNullableFormBuilder);
   private readonly router = inject(Router);
+  private readonly authNavigationService = inject(AuthNavigationService);
   protected readonly loginStore = inject(LoginStore);
   protected readonly i18nStore = inject(LoginI18nStore);
   protected readonly translations = this.i18nStore.translations;
@@ -37,18 +39,13 @@ export class LoginComponent {
       return;
     }
 
-    const userType = this.loginStore.userType();
+    const session = this.loginStore.session();
 
-    if (!userType) {
+    if (!session) {
       return;
     }
 
-    const route =
-      userType === 'TechnicalAdmin'
-        ? '/technical-admin/branch-editor'
-        : '/organization/global-configurations';
-
-    void this.router.navigateByUrl(route);
+    void this.router.navigateByUrl(this.authNavigationService.resolvePostLoginUrl(session));
   });
 
   protected readonly loginFeedback = computed(() => {
@@ -134,4 +131,3 @@ export class LoginComponent {
     this.loginStore.submit(credentials);
   }
 }
-

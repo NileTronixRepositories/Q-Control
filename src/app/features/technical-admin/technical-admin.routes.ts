@@ -1,4 +1,4 @@
-﻿import { Routes } from '@angular/router';
+import { Routes } from '@angular/router';
 
 import { technicalAdminPermissionGuard } from './guards/technical-admin-permission.guard';
 
@@ -17,10 +17,19 @@ export const TECHNICAL_ADMIN_ROUTES: Routes = [
       },
       {
         path: 'branch-editor',
+        canActivate: [technicalAdminPermissionGuard],
         data: {
           pageKey: 'branch-editor',
           title: 'Branch Editor',
           description: 'Manage branch records, operating status, and assigned queue counters.',
+          allowTechnicalAdminWithoutPermission: true,
+          requiredAnyPermissions: [
+            'Branches.ViewAll',
+            'Branches.ViewDetails',
+            'Branches.Create',
+            'Branches.Update',
+            'BranchAdmins.Create',
+          ],
         },
         loadComponent: () =>
           import('./pages/legacy-page/legacy-page.component').then(
@@ -42,7 +51,7 @@ export const TECHNICAL_ADMIN_ROUTES: Routes = [
         path: 'services',
         canActivate: [technicalAdminPermissionGuard],
         data: {
-          requiredAnyPermissions: ['Services.ViewAll', 'ServiceWorkflows.ViewAll'],
+          requiredAnyPermissions: ['Services.ViewAll', 'BranchServices.View', 'ServiceWorkflows.ViewAll'],
         },
         loadChildren: () =>
           import('../service-management/service-management.routes').then(
@@ -51,6 +60,11 @@ export const TECHNICAL_ADMIN_ROUTES: Routes = [
       },
       {
         path: 'waiting-areas',
+        canActivate: [technicalAdminPermissionGuard],
+        data: {
+          allowTechnicalAdminWithoutPermission: true,
+          requiredAnyPermissions: ['WaitingAreas.ViewAll'],
+        },
         loadComponent: () =>
           import('./pages/waiting-areas/waiting-areas.component').then(
             (component) => component.WaitingAreasComponent,
@@ -98,4 +112,3 @@ export const TECHNICAL_ADMIN_ROUTES: Routes = [
     ],
   },
 ];
-

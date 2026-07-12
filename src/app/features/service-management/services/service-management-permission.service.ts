@@ -1,4 +1,4 @@
-﻿import { computed, inject, Injectable } from '@angular/core';
+import { computed, inject, Injectable } from '@angular/core';
 
 import { AuthSessionService } from '../../auth/services/auth-session.service';
 import { ServicePermission } from '../models/service-management.model';
@@ -26,6 +26,9 @@ const SERVICE_PERMISSIONS = new Set<ServicePermission>([
   'Services.Update',
   'Services.Delete',
   'Services.Restore',
+  'BranchServices.View',
+  'BranchServices.Assign',
+  'BranchServiceTrees.Create',
 ]);
 
 const WORKFLOW_PERMISSIONS = new Set<ServiceWorkflowPermission>([
@@ -54,6 +57,11 @@ export class ServiceManagementPermissionService {
   readonly canUpdate = computed(() => this.hasPermission('Services.Update'));
   readonly canDelete = computed(() => this.hasPermission('Services.Delete'));
   readonly canRestore = computed(() => this.hasPermission('Services.Restore'));
+  readonly canViewBranchServices = computed(() => this.hasPermission('BranchServices.View'));
+  readonly canAssignBranchServices = computed(() => this.hasPermission('BranchServices.Assign'));
+  readonly canCreateBranchServiceTree = computed(() =>
+    this.hasPermission('BranchServiceTrees.Create'),
+  );
 
   readonly canViewWorkflows = computed(() => this.hasPermission('ServiceWorkflows.ViewAll'));
   readonly canViewWorkflowDetails = computed(() =>

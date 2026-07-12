@@ -155,6 +155,10 @@
   position: relative;
 }
 
+.svc-tree-node--selectable {
+  grid-template-columns: var(--tree-toggle-size) 24px minmax(0, 1fr) auto;
+}
+
 .svc-tree-node::before,
 .svc-tree-node::after {
   background: #bfdbfe;
@@ -184,6 +188,23 @@
 .svc-tree-node--selected {
   background: #eff6ff;
   border-color: #7dd3fc;
+}
+
+.svc-tree-panel--drop-target {
+  border-style: dashed;
+}
+
+.svc-tree-panel--drop-active {
+  border-color: #0284c7;
+  box-shadow: 0 0 0 3px #bae6fd, 0 8px 18px #0f172a0d;
+}
+
+.svc-tree-node--draggable {
+  cursor: grab;
+}
+
+.svc-tree-node--draggable:active {
+  cursor: grabbing;
 }
 
 .svc-tree-toggle {
@@ -351,9 +372,49 @@
     grid-template-columns: 28px minmax(0, 1fr);
   }
 
+  .svc-tree-node--selectable {
+    grid-template-columns: 28px 24px minmax(0, 1fr);
+  }
+
   .svc-tree-actions {
     grid-column: 1 / -1;
     justify-content: flex-start;
     margin-inline-start: calc(var(--tree-offset) + 38px);
   }
+}
+
+.svc-tree-select {
+  align-items: center;
+  align-self: center;
+  display: inline-flex;
+  justify-content: center;
+  min-width: 24px;
+  position: relative;
+  z-index: 1;
+}
+
+.svc-tree-select input {
+  accent-color: #0284c7;
+  height: 16px;
+  width: 16px;
+}
+
+.svc-tree-chip--scope {
+  background: #eef2ff;
+  color: #3730a3;
+}
+
+.svc-tree-chip--owner {
+  background: #f0fdf4;
+  color: #166534;
+}
+
+.svc-tree-chip--assigned {
+  background: #ecfeff;
+  color: #0e7490;
+}
+
+.svc-tree-chip--owned {
+  background: #fff7ed;
+  color: #c2410c;
 }

@@ -128,3 +128,14 @@
     max-width: 120px;
   }
 }
+
+@container (max-width: 900px) {
+  .workflow-embedded-card {
+    align-items: stretch !important;
+    flex-direction: column;
+  }
+
+  .workflow-embedded-tools {
+    justify-content: flex-end;
+  }
+}

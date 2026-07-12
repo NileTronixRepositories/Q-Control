@@ -1,0 +1,129 @@
+<section class="branch-services-page" [attr.dir]="direction()" [attr.lang]="language()">
+  <header class="branch-services-hero">
+    <div>
+      <p>{{ translations().title }}</p>
+      <h1>{{ translations().title }}</h1>
+      <span>{{ translations().description }}</span>
+    </div>
+    <div class="branch-services-actions">
+      @if (canAssignBranchServices() && store.hasSelectedBranch()) {
+        <button type="button" class="branch-services-primary-btn" (click)="openAssignDialog()">
+          <i class="bi bi-node-plus" aria-hidden="true"></i>
+          {{ translations().addServices }}
+        </button>
+      }
+      @if (canOpenCreateTree()) {
+        <button type="button" class="branch-services-secondary-btn" (click)="openCreateTreeDialog()">
+          <i class="bi bi-diagram-3" aria-hidden="true"></i>
+          {{ translations().createBranchTree }}
+        </button>
+      }
+    </div>
+  </header>
+
+  @if (store.message(); as currentMessage) {
+    <div class="branch-services-toast" role="status" aria-live="polite" aria-atomic="true">
+      <div
+        class="branch-services-toast-item"
+        [class.success]="currentMessage.tone === 'success'"
+        [class.error]="currentMessage.tone === 'error'"
+        [class.info]="currentMessage.tone === 'info'"
+      >
+        <p>{{ currentMessage.text }}</p>
+        <button type="button" [attr.aria-label]="translations().close" (click)="clearMessage()">
+          <i class="bi bi-x-lg" aria-hidden="true"></i>
+        </button>
+      </div>
+    </div>
+  }
+
+  @if (!canViewBranchServices()) {
+    <section class="branch-services-empty branch-services-denied">
+      <i class="bi bi-shield-lock" aria-hidden="true"></i>
+      <h2>{{ translations().accessDenied }}</h2>
+    </section>
+  } @else {
+    <section class="branch-services-toolbar">
+      @if (isBranchAdmin()) {
+        <div class="branch-services-active-branch">
+          <span>{{ translations().activeBranch }}</span>
+          <strong>{{ store.selectedBranchLabel() }}</strong>
+        </div>
+      } @else {
+        <label class="branch-services-field">
+          <span>{{ translations().branchSelector }}</span>
+          <select [disabled]="store.branchesLoading()" (change)="onBranchChange($event)">
+            <option value="">{{ translations().selectBranch }}</option>
+            @for (branch of branches(); track branch.branchId) {
+              <option [value]="branch.branchId">{{ branchName(branch) }}</option>
+            }
+          </select>
+        </label>
+      }
+
+      <button type="button" class="branch-services-secondary-btn" [disabled]="!store.hasSelectedBranch()" (click)="refresh()">
+        <i class="bi bi-arrow-clockwise" aria-hidden="true"></i>
+        {{ translations().refresh }}
+      </button>
+    </section>
+
+    @if (!store.hasSelectedBranch()) {
+      <section class="branch-services-empty">
+        <i class="bi bi-building" aria-hidden="true"></i>
+        <h2>{{ translations().noBranchSelected }}</h2>
+      </section>
+    } @else {
+      <app-service-hierarchy-tree
+        [nodes]="store.branchTree()"
+        [expandedNodeIds]="store.expandedBranchNodeIds()"
+        [selectedServiceId]="store.selectedBranchNodeId()"
+        [translations]="serviceTranslations()"
+        [language]="language()"
+        [direction]="direction()"
+        [loading]="store.branchTreeLoading()"
+        [includeInactive]="store.includeInactive()"
+        [includeDeleted]="store.includeDeleted()"
+        [canCreate]="canOpenCreateTree()"
+        [canCreateChildFor]="canCreateBranchSubtreeFor"
+        [canViewDetails]="false"
+        [canUpdate]="false"
+        [canDelete]="false"
+        [canRestore]="false"
+        (refresh)="refresh()"
+        (includeInactiveChange)="updateTreeToggle('inactive', $event)"
+        (includeDeletedChange)="updateTreeToggle('deleted', $event)"
+        (toggleNode)="toggleBranchNode($event)"
+        (selectNode)="selectBranchNode($event)"
+        (createRoot)="openCreateTreeDialog()"
+        (createChild)="openCreateSubtreeDialog($event)"
+      />
+    }
+  }
+
+  <app-assign-branch-services-dialog
+    [open]="store.assignDialogOpen()"
+    [nodes]="store.serviceCentralTree()"
+    [expandedNodeIds]="store.expandedCentralNodeIds()"
+    [loading]="store.centralTreeLoading()"
+    [assigning]="store.assigning()"
+    [translations]="translations()"
+    [serviceTranslations]="serviceTranslations()"
+    [language]="language()"
+    [direction]="direction()"
+    (closed)="store.closeAssignDialog()"
+    (refresh)="loadServiceCentralTree()"
+    (toggleNode)="toggleCentralNode($event)"
+    (assigned)="assignServices($event)"
+  />
+
+  <app-create-branch-service-tree-dialog
+    [open]="store.createTreeDialogOpen()"
+    [saving]="store.creatingTree()"
+    [resetKey]="createTreeResetKey()"
+    [mode]="store.createTreeMode()"
+    [parentLabel]="store.createSubtreeParent()?.label ?? null"
+    [translations]="translations()"
+    (closed)="store.closeCreateTreeDialog()"
+    (created)="createBranchTree($event)"
+  />
+</section>

@@ -1,4 +1,4 @@
-﻿import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
@@ -51,9 +51,7 @@ export class ServiceManagementApiService {
   getServiceTree(query: ServiceTreeQuery): Observable<readonly ServiceTreeNode[]> {
     return this.httpClient.get<readonly ServiceTreeNode[]>(`${this.servicesEndpoint}/tree`, {
       headers: this.createJsonHeaders(),
-      params: new HttpParams()
-        .set('includeInactive', query.includeInactive)
-        .set('includeDeleted', query.includeDeleted),
+      params: this.createTreeParams(query),
     });
   }
 
@@ -219,9 +217,40 @@ export class ServiceManagementApiService {
       params = params.set('parentServiceId', query.parentServiceId);
     }
 
+    if (query.scope) {
+      params = params.set('scope', query.scope);
+    }
+
+    if (query.ownerBranchId) {
+      params = params.set('ownerBranchId', query.ownerBranchId);
+    }
+
+    if (query.isAssignedToCurrentBranch !== null) {
+      params = params.set('isAssignedToCurrentBranch', query.isAssignedToCurrentBranch);
+    }
+
     return params;
   }
 
+  private createTreeParams(query: ServiceTreeQuery): HttpParams {
+    let params = new HttpParams()
+      .set('includeInactive', query.includeInactive)
+      .set('includeDeleted', query.includeDeleted);
+
+    if (query.scope) {
+      params = params.set('scope', query.scope);
+    }
+
+    if (query.ownerBranchId) {
+      params = params.set('ownerBranchId', query.ownerBranchId);
+    }
+
+    if (query.isAssignedToCurrentBranch !== undefined && query.isAssignedToCurrentBranch !== null) {
+      params = params.set('isAssignedToCurrentBranch', query.isAssignedToCurrentBranch);
+    }
+
+    return params;
+  }
   private resolveMediaOrigin(apiBaseUrl: string): string {
     const apiUrl = new URL(apiBaseUrl);
     return `${apiUrl.protocol}//${apiUrl.host}`;

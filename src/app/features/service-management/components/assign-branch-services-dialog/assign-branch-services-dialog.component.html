@@ -1,0 +1,50 @@
+@if (open()) {
+  <div class="branch-services-backdrop" (click)="close()"></div>
+  <aside class="branch-services-dialog" role="dialog" [attr.aria-label]="translations().assignTitle">
+    <header class="branch-services-dialog-header">
+      <div>
+        <p>{{ translations().addServices }}</p>
+        <h2>{{ translations().assignTitle }}</h2>
+        <span>{{ translations().assignDescription }}</span>
+      </div>
+      <button type="button" class="branch-services-icon-btn" [attr.aria-label]="translations().close" (click)="close()">
+        <i class="bi bi-x-lg" aria-hidden="true"></i>
+      </button>
+    </header>
+
+    <div class="branch-services-dialog-body branch-services-dialog-tree">
+      <app-service-hierarchy-tree
+        [nodes]="nodes()"
+        [expandedNodeIds]="expandedNodeIds()"
+        [selectedServiceId]="null"
+        [translations]="serviceTranslations()"
+        [language]="language()"
+        [direction]="direction()"
+        [loading]="loading()"
+        [includeInactive]="false"
+        [includeDeleted]="false"
+        [canCreate]="false"
+        [canViewDetails]="false"
+        [canUpdate]="false"
+        [canDelete]="false"
+        [canRestore]="false"
+        [selectableLeaves]="true"
+        [selectedLeafIds]="selectedLeafIds()"
+        (refresh)="refresh.emit()"
+        (toggleNode)="toggleNode.emit($event)"
+        (leafSelectionChange)="updateSelection($event)"
+      />
+    </div>
+
+    <footer class="branch-services-dialog-actions">
+      <span>{{ translations().selectedCount }}: {{ selectedCount() }}</span>
+      <button type="button" class="branch-services-secondary-btn" [disabled]="assigning()" (click)="close()">
+        {{ translations().cancel }}
+      </button>
+      <button type="button" class="branch-services-primary-btn" [disabled]="assigning() || selectedCount() === 0" (click)="submit()">
+        <i class="bi bi-check2" aria-hidden="true"></i>
+        {{ translations().assign }}
+      </button>
+    </footer>
+  </aside>
+}
