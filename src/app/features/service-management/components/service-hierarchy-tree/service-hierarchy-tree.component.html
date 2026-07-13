@@ -1,7 +1,14 @@
-<section class="svc-tree-panel" [class.svc-tree-panel--drop-target]="dropTarget()" [class.svc-tree-panel--drop-active]="isDropActive()" (dragover)="onDropTargetDragOver($event)" (dragleave)="onDropTargetDragLeave($event)" (drop)="onDropTargetDrop($event)">
+<section
+  class="svc-tree-panel"
+  [class.svc-tree-panel--drop-target]="dropTarget()"
+  [class.svc-tree-panel--drop-active]="isDropActive()"
+  (dragover)="onDropTargetDragOver($event)"
+  (dragleave)="onDropTargetDragLeave($event)"
+  (drop)="onDropTargetDrop($event)"
+>
   <header class="svc-tree-header">
     <div class="svc-tree-title">
-      <p class="svc-tree-eyebrow">{{ translations().hierarchy }}</p>
+      <p class="svc-tree-eyebrow py-2">{{ translations().hierarchy }}</p>
       <h2>{{ translations().serviceHierarchy }}</h2>
     </div>
 
@@ -107,7 +114,9 @@
                   <span class="svc-tree-chip svc-tree-chip--owner">{{ entry.ownerLabel }}</span>
                 }
                 @if (entry.assignedLabel) {
-                  <span class="svc-tree-chip svc-tree-chip--assigned">{{ entry.assignedLabel }}</span>
+                  <span class="svc-tree-chip svc-tree-chip--assigned">{{
+                    entry.assignedLabel
+                  }}</span>
                 }
                 @if (entry.ownedLabel) {
                   <span class="svc-tree-chip svc-tree-chip--owned">{{ entry.ownedLabel }}</span>
@@ -126,6 +135,18 @@
             </div>
 
             <div class="svc-tree-actions">
+              @if (entry.canUnassign) {
+                <button
+                  type="button"
+                  class="svc-tree-action-btn svc-tree-action-btn--danger"
+                  [disabled]="actionsDisabled() || unassigning()"
+                  [title]="unassignLabel()"
+                  [attr.aria-label]="unassignLabel()"
+                  (click)="requestUnassign(entry.node, $event)"
+                >
+                  <i class="bi bi-node-minus" aria-hidden="true"></i>
+                </button>
+              }
               @if (canCreate() && canCreateChildFor()(entry.node)) {
                 <button
                   type="button"
@@ -137,7 +158,7 @@
                   <i class="bi bi-plus-lg" aria-hidden="true"></i>
                 </button>
               }
-              @if (canViewDetails()) {
+              <!-- @if (canViewDetails()) {
                 <button
                   type="button"
                   class="svc-tree-action-btn"
@@ -147,7 +168,7 @@
                 >
                   <i class="bi bi-eye" aria-hidden="true"></i>
                 </button>
-              }
+              } -->
               @if (canUpdate() && entry.node.canEditDefinition && !entry.node.isDeleted) {
                 <button
                   type="button"
@@ -159,10 +180,11 @@
                   <i class="bi bi-pencil-square" aria-hidden="true"></i>
                 </button>
               }
-              @if (canDelete() && !entry.node.isDeleted) {
+              @if (entry.canDelete) {
                 <button
                   type="button"
                   class="svc-tree-action-btn svc-tree-action-btn--danger"
+                  [disabled]="actionsDisabled()"
                   [title]="translations().delete"
                   [attr.aria-label]="translations().delete"
                   (click)="requestDelete(entry.node, $event)"
@@ -170,10 +192,11 @@
                   <i class="bi bi-trash3" aria-hidden="true"></i>
                 </button>
               }
-              @if (canRestore() && entry.node.isDeleted) {
+              @if (entry.canRestore) {
                 <button
                   type="button"
                   class="svc-tree-action-btn svc-tree-action-btn--success"
+                  [disabled]="actionsDisabled()"
                   [title]="translations().restore"
                   [attr.aria-label]="translations().restore"
                   (click)="requestRestore(entry.node, $event)"

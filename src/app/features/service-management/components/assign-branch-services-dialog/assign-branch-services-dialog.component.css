@@ -46,6 +46,7 @@
   color: #64748b;
   font-size: 10px;
   font-weight: 800;
+  line-height: var(--q-line-height-supporting, 1.5);
   margin: 0;
 }
 
@@ -53,8 +54,8 @@
   color: #0f172a;
   font-size: 16px;
   font-weight: 900;
-  line-height: 1.1;
-  margin: 1px 0;
+  line-height: var(--q-line-height-title, 1.3);
+  margin: var(--q-text-stack-gap-sm, 4px) 0;
 }
 
 .branch-services-dialog-header span {

@@ -1,21 +1,15 @@
 <section
-  class="workflow-page container-fluid px-2 px-lg-3 py-2 d-flex flex-column gap-2"
+  class="technical-admin-responsive-page workflow-page container-fluid d-flex flex-column !mx-auto !w-full !max-w-[1600px] !gap-4 !p-3 sm:!p-4 lg:!p-5"
   [attr.dir]="direction()"
   [attr.lang]="language()"
 >
-  <header class="workflow-hero d-flex flex-column gap-2 p-2 p-lg-3">
-    <div
-      class="workflow-hero-main d-flex align-items-center justify-content-between flex-wrap gap-2"
-    >
-      <div>
-        <p class="workflow-eyebrow">
-          <i class="bi bi-diagram-3" aria-hidden="true"></i> {{ translations().title }}
-        </p>
-        <!-- <h1>{{ translations().title }}</h1>
-        <span>{{ translations().description }}</span> -->
-      </div>
-
-      <div class="workflow-hero-actions d-flex align-items-center flex-wrap gap-2">
+  <app-technical-admin-page-hero
+    [eyebrow]="translations().title"
+    [title]="translations().title"
+    [description]="translations().description"
+    icon="bi bi-signpost-split-fill"
+  >
+      <div hero-actions class="workflow-hero-actions d-flex align-items-center flex-wrap gap-2">
         @if (canViewAll()) {
           <button
             type="button"
@@ -39,7 +33,7 @@
           </button>
         }
       </div>
-    </div>
+  </app-technical-admin-page-hero>
 
     @if (canViewAll()) {
       <div id="workflowFilters" class="workflow-filters p-2 mt-1" [hidden]="!filtersExpanded()">
@@ -115,7 +109,6 @@
         </div>
       </div>
     }
-  </header>
   @if (canCreate()) {
     <section class="workflow-selection-bar d-grid gap-2 p-2 p-lg-3">
       <header
@@ -366,123 +359,6 @@
                 <p>{{ translations().description }}</p>
               </section>
             }
-            @if (store.panelMode() === 'view') {
-              @if (store.selectedDetails(); as details) {
-                <section class="workflow-details">
-                  <div
-                    class="workflow-details-head d-flex align-items-center justify-content-between flex-wrap gap-2 p-2"
-                  >
-                    <div>
-                      <h3>{{ workflowName(details) }}</h3>
-                      <p>{{ translations().start }}: {{ serviceName(sortedSteps(details)[0]) }}</p>
-                    </div>
-                    <span
-                      [class]="
-                        details.isActive ? 'workflow-badge active' : 'workflow-badge inactive'
-                      "
-                    >
-                      {{ details.isActive ? translations().active : translations().inactive }}
-                    </span>
-                  </div>
-
-                  <div class="workflow-details-path">
-                    @for (
-                      step of sortedSteps(details);
-                      track step.stepOrder;
-                      let isLast = $last;
-                      let index = $index
-                    ) {
-                      <article
-                        class="workflow-flow-step"
-                        [class.workflow-flow-step-matched]="isMatchedWorkflowStep(step)"
-                        [class.workflow-flow-step-invalid]="isInvalidWorkflowStep(step)"
-                        [title]="isInvalidWorkflowStep(step) ? translations().invalidStep : null"
-                      >
-                        <span class="workflow-step-index">{{ index + 1 }}</span>
-                        <div>
-                          <strong>{{ serviceName(step) }}</strong>
-                          <small>{{ translations().parent }}: {{ parentName(step) }}</small>
-                          <div class="workflow-step-badges">
-                            @if (step.isTicketIssuable) {
-                              <span class="workflow-badge info">{{
-                                translations().ticketIssuable
-                              }}</span>
-                            }
-                            @if (step.isDeleted) {
-                              <span class="workflow-badge danger">{{
-                                translations().deleted
-                              }}</span>
-                            }
-                          </div>
-                        </div>
-                      </article>
-                      @if (!isLast) {
-                        <i
-                          [class]="
-                            direction() === 'rtl'
-                              ? 'workflow-flow-arrow bi bi-arrow-left'
-                              : 'workflow-flow-arrow bi bi-arrow-right'
-                          "
-                          aria-hidden="true"
-                        ></i>
-                      }
-                    }
-                  </div>
-
-                  <dl class="workflow-meta-grid row g-2">
-                    <div class="col-6 col-lg-3">
-                      <dt>{{ translations().created }}</dt>
-                      <dd>{{ formatDate(details.createdOnUtc) }}</dd>
-                    </div>
-                    <div class="col-6 col-lg-3">
-                      <dt>{{ translations().modified }}</dt>
-                      <dd>{{ formatDate(details.modifiedOnUtc) }}</dd>
-                    </div>
-                    <div class="col-6 col-lg-3">
-                      <dt>{{ translations().steps }}</dt>
-                      <dd>{{ details.steps.length }}</dd>
-                    </div>
-                    <div class="col-6 col-lg-3">
-                      <dt>{{ translations().rowVersion }}</dt>
-                      <dd>{{ details.rowVersion }}</dd>
-                    </div>
-                  </dl>
-
-                  <footer class="workflow-actions end d-flex flex-wrap justify-content-end gap-2">
-                    @if (canUpdate() && details.isActive) {
-                      <button
-                        type="button"
-                        class="workflow-secondary-btn"
-                        (click)="openEdit(details)"
-                      >
-                        <i class="bi bi-pencil-square" aria-hidden="true"></i
-                        >{{ translations().edit }}
-                      </button>
-                    }
-                    @if (canDeactivate() && details.isActive) {
-                      <button
-                        type="button"
-                        class="workflow-danger-btn"
-                        (click)="requestDeactivate(details)"
-                      >
-                        <i class="bi bi-pause-circle" aria-hidden="true"></i
-                        >{{ translations().deactivate }}
-                      </button>
-                    }
-                    @if (canReactivate() && !details.isActive) {
-                      <button
-                        type="button"
-                        class="workflow-success-btn"
-                        (click)="requestReactivate(details)"
-                      >
-                        <i class="bi bi-play-circle" aria-hidden="true"></i
-                        >{{ translations().reactivate }}
-                      </button>
-                    }
-                  </footer>
-                </section>
-              }
-            }
             @if (store.panelMode() === 'create' || store.panelMode() === 'edit') {
               @if (formError(); as error) {
                 <p class="workflow-note danger">
@@ -701,8 +577,10 @@
 
                 @if (hasWorkflows()) {
                   @for (workflow of workflows(); track workflowId(workflow)) {
+                    @let cardDetails = workflowCardDetails(workflow);
                     <article
-                      class="workflow-embedded-card d-flex align-items-center gap-2 p-2"
+                      class="workflow-embedded-card d-grid align-items-center gap-1 p-1"
+                      [class.workflow-embedded-card-expanded]="cardDetails !== null"
                       [class.workflow-card-inactive]="!workflow.isActive"
                     >
                       <div
@@ -710,7 +588,7 @@
                         [attr.aria-label]="workflowName(workflow)"
                       >
                         @for (
-                          step of workflowListSteps(workflow);
+                          step of workflowCardSteps(workflow);
                           track step.stepOrder;
                           let index = $index;
                           let isLast = $last
@@ -755,9 +633,9 @@
                       </div>
 
                       <div
-                        class="workflow-embedded-tools d-flex align-items-center flex-wrap gap-2 flex-shrink-0"
+                        class="workflow-embedded-tools d-flex align-items-center flex-wrap gap-1 flex-shrink-0"
                       >
-                        <div class="workflow-card-actions d-flex flex-wrap gap-1 p-1 flex-shrink-0">
+                        <div class="workflow-card-actions d-flex flex-wrap gap-1 p-0 flex-shrink-0">
                           @if (canViewDetails()) {
                             <button
                               type="button"
@@ -768,7 +646,7 @@
                               <i class="bi bi-eye" aria-hidden="true"></i>
                             </button>
                           }
-                          @if (canUpdate() && workflow.isActive) {
+                          @if (!cardDetails && canUpdate() && workflow.isActive) {
                             <button
                               type="button"
                               class="workflow-icon-btn"
@@ -778,7 +656,7 @@
                               <i class="bi bi-pencil-square" aria-hidden="true"></i>
                             </button>
                           }
-                          @if (canDeactivate() && workflow.isActive) {
+                          @if (!cardDetails && canDeactivate() && workflow.isActive) {
                             <button
                               type="button"
                               class="workflow-icon-btn danger"
@@ -788,7 +666,7 @@
                               <i class="bi bi-pause-circle" aria-hidden="true"></i>
                             </button>
                           }
-                          @if (canReactivate() && !workflow.isActive) {
+                          @if (!cardDetails && canReactivate() && !workflow.isActive) {
                             <button
                               type="button"
                               class="workflow-icon-btn success"
@@ -799,11 +677,96 @@
                             </button>
                           }
                         </div>
-                        <div class="workflow-card-side flex-shrink-0 px-2 py-1">
+                        <div class="workflow-card-side flex-shrink-0 px-1 py-0">
                           <strong>{{ workflowStepCount(workflow) }}</strong>
                           <span>{{ translations().steps }}</span>
                         </div>
                       </div>
+
+                      @if (cardDetails; as details) {
+                        <section
+                          class="workflow-embedded-expanded-details d-flex align-items-center flex-nowrap gap-1"
+                        >
+                          <div
+                            class="workflow-details-head d-flex align-items-center justify-content-between flex-nowrap gap-1 p-1 flex-shrink-0 flex-grow-1 flex-basis-0"
+                          >
+                            <div>
+                              <h3>{{ workflowName(details) }}</h3>
+                              <p>
+                                {{ translations().start }}:
+                                {{ serviceName(sortedSteps(details)[0]) }}
+                              </p>
+                            </div>
+                            <span
+                              [class]="
+                                details.isActive
+                                  ? 'workflow-badge active'
+                                  : 'workflow-badge inactive'
+                              "
+                            >
+                              {{
+                                details.isActive ? translations().active : translations().inactive
+                              }}
+                            </span>
+                            <div
+                              class="workflow-embedded-tools d-flex align-items-center flex-wrap gap-1 flex-shrink-0"
+                            >
+                              <dt>{{ translations().created }}</dt>
+                              <dd>{{ formatDate(details.createdOnUtc) }}</dd>
+                            </div>
+                          </div>
+
+                          <dl class="workflow-meta-grid row flex-nowrap g-1 p-1 flex-shrink-0">
+                            <!-- <div class="col-3">
+                              <dt>{{ translations().modified }}</dt>
+                              <dd>{{ formatDate(details.modifiedOnUtc) }}</dd>
+                            </div> -->
+                            <!-- <div class="col-3">
+                              <dt>{{ translations().steps }}</dt>
+                              <dd>{{ details.steps.length }}</dd>
+                            </div> -->
+                            <!-- <div class="col-3">
+                              <dt>{{ translations().rowVersion }}</dt>
+                              <dd>{{ details.rowVersion }}</dd>
+                            </div> -->
+                          </dl>
+
+                          <footer
+                            class="workflow-actions end d-flex flex-nowrap justify-content-end gap-1"
+                          >
+                            @if (canUpdate() && details.isActive) {
+                              <button
+                                type="button"
+                                class="workflow-secondary-btn"
+                                (click)="openEdit(details)"
+                              >
+                                <i class="bi bi-pencil-square" aria-hidden="true"></i
+                                >{{ translations().edit }}
+                              </button>
+                            }
+                            @if (canDeactivate() && details.isActive) {
+                              <button
+                                type="button"
+                                class="workflow-danger-btn"
+                                (click)="requestDeactivate(details)"
+                              >
+                                <i class="bi bi-pause-circle" aria-hidden="true"></i
+                                >{{ translations().deactivate }}
+                              </button>
+                            }
+                            @if (canReactivate() && !details.isActive) {
+                              <button
+                                type="button"
+                                class="workflow-success-btn"
+                                (click)="requestReactivate(details)"
+                              >
+                                <i class="bi bi-play-circle" aria-hidden="true"></i
+                                >{{ translations().reactivate }}
+                              </button>
+                            }
+                          </footer>
+                        </section>
+                      }
                     </article>
                   }
                 } @else if (!store.listLoading()) {

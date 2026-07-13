@@ -55,6 +55,28 @@ export class TechnicalAdminShellComponent {
       });
     }
 
+    if (
+      this.canShow(['ServiceGlobalizationRequests.ViewAll']) &&
+      this.servicePermissionService.canViewGlobalizationRequests()
+    ) {
+      serviceNavChildren.push({
+        label: translations.globalizationRequestsLabel,
+        route: '/technical-admin/services/globalization-requests',
+        icon: 'bi-patch-check',
+      });
+    }
+
+    if (
+      this.canShow(['Services.ViewCentralTree']) &&
+      this.servicePermissionService.canViewCentralTree()
+    ) {
+      serviceNavChildren.push({
+        label: translations.centralServiceTreeLabel,
+        route: '/technical-admin/services/central-tree',
+        icon: 'bi-diagram-3-fill',
+      });
+    }
+
     const branchChildren: AppNavigationItem[] = [];
 
     if (

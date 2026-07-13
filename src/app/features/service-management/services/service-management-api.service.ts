@@ -55,6 +55,17 @@ export class ServiceManagementApiService {
     });
   }
 
+  getCentralServiceTree(
+    query: Pick<ServiceTreeQuery, 'includeInactive' | 'includeDeleted'>,
+  ): Observable<readonly ServiceTreeNode[]> {
+    return this.httpClient.get<readonly ServiceTreeNode[]>(`${this.servicesEndpoint}/central-tree`, {
+      headers: this.createJsonHeaders(),
+      params: new HttpParams()
+        .set('includeInactive', query.includeInactive)
+        .set('includeDeleted', query.includeDeleted),
+    });
+  }
+
   getServiceSelectionOptions(
     serviceId?: number,
   ): Observable<ServiceSelectionOptionsResponse> {

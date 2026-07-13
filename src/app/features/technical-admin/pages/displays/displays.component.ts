@@ -15,6 +15,8 @@ import {
   ValidationErrors,
   Validators,
 } from '@angular/forms';
+import { TechnicalAdminMobileRecordCardComponent } from '../../../../shared/components/technical-admin-mobile-record-card/technical-admin-mobile-record-card.component';
+import { TechnicalAdminPageHeroComponent } from '../../../../shared/components/technical-admin-page-hero/technical-admin-page-hero.component';
 import { Router } from '@angular/router';
 
 import { AppLanguage } from '../../../../shared/models/app-language.model';
@@ -261,7 +263,7 @@ const EMPTY_DELETED_DISPLAY_PAGE: PaginationResponse<DeletedDisplayListItemRespo
 
 @Component({
   selector: 'app-displays',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, TechnicalAdminMobileRecordCardComponent, TechnicalAdminPageHeroComponent],
   templateUrl: './displays.component.html',
   styleUrl: './displays.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

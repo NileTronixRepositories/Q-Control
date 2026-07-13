@@ -29,7 +29,7 @@ const BRANCH_ADMIN_ROUTES: readonly PermissionRoute[] = [
   },
   {
     route: '/technical-admin/services/branch-services',
-    permissions: ['BranchServices.View'],
+    permissions: ['BranchServices.View', 'ServiceGlobalizationRequests.ViewOwn'],
   },
   {
     route: '/technical-admin/services/workflows',

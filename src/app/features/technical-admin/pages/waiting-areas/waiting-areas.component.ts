@@ -1,6 +1,8 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { TechnicalAdminMobileRecordCardComponent } from '../../../../shared/components/technical-admin-mobile-record-card/technical-admin-mobile-record-card.component';
+import { TechnicalAdminPageHeroComponent } from '../../../../shared/components/technical-admin-page-hero/technical-admin-page-hero.component';
 import { Router } from '@angular/router';
 
 import { AppLanguage } from '../../../../shared/models/app-language.model';
@@ -193,7 +195,7 @@ const EMPTY_PAGE: Pagination<WaitingAreaListItem> = {
 
 @Component({
   selector: 'app-waiting-areas',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, TechnicalAdminMobileRecordCardComponent, TechnicalAdminPageHeroComponent],
   templateUrl: './waiting-areas.component.html',
   styleUrl: './waiting-areas.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush

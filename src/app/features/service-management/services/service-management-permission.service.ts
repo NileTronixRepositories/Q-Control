@@ -3,8 +3,12 @@ import { computed, inject, Injectable } from '@angular/core';
 import { AuthSessionService } from '../../auth/services/auth-session.service';
 import { ServicePermission } from '../models/service-management.model';
 import { ServiceWorkflowPermission } from '../models/service-workflow.model';
+import { ServiceGlobalizationPermission } from '../models/service-globalization.model';
 
-export type ServiceAreaPermission = ServicePermission | ServiceWorkflowPermission;
+export type ServiceAreaPermission =
+  | ServicePermission
+  | ServiceWorkflowPermission
+  | ServiceGlobalizationPermission;
 
 const PERMISSION_CLAIM_KEYS = [
   'permissions',
@@ -26,9 +30,19 @@ const SERVICE_PERMISSIONS = new Set<ServicePermission>([
   'Services.Update',
   'Services.Delete',
   'Services.Restore',
+  'Services.ViewCentralTree',
   'BranchServices.View',
   'BranchServices.Assign',
+  'BranchServices.Unassign',
   'BranchServiceTrees.Create',
+]);
+
+const GLOBALIZATION_PERMISSIONS = new Set<ServiceGlobalizationPermission>([
+  'ServiceGlobalizationRequests.ViewAll',
+  'ServiceGlobalizationRequests.ViewDetails',
+  'ServiceGlobalizationRequests.ViewOwn',
+  'ServiceGlobalizationRequests.Approve',
+  'ServiceGlobalizationRequests.Reject',
 ]);
 
 const WORKFLOW_PERMISSIONS = new Set<ServiceWorkflowPermission>([
@@ -57,8 +71,27 @@ export class ServiceManagementPermissionService {
   readonly canUpdate = computed(() => this.hasPermission('Services.Update'));
   readonly canDelete = computed(() => this.hasPermission('Services.Delete'));
   readonly canRestore = computed(() => this.hasPermission('Services.Restore'));
+  readonly canViewCentralTree = computed(() => this.hasPermission('Services.ViewCentralTree'));
+  readonly canViewGlobalizationRequests = computed(() =>
+    this.hasPermission('ServiceGlobalizationRequests.ViewAll'),
+  );
+  readonly canViewGlobalizationRequestDetails = computed(() =>
+    this.hasPermission('ServiceGlobalizationRequests.ViewDetails'),
+  );
+  readonly canViewOwnGlobalizationRequests = computed(() =>
+    this.hasPermission('ServiceGlobalizationRequests.ViewOwn'),
+  );
+  readonly canApproveGlobalizationRequests = computed(() =>
+    this.hasPermission('ServiceGlobalizationRequests.Approve'),
+  );
+  readonly canRejectGlobalizationRequests = computed(() =>
+    this.hasPermission('ServiceGlobalizationRequests.Reject'),
+  );
   readonly canViewBranchServices = computed(() => this.hasPermission('BranchServices.View'));
   readonly canAssignBranchServices = computed(() => this.hasPermission('BranchServices.Assign'));
+  readonly canUnassignBranchServices = computed(() =>
+    this.hasPermission('BranchServices.Unassign'),
+  );
   readonly canCreateBranchServiceTree = computed(() =>
     this.hasPermission('BranchServiceTrees.Create'),
   );
@@ -177,7 +210,8 @@ export class ServiceManagementPermissionService {
   private isServiceAreaPermission(value: string): value is ServiceAreaPermission {
     return (
       SERVICE_PERMISSIONS.has(value as ServicePermission) ||
-      WORKFLOW_PERMISSIONS.has(value as ServiceWorkflowPermission)
+      WORKFLOW_PERMISSIONS.has(value as ServiceWorkflowPermission) ||
+      GLOBALIZATION_PERMISSIONS.has(value as ServiceGlobalizationPermission)
     );
   }
 

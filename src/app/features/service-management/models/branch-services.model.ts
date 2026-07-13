@@ -1,4 +1,5 @@
 import { ServiceScope, ServiceTreeNode } from './service-management.model';
+import { ServiceGlobalizationRequestSummary } from './service-globalization.model';
 
 export interface BranchServicesTreeQuery {
   readonly includeInactive: boolean;
@@ -16,6 +17,13 @@ export interface AssignBranchServicesResponse {
   readonly createdAssignmentsCount: number;
   readonly existingAssignmentsCount: number;
   readonly message: string;
+}
+
+export interface UnassignBranchLeafServiceResponse {
+  readonly branchId: number;
+  readonly leafServiceId: number;
+  readonly unassignedServiceIds: readonly number[];
+  readonly removedAssignmentsCount: number;
 }
 
 export interface CreateBranchServiceTreeRequest {
@@ -51,7 +59,7 @@ export interface CreatedBranchServiceTreeNode {
   readonly children: readonly CreatedBranchServiceTreeNode[];
 }
 
-export interface CreateBranchServiceTreeResponse {
+interface CreateBranchServiceTreeResponseBase {
   readonly branchId: number;
   readonly scope: Extract<ServiceScope, 'BranchScoped'>;
   readonly ownerBranchId: number;
@@ -61,8 +69,13 @@ export interface CreateBranchServiceTreeResponse {
   readonly message: string;
 }
 
-export interface CreateBranchServiceSubtreeResponse extends CreateBranchServiceTreeResponse {
+export interface CreateBranchServiceTreeResponse extends CreateBranchServiceTreeResponseBase {
+  readonly globalizationRequest: ServiceGlobalizationRequestSummary;
+}
+
+export interface CreateBranchServiceSubtreeResponse extends CreateBranchServiceTreeResponseBase {
   readonly parentServiceId: number;
+  readonly globalizationRequest: ServiceGlobalizationRequestSummary | null;
 }
 
 export interface BranchServiceTreeDraftNode {
@@ -87,6 +100,23 @@ export interface BranchServiceTreeDraftNode {
 export interface BranchServicesUiMessage {
   readonly tone: 'success' | 'error' | 'info';
   readonly text: string;
+}
+
+export interface BranchServiceUnassignConfirmState {
+  readonly branchId: number;
+  readonly leafServiceId: number;
+  readonly serviceName: string;
+}
+
+export type BranchServiceLifecycleAction = 'delete' | 'restore';
+
+export interface BranchServiceLifecycleConfirmState {
+  readonly action: BranchServiceLifecycleAction;
+  readonly branchId: number;
+  readonly serviceId: number;
+  readonly rowVersion: string;
+  readonly serviceName: string;
+  readonly hasChildren: boolean;
 }
 
 export type BranchServiceTreeNode = ServiceTreeNode;

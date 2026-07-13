@@ -4,6 +4,8 @@ import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angula
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { AppLanguage } from '../../../../shared/models/app-language.model';
+import { TechnicalAdminMobileRecordCardComponent } from '../../../../shared/components/technical-admin-mobile-record-card/technical-admin-mobile-record-card.component';
+import { TechnicalAdminPageHeroComponent } from '../../../../shared/components/technical-admin-page-hero/technical-admin-page-hero.component';
 import { CreateBranchAdminDialogComponent } from '../../../branch-admins/components/create-branch-admin-dialog/create-branch-admin-dialog.component';
 import { BRANCH_ADMINS_TRANSLATIONS } from '../../../branch-admins/i18n/branch-admins.translations';
 import { AuthSessionService } from '../../../auth/services/auth-session.service';
@@ -202,7 +204,12 @@ const EMPTY_BRANCH_TABLE_META: BranchTableMeta = {
 
 @Component({
   selector: 'app-legacy-page',
-  imports: [ReactiveFormsModule, CreateBranchAdminDialogComponent],
+  imports: [
+    ReactiveFormsModule,
+    CreateBranchAdminDialogComponent,
+    TechnicalAdminMobileRecordCardComponent,
+    TechnicalAdminPageHeroComponent,
+  ],
   templateUrl: './legacy-page.component.html',
   styleUrl: './legacy-page.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush

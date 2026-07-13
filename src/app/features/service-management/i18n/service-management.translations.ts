@@ -127,6 +127,14 @@ export interface ServiceManagementTranslations {
   readonly branchAssignmentInvalidLeaf: string;
   readonly branchAssignmentMissingBranch: string;
   readonly branchAssignmentAlreadyAssigned: string;
+  readonly relatedWorkflows: string;
+  readonly workflowStartOptions: string;
+  readonly workflowSelectionRequired: string;
+  readonly workflowSelectionNotRequired: string;
+  readonly workflowStartModeNoWorkflow: string;
+  readonly workflowStartModeAutoApply: string;
+  readonly workflowStartModeSelectionRequired: string;
+  readonly workflows: string;
 }
 
 export const SERVICE_MANAGEMENT_TRANSLATIONS: Record<AppLanguage, ServiceManagementTranslations> = {
@@ -138,7 +146,7 @@ export const SERVICE_MANAGEMENT_TRANSLATIONS: Record<AppLanguage, ServiceManagem
     addService: 'إضافة خدمة',
     addRootService: 'إضافة خدمة رئيسية',
     addChildService: 'إضافة خدمة فرعية',
-    serviceHierarchy: 'شجرة الخدمات',
+    serviceHierarchy: ' الخدمات',
     treeRoot: 'الخدمات',
     selectedService: 'الخدمة المحددة',
     editorEmptyTitle: 'اختر خدمة أو أنشئ خدمة جديدة',
@@ -233,30 +241,40 @@ export const SERVICE_MANAGEMENT_TRANSLATIONS: Record<AppLanguage, ServiceManagem
     deleteConfirmBody: 'هل أنت متأكد من حذف هذه الخدمة؟',
     restoreConfirmBody: 'هل أنت متأكد من استرجاع هذه الخدمة؟',
     removeLogoConfirmBody: 'هل أنت متأكد من حذف شعار هذه الخدمة؟',
-    deleteChildrenWarning: 'هذه الخدمة تحتوي على خدمات فرعية. حذفها لن يحذف الخدمات الفرعية، لكنها لن تتمكن من إصدار تذاكر طالما الخدمة الرئيسية محذوفة.',
-    restoredButDisabled: 'تم استرجاع الخدمة بنجاح، لكنها ما زالت غير فعالة تشغيليًا لأن الخدمة الرئيسية غير فعالة أو محذوفة.',
+    deleteChildrenWarning:
+      'هذه الخدمة تحتوي على خدمات فرعية. حذفها لن يحذف الخدمات الفرعية، لكنها لن تتمكن من إصدار تذاكر طالما الخدمة الرئيسية محذوفة.',
+    restoredButDisabled:
+      'تم استرجاع الخدمة بنجاح، لكنها ما زالت غير فعالة تشغيليًا لأن الخدمة الرئيسية غير فعالة أو محذوفة.',
     yes: 'نعم',
     no: 'لا',
     notAvailable: '-',
     scope: 'النطاق',
-    globalScope: 'عام',
-    branchScopedScope: 'مملوك لفرع',
+    globalScope: 'مسند لفروع أخرى',
+    branchScopedScope: 'مخصص لفرع',
     ownerBranch: 'الفرع المالك',
     assignedToCurrentBranch: 'مسند للفرع الحالي',
     notAssignedToCurrentBranch: 'غير مسند للفرع الحالي',
     ownedByCurrentBranch: 'مملوك للفرع الحالي',
-    serviceCentral: 'Service Central',
+    serviceCentral: 'مركز الخدمات',
     scopeFilter: 'نطاق الخدمة',
     ownerBranchFilter: 'كود الفرع المالك',
     assignedFilter: 'الإسناد للفرع الحالي',
-    branchAssignmentTitle: 'Branch service assignment',
-    branchAssignmentDescription: 'Drag active leaf services into the branch tree to assign them.',
-    branchAssignmentSourceTitle: 'Service Central',
-    branchAssignmentTargetTitle: 'Assigned branch services',
-    branchAssignmentDropHint: 'Drop a service here to assign it to the branch.',
-    branchAssignmentInvalidLeaf: 'Only active leaf services can be assigned.',
-    branchAssignmentMissingBranch: 'No active branch is available for assignment.',
-    branchAssignmentAlreadyAssigned: 'This service is already assigned to the branch.',
+    branchAssignmentTitle: 'إسناد خدمات الفرع',
+    branchAssignmentDescription: 'اسحب الخدمات الطرفية النشطة إلى شجرة الفرع لإسنادها.',
+    branchAssignmentSourceTitle: 'مركز الخدمات',
+    branchAssignmentTargetTitle: 'الخدمات المسندة للفرع',
+    branchAssignmentDropHint: 'أفلت الخدمة هنا لإسنادها إلى الفرع.',
+    branchAssignmentInvalidLeaf: 'يمكن إسناد الخدمات الطرفية النشطة فقط.',
+    branchAssignmentMissingBranch: 'لا يوجد فرع نشط متاح للإسناد.',
+    branchAssignmentAlreadyAssigned: 'هذه الخدمة مسندة بالفعل إلى الفرع.',
+    relatedWorkflows: 'المسارات المرتبطة',
+    workflowStartOptions: 'خيارات بدء المسار',
+    workflowSelectionRequired: 'اختيار المسار مطلوب',
+    workflowSelectionNotRequired: 'اختيار المسار غير مطلوب',
+    workflowStartModeNoWorkflow: 'لا يوجد مسار',
+    workflowStartModeAutoApply: 'تطبيق تلقائي للمسار',
+    workflowStartModeSelectionRequired: 'يتطلب اختيار مسار',
+    workflows: 'المسارات',
   },
   en: {
     title: 'Service Management',
@@ -266,11 +284,12 @@ export const SERVICE_MANAGEMENT_TRANSLATIONS: Record<AppLanguage, ServiceManagem
     addService: 'Add Service',
     addRootService: 'Add Root Service',
     addChildService: 'Add Child Service',
-    serviceHierarchy: 'Services Tree',
+    serviceHierarchy: 'Services ',
     treeRoot: 'Services',
     selectedService: 'Selected service',
     editorEmptyTitle: 'Select a service or create a new one',
-    editorEmptyBody: 'Use the tree to add a root service, or press + next to any service to add a child service.',
+    editorEmptyBody:
+      'Use the tree to add a root service, or press + next to any service to add a child service.',
     createUnder: 'Creating under',
     searchPlaceholder: 'Search Arabic or English name',
     activeFilter: 'Status',
@@ -361,8 +380,10 @@ export const SERVICE_MANAGEMENT_TRANSLATIONS: Record<AppLanguage, ServiceManagem
     deleteConfirmBody: 'Are you sure you want to delete this service?',
     restoreConfirmBody: 'Are you sure you want to restore this service?',
     removeLogoConfirmBody: 'Are you sure you want to remove this service logo?',
-    deleteChildrenWarning: 'This service has child services. Deleting it will not delete the children, but they will not be able to issue tickets while this parent is deleted.',
-    restoredButDisabled: 'Service restored successfully, but it is still not operational because its parent service is inactive or deleted.',
+    deleteChildrenWarning:
+      'This service has child services. Deleting it will not delete the children, but they will not be able to issue tickets while this parent is deleted.',
+    restoredButDisabled:
+      'Service restored successfully, but it is still not operational because its parent service is inactive or deleted.',
     yes: 'Yes',
     no: 'No',
     notAvailable: '-',
@@ -385,5 +406,13 @@ export const SERVICE_MANAGEMENT_TRANSLATIONS: Record<AppLanguage, ServiceManagem
     branchAssignmentInvalidLeaf: 'Only active leaf services can be assigned.',
     branchAssignmentMissingBranch: 'No active branch is available for assignment.',
     branchAssignmentAlreadyAssigned: 'This service is already assigned to the branch.',
+    relatedWorkflows: 'Related Workflows',
+    workflowStartOptions: 'Workflow Start Options',
+    workflowSelectionRequired: 'Workflow selection required',
+    workflowSelectionNotRequired: 'No workflow selection required',
+    workflowStartModeNoWorkflow: 'No Workflow',
+    workflowStartModeAutoApply: 'Auto Apply',
+    workflowStartModeSelectionRequired: 'Selection Required',
+    workflows: 'Workflows',
   },
 };

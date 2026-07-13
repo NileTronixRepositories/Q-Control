@@ -1,0 +1,33 @@
+/* Shared typography rhythm for readable Arabic and English text. */
+body {
+  line-height: var(--q-line-height-body);
+}
+
+:where(h1, h2, h3, h4, h5, h6) {
+  line-height: var(--q-line-height-title);
+}
+
+:where(p, li, dd, figcaption, blockquote, td, th) {
+  line-height: var(--q-line-height-body);
+}
+
+:where(label, .form-label, dt, small, .header-description, .field-help, .form-text) {
+  line-height: var(--q-line-height-supporting);
+}
+
+:where(.eyebrow) {
+  line-height: var(--q-line-height-label);
+}
+
+:where(.page-header, .page-hero) :where(.eyebrow) {
+  margin-block: 0 var(--q-text-stack-gap-sm);
+}
+
+:where(.page-header, .page-hero) :where(h1, h2, h3) {
+  margin-block: 0 var(--q-text-stack-gap-sm);
+}
+
+:where(.page-header, .page-hero) :where(.header-description) {
+  display: block;
+  margin-block: 0;
+}

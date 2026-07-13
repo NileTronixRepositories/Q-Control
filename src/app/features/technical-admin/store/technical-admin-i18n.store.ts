@@ -80,6 +80,8 @@ interface TechnicalAdminTranslations {
   readonly serviceManagementLabel: string;
   readonly branchServicesLabel: string;
   readonly serviceWorkflowsLabel: string;
+  readonly globalizationRequestsLabel: string;
+  readonly centralServiceTreeLabel: string;
   readonly managerLabel: string;
   readonly liveBranchStatusLabel: string;
   readonly monitoringHint: string;
@@ -186,6 +188,8 @@ const TECHNICAL_ADMIN_TRANSLATIONS: Record<AppLanguage, TechnicalAdminTranslatio
     serviceManagementLabel: '\u0625\u062f\u0627\u0631\u0629 \u0627\u0644\u062e\u062f\u0645\u0627\u062a',
     branchServicesLabel: '\u062e\u062f\u0645\u0627\u062a \u0627\u0644\u0641\u0631\u0639',
     serviceWorkflowsLabel: '\u0645\u0633\u0627\u0631\u0627\u062a \u0627\u0644\u062e\u062f\u0645\u0627\u062a',
+    globalizationRequestsLabel: '\u0637\u0644\u0628\u0627\u062a \u0627\u0639\u062a\u0645\u0627\u062f \u0627\u0644\u062e\u062f\u0645\u0627\u062a',
+    centralServiceTreeLabel: '\u0634\u062c\u0631\u0629 \u0627\u0644\u062e\u062f\u0645\u0627\u062a \u0627\u0644\u0645\u0631\u0643\u0632\u064a\u0629',
     managerLabel: '\u0627\u0644\u0645\u062f\u064a\u0631',
     liveBranchStatusLabel: '\u062d\u0627\u0644\u0629 \u0627\u0644\u0641\u0631\u0648\u0639 \u0627\u0644\u062d\u064a\u0629',
     monitoringHint: '\u0644\u0642\u0637\u0629 \u062a\u062c\u0631\u064a\u0628\u064a\u0629 \u0644\u0627\u062a\u0635\u0627\u0644 \u0627\u0644\u0641\u0631\u0648\u0639 \u0648\u0646\u0634\u0627\u0637 \u0627\u0644\u0637\u0648\u0627\u0628\u064a\u0631. ',
@@ -293,6 +297,8 @@ const TECHNICAL_ADMIN_TRANSLATIONS: Record<AppLanguage, TechnicalAdminTranslatio
     serviceManagementLabel: 'Service Management',
     branchServicesLabel: 'Branch Services',
     serviceWorkflowsLabel: 'Service Workflows',
+    globalizationRequestsLabel: 'Globalization Requests',
+    centralServiceTreeLabel: 'Central Service Tree',
     managerLabel: 'Manager',
     liveBranchStatusLabel: 'Live branch status',
     monitoringHint:

@@ -129,7 +129,7 @@
   color: var(--q-text-primary) !important;
   font-size: var(--q-font-size-base) !important;
   font-weight: 700 !important;
-  line-height: 1.25 !important;
+  line-height: var(--q-line-height-title, 1.3) !important;
   overflow-wrap: anywhere !important;
 }
 
@@ -195,13 +195,13 @@
   color: var(--q-text-muted) !important;
   font-size: 0.85rem !important;
   font-weight: 700 !important;
-  line-height: 1.5 !important;
+  line-height: var(--q-line-height-supporting, 1.5) !important;
   text-transform: uppercase !important;
 }
 
 /* Scoped compact layout for create/edit branch popup only. */
 .branch-mutation-dialog {
-  --q-popup-wide-width: min(820px, calc(100dvw - 48px));
+  --q-popup-wide-width: min(960px, calc(100dvw - 48px));
   --q-popup-x: 18px;
   --q-popup-y: 14px;
 }
@@ -212,32 +212,19 @@
 }
 
 .branch-mutation-form.branch-form.row {
-  --bs-gutter-x: 0 !important;
-  --bs-gutter-y: 0 !important;
-  display: grid !important;
-  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-  gap: 12px 16px !important;
+  --bs-gutter-x: 16px;
+  --bs-gutter-y: 12px;
   padding-block: 14px !important;
 }
 
-.branch-mutation-form > :where(.branch-field, .branch-section-title, .branch-form-actions) {
-  width: auto !important;
-  max-width: none !important;
-  flex: initial !important;
-  padding: 0 !important;
-}
-
-.branch-mutation-form > :where(.branch-section-title, .branch-form-actions) {
-  grid-column: 1 / -1 !important;
-}
-
 .branch-mutation-form .branch-field {
+  min-width: 0;
   gap: 5px !important;
 }
 
 .branch-mutation-form .branch-field span {
   font-size: 0.72rem !important;
-  line-height: 1.2 !important;
+  line-height: var(--q-line-height-label, 1.4) !important;
 }
 
 .branch-mutation-form .branch-field :where(input, textarea, .form-control) {
@@ -263,13 +250,14 @@
 .branch-mutation-form .branch-feedback.invalid-feedback {
   min-height: 14px !important;
   font-size: 0.68rem !important;
-  line-height: 1.2 !important;
+  line-height: var(--q-line-height-supporting, 1.5) !important;
 }
 
 .branch-mutation-form .branch-form-actions {
   justify-content: flex-end !important;
   margin-top: 2px !important;
   padding-top: 12px !important;
+  border-top-color: rgb(var(--q-primary-rgb) / 0.12) !important;
 }
 
 .branch-mutation-form .branch-form-actions :where(.primary-action, .secondary-action) {
@@ -280,10 +268,6 @@
 @media (max-width: 767.98px) {
   .branch-mutation-dialog {
     --q-popup-wide-width: min(100dvw - 24px, 720px);
-  }
-
-  .branch-mutation-form.branch-form.row {
-    grid-template-columns: 1fr !important;
   }
 
   .branch-mutation-form .branch-form-actions {

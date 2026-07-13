@@ -15,6 +15,8 @@ import {
   ValidationErrors,
   Validators,
 } from '@angular/forms';
+import { TechnicalAdminMobileRecordCardComponent } from '../../../../shared/components/technical-admin-mobile-record-card/technical-admin-mobile-record-card.component';
+import { TechnicalAdminPageHeroComponent } from '../../../../shared/components/technical-admin-page-hero/technical-admin-page-hero.component';
 import { Router } from '@angular/router';
 
 import { AppLanguage } from '../../../../shared/models/app-language.model';
@@ -268,7 +270,7 @@ const EMPTY_DELETED_TERMINAL_PAGE: PaginationResponse<DeletedTerminalListItemRes
 
 @Component({
   selector: 'app-terminals',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, TechnicalAdminMobileRecordCardComponent, TechnicalAdminPageHeroComponent],
   templateUrl: './terminals.component.html',
   styleUrl: './terminals.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -5,8 +5,10 @@ export type ServicePermission =
   | 'Services.Update'
   | 'Services.Delete'
   | 'Services.Restore'
+  | 'Services.ViewCentralTree'
   | 'BranchServices.View'
   | 'BranchServices.Assign'
+  | 'BranchServices.Unassign'
   | 'BranchServiceTrees.Create';
 
 export type ServiceBooleanFilter = boolean | null;

@@ -13,10 +13,10 @@
 }
 
 :host-context(body[data-admin-theme]) .branch-admin-dialog {
-  --q-popup-wide-width: min(760px, calc(100dvw - 48px));
+  --q-popup-wide-width: min(960px, calc(100dvw - 48px));
   --q-popup-x: 18px;
   --q-popup-y: 14px;
-  max-height: min(82dvh, 680px) !important;
+  max-height: min(82dvh, 720px) !important;
 }
 
 :host-context(body[data-admin-theme]) .branch-admin-dialog .editor-panel-header {
@@ -25,24 +25,9 @@
 }
 
 :host-context(body[data-admin-theme]) .branch-admin-form.branch-form.row {
-  --bs-gutter-x: 0 !important;
-  --bs-gutter-y: 0 !important;
-  display: grid !important;
-  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-  gap: 12px 16px !important;
+  --bs-gutter-x: 16px;
+  --bs-gutter-y: 12px;
   padding-block: 14px !important;
-}
-
-:host-context(body[data-admin-theme]) .branch-admin-form > :where(.branch-field, .api-note, .branch-section-title, .branch-form-actions) {
-  width: auto !important;
-  max-width: none !important;
-  flex: initial !important;
-  padding: 0 !important;
-}
-
-:host-context(body[data-admin-theme]) .branch-admin-form > :where(.api-note, .branch-section-title, .branch-form-actions),
-:host-context(body[data-admin-theme]) .branch-admin-form > .branch-field.col-12:not(.col-md-6) {
-  grid-column: 1 / -1 !important;
 }
 
 :host-context(body[data-admin-theme]) .branch-admin-form .branch-section-title {
@@ -51,7 +36,7 @@
   padding: 2px 0 4px !important;
   color: var(--q-text-secondary) !important;
   font-size: 0.68rem !important;
-  line-height: 1.2 !important;
+  line-height: var(--q-line-height-supporting, 1.5) !important;
 }
 
 :host-context(body[data-admin-theme]) .branch-admin-form > .api-note {
@@ -60,16 +45,17 @@
   margin: -2px 0 2px !important;
   padding: 3px 8px !important;
   font-size: 0.72rem !important;
-  line-height: 1.25 !important;
+  line-height: var(--q-line-height-supporting, 1.5) !important;
 }
 
 :host-context(body[data-admin-theme]) .branch-admin-form .branch-field {
+  min-width: 0;
   gap: 5px !important;
 }
 
 :host-context(body[data-admin-theme]) .branch-admin-form .branch-field span {
   font-size: 0.72rem !important;
-  line-height: 1.2 !important;
+  line-height: var(--q-line-height-label, 1.4) !important;
 }
 
 :host-context(body[data-admin-theme]) .branch-admin-form .branch-field :where(input, .form-control) {
@@ -83,13 +69,14 @@
 :host-context(body[data-admin-theme]) .branch-admin-form .branch-feedback.invalid-feedback {
   min-height: 14px !important;
   font-size: 0.68rem !important;
-  line-height: 1.2 !important;
+  line-height: var(--q-line-height-supporting, 1.5) !important;
 }
 
 :host-context(body[data-admin-theme]) .branch-admin-form .branch-form-actions {
   justify-content: flex-end !important;
   margin-top: 2px !important;
   padding-top: 12px !important;
+  border-top-color: rgb(var(--q-primary-rgb) / 0.12) !important;
 }
 
 :host-context(body[data-admin-theme]) .branch-admin-form .branch-form-actions :where(.primary-action, .secondary-action) {
@@ -100,10 +87,6 @@
 @media (max-width: 767.98px) {
   :host-context(body[data-admin-theme]) .branch-admin-dialog {
     --q-popup-wide-width: min(100dvw - 24px, 720px);
-  }
-
-  :host-context(body[data-admin-theme]) .branch-admin-form.branch-form.row {
-    grid-template-columns: 1fr !important;
   }
 
   :host-context(body[data-admin-theme]) .branch-admin-form .branch-form-actions {

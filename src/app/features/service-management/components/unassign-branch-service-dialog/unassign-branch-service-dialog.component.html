@@ -1,0 +1,72 @@
+<div
+  class="fixed inset-0 z-50 flex items-end justify-center bg-slate-950/55 p-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] backdrop-blur-sm sm:items-center sm:p-4"
+  role="presentation"
+  (click)="closeFromBackdrop($event)"
+>
+  <section
+    class="w-full max-w-lg overflow-hidden rounded-t-3xl border border-slate-200 bg-white shadow-2xl sm:rounded-2xl"
+    role="dialog"
+    aria-modal="true"
+    [attr.aria-labelledby]="'unassign-branch-service-title'"
+    [attr.aria-describedby]="'unassign-branch-service-description'"
+  >
+    <header class="flex items-start justify-between gap-3 border-b border-slate-200 px-4 py-4 sm:gap-4 sm:px-6 sm:py-5">
+      <div class="flex min-w-0 items-start gap-3">
+        <span class="flex size-10 shrink-0 items-center justify-center rounded-full bg-rose-100 text-rose-700">
+          <i class="bi bi-node-minus text-lg" aria-hidden="true"></i>
+        </span>
+        <div class="min-w-0">
+          <h2 id="unassign-branch-service-title" class="text-lg font-bold text-slate-900">
+            {{ translations().unassignConfirmTitle }}
+          </h2>
+          <p class="mt-1 break-words font-semibold text-sky-700">{{ state().serviceName }}</p>
+        </div>
+      </div>
+      <button
+        type="button"
+        class="flex size-9 shrink-0 items-center justify-center rounded-lg text-slate-500 transition hover:bg-slate-100 hover:text-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
+        [disabled]="unassigning()"
+        [attr.aria-label]="translations().close"
+        (click)="requestClose()"
+      >
+        <i class="bi bi-x-lg" aria-hidden="true"></i>
+      </button>
+    </header>
+
+    <div class="space-y-4 px-6 py-5">
+      <p id="unassign-branch-service-description" class="leading-7 text-slate-700">
+        {{ translations().unassignConfirmBody }}
+      </p>
+      <div class="flex gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-900">
+        <i class="bi bi-info-circle mt-0.5 shrink-0" aria-hidden="true"></i>
+        <p>{{ translations().unassignPreserveDefinition }}</p>
+      </div>
+    </div>
+
+    <footer class="flex flex-col-reverse gap-3 border-t border-slate-200 bg-slate-50 px-6 py-4 sm:flex-row sm:justify-end">
+      <button
+        type="button"
+        class="rounded-lg border border-slate-300 bg-white px-5 py-2.5 font-semibold text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50"
+        autofocus
+        [disabled]="unassigning()"
+        (click)="requestClose()"
+      >
+        {{ translations().cancel }}
+      </button>
+      <button
+        type="button"
+        class="inline-flex items-center justify-center gap-2 rounded-lg bg-rose-600 px-5 py-2.5 font-semibold text-white transition hover:bg-rose-700 disabled:cursor-not-allowed disabled:opacity-60"
+        [disabled]="unassigning()"
+        (click)="requestConfirm()"
+      >
+        @if (unassigning()) {
+          <i class="bi bi-arrow-repeat animate-spin" aria-hidden="true"></i>
+          <span>{{ translations().unassigning }}</span>
+        } @else {
+          <i class="bi bi-node-minus" aria-hidden="true"></i>
+          <span>{{ translations().unassign }}</span>
+        }
+      </button>
+    </footer>
+  </section>
+</div>

@@ -3,17 +3,49 @@
   [class.sidebar-expanded]="sidebarExpanded()"
   [class.sidebar-collapsed]="!sidebarExpanded()"
   [class.is-mobile]="isMobile()"
+  [class.mobile-navigation-overlay]="mobileNavigationMode() === 'overlay'"
   [class.app-shell-rtl]="direction() === 'rtl'"
   [class.app-shell-ltr]="direction() === 'ltr'"
   [attr.dir]="direction()"
   [attr.lang]="language()"
 >
-  @if (isMobile() && sidebarExpanded()) {
-    <div class="sidebar-backdrop" (click)="closeSidebar()" aria-hidden="true"></div>
+  @if (usesMobileOverlay()) {
+    <header class="mobile-topbar">
+      <button
+        #mobileMenuButton
+        type="button"
+        class="mobile-menu-button"
+        [attr.aria-label]="openSidebarLabel()"
+        [attr.aria-expanded]="sidebarExpanded()"
+        aria-controls="application-sidebar"
+        (click)="openSidebar()"
+      >
+        <i class="bi bi-list" aria-hidden="true"></i>
+      </button>
+      <div class="mobile-topbar-identity">
+        <img src="/images/nile.png" [alt]="topbarLogoAlt()" />
+        <strong>{{ topbarTitle() }}</strong>
+      </div>
+    </header>
+  }
+
+  @if (usesMobileOverlay() && sidebarExpanded()) {
+    <button
+      type="button"
+      class="sidebar-backdrop"
+      [attr.aria-label]="closeSidebarLabel()"
+      (click)="closeSidebar()"
+    ></button>
   }
 
   <!-- Sidebar -->
-  <aside class="sidebar" [attr.dir]="direction()" [attr.lang]="language()">
+  <aside
+    id="application-sidebar"
+    class="sidebar"
+    [attr.dir]="direction()"
+    [attr.lang]="language()"
+    [attr.aria-hidden]="usesMobileOverlay() && !sidebarExpanded()"
+  >
     <div class="sidebar-header">
       @if (sidebarExpanded()) {
         <div class="logo-container">
@@ -22,6 +54,7 @@
         <app-theme-switcher></app-theme-switcher>
       }
       <button
+        #sidebarToggleButton
         type="button"
         class="sidebar-toggle"
         [attr.aria-label]="sidebarExpanded() ? closeSidebarLabel() : openSidebarLabel()"

@@ -39,4 +39,26 @@ export const SERVICE_MANAGEMENT_ROUTES: Routes = [
         (component) => component.ServiceWorkflowsComponent,
       ),
   },
+  {
+    path: 'globalization-requests',
+    canActivate: [technicalAdminPermissionGuard],
+    data: {
+      requiredAnyPermissions: ['ServiceGlobalizationRequests.ViewAll'],
+    },
+    loadComponent: () =>
+      import('./pages/globalization-requests/globalization-requests.component').then(
+        (component) => component.GlobalizationRequestsComponent,
+      ),
+  },
+  {
+    path: 'central-tree',
+    canActivate: [technicalAdminPermissionGuard],
+    data: {
+      requiredAnyPermissions: ['Services.ViewCentralTree'],
+    },
+    loadComponent: () =>
+      import('./pages/central-service-tree/central-service-tree.component').then(
+        (component) => component.CentralServiceTreeComponent,
+      ),
+  },
 ];

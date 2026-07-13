@@ -185,7 +185,6 @@ body .login-shell .brand-subtitle {
   margin: 0;
   overflow: hidden;
   letter-spacing: 0;
-  line-height: 1.15;
   text-overflow: ellipsis;
   text-transform: uppercase;
   white-space: nowrap;
@@ -193,11 +192,13 @@ body .login-shell .brand-subtitle {
 
 body .login-shell .brand-name {
   color: inherit;
+  line-height: var(--q-line-height-title, 1.3);
   font-size: 0.94rem;
   font-weight: 900;
 }
 
 body .login-shell .brand-subtitle {
+  line-height: var(--q-line-height-supporting, 1.5);
   color: rgba(255, 255, 255, 0.76);
   font-size: 0.64rem;
   font-weight: 800;
@@ -238,7 +239,7 @@ body .login-shell .brand-message h1 {
   color: #ffffff;
   font-size: clamp(1.9rem, 2.45vw, 2.55rem);
   font-weight: 900;
-  line-height: 1.15;
+  line-height: var(--q-line-height-title, 1.3);
   overflow-wrap: normal;
 }
 
@@ -315,7 +316,7 @@ body .login-shell .login-card-header h2 {
   color: var(--login-text);
   font-size: clamp(1.85rem, 2.05vw, 2.25rem);
   font-weight: 900;
-  line-height: 1.18;
+  line-height: var(--q-line-height-title, 1.3);
   overflow-wrap: anywhere;
 }
 
@@ -348,7 +349,7 @@ body .login-shell .form-label {
   color: var(--login-text-soft);
   font-size: 0.82rem;
   font-weight: 900;
-  line-height: 1.3;
+  line-height: var(--q-line-height-label, 1.4);
 }
 
 body .login-shell .required-field::after {
@@ -533,7 +534,7 @@ body .login-shell .support-link {
   color: var(--login-text-soft);
   font-size: 0.82rem;
   font-weight: 800;
-  line-height: 1.3;
+  line-height: var(--q-line-height-label, 1.4);
 }
 
 body .login-shell .form-check-label {

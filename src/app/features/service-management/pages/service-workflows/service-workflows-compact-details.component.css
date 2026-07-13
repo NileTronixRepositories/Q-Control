@@ -1,0 +1,140 @@
+.workflow-embedded-expanded-details {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-top: 4px;
+  scrollbar-width: thin;
+}
+
+.workflow-embedded-expanded-details .workflow-details-head {
+  flex: 0 0 220px;
+  min-width: 220px;
+  padding: 4px;
+}
+
+.workflow-embedded-expanded-details .workflow-details-head > div {
+  min-width: 0;
+}
+
+.workflow-embedded-expanded-details .workflow-details-head h3 {
+  font-size: 14px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workflow-embedded-expanded-details .workflow-details-head p {
+  font-size: 10px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workflow-embedded-expanded-details .workflow-meta-grid {
+  flex: 1 0 500px;
+  min-width: 500px;
+}
+
+.workflow-embedded-expanded-details .workflow-meta-grid > div {
+  padding: 4px;
+}
+
+.workflow-embedded-expanded-details .workflow-meta-grid dt {
+  font-size: 10px;
+}
+
+.workflow-embedded-expanded-details .workflow-meta-grid dd {
+  font-size: 11px;
+  margin-top: 2px;
+}
+
+.workflow-embedded-expanded-details .workflow-actions {
+  border-top: 0;
+  flex: 0 0 auto;
+  margin-inline-start: 0;
+  padding-top: 0;
+}
+
+.workflow-embedded-expanded-details .workflow-actions > button {
+  flex: 0 0 auto;
+  font-size: 11px;
+  min-height: 28px;
+  padding-inline: 8px;
+  width: auto;
+}
+
+.workflow-embedded-details-path {
+  gap: 6px;
+  padding: 2px 0;
+}
+
+.workflow-embedded-details-path .workflow-flow-step {
+  gap: 6px;
+  grid-template-columns: 24px minmax(0, 1fr);
+  min-width: 150px;
+  padding: 5px 8px;
+  width: clamp(150px, 16vw, 185px);
+}
+
+.workflow-embedded-details-path .workflow-flow-step > div {
+  gap: 2px;
+  min-width: 0;
+}
+
+.workflow-embedded-details-path .workflow-flow-step strong {
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workflow-embedded-details-path .workflow-flow-step small {
+  font-size: 10px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workflow-embedded-details-path .workflow-step-index {
+  font-size: 11px;
+  height: 24px;
+  width: 24px;
+}
+
+.workflow-embedded-details-path .workflow-badge {
+  font-size: 9px;
+  padding: 3px 5px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .workflow-embedded-card-expanded {
+    animation: workflow-card-view-in 180ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .workflow-embedded-card-expanded .workflow-embedded-expanded-details {
+    animation: workflow-details-row-in 220ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+}
+
+@keyframes workflow-card-view-in {
+  from {
+    opacity: 0.88;
+    transform: translateY(-2px) scale(0.998);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes workflow-details-row-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

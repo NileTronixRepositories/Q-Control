@@ -1,0 +1,275 @@
+@if (open()) {
+  <div
+    class="fixed inset-0 z-[1250] flex items-end justify-center p-0 sm:items-center sm:p-6"
+    [attr.dir]="direction()"
+    [attr.lang]="language()"
+  >
+    <button
+      type="button"
+      class="absolute inset-0 cursor-default bg-slate-950/55"
+      [attr.aria-label]="translations().close"
+      (click)="close()"
+    ></button>
+
+    <section
+      class="relative z-10 flex h-[100dvh] max-h-[100dvh] w-full max-w-6xl flex-col overflow-hidden rounded-none border border-cyan-100 bg-white shadow-[0_32px_80px_-24px_rgba(15,23,42,0.45)] sm:h-auto sm:max-h-[90vh] sm:rounded-3xl"
+      role="dialog"
+      aria-modal="true"
+      [attr.aria-labelledby]="'branch-globalization-requests-title'"
+    >
+      <header
+        class="relative flex items-start justify-between gap-4 overflow-hidden border-b border-cyan-100 bg-gradient-to-br from-cyan-50 via-white to-sky-50 p-4 sm:p-5"
+      >
+        <div
+          class="pointer-events-none absolute -start-16 -top-20 size-44 rounded-full bg-cyan-200/30 blur-3xl"
+        ></div>
+        <div class="relative flex items-start gap-3">
+          <span
+            class="grid size-11 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-cyan-600 to-sky-700 text-lg text-white shadow-lg shadow-cyan-700/20"
+          >
+            <i class="bi bi-bell-fill" aria-hidden="true"></i>
+          </span>
+          <div>
+            <h2
+              id="branch-globalization-requests-title"
+              class="text-xl font-black leading-[1.3] text-slate-900"
+            >
+              {{ translations().branchRequestsTitle }}
+            </h2>
+            <p class="mt-1 text-sm leading-relaxed text-slate-500">
+              {{ translations().branchRequestsDescription }}
+            </p>
+          </div>
+        </div>
+        <button
+          type="button"
+          class="relative grid size-10 shrink-0 place-items-center rounded-xl border border-white/80 bg-white/80 text-lg text-slate-600 shadow-sm backdrop-blur transition hover:-translate-y-0.5 hover:border-cyan-200 hover:text-cyan-700 hover:shadow-md"
+          [attr.aria-label]="translations().close"
+          (click)="close()"
+        >
+          <i class="bi bi-x-lg" aria-hidden="true"></i>
+        </button>
+      </header>
+
+      <div class="min-h-0 flex-1 overflow-y-auto bg-slate-50/70 p-4 sm:p-5">
+        <form
+          class="grid gap-3 rounded-2xl border border-cyan-100 bg-gradient-to-br from-white to-cyan-50/60 p-3 shadow-sm md:grid-cols-4 sm:p-4"
+          (submit)="search($event)"
+        >
+          <label class="grid gap-1.5">
+            <span class="flex items-center gap-1.5 text-xs font-extrabold text-slate-600">
+              <i class="bi bi-search text-cyan-700" aria-hidden="true"></i>
+              {{ translations().search }}
+            </span>
+            <span class="relative block">
+              <i
+                class="bi bi-search pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-slate-400"
+                aria-hidden="true"
+              ></i>
+              <input
+                type="search"
+                maxlength="200"
+                class="h-11 w-full rounded-xl border border-slate-200 bg-white pe-3 ps-9 text-slate-800 outline-none transition placeholder:text-slate-400 hover:border-cyan-300 focus:border-cyan-500 focus:ring-4 focus:ring-cyan-100"
+                [placeholder]="translations().search"
+                [value]="searchText()"
+                (input)="searchText.set($any($event.target).value)"
+              />
+            </span>
+          </label>
+
+          <label class="grid gap-1.5">
+            <span class="flex items-center gap-1.5 text-xs font-extrabold text-slate-600">
+              <i class="bi bi-activity text-cyan-700" aria-hidden="true"></i>
+              {{ translations().status }}
+            </span>
+            <select
+              class="h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-slate-800 outline-none transition hover:border-cyan-300 focus:border-cyan-500 focus:ring-4 focus:ring-cyan-100"
+              [value]="status() ?? ''"
+              (change)="updateFilter($event, 'status')"
+            >
+              <option value="">{{ translations().allStatuses }}</option>
+              <option value="Pending">{{ translations().pending }}</option>
+              <option value="Approved">{{ translations().approved }}</option>
+              <option value="Rejected">{{ translations().rejected }}</option>
+            </select>
+          </label>
+
+          <label class="grid gap-1.5">
+            <span class="flex items-center gap-1.5 text-xs font-extrabold text-slate-600">
+              <i class="bi bi-diagram-3 text-cyan-700" aria-hidden="true"></i>
+              {{ translations().requestType }}
+            </span>
+            <select
+              class="h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-slate-800 outline-none transition hover:border-cyan-300 focus:border-cyan-500 focus:ring-4 focus:ring-cyan-100"
+              [value]="requestType() ?? ''"
+              (change)="updateFilter($event, 'type')"
+            >
+              <option value="">{{ translations().allTypes }}</option>
+              <option value="BranchServiceTree">{{ translations().branchServiceTree }}</option>
+              <option value="LeafUnderGlobalParent">
+                {{ translations().leafUnderGlobalParent }}
+              </option>
+            </select>
+          </label>
+
+          <button
+            type="submit"
+            class="mt-auto rounded flex h-11 items-center justify-center gap-2 rounded-xl border border-cyan-700 bg-gradient-to-r from-cyan-700 to-sky-700 px-4 font-extrabold text-white shadow-lg shadow-cyan-800/15 transition hover:-translate-y-0.5 hover:from-cyan-800 hover:to-sky-800 hover:shadow-xl active:translate-y-0"
+          >
+            <i class="bi bi-search" aria-hidden="true"></i>
+            {{ translations().search }}
+          </button>
+        </form>
+
+        @if (error()) {
+          <div
+            class="mt-4 flex items-start gap-3 rounded-2xl border border-rose-200 bg-rose-50 p-4 text-rose-800 shadow-sm"
+            role="alert"
+          >
+            <span class="grid size-9 shrink-0 place-items-center rounded-xl bg-rose-100 text-lg"
+              ><i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i
+            ></span>
+            <p class="m-0 pt-1 leading-relaxed">{{ error() }}</p>
+          </div>
+        }
+
+        @if (loading()) {
+          <div
+            class="mt-4 grid min-h-52 place-items-center rounded-2xl border border-cyan-100 bg-white p-8 text-center shadow-sm"
+          >
+            <div>
+              <span
+                class="mx-auto grid size-12 place-items-center rounded-2xl bg-cyan-50 text-2xl text-cyan-700"
+                ><i class="bi bi-arrow-repeat animate-spin" aria-hidden="true"></i
+              ></span>
+              <p class="mb-0 mt-3 font-bold text-slate-600">{{ translations().loading }}</p>
+            </div>
+          </div>
+        } @else if (page().data.length === 0) {
+          <div
+            class="mt-4 grid min-h-52 place-items-center rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center shadow-sm"
+          >
+            <div>
+              <span
+                class="mx-auto grid size-14 place-items-center rounded-2xl bg-slate-100 text-2xl text-slate-400"
+                ><i class="bi bi-inbox" aria-hidden="true"></i
+              ></span>
+              <p class="mb-0 mt-3 font-bold text-slate-500">{{ translations().empty }}</p>
+            </div>
+          </div>
+        } @else {
+          <div class="mt-4 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <div class="overflow-x-auto">
+              <table class="w-full min-w-[900px] text-sm">
+                <thead
+                  class="sticky top-0 z-10 bg-gradient-to-r from-cyan-800 to-sky-800 text-white shadow-sm"
+                >
+                  <tr>
+                    <th class="p-3.5 text-start font-extrabold">{{ translations().service }}</th>
+                    <th class="p-3.5 text-start font-extrabold">
+                      {{ translations().requestType }}
+                    </th>
+                    <th class="p-3.5 text-start font-extrabold">{{ translations().status }}</th>
+                    <th class="p-3.5 text-start font-extrabold">
+                      {{ translations().requestedOn }}
+                    </th>
+                    <th class="p-3.5 text-start font-extrabold">{{ translations().reviewedOn }}</th>
+                    <th class="p-3.5 text-start font-extrabold">
+                      {{ translations().rejectionReason }}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                  @for (item of page().data; track item.requestId; let even = $even) {
+                    <tr class="group transition hover:bg-cyan-50/70" [class.bg-slate-50/60]="even">
+                      <td class="p-3.5">
+                        <div class="flex items-center gap-2.5">
+                          <span
+                            class="grid size-9 shrink-0 place-items-center rounded-xl bg-cyan-50 text-cyan-700 ring-1 ring-cyan-100 transition group-hover:bg-cyan-100"
+                            ><i class="bi bi-grid-1x2-fill" aria-hidden="true"></i
+                          ></span>
+                          <strong class="font-extrabold text-slate-900">{{
+                            serviceName(item)
+                          }}</strong>
+                        </div>
+                      </td>
+                      <td class="p-3.5">
+                        <span
+                          class="inline-flex items-center gap-1.5 rounded-full bg-indigo-50 px-2.5 py-1 font-bold text-indigo-700 ring-1 ring-inset ring-indigo-100"
+                          ><i class="bi bi-diagram-3" aria-hidden="true"></i
+                          >{{ typeLabel(item.requestType) }}</span
+                        >
+                      </td>
+                      <td class="p-3.5">
+                        <span
+                          class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 font-extrabold ring-1 ring-inset"
+                          [class]="statusClasses(item.status)"
+                          ><i [class]="statusIcon(item.status)" aria-hidden="true"></i
+                          >{{ statusLabel(item.status) }}</span
+                        >
+                      </td>
+                      <td class="p-3.5 text-slate-600">
+                        <span class="inline-flex items-center gap-1.5"
+                          ><i class="bi bi-calendar3 text-slate-400" aria-hidden="true"></i
+                          >{{ formatDate(item.requestedOnUtc) }}</span
+                        >
+                      </td>
+                      <td class="p-3.5 text-slate-600">
+                        <span class="inline-flex items-center gap-1.5"
+                          ><i class="bi bi-calendar-check text-slate-400" aria-hidden="true"></i
+                          >{{ formatDate(item.reviewedOnUtc) }}</span
+                        >
+                      </td>
+                      <td class="max-w-sm p-3.5">
+                        <span
+                          class="inline-block rounded-lg bg-slate-100 px-2.5 py-1.5 leading-relaxed text-slate-600"
+                          >{{ item.rejectionReason || translations().noReason }}</span
+                        >
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+        }
+      </div>
+
+      <footer
+        class="flex flex-wrap items-center justify-between gap-3 border-t border-cyan-100 bg-gradient-to-r from-white to-cyan-50/70 p-4"
+      >
+        <span
+          class="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1.5 font-extrabold text-slate-700 shadow-sm ring-1 ring-slate-200"
+          ><i class="bi bi-layers text-cyan-700" aria-hidden="true"></i>{{ translations().total }}:
+          <strong class="text-cyan-800">{{ page().totalItems }}</strong></span
+        >
+        <div
+          class="flex items-center gap-2 rounded-2xl bg-white p-1.5 shadow-sm ring-1 ring-slate-200"
+        >
+          <button
+            type="button"
+            class="inline-flex h-9 items-center gap-1.5 rounded-xl border border-transparent px-3 font-bold text-slate-600 transition hover:border-cyan-100 hover:bg-cyan-50 hover:text-cyan-800 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-transparent disabled:hover:bg-transparent"
+            [disabled]="page().currentPage <= 1 || loading()"
+            (click)="load(page().currentPage - 1)"
+          >
+            <i class="bi bi-chevron-right rtl:rotate-0 ltr:rotate-180" aria-hidden="true"></i
+            >{{ translations().previous }}
+          </button>
+          <strong
+            class="grid min-w-20 place-items-center rounded-xl bg-gradient-to-r from-cyan-700 to-sky-700 px-3 py-2 text-white shadow-sm"
+            >{{ page().currentPage }} / {{ totalPages() }}</strong
+          >
+          <button
+            type="button"
+            class="inline-flex h-9 items-center gap-1.5 rounded-xl border border-transparent px-3 font-bold text-slate-600 transition hover:border-cyan-100 hover:bg-cyan-50 hover:text-cyan-800 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-transparent disabled:hover:bg-transparent"
+            [disabled]="page().currentPage >= totalPages() || loading()"
+            (click)="load(page().currentPage + 1)"
+          >
+            {{ translations().next
+            }}<i class="bi bi-chevron-left rtl:rotate-0 ltr:rotate-180" aria-hidden="true"></i>
+          </button>
+        </div>
+      </footer>
+    </section>
+  </div>
+}

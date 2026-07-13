@@ -52,6 +52,7 @@ export class CreateBranchServiceTreeDialogComponent {
   readonly translations = input.required<BranchServicesTranslations>();
   readonly mode = input<CreateBranchServiceTreeMode>('root');
   readonly parentLabel = input<string | null>(null);
+  readonly leafOnly = input(false);
 
   readonly closed = output<void>();
   readonly created = output<CreateBranchServiceTreeRequest>();
@@ -60,10 +61,16 @@ export class CreateBranchServiceTreeDialogComponent {
   readonly root = this.createNodeForm();
 
   protected readonly dialogTitle = computed(() =>
-    this.mode() === 'subtree' ? this.translations().createSubtreeTitle : this.translations().createTreeTitle,
+    this.leafOnly()
+      ? this.translations().createLeafTitle
+      : this.mode() === 'subtree'
+        ? this.translations().createSubtreeTitle
+        : this.translations().createTreeTitle,
   );
   protected readonly dialogDescription = computed(() =>
-    this.mode() === 'subtree'
+    this.leafOnly()
+      ? this.translations().createLeafDescription
+      : this.mode() === 'subtree'
       ? this.translations().createSubtreeDescription
       : this.translations().createTreeDescription,
   );
@@ -81,6 +88,7 @@ export class CreateBranchServiceTreeDialogComponent {
   }
 
   protected addChild(group: NodeForm): void {
+    if (this.leafOnly()) return;
     group.controls.isTicketIssuable.setValue(false);
     this.childrenControls(group).push(this.createNodeForm());
   }
@@ -100,6 +108,7 @@ export class CreateBranchServiceTreeDialogComponent {
       return;
     }
 
+    if (this.leafOnly()) this.root.controls.children.clear();
     this.created.emit({ root: this.mapNode(this.root) });
   }
 

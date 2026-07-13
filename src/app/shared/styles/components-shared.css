@@ -9,7 +9,7 @@ body {
   font-size: var(--q-font-size-base) !important;
   background-color: var(--q-bg-base) !important;
   color: var(--q-text-primary) !important;
-  line-height: 1.4 !important;
+  line-height: var(--q-line-height-body, 1.55) !important;
 }
 
 /* Forms and Inputs Spacing */

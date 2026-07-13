@@ -1,18 +1,16 @@
-<section class="window-management-page container-fluid px-0 px-sm-2 px-xl-3" [attr.dir]="direction()" [attr.lang]="language()">
-  <header
-    class="page-header d-flex align-items-start justify-content-between gap-3 flex-column flex-md-row"
+<section class="technical-admin-responsive-page window-management-page container-fluid !mx-auto !w-full !max-w-[1600px] !gap-4 !p-3 sm:!p-4 lg:!p-5" [attr.dir]="direction()" [attr.lang]="language()">
+  <app-technical-admin-page-hero
+    [eyebrow]="translations().title"
+    [title]="translations().title"
+    [description]="translations().description"
+    icon="bi bi-window-stack"
   >
-    <div>
-      <p class="eyebrow">{{ translations().title }}</p>
-      <h1>{{ translations().title }}</h1>
-      <span>{{ translations().description }}</span>
-    </div>
     @if (activeTab() === 'active' && canCreate() && canViewActive()) {
-      <button type="button" class="primary-action" (click)="openCreate()">
+      <button hero-actions type="button" class="primary-action" (click)="openCreate()">
         <i class="bi bi-plus-lg" aria-hidden="true"> </i> {{ translations().addWindow }}
       </button>
     }
-  </header>
+  </app-technical-admin-page-hero>
   <!-- Toast -->
   @if (message(); as currentMessage) {
     <div class="toast-stack" role="status" aria-live="polite" aria-atomic="true">
@@ -132,7 +130,7 @@
             </p>
           }
           @if (activeWindowsPage().data.length > 0) {
-            <div class="table-responsive table-wrap">
+            <div data-testid="windows-active-desktop" class="table-responsive table-wrap hidden md:block">
               <table class="table align-middle custom-table">
                 <thead>
                   <tr>
@@ -200,6 +198,37 @@
                   }
                 </tbody>
               </table>
+            </div>
+            <div data-testid="windows-active-mobile" class="grid gap-3 md:hidden">
+              @for (item of activeWindowsPage().data; track item.id) {
+                <app-technical-admin-mobile-record-card [eyebrow]="translations().windowNumber" [title]="formatText(item.descriptiveName)" icon="bi bi-window-stack" [recordId]="item.number">
+                  <div record-fields>
+                    <dt class="text-[11px] font-extrabold text-slate-500">{{ translations().waitingAreaNumberLabel }}</dt>
+                    <dd class="mb-0 mt-1 break-words font-bold text-slate-800">{{ item.waitingAreaNumber }} - {{ formatText(item.waitingAreaDescriptiveName) }}</dd>
+                  </div>
+                  <div record-fields>
+                    <dt class="text-[11px] font-extrabold text-slate-500">{{ translations().ipAddress }}</dt>
+                    <dd class="mb-0 mt-1 break-all font-bold text-slate-800" dir="ltr">{{ formatText(item.ipAddress) }}</dd>
+                  </div>
+                  <div record-fields>
+                    <dt class="text-[11px] font-extrabold text-slate-500">{{ translations().ticketBooking }}</dt>
+                    <dd class="mb-0 mt-1 font-bold text-slate-800">{{ displayBoolean(item.enableTicketBooking) }}</dd>
+                  </div>
+                  <div record-fields>
+                    <dt class="text-[11px] font-extrabold text-slate-500">{{ translations().directCall }}</dt>
+                    <dd class="mb-0 mt-1 font-bold text-slate-800">{{ displayBoolean(item.enableDirectCall) }}</dd>
+                  </div>
+                  @if (canViewDetails()) {
+                    <button record-actions type="button" class="icon-action" [attr.aria-label]="translations().view" [title]="translations().view" (click)="openView(item.id)"><i class="bi bi-eye" aria-hidden="true"></i></button>
+                  }
+                  @if (canUpdate()) {
+                    <button record-actions type="button" class="icon-action" [attr.aria-label]="translations().edit" [title]="translations().edit" (click)="openEdit(item.id)"><i class="bi bi-pencil-square" aria-hidden="true"></i></button>
+                  }
+                  @if (canDeactivate()) {
+                    <button record-actions type="button" class="icon-action danger-action" [attr.aria-label]="translations().deactivate" [title]="translations().deactivate" (click)="requestSoftDelete(item)"><i class="bi bi-pause-circle" aria-hidden="true"></i></button>
+                  }
+                </app-technical-admin-mobile-record-card>
+              }
             </div>
           } @else if (!activeLoading()) {
             <div class="empty-state">
@@ -287,7 +316,7 @@
             </p>
           }
           @if (deletedWindowsPage().data.length > 0) {
-            <div class="table-responsive table-wrap">
+            <div data-testid="windows-deleted-desktop" class="table-responsive table-wrap hidden md:block">
               <table class="table align-middle custom-table">
                 <thead>
                   <tr>
@@ -344,6 +373,35 @@
                   }
                 </tbody>
               </table>
+            </div>
+            <div data-testid="windows-deleted-mobile" class="grid gap-3 md:hidden">
+              @for (item of deletedWindowsPage().data; track item.id) {
+                <app-technical-admin-mobile-record-card [eyebrow]="translations().windowNumber" [title]="formatText(item.descriptiveName)" icon="bi bi-window-stack" [recordId]="item.number">
+                  <span record-badges class="status-pill status-inactive">{{ translations().deletedTab }}</span>
+                  <div record-fields>
+                    <dt class="text-[11px] font-extrabold text-slate-500">{{ translations().waitingAreaNumberLabel }}</dt>
+                    <dd class="mb-0 mt-1 break-words font-bold text-slate-800">{{ item.waitingAreaNumber }} - {{ formatText(item.waitingAreaDescriptiveName) }}</dd>
+                  </div>
+                  <div record-fields>
+                    <dt class="text-[11px] font-extrabold text-slate-500">{{ translations().ipAddress }}</dt>
+                    <dd class="mb-0 mt-1 break-all font-bold text-slate-800" dir="ltr">{{ formatText(item.ipAddress) }}</dd>
+                  </div>
+                  <div record-fields>
+                    <dt class="text-[11px] font-extrabold text-slate-500">{{ translations().ticketBooking }}</dt>
+                    <dd class="mb-0 mt-1 font-bold text-slate-800">{{ displayBoolean(item.enableTicketBooking) }}</dd>
+                  </div>
+                  <div record-fields>
+                    <dt class="text-[11px] font-extrabold text-slate-500">{{ translations().directCall }}</dt>
+                    <dd class="mb-0 mt-1 font-bold text-slate-800">{{ displayBoolean(item.enableDirectCall) }}</dd>
+                  </div>
+                  @if (canReactivate()) {
+                    <button record-actions type="button" class="icon-action success-action" [attr.aria-label]="translations().reactivate" [title]="translations().reactivate" (click)="requestReactivate(item)"><i class="bi bi-play-circle" aria-hidden="true"></i></button>
+                  }
+                  @if (canDeletePermanent()) {
+                    <button record-actions type="button" class="icon-action danger-action" [attr.aria-label]="translations().permanentDelete" [title]="translations().permanentDelete" (click)="requestPermanentDelete(item)"><i class="bi bi-trash3-fill" aria-hidden="true"></i></button>
+                  }
+                </app-technical-admin-mobile-record-card>
+              }
             </div>
           } @else if (!deletedLoading()) {
             <div class="empty-state">

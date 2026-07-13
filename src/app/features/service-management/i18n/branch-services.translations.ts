@@ -17,6 +17,8 @@ export interface BranchServicesTranslations {
   readonly assignDescription: string;
   readonly createTreeTitle: string;
   readonly createTreeDescription: string;
+  readonly createLeafTitle: string;
+  readonly createLeafDescription: string;
   readonly createSubtreeTitle: string;
   readonly createSubtreeDescription: string;
   readonly createSubtreeUnder: string;
@@ -24,6 +26,21 @@ export interface BranchServicesTranslations {
   readonly cancel: string;
   readonly save: string;
   readonly assign: string;
+  readonly unassign: string;
+  readonly unassigning: string;
+  readonly unassignConfirmTitle: string;
+  readonly unassignConfirmBody: string;
+  readonly unassignPreserveDefinition: string;
+  readonly unassignSuccess: string;
+  readonly lifecycleDeleteTitle: string;
+  readonly lifecycleRestoreTitle: string;
+  readonly lifecycleDeleteBody: string;
+  readonly lifecycleRestoreBody: string;
+  readonly lifecycleDeleteParentWarning: string;
+  readonly lifecycleRestoreOperationalWarning: string;
+  readonly lifecycleDeleting: string;
+  readonly lifecycleRestoring: string;
+  readonly lifecycleActionUnavailable: string;
   readonly selectedCount: string;
   readonly createdAssignments: string;
   readonly existingAssignments: string;
@@ -74,6 +91,8 @@ export const BRANCH_SERVICES_TRANSLATIONS: Record<AppLanguage, BranchServicesTra
     assignDescription: 'اختر خدمات Leaf فعالة فقط. سيضيف النظام المسار الأبوي تلقائيًا.',
     createTreeTitle: 'إنشاء شجرة خدمات للفرع',
     createTreeDescription: 'كل العناصر ستنشأ كـ BranchScoped ومملوكة للفرع الحالي.',
+    createLeafTitle: 'إنشاء خدمة فرعية',
+    createLeafDescription: 'سيتم إنشاء خدمة واحدة تحت الخدمة المركزية وإرسالها للمراجعة.',
     createSubtreeTitle: 'إضافة خدمة فرعية',
     createSubtreeDescription: 'سيتم إنشاء الخدمة الجديدة كفرع مباشر تحت الخدمة المحددة.',
     createSubtreeUnder: 'تحت الخدمة',
@@ -81,6 +100,21 @@ export const BRANCH_SERVICES_TRANSLATIONS: Record<AppLanguage, BranchServicesTra
     cancel: 'إلغاء',
     save: 'حفظ',
     assign: 'إسناد',
+    unassign: 'إلغاء الربط',
+    unassigning: 'جارٍ إلغاء الربط...',
+    unassignConfirmTitle: 'تأكيد إلغاء ربط الخدمة',
+    unassignConfirmBody: 'قد تؤدي العملية إلى إزالة روابط الخدمات الأب غير المستخدمة من هذا الفرع تلقائيًا.',
+    unassignPreserveDefinition: 'سيتم حذف علاقات الربط فقط. لن يتم حذف تعريف الخدمة أو تعديلها في أي فرع آخر.',
+    unassignSuccess: 'تم إلغاء ربط {service} وإزالة {count} من روابط الخدمات.',
+    lifecycleDeleteTitle: 'تأكيد حذف خدمة الفرع',
+    lifecycleRestoreTitle: 'تأكيد استعادة خدمة الفرع',
+    lifecycleDeleteBody: 'سيتم حذف تعريف الخدمة المحددة حذفًا منطقيًا مع الحفاظ على ربطها بالفرع وعلاقاتها الحالية.',
+    lifecycleRestoreBody: 'سيتم استعادة الخدمة المحددة فقط دون استعادة أي أب أو ابن محذوف تلقائيًا.',
+    lifecycleDeleteParentWarning: 'لن يتم حذف الأبناء أو تعطيلهم مباشرة، لكنهم سيصبحون غير فعالين تشغيليًا حتى استعادة وتفعيل المسار الأبوي.',
+    lifecycleRestoreOperationalWarning: 'قد تظل الخدمة غير فعالة تشغيليًا إذا كان أحد الآباء ما زال محذوفًا أو غير نشط.',
+    lifecycleDeleting: 'جارٍ حذف الخدمة...',
+    lifecycleRestoring: 'جارٍ استعادة الخدمة...',
+    lifecycleActionUnavailable: 'هذا الإجراء متاح فقط لخدمة BranchScoped مملوكة للفرع الحالي.',
     selectedCount: 'عدد الخدمات المحددة',
     createdAssignments: 'علاقات جديدة',
     existingAssignments: 'علاقات موجودة',
@@ -129,6 +163,8 @@ export const BRANCH_SERVICES_TRANSLATIONS: Record<AppLanguage, BranchServicesTra
     assignDescription: 'Select active leaf services only. Parent paths will be assigned automatically.',
     createTreeTitle: 'Create Branch Service Tree',
     createTreeDescription: 'All nodes will be created as BranchScoped and owned by the active branch.',
+    createLeafTitle: 'Create Leaf Service',
+    createLeafDescription: 'One service will be created under the global parent and sent for review.',
     createSubtreeTitle: 'Add Branch Service Subtree',
     createSubtreeDescription: 'Create a new branch-owned service under the selected parent service.',
     createSubtreeUnder: 'Under service',
@@ -136,6 +172,21 @@ export const BRANCH_SERVICES_TRANSLATIONS: Record<AppLanguage, BranchServicesTra
     cancel: 'Cancel',
     save: 'Save',
     assign: 'Assign',
+    unassign: 'Unassign',
+    unassigning: 'Unassigning...',
+    unassignConfirmTitle: 'Confirm Service Unassignment',
+    unassignConfirmBody: 'This may also remove unused parent service assignments from this branch automatically.',
+    unassignPreserveDefinition: 'Only branch assignments will be removed. The service definition and other branches will not be changed.',
+    unassignSuccess: 'Unassigned {service} and removed {count} service assignments.',
+    lifecycleDeleteTitle: 'Confirm Branch Service Deletion',
+    lifecycleRestoreTitle: 'Confirm Branch Service Restore',
+    lifecycleDeleteBody: 'The selected service definition will be soft deleted while its branch assignment and existing relationships are preserved.',
+    lifecycleRestoreBody: 'Only the selected service will be restored. Deleted parents or children will not be restored automatically.',
+    lifecycleDeleteParentWarning: 'Children will not be deleted or directly disabled, but they will remain operationally unavailable until their parent path is restored and active.',
+    lifecycleRestoreOperationalWarning: 'The service may remain operationally unavailable while any parent is deleted or inactive.',
+    lifecycleDeleting: 'Deleting service...',
+    lifecycleRestoring: 'Restoring service...',
+    lifecycleActionUnavailable: 'This action is available only for a BranchScoped service owned by the active branch.',
     selectedCount: 'Selected services',
     createdAssignments: 'New assignments',
     existingAssignments: 'Existing assignments',

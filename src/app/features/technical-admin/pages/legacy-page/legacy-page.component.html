@@ -1,23 +1,21 @@
 <section
-  class="branch-page container-fluid px-0 px-sm-2 px-xl-3"
+  class="technical-admin-responsive-page branch-page container-fluid !mx-auto !w-full !max-w-[1600px] !gap-4 !p-3 sm:!p-4 lg:!p-5"
   [attr.dir]="direction()"
   [attr.lang]="language()"
 >
-  <header
-    class="page-header d-flex align-items-start justify-content-between gap-3 flex-column flex-md-row"
+  <app-technical-admin-page-hero
+    [eyebrow]="translations().branchManagementLabel"
+    [title]="title()"
+    [description]="description()"
+    icon="bi bi-buildings-fill"
   >
-    <div>
-      <p class="eyebrow">{{ translations().branchManagementLabel }}</p>
-      <h1>{{ title() }}</h1>
-      <span>{{ description() }}</span>
-    </div>
     @if (pageKey() === 'branch-editor') {
-      <button type="button" class="primary-action" (click)="openCreateBranch()">
+      <button hero-actions type="button" class="primary-action" (click)="openCreateBranch()">
         <i class="bi bi-plus-lg" aria-hidden="true"></i>
         {{ branchEditorTranslations().addBranch }}
       </button>
     }
-  </header>
+  </app-technical-admin-page-hero>
 
   <!-- Toast -->
   @if (branchMessage(); as currentMessage) {
@@ -140,7 +138,7 @@
           </p>
         }
 
-        <div class="table-responsive table-wrap">
+        <div data-testid="branches-desktop" class="table-responsive table-wrap hidden md:block">
           <table class="table align-middle custom-table">
             <thead>
               <tr>
@@ -270,6 +268,77 @@
           </table>
         </div>
 
+        <div data-testid="branches-mobile" class="grid gap-3 md:hidden">
+          @for (branch of branches(); track branch.id) {
+            <app-technical-admin-mobile-record-card
+              eyebrow="BR-{{ branch.id }}"
+              [title]="branch.arabicName"
+              icon="bi bi-building-fill"
+            >
+              <span
+                record-badges
+                class="status-pill"
+                [class.status-active]="branch.isActive"
+                [class.status-inactive]="!branch.isActive"
+              >{{ branchStatusLabel(branch) }}</span>
+              <span
+                record-badges
+                class="status-pill"
+                [class.status-active]="branch.effectiveIsActive"
+                [class.status-inactive]="!branch.effectiveIsActive"
+              >{{ branchOperationalLabel(branch) }}</span>
+              <div record-fields>
+                <dt class="text-[11px] font-extrabold text-slate-500">{{ translations().englishNameLabel }}</dt>
+                <dd class="mb-0 mt-1 break-words font-bold text-slate-800">{{ branch.englishName }}</dd>
+              </div>
+              <div record-fields>
+                <dt class="text-[11px] font-extrabold text-slate-500">{{ translations().ipAddressLabel }}</dt>
+                <dd class="mb-0 mt-1 break-all font-bold text-slate-800" dir="ltr">{{ branch.ipAddress }}</dd>
+              </div>
+              <div record-fields>
+                <dt class="text-[11px] font-extrabold text-slate-500">{{ translations().governorateLabel }}</dt>
+                <dd class="mb-0 mt-1 break-words font-bold text-slate-800">{{ branch.governorate }}</dd>
+              </div>
+              <div record-fields>
+                <dt class="text-[11px] font-extrabold text-slate-500">{{ translations().cityLabel }}</dt>
+                <dd class="mb-0 mt-1 break-words font-bold text-slate-800">{{ branch.city }}</dd>
+              </div>
+              <div record-fields class="min-[430px]:col-span-2">
+                <dt class="text-[11px] font-extrabold text-slate-500">{{ translations().createdByLabel }}</dt>
+                <dd class="mb-0 mt-1 break-words font-bold text-slate-800">{{ branch.createdBy }}</dd>
+              </div>
+              <button record-actions type="button" class="icon-action" [title]="branchEditorTranslations().view" [attr.aria-label]="branchEditorTranslations().view" (click)="openViewBranch(branch.id)">
+                <i class="bi bi-eye" aria-hidden="true"></i>
+              </button>
+              <button record-actions type="button" class="icon-action" [title]="branchEditorTranslations().edit" [attr.aria-label]="branchEditorTranslations().edit" (click)="openEditBranch(branch.id)">
+                <i class="bi bi-pencil-square" aria-hidden="true"></i>
+              </button>
+              <button record-actions type="button" class="icon-action" [title]="branchEditorTranslations().branding" [attr.aria-label]="branchEditorTranslations().branding" (click)="openBranchBranding(branch.id)">
+                <i class="bi bi-brush" aria-hidden="true"></i>
+              </button>
+              @if (canCreateBranchAdmin() && branch.isActive) {
+                <button record-actions type="button" class="icon-action success-action" [title]="branchAdminTranslations().addBranchAdmin" [attr.aria-label]="branchAdminTranslations().addBranchAdmin" (click)="openCreateBranchAdmin(branch)">
+                  <i class="bi bi-person-plus" aria-hidden="true"></i>
+                </button>
+              }
+              @if (branch.isActive) {
+                <button record-actions type="button" class="icon-action warning-action" [disabled]="deletingBranchId() === branch.id" [title]="branchEditorTranslations().deactivate" [attr.aria-label]="branchEditorTranslations().deactivate" (click)="deactivateBranch(branch)">
+                  <i class="bi bi-pause-circle" aria-hidden="true"></i>
+                </button>
+              } @else {
+                <ng-container record-actions>
+                  <button type="button" class="icon-action success-action" [disabled]="deletingBranchId() === branch.id" [title]="branchEditorTranslations().reactivate" [attr.aria-label]="branchEditorTranslations().reactivate" (click)="reactivateBranch(branch)">
+                    <i class="bi bi-play-circle" aria-hidden="true"></i>
+                  </button>
+                  <button type="button" class="icon-action danger-action" [disabled]="deletingBranchId() === branch.id" [title]="branchEditorTranslations().permanentDelete" [attr.aria-label]="branchEditorTranslations().permanentDelete" (click)="permanentlyDeleteBranch(branch)">
+                    <i class="bi bi-trash3" aria-hidden="true"></i>
+                  </button>
+                </ng-container>
+              }
+            </app-technical-admin-mobile-record-card>
+          }
+        </div>
+
         @if (branches().length === 0 && !branchTableLoading()) {
           <p class="empty-state">{{ translations().emptyBranchesLabel }}</p>
         }
@@ -309,12 +378,13 @@
           aria-hidden="true"
         ></div>
         <aside
-          class="editor-panel app-popup-panel app-popup-wide"
+          class="editor-panel app-popup-panel app-popup-wide modal-content"
           [class.branch-mutation-dialog]="branchPanelMode() === 'create' || branchPanelMode() === 'edit'"
           role="dialog"
+          aria-modal="true"
           [attr.aria-label]="branchFormTitle()"
         >
-          <header class="editor-panel-header">
+          <header class="editor-panel-header modal-header">
             <h2>{{ branchFormTitle() }}</h2>
             <button
               type="button"
@@ -413,12 +483,12 @@
 
           @if (branchPanelMode() === 'create' || branchPanelMode() === 'edit') {
             <form
-              class="branch-form branch-mutation-form row align-items-start"
+              class="branch-form branch-mutation-form row g-3 align-items-start"
               [formGroup]="branchForm"
               (ngSubmit)="saveBranch()"
               novalidate
             >
-              <label class="form-field branch-field col-12 col-md-6">
+              <label class="form-field branch-field col-12 col-md-6 col-xl-4">
                 <span>{{ translations().arabicNameLabel }}</span>
                 <input
                   class="form-control"
@@ -438,7 +508,7 @@
                 }
               </label>
 
-              <label class="form-field branch-field col-12 col-md-6">
+              <label class="form-field branch-field col-12 col-md-6 col-xl-4">
                 <span>{{ translations().englishNameLabel }}</span>
                 <input
                   class="form-control"
@@ -458,7 +528,7 @@
                 }
               </label>
 
-              <label class="form-field branch-field col-12 col-md-6">
+              <label class="form-field branch-field col-12 col-md-6 col-xl-4">
                 <span>{{ translations().ipAddressLabel }}</span>
                 <input
                   class="form-control"
@@ -478,16 +548,16 @@
                 }
               </label>
 
-              <label class="form-field branch-field col-12 col-md-6">
+              <label class="form-field branch-field col-12">
                 <span>{{ branchEditorTranslations().license }}</span>
                 <textarea class="form-control" rows="1" formControlName="license"></textarea>
               </label>
 
-              <div class="form-section-title branch-section-title col-12">
+              <div class="form-section-title branch-section-title col-12 d-flex align-items-center">
                 {{ branchEditorTranslations().location }}
               </div>
 
-              <label class="form-field branch-field col-12 col-md-6">
+              <label class="form-field branch-field col-12 col-md-6 col-xl-4">
                 <span>{{ translations().governorateLabel }}</span>
                 <input
                   class="form-control"
@@ -507,7 +577,7 @@
                 }
               </label>
 
-              <label class="form-field branch-field col-12 col-md-6">
+              <label class="form-field branch-field col-12 col-md-6 col-xl-4">
                 <span>{{ translations().cityLabel }}</span>
                 <input
                   class="form-control"
@@ -527,7 +597,7 @@
                 }
               </label>
 
-              <label class="form-field branch-field col-12 col-md-6">
+              <label class="form-field branch-field col-12 col-md-6 col-xl-4">
                 <span>{{ branchEditorTranslations().area }}</span>
                 <input
                   class="form-control"
@@ -547,7 +617,7 @@
                 }
               </label>
 
-              <label class="form-field branch-field col-12 col-md-6">
+              <label class="form-field branch-field col-12 col-xl-6">
                 <span>{{ branchEditorTranslations().address }}</span>
                 <input
                   class="form-control"
@@ -567,7 +637,7 @@
                 }
               </label>
 
-              <label class="form-field branch-field col-12 col-md-6">
+              <label class="form-field branch-field col-12 col-md-6 col-xl-3">
                 <span>{{ branchEditorTranslations().longitude }}</span>
                 <input
                   class="form-control"
@@ -585,7 +655,7 @@
                 }
               </label>
 
-              <label class="form-field branch-field col-12 col-md-6">
+              <label class="form-field branch-field col-12 col-md-6 col-xl-3">
                 <span>{{ branchEditorTranslations().latitude }}</span>
                 <input
                   class="form-control"
@@ -603,11 +673,21 @@
                 }
               </label>
 
-              <div class="editor-actions branch-form-actions col-12">
-                <button type="button" class="secondary-action" (click)="closeBranchPanel()">
+              <div
+                class="editor-actions branch-form-actions modal-footer col-12 d-flex flex-wrap justify-content-end gap-2"
+              >
+                <button
+                  type="button"
+                  class="btn btn-outline-primary secondary-action"
+                  (click)="closeBranchPanel()"
+                >
                   {{ branchEditorTranslations().cancel }}
                 </button>
-                <button type="submit" class="primary-action" [disabled]="branchSaving()">
+                <button
+                  type="submit"
+                  class="btn btn-primary primary-action"
+                  [disabled]="branchSaving()"
+                >
                   {{ branchEditorTranslations().save }}
                 </button>
               </div>

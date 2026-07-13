@@ -37,6 +37,50 @@ const DEFAULT_QUERY: ServiceListQuery = {
   orderSort: 'orderNo',
 };
 
+function collectTreeNodeIds(
+  nodes: readonly ServiceTreeNode[],
+  nodeIds: Set<number> = new Set<number>(),
+): ReadonlySet<number> {
+  nodes.forEach((node) => {
+    nodeIds.add(node.id);
+    collectTreeNodeIds(node.children, nodeIds);
+  });
+
+  return nodeIds;
+}
+
+function filterAvailableBranchAssignmentNodes(
+  nodes: readonly ServiceTreeNode[],
+  assignedNodeIds: ReadonlySet<number>,
+): readonly ServiceTreeNode[] {
+  const availableNodes: ServiceTreeNode[] = [];
+
+  nodes.forEach((node) => {
+    const isLeaf = node.children.length === 0 && !node.hasChildren;
+    const isAssignedLeaf =
+      isLeaf && (node.isAssignedToCurrentBranch === true || assignedNodeIds.has(node.id));
+
+    if (isAssignedLeaf) {
+      return;
+    }
+
+    const filteredChildren = filterAvailableBranchAssignmentNodes(node.children, assignedNodeIds);
+    const hadLoadedChildren = node.children.length > 0;
+
+    if (hadLoadedChildren && filteredChildren.length === 0) {
+      return;
+    }
+
+    const childrenChanged =
+      filteredChildren.length !== node.children.length ||
+      filteredChildren.some((child, index) => child !== node.children[index]);
+
+    availableNodes.push(childrenChanged ? { ...node, children: filteredChildren } : node);
+  });
+
+  return availableNodes;
+}
+
 @Injectable()
 export class ServiceManagementStore {
   readonly activeTab = signal<ServiceManagementTab>('tree');
@@ -67,6 +111,12 @@ export class ServiceManagementStore {
   readonly uploadingLogo = signal(false);
 
   readonly isPanelOpen = computed(() => this.panelMode() !== 'closed');
+  readonly availableBranchAssignmentTree = computed(() =>
+    filterAvailableBranchAssignmentNodes(
+      this.serviceTree(),
+      collectTreeNodeIds(this.assignedBranchServiceTree()),
+    ),
+  );
 
   updateQuery(patch: Partial<ServiceListQuery>): void {
     this.listQuery.update((query) => ({

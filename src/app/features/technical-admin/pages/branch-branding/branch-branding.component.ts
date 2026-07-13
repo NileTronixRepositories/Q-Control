@@ -14,6 +14,7 @@ import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angula
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { AppLanguage } from '../../../../shared/models/app-language.model';
+import { TechnicalAdminPageHeroComponent } from '../../../../shared/components/technical-admin-page-hero/technical-admin-page-hero.component';
 import { AuthSessionService } from '../../../auth/services/auth-session.service';
 import {
   BranchAdvertisementResponse,
@@ -214,7 +215,7 @@ const PAGE_TRANSLATIONS: Record<AppLanguage, BranchBrandingPageTranslations> = {
 
 @Component({
   selector: 'app-branch-branding',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, TechnicalAdminPageHeroComponent],
   templateUrl: './branch-branding.component.html',
   styleUrl: './branch-branding.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

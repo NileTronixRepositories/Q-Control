@@ -18,6 +18,8 @@ import {
 import { Router } from '@angular/router';
 import { finalize } from 'rxjs';
 
+import { TechnicalAdminPageHeroComponent } from '../../../../shared/components/technical-admin-page-hero/technical-admin-page-hero.component';
+
 import { AuthSessionService } from '../../../auth/services/auth-session.service';
 import { TechnicalAdminI18nStore } from '../../../technical-admin/store/technical-admin-i18n.store';
 import { formatTechnicalAdminApiError } from '../../../technical-admin/utils/api-error-message.util';
@@ -56,7 +58,7 @@ interface WorkflowSelectionLevel {
 @Component({
   selector: 'app-service-workflows',
   standalone: true,
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, TechnicalAdminPageHeroComponent],
   providers: [ServiceWorkflowStore],
   templateUrl: './service-workflows.component.html',
   styleUrls: [
@@ -65,6 +67,7 @@ interface WorkflowSelectionLevel {
     './service-workflows-responsive.component.css',
     './service-workflows-visual-path.component.css',
     './service-workflows-suggestions.component.css',
+    './service-workflows-compact-details.component.css',
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -843,6 +846,23 @@ export class ServiceWorkflowsComponent implements OnInit, OnDestroy {
     ];
   }
 
+  workflowCardSteps(item: ServiceWorkflowListItem): readonly ServiceWorkflowStep[] {
+    const details = this.workflowCardDetails(item);
+
+    return details ? this.sortedSteps(details) : this.workflowListSteps(item);
+  }
+
+  workflowCardDetails(item: ServiceWorkflowListItem): ServiceWorkflowDetails | null {
+    const details = this.store.selectedDetails();
+    const isSelectedView =
+      !this.store.detailsLoading() &&
+      this.store.panelMode() === 'view' &&
+      details !== null &&
+      this.workflowId(details) === this.workflowId(item);
+
+    return isSelectedView ? details : null;
+  }
+
   previewSteps(
     item: ServiceWorkflowListItem | ServiceWorkflowDetails,
   ): readonly ServiceWorkflowStep[] {
@@ -1207,6 +1227,7 @@ export class ServiceWorkflowsComponent implements OnInit, OnDestroy {
       return;
     }
 
+    this.store.selectedDetails.set(null);
     this.store.openPanel(mode);
     this.store.detailsLoading.set(true);
     this.formError.set(null);

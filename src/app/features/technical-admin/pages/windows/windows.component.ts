@@ -15,6 +15,8 @@ import {
   ValidationErrors,
   Validators,
 } from '@angular/forms';
+import { TechnicalAdminMobileRecordCardComponent } from '../../../../shared/components/technical-admin-mobile-record-card/technical-admin-mobile-record-card.component';
+import { TechnicalAdminPageHeroComponent } from '../../../../shared/components/technical-admin-page-hero/technical-admin-page-hero.component';
 import { Router } from '@angular/router';
 
 import { AppLanguage } from '../../../../shared/models/app-language.model';
@@ -268,7 +270,7 @@ const EMPTY_DELETED_WINDOW_PAGE: PaginationResponse<DeletedWindowListItemRespons
 
 @Component({
   selector: 'app-windows',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, TechnicalAdminMobileRecordCardComponent, TechnicalAdminPageHeroComponent],
   templateUrl: './windows.component.html',
   styleUrl: './windows.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

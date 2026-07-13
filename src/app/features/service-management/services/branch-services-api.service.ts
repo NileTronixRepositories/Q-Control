@@ -13,6 +13,7 @@ import {
   CreateBranchServiceSubtreeResponse,
   CreateBranchServiceTreeRequest,
   CreateBranchServiceTreeResponse,
+  UnassignBranchLeafServiceResponse,
 } from '../models/branch-services.model';
 
 const BRANCHES_PATH = 'api/branches';
@@ -46,6 +47,16 @@ export class BranchServicesApiService {
     return this.httpClient.post<AssignBranchServicesResponse>(
       `${this.createBranchUrl(branchId)}/services/assign`,
       request,
+      { headers: this.createJsonHeaders() },
+    );
+  }
+
+  unassignLeafService(
+    branchId: number,
+    leafServiceId: number,
+  ): Observable<UnassignBranchLeafServiceResponse> {
+    return this.httpClient.delete<UnassignBranchLeafServiceResponse>(
+      `${this.createBranchUrl(branchId)}/services/${leafServiceId}`,
       { headers: this.createJsonHeaders() },
     );
   }

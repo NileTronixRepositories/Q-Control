@@ -1,28 +1,16 @@
-<section class="waiting-areas-page container-fluid py-3 py-lg-4" [attr.dir]="direction()" [attr.lang]="language()">
+<section class="technical-admin-responsive-page waiting-areas-page container-fluid !mx-auto !w-full !max-w-[1600px] !gap-4 !p-3 sm:!p-4 lg:!p-5" [attr.dir]="direction()" [attr.lang]="language()">
   <!-- Header -->
-  <header
-    class="page-header d-flex flex-column flex-md-row align-items-start justify-content-between gap-3"
+  <app-technical-admin-page-hero
+    [eyebrow]="translations().branch"
+    [title]="translations().title"
+    [description]="translations().description"
+    icon="bi bi-people-fill"
   >
-    <div>
-      <p class="eyebrow mb-2">
-        {{ translations().branch }}
-      </p>
-
-      <h1 class="mb-2">
-        {{ translations().title }}
-      </h1>
-
-      <span class="header-description">
-        {{ translations().description }}
-      </span>
-    </div>
-
-    <button type="button" class="btn primary-action" (click)="openCreate()">
+    <button hero-actions type="button" class="btn primary-action" (click)="openCreate()">
       <i class="bi bi-plus-lg"></i>
-
       {{ translations().addButton }}
     </button>
-  </header>
+  </app-technical-admin-page-hero>
 
   <!-- Toast -->
   @if (message(); as currentMessage) {
@@ -159,7 +147,7 @@
 
       <!-- Table -->
       @if (waitingAreaPage().data.length > 0) {
-        <div class="table-responsive">
+        <div data-testid="waiting-areas-desktop" class="table-responsive hidden md:block">
           <table class="table align-middle custom-table">
             <thead>
               <tr>
@@ -274,6 +262,45 @@
               }
             </tbody>
           </table>
+        </div>
+
+        <div data-testid="waiting-areas-mobile" class="grid gap-3 md:hidden">
+          @for (item of waitingAreaPage().data; track item.id) {
+            <app-technical-admin-mobile-record-card
+              [eyebrow]="translations().number"
+              [title]="textOrFallback(item.descriptiveName)"
+              icon="bi bi-hourglass-split"
+              [recordId]="item.number"
+            >
+              <span record-badges class="status-pill" [class.status-active]="item.isActive" [class.status-inactive]="!item.isActive">{{ statusLabel(item) }}</span>
+              <div record-fields>
+                <dt class="text-[11px] font-extrabold text-slate-500">{{ translations().branch }}</dt>
+                <dd class="mb-0 mt-1 break-words font-bold text-slate-800">{{ branchName(item) }}</dd>
+              </div>
+              <div record-fields>
+                <dt class="text-[11px] font-extrabold text-slate-500">{{ translations().windowsCount }}</dt>
+                <dd class="mb-0 mt-1 font-bold text-slate-800">{{ item.windowsCount }}</dd>
+              </div>
+              <div record-fields>
+                <dt class="text-[11px] font-extrabold text-slate-500">{{ translations().audioDevice }}</dt>
+                <dd class="mb-0 mt-1 break-words font-bold text-slate-800">{{ textOrFallback(item.audioDevice) }}</dd>
+              </div>
+              <div record-fields>
+                <dt class="text-[11px] font-extrabold text-slate-500">{{ translations().controlDevice }}</dt>
+                <dd class="mb-0 mt-1 break-words font-bold text-slate-800">{{ textOrFallback(item.controlDevice) }}</dd>
+              </div>
+              <button record-actions type="button" class="icon-action" [attr.aria-label]="translations().view" [title]="translations().view" (click)="openView(item.id)"><i class="bi bi-eye"></i></button>
+              <button record-actions type="button" class="icon-action" [attr.aria-label]="translations().edit" [title]="translations().edit" (click)="openEdit(item.id)"><i class="bi bi-pencil-square"></i></button>
+              @if (item.isActive) {
+                <button record-actions type="button" class="icon-action warning-action" [attr.aria-label]="translations().deactivate" [title]="translations().deactivate" [disabled]="deletingId() === item.id" (click)="deactivateWaitingArea(item)"><i class="bi bi-pause-circle"></i></button>
+              } @else {
+                <ng-container record-actions>
+                  <button type="button" class="icon-action success-action" [attr.aria-label]="translations().reactivate" [title]="translations().reactivate" [disabled]="deletingId() === item.id" (click)="reactivateWaitingArea(item)"><i class="bi bi-play-circle"></i></button>
+                  <button type="button" class="icon-action danger-action" [attr.aria-label]="translations().permanentDelete" [title]="translations().permanentDelete" [disabled]="deletingId() === item.id" (click)="permanentlyDeleteWaitingArea(item)"><i class="bi bi-trash3"></i></button>
+                </ng-container>
+              }
+            </app-technical-admin-mobile-record-card>
+          }
         </div>
       }
 

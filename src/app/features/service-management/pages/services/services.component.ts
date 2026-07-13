@@ -18,6 +18,8 @@ import {
 import { Router } from '@angular/router';
 import { finalize } from 'rxjs';
 
+import { TechnicalAdminPageHeroComponent } from '../../../../shared/components/technical-admin-page-hero/technical-admin-page-hero.component';
+
 import { AuthSessionService } from '../../../auth/services/auth-session.service';
 import { TechnicalAdminI18nStore } from '../../../technical-admin/store/technical-admin-i18n.store';
 import { formatTechnicalAdminApiError } from '../../../technical-admin/utils/api-error-message.util';
@@ -40,6 +42,7 @@ import {
 import {
   ServiceRelatedWorkflow,
   ServiceWorkflowStep,
+  WorkflowStartMode,
   WorkflowStartOptions,
 } from '../../models/service-workflow.model';
 import { BranchServicesApiService } from '../../services/branch-services-api.service';
@@ -68,7 +71,11 @@ const LOGO_TYPES = new Set(['image/png', 'image/jpeg', 'image/webp']);
 @Component({
   selector: 'app-service-management-services',
   standalone: true,
-  imports: [ReactiveFormsModule, ServiceHierarchyTreeComponent],
+  imports: [
+    ReactiveFormsModule,
+    ServiceHierarchyTreeComponent,
+    TechnicalAdminPageHeroComponent,
+  ],
   providers: [ServiceManagementStore],
   templateUrl: './services.component.html',
   styleUrls: ['./services.component.css', './services-form-switches.component.css'],
@@ -85,6 +92,8 @@ export class ServicesComponent implements OnInit, OnDestroy {
   private readonly permissionService = inject(ServiceManagementPermissionService);
 
   public readonly store = inject(ServiceManagementStore);
+  public readonly canManageDefinitionNode = (node: ServiceTreeNode): boolean =>
+    node.canEditDefinition;
   public readonly translations = computed(
     () => SERVICE_MANAGEMENT_TRANSLATIONS[this.i18nStore.language()],
   );
@@ -397,7 +406,7 @@ export class ServicesComponent implements OnInit, OnDestroy {
   }
 
   public requestDelete(item: ServiceListItem | ServiceDetails): void {
-    if (!this.canDelete() || item.isDeleted) {
+    if (!this.canDelete() || !item.canEditDefinition || item.isDeleted) {
       this.showMessage('error', this.translations().noPermissionHint);
       return;
     }
@@ -412,7 +421,7 @@ export class ServicesComponent implements OnInit, OnDestroy {
   }
 
   public requestRestore(item: ServiceListItem | ServiceDetails): void {
-    if (!this.canRestore() || !item.isDeleted) {
+    if (!this.canRestore() || !item.canEditDefinition || !item.isDeleted) {
       this.showMessage('error', this.translations().noPermissionHint);
       return;
     }
@@ -427,7 +436,7 @@ export class ServicesComponent implements OnInit, OnDestroy {
   }
 
   public requestTreeDelete(node: ServiceTreeNode): void {
-    if (!this.canDelete() || node.isDeleted) {
+    if (!this.canDelete() || !node.canEditDefinition || node.isDeleted) {
       this.showMessage('error', this.translations().noPermissionHint);
       return;
     }
@@ -436,7 +445,7 @@ export class ServicesComponent implements OnInit, OnDestroy {
   }
 
   public requestTreeRestore(node: ServiceTreeNode): void {
-    if (!this.canRestore() || !node.isDeleted) {
+    if (!this.canRestore() || !node.canEditDefinition || !node.isDeleted) {
       this.showMessage('error', this.translations().noPermissionHint);
       return;
     }
@@ -623,7 +632,23 @@ export class ServicesComponent implements OnInit, OnDestroy {
 
   public startModeLabel(): string {
     const options = this.workflowStartOptions();
-    return options ? options.mode : this.workflowTranslations().notAvailable;
+    if (!options) {
+      return this.translations().notAvailable;
+    }
+
+    const labels: Record<WorkflowStartMode, string> = {
+      NoWorkflow: this.translations().workflowStartModeNoWorkflow,
+      AutoApply: this.translations().workflowStartModeAutoApply,
+      SelectionRequired: this.translations().workflowStartModeSelectionRequired,
+    };
+
+    return labels[options.mode];
+  }
+
+  public workflowSelectionLabel(requiresSelection: boolean): string {
+    return requiresSelection
+      ? this.translations().workflowSelectionRequired
+      : this.translations().workflowSelectionNotRequired;
   }
 
   public panelTitle(): string {
@@ -926,7 +951,7 @@ export class ServicesComponent implements OnInit, OnDestroy {
           }
 
           if (mode === 'edit') {
-            if (response.isDeleted) {
+            if (response.isDeleted || !response.canEditDefinition) {
               this.showMessage('error', this.translations().noPermissionHint);
               this.closePanel();
               return;

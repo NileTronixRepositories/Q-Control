@@ -1,13 +1,14 @@
 @if (open()) {
   <div class="editor-backdrop app-popup-overlay" (click)="closeDialog()" aria-hidden="true"></div>
   <aside
-    class="editor-panel app-popup-panel app-popup-wide branch-admin-dialog"
+    class="editor-panel app-popup-panel app-popup-wide branch-admin-dialog modal-content"
     role="dialog"
+    aria-modal="true"
     [attr.aria-label]="copy().createBranchAdminTitle"
     [attr.dir]="direction()"
     [attr.lang]="language()"
   >
-    <header class="editor-panel-header">
+    <header class="editor-panel-header modal-header">
       <h2>{{ copy().createBranchAdminTitle }}</h2>
       <button
         type="button"
@@ -27,24 +28,24 @@
     }
 
     <form
-      class="branch-form branch-admin-form row align-items-start"
+      class="branch-form branch-admin-form row g-3 align-items-start"
       [formGroup]="branchAdminForm"
       [attr.aria-busy]="store.isSubmitting()"
       (ngSubmit)="submitBranchAdmin()"
       novalidate
     >
       @if (branchLabel()) {
-        <div class="form-section-title branch-section-title col-12">
+        <div class="form-section-title branch-section-title col-12 d-flex align-items-center gap-2">
           {{ branchLabel() }}
         </div>
       }
 
-      <p class="api-note col-12 mb-0" role="note">
+      <p class="api-note alert alert-info col-12 d-flex align-items-center gap-2 mb-0" role="note">
         <i class="bi bi-info-circle" aria-hidden="true"></i>
         {{ copy().branchAdminHandoffNote }}
       </p>
 
-      <label class="form-field branch-field col-12 col-md-6">
+      <label class="form-field branch-field col-12 col-md-6 col-xl-4">
         <span>{{ copy().branchAdminUserName }}</span>
         <input
           class="form-control"
@@ -59,7 +60,7 @@
         }
       </label>
 
-      <label class="form-field branch-field col-12 col-md-6">
+      <label class="form-field branch-field col-12 col-md-6 col-xl-4">
         <span>{{ copy().branchAdminEmail }}</span>
         <input
           class="form-control"
@@ -74,17 +75,20 @@
         }
       </label>
 
-      <label class="form-field branch-field col-12 col-md-6">
-        <span>{{ copy().branchAdminNameEn }}</span>
+      <label class="form-field branch-field col-12 col-md-6 col-xl-4">
+        <span>{{ copy().branchAdminPhone }}</span>
         <input
           class="form-control"
-          [class.is-invalid]="hasControlError('nameEn')"
-          type="text"
-          maxlength="200"
-          formControlName="nameEn"
+          [class.is-invalid]="hasControlError('phoneNumber')"
+          type="tel"
+          maxlength="30"
+          formControlName="phoneNumber"
+          autocomplete="tel"
         />
-        @if (controlErrorMessage('nameEn')) {
-          <small class="invalid-feedback branch-feedback">{{ controlErrorMessage('nameEn') }}</small>
+        @if (controlErrorMessage('phoneNumber')) {
+          <small class="invalid-feedback branch-feedback">{{
+            controlErrorMessage('phoneNumber')
+          }}</small>
         }
       </label>
 
@@ -102,18 +106,19 @@
         }
       </label>
 
-      <label class="form-field branch-field col-12">
-        <span>{{ copy().branchAdminPhone }}</span>
+      <label class="form-field branch-field col-12 col-md-6">
+        <span>{{ copy().branchAdminNameEn }}</span>
         <input
           class="form-control"
-          [class.is-invalid]="hasControlError('phoneNumber')"
-          type="tel"
-          maxlength="30"
-          formControlName="phoneNumber"
-          autocomplete="tel"
+          [class.is-invalid]="hasControlError('nameEn')"
+          type="text"
+          maxlength="200"
+          formControlName="nameEn"
         />
-        @if (controlErrorMessage('phoneNumber')) {
-          <small class="invalid-feedback branch-feedback">{{ controlErrorMessage('phoneNumber') }}</small>
+        @if (controlErrorMessage('nameEn')) {
+          <small class="invalid-feedback branch-feedback">{{
+            controlErrorMessage('nameEn')
+          }}</small>
         }
       </label>
 
@@ -147,11 +152,21 @@
         }
       </label>
 
-      <div class="editor-actions branch-form-actions col-12">
-        <button type="button" class="secondary-action" (click)="closeDialog()">
+      <div
+        class="editor-actions branch-form-actions modal-footer col-12 d-flex flex-wrap justify-content-end gap-2"
+      >
+        <button
+          type="button"
+          class="btn btn-outline-primary secondary-action"
+          (click)="closeDialog()"
+        >
           {{ copy().cancel }}
         </button>
-        <button type="submit" class="primary-action" [disabled]="store.isSubmitting()">
+        <button
+          type="submit"
+          class="btn btn-primary primary-action"
+          [disabled]="store.isSubmitting()"
+        >
           {{ copy().save }}
         </button>
       </div>

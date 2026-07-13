@@ -45,10 +45,12 @@
     <header class="branch-tree-node-header">
       <strong>{{ level === 0 ? dialogTitle() : translations().addChild }}</strong>
       <div class="branch-tree-node-actions">
-        <button type="button" class="branch-tree-secondary-btn" (click)="addChild(group)">
-          <i class="bi bi-plus-lg" aria-hidden="true"></i>
-          {{ translations().addChild }}
-        </button>
+        @if (!leafOnly()) {
+          <button type="button" class="branch-tree-secondary-btn" (click)="addChild(group)">
+            <i class="bi bi-plus-lg" aria-hidden="true"></i>
+            {{ translations().addChild }}
+          </button>
+        }
         @if (parent) {
           <button type="button" class="branch-tree-danger-btn" (click)="removeChild(parent, index)">
             <i class="bi bi-trash3" aria-hidden="true"></i>

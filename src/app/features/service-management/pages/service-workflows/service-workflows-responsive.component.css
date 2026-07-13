@@ -132,7 +132,7 @@
 @container (max-width: 900px) {
   .workflow-embedded-card {
     align-items: stretch !important;
-    flex-direction: column;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .workflow-embedded-tools {

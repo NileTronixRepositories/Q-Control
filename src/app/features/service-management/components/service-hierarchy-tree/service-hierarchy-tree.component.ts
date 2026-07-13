@@ -29,6 +29,9 @@ interface ServiceHierarchyTreeEntry {
   readonly canSelectLeaf: boolean;
   readonly isSelectedLeaf: boolean;
   readonly canDragLeaf: boolean;
+  readonly canUnassign: boolean;
+  readonly canDelete: boolean;
+  readonly canRestore: boolean;
 }
 
 const ROW_BASE_CLASSES = 'svc-tree-node';
@@ -71,6 +74,13 @@ export class ServiceHierarchyTreeComponent {
   readonly selectedLeafIds = input<ReadonlySet<number>>(new Set());
   readonly draggableLeaves = input(false);
   readonly dropTarget = input(false);
+  readonly canUnassign = input(false);
+  readonly unassigning = input(false);
+  readonly unassignLabel = input('');
+  readonly canDeleteNode = input<(node: ServiceTreeNode) => boolean>(() => true);
+  readonly canRestoreNode = input<(node: ServiceTreeNode) => boolean>(() => true);
+  readonly canUnassignNode = input<(node: ServiceTreeNode) => boolean>(() => true);
+  readonly actionsDisabled = input(false);
 
   readonly refresh = output<void>();
   readonly includeInactiveChange = output<boolean>();
@@ -87,6 +97,7 @@ export class ServiceHierarchyTreeComponent {
   readonly leafDragStarted = output<ServiceTreeNode>();
   readonly leafDragEnded = output<void>();
   readonly leafDropped = output<number>();
+  readonly unassignNode = output<ServiceTreeNode>();
 
   public readonly isDropActive = signal(false);
 
@@ -110,6 +121,16 @@ export class ServiceHierarchyTreeComponent {
   public requestCreateChild(node: ServiceTreeNode, event: MouseEvent): void {
     event.stopPropagation();
     this.createChild.emit(node);
+  }
+
+  public requestUnassign(node: ServiceTreeNode, event: MouseEvent): void {
+    event.stopPropagation();
+
+    if (this.actionsDisabled() || this.unassigning() || !this.isUnassignableLeaf(node)) {
+      return;
+    }
+
+    this.unassignNode.emit(node);
   }
 
   public onLeafSelectionChange(node: ServiceTreeNode, event: Event): void {
@@ -200,11 +221,31 @@ export class ServiceHierarchyTreeComponent {
 
   public requestDelete(node: ServiceTreeNode, event: MouseEvent): void {
     event.stopPropagation();
+
+    if (
+      this.actionsDisabled() ||
+      !this.canDelete() ||
+      node.isDeleted ||
+      !this.canDeleteNode()(node)
+    ) {
+      return;
+    }
+
     this.deleteNode.emit(node);
   }
 
   public requestRestore(node: ServiceTreeNode, event: MouseEvent): void {
     event.stopPropagation();
+
+    if (
+      this.actionsDisabled() ||
+      !this.canRestore() ||
+      !node.isDeleted ||
+      !this.canRestoreNode()(node)
+    ) {
+      return;
+    }
+
     this.restoreNode.emit(node);
   }
 
@@ -263,7 +304,19 @@ export class ServiceHierarchyTreeComponent {
       canSelectLeaf: this.canSelectLeaf(node),
       isSelectedLeaf: this.selectedLeafIds().has(node.id),
       canDragLeaf: this.canDragLeaf(node),
+      canUnassign: this.isUnassignableLeaf(node),
+      canDelete: this.canDelete() && !node.isDeleted && this.canDeleteNode()(node),
+      canRestore: this.canRestore() && node.isDeleted && this.canRestoreNode()(node),
     };
+  }
+
+  private isUnassignableLeaf(node: ServiceTreeNode): boolean {
+    return (
+      this.canUnassign() &&
+      node.children.length === 0 &&
+      !node.hasChildren &&
+      this.canUnassignNode()(node)
+    );
   }
 
   private canSelectLeaf(node: ServiceTreeNode): boolean {

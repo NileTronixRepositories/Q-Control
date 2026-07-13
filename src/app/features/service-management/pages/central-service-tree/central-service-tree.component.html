@@ -1,0 +1,17 @@
+<section class="technical-admin-responsive-page mx-auto flex w-full max-w-[1600px] flex-col gap-4 p-3 sm:p-4 lg:p-5" [attr.dir]="direction()" [attr.lang]="language()">
+  <app-technical-admin-page-hero
+    [eyebrow]="translations().eyebrow"
+    [title]="translations().centralTreeTitle"
+    [description]="translations().centralTreeDescription"
+    icon="bi bi-diagram-2-fill"
+  />
+  @if (error()) { <p class="rounded-xl border border-rose-200 bg-rose-50 p-4 text-rose-800">{{ error() }}</p> }
+  <app-service-hierarchy-tree
+    [nodes]="nodes()" [expandedNodeIds]="expandedIds()" [selectedServiceId]="null"
+    [translations]="serviceTranslations()" [language]="language()" [direction]="direction()"
+    [loading]="loading()" [includeInactive]="includeInactive()" [includeDeleted]="includeDeleted()"
+    [canCreate]="false" [canViewDetails]="false" [canUpdate]="false" [canDelete]="false" [canRestore]="false"
+    (refresh)="loadTree()" (includeInactiveChange)="updateFilter('inactive', $event)"
+    (includeDeletedChange)="isTechnicalAdmin() && updateFilter('deleted', $event)" (toggleNode)="toggleNode($event)"
+  />
+</section>

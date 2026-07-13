@@ -41,7 +41,7 @@ body {
   font-family: var(--q-font-family, 'Cairo', Arial, sans-serif);
   background-color: var(--bg-base);
   color: var(--text-primary);
-  line-height: 1.5;
+  line-height: var(--q-line-height-body, 1.55);
   overflow-x: hidden;
 }
 

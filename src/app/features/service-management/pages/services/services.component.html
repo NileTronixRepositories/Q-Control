@@ -1,18 +1,17 @@
-<section class="service-management-page" [attr.dir]="direction()" [attr.lang]="language()">
-  <header class="svc-hero">
-    <div>
-      <p class="svc-eyebrow">{{ translations().title }}</p>
-      <h1>{{ translations().title }}</h1>
-      <span>{{ translations().description }}</span>
-    </div>
-
+<section class="technical-admin-responsive-page service-management-page !mx-auto !w-full !max-w-[1600px] !gap-4 !p-3 sm:!p-4 lg:!p-5" [attr.dir]="direction()" [attr.lang]="language()">
+  <app-technical-admin-page-hero
+    [eyebrow]="translations().title"
+    [title]="translations().title"
+    [description]="translations().description"
+    icon="bi bi-grid-1x2-fill"
+  >
     @if (canCreateGlobal() && canViewAll()) {
-      <button type="button" class="svc-primary-btn" (click)="openCreateRoot()">
+      <button hero-actions type="button" class="svc-primary-btn" (click)="openCreateRoot()">
         <i class="bi bi-plus-lg" aria-hidden="true"></i>
         {{ translations().addRootService }}
       </button>
     }
-  </header>
+  </app-technical-admin-page-hero>
 
   @if (store.message(); as currentMessage) {
     <div class="toast-stack" role="status" aria-live="polite" aria-atomic="true">
@@ -95,7 +94,7 @@
             </div>
           </header>
           <app-service-hierarchy-tree
-            [nodes]="store.serviceTree()"
+            [nodes]="store.availableBranchAssignmentTree()"
             [expandedNodeIds]="store.expandedTreeNodeIds()"
             [selectedServiceId]="store.selectedTreeServiceId()"
             [translations]="translations()"
@@ -289,7 +288,7 @@
                     <header class="svc-workflow-context-header">
                       <div>
                         <p class="svc-eyebrow">{{ workflowTranslations().title }}</p>
-                        <h3>Related Workflows</h3>
+                        <h3>{{ translations().relatedWorkflows }}</h3>
                       </div>
                       @if (relatedWorkflowsLoading()) {
                         <span class="svc-mini-loading">{{ workflowTranslations().loading }}</span>
@@ -322,7 +321,7 @@
                   <section class="svc-workflow-start-options">
                     <header class="svc-workflow-context-header">
                       <div>
-                        <p class="svc-eyebrow">Workflow Start Options</p>
+                        <p class="svc-eyebrow">{{ translations().workflowStartOptions }}</p>
                         <h3>{{ startModeLabel() }}</h3>
                       </div>
                       @if (startOptionsLoading()) {
@@ -331,8 +330,8 @@
                     </header>
                     @if (workflowStartOptions(); as options) {
                       <div class="svc-start-option-summary">
-                        <span>{{ options.requiresWorkflowSelection ? 'Selection Required' : 'No Selection Required' }}</span>
-                        <strong>{{ options.workflows.length }} {{ workflowTranslations().steps }}</strong>
+                        <span>{{ workflowSelectionLabel(options.requiresWorkflowSelection) }}</span>
+                        <strong>{{ options.workflows.length }} {{ translations().workflows }}</strong>
                       </div>
                       @if (options.workflows.length > 0) {
                         <div class="svc-start-option-list">
@@ -351,13 +350,13 @@
                       {{ translations().edit }}
                     </button>
                   }
-                  @if (canDelete() && !details.isDeleted) {
+                  @if (canDelete() && details.canEditDefinition && !details.isDeleted) {
                     <button type="button" class="svc-danger-btn" (click)="requestDelete(details)">
                       <i class="bi bi-trash3" aria-hidden="true"></i>
                       {{ translations().delete }}
                     </button>
                   }
-                  @if (canRestore() && details.isDeleted) {
+                  @if (canRestore() && details.canEditDefinition && details.isDeleted) {
                     <button type="button" class="svc-success-btn" (click)="requestRestore(details)">
                       <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
                       {{ translations().restore }}
@@ -644,6 +643,8 @@
         [canUpdate]="canUpdate()"
         [canDelete]="canDelete()"
         [canRestore]="canRestore()"
+        [canDeleteNode]="canManageDefinitionNode"
+        [canRestoreNode]="canManageDefinitionNode"
         (refresh)="refresh()"
         (includeInactiveChange)="updateTreeToggle('inactive', $event)"
         (includeDeletedChange)="updateTreeToggle('deleted', $event)"

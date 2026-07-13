@@ -105,7 +105,7 @@ html
   border: 0 !important;
   font-size: 0.72rem !important;
   font-weight: 800 !important;
-  line-height: 1.25 !important;
+  line-height: var(--q-line-height-supporting, 1.5) !important;
 }
 
 html

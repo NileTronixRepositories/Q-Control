@@ -51,7 +51,14 @@ export const TECHNICAL_ADMIN_ROUTES: Routes = [
         path: 'services',
         canActivate: [technicalAdminPermissionGuard],
         data: {
-          requiredAnyPermissions: ['Services.ViewAll', 'BranchServices.View', 'ServiceWorkflows.ViewAll'],
+          requiredAnyPermissions: [
+            'Services.ViewAll',
+            'Services.ViewCentralTree',
+            'BranchServices.View',
+            'ServiceWorkflows.ViewAll',
+            'ServiceGlobalizationRequests.ViewAll',
+            'ServiceGlobalizationRequests.ViewOwn',
+          ],
         },
         loadChildren: () =>
           import('../service-management/service-management.routes').then(

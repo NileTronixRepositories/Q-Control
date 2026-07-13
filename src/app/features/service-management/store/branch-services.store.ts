@@ -1,12 +1,22 @@
 import { computed, Injectable, signal } from '@angular/core';
 
-import { BranchServiceTreeNode, BranchServicesUiMessage } from '../models/branch-services.model';
+import {
+  BranchServiceTreeNode,
+  BranchServicesUiMessage,
+  BranchServiceLifecycleConfirmState,
+  BranchServiceUnassignConfirmState,
+} from '../models/branch-services.model';
 import { ServiceTreeNode } from '../models/service-management.model';
+import { ServiceScope } from '../models/service-management.model';
 
 type CreateBranchTreeMode = 'root' | 'subtree';
 interface CreateBranchSubtreeParent {
   readonly id: number;
   readonly label: string;
+  readonly scope: ServiceScope;
+  readonly ownerBranchId: number | null;
+  readonly isOwnedByCurrentBranch: boolean;
+  readonly canEditDefinition: boolean;
 }
 
 @Injectable()
@@ -25,11 +35,19 @@ export class BranchServicesStore {
   readonly centralTreeLoading = signal(false);
   readonly branchesLoading = signal(false);
   readonly assigning = signal(false);
+  readonly unassigning = signal(false);
+  readonly lifecyclePreparing = signal(false);
+  readonly lifecycleMutating = signal(false);
   readonly creatingTree = signal(false);
   readonly assignDialogOpen = signal(false);
   readonly createTreeDialogOpen = signal(false);
+  readonly globalizationRequestsDialogOpen = signal(false);
+  readonly pendingGlobalizationRequestsCount = signal(0);
+  readonly pendingGlobalizationRequestsLoading = signal(false);
   readonly createTreeMode = signal<CreateBranchTreeMode>('root');
   readonly createSubtreeParent = signal<CreateBranchSubtreeParent | null>(null);
+  readonly unassignConfirmState = signal<BranchServiceUnassignConfirmState | null>(null);
+  readonly lifecycleConfirmState = signal<BranchServiceLifecycleConfirmState | null>(null);
 
   readonly hasSelectedBranch = computed(() => this.selectedBranchId() !== null);
 
@@ -39,6 +57,10 @@ export class BranchServicesStore {
     this.selectedBranchNodeId.set(null);
     this.branchTree.set([]);
     this.expandedBranchNodeIds.set(new Set());
+    this.unassignConfirmState.set(null);
+    this.lifecycleConfirmState.set(null);
+    this.globalizationRequestsDialogOpen.set(false);
+    this.pendingGlobalizationRequestsCount.set(0);
   }
 
   toggleBranchNode(nodeId: number): void {
@@ -59,6 +81,34 @@ export class BranchServicesStore {
 
   closeAssignDialog(): void {
     this.assignDialogOpen.set(false);
+  }
+
+  openGlobalizationRequestsDialog(): void {
+    this.globalizationRequestsDialogOpen.set(true);
+  }
+
+  closeGlobalizationRequestsDialog(): void {
+    this.globalizationRequestsDialogOpen.set(false);
+  }
+
+  openUnassignConfirm(state: BranchServiceUnassignConfirmState): void {
+    this.unassignConfirmState.set(state);
+  }
+
+  closeUnassignConfirm(): void {
+    if (!this.unassigning()) {
+      this.unassignConfirmState.set(null);
+    }
+  }
+
+  openLifecycleConfirm(state: BranchServiceLifecycleConfirmState): void {
+    this.lifecycleConfirmState.set(state);
+  }
+
+  closeLifecycleConfirm(): void {
+    if (!this.lifecyclePreparing() && !this.lifecycleMutating()) {
+      this.lifecycleConfirmState.set(null);
+    }
   }
 
   openCreateTreeDialog(): void {

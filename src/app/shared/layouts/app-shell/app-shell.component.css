@@ -411,7 +411,9 @@
     z-index: 1090;
     display: block;
     background: var(--sidebar-overlay);
+    border: 0;
   }
+
 }
 .app-shell-ltr .sidebar-group-header,
 .app-shell-ltr .sidebar-link,

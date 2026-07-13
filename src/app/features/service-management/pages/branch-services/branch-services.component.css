@@ -37,7 +37,8 @@
   color: #0369a1;
   font-size: 9px;
   font-weight: 900;
-  margin: 0;
+  line-height: var(--q-line-height-label, 1.4);
+  margin: 0 0 var(--q-text-stack-gap-sm, 4px);
   text-transform: uppercase;
 }
 
@@ -45,8 +46,8 @@
   color: #0f172a;
   font-size: 18px;
   font-weight: 900;
-  line-height: 1.05;
-  margin: 1px 0;
+  line-height: var(--q-line-height-title, 1.3);
+  margin: 0 0 var(--q-text-stack-gap-sm, 4px);
 }
 
 .branch-services-hero span,
@@ -55,6 +56,11 @@
   color: #64748b;
   font-size: 10px;
   font-weight: 800;
+  line-height: var(--q-line-height-label, 1.4);
+}
+
+.branch-services-hero span {
+  display: block;
 }
 
 .branch-services-primary-btn,
