@@ -211,7 +211,10 @@ const EMPTY_BRANCH_TABLE_META: BranchTableMeta = {
     TechnicalAdminPageHeroComponent,
   ],
   templateUrl: './legacy-page.component.html',
-  styleUrl: './legacy-page.component.css',
+  styleUrls: [
+    './legacy-page.component.css',
+    './branch-editor-form.component.css'
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LegacyPageComponent implements OnInit, OnDestroy {

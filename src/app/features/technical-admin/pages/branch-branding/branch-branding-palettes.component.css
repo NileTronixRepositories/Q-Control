@@ -1,5 +1,5 @@
 /* Catchy branch theme color palettes. */
-body[data-admin-theme] .branch-branding-page .theme-form {
+:host-context(body[data-admin-theme]) .theme-form {
   position: relative;
   overflow: hidden;
   background:
@@ -9,7 +9,7 @@ body[data-admin-theme] .branch-branding-page .theme-form {
   box-shadow: 0 14px 36px rgba(15, 23, 42, 0.055) !important;
 }
 
-body[data-admin-theme] .branch-branding-page .theme-form-title {
+:host-context(body[data-admin-theme]) .theme-form-title {
   display: flex !important;
   align-items: center !important;
   gap: 10px !important;
@@ -17,7 +17,7 @@ body[data-admin-theme] .branch-branding-page .theme-form-title {
   font-weight: 900 !important;
 }
 
-body[data-admin-theme] .branch-branding-page .theme-form-title::before {
+:host-context(body[data-admin-theme]) .theme-form-title::before {
   width: 10px;
   height: 10px;
   flex: 0 0 auto;
@@ -29,12 +29,12 @@ body[data-admin-theme] .branch-branding-page .theme-form-title::before {
     32px 0 0 rgb(var(--q-primary-rgb, 15 125 168) / 0.16);
 }
 
-body[data-admin-theme] .branch-branding-page .colors-grid {
+:host-context(body[data-admin-theme]) .colors-grid {
   grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
   gap: 18px !important;
 }
 
-body[data-admin-theme] .branch-branding-page .color-field {
+:host-context(body[data-admin-theme]) .color-field {
   position: relative !important;
   min-width: 0 !important;
   gap: 12px !important;
@@ -52,7 +52,7 @@ body[data-admin-theme] .branch-branding-page .color-field {
     transform 160ms ease !important;
 }
 
-body[data-admin-theme] .branch-branding-page .color-field::before {
+:host-context(body[data-admin-theme]) .color-field::before {
   position: absolute;
   inset: 0 auto 0 0;
   width: 4px;
@@ -61,18 +61,18 @@ body[data-admin-theme] .branch-branding-page .color-field::before {
   opacity: 0.72;
 }
 
-body[data-admin-theme] .app-shell-rtl .branch-branding-page .color-field::before {
+:host-context(body[data-admin-theme] .app-shell-rtl) .color-field::before {
   inset: 0 0 0 auto;
 }
 
-body[data-admin-theme] .branch-branding-page .color-field:hover,
-body[data-admin-theme] .branch-branding-page .color-field:focus-within {
+:host-context(body[data-admin-theme]) .color-field:hover,
+:host-context(body[data-admin-theme]) .color-field:focus-within {
   border-color: rgb(var(--q-primary-rgb, 15 125 168) / 0.34) !important;
   box-shadow: 0 16px 32px rgb(var(--q-primary-rgb, 15 125 168) / 0.09) !important;
   transform: translateY(-1px);
 }
 
-body[data-admin-theme] .branch-branding-page .color-field > span {
+:host-context(body[data-admin-theme]) .color-field > span {
   position: relative;
   z-index: 1;
   display: flex !important;
@@ -84,7 +84,7 @@ body[data-admin-theme] .branch-branding-page .color-field > span {
   font-weight: 900 !important;
 }
 
-body[data-admin-theme] .branch-branding-page .color-field > span::after {
+:host-context(body[data-admin-theme]) .color-field > span::after {
   width: 34px;
   height: 10px;
   flex: 0 0 auto;
@@ -94,7 +94,7 @@ body[data-admin-theme] .branch-branding-page .color-field > span::after {
   opacity: 0.78;
 }
 
-body[data-admin-theme] .branch-branding-page .color-control {
+:host-context(body[data-admin-theme]) .color-control {
   position: relative;
   z-index: 1;
   grid-template-columns: 58px 1fr !important;
@@ -111,17 +111,17 @@ body[data-admin-theme] .branch-branding-page .color-control {
     box-shadow 160ms ease;
 }
 
-body[data-admin-theme] .branch-branding-page .color-control:focus-within {
+:host-context(body[data-admin-theme]) .color-control:focus-within {
   border-color: var(--q-primary);
   box-shadow: 0 0 0 4px rgb(var(--q-primary-rgb, 15 125 168) / 0.1);
 }
 
-body[data-admin-theme] .branch-branding-page .color-control.invalid-control {
+:host-context(body[data-admin-theme]) .color-control.invalid-control {
   border-color: rgba(210, 31, 53, 0.48) !important;
   box-shadow: 0 0 0 4px rgba(210, 31, 53, 0.07) !important;
 }
 
-body[data-admin-theme] .branch-branding-page .color-control input[type='color'] {
+:host-context(body[data-admin-theme]) .color-control input[type='color'] {
   width: 100% !important;
   height: 100% !important;
   min-height: 48px;
@@ -139,18 +139,18 @@ body[data-admin-theme] .branch-branding-page .color-control input[type='color'] 
   border-radius: 0 !important;
 }
 
-body[data-admin-theme] .branch-branding-page .color-control input[type='color']::-webkit-color-swatch-wrapper {
+:host-context(body[data-admin-theme]) .color-control input[type='color']::-webkit-color-swatch-wrapper {
   padding: 0;
 }
 
-body[data-admin-theme] .branch-branding-page .color-control input[type='color']::-webkit-color-swatch,
-body[data-admin-theme] .branch-branding-page .color-control input[type='color']::-moz-color-swatch {
+:host-context(body[data-admin-theme]) .color-control input[type='color']::-webkit-color-swatch,
+:host-context(body[data-admin-theme]) .color-control input[type='color']::-moz-color-swatch {
   border: 0;
   border-radius: 9px;
   box-shadow: 0 8px 16px rgba(15, 23, 42, 0.13);
 }
 
-body[data-admin-theme] .branch-branding-page .color-control input[type='text'] {
+:host-context(body[data-admin-theme]) .color-control input[type='text'] {
   min-width: 0;
   height: 48px !important;
   padding: 0 16px !important;
@@ -165,12 +165,12 @@ body[data-admin-theme] .branch-branding-page .color-control input[type='text'] {
   text-transform: uppercase;
 }
 
-body[data-admin-theme] .branch-branding-page .color-control input[type='text']::placeholder {
+:host-context(body[data-admin-theme]) .color-control input[type='text']::placeholder {
   color: var(--q-text-muted);
   opacity: 0.62;
 }
 
-body[data-admin-theme] .branch-branding-page .color-field small {
+:host-context(body[data-admin-theme]) .color-field small {
   position: relative;
   z-index: 1;
   display: flex;
@@ -182,7 +182,7 @@ body[data-admin-theme] .branch-branding-page .color-field small {
   font-weight: 850;
 }
 
-body[data-admin-theme] .branch-branding-page .color-field small::before {
+:host-context(body[data-admin-theme]) .color-field small::before {
   width: 6px;
   height: 6px;
   flex: 0 0 auto;
@@ -191,18 +191,18 @@ body[data-admin-theme] .branch-branding-page .color-field small::before {
   border-radius: 999px;
 }
 
-body[data-admin-theme] .branch-branding-page .theme-form-actions {
+:host-context(body[data-admin-theme]) .theme-form-actions {
   border-top-color: rgb(var(--q-primary-rgb, 15 125 168) / 0.14) !important;
 }
 
 @media (max-width: 1199px) {
-  body[data-admin-theme] .branch-branding-page .colors-grid {
+  :host-context(body[data-admin-theme]) .colors-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
   }
 }
 
 @media (max-width: 767px) {
-  body[data-admin-theme] .branch-branding-page .colors-grid {
+  :host-context(body[data-admin-theme]) .colors-grid {
     grid-template-columns: 1fr !important;
   }
 }

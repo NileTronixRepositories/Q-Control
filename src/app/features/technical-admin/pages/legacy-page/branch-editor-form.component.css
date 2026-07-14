@@ -1,11 +1,11 @@
 /* Branch editor popup form layout and validation. */
-body[data-admin-theme] .branch-page .branch-form.row {
+:host-context(body[data-admin-theme]) .branch-form.row {
   --bs-gutter-x: 18px;
   --bs-gutter-y: 14px;
   align-items: flex-start !important;
 }
 
-body[data-admin-theme] .branch-page .branch-field {
+:host-context(body[data-admin-theme]) .branch-field {
   display: flex !important;
   min-width: 0 !important;
   flex-direction: column !important;
@@ -13,9 +13,9 @@ body[data-admin-theme] .branch-page .branch-field {
   margin: 0 !important;
 }
 
-body[data-admin-theme] .branch-page .branch-form .branch-field input,
-body[data-admin-theme] .branch-page .branch-form .branch-field textarea,
-body[data-admin-theme] .branch-page .branch-form .branch-field .form-control {
+:host-context(body[data-admin-theme]) .branch-form .branch-field input,
+:host-context(body[data-admin-theme]) .branch-form .branch-field textarea,
+:host-context(body[data-admin-theme]) .branch-form .branch-field .form-control {
   min-height: 46px !important;
   color: var(--q-text-primary) !important;
   background-color: #ffffff !important;
@@ -28,25 +28,25 @@ body[data-admin-theme] .branch-page .branch-form .branch-field .form-control {
     background-color var(--nt-motion-base, 160ms) var(--nt-motion-ease, ease) !important;
 }
 
-body[data-admin-theme] .branch-page .branch-form .branch-field textarea {
+:host-context(body[data-admin-theme]) .branch-form .branch-field textarea {
   resize: vertical !important;
 }
 
-body[data-admin-theme] .branch-page .branch-form .branch-field input:focus,
-body[data-admin-theme] .branch-page .branch-form .branch-field textarea:focus,
-body[data-admin-theme] .branch-page .branch-form .branch-field .form-control:focus {
+:host-context(body[data-admin-theme]) .branch-form .branch-field input:focus,
+:host-context(body[data-admin-theme]) .branch-form .branch-field textarea:focus,
+:host-context(body[data-admin-theme]) .branch-form .branch-field .form-control:focus {
   border-color: var(--q-primary) !important;
   box-shadow: 0 0 0 3px rgb(var(--q-primary-rgb) / 0.12) !important;
 }
 
-body[data-admin-theme] .branch-page .branch-form .branch-field .form-control.is-invalid {
+:host-context(body[data-admin-theme]) .branch-form .branch-field .form-control.is-invalid {
   padding-inline-end: var(--nt-control-padding-x, 14px) !important;
   border-color: rgba(210, 31, 53, 0.48) !important;
   background-image: none !important;
   box-shadow: 0 0 0 3px rgba(210, 31, 53, 0.06) !important;
 }
 
-body[data-admin-theme] .branch-page .branch-feedback.invalid-feedback {
+:host-context(body[data-admin-theme]) .branch-feedback.invalid-feedback {
   display: flex !important;
   width: auto !important;
   max-width: 100% !important;
@@ -62,7 +62,7 @@ body[data-admin-theme] .branch-page .branch-feedback.invalid-feedback {
   line-height: var(--q-line-height-supporting, 1.5) !important;
 }
 
-body[data-admin-theme] .branch-page .branch-feedback::before {
+:host-context(body[data-admin-theme]) .branch-feedback::before {
   width: 6px !important;
   height: 6px !important;
   flex: 0 0 auto !important;
@@ -72,8 +72,8 @@ body[data-admin-theme] .branch-page .branch-feedback::before {
   box-shadow: 0 0 0 3px rgba(210, 31, 53, 0.08) !important;
 }
 
-body[data-admin-theme] .branch-page .form-section-title,
-body[data-admin-theme] .branch-page .branch-section-title {
+:host-context(body[data-admin-theme]) .form-section-title,
+:host-context(body[data-admin-theme]) .branch-section-title {
   display: flex !important;
   align-items: center !important;
   gap: 10px !important;
@@ -85,6 +85,6 @@ body[data-admin-theme] .branch-page .branch-section-title {
   font-weight: 900 !important;
 }
 
-body[data-admin-theme] .branch-page .branch-form-actions {
+:host-context(body[data-admin-theme]) .branch-form-actions {
   margin-top: 4px !important;
 }

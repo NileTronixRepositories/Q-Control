@@ -1,7 +1,7 @@
 import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
-import { of } from 'rxjs';
+import { of, Subject } from 'rxjs';
 
 import { AuthSessionService } from '../../../auth/services/auth-session.service';
 import { BranchManagementApiService } from '../../../technical-admin/services/branch-management-api.service';
@@ -13,14 +13,23 @@ import {
 import { ServiceDataInvalidationService } from '../../services/service-data-invalidation.service';
 import { ServiceGlobalizationApiService } from '../../services/service-globalization-api.service';
 import { ServiceManagementPermissionService } from '../../services/service-management-permission.service';
+import { ServiceGlobalizationStore } from '../../store/service-globalization.store';
 import { GlobalizationRequestsComponent } from './globalization-requests.component';
 
 describe('GlobalizationRequestsComponent responsive presentation', () => {
   let fixture: ComponentFixture<GlobalizationRequestsComponent>;
-  let api: { readonly getRequests: ReturnType<typeof vi.fn> };
+  let api: {
+    readonly getRequests: ReturnType<typeof vi.fn>;
+    readonly approveRequest: ReturnType<typeof vi.fn>;
+    readonly rejectRequest: ReturnType<typeof vi.fn>;
+  };
 
   beforeEach(async () => {
-    api = { getRequests: vi.fn(() => of(createPage())) };
+    api = {
+      getRequests: vi.fn(() => of(createPage())),
+      approveRequest: vi.fn(),
+      rejectRequest: vi.fn(),
+    };
 
     await TestBed.configureTestingModule({
       imports: [GlobalizationRequestsComponent],
@@ -109,6 +118,65 @@ describe('GlobalizationRequestsComponent responsive presentation', () => {
     expect(api.getRequests).toHaveBeenCalledTimes(2);
     expect(api.getRequests.mock.calls[1][0].status).toBe('Approved');
   });
+
+  it('ignores an older list response after a forced refresh starts', () => {
+    const staleResponse = new Subject<PagedServiceGlobalizationRequestsResponse>();
+    const freshResponse = new Subject<PagedServiceGlobalizationRequestsResponse>();
+    api.getRequests
+      .mockReturnValueOnce(staleResponse.asObservable())
+      .mockReturnValueOnce(freshResponse.asObservable());
+    const component = fixture.componentInstance as unknown as {
+      loadRequests(pageNumber?: number, force?: boolean): void;
+      readonly store: {
+        readonly page: () => PagedServiceGlobalizationRequestsResponse;
+      };
+    };
+
+    component.loadRequests(1);
+    component.loadRequests(1, true);
+    expect(api.getRequests).toHaveBeenCalledTimes(3);
+
+    freshResponse.next(createSinglePage('Approved'));
+    freshResponse.complete();
+    staleResponse.next(createSinglePage('Pending'));
+    staleResponse.complete();
+    fixture.detectChanges();
+
+    expect(component.store.page().data[0].status).toBe('Approved');
+  });
+
+  it('applies an approval immediately and forces a fresh list request', () => {
+    api.approveRequest.mockReturnValueOnce(
+      of({
+        requestId: 1,
+        status: 'Approved' as const,
+        branchId: 5,
+        promotedServiceIds: [101],
+        reviewedByApplicationUserId: 'reviewer-1',
+        reviewedOnUtc: '2026-07-13T11:00:00Z',
+        rowVersion: 'approved-version',
+        message: 'Approved',
+      }),
+    );
+    api.getRequests.mockReturnValueOnce(of(createSinglePage('Pending')));
+    const component = fixture.componentInstance as unknown as {
+      confirmDecision(): void;
+      readonly store: ServiceGlobalizationStore;
+    };
+    component.store.decisionState.set({
+      action: 'approve',
+      requestId: 1,
+      serviceName: 'Service 1',
+      rowVersion: 'row-version-1',
+    });
+
+    component.confirmDecision();
+    fixture.detectChanges();
+
+    expect(api.approveRequest).toHaveBeenCalledWith(1, 'row-version-1');
+    expect(api.getRequests).toHaveBeenCalledTimes(2);
+    expect(component.store.page().data[0].status).toBe('Approved');
+  });
 });
 
 function createPage(): PagedServiceGlobalizationRequestsResponse {
@@ -117,6 +185,17 @@ function createPage(): PagedServiceGlobalizationRequestsResponse {
     pageSize: 10,
     totalItems: 3,
     data: [createItem(1, 'Pending'), createItem(2, 'Approved'), createItem(3, 'Rejected')],
+  };
+}
+
+function createSinglePage(
+  status: ServiceGlobalizationRequestListItem['status'],
+): PagedServiceGlobalizationRequestsResponse {
+  return {
+    currentPage: 1,
+    pageSize: 10,
+    totalItems: 1,
+    data: [createItem(1, status)],
   };
 }
 

@@ -19,6 +19,11 @@ interface CreateBranchSubtreeParent {
   readonly canEditDefinition: boolean;
 }
 
+interface PendingRequestsSeenSnapshot {
+  readonly newestRequestId: number | null;
+  readonly count: number;
+}
+
 @Injectable()
 export class BranchServicesStore {
   readonly selectedBranchId = signal<number | null>(null);
@@ -43,13 +48,39 @@ export class BranchServicesStore {
   readonly createTreeDialogOpen = signal(false);
   readonly globalizationRequestsDialogOpen = signal(false);
   readonly pendingGlobalizationRequestsCount = signal(0);
+  readonly pendingGlobalizationRequestsNewestId = signal<number | null>(null);
   readonly pendingGlobalizationRequestsLoading = signal(false);
+  private readonly pendingGlobalizationRequestsSeenByBranch = signal<
+    ReadonlyMap<number, PendingRequestsSeenSnapshot>
+  >(new Map());
   readonly createTreeMode = signal<CreateBranchTreeMode>('root');
   readonly createSubtreeParent = signal<CreateBranchSubtreeParent | null>(null);
   readonly unassignConfirmState = signal<BranchServiceUnassignConfirmState | null>(null);
   readonly lifecycleConfirmState = signal<BranchServiceLifecycleConfirmState | null>(null);
 
   readonly hasSelectedBranch = computed(() => this.selectedBranchId() !== null);
+  readonly hasUnreadPendingGlobalizationRequests = computed(() => {
+    const branchId = this.selectedBranchId();
+    const count = this.pendingGlobalizationRequestsCount();
+
+    if (branchId === null || count <= 0) {
+      return false;
+    }
+
+    const seenSnapshot = this.pendingGlobalizationRequestsSeenByBranch().get(branchId);
+
+    if (!seenSnapshot) {
+      return true;
+    }
+
+    const newestRequestId = this.pendingGlobalizationRequestsNewestId();
+
+    if (newestRequestId !== null && seenSnapshot.newestRequestId !== null) {
+      return newestRequestId > seenSnapshot.newestRequestId;
+    }
+
+    return count > seenSnapshot.count;
+  });
 
   selectBranch(branchId: number | null, label: string | null): void {
     this.selectedBranchId.set(branchId);
@@ -61,6 +92,7 @@ export class BranchServicesStore {
     this.lifecycleConfirmState.set(null);
     this.globalizationRequestsDialogOpen.set(false);
     this.pendingGlobalizationRequestsCount.set(0);
+    this.pendingGlobalizationRequestsNewestId.set(null);
   }
 
   toggleBranchNode(nodeId: number): void {
@@ -85,6 +117,23 @@ export class BranchServicesStore {
 
   openGlobalizationRequestsDialog(): void {
     this.globalizationRequestsDialogOpen.set(true);
+  }
+
+  markPendingGlobalizationRequestsAsSeen(): void {
+    const branchId = this.selectedBranchId();
+
+    if (branchId === null) {
+      return;
+    }
+
+    this.pendingGlobalizationRequestsSeenByBranch.update((current) => {
+      const next = new Map(current);
+      next.set(branchId, {
+        newestRequestId: this.pendingGlobalizationRequestsNewestId(),
+        count: this.pendingGlobalizationRequestsCount(),
+      });
+      return next;
+    });
   }
 
   closeGlobalizationRequestsDialog(): void {

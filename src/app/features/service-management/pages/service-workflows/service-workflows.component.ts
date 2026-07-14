@@ -4,6 +4,7 @@ import {
   Component,
   OnDestroy,
   OnInit,
+  ViewChild,
   computed,
   inject,
   signal,
@@ -21,10 +22,10 @@ import { finalize } from 'rxjs';
 import { TechnicalAdminPageHeroComponent } from '../../../../shared/components/technical-admin-page-hero/technical-admin-page-hero.component';
 
 import { AuthSessionService } from '../../../auth/services/auth-session.service';
+import { ServiceCascadeSelectorComponent } from '../../components/service-cascade-selector/service-cascade-selector.component';
 import { TechnicalAdminI18nStore } from '../../../technical-admin/store/technical-admin-i18n.store';
 import { formatTechnicalAdminApiError } from '../../../technical-admin/utils/api-error-message.util';
 import { SERVICE_WORKFLOW_TRANSLATIONS } from '../../i18n/service-workflow.translations';
-import { ServiceSelectionOption } from '../../models/service-management.model';
 import {
   ServiceRelatedWorkflow,
   ServiceWorkflowDetails,
@@ -47,18 +48,10 @@ type WorkflowSelectionMode =
   | { readonly kind: 'add' }
   | { readonly kind: 'replace'; readonly stepUid: string };
 
-interface WorkflowSelectionLevel {
-  readonly parentServiceId: number | null;
-  readonly items: readonly ServiceSelectionOption[];
-  readonly selectedServiceId: number | null;
-  readonly loading: boolean;
-  readonly error: string | null;
-}
-
 @Component({
   selector: 'app-service-workflows',
   standalone: true,
-  imports: [ReactiveFormsModule, TechnicalAdminPageHeroComponent],
+  imports: [ReactiveFormsModule, TechnicalAdminPageHeroComponent, ServiceCascadeSelectorComponent],
   providers: [ServiceWorkflowStore],
   templateUrl: './service-workflows.component.html',
   styleUrls: [
@@ -96,8 +89,6 @@ export class ServiceWorkflowsComponent implements OnInit, OnDestroy {
   readonly canUseServiceSelection = this.permissionService.canViewAll;
 
   readonly builderSteps = signal<readonly WorkflowBuilderStep[]>([]);
-  readonly selectionLevels = signal<readonly WorkflowSelectionLevel[]>([]);
-  readonly selectedSelectionPath = signal<readonly ServiceSelectionOption[]>([]);
   readonly selectionMode = signal<WorkflowSelectionMode>({ kind: 'add' });
   readonly selectionError = signal<string | null>(null);
   readonly workflowStartOptions = signal<WorkflowStartOptions | null>(null);
@@ -117,6 +108,8 @@ export class ServiceWorkflowsComponent implements OnInit, OnDestroy {
 
   readonly arabicNameControl = this.workflowForm.controls.arabicName;
   readonly englishNameControl = this.workflowForm.controls.englishName;
+
+  @ViewChild(ServiceCascadeSelectorComponent) cascadeSelector?: ServiceCascadeSelectorComponent;
 
   private searchDebounceId: ReturnType<typeof setTimeout> | null = null;
   private candidateSearchDebounceId: ReturnType<typeof setTimeout> | null = null;
@@ -410,67 +403,17 @@ export class ServiceWorkflowsComponent implements OnInit, OnDestroy {
     this.startAddStepSelection();
   }
 
-  selectSelectionOption(levelIndex: number, event: Event): void {
-    const serviceId = this.toOptionalNumber(this.readInputValue(event));
-    const level = this.selectionLevels()[levelIndex];
-
-    if (!level) {
-      return;
-    }
-
-    if (!serviceId) {
-      this.selectedSelectionPath.set(this.selectedSelectionPath().slice(0, levelIndex));
-      this.selectionLevels.update((levels) => [
-        ...levels.slice(0, levelIndex),
-        { ...level, selectedServiceId: null, error: null },
-      ]);
-      this.clearWorkflowStartOptions();
-      this.selectionError.set(null);
-      return;
-    }
-
-    const selectedOption = level.items.find((item) => item.serviceId === serviceId);
-
-    if (!selectedOption) {
-      this.selectionError.set(this.translations().selectedServiceNotFound);
-      return;
-    }
-
-    const nextPath = [...this.selectedSelectionPath().slice(0, levelIndex), selectedOption];
-    this.selectedSelectionPath.set(nextPath);
-    this.selectionLevels.update((levels) => [
-      ...levels.slice(0, levelIndex),
-      { ...level, selectedServiceId: selectedOption.serviceId, error: null },
-    ]);
-    this.clearWorkflowStartOptions();
-    this.selectionError.set(null);
-
-    if (!this.isSelectionOptionSelectable(selectedOption)) {
-      this.selectionError.set(this.translations().invalidStep);
-      return;
-    }
-
-    if (selectedOption.canIssueTicket) {
-      this.commitSelectionOptionAsStep(selectedOption, nextPath);
-      return;
-    }
-
-    if (selectedOption.hasChildren) {
-      this.loadSelectionLevel(selectedOption.serviceId, levelIndex + 1);
-      return;
-    }
-
-    this.selectionError.set(this.translations().serviceCannotIssueTicket);
-  }
-
-  isSelectionOptionSelectable(option: ServiceSelectionOption): boolean {
-    return option.effectiveIsActive !== false;
-  }
-
-  selectionOptionName(option: ServiceSelectionOption): string {
-    return this.language() === 'ar'
-      ? this.formatText(option.arabicName)
-      : this.formatText(option.englishName);
+  handleCascadeSelection(event: {
+    service: WorkflowCandidateService;
+    mode: 'add' | 'replace';
+    stepUid: string | null;
+  }): void {
+    this.selectionMode.set(
+      event.mode === 'replace' && event.stepUid
+        ? { kind: 'replace', stepUid: event.stepUid }
+        : { kind: 'add' }
+    );
+    this.loadWorkflowStartOptionsForSelection(event.service.serviceId!, event.service);
   }
 
   workflowStartOptionName(workflow: WorkflowStartOptionItem): string {
@@ -912,101 +855,13 @@ export class ServiceWorkflowsComponent implements OnInit, OnDestroy {
 
   private initializeServiceSelection(): void {
     this.clearWorkflowStartOptions();
-    this.selectedSelectionPath.set([]);
-    this.selectionError.set(null);
-    this.store.clearSuggestions();
-
-    if (!this.canUseServiceSelection()) {
-      this.selectionLevels.set([]);
-      this.selectionError.set(this.translations().selectionAccessDenied);
-      return;
-    }
-
-    this.loadSelectionLevel(null, 0);
+    this.cascadeSelector?.reset();
   }
 
   private clearServiceSelection(): void {
-    this.selectionLevels.set([]);
-    this.selectedSelectionPath.set([]);
     this.selectionMode.set({ kind: 'add' });
     this.clearWorkflowStartOptions();
-    this.selectionError.set(null);
-  }
-
-  private loadSelectionLevel(parentServiceId: number | null, levelIndex: number): void {
-    if (!this.canUseServiceSelection()) {
-      this.selectionError.set(this.translations().selectionAccessDenied);
-      return;
-    }
-
-    const loadingLevel: WorkflowSelectionLevel = {
-      parentServiceId,
-      items: [],
-      selectedServiceId: null,
-      loading: true,
-      error: null,
-    };
-
-    this.selectionError.set(null);
-    this.selectionLevels.update((levels) => [...levels.slice(0, levelIndex), loadingLevel]);
-
-    this.serviceManagementApiService
-      .getServiceSelectionOptions(parentServiceId ?? undefined)
-      .pipe(finalize(() => this.setSelectionLevelLoading(levelIndex, false)))
-      .subscribe({
-        next: (response) => {
-          const items = response.items ?? [];
-          const error = items.length === 0 ? this.translations().noSelectionOptions : null;
-
-          this.selectionLevels.update((levels) => [
-            ...levels.slice(0, levelIndex),
-            {
-              parentServiceId: response.parentServiceId ?? parentServiceId,
-              items,
-              selectedServiceId: null,
-              loading: false,
-              error,
-            },
-          ]);
-          this.selectionError.set(error);
-        },
-        error: (error: HttpErrorResponse) => this.handleSelectionApiError(error, levelIndex),
-      });
-  }
-
-  private setSelectionLevelLoading(levelIndex: number, loading: boolean): void {
-    this.selectionLevels.update((levels) => {
-      const level = levels[levelIndex];
-
-      if (!level) {
-        return levels;
-      }
-
-      return levels.map((item, index) => (index === levelIndex ? { ...item, loading } : item));
-    });
-  }
-
-  private handleSelectionApiError(error: HttpErrorResponse, levelIndex: number): void {
-    if (this.authSessionService.shouldClearSessionForHttpStatus(error.status)) {
-      this.authSessionService.clearSession();
-      void this.router.navigateByUrl('/login');
-      return;
-    }
-
-    const message = this.selectionErrorMessage(error);
-    this.selectionError.set(message);
-    this.showMessage('error', message);
-    this.selectionLevels.update((levels) => {
-      const level = levels[levelIndex];
-
-      if (!level) {
-        return levels;
-      }
-
-      return levels.map((item, index) =>
-        index === levelIndex ? { ...item, loading: false, error: message } : item,
-      );
-    });
+    this.cascadeSelector?.clear();
   }
 
   private selectionErrorMessage(error: HttpErrorResponse): string {
@@ -1019,14 +874,6 @@ export class ServiceWorkflowsComponent implements OnInit, OnDestroy {
     }
 
     return formatTechnicalAdminApiError(error, this.translations().fallbackError);
-  }
-
-  private commitSelectionOptionAsStep(
-    option: ServiceSelectionOption,
-    path: readonly ServiceSelectionOption[],
-  ): void {
-    const service = this.candidateFromSelectionOption(option, path);
-    this.loadWorkflowStartOptionsForSelection(option.serviceId, service);
   }
 
   private loadWorkflowStartOptionsForSelection(
@@ -1118,34 +965,11 @@ export class ServiceWorkflowsComponent implements OnInit, OnDestroy {
     this.builderSteps.set([]);
     this.selectionMode.set({ kind: 'add' });
   }
+
   private clearWorkflowStartOptions(): void {
     this.workflowStartOptions.set(null);
     this.workflowStartOptionsLoading.set(false);
     this.pendingWorkflowStartServiceId.set(null);
-  }
-
-  private candidateFromSelectionOption(
-    option: ServiceSelectionOption,
-    path: readonly ServiceSelectionOption[],
-  ): WorkflowCandidateService {
-    const parent = [...path]
-      .slice(0, -1)
-      .reverse()
-      .find((item) => item.serviceId === option.parentServiceId);
-
-    return {
-      serviceId: option.serviceId,
-      id: option.serviceId,
-      arabicName: option.arabicName,
-      englishName: option.englishName,
-      parentServiceId: option.parentServiceId,
-      parentServiceArabicName: parent?.arabicName ?? null,
-      parentServiceEnglishName: parent?.englishName ?? null,
-      isActive: option.isActive,
-      isDeleted: false,
-      isTicketIssuable: option.canIssueTicket,
-      relatedWorkflows: [],
-    };
   }
 
   private loadWorkflows(pageNumber = this.store.query().pageNumber): void {
@@ -1462,7 +1286,3 @@ export class ServiceWorkflowsComponent implements OnInit, OnDestroy {
     return control.value.trim().length > 0 ? null : { whitespace: true };
   }
 }
-
-
-
-

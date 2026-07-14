@@ -15,6 +15,7 @@ describe('BranchGlobalizationRequestsComponent request triggers', () => {
   let requests: Subject<PagedServiceGlobalizationRequestsResponse>[];
 
   beforeEach(async () => {
+    vi.useFakeTimers();
     requests = [];
     api = {
       getBranchRequests: vi.fn(() => {
@@ -46,6 +47,13 @@ describe('BranchGlobalizationRequestsComponent request triggers', () => {
     fixture = TestBed.createComponent(BranchGlobalizationRequestsComponent);
     fixture.componentRef.setInput('branchId', 5);
     fixture.detectChanges();
+  });
+
+  afterEach(() => {
+    if (!fixture.componentRef.hostView.destroyed) {
+      fixture.destroy();
+    }
+    vi.useRealTimers();
   });
 
   it('does not load while closed, then sends one request when opened', () => {
@@ -106,6 +114,27 @@ describe('BranchGlobalizationRequestsComponent request triggers', () => {
     openPopup();
     expect(api.getBranchRequests).toHaveBeenCalledTimes(2);
     expect(api.getBranchRequests.mock.calls[1][1].status).toBe('Approved');
+  });
+
+  it('polls the open list every 15 seconds without overlapping requests', () => {
+    openPopup();
+
+    vi.advanceTimersByTime(15_000);
+    expect(api.getBranchRequests).toHaveBeenCalledTimes(1);
+
+    requests[0].next(emptyPage(1));
+    requests[0].complete();
+    fixture.detectChanges();
+
+    vi.advanceTimersByTime(15_000);
+    expect(api.getBranchRequests).toHaveBeenCalledTimes(2);
+
+    requests[1].next(emptyPage(1));
+    requests[1].complete();
+    fixture.destroy();
+    vi.advanceTimersByTime(15_000);
+
+    expect(api.getBranchRequests).toHaveBeenCalledTimes(2);
   });
 
   it('uses distinct enterprise badge colors for every request status', () => {

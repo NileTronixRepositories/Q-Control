@@ -119,10 +119,10 @@
   }
 
   <form
-    class="grid gap-3 rounded-3xl border border-cyan-100 bg-gradient-to-br from-white to-cyan-50/50 p-3 shadow-sm md:grid-cols-2 sm:p-4 xl:grid-cols-8"
+    class="flex flex-wrap items-end gap-3 rounded-3xl border border-cyan-100 bg-gradient-to-br from-white to-cyan-50/50 p-3 shadow-sm sm:p-4"
     (submit)="submitSearch($event)"
   >
-    <label class="grid gap-1.5 xl:col-span-2">
+    <label class="grid min-w-[200px] flex-1 gap-1.5 basis-48">
       <span class="flex items-center gap-1.5 text-xs font-extrabold text-slate-600"
         ><i class="bi bi-search text-cyan-700" aria-hidden="true"></i
         >{{ translations().search }}</span
@@ -140,14 +140,14 @@
           (input)="updateSearch($event)"
       /></span>
     </label>
-    <label class="grid gap-1.5"
-      ><span class="flex items-center gap-1.5 text-xs font-extrabold text-slate-600"
+    <label class="grid min-w-[130px] flex-1 gap-1.5 basis-32">
+      <span class="flex items-center gap-1.5 text-xs font-extrabold text-slate-600"
         ><i class="bi bi-activity text-cyan-700" aria-hidden="true"></i
         >{{ translations().status }}</span
       >
       <select
         data-testid="status-filter"
-        class="h-11 rounded-xl border border-slate-200 bg-white px-3 outline-none transition hover:border-cyan-300 focus:border-cyan-500 focus:ring-4 focus:ring-cyan-100"
+        class="h-11 w-full rounded-xl border border-slate-200 bg-white px-3 outline-none transition hover:border-cyan-300 focus:border-cyan-500 focus:ring-4 focus:ring-cyan-100"
         [value]="store.status() ?? ''"
         (change)="updateStatus($event)"
       >
@@ -157,13 +157,13 @@
         <option value="Rejected">{{ translations().rejected }}</option>
       </select>
     </label>
-    <label class="grid gap-1.5"
-      ><span class="flex items-center gap-1.5 text-xs font-extrabold text-slate-600"
+    <label class="grid min-w-[130px] flex-1 gap-1.5 basis-32">
+      <span class="flex items-center gap-1.5 text-xs font-extrabold text-slate-600"
         ><i class="bi bi-diagram-3 text-cyan-700" aria-hidden="true"></i
         >{{ translations().requestType }}</span
       >
       <select
-        class="h-11 rounded-xl border border-slate-200 bg-white px-3 outline-none transition hover:border-cyan-300 focus:border-cyan-500 focus:ring-4 focus:ring-cyan-100"
+        class="h-11 w-full rounded-xl border border-slate-200 bg-white px-3 outline-none transition hover:border-cyan-300 focus:border-cyan-500 focus:ring-4 focus:ring-cyan-100"
         [value]="store.requestType() ?? ''"
         (change)="updateType($event)"
       >
@@ -172,13 +172,13 @@
         <option value="LeafUnderGlobalParent">{{ translations().leafUnderGlobalParent }}</option>
       </select>
     </label>
-    <label class="grid gap-1.5"
-      ><span class="flex items-center gap-1.5 text-xs font-extrabold text-slate-600"
+    <label class="grid min-w-[130px] flex-1 gap-1.5 basis-32">
+      <span class="flex items-center gap-1.5 text-xs font-extrabold text-slate-600"
         ><i class="bi bi-building text-cyan-700" aria-hidden="true"></i
         >{{ translations().branch }}</span
       >
       <select
-        class="h-11 rounded-xl border border-slate-200 bg-white px-3 outline-none transition hover:border-cyan-300 focus:border-cyan-500 focus:ring-4 focus:ring-cyan-100"
+        class="h-11 w-full rounded-xl border border-slate-200 bg-white px-3 outline-none transition hover:border-cyan-300 focus:border-cyan-500 focus:ring-4 focus:ring-cyan-100"
         [value]="store.branchId() ?? ''"
         (change)="updateBranch($event)"
       >
@@ -188,13 +188,13 @@
         }
       </select>
     </label>
-    <label class="grid gap-1.5"
-      ><span class="flex items-center gap-1.5 text-xs font-extrabold text-slate-600"
+    <label class="grid min-w-[110px] flex-1 gap-1.5 basis-28">
+      <span class="flex items-center gap-1.5 text-xs font-extrabold text-slate-600"
         ><i class="bi bi-sort-down text-cyan-700" aria-hidden="true"></i
         >{{ translations().order }}</span
       >
       <select
-        class="h-11 rounded-xl border border-slate-200 bg-white px-3 outline-none transition hover:border-cyan-300 focus:border-cyan-500 focus:ring-4 focus:ring-cyan-100"
+        class="h-11 w-full rounded-xl border border-slate-200 bg-white px-3 outline-none transition hover:border-cyan-300 focus:border-cyan-500 focus:ring-4 focus:ring-cyan-100"
         [value]="store.orderSort()"
         (change)="updateOrder($event)"
       >
@@ -202,13 +202,13 @@
         <option value="Oldest">{{ translations().oldest }}</option>
       </select>
     </label>
-    <label class="grid gap-1.5"
-      ><span class="flex items-center gap-1.5 text-xs font-extrabold text-slate-600"
+    <label class="grid min-w-[100px] flex-1 gap-1.5 basis-24">
+      <span class="flex items-center gap-1.5 text-xs font-extrabold text-slate-600"
         ><i class="bi bi-list-ol text-cyan-700" aria-hidden="true"></i
         >{{ translations().pageSize }}</span
       >
       <select
-        class="h-11 rounded-xl border border-slate-200 bg-white px-3 outline-none transition hover:border-cyan-300 focus:border-cyan-500 focus:ring-4 focus:ring-cyan-100"
+        class="h-11 w-full rounded-xl border border-slate-200 bg-white px-3 outline-none transition hover:border-cyan-300 focus:border-cyan-500 focus:ring-4 focus:ring-cyan-100"
         [value]="store.pageSize()"
         (change)="updatePageSize($event)"
       >
@@ -218,10 +218,7 @@
         <option>100</option>
       </select>
     </label>
-    <button
-      type="submit"
-      class="mt-auto rounded inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-cyan-700 bg-gradient-to-r from-cyan-700 to-sky-700 px-4 font-extrabold text-white shadow-lg shadow-cyan-800/15 transition hover:-translate-y-0.5 hover:from-cyan-800 hover:to-sky-800 active:translate-y-0 p-4"
-    >
+    <button type="submit" class="primary-action shrink-0 whitespace-nowrap">
       <i class="bi bi-search" aria-hidden="true"></i>{{ translations().search }}
     </button>
   </form>
@@ -324,11 +321,11 @@
                   >
                 </td>
                 <td class="p-3.5">
-                  <div class="flex justify-center gap-1.5">
+                  <div class="flex justify-center gap-2">
                     @if (canViewDetails()) {
                       <button
                         type="button"
-                        class="inline-flex min-h-9 items-center rounded gap-1 rounded-xl border border-slate-200 bg-white px-3 font-bold text-slate-600 transition hover:border-cyan-200 hover:bg-cyan-50 hover:text-cyan-800"
+                        class="secondary-action compact-action"
                         (click)="openDetails(item.requestId)"
                       >
                         <i class="bi bi-eye" aria-hidden="true"></i>{{ translations().view }}
@@ -338,7 +335,7 @@
                       <button
                         type="button"
                         data-action="approve"
-                        class="inline-flex min-h-9 items-center rounded gap-1 rounded-xl bg-emerald-600 px-3 font-bold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-emerald-700"
+                        class="primary-action compact-action success-primary"
                         (click)="requestDecision(item, 'approve')"
                       >
                         <i class="bi bi-check-lg" aria-hidden="true"></i
@@ -349,7 +346,7 @@
                       <button
                         type="button"
                         data-action="reject"
-                        class="inline-flex min-h-9 items-center rounded gap-1 rounded-xl bg-rose-600 px-3 font-bold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-rose-700"
+                        class="primary-action compact-action danger-primary"
                         (click)="requestDecision(item, 'reject')"
                       >
                         <i class="bi bi-x-lg" aria-hidden="true"></i>{{ translations().reject }}
@@ -428,7 +425,7 @@
               @if (canViewDetails()) {
                 <button
                   type="button"
-                  class="inline-flex min-h-10 flex-1 items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 font-bold text-slate-600"
+                  class="secondary-action flex-1"
                   (click)="openDetails(item.requestId)"
                 >
                   <i class="bi bi-eye" aria-hidden="true"></i>{{ translations().view }}
@@ -438,7 +435,7 @@
                 <button
                   type="button"
                   data-action="approve"
-                  class="inline-flex min-h-10 flex-1 items-center justify-center gap-1.5 rounded-xl bg-emerald-600 px-3 font-bold text-white"
+                  class="primary-action success-primary flex-1"
                   (click)="requestDecision(item, 'approve')"
                 >
                   <i class="bi bi-check-lg" aria-hidden="true"></i>{{ translations().approve }}
@@ -448,7 +445,7 @@
                 <button
                   type="button"
                   data-action="reject"
-                  class="inline-flex min-h-10 flex-1 items-center justify-center gap-1.5 rounded-xl bg-rose-600 px-3 font-bold text-white"
+                  class="primary-action danger-primary flex-1"
                   (click)="requestDecision(item, 'reject')"
                 >
                   <i class="bi bi-x-lg" aria-hidden="true"></i>{{ translations().reject }}
@@ -530,7 +527,7 @@
         </div>
         <button
           type="button"
-          class="relative rounded grid size-10 shrink-0 place-items-center rounded-xl border border-white/80 bg-white/85 text-lg text-slate-600 shadow-sm transition hover:-translate-y-0.5 hover:border-cyan-200 hover:text-cyan-700 hover:shadow-md disabled:opacity-50"
+          class="icon-action shrink-0 text-lg shadow-sm hover:-translate-y-0.5 hover:shadow-md disabled:opacity-50"
           [attr.aria-label]="translations().close"
           [disabled]="store.mutating()"
           (click)="store.closeDetails()"
@@ -684,7 +681,7 @@
             @if (canReject()) {
               <button
                 type="button"
-                class="inline-flex rounded min-h-11 flex-1 items-center justify-center gap-2 rounded-xl bg-rose-600 px-5 font-extrabold text-white shadow-lg shadow-rose-700/20 transition hover:-translate-y-0.5 hover:bg-rose-700 sm:flex-none"
+                class="primary-action danger-primary flex-1 sm:flex-none"
                 (click)="requestDetailsDecision('reject')"
               >
                 <i class="bi bi-x-lg" aria-hidden="true"></i>{{ translations().reject }}
@@ -693,7 +690,7 @@
             @if (canApprove()) {
               <button
                 type="button"
-                class="inline-flex rounded min-h-11 flex-1 items-center justify-center gap-2 rounded-xl bg-emerald-600 px-5 font-extrabold text-white shadow-lg shadow-emerald-700/20 transition hover:-translate-y-0.5 hover:bg-emerald-700 sm:flex-none"
+                class="primary-action success-primary flex-1 sm:flex-none"
                 (click)="requestDetailsDecision('approve')"
               >
                 <i class="bi bi-check-lg" aria-hidden="true"></i>{{ translations().approve }}

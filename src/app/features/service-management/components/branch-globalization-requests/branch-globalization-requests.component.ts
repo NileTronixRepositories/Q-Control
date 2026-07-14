@@ -3,6 +3,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   HostListener,
+  OnDestroy,
   computed,
   effect,
   inject,
@@ -26,13 +27,15 @@ import {
 import { ServiceDataInvalidationService } from '../../services/service-data-invalidation.service';
 import { ServiceGlobalizationApiService } from '../../services/service-globalization-api.service';
 
+const STATUS_POLL_INTERVAL_MS = 15_000;
+
 @Component({
   selector: 'app-branch-globalization-requests',
   standalone: true,
   templateUrl: './branch-globalization-requests.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class BranchGlobalizationRequestsComponent {
+export class BranchGlobalizationRequestsComponent implements OnDestroy {
   private readonly apiService = inject(ServiceGlobalizationApiService);
   private readonly i18nStore = inject(TechnicalAdminI18nStore);
   private readonly invalidationService = inject(ServiceDataInvalidationService);
@@ -56,6 +59,7 @@ export class BranchGlobalizationRequestsComponent {
   private activeBranchId: number | null = null;
   private wasOpen = false;
   private lastRefreshKey = 0;
+  private pollingIntervalId: ReturnType<typeof setInterval> | null = null;
 
   constructor() {
     effect(() => {
@@ -83,6 +87,21 @@ export class BranchGlobalizationRequestsComponent {
         untracked(() => this.load(pageNumber, branchId, true));
       }
     });
+
+    this.pollingIntervalId = setInterval(() => {
+      if (this.open() && !this.loading()) {
+        this.load(this.page().currentPage, this.branchId());
+      }
+    }, STATUS_POLL_INTERVAL_MS);
+  }
+
+  ngOnDestroy(): void {
+    this.requestId += 1;
+
+    if (this.pollingIntervalId !== null) {
+      clearInterval(this.pollingIntervalId);
+      this.pollingIntervalId = null;
+    }
   }
 
   @HostListener('document:keydown.escape')

@@ -67,27 +67,40 @@
 .branch-services-secondary-btn {
   align-items: center;
   border: 1px solid transparent;
-  border-radius: 7px;
+  border-radius: 10px;
   display: inline-flex;
   font-size: 11px;
   font-weight: 850;
   gap: 5px;
   justify-content: center;
-  min-height: 30px;
-  padding: 0 10px;
+  min-height: 38px;
+  padding: 0 14px;
   white-space: nowrap;
+  transition: all 0.18s ease;
 }
 
 .branch-services-primary-btn {
-  background: #0284c7;
-  border-color: #0284c7;
-  color: #fff;
+  background: var(--q-button-bg, linear-gradient(135deg, #0b7fa3, #086b8d));
+  border-color: var(--q-button-border, rgba(8, 107, 141, 0.72));
+  color: var(--q-button-text, #fff);
+  box-shadow: var(--q-button-shadow, 0 8px 18px rgba(8, 107, 141, 0.14));
+}
+.branch-services-primary-btn:hover:not(:disabled) {
+  background: var(--q-button-hover-bg, linear-gradient(135deg, #086f92, #075d7b));
+  box-shadow: var(--q-button-hover-shadow, 0 10px 22px rgba(8, 107, 141, 0.18));
+  transform: translateY(-1px);
 }
 
 .branch-services-secondary-btn {
-  background: #fff;
-  border-color: #bae6fd;
-  color: #0369a1;
+  background: var(--q-secondary-button-bg, #fff);
+  border-color: var(--q-secondary-button-border, rgba(8, 107, 141, 0.22));
+  color: var(--q-secondary-button-text, #075d7b);
+  box-shadow: 0 4px 10px rgba(8, 107, 141, 0.06);
+}
+.branch-services-secondary-btn:hover:not(:disabled) {
+  background: var(--q-secondary-button-hover-bg, rgba(8, 107, 141, 0.06));
+  border-color: var(--q-secondary-button-border, rgba(8, 107, 141, 0.3));
+  transform: translateY(-1px);
 }
 
 .branch-services-field {
@@ -97,13 +110,19 @@
 }
 
 .branch-services-field select {
-  background: #fff;
-  border: 1px solid #cbd5e1;
-  border-radius: 7px;
-  color: #0f172a;
+  background: var(--q-surface-card, #fff);
+  border: 1px solid var(--q-border-strong, #cbd5e1);
+  border-radius: 8px;
+  color: var(--q-text-primary, #0f172a);
   font-size: 11px;
-  min-height: 32px;
+  min-height: 38px;
   padding: 0 8px;
+  outline: 0;
+  transition: all 0.2s;
+}
+.branch-services-field select:focus {
+  border-color: var(--q-primary, #0284c7);
+  box-shadow: 0 0 0 2px var(--q-primary-soft, #bae6fd);
 }
 
 .branch-services-active-branch {

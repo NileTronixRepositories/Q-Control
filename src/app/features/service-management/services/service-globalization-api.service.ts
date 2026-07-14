@@ -28,7 +28,7 @@ export class ServiceGlobalizationApiService {
 
   getRequests(query: TechnicalServiceGlobalizationRequestQuery): Observable<PagedServiceGlobalizationRequestsResponse> {
     return this.httpClient.get<PagedServiceGlobalizationRequestsResponse>(this.requestsEndpoint, {
-      headers: this.createHeaders(),
+      headers: this.createReadHeaders(),
       params: this.createParams(query, true),
     });
   }
@@ -37,13 +37,13 @@ export class ServiceGlobalizationApiService {
     const branchUrl = new URL(String(branchId), `${this.branchesEndpoint}/`).toString();
     return this.httpClient.get<PagedServiceGlobalizationRequestsResponse>(
       `${branchUrl}/service-globalization-requests`,
-      { headers: this.createHeaders(), params: this.createParams(query, false) },
+      { headers: this.createReadHeaders(), params: this.createParams(query, false) },
     );
   }
 
   getRequestDetails(requestId: number): Observable<ServiceGlobalizationRequestDetails> {
     return this.httpClient.get<ServiceGlobalizationRequestDetails>(this.createRequestUrl(requestId), {
-      headers: this.createHeaders(),
+      headers: this.createReadHeaders(),
     });
   }
 
@@ -98,5 +98,11 @@ export class ServiceGlobalizationApiService {
     if (token) headers = headers.set('Authorization', `Bearer ${token}`);
     if (rowVersion) headers = headers.set('If-Match', rowVersion);
     return headers;
+  }
+
+  private createReadHeaders(): HttpHeaders {
+    return this.createHeaders()
+      .set('Cache-Control', 'no-cache')
+      .set('Pragma', 'no-cache');
   }
 }

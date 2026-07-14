@@ -77,83 +77,97 @@
 .workflow-icon-btn {
   align-items: center;
   border: 1px solid transparent;
-  border-radius: 6px;
+  border-radius: 10px;
   display: inline-flex;
   font-size: 12px;
   font-weight: 700;
-  gap: 4px;
+  gap: 6px;
   justify-content: center;
-  min-height: 32px;
+  min-height: 38px;
   white-space: nowrap;
-  transition: all 0.2s;
+  transition: background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, transform 0.12s ease;
   cursor: pointer;
 }
 .workflow-primary-btn {
-  background: var(--q-primary, #0284c7);
-  border-color: var(--q-primary, #0284c7);
-  color: #fff;
-  padding: 0 12px;
+  background: var(--q-button-bg, linear-gradient(135deg, #0b7fa3, #086b8d));
+  border-color: var(--q-button-border, rgba(8, 107, 141, 0.72));
+  color: var(--q-button-text, #fff);
+  box-shadow: var(--q-button-shadow, 0 8px 18px rgba(8, 107, 141, 0.14));
+  padding: 0 14px;
 }
 .workflow-primary-btn:hover:not(:disabled) {
-  background: var(--q-primary-hover, #0369a1);
-  border-color: var(--q-primary-hover, #0369a1);
-  box-shadow: var(--q-shadow-button-hover, 0 4px 8px rgba(0, 0, 0, 0.1));
+  background: var(--q-button-hover-bg, linear-gradient(135deg, #086f92, #075d7b));
+  box-shadow: var(--q-button-hover-shadow, 0 10px 22px rgba(8, 107, 141, 0.18));
+  transform: translateY(-1px);
 }
 .workflow-secondary-btn {
-  background: var(--q-surface-card, #fff);
-  border-color: var(--q-border-strong, #bae6fd);
-  color: var(--q-primary, #0369a1);
-  padding: 0 12px;
+  background: var(--q-secondary-button-bg, #fff);
+  border-color: var(--q-secondary-button-border, rgba(8, 107, 141, 0.22));
+  color: var(--q-secondary-button-text, #075d7b);
+  box-shadow: 0 4px 10px rgba(8, 107, 141, 0.06);
+  padding: 0 14px;
 }
 .workflow-secondary-btn:hover:not(:disabled) {
-  background: var(--q-primary-soft, #f0f9ff);
-  border-color: var(--q-primary, #0369a1);
+  background: var(--q-secondary-button-hover-bg, rgba(8, 107, 141, 0.06));
+  border-color: var(--q-secondary-button-border, rgba(8, 107, 141, 0.3));
+  transform: translateY(-1px);
 }
+/* Filled danger button (reject / deactivate) */
 .workflow-danger-btn,
 .workflow-icon-btn.danger {
-  background: var(--q-surface-card, #fff);
-  border-color: var(--q-accent-soft, #fecdd3);
-  color: var(--q-accent, #e11d48);
-  padding: 0 12px;
+  background: var(--q-danger, #d21f35);
+  border-color: var(--q-danger, #d21f35);
+  color: #fff;
+  box-shadow: 0 8px 18px rgba(210, 31, 53, 0.16);
+  padding: 0 14px;
 }
 .workflow-danger-btn:hover:not(:disabled),
 .workflow-icon-btn.danger:hover:not(:disabled) {
-  background: var(--q-accent-soft, #ffe4e6);
-  border-color: var(--q-accent, #e11d48);
+  background: #b81b2e;
+  border-color: #b81b2e;
+  box-shadow: 0 10px 22px rgba(210, 31, 53, 0.22);
+  transform: translateY(-1px);
 }
+/* Filled success button (reactivate / approve) */
 .workflow-success-btn,
 .workflow-icon-btn.success {
-  background: var(--q-surface-card, #fff);
-  border-color: #bbf7d0;
-  color: #047857;
-  padding: 0 12px;
+  background: var(--q-success, #138a5b);
+  border-color: var(--q-success, #138a5b);
+  color: #fff;
+  box-shadow: 0 8px 18px rgba(19, 138, 91, 0.16);
+  padding: 0 14px;
 }
 .workflow-success-btn:hover:not(:disabled),
 .workflow-icon-btn.success:hover:not(:disabled) {
-  background: #dcfce7;
-  border-color: #059669;
+  background: #0f7a4f;
+  border-color: #0f7a4f;
+  box-shadow: 0 10px 22px rgba(19, 138, 91, 0.22);
+  transform: translateY(-1px);
 }
 .workflow-icon-btn {
-  background: var(--q-surface-card, #fff);
-  border-color: var(--q-border-subtle, #dbeafe);
-  color: var(--q-primary, #0369a1);
-  height: 32px;
-  min-height: 32px;
+  background: var(--q-icon-button-bg, #fff);
+  border: 1px solid var(--q-icon-button-border, rgba(8, 107, 141, 0.2));
+  border-radius: 9px;
+  color: var(--q-icon-button-text, #075d7b);
+  box-shadow: 0 4px 10px rgba(8, 107, 141, 0.06);
+  height: 36px;
+  min-height: 36px;
   padding: 0;
-  width: 32px;
+  width: 36px;
 }
 .workflow-icon-btn:hover:not(:disabled) {
-  background: var(--q-primary-soft, #f0f9ff);
-  border-color: var(--q-primary, #0369a1);
+  background: var(--q-icon-button-hover-bg, rgba(8, 107, 141, 0.075));
+  border-color: var(--q-icon-button-border, rgba(8, 107, 141, 0.28));
+  box-shadow: 0 6px 14px rgba(8, 107, 141, 0.1);
 }
 :where(button):disabled {
   opacity: 0.55;
   cursor: not-allowed;
+  transform: none;
 }
 .workflow-filters[hidden] {
   display: none !important;
 }
-
 .workflow-filters {
   background: var(--q-surface-muted, #f8fafc);
   border: 1px solid var(--q-border-subtle, #e2e8f0);

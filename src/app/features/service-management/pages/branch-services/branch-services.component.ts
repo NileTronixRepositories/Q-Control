@@ -49,6 +49,8 @@ import { ServiceGlobalizationApiService } from '../../services/service-globaliza
 import { BranchServicesStore } from '../../store/branch-services.store';
 import { ServiceDataInvalidationService } from '../../services/service-data-invalidation.service';
 
+const STATUS_POLL_INTERVAL_MS = 15_000;
+
 @Component({
   selector: 'app-branch-services-page',
   standalone: true,
@@ -102,6 +104,10 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
   protected readonly createTreeResetKey = signal(0);
   protected readonly creationRequestSummary = signal<ServiceGlobalizationRequestSummary | null>(null);
   protected readonly pendingRequestsBadge = computed(() => {
+    if (!this.store.hasUnreadPendingGlobalizationRequests()) {
+      return null;
+    }
+
     const count = this.store.pendingGlobalizationRequestsCount();
     return count > 99 ? '99+' : count > 0 ? String(count) : null;
   });
@@ -129,6 +135,9 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
   private toastTimeoutId: ReturnType<typeof setTimeout> | null = null;
   private pendingCountRequestId = 0;
   private pendingCountBranchId: number | null = null;
+  private lastPendingRequestsCount: number | null = null;
+  private statusPollingIntervalId: ReturnType<typeof setInterval> | null = null;
+  private branchTreeInitialized = false;
 
   constructor() {
     effect(() => {
@@ -138,10 +147,15 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
       const branchChanged = branchId !== this.pendingCountBranchId;
       this.pendingCountBranchId = branchId;
 
+      if (branchChanged) {
+        this.lastPendingRequestsCount = null;
+      }
+
       if (!branchId || !canViewRequests) {
         untracked(() => {
           this.pendingCountRequestId += 1;
           this.store.pendingGlobalizationRequestsCount.set(0);
+          this.store.pendingGlobalizationRequestsNewestId.set(null);
           this.store.pendingGlobalizationRequestsLoading.set(false);
           this.store.closeGlobalizationRequestsDialog();
         });
@@ -152,9 +166,32 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
         untracked(() => this.loadPendingRequestsCount(branchId, true));
       }
     });
+
+    effect(() => {
+      const invalidation = this.invalidationService.branchTreeInvalidation();
+      const branchId = this.store.selectedBranchId();
+
+      if (
+        !this.branchTreeInitialized ||
+        !invalidation ||
+        !branchId ||
+        invalidation.branchId !== branchId
+      ) {
+        return;
+      }
+
+      untracked(() => {
+        this.loadBranchTree();
+
+        if (this.canAssignBranchServices()) {
+          this.loadServiceCentralTree();
+        }
+      });
+    });
   }
 
   ngOnInit(): void {
+    this.startStatusPolling();
     const session = this.authSessionService.currentSession();
 
     if (session?.userType === 'BranchAdmin') {
@@ -166,14 +203,22 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
         branch ? this.branchSessionName(branch) : this.translations().activeBranch,
       );
       this.loadBranchTree();
+      this.branchTreeInitialized = true;
       return;
     }
 
     this.loadBranches();
+    this.branchTreeInitialized = true;
   }
 
   ngOnDestroy(): void {
     this.pendingCountRequestId += 1;
+
+    if (this.statusPollingIntervalId !== null) {
+      clearInterval(this.statusPollingIntervalId);
+      this.statusPollingIntervalId = null;
+    }
+
     if (this.toastTimeoutId) {
       clearTimeout(this.toastTimeoutId);
     }
@@ -213,6 +258,7 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
       return;
     }
 
+    this.store.markPendingGlobalizationRequestsAsSeen();
     this.store.openGlobalizationRequestsDialog();
   }
 
@@ -631,16 +677,50 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (response) => {
           if (requestId === this.pendingCountRequestId && this.store.selectedBranchId() === branchId) {
+            const previousCount = this.lastPendingRequestsCount;
+            this.lastPendingRequestsCount = response.totalItems;
             this.store.pendingGlobalizationRequestsCount.set(response.totalItems);
+            this.store.pendingGlobalizationRequestsNewestId.set(
+              response.data[0]?.requestId ?? null,
+            );
+
+            if (previousCount !== null && response.totalItems < previousCount) {
+              this.loadBranchTree();
+
+              if (this.canAssignBranchServices()) {
+                this.loadServiceCentralTree();
+              }
+            }
           }
         },
         error: (error: HttpErrorResponse) => {
           if (requestId === this.pendingCountRequestId && this.store.selectedBranchId() === branchId) {
             this.store.pendingGlobalizationRequestsCount.set(0);
+            this.store.pendingGlobalizationRequestsNewestId.set(null);
             this.handleApiError(error);
           }
         },
       });
+  }
+
+  private startStatusPolling(): void {
+    if (this.statusPollingIntervalId !== null) {
+      return;
+    }
+
+    this.statusPollingIntervalId = setInterval(() => {
+      const branchId = this.store.selectedBranchId();
+
+      if (
+        !branchId ||
+        !this.canViewOwnGlobalizationRequests() ||
+        this.store.pendingGlobalizationRequestsLoading()
+      ) {
+        return;
+      }
+
+      this.loadPendingRequestsCount(branchId);
+    }, STATUS_POLL_INTERVAL_MS);
   }
 
   protected loadServiceCentralTree(): void {

@@ -56,3 +56,60 @@ body .status-pill.status-offline {
   background: var(--nt-accent-soft) !important;
   border: 1px solid rgba(243, 24, 45, 0.16) !important;
 }
+
+/* Merged from tables-responsive.css */
+/* Bootstrap responsive table sizing. */
+body[data-admin-theme] :where(.list-panel, .content-panel, .settings-panel) {
+  min-width: 0 !important;
+}
+
+body[data-admin-theme] :where(.table-wrap, .table-responsive) {
+  max-width: 100% !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  -webkit-overflow-scrolling: touch !important;
+  scrollbar-gutter: stable both-edges;
+}
+
+body[data-admin-theme] :where(.table-wrap table, .table-responsive table, .custom-table) {
+  width: 100% !important;
+  min-width: var(--q-admin-table-min-width, 760px) !important;
+  table-layout: auto !important;
+}
+
+body[data-admin-theme] :where(.table-wrap th, .table-responsive th, .custom-table th),
+body[data-admin-theme] :where(.table-wrap td, .table-responsive td, .custom-table td) {
+  white-space: nowrap !important;
+}
+
+body[data-admin-theme] :where(.display-management-page) {
+  --q-admin-table-min-width: 760px;
+}
+
+body[data-admin-theme] :where(.terminal-management-page) {
+  --q-admin-table-min-width: 1040px;
+}
+
+body[data-admin-theme] :where(.waiting-areas-page) {
+  --q-admin-table-min-width: 1080px;
+}
+
+body[data-admin-theme] :where(.window-management-page) {
+  --q-admin-table-min-width: 980px;
+}
+
+body[data-admin-theme] :where(.branch-page) {
+  --q-admin-table-min-width: 1180px;
+}
+
+@media (max-width: 575.98px) {
+  body[data-admin-theme] :where(.table-wrap, .table-responsive) {
+    margin-inline: -2px !important;
+    border-radius: var(--q-radius-md) !important;
+  }
+
+  body[data-admin-theme] :where(.table-wrap th, .table-responsive th, .custom-table th),
+  body[data-admin-theme] :where(.table-wrap td, .table-responsive td, .custom-table td) {
+    padding-inline: 10px !important;
+  }
+}

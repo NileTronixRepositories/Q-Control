@@ -1,4 +1,25 @@
-/* Theme-aware component harmonization for admin pages. */
+/*
+ * theme-harmonization.css
+ * ========================
+ * Merged from: theme-harmonization.css + final-separation.css + readability-pass.css + theme-state-colors.css
+ *
+ * Sections:
+ *  1. Theme Tokens         — per-theme CSS custom properties
+ *  2. Readability Tokens   — text/hover color tokens per theme
+ *  3. Page Backgrounds     — per-theme workspace backgrounds
+ *  4. Page Hero & Panels   — per-theme panel/hero tokens
+ *  5. Per-Theme Overrides  — tabs, tables, uploads per theme
+ *  6. Global Component     — shared harmonization rules (Bootstrap overrides)
+ *  7. State Colors         — success/danger/info toast & status
+ *  8. Readability Rules    — concrete text color rules using readability tokens
+ *  9. Loading Spinner      — animated state-note / api-note.loading-note
+ * 10. Responsive           — mobile tab adjustments
+ */
+
+/* ============================================================
+   1. THEME TOKENS
+   ============================================================ */
+
 body[data-admin-theme='beach-sunset'] {
   --q-primary-rgb: 27 73 101;
   --q-primary-hover-rgb: 18 54 77;
@@ -66,12 +87,196 @@ body[data-admin-theme='niletronix-brand'] {
   --q-component-soft-shadow: 0 10px 26px rgba(26, 29, 33, 0.07);
 }
 
-:where(body[data-admin-theme]) :where(.workspace, .workspace-content, .main-content, .main-contact) {
-  color: var(--q-text-primary) !important;
+/* ============================================================
+   2. READABILITY TOKENS (from readability-pass.css)
+   ============================================================ */
+
+body[data-admin-theme='niletronix-admin'] {
+  --q-readable-heading: #101828;
+  --q-readable-body: #1f2a37;
+  --q-readable-label: #123f4f;
+  --q-readable-muted: #475467;
+  --q-readable-placeholder: #667085;
+  --q-hover-soft-bg: rgba(11, 138, 168, 0.075);
+  --q-hover-soft-border: rgba(11, 138, 168, 0.24);
 }
 
-:where(body[data-admin-theme])
-  :where(
+body[data-admin-theme='beach-sunset'] {
+  --q-readable-heading: #102f43;
+  --q-readable-body: #183f52;
+  --q-readable-label: #1b4965;
+  --q-readable-muted: #446a7d;
+  --q-readable-placeholder: #607f90;
+  --q-hover-soft-bg: rgba(95, 168, 211, 0.14);
+  --q-hover-soft-border: rgba(27, 73, 101, 0.26);
+}
+
+body[data-admin-theme='niletronix-brand'] {
+  --q-readable-heading: #101418;
+  --q-readable-body: #202a33;
+  --q-readable-label: #0a526f;
+  --q-readable-muted: #4b5865;
+  --q-readable-placeholder: #66727e;
+  --q-hover-soft-bg: rgba(13, 120, 166, 0.09);
+  --q-hover-soft-border: rgba(13, 120, 166, 0.28);
+}
+
+/* ============================================================
+   3. PAGE BACKGROUNDS (from final-separation.css)
+   ============================================================ */
+
+body[data-admin-theme='niletronix-admin']
+  .workspace, body[data-admin-theme='niletronix-admin'] .workspace-content, body[data-admin-theme='niletronix-admin'] .main-content, body[data-admin-theme='niletronix-admin'] .main-contact {
+  background:
+    radial-gradient(circle at 12% 8%, rgba(11, 138, 168, 0.08), transparent 24rem),
+    radial-gradient(circle at 92% 0%, rgba(242, 39, 69, 0.06), transparent 22rem),
+    linear-gradient(135deg, #f6fafc 0%, #ffffff 54%, #f7fbfc 100%);
+}
+
+body[data-admin-theme='beach-sunset']
+  .workspace, body[data-admin-theme='beach-sunset'] .workspace-content, body[data-admin-theme='beach-sunset'] .main-content, body[data-admin-theme='beach-sunset'] .main-contact {
+  background:
+    radial-gradient(circle at 14% 8%, rgba(190, 233, 232, 0.82), transparent 27rem),
+    radial-gradient(circle at 86% 0%, rgba(202, 233, 255, 0.86), transparent 26rem),
+    linear-gradient(135deg, #f8fdff 0%, #e7f9fb 44%, #d9effb 100%);
+}
+
+body[data-admin-theme='niletronix-brand']
+  .workspace, body[data-admin-theme='niletronix-brand'] .workspace-content, body[data-admin-theme='niletronix-brand'] .main-content, body[data-admin-theme='niletronix-brand'] .main-contact {
+  background:
+    radial-gradient(circle at 12% 8%, rgba(13, 120, 166, 0.11), transparent 25rem),
+    radial-gradient(circle at 92% 4%, rgba(227, 30, 36, 0.08), transparent 23rem),
+    linear-gradient(135deg, #eef2f4 0%, #ffffff 48%, #f4f6f8 76%, #eef5f8 100%);
+}
+
+/* ============================================================
+   4. PAGE HERO & PANEL TOKENS (from final-separation.css)
+   ============================================================ */
+
+body[data-admin-theme='niletronix-admin'] {
+  --q-page-hero-bg:
+    linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.98) 0%,
+      rgba(239, 248, 250, 0.94) 64%,
+      rgba(255, 240, 243, 0.68) 100%
+    ),
+    #ffffff;
+  --q-page-hero-border: rgba(11, 138, 168, 0.18);
+  --q-panel-bg: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
+  --q-panel-border: rgba(11, 138, 168, 0.16);
+  --q-panel-shadow: 0 14px 34px rgba(20, 42, 58, 0.065);
+}
+
+body[data-admin-theme='beach-sunset'] {
+  --q-page-hero-bg:
+    linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.94) 0%,
+      rgba(202, 233, 255, 0.82) 58%,
+      rgba(190, 233, 232, 0.86) 100%
+    ),
+    #f8fdff;
+  --q-page-hero-border: rgba(95, 168, 211, 0.28);
+  --q-page-hero-accent-bg: linear-gradient(
+    135deg,
+    transparent 0 18%,
+    rgba(95, 168, 211, 0.16) 18% 34%,
+    transparent 34% 50%,
+    rgba(190, 233, 232, 0.24) 50% 68%,
+    transparent 68% 100%
+  );
+  --q-page-hero-dot-color: rgba(95, 168, 211, 0.2);
+  --q-panel-bg: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.96) 0%,
+    rgba(248, 253, 255, 0.9) 100%
+  );
+  --q-panel-border: rgba(95, 168, 211, 0.24);
+  --q-panel-shadow: 0 16px 36px rgba(27, 73, 101, 0.085);
+  --q-summary-accent-bg: linear-gradient(180deg, var(--q-beach-navy), rgba(95, 168, 211, 0.34));
+}
+
+body[data-admin-theme='niletronix-brand'] {
+  --q-page-hero-bg:
+    linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.98) 0%,
+      rgba(244, 246, 248, 0.92) 56%,
+      rgba(227, 30, 36, 0.11) 100%
+    ),
+    #ffffff;
+  --q-page-hero-border: rgba(13, 120, 166, 0.22);
+  --q-panel-bg: linear-gradient(180deg, #ffffff 0%, #f8fafb 100%);
+  --q-panel-border: rgba(13, 120, 166, 0.2);
+  --q-panel-shadow: 0 16px 38px rgba(26, 29, 33, 0.08);
+}
+
+/* ============================================================
+   5. PER-THEME OVERRIDES (from final-separation.css)
+   ============================================================ */
+
+/* Tabs */
+body[data-admin-theme='niletronix-admin'] .tabs {
+  background: rgba(11, 138, 168, 0.08);
+  border-color: rgba(11, 138, 168, 0.18);
+}
+
+body[data-admin-theme='beach-sunset'] .tabs {
+  background: rgba(202, 233, 255, 0.68);
+  border-color: rgba(95, 168, 211, 0.28);
+}
+
+body[data-admin-theme='niletronix-brand'] .tabs {
+  background: rgba(26, 29, 33, 0.07);
+  border-color: rgba(13, 120, 166, 0.24);
+}
+
+/* Table headers */
+body[data-admin-theme='niletronix-admin'] th, body[data-admin-theme='niletronix-admin'] .custom-table thead th, body[data-admin-theme='niletronix-admin'] .table thead th {
+  color: #22314a;
+  background: #eaf4f7;
+}
+
+body[data-admin-theme='beach-sunset'] th, body[data-admin-theme='beach-sunset'] .custom-table thead th, body[data-admin-theme='beach-sunset'] .table thead th {
+  color: #1b4965;
+  background: #cae9ff;
+}
+
+body[data-admin-theme='niletronix-brand'] th, body[data-admin-theme='niletronix-brand'] .custom-table thead th, body[data-admin-theme='niletronix-brand'] .table thead th {
+  color: #f4f6f8;
+  background: linear-gradient(135deg, #1a1d21, #0d78a6);
+}
+
+/* Table alternating rows */
+body[data-admin-theme='niletronix-admin'] tbody tr:nth-child(even) td,
+body[data-admin-theme='niletronix-admin'] .custom-table tbody tr:nth-child(even) td,
+body[data-admin-theme='niletronix-admin'] .table tbody tr:nth-child(even) td {
+  background: rgba(224, 246, 248, 0.32);
+}
+
+body[data-admin-theme='beach-sunset'] tbody tr:nth-child(even) td,
+body[data-admin-theme='beach-sunset'] .custom-table tbody tr:nth-child(even) td,
+body[data-admin-theme='beach-sunset'] .table tbody tr:nth-child(even) td {
+  background: rgba(190, 233, 232, 0.24);
+}
+
+body[data-admin-theme='niletronix-brand'] tbody tr:nth-child(even) td,
+body[data-admin-theme='niletronix-brand'] .custom-table tbody tr:nth-child(even) td,
+body[data-admin-theme='niletronix-brand'] .table tbody tr:nth-child(even) td {
+  background: rgba(79, 165, 201, 0.09);
+}
+
+/* ============================================================
+   6. GLOBAL COMPONENT HARMONIZATION (Bootstrap overrides)
+   ============================================================ */
+
+:is(body[data-admin-theme]) :is(.workspace, .workspace-content, .main-content, .main-contact) {
+  color: var(--q-text-primary);
+}
+
+:is(body[data-admin-theme])
+  :is(
     .organization-page,
     .technical-page,
     .branch-page,
@@ -80,16 +285,16 @@ body[data-admin-theme='niletronix-brand'] {
     .terminal-management-page,
     .display-management-page
   ) {
-  color: var(--q-text-primary) !important;
+  color: var(--q-text-primary);
 }
 
-:where(body[data-admin-theme])
-  :where(.eyebrow, .panel-header i, .filter-icon, .form-field-icon, .window-filter-icon) {
-  color: var(--q-primary) !important;
+:is(body[data-admin-theme])
+  :is(.eyebrow, .panel-header i, .filter-icon, .form-field-icon, .window-filter-icon) {
+  color: var(--q-primary);
 }
 
-:where(body[data-admin-theme])
-  :where(
+:is(body[data-admin-theme])
+  :is(
     .header-description,
     .page-header span,
     .page-hero span,
@@ -100,37 +305,37 @@ body[data-admin-theme='niletronix-brand'] {
     .detail-label,
     dt
   ) {
-  color: var(--q-text-secondary) !important;
+  color: var(--q-text-secondary);
 }
 
-:where(body[data-admin-theme]) :where(.tabs) {
-  display: inline-flex !important;
-  width: fit-content !important;
-  max-width: 100% !important;
-  flex-wrap: wrap !important;
-  align-items: center !important;
-  gap: 4px !important;
-  padding: 4px !important;
-  background: var(--q-component-strip-bg) !important;
-  border: 1px solid var(--q-border-subtle) !important;
-  border-radius: var(--q-radius-md) !important;
-  box-shadow: 0 8px 18px rgb(var(--q-primary-rgb) / 0.06) !important;
+:is(body[data-admin-theme]) :is(.tabs) {
+  display: inline-flex;
+  width: fit-content;
+  max-width: 100%;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  background: var(--q-component-strip-bg);
+  border: 1px solid var(--q-border-subtle);
+  border-radius: var(--q-radius-md);
+  box-shadow: 0 8px 18px rgb(var(--q-primary-rgb) / 0.06);
 }
 
-:where(body[data-admin-theme]) :where(.logo-tabs) {
-  background: var(--q-component-strip-bg) !important;
-  border: 1px solid var(--q-border-subtle) !important;
+:is(body[data-admin-theme]) :is(.logo-tabs) {
+  background: var(--q-component-strip-bg);
+  border: 1px solid var(--q-border-subtle);
 }
 
-:where(body[data-admin-theme])
-  :where(.tabs .btn, .tabs .primary-action, .tabs .secondary-action, .logo-tab) {
-  min-height: 38px !important;
-  border-radius: var(--q-radius-sm) !important;
-  box-shadow: none !important;
+:is(body[data-admin-theme])
+  :is(.tabs .btn, .tabs .primary-action, .tabs .secondary-action, .logo-tab) {
+  min-height: 38px;
+  border-radius: var(--q-radius-sm);
+  box-shadow: none;
 }
 
-:where(body[data-admin-theme])
-  :where(
+:is(body[data-admin-theme])
+  :is(
     input:not([type='checkbox']):not([type='radio']):not([type='color']),
     select,
     textarea,
@@ -138,14 +343,14 @@ body[data-admin-theme='niletronix-brand'] {
     .form-select,
     .color-control
   ) {
-  color: var(--q-text-primary) !important;
-  background: rgb(var(--q-surface-card-rgb) / 0.92) !important;
-  border-color: var(--q-border-strong) !important;
-  box-shadow: none !important;
+  color: var(--q-text-primary);
+  background: rgb(var(--q-surface-card-rgb) / 0.92);
+  border-color: var(--q-border-strong);
+  box-shadow: none;
 }
 
-:where(body[data-admin-theme])
-  :where(
+:is(body[data-admin-theme])
+  :is(
     input:not([type='checkbox']):not([type='radio']):not([type='color']):hover,
     select:hover,
     textarea:hover,
@@ -153,89 +358,366 @@ body[data-admin-theme='niletronix-brand'] {
     .form-select:hover,
     .color-control:hover
   ) {
-  border-color: rgb(var(--q-primary-rgb) / 0.36) !important;
+  border-color: rgb(var(--q-primary-rgb) / 0.36);
 }
 
-:where(body[data-admin-theme])
-  :where(
+:is(body[data-admin-theme])
+  :is(
     input:not([type='checkbox']):not([type='radio']):not([type='color']):focus,
     select:focus,
     textarea:focus,
     .form-control:focus,
     .form-select:focus
   ) {
-  background: #ffffff !important;
-  border-color: var(--q-primary) !important;
-  box-shadow: var(--nt-focus) !important;
+  background: #ffffff;
+  border-color: var(--q-primary);
+  box-shadow: var(--nt-focus);
 }
 
-:where(body[data-admin-theme]) :where(.input-wrapper i) {
-  color: var(--q-primary) !important;
+:is(body[data-admin-theme]) :is(.input-wrapper i) {
+  color: var(--q-primary);
 }
 
-:where(body[data-admin-theme]) :where(.table-wrap, .table-responsive) {
-  background: var(--q-component-panel-bg) !important;
-  border-color: var(--q-border-subtle) !important;
+:is(body[data-admin-theme]) :is(.table-wrap, .table-responsive) {
+  background: var(--q-component-panel-bg);
+  border-color: var(--q-border-subtle);
 }
 
-:where(body[data-admin-theme]) :where(table, .table, .custom-table) {
-  color: var(--q-text-primary) !important;
-  border-color: var(--q-border-subtle) !important;
+:is(body[data-admin-theme]) :is(table, .table, .custom-table) {
+  color: var(--q-text-primary);
+  border-color: var(--q-border-subtle);
 }
 
-:where(body[data-admin-theme])
-  :where(.table > :not(caption) > * > *, .custom-table > :not(caption) > * > *) {
-  color: var(--q-text-primary) !important;
-  background-color: transparent !important;
-  border-color: var(--q-border-subtle) !important;
-  box-shadow: none !important;
+:is(body[data-admin-theme])
+  :is(.table > :not(caption) > * > *, .custom-table > :not(caption) > * > *) {
+  color: var(--q-text-primary);
+  background-color: transparent;
+  border-color: var(--q-border-subtle);
+  box-shadow: none;
 }
 
-:where(body[data-admin-theme]) :where(th, .custom-table thead th, .table thead th) {
-  color: var(--q-text-secondary) !important;
-  background: var(--q-component-table-head-bg) !important;
-  border-bottom-color: var(--q-border-subtle) !important;
+:is(body[data-admin-theme]) :is(th, .custom-table thead th, .table thead th) {
+  color: var(--q-text-secondary);
+  background: var(--q-component-table-head-bg);
+  border-bottom-color: var(--q-border-subtle);
 }
 
-:where(body[data-admin-theme]) :where(td, .custom-table tbody td, .table tbody td) {
-  color: var(--q-text-primary) !important;
-  border-bottom-color: rgb(var(--q-primary-rgb) / 0.08) !important;
+:is(body[data-admin-theme]) :is(td, .custom-table tbody td, .table tbody td) {
+  color: var(--q-text-primary);
+  border-bottom-color: rgb(var(--q-primary-rgb) / 0.08);
 }
 
-:where(body[data-admin-theme])
-  :where(
+:is(body[data-admin-theme])
+  :is(
     tbody tr:nth-child(even) td,
     .custom-table tbody tr:nth-child(even) td,
     .table tbody tr:nth-child(even) td
   ) {
-  background: var(--q-component-table-row-alt-bg) !important;
+  background: var(--q-component-table-row-alt-bg);
 }
 
-:where(body[data-admin-theme])
-  :where(tbody tr:hover td, .custom-table tbody tr:hover td, .table tbody tr:hover td) {
-  background: var(--q-component-table-row-hover-bg) !important;
+:is(body[data-admin-theme])
+  :is(tbody tr:hover td, .custom-table tbody tr:hover td, .table tbody tr:hover td) {
+  background: var(--q-component-table-row-hover-bg);
 }
 
-:where(body[data-admin-theme]) :where(.api-note:not(.loading-note)) {
-  color: var(--q-primary-hover) !important;
-  background: var(--q-primary-soft) !important;
-  border: 1px solid var(--q-primary-border) !important;
+:is(body[data-admin-theme]) :is(.api-note:not(.loading-note)) {
+  color: var(--q-primary-hover);
+  background: var(--q-primary-soft);
+  border: 1px solid var(--q-primary-border);
 }
 
-:where(body[data-admin-theme]) :where(.state-note, .api-note.loading-note) {
-  position: relative !important;
-  isolation: isolate !important;
-  display: flex !important;
-  width: 96px !important;
-  height: 96px !important;
-  min-width: 96px !important;
-  min-height: 96px !important;
-  align-items: center !important;
-  justify-content: center !important;
-  margin: 0 auto 18px !important;
-  padding: 0 !important;
-  overflow: visible !important;
-  color: transparent !important;
+:is(body[data-admin-theme]) :is(.empty-state) {
+  color: var(--q-text-secondary);
+}
+
+:is(body[data-admin-theme]) :is(.empty-state i) {
+  color: var(--q-primary);
+  background: var(--q-primary-soft);
+}
+
+:is(body[data-admin-theme]) :is(.save-status, .save-chip, .status-pill, .status-badge, .order-badge) {
+  color: var(--q-primary-hover);
+  background: var(--q-primary-soft);
+  border: 1px solid var(--q-primary-border);
+}
+
+:is(body[data-admin-theme]) :is(.status-active, .message-success, .toast-success > .bi) {
+  color: var(--q-success);
+}
+
+:is(body[data-admin-theme]) :is(.status-inactive, .message-error, .toast-error > .bi) {
+  color: var(--q-danger);
+}
+
+:is(body[data-admin-theme]) :is(.message, .toast-item) {
+  color: var(--q-text-primary);
+  background: rgb(var(--q-surface-card-rgb) / 0.98);
+  border-color: var(--q-border-subtle);
+  box-shadow: var(--q-component-soft-shadow);
+}
+
+:is(body[data-admin-theme]) :is(.toast-info::before, .toast-item::before) {
+  background: var(--q-primary);
+}
+
+:is(body[data-admin-theme]) :is(.toast-info > .bi) {
+  color: var(--q-primary);
+  background: var(--q-primary-soft);
+}
+
+:is(body[data-admin-theme]) :is(.editor-backdrop:not(.app-popup-overlay)) {
+  background: rgb(15 23 42 / 0.5);
+}
+
+:is(body[data-admin-theme]) :is(.dialog-content p, .detail-row, .detail-value, dd) {
+  color: var(--q-text-primary);
+}
+
+:is(body[data-admin-theme]) :is(.pagination-bar, .page-indicator) {
+  color: var(--q-text-primary);
+}
+
+:is(body[data-admin-theme]) :is(.upload-control, .upload-dropzone) {
+  color: var(--q-primary-hover);
+  background: var(--q-primary-soft);
+  border-color: var(--q-primary-border);
+  box-shadow: 0 7px 16px rgb(var(--q-primary-rgb) / 0.07);
+}
+
+:is(body[data-admin-theme]) :is(.upload-control:hover, .upload-dropzone:hover) {
+  color: var(--q-accent);
+  background: var(--q-accent-soft);
+  border-color: rgb(var(--q-accent-rgb) / 0.24);
+}
+
+/* ============================================================
+   7. STATE COLORS (from theme-state-colors.css)
+   State colors must win over the generic themed surface.
+   ============================================================ */
+
+body[data-admin-theme] :is(.message-success, .toast-success) {
+  color: var(--q-success);
+  background: var(--q-success-soft);
+  border-color: rgba(19, 138, 91, 0.2);
+}
+
+body[data-admin-theme] :is(.message-error, .toast-error) {
+  color: var(--q-danger);
+  background: var(--q-danger-soft);
+  border-color: rgba(210, 31, 53, 0.2);
+}
+
+body[data-admin-theme] :is(.message-info, .toast-info) {
+  color: var(--q-primary-hover);
+  background: var(--q-primary-soft);
+  border-color: var(--q-primary-border);
+}
+
+body[data-admin-theme] :is(.toast-success::before) {
+  background: var(--q-success);
+}
+
+body[data-admin-theme] :is(.toast-error::before) {
+  background: var(--q-danger);
+}
+
+body[data-admin-theme] :is(.status-pill.status-active, .status-badge.status-active) {
+  color: var(--q-success);
+  background: var(--q-success-soft);
+  border-color: rgba(19, 138, 91, 0.2);
+}
+
+body[data-admin-theme] :is(.status-pill.status-inactive, .status-badge.status-inactive) {
+  color: var(--q-danger);
+  background: var(--q-danger-soft);
+  border-color: rgba(210, 31, 53, 0.2);
+}
+
+/* ============================================================
+   8. READABILITY RULES (from readability-pass.css)
+   ============================================================ */
+
+body[data-admin-theme] :is(.workspace, .workspace-content, .main-content, .main-contact) {
+  color: var(--q-readable-body);
+}
+
+body[data-admin-theme]
+  :is(.workspace, .workspace-content, .main-content, .main-contact)
+  :is(
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    .theme-form-title,
+    .page-title,
+    .panel-title,
+    .section-title,
+    strong
+  ) {
+  color: var(--q-readable-heading);
+}
+
+body[data-admin-theme]
+  :is(.workspace, .workspace-content, .main-content, .main-contact)
+  :is(
+    p,
+    td,
+    dd,
+    .detail-value,
+    .pagination-bar,
+    .page-indicator,
+    .order-input,
+    .color-control input[type='text']
+  ) {
+  color: var(--q-readable-body);
+}
+
+body[data-admin-theme]
+  :is(.workspace, .workspace-content, .main-content, .main-contact)
+  :is(
+    label,
+    .form-label,
+    .filter-field span,
+    .form-field span,
+    .color-field span,
+    .branch-selector label,
+    .order-summary span,
+    .detail-label,
+    dt,
+    th,
+    .eyebrow,
+    .panel-header h2,
+    .panel-header p
+  ) {
+  color: var(--q-readable-label);
+  font-weight: 800;
+}
+
+body[data-admin-theme]
+  :is(.workspace, .workspace-content, .main-content, .main-contact)
+  :is(
+    .header-description,
+    .field-hint,
+    .logo-empty,
+    .api-note,
+    .permission-note,
+    .upload-placeholder span
+  ) {
+  color: var(--q-readable-muted);
+}
+
+body[data-admin-theme]
+  :is(input::placeholder, textarea::placeholder, .form-control::placeholder) {
+  color: var(--q-readable-placeholder);
+  opacity: 1;
+}
+
+body[data-admin-theme]
+  :is(
+    input:not([type='checkbox']):not([type='radio']):not([type='color']),
+    select,
+    textarea,
+    .form-control,
+    .form-select,
+    .color-control,
+    .order-input
+  ) {
+  color: var(--q-readable-body);
+  background: rgba(255, 255, 255, 0.96);
+  border-color: var(--q-border-strong);
+}
+
+body[data-admin-theme]
+  :is(
+    input:not([type='checkbox']):not([type='radio']):not([type='color']):hover,
+    select:hover,
+    textarea:hover,
+    .form-control:hover,
+    .form-select:hover,
+    .color-control:hover,
+    .order-input:hover
+  ) {
+  border-color: var(--q-hover-soft-border);
+  box-shadow: none;
+}
+
+body[data-admin-theme]
+  :is(
+    input:not([type='checkbox']):not([type='radio']):not([type='color']):focus,
+    select:focus,
+    textarea:focus,
+    .form-control:focus,
+    .form-select:focus,
+    .order-input:focus
+  ) {
+  color: var(--q-readable-heading);
+  background: #ffffff;
+  border-color: var(--q-primary);
+  box-shadow: var(--nt-focus);
+}
+
+body[data-admin-theme]
+  :is(
+    .upload-control:hover,
+    .upload-dropzone:hover,
+    .advertisement-upload-card:hover:not(.disabled-upload)
+  ) {
+  color: var(--q-primary-hover);
+  background: var(--q-hover-soft-bg);
+  border-color: var(--q-hover-soft-border);
+  box-shadow: 0 8px 18px rgb(var(--q-primary-rgb) / 0.08);
+  transform: none;
+}
+
+body[data-admin-theme] :is(.advertisement-card:hover) {
+  border-color: var(--q-hover-soft-border);
+  box-shadow: 0 12px 26px rgb(var(--q-primary-rgb) / 0.08);
+  transform: none;
+}
+
+body[data-admin-theme]
+  :is(.drag-handle, .order-badge, .status-badge, .status-pill, .save-status, .save-chip) {
+  font-weight: 800;
+}
+
+body[data-admin-theme] :is(.toast-item p, .message, .state-note) {
+  color: var(--q-readable-body);
+  font-weight: 800;
+}
+
+body[data-admin-theme] :is(.message-success, .toast-success) {
+  color: #0b6f49;
+}
+
+body[data-admin-theme] :is(.message-error, .toast-error) {
+  color: #b42318;
+}
+
+body[data-admin-theme='niletronix-brand'] :is(th, .custom-table thead th, .table thead th) {
+  color: #ffffff;
+}
+
+/* ============================================================
+   9. LOADING SPINNER (state-note / api-note.loading-note)
+   ============================================================ */
+
+:is(body[data-admin-theme]) :is(.state-note, .api-note.loading-note) {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  width: 96px;
+  height: 96px;
+  min-width: 96px;
+  min-height: 96px;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 18px;
+  padding: 0;
+  overflow: visible;
+  color: transparent;
   background: transparent !important;
   border: 0 !important;
   border-radius: 999px !important;
@@ -245,110 +727,105 @@ body[data-admin-theme='niletronix-brand'] {
   text-align: center !important;
 }
 
-:where(body[data-admin-theme]) :where(.state-note, .api-note.loading-note)::before,
-:where(body[data-admin-theme]) :where(.state-note, .api-note.loading-note)::after {
-  content: '' !important;
-  display: block !important;
-  position: absolute !important;
-  inset: 0 !important;
-  border-radius: 999px !important;
-  border: 2px solid transparent !important;
-  border-top-color: var(--q-primary) !important;
+:is(body[data-admin-theme]) :is(.state-note, .api-note.loading-note)::before,
+:is(body[data-admin-theme]) :is(.state-note, .api-note.loading-note)::after {
+  content: '';
+  display: block;
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  border: 2px solid transparent;
+  border-top-color: var(--q-primary);
   opacity: 0.7;
 }
 
-:where(body[data-admin-theme]) :where(.state-note, .api-note.loading-note)::before {
-  inset: 8px !important;
-  border-top-color: var(--q-accent) !important;
+:is(body[data-admin-theme]) :is(.state-note, .api-note.loading-note)::before {
+  inset: 8px;
+  border-top-color: var(--q-accent);
   opacity: 0.5;
 }
 
-:where(body[data-admin-theme]) :where(.state-note, .api-note.loading-note) > :where(i, .bi) {
-  position: absolute !important;
-  inset: 0 !important;
-  display: block !important;
-  width: 100% !important;
-  height: 100% !important;
-  margin: 0 !important;
-  color: transparent !important;
-  background: transparent !important;
-  border: 0 !important;
-  box-shadow: none !important;
-  font-size: 0 !important;
-  line-height: 0 !important;
+:is(body[data-admin-theme]) :is(.state-note, .api-note.loading-note) > :is(i, .bi) {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  color: transparent;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  font-size: 0;
+  line-height: 0;
 }
 
 /* Glowing Core Orb */
-:where(body[data-admin-theme]) :where(.state-note, .api-note.loading-note) > :where(i, .bi)::before {
-  position: absolute !important;
-  content: '' !important;
-  inset: 50% auto auto 50% !important;
-  width: 22px !important;
-  height: 22px !important;
-  border-radius: 999px !important;
-  background: linear-gradient(135deg, var(--q-primary), var(--q-accent)) !important;
+:is(body[data-admin-theme]) :is(.state-note, .api-note.loading-note) > :is(i, .bi)::before {
+  position: absolute;
+  content: '';
+  inset: 50% auto auto 50%;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--q-primary), var(--q-accent));
   box-shadow:
     0 0 18px rgba(6, 182, 212, 0.5),
-    0 0 40px rgba(6, 182, 212, 0.2) !important;
-  transform: translate(-50%, -50%) !important;
-  transform-origin: center !important;
+    0 0 40px rgba(6, 182, 212, 0.2);
+  transform: translate(-50%, -50%);
+  transform-origin: center;
 }
 
 /* Expanding Pulse Ring */
-:where(body[data-admin-theme]) :where(.state-note, .api-note.loading-note) > :where(i, .bi)::after {
-  position: absolute !important;
-  content: '' !important;
-  inset: 50% auto auto 50% !important;
-  width: 22px !important;
-  height: 22px !important;
-  border-radius: 999px !important;
-  border: 2px solid var(--q-primary) !important;
-  background: transparent !important;
-  transform: translate(-50%, -50%) scale(1) !important;
+:is(body[data-admin-theme]) :is(.state-note, .api-note.loading-note) > :is(i, .bi)::after {
+  position: absolute;
+  content: '';
+  inset: 50% auto auto 50%;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  border: 2px solid var(--q-primary);
+  background: transparent;
+  transform: translate(-50%, -50%) scale(1);
   opacity: 1;
 }
 
-:where(body[data-admin-theme]) :where(.list-panel, .content-panel):has(> :where(.state-note, .api-note.loading-note)) {
-  min-height: clamp(360px, calc(100dvh - 300px), 620px) !important;
+:is(body[data-admin-theme]) :is(.list-panel, .content-panel):has(> :is(.state-note, .api-note.loading-note)) {
+  min-height: clamp(360px, calc(100dvh - 300px), 620px);
 }
 
-:where(body[data-admin-theme]) :where(.list-panel, .content-panel) > :where(.state-note, .api-note.loading-note) {
-  margin: clamp(88px, 18vh, 180px) auto !important;
+:is(body[data-admin-theme]) :is(.list-panel, .content-panel) > :is(.state-note, .api-note.loading-note) {
+  margin: clamp(88px, 18vh, 180px) auto;
 }
 
-:where(body[data-admin-theme]) :where(.app-popup-panel, .editor-panel) > :where(.state-note, .api-note.loading-note) {
-  width: 88px !important;
-  height: 88px !important;
-  min-width: 88px !important;
-  min-height: 88px !important;
-  margin: 8px auto 18px !important;
+:is(body[data-admin-theme]) :is(.app-popup-panel, .editor-panel) > :is(.state-note, .api-note.loading-note) {
+  width: 88px;
+  height: 88px;
+  min-width: 88px;
+  min-height: 88px;
+  margin: 8px auto 18px;
 }
 
-
-:where(body[data-admin-theme]) :where(.app-popup-panel, .editor-panel) > :where(.state-note, .api-note.loading-note) > :where(i, .bi)::before {
-  inset-block-start: 15px !important;
-  transform-origin: 50% 30px !important;
+:is(body[data-admin-theme]) :is(.app-popup-panel, .editor-panel) > :is(.state-note, .api-note.loading-note) > :is(i, .bi)::before {
+  inset-block-start: 15px;
+  transform-origin: 50% 30px;
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  /* Outer ring spins clockwise */
-  :where(body[data-admin-theme]) :where(.state-note, .api-note.loading-note)::after {
-    animation: qRingSpin 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite !important;
+  :is(body[data-admin-theme]) :is(.state-note, .api-note.loading-note)::after {
+    animation: qRingSpin 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
   }
 
-  /* Inner ring spins counter-clockwise */
-  :where(body[data-admin-theme]) :where(.state-note, .api-note.loading-note)::before {
-    animation: qRingSpin 1.8s cubic-bezier(0.5, 0, 0.5, 1) infinite reverse !important;
+  :is(body[data-admin-theme]) :is(.state-note, .api-note.loading-note)::before {
+    animation: qRingSpin 1.8s cubic-bezier(0.5, 0, 0.5, 1) infinite reverse;
   }
 
-  /* Core orb breathes */
-  :where(body[data-admin-theme]) :where(.state-note, .api-note.loading-note) > :where(i, .bi)::before {
-    animation: qOrbBreath 2s ease-in-out infinite !important;
+  :is(body[data-admin-theme]) :is(.state-note, .api-note.loading-note) > :is(i, .bi)::before {
+    animation: qOrbBreath 2s ease-in-out infinite;
   }
 
-  /* Pulse ring expands */
-  :where(body[data-admin-theme]) :where(.state-note, .api-note.loading-note) > :where(i, .bi)::after {
-    animation: qPulseExpand 1.6s ease-out infinite !important;
+  :is(body[data-admin-theme]) :is(.state-note, .api-note.loading-note) > :is(i, .bi)::after {
+    animation: qPulseExpand 1.6s ease-out infinite;
   }
 }
 
@@ -384,78 +861,18 @@ body[data-admin-theme='niletronix-brand'] {
   }
 }
 
-:where(body[data-admin-theme]) :where(.empty-state) {
-  color: var(--q-text-secondary) !important;
-}
-
-:where(body[data-admin-theme]) :where(.empty-state i) {
-  color: var(--q-primary) !important;
-  background: var(--q-primary-soft) !important;
-}
-
-:where(body[data-admin-theme]) :where(.save-status, .save-chip, .status-pill, .status-badge, .order-badge) {
-  color: var(--q-primary-hover) !important;
-  background: var(--q-primary-soft) !important;
-  border: 1px solid var(--q-primary-border) !important;
-}
-
-:where(body[data-admin-theme]) :where(.status-active, .message-success, .toast-success > .bi) {
-  color: var(--q-success) !important;
-}
-
-:where(body[data-admin-theme]) :where(.status-inactive, .message-error, .toast-error > .bi) {
-  color: var(--q-danger) !important;
-}
-
-:where(body[data-admin-theme]) :where(.message, .toast-item) {
-  color: var(--q-text-primary) !important;
-  background: rgb(var(--q-surface-card-rgb) / 0.98) !important;
-  border-color: var(--q-border-subtle) !important;
-  box-shadow: var(--q-component-soft-shadow) !important;
-}
-
-:where(body[data-admin-theme]) :where(.toast-info::before, .toast-item::before) {
-  background: var(--q-primary) !important;
-}
-
-:where(body[data-admin-theme]) :where(.toast-info > .bi) {
-  color: var(--q-primary) !important;
-  background: var(--q-primary-soft) !important;
-}
-
-:where(body[data-admin-theme]) :where(.editor-backdrop:not(.app-popup-overlay)) {
-  background: rgb(15 23 42 / 0.5) !important;
-}
-
-:where(body[data-admin-theme]) :where(.dialog-content p, .detail-row, .detail-value, dd) {
-  color: var(--q-text-primary) !important;
-}
-
-:where(body[data-admin-theme]) :where(.pagination-bar, .page-indicator) {
-  color: var(--q-text-primary) !important;
-}
-
-:where(body[data-admin-theme]) :where(.upload-control, .upload-dropzone) {
-  color: var(--q-primary-hover) !important;
-  background: var(--q-primary-soft) !important;
-  border-color: var(--q-primary-border) !important;
-  box-shadow: 0 7px 16px rgb(var(--q-primary-rgb) / 0.07) !important;
-}
-
-:where(body[data-admin-theme]) :where(.upload-control:hover, .upload-dropzone:hover) {
-  color: var(--q-accent) !important;
-  background: var(--q-accent-soft) !important;
-  border-color: rgb(var(--q-accent-rgb) / 0.24) !important;
-}
+/* ============================================================
+   10. RESPONSIVE
+   ============================================================ */
 
 @media (max-width: 767.98px) {
-  :where(body[data-admin-theme]) :where(.tabs) {
-    display: flex !important;
-    width: 100% !important;
+  :is(body[data-admin-theme]) :is(.tabs) {
+    display: flex;
+    width: 100%;
   }
 
-  :where(body[data-admin-theme]) :where(.tabs .btn, .tabs .primary-action, .tabs .secondary-action) {
-    flex: 1 1 0 !important;
-    min-width: 0 !important;
+  :is(body[data-admin-theme]) :is(.tabs .btn, .tabs .primary-action, .tabs .secondary-action) {
+    flex: 1 1 0;
+    min-width: 0;
   }
 }

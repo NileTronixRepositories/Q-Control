@@ -39,6 +39,8 @@ describe('ServiceGlobalizationApiService', () => {
     expect(request.request.params.get('requestType')).toBe('LeafUnderGlobalParent');
     expect(request.request.params.get('branchId')).toBe('12');
     expect(request.request.params.get('searchText')).toBe('Medical');
+    expect(request.request.headers.get('Cache-Control')).toBe('no-cache');
+    expect(request.request.headers.get('Pragma')).toBe('no-cache');
     request.flush({ currentPage: 1, pageSize: 20, totalItems: 0, data: [] });
   });
 
@@ -50,7 +52,18 @@ describe('ServiceGlobalizationApiService', () => {
     const request = http.expectOne((candidate) => candidate.url === endpoint);
     expect(request.request.params.has('branchId')).toBe(false);
     expect(request.request.headers.get('Accept-Language')).toBe('ar');
+    expect(request.request.headers.get('Cache-Control')).toBe('no-cache');
+    expect(request.request.headers.get('Pragma')).toBe('no-cache');
     request.flush({ currentPage: 1, pageSize: 10, totalItems: 0, data: [] });
+  });
+
+  it('loads request details without using a cached response', () => {
+    service.getRequestDetails(46).subscribe();
+    const endpoint = new URL('api/service-globalization-requests/46', environment.apiBaseUrl).toString();
+    const request = http.expectOne(endpoint);
+    expect(request.request.headers.get('Cache-Control')).toBe('no-cache');
+    expect(request.request.headers.get('Pragma')).toBe('no-cache');
+    request.flush({ requestId: 46 });
   });
 
   it('approves with If-Match and no body', () => {

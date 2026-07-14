@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
-import { signal, WritableSignal } from '@angular/core';
+import { computed, signal, WritableSignal } from '@angular/core';
 import { of, Subject } from 'rxjs';
 
 import { AuthSessionService } from '../../../auth/services/auth-session.service';
@@ -20,6 +20,7 @@ import { ServiceGlobalizationApiService } from '../../services/service-globaliza
 import { UnassignBranchLeafServiceResponse } from '../../models/branch-services.model';
 import { SERVICE_MANAGEMENT_TRANSLATIONS } from '../../i18n/service-management.translations';
 import { PagedServiceGlobalizationRequestsResponse } from '../../models/service-globalization.model';
+import { BranchServicesStore } from '../../store/branch-services.store';
 import { BranchServicesComponent } from './branch-services.component';
 
 describe('BranchServicesComponent branch service actions', () => {
@@ -37,6 +38,7 @@ describe('BranchServicesComponent branch service actions', () => {
     readonly restoreService: ReturnType<typeof vi.fn>;
   };
   let canViewOwnRequests: WritableSignal<boolean>;
+  let currentUserType: WritableSignal<'BranchAdmin' | 'TechnicalAdmin'>;
   let globalizationApi: { readonly getBranchRequests: ReturnType<typeof vi.fn> };
 
   const leaf = createLeafNode();
@@ -45,9 +47,11 @@ describe('BranchServicesComponent branch service actions', () => {
   const foreignBranchLeaf = createOwnedBranchNode(202, false, 9);
 
   beforeEach(async () => {
+    vi.useFakeTimers();
     unassignResult = new Subject<UnassignBranchLeafServiceResponse>();
     lifecycleResult = new Subject<ServiceDeleteResponse | ServiceRestoreResponse>();
     canViewOwnRequests = signal(false);
+    currentUserType = signal<'BranchAdmin' | 'TechnicalAdmin'>('BranchAdmin');
     globalizationApi = {
       getBranchRequests: vi.fn((_: number, query: { readonly pageSize: number }) =>
         of<PagedServiceGlobalizationRequestsResponse>({
@@ -80,9 +84,9 @@ describe('BranchServicesComponent branch service actions', () => {
         {
           provide: AuthSessionService,
           useValue: {
-            currentSession: signal({
+            currentSession: computed(() => ({
               token: 'token',
-              userType: 'BranchAdmin',
+              userType: currentUserType(),
               activeBranchId: 5,
               branches: [
                 {
@@ -92,7 +96,7 @@ describe('BranchServicesComponent branch service actions', () => {
                   isActive: true,
                 },
               ],
-            }).asReadonly(),
+            })),
             shouldClearSessionForHttpStatus: () => false,
             clearSession: vi.fn(),
           },
@@ -128,6 +132,13 @@ describe('BranchServicesComponent branch service actions', () => {
     fixture.detectChanges();
   });
 
+  afterEach(() => {
+    if (!fixture.componentRef.hostView.destroyed) {
+      fixture.destroy();
+    }
+    vi.useRealTimers();
+  });
+
   it('loads the pending badge only, then loads the full list when the notification opens', () => {
     canViewOwnRequests.set(true);
     fixture.detectChanges();
@@ -142,15 +153,133 @@ describe('BranchServicesComponent branch service actions', () => {
       ?.closest('button') as HTMLButtonElement | null;
     expect(notificationButton).not.toBeNull();
     expect(notificationButton?.textContent).toContain('3');
+    expect(
+      notificationButton?.querySelector('[data-testid="pending-requests-shadow"]'),
+    ).not.toBeNull();
 
     notificationButton?.click();
     fixture.detectChanges();
 
+    expect(notificationButton?.textContent).not.toContain('3');
+    expect(
+      notificationButton?.querySelector('[data-testid="pending-requests-shadow"]'),
+    ).toBeNull();
     expect(globalizationApi.getBranchRequests).toHaveBeenCalledTimes(2);
     expect(globalizationApi.getBranchRequests.mock.calls[1][1]).toEqual(
       expect.objectContaining({ status: null, pageNumber: 1, pageSize: 10 }),
     );
     expect(fixture.nativeElement.querySelector('[role="dialog"]')).not.toBeNull();
+  });
+
+  it('keeps the badge hidden for the same request and restores it for a newer request', () => {
+    globalizationApi.getBranchRequests
+      .mockImplementationOnce((_: number, query: { readonly pageSize: number }) =>
+        of(pendingRequestsPage(query.pageSize, 3, 101)),
+      )
+      .mockImplementationOnce((_: number, query: { readonly pageSize: number }) =>
+        of(pendingRequestsPage(query.pageSize, 3, 101)),
+      )
+      .mockImplementationOnce((_: number, query: { readonly pageSize: number }) =>
+        of(pendingRequestsPage(query.pageSize, 3, 101)),
+      )
+      .mockImplementationOnce((_: number, query: { readonly pageSize: number }) =>
+        of(pendingRequestsPage(query.pageSize, 3, 102)),
+      );
+
+    canViewOwnRequests.set(true);
+    fixture.detectChanges();
+
+    const notificationButton = fixture.nativeElement.querySelector('.bi-bell')
+      ?.closest('button') as HTMLButtonElement;
+    notificationButton.click();
+    fixture.detectChanges();
+
+    const store = fixture.debugElement.injector.get(BranchServicesStore);
+    store.closeGlobalizationRequestsDialog();
+    fixture.detectChanges();
+
+    vi.advanceTimersByTime(15_000);
+    fixture.detectChanges();
+
+    expect(notificationButton.querySelector('[data-testid="pending-requests-shadow"]')).toBeNull();
+    expect(notificationButton.textContent).not.toContain('3');
+
+    vi.advanceTimersByTime(15_000);
+    fixture.detectChanges();
+
+    expect(notificationButton.textContent).toContain('3');
+    expect(
+      notificationButton.querySelector('[data-testid="pending-requests-shadow"]'),
+    ).not.toBeNull();
+  });
+
+  it('restores the badge from a count increase when the API omits the newest row', () => {
+    globalizationApi.getBranchRequests
+      .mockImplementationOnce((_: number, query: { readonly pageSize: number }) =>
+        of(pendingRequestsPage(query.pageSize, 3, null)),
+      )
+      .mockImplementationOnce((_: number, query: { readonly pageSize: number }) =>
+        of(pendingRequestsPage(query.pageSize, 3, null)),
+      )
+      .mockImplementationOnce((_: number, query: { readonly pageSize: number }) =>
+        of(pendingRequestsPage(query.pageSize, 4, null)),
+      );
+
+    canViewOwnRequests.set(true);
+    fixture.detectChanges();
+
+    const notificationButton = fixture.nativeElement.querySelector('.bi-bell')
+      ?.closest('button') as HTMLButtonElement;
+    notificationButton.click();
+    fixture.detectChanges();
+
+    fixture.debugElement.injector
+      .get(BranchServicesStore)
+      .closeGlobalizationRequestsDialog();
+    fixture.detectChanges();
+
+    vi.advanceTimersByTime(15_000);
+    fixture.detectChanges();
+
+    expect(notificationButton.textContent).toContain('4');
+    expect(
+      notificationButton.querySelector('[data-testid="pending-requests-shadow"]'),
+    ).not.toBeNull();
+  });
+
+  it('polls as a technical admin and refreshes service trees when a request is completed', () => {
+    globalizationApi.getBranchRequests
+      .mockImplementationOnce((_: number, query: { readonly pageSize: number }) =>
+        of<PagedServiceGlobalizationRequestsResponse>({
+          currentPage: 1,
+          pageSize: query.pageSize,
+          totalItems: 3,
+          data: [],
+        }),
+      )
+      .mockImplementationOnce((_: number, query: { readonly pageSize: number }) =>
+        of<PagedServiceGlobalizationRequestsResponse>({
+          currentPage: 1,
+          pageSize: query.pageSize,
+          totalItems: 2,
+          data: [],
+        }),
+      );
+
+    canViewOwnRequests.set(true);
+    fixture.detectChanges();
+
+    expect(globalizationApi.getBranchRequests).toHaveBeenCalledTimes(1);
+    expect(branchServicesApi.getBranchServicesTree).toHaveBeenCalledTimes(1);
+
+    currentUserType.set('TechnicalAdmin');
+    fixture.detectChanges();
+    vi.advanceTimersByTime(15_000);
+    fixture.detectChanges();
+
+    expect(globalizationApi.getBranchRequests).toHaveBeenCalledTimes(2);
+    expect(branchServicesApi.getBranchServicesTree).toHaveBeenCalledTimes(2);
+    expect(serviceManagementApi.getServiceTree).toHaveBeenCalledTimes(1);
   });
 
   it('loads the latest row version, soft deletes once, and refreshes both trees', () => {
@@ -386,5 +515,43 @@ function createServiceDetails(node: ServiceTreeNode): ServiceDetails {
     rangeEndNumber: 999,
     waitingDuration: 0,
     noOfTicketCopies: 1,
+  };
+}
+
+function pendingRequestsPage(
+  pageSize: number,
+  totalItems: number,
+  requestId: number | null,
+): PagedServiceGlobalizationRequestsResponse {
+  return {
+    currentPage: 1,
+    pageSize,
+    totalItems,
+    data:
+      requestId === null
+        ? []
+        : [
+            {
+              requestId,
+              requestType: 'BranchServiceTree',
+              status: 'Pending',
+              branchId: 5,
+              branchArabicName: 'الفرع الرئيسي',
+              branchEnglishName: 'Main Branch',
+              rootServiceId: 100,
+              rootServiceArabicName: 'الخدمة',
+              rootServiceEnglishName: 'Service',
+              parentServiceId: null,
+              parentServiceArabicName: null,
+              parentServiceEnglishName: null,
+              servicesCount: 1,
+              requestedByApplicationUserId: 'branch-admin',
+              requestedOnUtc: '2026-07-14T08:00:00Z',
+              reviewedByApplicationUserId: null,
+              reviewedOnUtc: null,
+              rejectionReason: null,
+              rowVersion: `row-version-${requestId}`,
+            },
+          ],
   };
 }

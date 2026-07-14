@@ -61,6 +61,8 @@ export class GlobalizationRequestsComponent implements OnInit, OnDestroy {
     this.flattenNodes(this.store.selectedDetails()?.services ?? []),
   );
   private toastTimeoutId: ReturnType<typeof setTimeout> | null = null;
+  private listRequestId = 0;
+  private detailsRequestId = 0;
 
   ngOnInit(): void {
     this.loadRequests(1);
@@ -68,11 +70,17 @@ export class GlobalizationRequestsComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.listRequestId += 1;
+    this.detailsRequestId += 1;
     if (this.toastTimeoutId) clearTimeout(this.toastTimeoutId);
   }
 
-  protected loadRequests(pageNumber = this.store.page().currentPage): void {
-    if (this.store.loading()) return;
+  protected loadRequests(
+    pageNumber = this.store.page().currentPage,
+    force = false,
+  ): void {
+    if (this.store.loading() && !force) return;
+    const requestId = ++this.listRequestId;
     this.store.loading.set(true);
     this.apiService
       .getRequests({
@@ -84,10 +92,24 @@ export class GlobalizationRequestsComponent implements OnInit, OnDestroy {
         pageNumber,
         pageSize: this.store.pageSize(),
       })
-      .pipe(finalize(() => this.store.loading.set(false)))
+      .pipe(
+        finalize(() => {
+          if (requestId === this.listRequestId) {
+            this.store.loading.set(false);
+          }
+        }),
+      )
       .subscribe({
-        next: (response) => this.store.page.set(response),
-        error: (error: HttpErrorResponse) => this.handleError(error),
+        next: (response) => {
+          if (requestId === this.listRequestId) {
+            this.store.applyPageResponse(response);
+          }
+        },
+        error: (error: HttpErrorResponse) => {
+          if (requestId === this.listRequestId) {
+            this.handleError(error);
+          }
+        },
       });
   }
 
@@ -176,14 +198,17 @@ export class GlobalizationRequestsComponent implements OnInit, OnDestroy {
     request$.pipe(finalize(() => this.store.mutating.set(false))).subscribe({
       next: (response) => {
         this.store.decisionState.set(null);
+        this.store.applyDecisionResponse(response);
         this.showMessage('success', response.message);
         if (response.status === 'Approved') {
           this.invalidationService.invalidateAfterApproval(response.branchId);
         } else {
           this.invalidationService.invalidateAfterRejection(response.branchId);
         }
-        this.loadRequests(this.store.page().currentPage);
-        if (this.store.detailsOpen()) this.loadDetails(response.requestId);
+        this.loadRequests(this.store.page().currentPage, true);
+        if (this.store.detailsOpen()) {
+          this.loadDetails(response.requestId, true);
+        }
       },
       error: (error: HttpErrorResponse) => this.handleMutationError(error, state.requestId),
     });
@@ -285,14 +310,30 @@ export class GlobalizationRequestsComponent implements OnInit, OnDestroy {
         }).format(date);
   }
 
-  private loadDetails(requestId: number): void {
+  private loadDetails(requestId: number, force = false): void {
+    if (this.store.detailsLoading() && !force) return;
+    const detailsRequestId = ++this.detailsRequestId;
     this.store.detailsLoading.set(true);
     this.apiService
       .getRequestDetails(requestId)
-      .pipe(finalize(() => this.store.detailsLoading.set(false)))
+      .pipe(
+        finalize(() => {
+          if (detailsRequestId === this.detailsRequestId) {
+            this.store.detailsLoading.set(false);
+          }
+        }),
+      )
       .subscribe({
-        next: (details) => this.store.selectedDetails.set(details),
-        error: (error: HttpErrorResponse) => this.handleDetailsError(error),
+        next: (details) => {
+          if (detailsRequestId === this.detailsRequestId) {
+            this.store.applyDetailsResponse(details);
+          }
+        },
+        error: (error: HttpErrorResponse) => {
+          if (detailsRequestId === this.detailsRequestId) {
+            this.handleDetailsError(error);
+          }
+        },
       });
   }
 

@@ -187,10 +187,40 @@ body[data-admin-theme]
   box-shadow: var(--q-warning-button-hover-shadow, 0 8px 18px rgba(217, 119, 6, 0.08)) !important;
 }
 
+/* Semantic filled action buttons (approve / reject) */
+body[data-admin-theme] :where(.success-primary) {
+  color: #ffffff !important;
+  background: var(--q-success, #138a5b) !important;
+  border-color: var(--q-success, #138a5b) !important;
+  box-shadow: 0 8px 18px rgba(19, 138, 91, 0.16) !important;
+}
+
+body[data-admin-theme] :where(.success-primary:hover:not(:disabled)) {
+  background: #0f7a4f !important;
+  border-color: #0f7a4f !important;
+  box-shadow: 0 10px 22px rgba(19, 138, 91, 0.22) !important;
+  transform: translateY(-1px) !important;
+}
+
 body[data-admin-theme] :where(.danger-primary) {
   color: #ffffff !important;
-  background: var(--q-danger) !important;
-  border-color: var(--q-danger) !important;
+  background: var(--q-danger, #d21f35) !important;
+  border-color: var(--q-danger, #d21f35) !important;
+  box-shadow: 0 8px 18px rgba(210, 31, 53, 0.16) !important;
+}
+
+body[data-admin-theme] :where(.danger-primary:hover:not(:disabled)) {
+  background: #b81b2e !important;
+  border-color: #b81b2e !important;
+  box-shadow: 0 10px 22px rgba(210, 31, 53, 0.22) !important;
+  transform: translateY(-1px) !important;
+}
+
+body[data-admin-theme] :where(.success-primary:disabled, .danger-primary:disabled) {
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+  box-shadow: none !important;
 }
 
 body[data-admin-theme] :where(.panel-actions) {

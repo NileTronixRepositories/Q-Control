@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, ViewEncapsulation } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 
 import { AppShellComponent } from '../../../shared/layouts/app-shell/app-shell.component';
@@ -12,8 +12,12 @@ import { TechnicalAdminI18nStore } from '../store/technical-admin-i18n.store';
   selector: 'app-technical-admin-shell',
   imports: [AppShellComponent, RouterOutlet],
   templateUrl: './technical-admin-shell.component.html',
-  styleUrl: './technical-admin-shell.component.css',
+  styleUrls: [
+    './technical-admin-shell.component.css',
+    './technical-admin-responsive.component.css'
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  encapsulation: ViewEncapsulation.None,
 })
 export class TechnicalAdminShellComponent {
   private readonly router = inject(Router);
