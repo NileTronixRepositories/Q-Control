@@ -50,10 +50,10 @@ const WORKFLOW_PERMISSIONS = new Set<ServiceWorkflowPermission>([
   'ServiceWorkflows.ViewDetails',
   'ServiceWorkflows.Create',
   'ServiceWorkflows.Update',
+  'ServiceWorkflows.SetDefault',
   'ServiceWorkflows.Deactivate',
   'ServiceWorkflows.Reactivate',
   'ServiceWorkflows.ViewCandidateServices',
-  'ServiceWorkflows.ViewServiceWorkflows',
   'ServiceWorkflows.ViewStartOptions',
 ]);
 
@@ -102,6 +102,9 @@ export class ServiceManagementPermissionService {
   );
   readonly canCreateWorkflow = computed(() => this.hasPermission('ServiceWorkflows.Create'));
   readonly canUpdateWorkflow = computed(() => this.hasPermission('ServiceWorkflows.Update'));
+  readonly canSetDefaultWorkflow = computed(() =>
+    this.hasPermission('ServiceWorkflows.SetDefault'),
+  );
   readonly canDeactivateWorkflow = computed(() =>
     this.hasPermission('ServiceWorkflows.Deactivate'),
   );
@@ -110,9 +113,6 @@ export class ServiceManagementPermissionService {
   );
   readonly canViewCandidateServices = computed(() =>
     this.hasPermission('ServiceWorkflows.ViewCandidateServices'),
-  );
-  readonly canViewServiceWorkflows = computed(() =>
-    this.hasPermission('ServiceWorkflows.ViewServiceWorkflows'),
   );
   readonly canViewStartOptions = computed(() =>
     this.hasPermission('ServiceWorkflows.ViewStartOptions'),

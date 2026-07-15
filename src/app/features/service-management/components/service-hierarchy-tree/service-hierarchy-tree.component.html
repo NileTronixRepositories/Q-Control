@@ -1,5 +1,6 @@
 <section
   class="svc-tree-panel"
+  [attr.aria-busy]="loading()"
   [class.svc-tree-panel--drop-target]="dropTarget()"
   [class.svc-tree-panel--drop-active]="isDropActive()"
   (dragover)="onDropTargetDragOver($event)"
@@ -55,11 +56,77 @@
   </div>
 
   <div class="svc-tree-body">
-    @if (loading()) {
-      <p class="svc-tree-note" role="status">
-        <i class="bi bi-arrow-repeat" aria-hidden="true"></i>
-        <span>{{ translations().loading }}</span>
-      </p>
+    @if (loading() && flatNodes().length === 0) {
+      <div
+        class="grid min-h-64 content-start gap-5 overflow-hidden rounded-2xl border border-sky-100 bg-gradient-to-b from-sky-50/80 to-white p-4 sm:p-5"
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+        data-testid="svc-tree-initial-loading"
+      >
+        <div class="flex items-center gap-3 text-sky-800">
+          <span
+            class="relative grid size-10 shrink-0 place-items-center rounded-xl border border-sky-100 bg-white text-lg shadow-sm"
+            aria-hidden="true"
+          >
+            <i class="bi bi-diagram-3-fill"></i>
+            <span
+              class="absolute -end-1 -top-1 size-3 rounded-full border-2 border-white bg-cyan-500 motion-safe:animate-pulse motion-reduce:animate-none"
+            ></span>
+          </span>
+          <span class="text-xs font-black sm:text-sm">{{ translations().loading }}</span>
+        </div>
+        <div class="grid gap-2.5" aria-hidden="true">
+          @for (row of loadingSkeletonRows; track $index) {
+            <div
+              class="grid min-h-16 grid-cols-[2rem_minmax(0,1fr)_auto] items-center gap-3 rounded-xl border border-sky-100/90 bg-white/90 p-2.5 shadow-sm motion-safe:animate-pulse motion-reduce:animate-none sm:p-3"
+              [style.margin-inline-start.px]="row.indent"
+              [style.animation-delay.ms]="$index * 110"
+              data-testid="svc-tree-skeleton-row"
+            >
+              <span class="size-8 rounded-lg bg-sky-100"></span>
+              <span class="grid min-w-0 gap-2">
+                <span
+                  class="h-2.5 rounded-full bg-gradient-to-r from-slate-200 via-sky-100 to-slate-200"
+                  [style.width.%]="row.nameWidth"
+                ></span>
+                <span class="flex gap-1.5">
+                  @for (chipWidth of row.chipWidths; track $index) {
+                    <span
+                      class="h-4 min-w-10 rounded-full bg-sky-50"
+                      [style.width.px]="chipWidth * 4"
+                    ></span>
+                  }
+                </span>
+              </span>
+              <span class="hidden gap-1 rounded-lg bg-slate-50 p-1 sm:flex">
+                <span class="size-6 rounded-md bg-slate-200"></span>
+                <span class="size-6 rounded-md bg-sky-100"></span>
+              </span>
+            </div>
+          }
+        </div>
+      </div>
+    } @else if (loading()) {
+      <div
+        class="sticky top-0 z-10 overflow-hidden rounded-xl border border-sky-100 bg-white/95 px-3 py-2 text-sky-800 shadow-sm backdrop-blur"
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+        data-testid="svc-tree-refresh-loading"
+      >
+        <div class="flex items-center gap-2 text-xs font-extrabold">
+          <i
+            class="bi bi-arrow-repeat motion-safe:animate-spin motion-reduce:animate-none"
+            aria-hidden="true"
+          ></i>
+          <span>{{ translations().loading }}</span>
+        </div>
+        <span
+          class="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-cyan-500 via-sky-400 to-cyan-500 motion-safe:animate-pulse motion-reduce:animate-none"
+          aria-hidden="true"
+        ></span>
+      </div>
     }
 
     @if (flatNodes().length > 0) {
@@ -135,6 +202,17 @@
             </div>
 
             <div class="svc-tree-actions">
+              @if (entry.canManageWorkflow) {
+                <button
+                  type="button"
+                  class="svc-tree-action-btn"
+                  [title]="manageWorkflowsLabel()"
+                  [attr.aria-label]="manageWorkflowsLabel()"
+                  (click)="requestManageWorkflows(entry.node, $event)"
+                >
+                  <i class="bi bi-signpost-split" aria-hidden="true"></i>
+                </button>
+              }
               @if (entry.canUnassign) {
                 <button
                   type="button"

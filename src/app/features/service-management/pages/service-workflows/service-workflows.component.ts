@@ -4,287 +4,249 @@ import {
   Component,
   OnDestroy,
   OnInit,
-  ViewChild,
   computed,
   inject,
   signal,
 } from '@angular/core';
 import {
-  AbstractControl,
   NonNullableFormBuilder,
   ReactiveFormsModule,
-  ValidationErrors,
   Validators,
 } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { finalize } from 'rxjs';
 
 import { TechnicalAdminPageHeroComponent } from '../../../../shared/components/technical-admin-page-hero/technical-admin-page-hero.component';
-
 import { AuthSessionService } from '../../../auth/services/auth-session.service';
-import { ServiceCascadeSelectorComponent } from '../../components/service-cascade-selector/service-cascade-selector.component';
+import { BranchListItem } from '../../../technical-admin/models/branch-management.model';
+import { BranchManagementApiService } from '../../../technical-admin/services/branch-management-api.service';
 import { TechnicalAdminI18nStore } from '../../../technical-admin/store/technical-admin-i18n.store';
 import { formatTechnicalAdminApiError } from '../../../technical-admin/utils/api-error-message.util';
+import { ServiceHierarchyTreeComponent } from '../../components/service-hierarchy-tree/service-hierarchy-tree.component';
+import { SERVICE_MANAGEMENT_TRANSLATIONS } from '../../i18n/service-management.translations';
 import { SERVICE_WORKFLOW_TRANSLATIONS } from '../../i18n/service-workflow.translations';
+import { ServiceTreeNode } from '../../models/service-management.model';
 import {
-  ServiceRelatedWorkflow,
   ServiceWorkflowDetails,
   ServiceWorkflowListItem,
+  ServiceWorkflowMutationResponse,
   ServiceWorkflowStep,
   WorkflowBuilderStep,
   WorkflowCandidateService,
-  WorkflowConfirmState,
-  WorkflowStartOptionItem,
-  WorkflowStartOptions,
+  WorkflowConfirmAction,
 } from '../../models/service-workflow.model';
+import { BranchServicesApiService } from '../../services/branch-services-api.service';
 import { ServiceManagementPermissionService } from '../../services/service-management-permission.service';
-import { ServiceManagementApiService } from '../../services/service-management-api.service';
 import { ServiceWorkflowApiService } from '../../services/service-workflow-api.service';
 import { ServiceWorkflowStore } from '../../store/service-workflow.store';
 
 type BooleanSelectValue = 'all' | 'true' | 'false';
 type WorkflowFormControlName = 'arabicName' | 'englishName';
-type WorkflowSelectionMode =
-  | { readonly kind: 'add' }
-  | { readonly kind: 'replace'; readonly stepUid: string };
+type WorkflowDragKind = 'candidate' | 'step';
+type WorkflowDragPayload =
+  | { readonly kind: 'candidate'; readonly serviceId: number }
+  | { readonly kind: 'step'; readonly uid: string };
+
+const WORKFLOW_DRAG_MIME_TYPE = 'application/x-qsystem-workflow-builder';
+
+interface WorkflowParentOption {
+  readonly id: number;
+  readonly arabicName: string;
+  readonly englishName: string;
+}
 
 @Component({
   selector: 'app-service-workflows',
   standalone: true,
-  imports: [ReactiveFormsModule, TechnicalAdminPageHeroComponent, ServiceCascadeSelectorComponent],
+  imports: [ReactiveFormsModule, TechnicalAdminPageHeroComponent, ServiceHierarchyTreeComponent],
   providers: [ServiceWorkflowStore],
   templateUrl: './service-workflows.component.html',
-  styleUrls: [
-    './service-workflows.component.css',
-    './service-workflows-layout.component.css',
-    './service-workflows-responsive.component.css',
-    './service-workflows-visual-path.component.css',
-    './service-workflows-suggestions.component.css',
-    './service-workflows-compact-details.component.css',
-  ],
+  styleUrl: './service-workflows.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ServiceWorkflowsComponent implements OnInit, OnDestroy {
   private readonly formBuilder = inject(NonNullableFormBuilder);
+  private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly authSessionService = inject(AuthSessionService);
   private readonly i18nStore = inject(TechnicalAdminI18nStore);
+  private readonly branchApiService = inject(BranchManagementApiService);
+  private readonly branchServicesApiService = inject(BranchServicesApiService);
   private readonly apiService = inject(ServiceWorkflowApiService);
-  private readonly serviceManagementApiService = inject(ServiceManagementApiService);
   private readonly permissionService = inject(ServiceManagementPermissionService);
 
   readonly store = inject(ServiceWorkflowStore);
   readonly translations = computed(() => SERVICE_WORKFLOW_TRANSLATIONS[this.i18nStore.language()]);
+  readonly serviceTranslations = computed(
+    () => SERVICE_MANAGEMENT_TRANSLATIONS[this.i18nStore.language()],
+  );
   readonly language = this.i18nStore.language;
   readonly direction = this.i18nStore.direction;
+  readonly isBranchAdmin = computed(
+    () => this.authSessionService.currentSession()?.userType === 'BranchAdmin',
+  );
 
   readonly canViewAll = this.permissionService.canViewWorkflows;
   readonly canViewDetails = this.permissionService.canViewWorkflowDetails;
   readonly canCreate = this.permissionService.canCreateWorkflow;
   readonly canUpdate = this.permissionService.canUpdateWorkflow;
+  readonly canSetDefault = this.permissionService.canSetDefaultWorkflow;
   readonly canDeactivate = this.permissionService.canDeactivateWorkflow;
   readonly canReactivate = this.permissionService.canReactivateWorkflow;
   readonly canViewCandidates = this.permissionService.canViewCandidateServices;
-  readonly canViewServiceWorkflows = this.permissionService.canViewServiceWorkflows;
-  readonly canUseServiceSelection = this.permissionService.canViewAll;
+  readonly canViewStartOptions = this.permissionService.canViewStartOptions;
 
+  readonly scopeError = signal<string | null>(null);
   readonly builderSteps = signal<readonly WorkflowBuilderStep[]>([]);
-  readonly selectionMode = signal<WorkflowSelectionMode>({ kind: 'add' });
-  readonly selectionError = signal<string | null>(null);
-  readonly workflowStartOptions = signal<WorkflowStartOptions | null>(null);
-  readonly workflowStartOptionsLoading = signal(false);
-  readonly filtersExpanded = signal(false);
+  readonly replacingStepUid = signal<string | null>(null);
   readonly formError = signal<string | null>(null);
+  readonly filtersExpanded = signal(false);
+  readonly activeDragKind = signal<WorkflowDragKind | null>(null);
+  readonly activeDropIndex = signal<number | null>(null);
   readonly workflows = computed(() => this.store.page().data);
-  readonly hasWorkflows = computed(() => this.workflows().length > 0);
   readonly candidateOptions = computed(() => this.store.candidates().data);
-  readonly suggestedWorkflows = computed(() => this.store.suggestedWorkflows());
-  readonly hasSuggestedWorkflows = computed(() => this.suggestedWorkflows().length > 0);
+  readonly selectedTreeNode = computed(() =>
+    this.findTreeNode(this.store.branchTree(), this.store.selectedBranchNodeId()),
+  );
+  readonly parentOptions = computed(() => this.collectParentOptions(this.store.branchTree()));
 
   readonly workflowForm = this.formBuilder.group({
-    arabicName: ['', [Validators.required, Validators.maxLength(100), this.notWhitespace]],
-    englishName: ['', [Validators.required, Validators.maxLength(100), this.notWhitespace]],
+    arabicName: ['', [Validators.maxLength(100)]],
+    englishName: ['', [Validators.maxLength(100)]],
   });
-
   readonly arabicNameControl = this.workflowForm.controls.arabicName;
   readonly englishNameControl = this.workflowForm.controls.englishName;
 
-  @ViewChild(ServiceCascadeSelectorComponent) cascadeSelector?: ServiceCascadeSelectorComponent;
-
+  private readonly routeBranchId = this.readPositiveInt(this.route.snapshot.paramMap.get('branchId'));
+  private readonly routeLeafServiceId = this.readPositiveInt(
+    this.route.snapshot.paramMap.get('leafServiceId'),
+  );
   private searchDebounceId: ReturnType<typeof setTimeout> | null = null;
   private candidateSearchDebounceId: ReturnType<typeof setTimeout> | null = null;
   private toastTimeoutId: ReturnType<typeof setTimeout> | null = null;
   private stepUid = 0;
-  private readonly pendingWorkflowStartServiceId = signal<number | null>(null);
-  private readonly draggedSuggestedWorkflowStep = signal<ServiceWorkflowStep | null>(null);
 
   ngOnInit(): void {
-    this.loadWorkflows();
+    if (!this.canViewAll()) return;
+    const session = this.authSessionService.currentSession();
 
-    if (this.canViewCandidates()) {
-      this.loadCandidates();
+    if (this.isBranchAdmin()) {
+      const activeBranchId = session?.activeBranchId ?? null;
+      if (!activeBranchId || (this.routeBranchId && this.routeBranchId !== activeBranchId)) {
+        this.scopeError.set(this.translations().invalidWorkflowScope);
+        return;
+      }
+      this.store.selectBranch(activeBranchId);
+      this.loadBranchTree(activeBranchId);
+      return;
     }
 
-    this.openCreateBlockOnPageLoad();
+    this.loadBranches();
+    if (this.routeBranchId) {
+      this.store.selectBranch(this.routeBranchId);
+      this.loadBranchTree(this.routeBranchId);
+    }
   }
 
   ngOnDestroy(): void {
-    if (this.searchDebounceId) {
-      clearTimeout(this.searchDebounceId);
-    }
-
-    if (this.candidateSearchDebounceId) {
-      clearTimeout(this.candidateSearchDebounceId);
-    }
-
-    if (this.toastTimeoutId) {
-      clearTimeout(this.toastTimeoutId);
-    }
+    if (this.searchDebounceId) clearTimeout(this.searchDebounceId);
+    if (this.candidateSearchDebounceId) clearTimeout(this.candidateSearchDebounceId);
+    if (this.toastTimeoutId) clearTimeout(this.toastTimeoutId);
   }
 
-  clearMessage(): void {
-    this.store.message.set(null);
+  private loadBranches(): void {
+    this.store.branchesLoading.set(true);
+    this.branchApiService
+      .getBranches({
+        searchText: '',
+        orderSort: 'Newest',
+        pageNumber: 1,
+        pageSize: 100,
+        isActive: true,
+      })
+      .pipe(finalize(() => this.store.branchesLoading.set(false)))
+      .subscribe({
+        next: (response) => this.store.branches.set(response.data),
+        error: (error: HttpErrorResponse) => this.handleApiError(error),
+      });
   }
 
-  openCreate(): void {
-    if (!this.canCreate()) {
-      this.showMessage('error', this.translations().noPermissionHint);
+  private loadBranchTree(branchId: number): void {
+    this.scopeError.set(null);
+    this.store.branchTreeLoading.set(true);
+    this.branchServicesApiService
+      .getBranchServicesTree(branchId, { includeInactive: false, includeDeleted: false })
+      .pipe(finalize(() => this.store.branchTreeLoading.set(false)))
+      .subscribe({
+        next: (tree) => {
+          this.store.branchTree.set(tree);
+          if (this.routeLeafServiceId) this.activateRouteScope(branchId, this.routeLeafServiceId);
+        },
+        error: (error: HttpErrorResponse) => this.handleApiError(error),
+      });
+  }
+
+  private activateRouteScope(branchId: number, leafServiceId: number): void {
+    const node = this.findTreeNode(this.store.branchTree(), leafServiceId);
+    if (!node || !this.canManageWorkflowFor(node)) {
+      this.scopeError.set(this.translations().invalidWorkflowScope);
       return;
     }
-
-    this.store.selectedDetails.set(null);
-    this.store.clearSuggestions();
-    this.store.openPanel('create');
-    this.formError.set(null);
-    this.clearServiceSelection();
-    this.workflowForm.reset({ arabicName: '', englishName: '' });
-    this.builderSteps.set([]);
-    this.initializeServiceSelection();
+    this.activateScope(branchId, node);
   }
 
-  private openCreateBlockOnPageLoad(): void {
-    if (!this.canCreate() || this.store.isPanelOpen()) {
+  private activateScope(branchId: number, node: ServiceTreeNode): void {
+    this.store.setScope({
+      branchId,
+      leafServiceId: node.id,
+      branchName: this.branchLabel(branchId),
+      ownerServiceName: this.serviceName(node),
+    });
+    this.loadScopedData();
+  }
+
+  selectBranch(event: Event): void {
+    const branchId = this.readPositiveInt(this.readInputValue(event));
+    this.store.selectBranch(branchId);
+    this.scopeError.set(null);
+    if (branchId) this.loadBranchTree(branchId);
+  }
+
+  toggleBranchNode(node: ServiceTreeNode): void {
+    if (node.children.length > 0) this.store.toggleBranchNode(node.id);
+  }
+
+  selectBranchNode(node: ServiceTreeNode): void {
+    this.store.selectedBranchNodeId.set(node.id);
+  }
+
+  openNodeWorkflows(node: ServiceTreeNode): void {
+    const branchId = this.store.selectedBranchId();
+    if (!branchId || !this.canManageWorkflowFor(node)) {
+      this.showMessage('error', this.translations().ineligibleOwnerService);
       return;
     }
-
+    this.activateScope(branchId, node);
     this.openCreate();
   }
 
-  openView(item: ServiceWorkflowListItem): void {
-    if (!this.canViewDetails()) {
-      this.showMessage('error', this.translations().noPermissionHint);
-      return;
-    }
-
-    this.loadDetails(this.workflowId(item), 'view');
+  backToScopeSelection(): void {
+    void this.router.navigateByUrl('/technical-admin/services/workflows');
   }
 
-  openEdit(item: ServiceWorkflowListItem | ServiceWorkflowDetails): void {
-    if (!this.canUpdate() || !item.isActive) {
-      this.showMessage('error', this.translations().noPermissionHint);
-      return;
-    }
-
-    this.loadDetails(this.workflowId(item), 'edit');
-  }
-
-  closePanel(): void {
-    this.store.closePanel();
-    this.builderSteps.set([]);
-    this.formError.set(null);
-    this.clearServiceSelection();
-    this.workflowForm.reset({ arabicName: '', englishName: '' });
-
-    if (this.canCreate()) {
-      this.initializeServiceSelection();
-    }
-  }
-
-  saveWorkflow(): void {
-    if (this.store.saving()) {
-      return;
-    }
-
-    if (!this.isFormValid()) {
-      this.workflowForm.markAllAsTouched();
-      return;
-    }
-
-    if (this.store.panelMode() === 'create') {
-      this.createWorkflow();
-      return;
-    }
-
-    if (this.store.panelMode() === 'edit') {
-      this.updateWorkflow();
-    }
-  }
-
-  requestDeactivate(item: ServiceWorkflowListItem | ServiceWorkflowDetails): void {
-    if (!this.canDeactivate() || !item.isActive) {
-      this.showMessage('error', this.translations().noPermissionHint);
-      return;
-    }
-
-    this.store.confirmState.set({
-      action: 'deactivate',
-      workflowId: this.workflowId(item),
-      rowVersion: item.rowVersion,
-      workflowName: this.workflowName(item),
-    });
-  }
-
-  requestReactivate(item: ServiceWorkflowListItem | ServiceWorkflowDetails): void {
-    if (!this.canReactivate() || item.isActive) {
-      this.showMessage('error', this.translations().noPermissionHint);
-      return;
-    }
-
-    this.store.confirmState.set({
-      action: 'reactivate',
-      workflowId: this.workflowId(item),
-      rowVersion: item.rowVersion,
-      workflowName: this.workflowName(item),
-    });
-  }
-
-  closeConfirmDialog(): void {
-    if (!this.store.mutating()) {
-      this.store.confirmState.set(null);
-    }
-  }
-
-  confirmAction(): void {
-    const state = this.store.confirmState();
-
-    if (!state || this.store.mutating()) {
-      return;
-    }
-
-    this.store.mutating.set(true);
-    const request =
-      state.action === 'deactivate'
-        ? this.apiService.deactivateWorkflow(state.workflowId, state.rowVersion)
-        : this.apiService.reactivateWorkflow(state.workflowId, state.rowVersion);
-
-    request.pipe(finalize(() => this.store.mutating.set(false))).subscribe({
-      next: (response) => {
-        this.showMessage('success', response.message || this.translations().fallbackSuccess);
-        this.store.confirmState.set(null);
-        this.loadWorkflows(this.store.page().currentPage || 1);
-        this.loadDetails(state.workflowId, 'view');
-      },
-      error: (error: HttpErrorResponse) => this.handleApiError(error),
-    });
-  }
+  readonly canManageWorkflowFor = (node: ServiceTreeNode): boolean =>
+    node.isAssignedToCurrentBranch !== false &&
+    node.children.length === 0 &&
+    !node.hasChildren &&
+    node.isActive &&
+    !node.isDeleted &&
+    node.effectiveIsActive &&
+    node.isTicketIssuable &&
+    node.canIssueTicket;
 
   updateSearch(event: Event): void {
     this.store.updateQuery({ searchText: this.readInputValue(event), pageNumber: 1 });
-
-    if (this.searchDebounceId) {
-      clearTimeout(this.searchDebounceId);
-    }
-
+    if (this.searchDebounceId) clearTimeout(this.searchDebounceId);
     this.searchDebounceId = setTimeout(() => this.loadWorkflows(), 350);
   }
 
@@ -296,9 +258,9 @@ export class ServiceWorkflowsComponent implements OnInit, OnDestroy {
     this.loadWorkflows();
   }
 
-  updateStartServiceFilter(event: Event): void {
+  updateSort(event: Event): void {
     this.store.updateQuery({
-      startServiceId: this.toOptionalNumber(this.readInputValue(event)),
+      orderSort: this.readInputValue(event) === 'Oldest' ? 'Oldest' : 'Newest',
       pageNumber: 1,
     });
     this.loadWorkflows();
@@ -306,7 +268,7 @@ export class ServiceWorkflowsComponent implements OnInit, OnDestroy {
 
   updatePageSize(event: Event): void {
     this.store.updateQuery({
-      pageSize: this.normalizePageSize(Number(this.readInputValue(event))),
+      pageSize: Math.min(Math.max(Number(this.readInputValue(event)) || 10, 1), 100),
       pageNumber: 1,
     });
     this.loadWorkflows();
@@ -314,17 +276,13 @@ export class ServiceWorkflowsComponent implements OnInit, OnDestroy {
 
   updateCandidateSearch(event: Event): void {
     this.store.updateCandidateQuery({ searchText: this.readInputValue(event), pageNumber: 1 });
-
-    if (this.candidateSearchDebounceId) {
-      clearTimeout(this.candidateSearchDebounceId);
-    }
-
+    if (this.candidateSearchDebounceId) clearTimeout(this.candidateSearchDebounceId);
     this.candidateSearchDebounceId = setTimeout(() => this.loadCandidates(), 300);
   }
 
-  updateCandidateToggle(key: 'includeInactive' | 'includeDeleted', event: Event): void {
+  updateCandidateParent(event: Event): void {
     this.store.updateCandidateQuery({
-      [key]: (event.target as HTMLInputElement).checked,
+      parentServiceId: this.readPositiveInt(this.readInputValue(event)),
       pageNumber: 1,
     });
     this.loadCandidates();
@@ -332,656 +290,237 @@ export class ServiceWorkflowsComponent implements OnInit, OnDestroy {
 
   previousPage(): void {
     const page = this.store.page();
-    if (page.hasPreviousPage) {
-      this.loadWorkflows(page.currentPage - 1);
-    }
+    if (page.hasPreviousPage) this.loadWorkflows(page.currentPage - 1);
   }
 
   nextPage(): void {
     const page = this.store.page();
-    if (page.hasNextPage) {
-      this.loadWorkflows(page.currentPage + 1);
-    }
+    if (page.hasNextPage) this.loadWorkflows(page.currentPage + 1);
   }
 
   previousCandidatesPage(): void {
     const page = this.store.candidates();
-    if (page.hasPreviousPage) {
-      this.store.updateCandidateQuery({ pageNumber: page.currentPage - 1 });
-      this.loadCandidates();
-    }
+    if (!page.hasPreviousPage) return;
+    this.store.updateCandidateQuery({ pageNumber: page.currentPage - 1 });
+    this.loadCandidates();
   }
 
   nextCandidatesPage(): void {
     const page = this.store.candidates();
-    if (page.hasNextPage) {
-      this.store.updateCandidateQuery({ pageNumber: page.currentPage + 1 });
-      this.loadCandidates();
-    }
-  }
-
-  refresh(): void {
-    this.loadWorkflows(this.store.page().currentPage || 1);
+    if (!page.hasNextPage) return;
+    this.store.updateCandidateQuery({ pageNumber: page.currentPage + 1 });
     this.loadCandidates();
   }
 
+  refresh(): void {
+    this.loadScopedData(this.store.page().currentPage || 1);
+  }
+
   toggleFilters(): void {
-    this.filtersExpanded.update((isExpanded) => !isExpanded);
+    this.filtersExpanded.update((value) => !value);
   }
 
-  isEditorMode(): boolean {
-    const mode = this.store.panelMode();
-    return mode === 'create' || mode === 'edit';
+  openCreate(): void {
+    if (!this.canCreate() || !this.store.scope()) return;
+    this.store.selectedDetails.set(null);
+    this.store.openPanel('create');
+    this.workflowForm.reset({ arabicName: '', englishName: '' });
+    this.builderSteps.set([]);
+    this.replacingStepUid.set(null);
+    this.clearWorkflowDragState();
+    this.formError.set(null);
   }
 
-  isReplacingStep(uid: string): boolean {
-    const mode = this.selectionMode();
-    return mode.kind === 'replace' && mode.stepUid === uid;
+  openView(item: ServiceWorkflowListItem): void {
+    if (this.canViewDetails()) this.loadDetails(item.workflowId, 'view');
   }
 
-  selectionModeLabel(): string {
-    return this.selectionMode().kind === 'replace'
-      ? this.translations().replaceStepMode
-      : this.translations().addStepMode;
+  openEdit(item: ServiceWorkflowListItem | ServiceWorkflowDetails): void {
+    if (this.canUpdate() && item.isActive) this.loadDetails(item.workflowId, 'edit');
   }
 
-  startAddStepSelection(): void {
-    this.selectionMode.set({ kind: 'add' });
-    this.initializeServiceSelection();
+  closePanel(): void {
+    if (this.store.saving()) return;
+    this.store.closePanel();
+    this.builderSteps.set([]);
+    this.replacingStepUid.set(null);
+    this.clearWorkflowDragState();
+    this.formError.set(null);
+    this.workflowForm.reset({ arabicName: '', englishName: '' });
   }
 
-  startReplaceStepSelection(uid: string): void {
-    if (!this.builderSteps().some((step) => step.uid === uid)) {
+  selectCandidate(candidate: WorkflowCandidateService): void {
+    const replacingUid = this.replacingStepUid();
+    if (replacingUid) {
+      this.builderSteps.update((steps) =>
+        steps.map((step) => (step.uid === replacingUid ? { ...step, service: candidate } : step)),
+      );
+      this.replacingStepUid.set(null);
       return;
     }
-
-    this.selectionMode.set({ kind: 'replace', stepUid: uid });
-    this.initializeServiceSelection();
+    this.builderSteps.update((steps) => [
+      ...steps,
+      { uid: this.createStepUid(), service: candidate },
+    ]);
   }
 
-  cancelReplaceStepSelection(): void {
-    this.startAddStepSelection();
-  }
-
-  handleCascadeSelection(event: {
-    service: WorkflowCandidateService;
-    mode: 'add' | 'replace';
-    stepUid: string | null;
-  }): void {
-    this.selectionMode.set(
-      event.mode === 'replace' && event.stepUid
-        ? { kind: 'replace', stepUid: event.stepUid }
-        : { kind: 'add' }
-    );
-    this.loadWorkflowStartOptionsForSelection(event.service.serviceId!, event.service);
-  }
-
-  workflowStartOptionName(workflow: WorkflowStartOptionItem): string {
-    const localized = this.language() === 'ar' ? workflow.arabicName : workflow.englishName;
-    const fallback = this.language() === 'ar' ? workflow.englishName : workflow.arabicName;
-    return this.formatText(localized || fallback);
-  }
-
-  workflowStartOptionSteps(workflow: WorkflowStartOptionItem): readonly ServiceWorkflowStep[] {
-    return workflow.steps;
-  }
-
-  workflowStartOptionStepCount(workflow: WorkflowStartOptionItem): number {
-    return workflow.stepsCount || workflow.steps.length;
-  }
-
-  canDragWorkflowStep(step: ServiceWorkflowStep): boolean {
-    return !this.isInvalidWorkflowStep(step);
-  }
-
-  canApplyWorkflowStartOption(workflow: WorkflowStartOptionItem): boolean {
-    const steps = this.workflowStartOptionSteps(workflow);
-    return steps.length > 0 && steps.every((step) => this.canDragWorkflowStep(step));
-  }
-
-  isAutoApplyWorkflow(workflow: WorkflowStartOptionItem, options: WorkflowStartOptions): boolean {
-    return options.mode === 'AutoApply' && workflow.workflowId === options.autoApplyWorkflowId;
-  }
-
-  applyWorkflowStartOption(workflow: WorkflowStartOptionItem): void {
-    const steps = this.workflowStartOptionSteps(workflow);
-
-    if (steps.length === 0) {
-      this.selectionError.set(this.translations().stepServiceRequired);
-      return;
-    }
-
-    if (!this.canApplyWorkflowStartOption(workflow)) {
-      this.selectionError.set(this.translations().invalidStep);
-      return;
-    }
-
-    this.applyWorkflowSteps(steps);
-    this.startAddStepSelection();
-  }
-
-  applyWorkflowStartOptionFromEvent(workflow: WorkflowStartOptionItem, event: Event): void {
-    event.stopPropagation();
-    this.applyWorkflowStartOption(workflow);
-  }
-
-  addStep(): void {
-    this.startAddStepSelection();
+  replaceStep(uid: string): void {
+    this.replacingStepUid.set(uid);
   }
 
   removeStep(uid: string): void {
-    this.store.selectedSuggestionWorkflowId.set(null);
     this.builderSteps.update((steps) => steps.filter((step) => step.uid !== uid));
-
-    const mode = this.selectionMode();
-    if (mode.kind === 'replace' && mode.stepUid === uid) {
-      this.startAddStepSelection();
-    }
+    if (this.replacingStepUid() === uid) this.replacingStepUid.set(null);
   }
 
   moveStep(index: number, direction: -1 | 1): void {
-    const nextIndex = index + direction;
-    this.store.selectedSuggestionWorkflowId.set(null);
+    const targetIndex = index + direction;
     const steps = [...this.builderSteps()];
-
-    if (nextIndex < 0 || nextIndex >= steps.length) {
-      return;
-    }
-
-    const current = steps[index];
-    steps[index] = steps[nextIndex];
-    steps[nextIndex] = current;
+    if (targetIndex < 0 || targetIndex >= steps.length) return;
+    [steps[index], steps[targetIndex]] = [steps[targetIndex], steps[index]];
     this.builderSteps.set(steps);
   }
 
-  selectStepService(uid: string, event: Event): void {
-    const serviceId = this.toOptionalNumber(this.readInputValue(event));
-    const service = serviceId ? this.findCandidate(serviceId) : null;
-
-    this.store.selectedSuggestionWorkflowId.set(null);
-    this.builderSteps.update((steps) =>
-      steps.map((step) => (step.uid === uid ? { ...step, service } : step)),
-    );
-
-    if (service) {
-      this.store.suggestionStepUid.set(uid);
-      this.loadSuggestedWorkflows(service);
-    } else {
-      this.store.clearSuggestions();
-    }
+  startCandidateDrag(candidate: WorkflowCandidateService, event: DragEvent): void {
+    event.stopPropagation();
+    this.writeDragPayload(event, { kind: 'candidate', serviceId: candidate.serviceId }, 'copy');
+    this.activeDragKind.set('candidate');
   }
 
-  applySuggestedWorkflow(workflow: ServiceRelatedWorkflow): void {
-    const orderedSteps = this.sortedSteps(workflow);
+  startStepDrag(uid: string, event: DragEvent): void {
+    event.stopPropagation();
+    this.writeDragPayload(event, { kind: 'step', uid }, 'move');
+    this.activeDragKind.set('step');
+  }
 
-    if (orderedSteps.length === 0) {
-      return;
+  endWorkflowDrag(): void {
+    this.clearWorkflowDragState();
+  }
+
+  onWorkflowDropZoneDragOver(event: DragEvent, dropIndex = this.builderSteps().length): void {
+    if (!this.isWorkflowEditorOpen()) return;
+    event.preventDefault();
+    event.stopPropagation();
+    if (event.dataTransfer) {
+      event.dataTransfer.dropEffect = this.activeDragKind() === 'step' ? 'move' : 'copy';
+    }
+    this.activeDropIndex.set(this.normalizeDropIndex(dropIndex));
+  }
+
+  onWorkflowDropZoneDragLeave(event: DragEvent): void {
+    const current = event.currentTarget as HTMLElement | null;
+    const related = event.relatedTarget as Node | null;
+    if (!current || (related && current.contains(related))) return;
+    this.activeDropIndex.set(null);
+  }
+
+  dropWorkflowItem(event: DragEvent, dropIndex = this.builderSteps().length): void {
+    if (!this.isWorkflowEditorOpen()) return;
+    event.preventDefault();
+    event.stopPropagation();
+
+    const payload = this.readDragPayload(event);
+    const targetIndex = this.normalizeDropIndex(dropIndex);
+
+    if (payload?.kind === 'candidate') {
+      const candidate = this.candidateOptions().find(
+        (item) => item.serviceId === payload.serviceId,
+      );
+      if (candidate) this.insertCandidate(candidate, targetIndex);
     }
 
-    const anchorStepUid = this.store.suggestionStepUid();
-    const anchorServiceId = this.store.suggestionAnchorServiceId();
-    const matchedIndex = orderedSteps.findIndex(
-      (step) =>
-        step.isMatchedService === true || (!!anchorServiceId && step.serviceId === anchorServiceId),
-    );
+    if (payload?.kind === 'step') {
+      this.moveDraggedStep(payload.uid, targetIndex);
+    }
 
-    if (anchorStepUid && matchedIndex >= 0) {
-      this.builderSteps.update((steps) => {
-        const anchorIndex = steps.findIndex((step) => step.uid === anchorStepUid);
+    this.clearWorkflowDragState();
+  }
+  saveWorkflow(): void {
+    if (this.store.saving() || !this.validateForm()) return;
+    if (this.store.panelMode() === 'create') this.createWorkflow();
+    if (this.store.panelMode() === 'edit') this.updateWorkflow();
+  }
 
-        if (anchorIndex < 0) {
-          return orderedSteps.map((step) => ({
-            uid: this.createStepUid(),
-            service: this.candidateFromStep(step),
-          }));
+  requestSetDefault(item: ServiceWorkflowListItem | ServiceWorkflowDetails): void {
+    this.openConfirmation('set-default', item);
+  }
+
+  requestDeactivate(item: ServiceWorkflowListItem | ServiceWorkflowDetails): void {
+    if (item.isDefault) {
+      this.showMessage('error', this.translations().defaultCannotDeactivate);
+      return;
+    }
+    this.openConfirmation('deactivate', item);
+  }
+
+  requestReactivate(item: ServiceWorkflowListItem | ServiceWorkflowDetails): void {
+    this.openConfirmation('reactivate', item);
+  }
+
+  closeConfirmDialog(): void {
+    if (!this.store.mutating()) this.store.confirmState.set(null);
+  }
+
+  confirmAction(): void {
+    const state = this.store.confirmState();
+    const scope = this.store.scope();
+    if (!state || !scope || this.store.mutating()) return;
+
+    this.store.mutating.set(true);
+    const request =
+      state.action === 'set-default'
+        ? this.apiService.setDefaultWorkflow(
+            scope.branchId,
+            scope.leafServiceId,
+            state.workflowId,
+            state.rowVersion,
+          )
+        : state.action === 'deactivate'
+          ? this.apiService.deactivateWorkflow(
+              scope.branchId,
+              scope.leafServiceId,
+              state.workflowId,
+              state.rowVersion,
+            )
+          : this.apiService.reactivateWorkflow(
+              scope.branchId,
+              scope.leafServiceId,
+              state.workflowId,
+              state.rowVersion,
+            );
+
+    request.pipe(finalize(() => this.store.mutating.set(false))).subscribe({
+      next: (response) => {
+        this.store.confirmState.set(null);
+        this.applyMutationResponse(response, state.action);
+        this.showMessage('success', response.message || this.translations().fallbackSuccess);
+        this.loadWorkflows(this.store.page().currentPage || 1);
+        this.loadStartOptions();
+        if (this.store.selectedDetails()?.workflowId === state.workflowId) {
+          this.loadDetails(state.workflowId, 'view');
         }
-
-        return [
-          ...steps.slice(0, anchorIndex + 1),
-          ...orderedSteps.slice(matchedIndex + 1).map((step) => ({
-            uid: this.createStepUid(),
-            service: this.candidateFromStep(step),
-          })),
-        ];
-      });
-    } else {
-      this.builderSteps.set(
-        orderedSteps.map((step) => ({
-          uid: this.createStepUid(),
-          service: this.candidateFromStep(step),
-        })),
-      );
-    }
-
-    this.store.selectedSuggestionWorkflowId.set(this.workflowId(workflow));
-    this.store.suggestionStepUid.set(null);
-  }
-
-  startNewWorkflowFromService(service: WorkflowCandidateService): void {
-    const anchorStepUid = this.store.suggestionStepUid();
-
-    this.builderSteps.update((steps) => {
-      const anchorIndex = steps.findIndex((step) => step.uid === anchorStepUid);
-      const pinnedStep: WorkflowBuilderStep = {
-        uid: anchorIndex >= 0 ? steps[anchorIndex].uid : this.createStepUid(),
-        service,
-      };
-
-      if (anchorIndex < 0) {
-        return [pinnedStep, this.createEmptyStep()];
-      }
-
-      return [...steps.slice(0, anchorIndex), pinnedStep, this.createEmptyStep()];
-    });
-    this.store.clearSuggestions();
-  }
-
-  shouldShowSuggestionsForStep(uid: string): boolean {
-    return this.store.suggestionStepUid() === uid && this.store.suggestionAnchorService() !== null;
-  }
-
-  dragWorkflowStepStart(step: ServiceWorkflowStep, event: DragEvent): void {
-    if (!this.canDragWorkflowStep(step)) {
-      event.preventDefault();
-      this.draggedSuggestedWorkflowStep.set(null);
-      this.selectionError.set(this.translations().invalidStep);
-      return;
-    }
-
-    this.draggedSuggestedWorkflowStep.set(step);
-
-    if (event.dataTransfer) {
-      event.dataTransfer.effectAllowed = 'copy';
-      event.dataTransfer.setData('application/x-service-workflow-step', String(step.serviceId));
-      event.dataTransfer.setData('text/plain', this.serviceName(step));
-    }
-  }
-
-  dragWorkflowStepEnd(): void {
-    this.draggedSuggestedWorkflowStep.set(null);
-  }
-
-  allowWorkflowStepDrop(event: DragEvent): void {
-    const draggedStep = this.draggedSuggestedWorkflowStep();
-
-    if (!draggedStep || this.isInvalidWorkflowStep(draggedStep)) {
-      return;
-    }
-
-    event.preventDefault();
-
-    if (event.dataTransfer) {
-      event.dataTransfer.dropEffect = 'copy';
-    }
-  }
-
-  dropWorkflowStepAfter(uid: string, event: DragEvent): void {
-    const draggedStep = this.draggedSuggestedWorkflowStep();
-
-    if (!draggedStep) {
-      return;
-    }
-
-    event.preventDefault();
-    event.stopPropagation();
-    this.addSuggestedStepAfter(uid, draggedStep);
-    this.dragWorkflowStepEnd();
-  }
-
-  dropWorkflowStepAtEnd(event: DragEvent): void {
-    const draggedStep = this.draggedSuggestedWorkflowStep();
-
-    if (!draggedStep) {
-      return;
-    }
-
-    event.preventDefault();
-    event.stopPropagation();
-    this.addSuggestedStepAfter('', draggedStep);
-    this.dragWorkflowStepEnd();
-  }
-
-  addSuggestedStepAfter(uid: string, step: ServiceWorkflowStep): void {
-    if (this.isInvalidWorkflowStep(step)) {
-      this.selectionError.set(this.translations().invalidStep);
-      return;
-    }
-
-    const service = this.candidateFromStep(step);
-
-    this.store.selectedSuggestionWorkflowId.set(null);
-    this.builderSteps.update((steps) => {
-      const anchorIndex = steps.findIndex((builderStep) => builderStep.uid === uid);
-      const insertIndex = anchorIndex >= 0 ? anchorIndex + 1 : steps.length;
-      const nextSteps = [...steps];
-
-      nextSteps.splice(insertIndex, 0, { uid: this.createStepUid(), service });
-      return nextSteps;
+      },
+      error: (error: HttpErrorResponse) => this.handleMutationError(error),
     });
   }
 
-  isInvalidWorkflowStep(step: ServiceWorkflowStep): boolean {
-    return (
-      step.isActive === false ||
-      step.isDeleted === true ||
-      step.effectiveIsActive === false ||
-      step.isTicketIssuable === false
-    );
+  clearMessage(): void {
+    this.store.message.set(null);
   }
 
-  isMatchedWorkflowStep(step: ServiceWorkflowStep): boolean {
-    const anchorServiceId = this.store.suggestionAnchorServiceId();
-    return (
-      step.isMatchedService === true || (!!anchorServiceId && step.serviceId === anchorServiceId)
-    );
-  }
-
-  isWorkflowStartingBeforeAnchor(workflow: ServiceRelatedWorkflow): boolean {
-    const anchorServiceId = this.store.suggestionAnchorServiceId();
-
-    if (!anchorServiceId) {
-      return false;
-    }
-
-    const orderedSteps = this.sortedSteps(workflow);
-    const matchedIndex = orderedSteps.findIndex(
-      (step) => step.isMatchedService === true || step.serviceId === anchorServiceId,
-    );
-
-    return matchedIndex > 0;
-  }
-
-  hasControlError(controlName: WorkflowFormControlName): boolean {
-    const control = this.workflowForm.controls[controlName];
-    return control.touched && control.invalid;
-  }
-
-  isActiveFilterValue(): BooleanSelectValue {
-    return this.toBooleanSelectValue(this.store.query().isActive);
-  }
-
-  workflowId(item: ServiceWorkflowListItem | ServiceWorkflowDetails): number {
-    return item.id ?? item.workflowId ?? 0;
-  }
-
-  workflowName(item: ServiceWorkflowListItem | ServiceWorkflowDetails): string {
-    const localized = this.language() === 'ar' ? item.arabicName : item.englishName;
-    const fallback = this.language() === 'ar' ? item.englishName : item.arabicName;
-    return this.formatText(localized || fallback);
-  }
-
-  serviceName(item: WorkflowCandidateService | ServiceWorkflowStep): string {
-    const arabicName =
-      'serviceArabicName' in item ? (item.serviceArabicName ?? item.arabicName) : item.arabicName;
-    const englishName =
-      'serviceEnglishName' in item
-        ? (item.serviceEnglishName ?? item.englishName)
-        : item.englishName;
-    return this.language() === 'ar' ? this.formatText(arabicName) : this.formatText(englishName);
-  }
-
-  parentName(item: WorkflowCandidateService | ServiceWorkflowStep): string {
-    const parentAliases = item as ServiceWorkflowStep & {
-      readonly parentArabicName?: string | null;
-      readonly parentEnglishName?: string | null;
-    };
-    const arabicName = item.parentServiceArabicName ?? parentAliases.parentArabicName;
-    const englishName = item.parentServiceEnglishName ?? parentAliases.parentEnglishName;
-    return this.language() === 'ar' ? this.formatText(arabicName) : this.formatText(englishName);
-  }
-
-  startServiceName(item: ServiceWorkflowListItem): string {
-    const localized =
-      this.language() === 'ar' ? item.startServiceArabicName : item.startServiceEnglishName;
-    const fallback = this.previewSteps(item)[0];
-    return localized && localized.trim().length > 0
-      ? localized
-      : fallback
-        ? this.serviceName(fallback)
-        : this.translations().notAvailable;
-  }
-  suggestionAnchorName(): string {
-    const anchorService = this.store.suggestionAnchorService();
-    return anchorService ? this.serviceName(anchorService) : this.translations().notAvailable;
-  }
-
-  suggestionEmptyMessage(): string {
-    return this.translations().noSuggestedWorkflows.replace(
-      '{{ serviceName }}',
-      this.suggestionAnchorName(),
-    );
-  }
-
-  workflowStepCount(item: ServiceWorkflowListItem | ServiceWorkflowDetails): number {
-    return item.stepsCount ?? item.steps?.length ?? this.previewSteps(item).length;
-  }
-
-  candidateId(item: WorkflowCandidateService): number {
-    return item.serviceId ?? item.id ?? 0;
-  }
-
-  stepServiceId(step: WorkflowBuilderStep): number {
-    return step.service ? this.candidateId(step.service) : 0;
-  }
-
-  sortedSteps(details: ServiceWorkflowDetails): readonly ServiceWorkflowStep[] {
-    return [...details.steps].sort((a, b) => a.stepOrder - b.stepOrder);
-  }
-
-  workflowListSteps(item: ServiceWorkflowListItem): readonly ServiceWorkflowStep[] {
-    const steps = [...(item.steps ?? [])].sort((a, b) => a.stepOrder - b.stepOrder);
-
-    if (steps.length > 0) {
-      return steps;
-    }
-
-    if (!item.startServiceId && !item.startServiceArabicName && !item.startServiceEnglishName) {
-      return [];
-    }
-
-    return [
-      {
-        serviceId: item.startServiceId ?? 0,
-        stepOrder: 1,
-        serviceArabicName: item.startServiceArabicName ?? null,
-        serviceEnglishName: item.startServiceEnglishName ?? null,
-      },
-    ];
-  }
-
-  workflowCardSteps(item: ServiceWorkflowListItem): readonly ServiceWorkflowStep[] {
-    const details = this.workflowCardDetails(item);
-
-    return details ? this.sortedSteps(details) : this.workflowListSteps(item);
-  }
-
-  workflowCardDetails(item: ServiceWorkflowListItem): ServiceWorkflowDetails | null {
-    const details = this.store.selectedDetails();
-    const isSelectedView =
-      !this.store.detailsLoading() &&
-      this.store.panelMode() === 'view' &&
-      details !== null &&
-      this.workflowId(details) === this.workflowId(item);
-
-    return isSelectedView ? details : null;
-  }
-
-  previewSteps(
-    item: ServiceWorkflowListItem | ServiceWorkflowDetails,
-  ): readonly ServiceWorkflowStep[] {
-    const steps = [...(item.steps ?? [])].sort((a, b) => a.stepOrder - b.stepOrder);
-
-    if (steps.length > 0) {
-      return steps.slice(0, 5);
-    }
-
-    if (!item.startServiceId && !item.startServiceArabicName && !item.startServiceEnglishName) {
-      return [];
-    }
-
-    return [
-      {
-        serviceId: item.startServiceId ?? 0,
-        stepOrder: 1,
-        serviceArabicName: item.startServiceArabicName ?? null,
-        serviceEnglishName: item.startServiceEnglishName ?? null,
-      },
-    ];
-  }
-
-  formatDate(value: string | null | undefined): string {
-    if (!value) {
-      return this.translations().notAvailable;
-    }
-
-    const date = new Date(value);
-    if (Number.isNaN(date.getTime())) {
-      return this.translations().notAvailable;
-    }
-
-    return new Intl.DateTimeFormat(this.language() === 'ar' ? 'ar-EG' : 'en-US', {
-      dateStyle: 'medium',
-      timeStyle: 'short',
-    }).format(date);
-  }
-
-  formatText(value: string | null | undefined): string {
-    return value && value.trim().length > 0 ? value : this.translations().notAvailable;
-  }
-
-  readInputValue(event: Event): string {
-    return (event.target as HTMLInputElement | HTMLSelectElement).value;
-  }
-
-  private initializeServiceSelection(): void {
-    this.clearWorkflowStartOptions();
-    this.cascadeSelector?.reset();
-  }
-
-  private clearServiceSelection(): void {
-    this.selectionMode.set({ kind: 'add' });
-    this.clearWorkflowStartOptions();
-    this.cascadeSelector?.clear();
-  }
-
-  private selectionErrorMessage(error: HttpErrorResponse): string {
-    if (error.status === 403) {
-      return this.translations().selectionAccessDenied;
-    }
-
-    if (error.status === 404) {
-      return this.translations().selectedServiceNotFound;
-    }
-
-    return formatTechnicalAdminApiError(error, this.translations().fallbackError);
-  }
-
-  private loadWorkflowStartOptionsForSelection(
-    serviceId: number,
-    fallbackService: WorkflowCandidateService,
-  ): void {
-    this.pendingWorkflowStartServiceId.set(serviceId);
-    this.workflowStartOptions.set(null);
-    this.workflowStartOptionsLoading.set(true);
-    this.selectionError.set(null);
-
-    this.apiService
-      .getWorkflowStartOptions(serviceId)
-      .pipe(finalize(() => this.workflowStartOptionsLoading.set(false)))
-      .subscribe({
-        next: (options) => {
-          if (this.pendingWorkflowStartServiceId() !== serviceId) {
-            return;
-          }
-
-          const workflows = options.workflows.filter(
-            (workflow) => workflow.isActive && workflow.steps.length > 0,
-          );
-          const nextOptions: WorkflowStartOptions = { ...options, workflows };
-
-          if (options.mode === 'NoWorkflow' || workflows.length === 0) {
-            this.commitServiceAsStep(fallbackService);
-            return;
-          }
-
-          this.workflowStartOptions.set(nextOptions);
-        },
-        error: (error: HttpErrorResponse) => this.handleWorkflowStartOptionsError(error),
-      });
-  }
-
-  private handleWorkflowStartOptionsError(error: HttpErrorResponse): void {
-    if (this.authSessionService.shouldClearSessionForHttpStatus(error.status)) {
-      this.authSessionService.clearSession();
-      void this.router.navigateByUrl('/login');
-      return;
-    }
-
-    const message = this.selectionErrorMessage(error);
-    this.clearWorkflowStartOptions();
-    this.selectionError.set(message);
-    this.showMessage('error', message);
-  }
-
-  private commitServiceAsStep(service: WorkflowCandidateService): void {
-    this.openCreatePanelForSelectionIfNeeded();
-
-    const mode = this.selectionMode();
-    this.formError.set(null);
-
-    if (mode.kind === 'replace') {
-      this.builderSteps.update((steps) =>
-        steps.map((step) => (step.uid === mode.stepUid ? { ...step, service } : step)),
-      );
-    } else {
-      this.builderSteps.update((steps) => [...steps, { uid: this.createStepUid(), service }]);
-    }
-
-    this.startAddStepSelection();
-  }
-
-  private applyWorkflowSteps(steps: readonly ServiceWorkflowStep[]): void {
-    this.openCreatePanelForSelectionIfNeeded();
-
-    const builderSteps = steps.map((step) => ({
-      uid: this.createStepUid(),
-      service: this.candidateFromStep(step),
-    }));
-    this.formError.set(null);
-
-    this.builderSteps.update((currentSteps) => [...currentSteps, ...builderSteps]);
-  }
-
-  private openCreatePanelForSelectionIfNeeded(): void {
-    if (this.isEditorMode()) {
-      return;
-    }
-
-    this.store.selectedDetails.set(null);
-    this.store.clearSuggestions();
-    this.store.openPanel('create');
-    this.formError.set(null);
-    this.workflowForm.reset({ arabicName: '', englishName: '' });
-    this.builderSteps.set([]);
-    this.selectionMode.set({ kind: 'add' });
-  }
-
-  private clearWorkflowStartOptions(): void {
-    this.workflowStartOptions.set(null);
-    this.workflowStartOptionsLoading.set(false);
-    this.pendingWorkflowStartServiceId.set(null);
+  private loadScopedData(pageNumber = 1): void {
+    this.loadWorkflows(pageNumber);
+    if (this.canViewCandidates()) this.loadCandidates();
+    if (this.canViewStartOptions()) this.loadStartOptions();
   }
 
   private loadWorkflows(pageNumber = this.store.query().pageNumber): void {
-    if (!this.canViewAll() || this.store.listLoading()) {
-      return;
-    }
-
+    const scope = this.store.scope();
+    if (!scope || this.store.listLoading()) return;
     this.store.updateQuery({ pageNumber });
     this.store.listLoading.set(true);
-
     this.apiService
-      .getWorkflows(this.store.query())
+      .getWorkflows(scope.branchId, scope.leafServiceId, this.store.query())
       .pipe(finalize(() => this.store.listLoading.set(false)))
       .subscribe({
         next: (response) => this.store.page.set(response),
@@ -989,56 +528,12 @@ export class ServiceWorkflowsComponent implements OnInit, OnDestroy {
       });
   }
 
-  private loadSuggestedWorkflows(service: WorkflowCandidateService): void {
-    if (!this.canViewServiceWorkflows()) {
-      this.store.clearSuggestions();
-      return;
-    }
-
-    const serviceId = this.candidateId(service);
-
-    if (serviceId <= 0) {
-      this.store.clearSuggestions();
-      return;
-    }
-
-    this.store.suggestionAnchorServiceId.set(serviceId);
-    this.store.suggestionAnchorService.set(service);
-    this.store.selectedSuggestionWorkflowId.set(null);
-    this.store.suggestionsLoading.set(true);
-
-    this.apiService
-      .getServiceWorkflows(serviceId)
-      .pipe(
-        finalize(() => {
-          if (this.store.suggestionAnchorServiceId() === serviceId) {
-            this.store.suggestionsLoading.set(false);
-          }
-        }),
-      )
-      .subscribe({
-        next: (response) => {
-          if (this.store.suggestionAnchorServiceId() === serviceId) {
-            this.store.suggestedWorkflows.set(response);
-          }
-        },
-        error: (error: HttpErrorResponse) => {
-          if (this.store.suggestionAnchorServiceId() === serviceId) {
-            this.handleApiError(error);
-          }
-        },
-      });
-  }
-
   private loadCandidates(): void {
-    if (!this.canViewCandidates() || this.store.candidatesLoading()) {
-      return;
-    }
-
+    const scope = this.store.scope();
+    if (!scope || !this.canViewCandidates() || this.store.candidatesLoading()) return;
     this.store.candidatesLoading.set(true);
-
     this.apiService
-      .getCandidateServices(this.store.candidateQuery())
+      .getCandidateServices(scope.branchId, this.store.candidateQuery())
       .pipe(finalize(() => this.store.candidatesLoading.set(false)))
       .subscribe({
         next: (response) => this.store.candidates.set(response),
@@ -1046,76 +541,240 @@ export class ServiceWorkflowsComponent implements OnInit, OnDestroy {
       });
   }
 
-  private loadDetails(workflowId: number, mode: 'view' | 'edit'): void {
-    if (workflowId <= 0 || this.store.detailsLoading()) {
-      return;
-    }
+  private loadStartOptions(): void {
+    const scope = this.store.scope();
+    if (!scope || !this.canViewStartOptions() || this.store.startOptionsLoading()) return;
+    this.store.startOptionsLoading.set(true);
+    this.apiService
+      .getWorkflowStartOptions(scope.branchId, scope.leafServiceId)
+      .pipe(finalize(() => this.store.startOptionsLoading.set(false)))
+      .subscribe({
+        next: (response) => this.store.startOptions.set(response),
+        error: (error: HttpErrorResponse) => this.handleApiError(error),
+      });
+  }
 
-    this.store.selectedDetails.set(null);
+  private loadDetails(workflowId: number, mode: 'view' | 'edit'): void {
+    const scope = this.store.scope();
+    if (!scope || workflowId <= 0 || this.store.detailsLoading()) return;
     this.store.openPanel(mode);
     this.store.detailsLoading.set(true);
-    this.formError.set(null);
-
     this.apiService
-      .getWorkflowDetails(workflowId)
+      .getWorkflowDetails(scope.branchId, scope.leafServiceId, workflowId)
       .pipe(finalize(() => this.store.detailsLoading.set(false)))
       .subscribe({
         next: (details) => {
           this.store.selectedDetails.set(details);
-          if (mode === 'edit') {
-            this.store.clearSuggestions();
-            this.populateForm(details);
-            this.initializeServiceSelection();
-          }
+          if (mode === 'edit') this.populateForm(details);
         },
         error: (error: HttpErrorResponse) => this.handleApiError(error),
       });
   }
 
   private createWorkflow(): void {
+    const scope = this.store.scope();
+    if (!scope) return;
     this.store.saving.set(true);
-
     this.apiService
-      .createWorkflow(this.mapCreateRequest())
+      .createWorkflow(scope.branchId, scope.leafServiceId, this.mapCreateRequest())
       .pipe(finalize(() => this.store.saving.set(false)))
       .subscribe({
         next: (response) => {
-          const id = response.id ?? response.workflowId ?? 0;
           this.showMessage('success', response.message || this.translations().fallbackSuccess);
           this.loadWorkflows(1);
-          if (id > 0) {
-            this.loadDetails(id, 'view');
+          this.loadStartOptions();
+          if (response.workflowId > 0 && this.canViewDetails()) {
+            this.loadDetails(response.workflowId, 'view');
           } else {
             this.closePanel();
           }
         },
-        error: (error: HttpErrorResponse) => this.handleApiError(error),
+        error: (error: HttpErrorResponse) => this.handleMutationError(error),
       });
   }
 
   private updateWorkflow(): void {
+    const scope = this.store.scope();
     const details = this.store.selectedDetails();
-
-    if (!details) {
-      return;
-    }
-
-    const id = this.workflowId(details);
+    if (!scope || !details) return;
     this.store.saving.set(true);
-
     this.apiService
-      .updateWorkflow(id, { ...this.mapCreateRequest(), rowVersion: details.rowVersion })
+      .updateWorkflow(scope.branchId, scope.leafServiceId, details.workflowId, {
+        ...this.mapCreateRequest(),
+        rowVersion: details.rowVersion,
+      })
       .pipe(finalize(() => this.store.saving.set(false)))
       .subscribe({
         next: (response) => {
+          this.store.selectedDetails.set(response);
+          this.replaceListItem(response);
+          this.store.openPanel('view');
           this.showMessage('success', response.message || this.translations().fallbackSuccess);
           this.loadWorkflows(this.store.page().currentPage || 1);
-          this.loadDetails(id, 'view');
+          this.loadStartOptions();
         },
-        error: (error: HttpErrorResponse) => this.handleApiError(error),
+        error: (error: HttpErrorResponse) => this.handleMutationError(error),
       });
   }
 
+  workflowName(item: ServiceWorkflowListItem | ServiceWorkflowDetails): string {
+    return this.formatText(this.language() === 'ar' ? item.arabicName : item.englishName);
+  }
+
+  serviceName(item: ServiceTreeNode | WorkflowCandidateService | ServiceWorkflowStep): string {
+    return this.formatText(this.language() === 'ar' ? item.arabicName : item.englishName);
+  }
+
+  parentName(item: WorkflowCandidateService | ServiceWorkflowStep): string {
+    return this.formatText(
+      this.language() === 'ar' ? item.parentArabicName : item.parentEnglishName,
+    );
+  }
+
+  parentOptionName(item: WorkflowParentOption): string {
+    return this.formatText(this.language() === 'ar' ? item.arabicName : item.englishName);
+  }
+
+  sortedSteps(item: ServiceWorkflowListItem | ServiceWorkflowDetails): readonly ServiceWorkflowStep[] {
+    return [...item.steps].sort((a, b) => a.stepOrder - b.stepOrder);
+  }
+
+  formatDate(value: string | null): string {
+    if (!value) return this.translations().notAvailable;
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return this.translations().notAvailable;
+    return new Intl.DateTimeFormat(this.language() === 'ar' ? 'ar-EG' : 'en-US', {
+      dateStyle: 'medium',
+      timeStyle: 'short',
+    }).format(date);
+  }
+
+  isActiveFilterValue(): BooleanSelectValue {
+    const value = this.store.query().isActive;
+    return value === null ? 'all' : value ? 'true' : 'false';
+  }
+
+  hasControlError(controlName: WorkflowFormControlName): boolean {
+    const control = this.workflowForm.controls[controlName];
+    return control.touched && control.invalid;
+  }
+
+  confirmTitle(action: WorkflowConfirmAction): string {
+    if (action === 'set-default') return this.translations().confirmSetDefaultTitle;
+    if (action === 'deactivate') return this.translations().confirmDeactivateTitle;
+    return this.translations().confirmReactivateTitle;
+  }
+
+  confirmBody(action: WorkflowConfirmAction): string {
+    if (action === 'set-default') return this.translations().confirmSetDefaultBody;
+    if (action === 'deactivate') return this.translations().confirmDeactivateBody;
+    return this.translations().confirmReactivateBody;
+  }
+
+  confirmActionLabel(action: WorkflowConfirmAction): string {
+    if (action === 'set-default') return this.translations().setDefault;
+    if (action === 'deactivate') return this.translations().deactivate;
+    return this.translations().reactivate;
+  }
+
+  private openConfirmation(
+    action: WorkflowConfirmAction,
+    item: ServiceWorkflowListItem | ServiceWorkflowDetails,
+  ): void {
+    const allowed =
+      (action === 'set-default' && this.canSetDefault() && item.isActive && !item.isDefault) ||
+      (action === 'deactivate' && this.canDeactivate() && item.isActive && !item.isDefault) ||
+      (action === 'reactivate' && this.canReactivate() && !item.isActive);
+    if (!allowed) return;
+    this.store.confirmState.set({
+      action,
+      workflowId: item.workflowId,
+      rowVersion: item.rowVersion,
+      workflowName: this.workflowName(item),
+    });
+  }
+
+  private writeDragPayload(
+    event: DragEvent,
+    payload: WorkflowDragPayload,
+    effectAllowed: 'copy' | 'move',
+  ): void {
+    if (!event.dataTransfer) return;
+    const serialized = JSON.stringify(payload);
+    event.dataTransfer.setData(WORKFLOW_DRAG_MIME_TYPE, serialized);
+    event.dataTransfer.setData('text/plain', serialized);
+    event.dataTransfer.effectAllowed = effectAllowed;
+  }
+
+  private readDragPayload(event: DragEvent): WorkflowDragPayload | null {
+    const rawValue =
+      event.dataTransfer?.getData(WORKFLOW_DRAG_MIME_TYPE) ||
+      event.dataTransfer?.getData('text/plain') ||
+      '';
+
+    if (!rawValue) return null;
+
+    try {
+      const value = JSON.parse(rawValue) as Partial<WorkflowDragPayload>;
+      if (value.kind === 'candidate') {
+        const serviceId = Number(value.serviceId);
+        if (Number.isInteger(serviceId) && serviceId > 0) {
+          return { kind: 'candidate', serviceId };
+        }
+      }
+      if (value.kind === 'step' && typeof value.uid === 'string' && value.uid.trim()) {
+        return { kind: 'step', uid: value.uid };
+      }
+    } catch {
+      return null;
+    }
+
+    return null;
+  }
+
+  private insertCandidate(candidate: WorkflowCandidateService, dropIndex: number): void {
+    const replacingUid = this.replacingStepUid();
+    if (replacingUid) {
+      this.selectCandidate(candidate);
+      return;
+    }
+
+    this.builderSteps.update((steps) => {
+      const next = [...steps];
+      next.splice(this.normalizeDropIndex(dropIndex), 0, {
+        uid: this.createStepUid(),
+        service: candidate,
+      });
+      return next;
+    });
+  }
+
+  private moveDraggedStep(uid: string, dropIndex: number): void {
+    this.builderSteps.update((steps) => {
+      const next = [...steps];
+      const sourceIndex = next.findIndex((step) => step.uid === uid);
+      if (sourceIndex < 0) return steps;
+
+      const [draggedStep] = next.splice(sourceIndex, 1);
+      const targetIndex = sourceIndex < dropIndex ? dropIndex - 1 : dropIndex;
+      next.splice(Math.min(Math.max(targetIndex, 0), next.length), 0, draggedStep);
+      return next;
+    });
+  }
+
+  private normalizeDropIndex(dropIndex: number): number {
+    return Math.min(Math.max(dropIndex, 0), this.builderSteps().length);
+  }
+
+  private isWorkflowEditorOpen(): boolean {
+    const mode = this.store.panelMode();
+    return mode === 'create' || mode === 'edit';
+  }
+
+  private clearWorkflowDragState(): void {
+    this.activeDragKind.set(null);
+    this.activeDropIndex.set(null);
+  }
   private populateForm(details: ServiceWorkflowDetails): void {
     this.workflowForm.reset({
       arabicName: details.arabicName,
@@ -1127,6 +786,7 @@ export class ServiceWorkflowsComponent implements OnInit, OnDestroy {
         service: this.candidateFromStep(step),
       })),
     );
+    this.replacingStepUid.set(null);
   }
 
   private mapCreateRequest() {
@@ -1135,97 +795,116 @@ export class ServiceWorkflowsComponent implements OnInit, OnDestroy {
       arabicName: value.arabicName.trim(),
       englishName: value.englishName.trim(),
       steps: this.builderSteps().map((step, index) => ({
-        serviceId: step.service ? this.candidateId(step.service) : 0,
+        serviceId: step.service.serviceId,
         stepOrder: index + 1,
       })),
     };
   }
 
-  private isFormValid(): boolean {
+  private validateForm(): boolean {
     this.formError.set(null);
-
     if (this.workflowForm.invalid) {
+      this.workflowForm.markAllAsTouched();
       return false;
     }
-
-    const steps = this.builderSteps();
-
-    if (steps.length < 2) {
+    if (this.builderSteps().length < 2) {
       this.formError.set(this.translations().minimumSteps);
       return false;
     }
-
-    if (steps.some((step) => !step.service || this.candidateId(step.service) <= 0)) {
-      this.formError.set(this.translations().stepServiceRequired);
-      return false;
-    }
-
     return true;
-  }
-
-  private createEmptyStep(): WorkflowBuilderStep {
-    return { uid: this.createStepUid(), service: null };
-  }
-
-  private createStepUid(): string {
-    this.stepUid += 1;
-    return `workflow-step-${this.stepUid}`;
-  }
-
-  private findCandidate(serviceId: number): WorkflowCandidateService | null {
-    return this.candidateOptions().find((item) => this.candidateId(item) === serviceId) ?? null;
   }
 
   private candidateFromStep(step: ServiceWorkflowStep): WorkflowCandidateService {
     return {
       serviceId: step.serviceId,
-      arabicName: step.serviceArabicName ?? step.arabicName ?? this.translations().notAvailable,
-      englishName: step.serviceEnglishName ?? step.englishName ?? this.translations().notAvailable,
-      parentServiceId: step.parentServiceId ?? null,
-      parentServiceArabicName: step.parentServiceArabicName ?? null,
-      parentServiceEnglishName: step.parentServiceEnglishName ?? null,
-      isActive: step.isActive ?? true,
-      isDeleted: step.isDeleted ?? false,
-      isTicketIssuable: step.isTicketIssuable ?? false,
-      relatedWorkflows: [],
+      parentServiceId: step.parentServiceId,
+      parentArabicName: step.parentArabicName,
+      parentEnglishName: step.parentEnglishName,
+      arabicName: step.arabicName ?? this.translations().notAvailable,
+      englishName: step.englishName ?? this.translations().notAvailable,
+      isActive: step.isActive,
+      isDeleted: step.isDeleted,
+      effectiveIsActive: step.effectiveIsActive,
+      isTicketIssuable: step.isTicketIssuable,
     };
   }
 
-  private toBooleanFilter(value: string): boolean | null {
-    if (value === 'true') {
-      return true;
-    }
+  private replaceListItem(details: ServiceWorkflowDetails): void {
+    this.store.page.update((page) => ({
+      ...page,
+      data: page.data.map((item) => (item.workflowId === details.workflowId ? details : item)),
+    }));
+  }
 
-    if (value === 'false') {
-      return false;
-    }
+  private applyMutationResponse(
+    response: ServiceWorkflowDetails | ServiceWorkflowMutationResponse,
+    action: WorkflowConfirmAction,
+  ): void {
+    this.store.page.update((page) => ({
+      ...page,
+      data: page.data.map((item) => {
+        if (item.workflowId === response.workflowId) return { ...item, ...response };
+        if (action === 'set-default' && item.isDefault) return { ...item, isDefault: false };
+        return item;
+      }),
+    }));
 
+    this.store.selectedDetails.update((details) => {
+      if (!details) return null;
+      if (details.workflowId === response.workflowId) return { ...details, ...response };
+      if (action === 'set-default' && details.isDefault) return { ...details, isDefault: false };
+      return details;
+    });
+  }
+
+  private collectParentOptions(nodes: readonly ServiceTreeNode[]): readonly WorkflowParentOption[] {
+    return nodes.flatMap((node) => [
+      ...(node.hasChildren || node.children.length > 0
+        ? [{ id: node.id, arabicName: node.arabicName, englishName: node.englishName }]
+        : []),
+      ...this.collectParentOptions(node.children),
+    ]);
+  }
+
+  private findTreeNode(
+    nodes: readonly ServiceTreeNode[],
+    nodeId: number | null,
+  ): ServiceTreeNode | null {
+    if (!nodeId) return null;
+    for (const node of nodes) {
+      if (node.id === nodeId) return node;
+      const nested = this.findTreeNode(node.children, nodeId);
+      if (nested) return nested;
+    }
     return null;
   }
 
-  private toBooleanSelectValue(value: boolean | null): BooleanSelectValue {
-    if (value === true) {
-      return 'true';
-    }
-
-    if (value === false) {
-      return 'false';
-    }
-
-    return 'all';
+  private branchLabel(branchId: number): string {
+    const branch = this.store.branches().find((item) => item.branchId === branchId);
+    const sessionBranch = this.authSessionService
+      .currentSession()
+      ?.branches.find((item) => item.branchId === branchId);
+    const item = branch ?? sessionBranch;
+    if (!item) return `#${branchId}`;
+    return this.language() === 'ar' ? item.arabicName : item.englishName;
   }
 
-  private toOptionalNumber(value: string): number | null {
-    const parsed = Number(value);
-    return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
-  }
-
-  private normalizePageSize(value: number): number {
-    if (!Number.isFinite(value) || value <= 0) {
-      return 10;
+  private handleMutationError(error: HttpErrorResponse): void {
+    this.store.confirmState.set(null);
+    if (this.containsErrorCode(error, 'ServiceWorkflows.Deactivate.DefaultWorkflow')) {
+      this.showMessage('error', this.translations().defaultCannotDeactivate);
+      this.loadWorkflows();
+      return;
     }
-
-    return Math.min(value, 100);
+    if (this.isConcurrencyError(error)) {
+      this.showMessage('error', this.translations().concurrencyError);
+      this.loadWorkflows();
+      this.loadStartOptions();
+      const selectedId = this.store.selectedDetails()?.workflowId;
+      if (selectedId) this.loadDetails(selectedId, 'view');
+      return;
+    }
+    this.handleApiError(error);
   }
 
   private handleApiError(error: HttpErrorResponse): void {
@@ -1234,55 +913,76 @@ export class ServiceWorkflowsComponent implements OnInit, OnDestroy {
       void this.router.navigateByUrl('/login');
       return;
     }
-
     if (error.status === 403) {
       this.showMessage('error', this.translations().accessDenied);
       return;
     }
-
-    if (this.isConcurrencyError(error)) {
-      this.showMessage('error', this.translations().concurrencyError);
-      return;
-    }
-
-    this.showMessage(
-      'error',
-      formatTechnicalAdminApiError(error, this.translations().fallbackError),
-    );
+    this.showMessage('error', formatTechnicalAdminApiError(error, this.translations().fallbackError));
   }
 
   private isConcurrencyError(error: HttpErrorResponse): boolean {
-    const body = error.error;
+    return this.containsErrorCode(error, 'concurrency') || this.containsErrorCode(error, 'rowversion');
+  }
 
-    if (typeof body === 'string') {
-      return body.toLowerCase().includes('concurrency');
-    }
-
-    if (!body || typeof body !== 'object') {
-      return false;
-    }
-
-    return Object.values(body as Record<string, unknown>).some(
-      (value) => typeof value === 'string' && value.toLowerCase().includes('concurrency'),
-    );
+  private containsErrorCode(error: HttpErrorResponse, expected: string): boolean {
+    const values: string[] = [];
+    const visit = (value: unknown, depth = 0): void => {
+      if (depth > 4 || value === null || value === undefined) return;
+      if (typeof value === 'string') {
+        values.push(value);
+        return;
+      }
+      if (Array.isArray(value)) {
+        value.forEach((item) => visit(item, depth + 1));
+        return;
+      }
+      if (typeof value === 'object') {
+        Object.values(value as Record<string, unknown>).forEach((item) => visit(item, depth + 1));
+      }
+    };
+    visit(error.error);
+    const normalizedExpected = expected.toLowerCase();
+    return values.some((value) => value.toLowerCase().includes(normalizedExpected));
   }
 
   private showMessage(tone: 'success' | 'error' | 'info', text: string): void {
-    if (this.toastTimeoutId) {
-      clearTimeout(this.toastTimeoutId);
-    }
-
+    if (this.toastTimeoutId) clearTimeout(this.toastTimeoutId);
     this.store.message.set({ tone, text });
-    this.toastTimeoutId = setTimeout(
-      () => {
-        this.store.message.set(null);
-        this.toastTimeoutId = null;
-      },
-      tone === 'error' ? 6500 : 4200,
-    );
+    this.toastTimeoutId = setTimeout(() => {
+      this.store.message.set(null);
+      this.toastTimeoutId = null;
+    }, 6000);
   }
 
-  private notWhitespace(control: AbstractControl<string>): ValidationErrors | null {
-    return control.value.trim().length > 0 ? null : { whitespace: true };
+  private branchName(branch: BranchListItem): string {
+    return this.language() === 'ar' ? branch.arabicName : branch.englishName;
+  }
+
+  branchOptionName(branch: BranchListItem): string {
+    return this.branchName(branch);
+  }
+
+  private createStepUid(): string {
+    this.stepUid += 1;
+    return `workflow-step-${this.stepUid}`;
+  }
+
+  private toBooleanFilter(value: string): boolean | null {
+    if (value === 'true') return true;
+    if (value === 'false') return false;
+    return null;
+  }
+
+  private readPositiveInt(value: string | null): number | null {
+    const parsed = Number(value);
+    return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
+  }
+
+  private readInputValue(event: Event): string {
+    return (event.target as HTMLInputElement | HTMLSelectElement).value;
+  }
+
+  private formatText(value: string | null | undefined): string {
+    return value?.trim() || this.translations().notAvailable;
   }
 }

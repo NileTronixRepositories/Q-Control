@@ -15,19 +15,19 @@
   --q-warning-soft: #fff8eb;
   --q-danger: #d21f35;
   --q-danger-soft: #fff0f2;
-  
+
   /* Sizing and Density Tokens */
   --q-radius-sm: 8px;
   --q-radius-md: 12px;
   --q-radius-lg: 16px;
-  
+
   --q-control-height: 34px;
   --q-action-height: 44px;
   --q-compact-action-height: 38px;
   --q-icon-action-size: 36px;
   --q-icon-action-radius: 8px;
   --q-upload-height: 48px;
-  
+
   --q-workspace-padding-y: 14px;
   --q-workspace-padding-x: 16px;
   --q-section-gap: 12px;
@@ -35,7 +35,7 @@
   --q-form-gap-y: 12px;
   --q-panel-padding-y: 14px;
   --q-panel-padding-x: 16px;
-  
+
   /* Shadows */
   --q-shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.03);
   --q-shadow-card: 0 10px 24px rgba(15, 23, 42, 0.06);
@@ -57,7 +57,7 @@
   --q-icon-button-bg: #ffffff;
   --q-icon-button-hover-bg: rgba(8, 107, 141, 0.08);
   --q-icon-button-border: rgba(8, 107, 141, 0.2);
-  
+
   /* Typography */
   --q-font-family: 'Cairo', Arial, sans-serif;
 
@@ -102,33 +102,33 @@
   --nt-success: var(--q-success);
   --nt-warning: var(--q-warning);
   --nt-danger: var(--q-danger);
-  
+
   --nt-radius-sm: var(--q-radius-sm);
   --nt-radius-md: var(--q-radius-md);
   --nt-radius-lg: var(--q-radius-lg);
-  
+
   --nt-control-height: var(--q-control-height);
   --nt-action-height: var(--q-action-height);
   --nt-compact-action-height: var(--q-compact-action-height);
   --nt-icon-action-size: var(--q-icon-action-size);
   --nt-upload-height: var(--q-upload-height);
-  
+
   --nt-workspace-padding-y: var(--q-workspace-padding-y);
   --nt-workspace-padding-x: var(--q-workspace-padding-x);
   --nt-workspace-padding-lg-y: var(--q-workspace-padding-y);
   --nt-workspace-padding-lg-x: var(--q-workspace-padding-x);
   --nt-workspace-padding-md: var(--q-workspace-padding-y);
-  
+
   --nt-section-gap: var(--q-section-gap);
   --nt-form-gap-x: var(--q-form-gap-x);
   --nt-form-gap-y: var(--q-form-gap-y);
-  
+
   --nt-panel-padding-y: var(--q-panel-padding-y);
   --nt-panel-padding-x: var(--q-panel-padding-x);
-  
+
   --nt-shadow-soft: var(--q-shadow-soft);
   --nt-shadow-card: var(--q-shadow-card);
-  
+
   --nt-hero-min-height: 80px;
   --nt-hero-padding-y: var(--q-panel-padding-y);
   --nt-hero-padding-x: var(--q-panel-padding-x);
@@ -155,7 +155,6 @@
   --shadow-raised: var(--q-shadow-card);
   --focus-ring: 0 0 0 4px rgba(11, 138, 168, 0.14);
 }
-
 
 /* Legacy deep-ocean color tokens (merged from deep-ocean.css). */
 :root {

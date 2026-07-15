@@ -1,14 +1,14 @@
-<section class="technical-admin-responsive-page branch-branding-page technical-page container-fluid w-100 !mx-auto !max-w-[1600px] !gap-4 !p-3 sm:!p-4 lg:!p-5" [attr.dir]="direction()" [attr.lang]="language()">
+<section
+  class="technical-admin-responsive-page branch-branding-page technical-page container-fluid w-100 !mx-auto !max-w-[1600px] !gap-4 !p-3 sm:!p-4 lg:!p-5"
+  [attr.dir]="direction()"
+  [attr.lang]="language()"
+>
   <app-technical-admin-page-hero
     [eyebrow]="copy().pageEyebrow"
     [title]="copy().pageTitle"
     [description]="copy().pageDescription"
     icon="bi bi-palette-fill"
   />
-
-  <!-- <div class="branch-context-bar fade-in">
-   
-  </div> -->
 
   @if (message(); as currentMessage) {
     <div class="toast-stack" role="status" aria-live="polite" aria-atomic="true">

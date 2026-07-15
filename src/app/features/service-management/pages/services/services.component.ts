@@ -25,7 +25,6 @@ import { TechnicalAdminI18nStore } from '../../../technical-admin/store/technica
 import { formatTechnicalAdminApiError } from '../../../technical-admin/utils/api-error-message.util';
 import { ServiceHierarchyTreeComponent } from '../../components/service-hierarchy-tree/service-hierarchy-tree.component';
 import { SERVICE_MANAGEMENT_TRANSLATIONS } from '../../i18n/service-management.translations';
-import { SERVICE_WORKFLOW_TRANSLATIONS } from '../../i18n/service-workflow.translations';
 import {
   CreateServiceRequest,
   ServiceBooleanFilter,
@@ -39,16 +38,9 @@ import {
   ServiceTreeNode,
   UpdateServiceRequest,
 } from '../../models/service-management.model';
-import {
-  ServiceRelatedWorkflow,
-  ServiceWorkflowStep,
-  WorkflowStartMode,
-  WorkflowStartOptions,
-} from '../../models/service-workflow.model';
 import { BranchServicesApiService } from '../../services/branch-services-api.service';
 import { ServiceManagementApiService } from '../../services/service-management-api.service';
 import { ServiceManagementPermissionService } from '../../services/service-management-permission.service';
-import { ServiceWorkflowApiService } from '../../services/service-workflow-api.service';
 import { ServiceManagementStore } from '../../store/service-management.store';
 
 type BooleanSelectValue = 'all' | 'true' | 'false';
@@ -88,7 +80,6 @@ export class ServicesComponent implements OnInit, OnDestroy {
   private readonly i18nStore = inject(TechnicalAdminI18nStore);
   private readonly apiService = inject(ServiceManagementApiService);
   private readonly branchServicesApiService = inject(BranchServicesApiService);
-  private readonly workflowApiService = inject(ServiceWorkflowApiService);
   private readonly permissionService = inject(ServiceManagementPermissionService);
 
   public readonly store = inject(ServiceManagementStore);
@@ -96,9 +87,6 @@ export class ServicesComponent implements OnInit, OnDestroy {
     node.canEditDefinition;
   public readonly translations = computed(
     () => SERVICE_MANAGEMENT_TRANSLATIONS[this.i18nStore.language()],
-  );
-  public readonly workflowTranslations = computed(
-    () => SERVICE_WORKFLOW_TRANSLATIONS[this.i18nStore.language()],
   );
   public readonly language = this.i18nStore.language;
   public readonly direction = this.i18nStore.direction;
@@ -121,17 +109,11 @@ export class ServicesComponent implements OnInit, OnDestroy {
     () => this.authSessionService.currentSession()?.userType === 'TechnicalAdmin',
   );
   public readonly canCreateGlobal = computed(() => this.isTechnicalAdmin() && this.canCreate());
-  public readonly canViewServiceWorkflows = this.permissionService.canViewServiceWorkflows;
-  public readonly canViewStartOptions = this.permissionService.canViewStartOptions;
 
   public readonly includeInactiveTree = signal(false);
   public readonly includeDeletedTree = signal(false);
   public readonly formError = signal<string | null>(null);
   public readonly selectedLogoName = signal<string | null>(null);
-  public readonly relatedWorkflows = signal<readonly ServiceRelatedWorkflow[]>([]);
-  public readonly workflowStartOptions = signal<WorkflowStartOptions | null>(null);
-  public readonly relatedWorkflowsLoading = signal(false);
-  public readonly startOptionsLoading = signal(false);
   public readonly createParentLabel = computed(
     () => this.store.createParentName() ?? this.translations().treeRoot,
   );
@@ -377,10 +359,6 @@ export class ServicesComponent implements OnInit, OnDestroy {
     this.store.closePanel();
     this.formError.set(null);
     this.selectedLogoName.set(null);
-    this.relatedWorkflows.set([]);
-    this.workflowStartOptions.set(null);
-    this.relatedWorkflowsLoading.set(false);
-    this.startOptionsLoading.set(false);
     this.serviceForm.markAsPristine();
     this.serviceForm.enable({ emitEvent: false });
   }
@@ -611,45 +589,6 @@ export class ServicesComponent implements OnInit, OnDestroy {
     return this.apiService.resolveMediaUrl(value);
   }
 
-  public relatedWorkflowName(workflow: ServiceRelatedWorkflow): string {
-    return this.i18nStore.language() === 'ar' ? workflow.arabicName : workflow.englishName;
-  }
-
-  public workflowStepName(step: ServiceWorkflowStep): string {
-    const value = this.i18nStore.language() === 'ar'
-      ? step.serviceArabicName ?? step.arabicName
-      : step.serviceEnglishName ?? step.englishName;
-    return this.formatText(value);
-  }
-
-  public workflowStepOrders(workflow: ServiceRelatedWorkflow): string {
-    return workflow.containsServiceStepOrders.join(', ');
-  }
-
-  public sortedWorkflowSteps(workflow: ServiceRelatedWorkflow): readonly ServiceWorkflowStep[] {
-    return [...workflow.steps].sort((a, b) => a.stepOrder - b.stepOrder);
-  }
-
-  public startModeLabel(): string {
-    const options = this.workflowStartOptions();
-    if (!options) {
-      return this.translations().notAvailable;
-    }
-
-    const labels: Record<WorkflowStartMode, string> = {
-      NoWorkflow: this.translations().workflowStartModeNoWorkflow,
-      AutoApply: this.translations().workflowStartModeAutoApply,
-      SelectionRequired: this.translations().workflowStartModeSelectionRequired,
-    };
-
-    return labels[options.mode];
-  }
-
-  public workflowSelectionLabel(requiresSelection: boolean): string {
-    return requiresSelection
-      ? this.translations().workflowSelectionRequired
-      : this.translations().workflowSelectionNotRequired;
-  }
 
   public panelTitle(): string {
     if (this.store.panelMode() === 'create') {
@@ -943,13 +882,6 @@ export class ServicesComponent implements OnInit, OnDestroy {
           this.store.selectedDetails.set(response);
           this.store.selectTreeNode(response.id);
 
-          if (mode === 'view') {
-            this.loadWorkflowContext(response.id);
-          } else {
-            this.relatedWorkflows.set([]);
-            this.workflowStartOptions.set(null);
-          }
-
           if (mode === 'edit') {
             if (response.isDeleted || !response.canEditDefinition) {
               this.showMessage('error', this.translations().noPermissionHint);
@@ -968,30 +900,6 @@ export class ServicesComponent implements OnInit, OnDestroy {
           }
         },
       });
-  }
-
-  private loadWorkflowContext(serviceId: number): void {
-    if (this.canViewServiceWorkflows()) {
-      this.relatedWorkflowsLoading.set(true);
-      this.workflowApiService
-        .getServiceWorkflows(serviceId)
-        .pipe(finalize(() => this.relatedWorkflowsLoading.set(false)))
-        .subscribe({
-          next: (response) => this.relatedWorkflows.set(response),
-          error: (error: HttpErrorResponse) => this.handleApiError(error),
-        });
-    }
-
-    if (this.canViewStartOptions()) {
-      this.startOptionsLoading.set(true);
-      this.workflowApiService
-        .getWorkflowStartOptions(serviceId)
-        .pipe(finalize(() => this.startOptionsLoading.set(false)))
-        .subscribe({
-          next: (response) => this.workflowStartOptions.set(response),
-          error: (error: HttpErrorResponse) => this.handleApiError(error),
-        });
-    }
   }
 
   private loadDetailsForTreeAction(serviceId: number, action: TreeMutationAction): void {

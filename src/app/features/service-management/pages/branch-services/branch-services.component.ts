@@ -92,6 +92,7 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
   protected readonly language = this.i18nStore.language;
   protected readonly direction = this.i18nStore.direction;
   protected readonly canViewBranchServices = this.permissionService.canViewBranchServices;
+  protected readonly canViewWorkflows = this.permissionService.canViewWorkflows;
   protected readonly canAssignBranchServices = this.permissionService.canAssignBranchServices;
   protected readonly canUnassignBranchServices =
     this.permissionService.canUnassignBranchServices;
@@ -128,6 +129,16 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
     this.canManageBranchService(node) && this.canRestoreBranchServices() && node.isDeleted;
   protected readonly canUnassignBranchService = (node: ServiceTreeNode): boolean =>
     node.scope === 'Global';
+  protected readonly canManageWorkflowFor = (node: ServiceTreeNode): boolean =>
+    this.canViewWorkflows() &&
+    node.isAssignedToCurrentBranch !== false &&
+    node.children.length === 0 &&
+    !node.hasChildren &&
+    node.isActive &&
+    !node.isDeleted &&
+    node.effectiveIsActive &&
+    node.isTicketIssuable &&
+    node.canIssueTicket;
   protected readonly branchActionsDisabled = computed(
     () => this.store.lifecyclePreparing() || this.store.lifecycleMutating(),
   );
@@ -286,6 +297,23 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
 
   protected selectBranchNode(node: ServiceTreeNode): void {
     this.store.selectBranchNode(node.id);
+  }
+
+  protected openServiceWorkflows(node: ServiceTreeNode): void {
+    const branchId = this.store.selectedBranchId();
+
+    if (!branchId || !this.canManageWorkflowFor(node)) {
+      this.showMessage('error', this.translations().accessDenied);
+      return;
+    }
+
+    void this.router.navigate([
+      '/technical-admin/services/branches',
+      branchId,
+      'services',
+      node.id,
+      'workflows',
+    ]);
   }
 
   protected openAssignDialog(): void {

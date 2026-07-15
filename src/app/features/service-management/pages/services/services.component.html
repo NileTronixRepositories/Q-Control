@@ -283,66 +283,6 @@
                 </dl>
 
                 
-                @if (canViewServiceWorkflows()) {
-                  <section class="svc-workflow-context">
-                    <header class="svc-workflow-context-header">
-                      <div>
-                        <p class="svc-eyebrow">{{ workflowTranslations().title }}</p>
-                        <h3>{{ translations().relatedWorkflows }}</h3>
-                      </div>
-                      @if (relatedWorkflowsLoading()) {
-                        <span class="svc-mini-loading">{{ workflowTranslations().loading }}</span>
-                      }
-                    </header>
-                    @if (relatedWorkflows().length > 0) {
-                      <div class="svc-related-workflows">
-                        @for (workflow of relatedWorkflows(); track workflow.id ?? workflow.workflowId) {
-                          <article class="svc-related-workflow-card">
-                            <div class="svc-related-workflow-title">
-                              <strong>{{ relatedWorkflowName(workflow) }}</strong>
-                              <span>{{ workflow.containsServiceOccurrenceCount }}x</span>
-                            </div>
-                            <small>{{ workflowTranslations().steps }}: {{ workflowStepOrders(workflow) }}</small>
-                            <div class="svc-workflow-path">
-                              @for (step of sortedWorkflowSteps(workflow); track step.stepOrder) {
-                                <span [class.matched]="step.isMatchedService">{{ workflowStepName(step) }}</span>
-                              }
-                            </div>
-                          </article>
-                        }
-                      </div>
-                    } @else if (!relatedWorkflowsLoading()) {
-                      <p class="svc-note svc-note-info">{{ workflowTranslations().noWorkflows }}</p>
-                    }
-                  </section>
-                }
-
-                @if (canViewStartOptions()) {
-                  <section class="svc-workflow-start-options">
-                    <header class="svc-workflow-context-header">
-                      <div>
-                        <p class="svc-eyebrow">{{ translations().workflowStartOptions }}</p>
-                        <h3>{{ startModeLabel() }}</h3>
-                      </div>
-                      @if (startOptionsLoading()) {
-                        <span class="svc-mini-loading">{{ workflowTranslations().loading }}</span>
-                      }
-                    </header>
-                    @if (workflowStartOptions(); as options) {
-                      <div class="svc-start-option-summary">
-                        <span>{{ workflowSelectionLabel(options.requiresWorkflowSelection) }}</span>
-                        <strong>{{ options.workflows.length }} {{ translations().workflows }}</strong>
-                      </div>
-                      @if (options.workflows.length > 0) {
-                        <div class="svc-start-option-list">
-                          @for (workflow of options.workflows; track workflow.workflowId) {
-                            <span>{{ language() === 'ar' ? workflow.arabicName : workflow.englishName }}</span>
-                          }
-                        </div>
-                      }
-                    }
-                  </section>
-                }
                 <footer class="svc-actions">
                   @if (canUpdate() && details.canEditDefinition && !details.isDeleted) {
                     <button type="button" class="svc-secondary-btn" (click)="openEdit(details.id)">

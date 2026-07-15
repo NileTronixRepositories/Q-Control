@@ -58,6 +58,13 @@ describe('ServiceManagementPermissionService', () => {
     expect(service.canRejectGlobalizationRequests()).toBe(true);
     expect(service.canViewCentralTree()).toBe(true);
   });
+
+  it('recognizes the branch-scoped set-default workflow permission', () => {
+    const service = createServiceForPermissions(['ServiceWorkflows.SetDefault']);
+
+    expect(service.canSetDefaultWorkflow()).toBe(true);
+    expect(service.hasPermission('ServiceWorkflows.SetDefault')).toBe(true);
+  });
 });
 
 function createServiceForPermissions(

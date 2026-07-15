@@ -4,7 +4,7 @@ import { SERVICE_MANAGEMENT_TRANSLATIONS } from '../../i18n/service-management.t
 import { ServiceTreeNode } from '../../models/service-management.model';
 import { ServiceHierarchyTreeComponent } from './service-hierarchy-tree.component';
 
-describe('ServiceHierarchyTreeComponent unassignment action', () => {
+describe('ServiceHierarchyTreeComponent', () => {
   let fixture: ComponentFixture<ServiceHierarchyTreeComponent>;
   let component: ServiceHierarchyTreeComponent;
   let parent: ServiceTreeNode;
@@ -117,6 +117,89 @@ describe('ServiceHierarchyTreeComponent unassignment action', () => {
       'button[aria-label="Delete"]',
     ) as HTMLButtonElement;
     expect(deleteButton.disabled).toBe(true);
+  });
+
+  it('renders an accessible tree skeleton during the initial load', () => {
+    fixture.componentRef.setInput('nodes', []);
+    fixture.componentRef.setInput('loading', true);
+    fixture.detectChanges();
+
+    const panel = fixture.nativeElement.querySelector('.svc-tree-panel') as HTMLElement;
+    const loadingState = fixture.nativeElement.querySelector(
+      '[data-testid="svc-tree-initial-loading"]',
+    ) as HTMLElement;
+    const skeletonRows = fixture.nativeElement.querySelectorAll(
+      '[data-testid="svc-tree-skeleton-row"]',
+    );
+
+    expect(panel.getAttribute('aria-busy')).toBe('true');
+    expect(loadingState.getAttribute('role')).toBe('status');
+    expect(loadingState.getAttribute('aria-live')).toBe('polite');
+    expect(loadingState.textContent).toContain(SERVICE_MANAGEMENT_TRANSLATIONS.en.loading);
+    expect(skeletonRows.length).toBe(5);
+    expect(fixture.nativeElement.querySelector('.svc-tree-empty')).toBeNull();
+  });
+
+  it('keeps the current tree visible behind the compact refresh indicator', () => {
+    fixture.componentRef.setInput('loading', true);
+    fixture.detectChanges();
+
+    expect(
+      fixture.nativeElement.querySelector('[data-testid="svc-tree-refresh-loading"]'),
+    ).not.toBeNull();
+    expect(
+      fixture.nativeElement.querySelector('[data-testid="svc-tree-initial-loading"]'),
+    ).toBeNull();
+    expect(fixture.nativeElement.querySelector('.svc-tree-list')).not.toBeNull();
+  });
+
+  it('removes all loading indicators when loading completes', () => {
+    fixture.componentRef.setInput('loading', false);
+    fixture.detectChanges();
+
+    const panel = fixture.nativeElement.querySelector('.svc-tree-panel') as HTMLElement;
+
+    expect(panel.getAttribute('aria-busy')).toBe('false');
+    expect(
+      fixture.nativeElement.querySelector('[data-testid="svc-tree-initial-loading"]'),
+    ).toBeNull();
+    expect(
+      fixture.nativeElement.querySelector('[data-testid="svc-tree-refresh-loading"]'),
+    ).toBeNull();
+  });
+
+  it('uses logical indentation so skeleton levels follow both LTR and RTL direction', () => {
+    fixture.componentRef.setInput('nodes', []);
+    fixture.componentRef.setInput('loading', true);
+    fixture.componentRef.setInput('direction', 'rtl');
+    fixture.detectChanges();
+
+    const rows = fixture.nativeElement.querySelectorAll(
+      '[data-testid="svc-tree-skeleton-row"]',
+    ) as NodeListOf<HTMLElement>;
+
+    expect(rows[1].style.marginInlineStart).toBe('22px');
+    expect(rows[2].style.marginInlineStart).toBe('44px');
+  });
+
+  it('emits the optional workflow action only for eligible nodes', () => {
+    const emitted: ServiceTreeNode[] = [];
+    component.manageWorkflows.subscribe((node) => emitted.push(node));
+    fixture.componentRef.setInput('canManageWorkflows', true);
+    fixture.componentRef.setInput(
+      'canManageWorkflowNode',
+      (node: ServiceTreeNode) => node.id === leaf.id,
+    );
+    fixture.componentRef.setInput('manageWorkflowsLabel', 'Manage workflows');
+    fixture.detectChanges();
+
+    const button = fixture.nativeElement.querySelector(
+      'button[aria-label="Manage workflows"]',
+    ) as HTMLButtonElement;
+
+    expect(button).not.toBeNull();
+    button.click();
+    expect(emitted).toEqual([leaf]);
   });
 });
 

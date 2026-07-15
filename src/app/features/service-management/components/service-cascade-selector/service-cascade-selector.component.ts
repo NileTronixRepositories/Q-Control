@@ -276,16 +276,15 @@ export class ServiceCascadeSelectorComponent implements OnInit {
 
     return {
       serviceId: option.serviceId,
-      id: option.serviceId,
       arabicName: option.arabicName,
       englishName: option.englishName,
       parentServiceId: option.parentServiceId,
-      parentServiceArabicName: parent?.arabicName ?? null,
-      parentServiceEnglishName: parent?.englishName ?? null,
+      parentArabicName: parent?.arabicName ?? null,
+      parentEnglishName: parent?.englishName ?? null,
       isActive: option.isActive,
       isDeleted: false,
+      effectiveIsActive: option.effectiveIsActive,
       isTicketIssuable: option.canIssueTicket,
-      relatedWorkflows: [],
     };
   }
 

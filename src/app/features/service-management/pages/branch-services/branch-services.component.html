@@ -125,6 +125,9 @@
         [canRestoreNode]="canRestoreBranchService"
         [canUnassign]="canUnassignBranchServices()"
         [canUnassignNode]="canUnassignBranchService"
+        [canManageWorkflows]="canViewWorkflows()"
+        [canManageWorkflowNode]="canManageWorkflowFor"
+        [manageWorkflowsLabel]="serviceTranslations().workflows"
         [unassigning]="store.unassigning()"
         [unassignLabel]="translations().unassign"
         [actionsDisabled]="branchActionsDisabled()"
@@ -138,6 +141,7 @@
         (deleteNode)="requestLifecycle($event, 'delete')"
         (restoreNode)="requestLifecycle($event, 'restore')"
         (unassignNode)="requestUnassign($event)"
+        (manageWorkflows)="openServiceWorkflows($event)"
       />
     }
   }

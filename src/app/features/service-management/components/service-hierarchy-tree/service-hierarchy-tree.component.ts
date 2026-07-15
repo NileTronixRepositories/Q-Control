@@ -32,6 +32,13 @@ interface ServiceHierarchyTreeEntry {
   readonly canUnassign: boolean;
   readonly canDelete: boolean;
   readonly canRestore: boolean;
+  readonly canManageWorkflow: boolean;
+}
+
+interface ServiceHierarchyLoadingRow {
+  readonly indent: number;
+  readonly nameWidth: number;
+  readonly chipWidths: readonly number[];
 }
 
 const ROW_BASE_CLASSES = 'svc-tree-node';
@@ -55,6 +62,14 @@ const INFO_STATUS_CLASSES = 'svc-tree-chip--info';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ServiceHierarchyTreeComponent {
+  protected readonly loadingSkeletonRows: readonly ServiceHierarchyLoadingRow[] = [
+    { indent: 0, nameWidth: 42, chipWidths: [18, 14, 12] },
+    { indent: 22, nameWidth: 34, chipWidths: [14, 19] },
+    { indent: 44, nameWidth: 48, chipWidths: [17, 12, 15] },
+    { indent: 22, nameWidth: 38, chipWidths: [20, 13] },
+    { indent: 44, nameWidth: 30, chipWidths: [15, 18, 11] },
+  ];
+
   readonly nodes = input.required<readonly ServiceTreeNode[]>();
   readonly expandedNodeIds = input.required<ReadonlySet<number>>();
   readonly selectedServiceId = input.required<number | null>();
@@ -81,6 +96,9 @@ export class ServiceHierarchyTreeComponent {
   readonly canRestoreNode = input<(node: ServiceTreeNode) => boolean>(() => true);
   readonly canUnassignNode = input<(node: ServiceTreeNode) => boolean>(() => true);
   readonly actionsDisabled = input(false);
+  readonly canManageWorkflows = input(false);
+  readonly canManageWorkflowNode = input<(node: ServiceTreeNode) => boolean>(() => false);
+  readonly manageWorkflowsLabel = input('');
 
   readonly refresh = output<void>();
   readonly includeInactiveChange = output<boolean>();
@@ -98,6 +116,7 @@ export class ServiceHierarchyTreeComponent {
   readonly leafDragEnded = output<void>();
   readonly leafDropped = output<number>();
   readonly unassignNode = output<ServiceTreeNode>();
+  readonly manageWorkflows = output<ServiceTreeNode>();
 
   public readonly isDropActive = signal(false);
 
@@ -131,6 +150,16 @@ export class ServiceHierarchyTreeComponent {
     }
 
     this.unassignNode.emit(node);
+  }
+
+  public requestManageWorkflows(node: ServiceTreeNode, event: MouseEvent): void {
+    event.stopPropagation();
+
+    if (!this.canManageWorkflows() || !this.canManageWorkflowNode()(node)) {
+      return;
+    }
+
+    this.manageWorkflows.emit(node);
   }
 
   public onLeafSelectionChange(node: ServiceTreeNode, event: Event): void {
@@ -307,6 +336,8 @@ export class ServiceHierarchyTreeComponent {
       canUnassign: this.isUnassignableLeaf(node),
       canDelete: this.canDelete() && !node.isDeleted && this.canDeleteNode()(node),
       canRestore: this.canRestore() && node.isDeleted && this.canRestoreNode()(node),
+      canManageWorkflow:
+        this.canManageWorkflows() && this.canManageWorkflowNode()(node),
     };
   }
 

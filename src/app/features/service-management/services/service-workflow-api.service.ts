@@ -1,4 +1,4 @@
-﻿import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 
@@ -8,38 +8,36 @@ import { AuthSessionService } from '../../auth/services/auth-session.service';
 import { PagedServiceResponse } from '../models/service-management.model';
 import {
   CreateServiceWorkflowRequest,
-  ServiceRelatedWorkflow,
   ServiceWorkflowDetails,
   ServiceWorkflowListItem,
   ServiceWorkflowListQuery,
   ServiceWorkflowMutationResponse,
-  ServiceWorkflowStatusResponse,
+  ServiceWorkflowStep,
   UpdateServiceWorkflowRequest,
   WorkflowCandidateQuery,
-  WorkflowCandidateRelatedWorkflow,
   WorkflowCandidateService,
   WorkflowStartOptionItem,
   WorkflowStartMode,
   WorkflowStartOptions,
 } from '../models/service-workflow.model';
 
-const WORKFLOWS_PATH = 'api/service-workflows';
-const SERVICES_PATH = 'api/services';
 type UnknownRecord = Record<string, unknown>;
+const BRANCHES_PATH = 'api/branches';
 
 @Injectable({ providedIn: 'root' })
 export class ServiceWorkflowApiService {
   private readonly httpClient = inject(HttpClient);
   private readonly authSessionService = inject(AuthSessionService);
   private readonly appLanguageStore = inject(AppLanguageStore);
-  private readonly workflowsEndpoint = new URL(WORKFLOWS_PATH, environment.apiBaseUrl).toString();
-  private readonly servicesEndpoint = new URL(SERVICES_PATH, environment.apiBaseUrl).toString();
+  private readonly branchesEndpoint = new URL(BRANCHES_PATH, environment.apiBaseUrl).toString();
 
   getWorkflows(
+    branchId: number,
+    leafServiceId: number,
     query: ServiceWorkflowListQuery,
   ): Observable<PagedServiceResponse<ServiceWorkflowListItem>> {
     return this.httpClient
-      .get<unknown>(this.workflowsEndpoint, {
+      .get<unknown>(this.createWorkflowsUrl(branchId, leafServiceId), {
         headers: this.createJsonHeaders(),
         params: this.createWorkflowListParams(query),
       })
@@ -52,56 +50,82 @@ export class ServiceWorkflowApiService {
       );
   }
 
-  getWorkflowDetails(workflowId: number): Observable<ServiceWorkflowDetails> {
+  getWorkflowDetails(
+    branchId: number,
+    leafServiceId: number,
+    workflowId: number,
+  ): Observable<ServiceWorkflowDetails> {
     return this.httpClient
-      .get<unknown>(this.createWorkflowUrl(workflowId), { headers: this.createJsonHeaders() })
+      .get<unknown>(this.createWorkflowUrl(branchId, leafServiceId, workflowId), {
+        headers: this.createJsonHeaders(),
+      })
       .pipe(map((response) => this.normalizeWorkflowDetails(response)));
   }
 
-  createWorkflow(request: CreateServiceWorkflowRequest): Observable<ServiceWorkflowMutationResponse> {
-    return this.httpClient.post<ServiceWorkflowMutationResponse>(this.workflowsEndpoint, request, {
-      headers: this.createJsonHeaders(),
-    });
+  createWorkflow(
+    branchId: number,
+    leafServiceId: number,
+    request: CreateServiceWorkflowRequest,
+  ): Observable<ServiceWorkflowMutationResponse> {
+    return this.httpClient
+      .post<unknown>(this.createWorkflowsUrl(branchId, leafServiceId), request, {
+        headers: this.createJsonHeaders(),
+      })
+      .pipe(map((response) => this.normalizeMutation(response, branchId, leafServiceId)));
   }
 
   updateWorkflow(
+    branchId: number,
+    leafServiceId: number,
     workflowId: number,
     request: UpdateServiceWorkflowRequest,
-  ): Observable<ServiceWorkflowMutationResponse> {
-    return this.httpClient.put<ServiceWorkflowMutationResponse>(
-      this.createWorkflowUrl(workflowId),
-      request,
-      { headers: this.createJsonHeaders() },
+  ): Observable<ServiceWorkflowDetails> {
+    return this.httpClient
+      .put<unknown>(this.createWorkflowUrl(branchId, leafServiceId, workflowId), request, {
+        headers: this.createJsonHeaders(),
+      })
+      .pipe(map((response) => this.normalizeWorkflowDetails(response)));
+  }
+
+  setDefaultWorkflow(
+    branchId: number,
+    leafServiceId: number,
+    workflowId: number,
+    rowVersion: string,
+  ): Observable<ServiceWorkflowDetails> {
+    return this.postStateAction(branchId, leafServiceId, workflowId, 'set-default', rowVersion).pipe(
+      map((response) => this.normalizeWorkflowDetails(response)),
     );
   }
 
   deactivateWorkflow(
+    branchId: number,
+    leafServiceId: number,
     workflowId: number,
     rowVersion: string,
-  ): Observable<ServiceWorkflowStatusResponse> {
-    return this.httpClient.post<ServiceWorkflowStatusResponse>(
-      `${this.createWorkflowUrl(workflowId)}/deactivate`,
-      null,
-      { headers: this.createJsonHeaders(rowVersion) },
+  ): Observable<ServiceWorkflowMutationResponse> {
+    return this.postStateAction(branchId, leafServiceId, workflowId, 'deactivate', rowVersion).pipe(
+      map((response) => this.normalizeMutation(response, branchId, leafServiceId)),
     );
   }
 
   reactivateWorkflow(
+    branchId: number,
+    leafServiceId: number,
     workflowId: number,
     rowVersion: string,
-  ): Observable<ServiceWorkflowStatusResponse> {
-    return this.httpClient.post<ServiceWorkflowStatusResponse>(
-      `${this.createWorkflowUrl(workflowId)}/reactivate`,
-      null,
-      { headers: this.createJsonHeaders(rowVersion) },
+  ): Observable<ServiceWorkflowMutationResponse> {
+    return this.postStateAction(branchId, leafServiceId, workflowId, 'reactivate', rowVersion).pipe(
+      map((response) => this.normalizeMutation(response, branchId, leafServiceId)),
     );
   }
 
   getCandidateServices(
+    branchId: number,
     query: WorkflowCandidateQuery,
   ): Observable<PagedServiceResponse<WorkflowCandidateService>> {
     return this.httpClient
-      .get<unknown>(`${this.workflowsEndpoint}/candidate-services`, {
+      .get<unknown>(`${this.createBranchServicesUrl(branchId)}/workflow-candidates`, {
         headers: this.createJsonHeaders(),
         params: this.createCandidateParams(query),
       })
@@ -114,69 +138,82 @@ export class ServiceWorkflowApiService {
       );
   }
 
-  getServiceWorkflows(serviceId: number): Observable<readonly ServiceRelatedWorkflow[]> {
+  getWorkflowStartOptions(
+    branchId: number,
+    leafServiceId: number,
+  ): Observable<WorkflowStartOptions> {
     return this.httpClient
-      .get<unknown>(`${this.createServiceUrl(serviceId)}/workflows`, {
-        headers: this.createJsonHeaders(),
-      })
-      .pipe(map((response) => this.normalizeServiceRelatedWorkflows(response, serviceId)));
+      .get<unknown>(
+        `${this.createBranchServicesUrl(branchId)}/${leafServiceId}/workflow-start-options`,
+        { headers: this.createJsonHeaders() },
+      )
+      .pipe(
+        map((response) => this.normalizeWorkflowStartOptions(response, branchId, leafServiceId)),
+      );
   }
 
-  getWorkflowStartOptions(serviceId: number): Observable<WorkflowStartOptions> {
-    return this.httpClient
-      .get<unknown>(`${this.createServiceUrl(serviceId)}/workflow-start-options`, {
-        headers: this.createJsonHeaders(),
-      })
-      .pipe(map((response) => this.normalizeWorkflowStartOptions(response, serviceId)));
-  }
-
-  private normalizeWorkflowStartOptions(response: unknown, serviceId: number): WorkflowStartOptions {
-    const source = this.unwrapResponse(response);
-    const record = this.asRecord(source);
-    const mode = this.normalizeWorkflowStartMode(this.readString(record, ['mode', 'startMode']));
-    const workflows = this.readArray(record, ['workflows', 'items', 'data', 'results']).map((item) =>
-      this.normalizeWorkflowStartOption(item),
+  private postStateAction(
+    branchId: number,
+    leafServiceId: number,
+    workflowId: number,
+    action: 'set-default' | 'deactivate' | 'reactivate',
+    rowVersion: string,
+  ): Observable<unknown> {
+    return this.httpClient.post<unknown>(
+      `${this.createWorkflowUrl(branchId, leafServiceId, workflowId)}/${action}`,
+      null,
+      { headers: this.createJsonHeaders(rowVersion) },
     );
-
-    return {
-      serviceId: this.readNumber(record, ['serviceId', 'id']) ?? serviceId,
-      mode,
-      requiresWorkflowSelection:
-        this.readBoolean(record, ['requiresWorkflowSelection', 'selectionRequired']) ??
-        mode === 'SelectionRequired',
-      autoApplyWorkflowId:
-        this.readNumber(record, ['autoApplyWorkflowId', 'defaultWorkflowId']) ?? null,
-      workflows,
-    };
   }
 
-  private normalizeWorkflowStartMode(value: string | null): WorkflowStartMode {
-    if (value === 'AutoApply' || value === 'SelectionRequired' || value === 'NoWorkflow') {
-      return value;
-    }
-
-    return 'NoWorkflow';
+  private createWorkflowsUrl(branchId: number, leafServiceId: number): string {
+    return `${this.createBranchServicesUrl(branchId)}/${leafServiceId}/workflows`;
   }
 
-  private normalizeWorkflowStartOption(source: unknown): WorkflowStartOptionItem {
-    const record = this.asRecord(source);
-    const steps = this.readArray(record, ['steps', 'workflowSteps', 'serviceSteps']).map((step) =>
-      this.normalizeWorkflowStep(step),
-    );
-    const firstStep = steps[0];
+  private createWorkflowUrl(
+    branchId: number,
+    leafServiceId: number,
+    workflowId: number,
+  ): string {
+    return `${this.createWorkflowsUrl(branchId, leafServiceId)}/${workflowId}`;
+  }
 
-    return {
-      workflowId: this.readNumber(record, ['workflowId', 'id', 'serviceWorkflowId']) ?? 0,
-      arabicName:
-        this.readString(record, ['arabicName', 'nameAr', 'workflowArabicName', 'arabicWorkflowName']) ?? '',
-      englishName:
-        this.readString(record, ['englishName', 'nameEn', 'workflowEnglishName', 'englishWorkflowName']) ?? '',
-      isActive: this.readBoolean(record, ['isActive', 'active']) ?? true,
-      startServiceId:
-        this.readNumber(record, ['startServiceId', 'firstServiceId']) ?? firstStep?.serviceId ?? null,
-      stepsCount: this.readNumber(record, ['stepsCount', 'stepCount', 'numberOfSteps']) ?? steps.length,
-      steps,
-    };
+  private createBranchServicesUrl(branchId: number): string {
+    return `${new URL(String(branchId), `${this.branchesEndpoint}/`).toString()}/services`;
+  }
+
+  private createJsonHeaders(rowVersion?: string): HttpHeaders {
+    let headers = new HttpHeaders({
+      'Accept-Language': this.appLanguageStore.language(),
+      'Content-Type': 'application/json',
+    });
+    const token = this.authSessionService.currentSession()?.token;
+
+    if (token) headers = headers.set('Authorization', `Bearer ${token}`);
+    if (rowVersion) headers = headers.set('If-Match', rowVersion);
+
+    return headers;
+  }
+
+  private createWorkflowListParams(query: ServiceWorkflowListQuery): HttpParams {
+    let params = new HttpParams()
+      .set('pageNumber', query.pageNumber)
+      .set('pageSize', Math.min(query.pageSize, 100))
+      .set('orderSort', query.orderSort);
+
+    if (query.searchText.trim()) params = params.set('searchText', query.searchText.trim());
+    if (query.isActive !== null) params = params.set('isActive', query.isActive);
+    return params;
+  }
+
+  private createCandidateParams(query: WorkflowCandidateQuery): HttpParams {
+    let params = new HttpParams()
+      .set('pageNumber', query.pageNumber)
+      .set('pageSize', Math.min(query.pageSize, 100));
+
+    if (query.searchText.trim()) params = params.set('searchText', query.searchText.trim());
+    if (query.parentServiceId) params = params.set('parentServiceId', query.parentServiceId);
+    return params;
   }
 
   private normalizePage<TItem>(
@@ -186,299 +223,234 @@ export class ServiceWorkflowApiService {
     normalizeItem: (item: unknown) => TItem,
   ): PagedServiceResponse<TItem> {
     const source = this.unwrapResponse(response);
-    const sourceRecord = this.asRecord(source);
-    const rawItems = this.readArray(source, ['data', 'items', 'results', 'records', 'value']);
-    const data = rawItems.map((item) => normalizeItem(item));
-    const currentPage = this.readNumber(sourceRecord, ['currentPage', 'pageNumber', 'pageIndex']) ?? fallbackPage;
-    const pageSize = this.readNumber(sourceRecord, ['pageSize', 'size', 'take']) ?? fallbackPageSize;
-    const totalItems = this.readNumber(sourceRecord, ['totalItems', 'totalCount', 'count']) ?? data.length;
+    const record = this.asRecord(source);
+    const data = this.readArray(source, ['data', 'items', 'results', 'records', 'value']).map(
+      normalizeItem,
+    );
+    const currentPage = this.readNumber(record, ['currentPage', 'pageNumber', 'pageIndex']) ?? fallbackPage;
+    const pageSize = this.readNumber(record, ['pageSize', 'size', 'take']) ?? fallbackPageSize;
+    const totalItems = this.readNumber(record, ['totalItems', 'totalCount', 'count']) ?? data.length;
     const totalPages =
-      this.readNumber(sourceRecord, ['totalPages', 'pagesCount']) ??
-      Math.max(0, Math.ceil(totalItems / Math.max(pageSize, 1)));
+      this.readNumber(record, ['totalPages', 'pagesCount']) ??
+      Math.ceil(totalItems / Math.max(1, pageSize));
 
     return {
       currentPage,
       pageSize,
-      totalPages,
       totalItems,
+      totalPages,
       data,
-      hasPreviousPage:
-        this.readBoolean(sourceRecord, ['hasPreviousPage', 'hasPrevious']) ?? currentPage > 1,
-      hasNextPage:
-        this.readBoolean(sourceRecord, ['hasNextPage', 'hasNext']) ?? currentPage < totalPages,
-    };
-  }
-
-  private normalizeWorkflowDetails(source: unknown): ServiceWorkflowDetails {
-    const item = this.normalizeWorkflowListItem(this.unwrapResponse(source));
-    const record = this.asRecord(this.unwrapResponse(source));
-
-    return {
-      ...item,
-      steps: item.steps ?? [],
-      deactivatedOnUtc: this.readString(record, ['deactivatedOnUtc', 'deactivatedAt']) ?? null,
-      reactivatedOnUtc: this.readString(record, ['reactivatedOnUtc', 'reactivatedAt']) ?? null,
-      deactivatedBy: this.readString(record, ['deactivatedBy']) ?? null,
-      reactivatedBy: this.readString(record, ['reactivatedBy']) ?? null,
+      hasPreviousPage: this.readBoolean(record, ['hasPreviousPage', 'hasPrevious']) ?? currentPage > 1,
+      hasNextPage: this.readBoolean(record, ['hasNextPage', 'hasNext']) ?? currentPage < totalPages,
     };
   }
 
   private normalizeWorkflowListItem(source: unknown): ServiceWorkflowListItem {
-    const record = this.asRecord(source);
-    const steps = this.readArray(record, ['steps', 'workflowSteps', 'serviceSteps']).map((step) =>
+    const record = this.asRecord(this.unwrapResponse(source));
+    const steps = this.readArray(record, ['steps', 'workflowSteps']).map((step) =>
       this.normalizeWorkflowStep(step),
     );
-    const firstStep = steps[0];
+    const firstStep = [...steps].sort((a, b) => a.stepOrder - b.stepOrder)[0];
 
     return {
-      id: this.readNumber(record, ['id', 'workflowId', 'serviceWorkflowId']) ?? 0,
-      workflowId: this.readNumber(record, ['workflowId', 'id', 'serviceWorkflowId']) ?? 0,
-      arabicName:
-        this.readString(record, ['arabicName', 'nameAr', 'workflowArabicName', 'arabicWorkflowName']) ?? '',
-      englishName:
-        this.readString(record, ['englishName', 'nameEn', 'workflowEnglishName', 'englishWorkflowName']) ?? '',
+      workflowId: this.readNumber(record, ['workflowId', 'id']) ?? 0,
+      branchId: this.readNumber(record, ['branchId']) ?? 0,
+      leafServiceId: this.readNumber(record, ['leafServiceId']) ?? 0,
+      arabicName: this.readString(record, ['arabicName', 'nameAr']) ?? '',
+      englishName: this.readString(record, ['englishName', 'nameEn']) ?? '',
+      isDefault: this.readBoolean(record, ['isDefault']) ?? false,
       startServiceId:
-        this.readNumber(record, ['startServiceId', 'firstServiceId']) ?? firstStep?.serviceId ?? null,
+        this.readNumber(record, ['startServiceId']) ?? firstStep?.serviceId ?? null,
       startServiceArabicName:
-        this.readString(record, ['startServiceArabicName', 'startServiceNameAr', 'startServiceAr']) ??
-        firstStep?.serviceArabicName ??
-        firstStep?.arabicName ??
-        null,
+        this.readString(record, ['startServiceArabicName']) ?? firstStep?.arabicName ?? null,
       startServiceEnglishName:
-        this.readString(record, ['startServiceEnglishName', 'startServiceNameEn', 'startServiceEn']) ??
-        firstStep?.serviceEnglishName ??
-        firstStep?.englishName ??
-        null,
-      stepsCount: this.readNumber(record, ['stepsCount', 'stepCount', 'numberOfSteps']) ?? steps.length,
+        this.readString(record, ['startServiceEnglishName']) ?? firstStep?.englishName ?? null,
+      stepsCount: this.readNumber(record, ['stepsCount', 'stepCount']) ?? steps.length,
       isActive: this.readBoolean(record, ['isActive', 'active']) ?? true,
-      createdOnUtc: this.readString(record, ['createdOnUtc', 'createdAt']) ?? null,
-      modifiedOnUtc: this.readString(record, ['modifiedOnUtc', 'updatedOnUtc', 'modifiedAt']) ?? null,
-      rowVersion: this.readString(record, ['rowVersion', 'version']) ?? '',
       steps,
+      rowVersion: this.readString(record, ['rowVersion', 'version']) ?? '',
+      createdOnUtc: this.readString(record, ['createdOnUtc', 'createdAt']) ?? null,
+      modifiedOnUtc: this.readString(record, ['modifiedOnUtc', 'modifiedAt', 'updatedOnUtc']) ?? null,
     };
   }
 
-  private normalizeWorkflowStep(source: unknown) {
+  private normalizeWorkflowStep(source: unknown): ServiceWorkflowStep {
     const record = this.asRecord(source);
 
     return {
       serviceId: this.readNumber(record, ['serviceId', 'id']) ?? 0,
       stepOrder: this.readNumber(record, ['stepOrder', 'order', 'orderNo']) ?? 0,
-      arabicName: this.readString(record, ['arabicName', 'nameAr']) ?? null,
-      englishName: this.readString(record, ['englishName', 'nameEn']) ?? null,
-      serviceArabicName:
-        this.readString(record, ['serviceArabicName', 'serviceNameAr']) ??
-        this.readString(record, ['arabicName', 'nameAr']) ??
-        null,
-      serviceEnglishName:
-        this.readString(record, ['serviceEnglishName', 'serviceNameEn']) ??
-        this.readString(record, ['englishName', 'nameEn']) ??
-        null,
+      arabicName: this.readString(record, ['arabicName', 'serviceArabicName', 'nameAr']) ?? null,
+      englishName: this.readString(record, ['englishName', 'serviceEnglishName', 'nameEn']) ?? null,
       parentServiceId: this.readNumber(record, ['parentServiceId']) ?? null,
-      parentServiceArabicName:
-        this.readString(record, ['parentServiceArabicName', 'parentServiceNameAr', 'parentArabicName']) ?? null,
-      parentServiceEnglishName:
-        this.readString(record, ['parentServiceEnglishName', 'parentServiceNameEn', 'parentEnglishName']) ?? null,
+      parentArabicName:
+        this.readString(record, ['parentArabicName', 'parentServiceArabicName']) ?? null,
+      parentEnglishName:
+        this.readString(record, ['parentEnglishName', 'parentServiceEnglishName']) ?? null,
       isActive: this.readBoolean(record, ['isActive', 'active']) ?? true,
       isDeleted: this.readBoolean(record, ['isDeleted', 'deleted']) ?? false,
       effectiveIsActive: this.readBoolean(record, ['effectiveIsActive']) ?? true,
-      isTicketIssuable: this.readBoolean(record, ['isTicketIssuable', 'ticketIssuable']) ?? true,
+      isTicketIssuable: this.readBoolean(record, ['isTicketIssuable']) ?? true,
       isMatchedService: this.readBoolean(record, ['isMatchedService']) ?? false,
     };
   }
 
-  private normalizeServiceRelatedWorkflows(response: unknown, serviceId: number): readonly ServiceRelatedWorkflow[] {
-    return this.extractArrayPayload(response).map((item) =>
-      this.normalizeServiceRelatedWorkflow(item, serviceId),
-    );
-  }
-
-  private normalizeServiceRelatedWorkflow(source: unknown, serviceId: number): ServiceRelatedWorkflow {
-    const record = this.asRecord(source);
-    const details = this.normalizeWorkflowDetails(source);
-    const matchedOrders = details.steps
-      .filter((step) => step.isMatchedService === true || step.serviceId === serviceId)
-      .map((step) => step.stepOrder)
-      .sort((a, b) => a - b);
-    const containsServiceStepOrders =
-      this.readNumberArray(record, ['containsServiceStepOrders', 'matchedStepOrders', 'stepOrders']) ??
-      matchedOrders;
+  private normalizeWorkflowDetails(source: unknown): ServiceWorkflowDetails {
+    const unwrapped = this.unwrapResponse(source);
+    const record = this.asRecord(unwrapped);
+    const item = this.normalizeWorkflowListItem(unwrapped);
 
     return {
-      ...details,
-      containsServiceOccurrenceCount:
-        this.readNumber(record, ['containsServiceOccurrenceCount', 'occurrenceCount', 'matchedCount']) ??
-        containsServiceStepOrders.length,
-      containsServiceStepOrders,
-      isStartService:
-        this.readBoolean(record, ['isStartService', 'startsWithService']) ??
-        containsServiceStepOrders.includes(1),
+      ...item,
+      ownerServiceArabicName: this.readString(record, ['ownerServiceArabicName']) ?? null,
+      ownerServiceEnglishName: this.readString(record, ['ownerServiceEnglishName']) ?? null,
+      createdByApplicationUserId:
+        this.readString(record, ['createdByApplicationUserId']) ?? null,
+      lastModifiedByApplicationUserId:
+        this.readString(record, ['lastModifiedByApplicationUserId']) ?? null,
+      deactivatedByApplicationUserId:
+        this.readString(record, ['deactivatedByApplicationUserId']) ?? null,
+      deactivatedOnUtc: this.readString(record, ['deactivatedOnUtc']) ?? null,
+      reactivatedByApplicationUserId:
+        this.readString(record, ['reactivatedByApplicationUserId']) ?? null,
+      reactivatedOnUtc: this.readString(record, ['reactivatedOnUtc']) ?? null,
+      message: this.readString(record, ['message']) ?? null,
+    };
+  }
+
+  private normalizeMutation(
+    source: unknown,
+    branchId: number,
+    leafServiceId: number,
+  ): ServiceWorkflowMutationResponse {
+    const record = this.asRecord(this.unwrapResponse(source));
+
+    return {
+      workflowId: this.readNumber(record, ['workflowId', 'id']) ?? 0,
+      branchId: this.readNumber(record, ['branchId']) ?? branchId,
+      leafServiceId: this.readNumber(record, ['leafServiceId']) ?? leafServiceId,
+      isDefault: this.readBoolean(record, ['isDefault']) ?? false,
+      isActive: this.readBoolean(record, ['isActive']) ?? true,
+      rowVersion: this.readString(record, ['rowVersion', 'version']) ?? '',
+      message: this.readString(record, ['message']) ?? null,
     };
   }
 
   private normalizeCandidateService(source: unknown): WorkflowCandidateService {
     const record = this.asRecord(source);
-    const relatedWorkflows = this.readArray(record, ['relatedWorkflows', 'workflows']).map((item) =>
-      this.normalizeCandidateWorkflow(item),
-    );
 
     return {
       serviceId: this.readNumber(record, ['serviceId', 'id']) ?? 0,
-      id: this.readNumber(record, ['id', 'serviceId']) ?? 0,
-      arabicName: this.readString(record, ['arabicName', 'serviceArabicName', 'nameAr']) ?? '',
-      englishName: this.readString(record, ['englishName', 'serviceEnglishName', 'nameEn']) ?? '',
       parentServiceId: this.readNumber(record, ['parentServiceId']) ?? null,
-      parentServiceArabicName:
-        this.readString(record, ['parentServiceArabicName', 'parentServiceNameAr', 'parentArabicName']) ?? null,
-      parentServiceEnglishName:
-        this.readString(record, ['parentServiceEnglishName', 'parentServiceNameEn', 'parentEnglishName']) ?? null,
-      isActive: this.readBoolean(record, ['isActive', 'active']) ?? true,
-      isDeleted: this.readBoolean(record, ['isDeleted', 'deleted']) ?? false,
-      isTicketIssuable: this.readBoolean(record, ['isTicketIssuable', 'ticketIssuable']) ?? false,
-      relatedWorkflows,
+      parentArabicName:
+        this.readString(record, ['parentArabicName', 'parentServiceArabicName']) ?? null,
+      parentEnglishName:
+        this.readString(record, ['parentEnglishName', 'parentServiceEnglishName']) ?? null,
+      arabicName: this.readString(record, ['arabicName', 'nameAr']) ?? '',
+      englishName: this.readString(record, ['englishName', 'nameEn']) ?? '',
+      isActive: this.readBoolean(record, ['isActive']) ?? true,
+      isDeleted: this.readBoolean(record, ['isDeleted']) ?? false,
+      effectiveIsActive: this.readBoolean(record, ['effectiveIsActive']) ?? true,
+      isTicketIssuable: this.readBoolean(record, ['isTicketIssuable']) ?? true,
     };
   }
 
-  private normalizeCandidateWorkflow(source: unknown): WorkflowCandidateRelatedWorkflow {
+  private normalizeWorkflowStartOptions(
+    source: unknown,
+    branchId: number,
+    leafServiceId: number,
+  ): WorkflowStartOptions {
+    const record = this.asRecord(this.unwrapResponse(source));
+    const workflows = this.readArray(record, ['workflows', 'items']).map((workflow) =>
+      this.normalizeWorkflowStartOption(workflow),
+    );
+    const mode = this.normalizeStartMode(this.readString(record, ['mode']));
+
+    return {
+      serviceId: this.readNumber(record, ['serviceId']) ?? leafServiceId,
+      branchId: this.readNumber(record, ['branchId']) ?? branchId,
+      leafServiceId: this.readNumber(record, ['leafServiceId']) ?? leafServiceId,
+      hasWorkflows: this.readBoolean(record, ['hasWorkflows']) ?? workflows.length > 0,
+      defaultWorkflowId: this.readNumber(record, ['defaultWorkflowId']) ?? null,
+      mode,
+      requiresWorkflowSelection:
+        this.readBoolean(record, ['requiresWorkflowSelection']) ?? false,
+      autoApplyWorkflowId: this.readNumber(record, ['autoApplyWorkflowId']) ?? null,
+      workflows,
+    };
+  }
+
+  private normalizeWorkflowStartOption(source: unknown): WorkflowStartOptionItem {
     const record = this.asRecord(source);
+    const steps = this.readArray(record, ['steps']).map((step) =>
+      this.normalizeWorkflowStep(step),
+    );
 
     return {
       workflowId: this.readNumber(record, ['workflowId', 'id']) ?? 0,
       arabicName: this.readString(record, ['arabicName', 'nameAr']) ?? '',
       englishName: this.readString(record, ['englishName', 'nameEn']) ?? '',
-      isActive: this.readBoolean(record, ['isActive', 'active']) ?? true,
-      stepsCount: this.readNumber(record, ['stepsCount', 'stepCount']) ?? 0,
+      isActive: this.readBoolean(record, ['isActive']) ?? true,
+      isDefault: this.readBoolean(record, ['isDefault']) ?? false,
+      startServiceId: this.readNumber(record, ['startServiceId']) ?? null,
+      stepsCount: this.readNumber(record, ['stepsCount']) ?? steps.length,
+      steps,
     };
   }
 
-  private extractArrayPayload(source: unknown, depth = 0): readonly unknown[] {
-    if (Array.isArray(source)) {
-      return source;
-    }
-
-    if (depth > 4 || !this.isRecord(source)) {
-      return this.looksLikeWorkflowRecord(source) ? [source] : [];
-    }
-
-    const record = this.asRecord(source);
-    for (const key of ['workflows', 'data', 'items', 'results', 'records', 'value', 'result'] as const) {
-      const value = record[key];
-      if (Array.isArray(value)) {
-        return value;
-      }
-      if (this.isRecord(value)) {
-        const nested = this.extractArrayPayload(value, depth + 1);
-        if (nested.length > 0) {
-          return nested;
-        }
-      }
-    }
-
-    return this.looksLikeWorkflowRecord(record) ? [record] : [];
+  private normalizeStartMode(value: string | null): WorkflowStartMode {
+    return value === 'DefaultAvailable' ? 'DefaultAvailable' : 'NoWorkflow';
   }
 
-  private looksLikeWorkflowRecord(source: unknown): boolean {
-    const record = this.asRecord(source);
-    const workflowId = this.readNumber(record, ['workflowId', 'id', 'serviceWorkflowId']);
-    const hasName =
-      this.readString(record, ['arabicName', 'englishName', 'nameAr', 'nameEn', 'workflowArabicName', 'workflowEnglishName']) !==
-      null;
-    const hasSteps = this.readArray(record, ['steps', 'workflowSteps', 'serviceSteps']).length > 0;
+  private unwrapResponse(source: unknown): unknown {
+    let current = source;
 
-    return workflowId !== null && (hasName || hasSteps);
-  }
+    for (let depth = 0; depth < 4; depth += 1) {
+      const record = this.asRecord(current);
+      const nested = record['result'] ?? record['value'];
 
-  private unwrapResponse(response: unknown): unknown {
-    const record = this.asRecord(response);
-    const result = record['result'];
-
-    if (this.isRecord(result) || Array.isArray(result)) {
-      return result;
+      if (!this.isRecord(nested) && !Array.isArray(nested)) break;
+      current = nested;
     }
 
-    return response;
+    return current;
   }
 
   private readArray(source: unknown, keys: readonly string[]): readonly unknown[] {
-    if (Array.isArray(source)) {
-      return source;
-    }
-
+    if (Array.isArray(source)) return source;
     const record = this.asRecord(source);
+
     for (const key of keys) {
-      const value = record[key];
-      if (Array.isArray(value)) {
-        return value;
-      }
+      if (Array.isArray(record[key])) return record[key] as readonly unknown[];
     }
 
     return [];
   }
 
-  private readNumberArray(record: UnknownRecord, keys: readonly string[]): readonly number[] | null {
-    for (const key of keys) {
-      const value = record[key];
-      if (Array.isArray(value)) {
-        const numbers = value
-          .map((item) => (typeof item === 'number' ? item : typeof item === 'string' ? Number(item) : Number.NaN))
-          .filter((item) => Number.isFinite(item));
-        return numbers.length > 0 ? numbers : null;
-      }
-      if (typeof value === 'string' && value.trim().length > 0) {
-        const numbers = value
-          .split(',')
-          .map((item) => Number(item.trim()))
-          .filter((item) => Number.isFinite(item));
-        return numbers.length > 0 ? numbers : null;
-      }
-    }
-
-    return null;
-  }
   private readString(record: UnknownRecord, keys: readonly string[]): string | null {
     for (const key of keys) {
       const value = record[key];
-      if (typeof value === 'string' && value.trim().length > 0) {
-        return value;
-      }
+      if (typeof value === 'string' && value.trim()) return value;
     }
-
     return null;
   }
 
   private readNumber(record: UnknownRecord, keys: readonly string[]): number | null {
     for (const key of keys) {
       const value = record[key];
-      if (typeof value === 'number' && Number.isFinite(value)) {
-        return value;
-      }
-      if (typeof value === 'string' && value.trim().length > 0) {
-        const parsed = Number(value);
-        if (Number.isFinite(parsed)) {
-          return parsed;
-        }
-      }
+      const numberValue = typeof value === 'number' ? value : Number(value);
+      if (value !== null && value !== '' && Number.isFinite(numberValue)) return numberValue;
     }
-
     return null;
   }
 
   private readBoolean(record: UnknownRecord, keys: readonly string[]): boolean | null {
     for (const key of keys) {
       const value = record[key];
-      if (typeof value === 'boolean') {
-        return value;
-      }
-      if (typeof value === 'string') {
-        if (value.toLowerCase() === 'true') {
-          return true;
-        }
-        if (value.toLowerCase() === 'false') {
-          return false;
-        }
-      }
+      if (typeof value === 'boolean') return value;
+      if (value === 'true' || value === 'True' || value === 1) return true;
+      if (value === 'false' || value === 'False' || value === 0) return false;
     }
-
     return null;
   }
 
@@ -489,85 +461,4 @@ export class ServiceWorkflowApiService {
   private isRecord(value: unknown): value is UnknownRecord {
     return value !== null && typeof value === 'object' && !Array.isArray(value);
   }
-
-  private createWorkflowUrl(workflowId: number): string {
-    return new URL(String(workflowId), `${this.workflowsEndpoint}/`).toString();
-  }
-
-  private createServiceUrl(serviceId: number): string {
-    return new URL(String(serviceId), `${this.servicesEndpoint}/`).toString();
-  }
-
-  private createJsonHeaders(rowVersion?: string): HttpHeaders {
-    let headers = new HttpHeaders({
-      'Accept-Language': this.appLanguageStore.language(),
-      'Content-Type': 'application/json',
-    });
-
-    const token = this.authSessionService.currentSession()?.token;
-
-    if (token) {
-      headers = headers.set('Authorization', `Bearer ${token}`);
-    }
-
-    if (rowVersion) {
-      headers = headers.set('If-Match', rowVersion);
-    }
-
-    return headers;
-  }
-
-  private createWorkflowListParams(query: ServiceWorkflowListQuery): HttpParams {
-    let params = new HttpParams()
-      .set('pageNumber', query.pageNumber)
-      .set('pageSize', Math.min(query.pageSize, 100));
-
-    if (query.searchText.trim()) {
-      params = params.set('searchText', query.searchText.trim());
-    }
-
-    if (query.isActive !== null) {
-      params = params.set('isActive', query.isActive);
-    }
-
-    if (query.startServiceId) {
-      params = params.set('startServiceId', query.startServiceId);
-    }
-
-    if (query.orderSort?.trim()) {
-      params = params.set('orderSort', query.orderSort.trim());
-    }
-
-    return params;
-  }
-
-  private createCandidateParams(query: WorkflowCandidateQuery): HttpParams {
-    let params = new HttpParams()
-      .set('includeInactive', query.includeInactive)
-      .set('includeDeleted', query.includeDeleted)
-      .set('pageNumber', query.pageNumber)
-      .set('pageSize', Math.min(query.pageSize, 100));
-
-    if (query.searchText.trim()) {
-      params = params.set('searchText', query.searchText.trim());
-    }
-
-    if (query.parentServiceId) {
-      params = params.set('parentServiceId', query.parentServiceId);
-    }
-
-    return params;
-  }
 }
-
-
-
-
-
-
-
-
-
-
-
-

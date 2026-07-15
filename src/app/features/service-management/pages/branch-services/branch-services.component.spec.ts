@@ -116,6 +116,7 @@ describe('BranchServicesComponent branch service actions', () => {
           provide: ServiceManagementPermissionService,
           useValue: {
             canViewBranchServices: signal(true).asReadonly(),
+            canViewWorkflows: signal(false).asReadonly(),
             canAssignBranchServices: signal(true).asReadonly(),
             canUnassignBranchServices: signal(true).asReadonly(),
             canDelete: signal(true).asReadonly(),

@@ -260,7 +260,7 @@
     .display-confirm-panel,
     .terminal-confirm-panel,
     .svc-dialog,
-    .workflow-dialog
+    .workflow-confirm-panel
   ) {
     top: auto !important;
     right: auto !important;

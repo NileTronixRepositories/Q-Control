@@ -40,6 +40,17 @@ export const SERVICE_MANAGEMENT_ROUTES: Routes = [
       ),
   },
   {
+    path: 'branches/:branchId/services/:leafServiceId/workflows',
+    canActivate: [technicalAdminPermissionGuard],
+    data: {
+      requiredAnyPermissions: ['ServiceWorkflows.ViewAll'],
+    },
+    loadComponent: () =>
+      import('./pages/service-workflows/service-workflows.component').then(
+        (component) => component.ServiceWorkflowsComponent,
+      ),
+  },
+  {
     path: 'globalization-requests',
     canActivate: [technicalAdminPermissionGuard],
     data: {

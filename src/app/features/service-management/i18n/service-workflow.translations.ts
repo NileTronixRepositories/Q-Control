@@ -3,6 +3,27 @@ import { AppLanguage } from '../../../shared/models/app-language.model';
 export interface ServiceWorkflowTranslations {
   readonly title: string;
   readonly description: string;
+  readonly branch: string;
+  readonly selectBranch: string;
+  readonly selectBranchFirst: string;
+  readonly invalidWorkflowScope: string;
+  readonly backToWorkflowSelection: string;
+  readonly changeWorkflowScope: string;
+  readonly manageWorkflows: string;
+  readonly workflowOwner: string;
+  readonly autoAppliedWorkflow: string;
+  readonly workflowList: string;
+  readonly sortOrder: string;
+  readonly newest: string;
+  readonly oldest: string;
+  readonly defaultWorkflow: string;
+  readonly setDefault: string;
+  readonly confirmSetDefaultTitle: string;
+  readonly confirmSetDefaultBody: string;
+  readonly defaultCannotDeactivate: string;
+  readonly ineligibleOwnerService: string;
+  readonly searchCandidates: string;
+  readonly allParents: string;
   readonly createWorkflow: string;
   readonly editWorkflow: string;
   readonly workflowDetails: string;
@@ -70,6 +91,8 @@ export interface ServiceWorkflowTranslations {
   readonly autoApplyWorkflow: string;
   readonly dragWorkflowStepHint: string;
   readonly dropWorkflowStepHint: string;
+  readonly dragCandidateServiceHint: string;
+  readonly dropWorkflowBuilderHint: string;
   readonly noSuggestedWorkflows: string;
   readonly useWorkflow: string;
   readonly startNewWorkflow: string;
@@ -94,6 +117,27 @@ export const SERVICE_WORKFLOW_TRANSLATIONS: Record<AppLanguage, ServiceWorkflowT
   ar: {
     title: 'إدارة مسارات الخدمات',
     description: 'إنشاء وتعديل مسارات تلقائية مرتبة بين الخدمات لاستخدامها لاحقًا في إصدار التذاكر.',
+    branch: 'الفرع',
+    selectBranch: 'اختر الفرع',
+    selectBranchFirst: 'اختر فرعًا لعرض شجرة الخدمات المؤهلة',
+    invalidWorkflowScope: 'الفرع أو الخدمة المحددة غير متاحة لإدارة المسارات.',
+    backToWorkflowSelection: 'العودة لاختيار الخدمة',
+    changeWorkflowScope: 'تغيير الفرع أو الخدمة',
+    manageWorkflows: 'إدارة مسارات الخدمة',
+    workflowOwner: 'الخدمة المالكة للمسارات',
+    autoAppliedWorkflow: 'المسار المطبق تلقائيًا',
+    workflowList: 'مسارات الخدمة',
+    sortOrder: 'الترتيب',
+    newest: 'الأحدث',
+    oldest: 'الأقدم',
+    defaultWorkflow: 'افتراضي',
+    setDefault: 'تعيين كافتراضي',
+    confirmSetDefaultTitle: 'تعيين المسار الافتراضي',
+    confirmSetDefaultBody: 'هل تريد تعيين هذا المسار كافتراضي؟ سيفقد المسار الافتراضي الحالي صفته.',
+    defaultCannotDeactivate: 'لا يمكن تعطيل المسار الافتراضي. عيّن مسارًا نشطًا آخر كافتراضي أولًا.',
+    ineligibleOwnerService: 'هذه الخدمة غير مؤهلة لإدارة المسارات.',
+    searchCandidates: 'البحث في الخدمات المتاحة',
+    allParents: 'كل الخدمات الرئيسية',
     createWorkflow: 'إضافة مسار',
     editWorkflow: 'تعديل المسار',
     workflowDetails: 'تفاصيل المسار',
@@ -161,6 +205,8 @@ export const SERVICE_WORKFLOW_TRANSLATIONS: Record<AppLanguage, ServiceWorkflowT
     autoApplyWorkflow: 'تطبيق تلقائي',
     dragWorkflowStepHint: 'اسحب هذه الخطوة إلى المسار الحالي.',
     dropWorkflowStepHint: 'أفلت خطوة من مسار مقترح هنا لإضافتها.',
+    dragCandidateServiceHint: 'اسحب الخدمة لإضافتها إلى المسار.',
+    dropWorkflowBuilderHint: 'أفلت الخدمة هنا لإضافتها أو أفلت خطوة لإعادة ترتيب المسار.',
     noSuggestedWorkflows: 'لا توجد مسارات محفوظة تحتوي "{{ serviceName }}" كخطوة. الخدمة نفسها موجودة ويمكنك بدء مسار جديد بها.',
     useWorkflow: 'استخدام هذا المسار',
     startNewWorkflow: 'ابدأ مسار جديد بهذه الخدمة',
@@ -182,6 +228,27 @@ export const SERVICE_WORKFLOW_TRANSLATIONS: Record<AppLanguage, ServiceWorkflowT
   },  en: {
     title: 'Service Workflows',
     description: 'Create and manage ordered automatic service paths for future ticket workflow decisions.',
+    branch: 'Branch',
+    selectBranch: 'Select branch',
+    selectBranchFirst: 'Select a branch to view eligible leaf services.',
+    invalidWorkflowScope: 'The selected branch or leaf service is not available for workflow management.',
+    backToWorkflowSelection: 'Back to service selection',
+    changeWorkflowScope: 'Change branch or service',
+    manageWorkflows: 'Manage service workflows',
+    workflowOwner: 'Workflow owner service',
+    autoAppliedWorkflow: 'Auto-applied workflow',
+    workflowList: 'Service workflows',
+    sortOrder: 'Sort order',
+    newest: 'Newest',
+    oldest: 'Oldest',
+    defaultWorkflow: 'Default',
+    setDefault: 'Set as Default',
+    confirmSetDefaultTitle: 'Set Default Workflow',
+    confirmSetDefaultBody: 'Set this workflow as default? The current default workflow will become non-default.',
+    defaultCannotDeactivate: 'The default workflow cannot be deactivated. Set another active workflow as default first.',
+    ineligibleOwnerService: 'This service is not eligible for workflow management.',
+    searchCandidates: 'Search available services',
+    allParents: 'All parent services',
     createWorkflow: 'Create Workflow',
     editWorkflow: 'Edit Workflow',
     workflowDetails: 'Workflow Details',
@@ -249,6 +316,8 @@ export const SERVICE_WORKFLOW_TRANSLATIONS: Record<AppLanguage, ServiceWorkflowT
     autoApplyWorkflow: 'Auto Apply',
     dragWorkflowStepHint: 'Drag this step into the current workflow path.',
     dropWorkflowStepHint: 'Drop a suggested workflow step here to add it.',
+    dragCandidateServiceHint: 'Drag this service into the workflow path.',
+    dropWorkflowBuilderHint: 'Drop a service here to add it, or drop a step to reorder the path.',
     noSuggestedWorkflows: 'No saved workflows contain "{{ serviceName }}" as a step. The service exists and can start a new workflow.',
     useWorkflow: 'Use this workflow',
     startNewWorkflow: 'Start new workflow with this service',

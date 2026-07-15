@@ -1,390 +1,838 @@
+/* ============================================================
+   Service Workflows – Component Stylesheet
+   Tokens: uses --q-* from theme-harmonization + --nt-* from tokens.css
+   Layout: CSS Grid throughout; no Bootstrap grid classes relied upon.
+   ============================================================ */
+
+/* ── Host ─────────────────────────────────────────────────── */
 :host {
   display: block;
   min-width: 0;
 }
+
 :host * {
   box-sizing: border-box;
 }
+
+/* ── Local shorthand tokens ───────────────────────────────── */
 .workflow-page {
-  container-type: inline-size;
-  font-size: 13px;
-  max-width: 100%;
-  min-width: 0;
+  /* colours */
+  --b:    var(--q-border-subtle, var(--nt-border));
+  --bg:   var(--q-surface-card, var(--nt-card));
+  --m:    var(--q-surface-muted, #f8fafc);
+  --t:    var(--q-text-primary, var(--nt-text));
+  --tm:   var(--q-text-muted, var(--nt-text-soft));
+  --p:    var(--q-primary-rgb, 15 125 168);
+  --ps:   var(--q-primary-soft, var(--nt-primary-soft));
+  --ph:   var(--q-primary-hover, var(--nt-primary-dark));
+  /* radii */
+  --r:    var(--q-radius-md, var(--nt-radius-md));
+  --pr:   var(--q-panel-radius, 14px);
+  --pb:   var(--q-panel-border, var(--nt-border));
+  /* panels */
+  --panel:  var(--q-panel-bg, var(--nt-card));
+  --shadow: var(--q-panel-shadow, var(--nt-shadow-soft));
+  /* gradient origin – flipped for LTR */
+  --cgx: 90%;
+
+  /* ── Page grid ── */
+  display: grid;
+  width: 100%;
+  max-width: 1600px;
+  gap: var(--nt-section-gap, 18px);
+  margin-inline: auto;
+  padding: var(--nt-workspace-padding-y, 14px) var(--nt-workspace-padding-x, 18px);
   overflow-x: clip;
 }
-.workflow-hero,
-.workflow-editor-panel,
-.workflow-dialog {
-  background: var(--q-surface-card, #fff);
-  border: 1px solid var(--q-border-subtle, #d7e8ff);
-  border-radius: 8px;
-  box-shadow: var(--q-shadow-card, 0 4px 12px rgba(0, 0, 0, 0.05));
+
+.workflow-page[dir='ltr'] {
+  --cgx: 10%;
 }
-.workflow-hero {
-  min-height: 56px;
-}
-.workflow-hero-main {
-  min-width: 0;
-}
-.workflow-eyebrow {
-  color: var(--q-primary, #0369a1);
-  font-size: 11px;
-  font-weight: 800;
-  line-height: var(--q-line-height-label, 1.4);
-  margin: 0 0 var(--q-text-stack-gap-sm, 4px);
-  text-transform: uppercase;
+
+/* ============================================================
+   1. Flex utility rows (toolbars, actions, pagination)
+   ============================================================ */
+.workflow-hero-actions,
+.workflow-toolbar-actions,
+.workflow-card-actions,
+.workflow-detail-actions,
+.workflow-step-actions,
+.workflow-candidate-footer,
+.workflow-pagination,
+.workflow-confirm-actions {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 4px;
+  gap: 8px;
 }
-.workflow-hero h1,
-.workflow-panel-header h2 {
-  color: var(--q-text-primary, #0f172a);
-  font-weight: 800;
-  line-height: var(--q-line-height-title, 1.3);
-  margin: 0;
-}
-.workflow-hero h1,
-.workflow-panel-header h2 {
-  font-size: 16px;
-}
-.workflow-hero span,
-.workflow-section-title p,
-.workflow-empty p {
-  color: var(--q-text-muted, #64748b);
-  font-size: 11px;
-  line-height: var(--q-line-height-body, 1.55);
-  margin: var(--q-text-stack-gap-sm, 4px) 0 0;
-}
-.workflow-grid {
-  /* max-width: 100%; */
-  min-width: 0;
-}
-.workflow-editor-panel {
-  max-width: 100%;
-  min-width: 0;
-  overflow: hidden;
-}
-.workflow-panel-header {
-  background: var(--q-surface-muted, #f8fafc);
-  border-bottom: 1px solid var(--q-border-subtle, #dbeafe);
-  min-height: 44px;
-}
-.workflow-primary-btn,
-.workflow-secondary-btn,
-.workflow-danger-btn,
-.workflow-success-btn,
-.workflow-icon-btn {
-  align-items: center;
-  border: 1px solid transparent;
-  border-radius: 10px;
-  display: inline-flex;
-  font-size: 12px;
-  font-weight: 700;
-  gap: 6px;
-  justify-content: center;
-  min-height: 38px;
-  white-space: nowrap;
-  transition: background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, transform 0.12s ease;
-  cursor: pointer;
-}
-.workflow-primary-btn {
-  background: var(--q-button-bg, linear-gradient(135deg, #0b7fa3, #086b8d));
-  border-color: var(--q-button-border, rgba(8, 107, 141, 0.72));
-  color: var(--q-button-text, #fff);
-  box-shadow: var(--q-button-shadow, 0 8px 18px rgba(8, 107, 141, 0.14));
-  padding: 0 14px;
-}
-.workflow-primary-btn:hover:not(:disabled) {
-  background: var(--q-button-hover-bg, linear-gradient(135deg, #086f92, #075d7b));
-  box-shadow: var(--q-button-hover-shadow, 0 10px 22px rgba(8, 107, 141, 0.18));
-  transform: translateY(-1px);
-}
-.workflow-secondary-btn {
-  background: var(--q-secondary-button-bg, #fff);
-  border-color: var(--q-secondary-button-border, rgba(8, 107, 141, 0.22));
-  color: var(--q-secondary-button-text, #075d7b);
-  box-shadow: 0 4px 10px rgba(8, 107, 141, 0.06);
-  padding: 0 14px;
-}
-.workflow-secondary-btn:hover:not(:disabled) {
-  background: var(--q-secondary-button-hover-bg, rgba(8, 107, 141, 0.06));
-  border-color: var(--q-secondary-button-border, rgba(8, 107, 141, 0.3));
-  transform: translateY(-1px);
-}
-/* Filled danger button (reject / deactivate) */
-.workflow-danger-btn,
-.workflow-icon-btn.danger {
-  background: var(--q-danger, #d21f35);
-  border-color: var(--q-danger, #d21f35);
-  color: #fff;
-  box-shadow: 0 8px 18px rgba(210, 31, 53, 0.16);
-  padding: 0 14px;
-}
-.workflow-danger-btn:hover:not(:disabled),
-.workflow-icon-btn.danger:hover:not(:disabled) {
-  background: #b81b2e;
-  border-color: #b81b2e;
-  box-shadow: 0 10px 22px rgba(210, 31, 53, 0.22);
-  transform: translateY(-1px);
-}
-/* Filled success button (reactivate / approve) */
-.workflow-success-btn,
-.workflow-icon-btn.success {
-  background: var(--q-success, #138a5b);
-  border-color: var(--q-success, #138a5b);
-  color: #fff;
-  box-shadow: 0 8px 18px rgba(19, 138, 91, 0.16);
-  padding: 0 14px;
-}
-.workflow-success-btn:hover:not(:disabled),
-.workflow-icon-btn.success:hover:not(:disabled) {
-  background: #0f7a4f;
-  border-color: #0f7a4f;
-  box-shadow: 0 10px 22px rgba(19, 138, 91, 0.22);
-  transform: translateY(-1px);
-}
-.workflow-icon-btn {
-  background: var(--q-icon-button-bg, #fff);
-  border: 1px solid var(--q-icon-button-border, rgba(8, 107, 141, 0.2));
-  border-radius: 9px;
-  color: var(--q-icon-button-text, #075d7b);
-  box-shadow: 0 4px 10px rgba(8, 107, 141, 0.06);
-  height: 36px;
-  min-height: 36px;
-  padding: 0;
-  width: 36px;
-}
-.workflow-icon-btn:hover:not(:disabled) {
-  background: var(--q-icon-button-hover-bg, rgba(8, 107, 141, 0.075));
-  border-color: var(--q-icon-button-border, rgba(8, 107, 141, 0.28));
-  box-shadow: 0 6px 14px rgba(8, 107, 141, 0.1);
-}
-:where(button):disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
-  transform: none;
-}
-.workflow-filters[hidden] {
-  display: none !important;
-}
-.workflow-filters {
-  background: var(--q-surface-muted, #f8fafc);
-  border: 1px solid var(--q-border-subtle, #e2e8f0);
-  border-radius: 8px;
-  width: 100%;
-}
-.workflow-field {
+
+/* ============================================================
+   2. Grid stacks (page-level sections & content areas)
+   ============================================================ */
+.workflow-scope-stack,
+.workflow-content-stack {
   display: grid;
-  gap: 4px;
+  gap: var(--nt-section-gap, 18px);
   min-width: 0;
 }
-.workflow-field span {
-  color: var(--q-text-secondary, #334155);
-  font-size: 11px;
-  font-weight: 700;
-  line-height: var(--q-line-height-label, 1.4);
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
 
-.workflow-refresh-btn {
-  background: var(--q-surface-card, #fff);
-  border: 1px solid var(--q-border-strong, #bae6fd);
-  width: 100%;
-  padding: 0 10px;
-  height: 32px;
-  border-radius: 6px;
-  color: var(--q-text-primary, #000);
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  font-size: 12px;
-  font-weight: 700;
-}
-.workflow-refresh-btn:hover:not(:disabled) {
-  background: var(--q-primary-soft, #f0f9ff);
-  border-color: var(--q-primary, #0369a1);
-  color: var(--q-primary, #0369a1);
-}
-
-.workflow-input {
-  background: var(--q-surface-card, #fff);
-  border: 1px solid var(--q-border-strong, #cbd5e1);
-  border-radius: 6px;
-  color: var(--q-text-primary, #0f172a);
-  font-size: 12px;
-  min-height: 32px;
-  outline: 0;
-  padding: 0 8px;
-  width: 100%;
-  transition: all 0.2s;
-}
-.workflow-input:focus {
-  border-color: var(--q-primary, #0284c7);
-  box-shadow: 0 0 0 2px var(--q-primary-soft, #bae6fd);
-}
 .workflow-list,
-.workflow-details,
-.workflow-form,
-.workflow-timeline {
+.workflow-builder-list {
   display: grid;
-  gap: 8px;
-}
-.workflow-card {
-  background: var(--q-surface-card, #fff);
-  border: 1px solid var(--q-border-subtle, #dbeafe);
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-.workflow-card:hover {
-  background: var(--q-surface-muted, #f8fafc);
-  border-color: var(--q-primary-border, #bae6fd);
-}
-.workflow-card-main {
-  flex: 1 1 auto;
+  gap: 12px;
   min-width: 0;
 }
-.workflow-card h2 {
-  color: var(--q-text-primary, #0f172a);
-  font-size: 13px;
-  font-weight: 800;
-  margin: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.workflow-card p {
-  color: var(--q-text-muted, #475569);
-  font-size: 11px;
-  margin: 2px 0 0;
-}
-.workflow-card-side {
-  background: var(--q-primary-soft, #f0f9ff);
-  border: 1px solid var(--q-primary-border, #bae6fd);
-  border-radius: 6px;
-  color: var(--q-primary, #0369a1);
+
+/* View-mode detail section (read-only layout) */
+.workflow-detail-view {
   display: grid;
-  justify-items: center;
+  gap: 14px;
+  min-width: 0;
 }
-.workflow-card-side strong {
-  font-size: 14px;
+
+/* ── filter-field: label stacked above control ────────────── */
+label.filter-field,
+.filter-field {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
 }
-.workflow-card-side span {
-  font-size: 9px;
-  font-weight: 700;
+
+/* ── field-control: base input / select / textarea styles ─── */
+/* Global forms.css targets .form-control/.form-select; this   */
+/* component uses .field-control, so we provide the equivalent */
+.field-control {
+  width: 100%;
+  min-height: var(--nt-control-height, 44px);
+  padding-inline: var(--nt-control-padding-x, 14px);
+  color: var(--nt-text);
+  background: #ffffff;
+  border: 1px solid #d9e3ee;
+  border-radius: 9px;
+  font-size: 0.9rem;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
 }
-.workflow-card-actions {
-  background: var(--q-surface-muted, #f8fafc);
-  border: 1px solid var(--q-border-subtle, #e2e8f0);
-  border-radius: 6px;
+
+.field-control:focus {
+  border-color: rgba(15, 125, 168, 0.52);
+  box-shadow: var(--nt-focus);
+  outline: 0;
 }
-.workflow-toast {
-  position: fixed;
-  right: 16px;
-  top: 16px;
-  z-index: 1200;
+
+/* ============================================================
+   3. Panel / card surfaces (shared border + shadow contract)
+   ============================================================ */
+.workflow-branch-panel,
+.workflow-tree-shell,
+.workflow-owner-card,
+.workflow-form-section,
+.workflow-detail-card,
+.workflow-path-strip {
+  color: var(--q-panel-text, var(--t));
+  background: var(--panel);
+  border: 1px solid var(--pb);
+  border-radius: var(--pr);
+  box-shadow: var(--shadow);
 }
-.workflow-toast-item {
-  background: var(--q-surface-card, #fff);
-  border: 1px solid var(--q-primary-border, #bae6fd);
-  border-radius: 8px;
-  box-shadow: var(--q-shadow-card, 0 8px 24px rgba(0, 0, 0, 0.1));
+
+.workflow-branch-panel,
+.workflow-detail-card,
+.workflow-form-section {
+  padding: 18px 20px;
+}
+
+/* Branch panel on scope-selection page: constrain width &    */
+/* lay label + select vertically in a single column           */
+.workflow-branch-panel {
+  max-width: 440px;
+}
+
+.workflow-branch-field {
+  display: grid;
+  gap: 6px;
+  width: 100%;
+}
+
+/* ============================================================
+   4. Owner card (scope header)
+   ============================================================ */
+.workflow-owner-card {
   display: flex;
-  gap: 8px;
-  max-width: 400px;
-  padding: 10px 12px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 22px;
+  background:
+    linear-gradient(90deg, rgb(var(--p) / 0.07), transparent 52%),
+    var(--panel);
 }
-.workflow-toast-item p {
+
+.workflow-owner-copy {
+  min-width: 0;
+}
+
+.workflow-owner-copy p,
+.workflow-section-head p,
+.workflow-detail-card p,
+.workflow-owner-metric span,
+.workflow-meta-row,
+.workflow-candidate-footer {
   margin: 0;
-  font-size: 12px;
+  color: var(--tm);
+  font-size: var(--q-font-size-small, 0.82rem);
+  font-weight: 750;
 }
-.workflow-toast-success {
-  color: #047857;
+
+.workflow-owner-copy h2,
+.workflow-list-header h2,
+.workflow-title-row h3,
+.workflow-detail-card h3,
+.workflow-section-head h3,
+.workflow-confirm-header h2 {
+  margin: 0;
+  color: var(--t);
+  font-weight: 850;
+  line-height: var(--q-line-height-title, 1.3);
 }
-.workflow-toast-error {
-  color: var(--q-accent, #be123c);
+
+.workflow-owner-copy h2 {
+  margin-block: 4px;
+  overflow-wrap: anywhere;
+  font-size: 1.22rem;
 }
-.workflow-toast-info {
-  color: var(--q-primary, #0369a1);
-}
-.workflow-toast-close {
-  background: transparent;
-  border: 0;
-  color: inherit;
-  cursor: pointer;
-}
-.workflow-embedded-list-section {
-  background: var(--q-surface-muted, #f8fafc);
-  border: 1px solid var(--q-border-subtle, #e2e8f0);
-  border-radius: 10px;
-  margin-top: 8px;
+
+/* ============================================================
+   5. List panel
+   ============================================================ */
+.workflow-list-panel {
+  padding: 0 !important;
   overflow: hidden;
 }
 
-.workflow-embedded-list {
-  background: transparent;
+.workflow-list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 58px;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--pb);
 }
 
-.workflow-embedded-card {
-  background: var(--q-surface-card, #fff);
-  border: 1px solid var(--q-border-subtle, #dbeafe);
-  border-radius: 8px;
+/* ── Filter grid ──────────────────────────────────────────── */
+.workflow-filter-grid {
+  display: grid;
+  grid-template-columns: 2fr repeat(3, 1fr);
+  gap: 12px;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--b);
+}
+
+/* Inline label+control pattern used inside filter grid */
+.filter-cell {
+  min-width: 0;
+}
+
+.filter-cell-wide {
+  /* already takes 2fr – no override needed */
+}
+
+.filter-cell-small {
+  min-width: 80px;
+}
+
+/* ── Workflow list area ────────────────────────────────────── */
+.workflow-list {
+  padding: 16px 18px;
+}
+
+/* ============================================================
+   6. Workflow card
+   ============================================================ */
+.workflow-card {
+  display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  min-height: 56px;
-  transition: background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+  grid-template-rows: auto auto;
+  gap: 10px 16px;
+  padding: 16px 18px;
+  background: var(--bg);
+  border: 1px solid var(--b);
+  border-radius: var(--r);
+  transition: box-shadow 160ms ease, border-color 160ms ease;
 }
 
-.workflow-embedded-card:hover {
-  background: var(--q-surface-muted, #f8fafc);
-  border-color: var(--q-primary-border, #bae6fd);
-  box-shadow: 0 8px 18px #0284c712;
+.workflow-card:hover {
+  border-color: rgb(var(--p) / 0.28);
+  box-shadow: 0 12px 30px rgb(var(--p) / 0.08);
 }
 
-.workflow-embedded-tools {
+.workflow-card-main,
+.workflow-title-row {
   min-width: 0;
 }
 
-.workflow-embedded-expanded-details {
-  border-top: 1px solid var(--q-border-subtle, #e2e8f0);
+.workflow-title-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.workflow-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+/* ── Badges ───────────────────────────────────────────────── */
+.workflow-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 22px;
+  padding: 0 9px;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.workflow-badge--active {
+  color: var(--q-success, #138a5b) !important;
+  background: var(--q-success-soft, #eefbf5) !important;
+  border: 1px solid rgba(19, 138, 91, 0.18) !important;
+}
+
+.workflow-badge--inactive {
+  color: var(--tm) !important;
+  background: var(--m) !important;
+  border: 1px solid var(--b) !important;
+}
+
+.workflow-badge--default,
+.workflow-action-accent {
+  color: var(--ph) !important;
+  background: var(--ps) !important;
+  border: 1px solid rgb(var(--p) / 0.22) !important;
+}
+
+/* ── Path strip (chip row) ────────────────────────────────── */
+.workflow-path-strip {
   grid-column: 1 / -1;
-  min-width: 0;
-  padding-top: 8px;
-}
-
-.workflow-embedded-expanded-details .workflow-actions {
-  border-top: 1px solid var(--q-border-subtle, #e2e8f0);
-  padding-top: 8px;
-}
-.workflow-embedded-details-path {
-  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
   flex-wrap: nowrap;
-  margin: 0;
-  max-width: 100%;
+  gap: 6px;
   min-width: 0;
   overflow-x: auto;
-  overflow-y: hidden;
-  padding: 4px 2px;
+  padding: 10px 12px;
+  background: linear-gradient(135deg, var(--m), rgb(var(--p) / 0.04));
+  box-shadow: none;
   scrollbar-width: thin;
 }
 
-.workflow-embedded-details-path .workflow-flow-step {
+.workflow-path-chip {
   flex: 0 0 auto;
-  min-width: 190px;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 6px 12px;
+  color: var(--t);
+  background:
+    radial-gradient(circle at var(--cgx) 50%, rgb(var(--p) / 0.13), transparent 56px),
+    linear-gradient(135deg, var(--bg), var(--ps));
+  border: 1px solid rgb(var(--p) / 0.2);
+  border-radius: 999px;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.8);
+  font-size: var(--q-font-size-small, 0.82rem);
+  font-weight: 850;
 }
 
-.workflow-embedded-pagination {
-  background: var(--q-surface-card, #fff);
+.workflow-path-chip--large {
+  padding: 8px 16px;
+  font-size: var(--q-font-size-base, 0.88rem);
+}
+
+.workflow-path-arrow {
+  color: rgb(var(--p) / 0.5);
+  font-size: 0.78rem;
+  flex: 0 0 auto;
+}
+
+/* ============================================================
+   7. Side-panel (workflow editor)
+   ============================================================ */
+.workflow-backdrop {
+  z-index: 2147483000 !important;
+}
+
+.workflow-panel {
+  position: fixed !important;
+  inset-block: 20px !important;
+  inset-inline-end: 20px !important;
+  z-index: 2147483010 !important;
+  display: flex !important;
+  width: min(52rem, calc(100vw - 40px)) !important;
+  height: calc(100dvh - 40px) !important;
+  flex-direction: column !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  border-radius: 18px !important;
+  box-shadow: 0 28px 70px rgb(15 23 42 / 0.18) !important;
+}
+
+/* ── Panel header ─────────────────────────────────────────── */
+.workflow-panel-header {
+  /* inherits from .editor-panel-header via dialogs.css */
+}
+
+/* ── Panel body ───────────────────────────────────────── */
+.workflow-panel-body {
+  display: flex;
+  min-height: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
+  overflow-y: auto;
+  /* No gap here – the workflow-form / workflow-detail-view    */
+  /* inside manage their own gaps.                              */
+  padding: 18px;
+  background: var(--m);
+}
+
+/* ============================================================
+   8. Editor form layout
+   ============================================================ */
+.workflow-detail-view {
+  display: grid;
+  gap: 16px;
+}
+
+.workflow-form {
+  display: flex;
+  /* Do NOT use min-height: 100% – it creates a giant gap      */
+  /* between the last section and the sticky footer.           */
+  height: auto;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Builder section should grow so empty state fills nicely    */
+.workflow-builder {
+  flex: 0 0 auto;
+}
+
+/* Candidates section grows to fill any leftover space         */
+.workflow-candidates {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+  /* flex-grow so it fills remaining panel height */
+  flex: 1 1 auto;
+}
+
+/* ── Name row: Arabic + English side-by-side ──────────────── */
+/* Note: HTML also has Bootstrap d-flex classes; we override   */
+.workflow-name-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 16px !important;
+  /* form-field children need proper label+input layout        */
+}
+
+/* form-field inside name grid: label on top, input below     */
+.workflow-name-grid .form-field {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+/* ── Candidate filter header row ──────────────────────────── */
+.workflow-candidate-filters {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--b);
+}
+
+/* ── Section head (title + hint inside a form section) ───── */
+.workflow-section-head {
+  display: grid;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+/* ── Drop zone active state ───────────────────────────────── */
+.workflow-drop-active {
+  background: var(--ps) !important;
+  border-color: rgb(var(--p) / 0.42) !important;
+  box-shadow: var(--nt-focus) !important;
+}
+
+/* ── Builder row (drag-reorder list item) ─────────────────── */
+.workflow-builder-row {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 12px 14px;
+  background: var(--bg);
+  border: 1px solid var(--b);
+  border-radius: var(--r);
+  cursor: move;
+  transition: border-color 140ms ease, box-shadow 140ms ease;
+}
+
+.workflow-builder-row:hover {
+  border-color: rgb(var(--p) / 0.26);
+  box-shadow: 0 8px 18px rgb(var(--p) / 0.06);
+}
+
+.workflow-builder-row--replace {
+  border-color: rgb(var(--p) / 0.46);
+  box-shadow: inset 4px 0 0 var(--q-primary, var(--nt-primary));
+}
+
+/* ── Step index chip ──────────────────────────────────────── */
+.workflow-step-index,
+.workflow-candidate-icon {
+  display: grid;
+  place-items: center;
+  background: var(--ps);
+  color: var(--ph);
+  border-radius: var(--q-radius-sm, 8px);
+  font-weight: 900;
+}
+
+.workflow-step-index {
+  width: 36px;
+  height: 36px;
+  font-size: 0.82rem;
+}
+
+/* ── Step / candidate copy ────────────────────────────────── */
+.workflow-step-copy,
+.workflow-candidate-copy {
+  display: grid;
+  min-width: 0;
+  gap: 3px;
+  text-align: start;
+}
+
+.workflow-step-copy strong,
+.workflow-candidate-copy strong {
+  overflow: hidden;
+  color: var(--t);
+  font-size: var(--q-font-size-base, 0.88rem);
+  font-weight: 850;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workflow-step-copy small,
+.workflow-candidate-copy small {
+  overflow: hidden;
+  color: var(--tm);
+  font-size: var(--q-font-size-small, 0.78rem);
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Step actions cluster ─────────────────────────────────── */
+.workflow-step-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ── Empty / placeholder states ──────────────────────────── */
+.workflow-drop-empty,
+.workflow-candidate-empty {
+  padding: 22px;
+  color: var(--tm);
+  background: var(--m);
+  border: 1px dashed var(--b);
+  border-radius: var(--r);
+  font-weight: 750;
+  text-align: center;
+}
+
+/* ============================================================
+   9. Candidate grid
+   ============================================================ */
+.workflow-candidate-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.workflow-candidate-card {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 14px 12px;
+  background:
+    radial-gradient(circle at var(--cgx) 50%, rgb(var(--p) / 0.15), transparent 70px),
+    linear-gradient(135deg, var(--bg), var(--ps));
+  border: 1px solid rgb(var(--p) / 0.18);
+  border-radius: 14px;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.82);
+  cursor: grab;
+  transition: border-color 140ms ease, box-shadow 140ms ease, transform 120ms ease;
+}
+
+.workflow-candidate-card:hover {
+  border-color: rgb(var(--p) / 0.34);
+  box-shadow:
+    0 14px 30px rgb(15 25 40 / 0.07),
+    inset 0 1px 0 rgb(255 255 255 / 0.9);
+  transform: translateY(-1px);
+}
+
+.workflow-candidate-icon {
+  width: 40px;
+  height: 40px;
+  font-size: 1rem;
+}
+
+.workflow-candidate-empty {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+
+/* ── Candidate footer (count + pagination) ────────────────── */
+.workflow-candidate-footer {
+  justify-content: space-between;
+  padding-top: 10px;
+  border-top: 1px solid var(--b);
+  flex-wrap: wrap;
+}
+
+/* ============================================================
+   10. Form actions (sticky footer inside panel)
+   ============================================================ */
+.workflow-form-actions {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  /* margin-top: 0 – do NOT use auto; that causes the big gap */
   margin-top: 0;
+  margin-inline: -18px;
+  margin-bottom: -18px;
+  padding: 14px 18px !important;
+  background: linear-gradient(0deg, #ffffff 60%, rgb(248 250 252 / 0));
+  border-top: 1px solid var(--b);
 }
 
-.workflow-embedded-empty {
-  background: var(--q-surface-card, #fff);
+/* ============================================================
+   11. Replace-mode note
+   ============================================================ */
+.workflow-replace-note {
+  margin-bottom: 8px;
 }
 
+/* ============================================================
+   12. Confirm dialog (modal overlay)
+   ============================================================ */
+.workflow-confirm-panel {
+  position: fixed !important;
+  inset: 50% auto auto 50% !important;
+  z-index: 2147483020 !important;
+  width: min(92vw, 28rem) !important;
+  padding: 0 !important;
+  transform: translate(-50%, -50%) !important;
+}
 
+.workflow-confirm-header,
+.workflow-confirm-actions {
+  padding: 16px 20px;
+}
 
+.workflow-confirm-header {
+  border-bottom: 1px solid var(--b);
+}
+
+.workflow-confirm-name {
+  display: block;
+  padding: 10px 14px;
+  margin-top: 4px;
+  background: var(--m);
+  border-radius: var(--r);
+  overflow-wrap: anywhere;
+  font-weight: 700;
+  color: var(--t);
+}
+
+.workflow-confirm-actions {
+  justify-content: flex-end;
+  border-top: 1px solid var(--b);
+}
+
+/* ============================================================
+   13. Toast
+   ============================================================ */
+.workflow-toast {
+  position: fixed;
+  inset-inline-end: 18px;
+  top: 80px;
+  z-index: 2147483050;
+  width: min(420px, calc(100dvw - 36px));
+}
+
+/* ============================================================
+   14. State cards (empty / access denied / warning)
+   ============================================================ */
+.workflow-state-card {
+  min-height: 200px;
+  padding: 32px 24px !important;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  text-align: center;
+}
+
+.workflow-state-card i {
+  font-size: 2.2rem;
+  color: var(--tm);
+  opacity: 0.6;
+}
+
+.workflow-state-card h2 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 750;
+  color: var(--tm);
+}
+
+/* Tree shell: fills the remaining scope-stack height         */
+.workflow-tree-shell {
+  min-height: 240px;
+}
+
+.workflow-state-card--warning {
+  border-color: rgba(183, 121, 31, 0.24) !important;
+  background: #fffcf5 !important;
+}
+
+/* ============================================================
+   15. Detail view
+   ============================================================ */
+.workflow-detail-card {
+  background: var(--panel);
+}
+
+.workflow-detail-actions {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--b);
+}
+
+/* ============================================================
+   16. Pagination bar
+   ============================================================ */
+.workflow-pagination {
+  justify-content: space-between;
+  padding: 12px 18px;
+  border-top: 1px solid var(--pb);
+  font-size: var(--q-font-size-small, 0.82rem);
+  font-weight: 700;
+  color: var(--tm);
+}
+
+/* ============================================================
+   17. Responsive – tablet (≤ 900px)
+   ============================================================ */
+@media (max-width: 900px) {
+  .workflow-owner-card,
+  .workflow-list-header,
+  .workflow-pagination,
+  .workflow-candidate-footer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  /* Filter grid: search full-width, rest 2-col */
+  .workflow-filter-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  /* Search cell spans both columns */
+  .workflow-filter-grid .filter-cell-wide {
+    grid-column: 1 / -1;
+  }
+
+  .workflow-card {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .workflow-card-actions,
+  .workflow-toolbar-actions,
+  .workflow-detail-actions {
+    justify-content: flex-start;
+  }
+
+  /* Branch panel on tablet: allow full width */
+  .workflow-branch-panel {
+    max-width: 100%;
+  }
+}
+
+/* ============================================================
+   18. Responsive – mobile (≤ 640px)
+   ============================================================ */
+@media (max-width: 640px) {
+  .workflow-page {
+    padding: var(--nt-workspace-padding-md, 12px);
+    gap: 14px;
+  }
+
+  /* Panel goes full screen on mobile */
+  .workflow-panel {
+    inset: 0 !important;
+    width: 100dvw !important;
+    height: 100dvh !important;
+    border-radius: 0 !important;
+  }
+
+  /* 1-column grids on small screens */
+  .workflow-name-grid,
+  .workflow-candidate-filters,
+  .workflow-candidate-grid,
+  .workflow-filter-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .workflow-builder-row {
+    grid-template-columns: 36px minmax(0, 1fr);
+  }
+
+  /* Builder step actions move below copy on tiny screens */
+  .workflow-builder-row .workflow-step-actions {
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+  }
+
+  /* Full-width elements */
+  .workflow-branch-field,
+  .workflow-owner-metric,
+  .workflow-hero-actions > *,
+  .workflow-card-actions > *,
+  .workflow-detail-actions > * {
+    width: 100%;
+  }
+
+  .workflow-form-actions > * {
+    flex: 1;
+  }
+}
