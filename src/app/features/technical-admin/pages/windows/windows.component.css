@@ -2,50 +2,29 @@
   display: block;
 }
 
-/* Dense window columns need a wider table than the shared table shell. */
-table {
-  min-width: 960px !important;
-  border-collapse: separate !important;
-  border-spacing: 0 !important;
+.window-management-page {
+  --q-table-min-width: 960px;
+}
+
+.window-editor-panel {
+  --q-popup-width: min(760px, calc(100dvw - 96px));
 }
 
 .window-editor-form {
-  --bs-gutter-x: 14px !important;
-  --bs-gutter-y: 12px !important;
+  --bs-gutter-x: 14px;
+  --bs-gutter-y: 12px;
 }
 
 .window-check-field {
-  display: flex !important;
-  min-height: var(--q-admin-control-height, 44px) !important;
-  align-items: center !important;
-  gap: 10px !important;
-  margin: 0 !important;
-  padding: 10px 12px !important;
+  display: flex;
+  min-height: var(--q-admin-control-height, 44px);
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  padding: 10px 12px;
 }
 
 .window-check-field .form-check-input {
-  flex: 0 0 auto !important;
-  margin: 0 !important;
-}
-
-.window-popup-actions {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: flex-end !important;
-  gap: 8px !important;
-}
-
-
-.window-management-page .page-indicator {
-  font-weight: 700 !important;
-}
-
-.window-management-page .dialog-content {
-  margin-bottom: 14px !important;
-}
-
-@media (max-width: 767.98px) {
-  table {
-    min-width: 700px !important;
-  }
+  flex: 0 0 auto;
+  margin: 0;
 }

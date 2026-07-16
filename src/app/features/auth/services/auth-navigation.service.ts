@@ -10,7 +10,7 @@ interface PermissionRoute {
 
 const BRANCH_ADMIN_ROUTES: readonly PermissionRoute[] = [
   {
-    route: '/technical-admin/branch-editor',
+    route: '/admin/branch-editor',
     permissions: [
       'Branches.ViewAll',
       'Branches.ViewDetails',
@@ -20,35 +20,35 @@ const BRANCH_ADMIN_ROUTES: readonly PermissionRoute[] = [
     ],
   },
   {
-    route: '/technical-admin/branch-branding',
+    route: '/admin/branch-branding',
     permissions: ['Branches.ViewDetails', 'Branches.Update'],
   },
   {
-    route: '/technical-admin/services/catalog',
+    route: '/admin/services/catalog',
     permissions: ['Services.ViewAll'],
   },
   {
-    route: '/technical-admin/services/branch-services',
+    route: '/admin/services/branch-services',
     permissions: ['BranchServices.View', 'ServiceGlobalizationRequests.ViewOwn'],
   },
   {
-    route: '/technical-admin/services/workflows',
+    route: '/admin/services/workflows',
     permissions: ['ServiceWorkflows.ViewAll'],
   },
   {
-    route: '/technical-admin/waiting-areas',
+    route: '/admin/waiting-areas',
     permissions: ['WaitingAreas.ViewAll'],
   },
   {
-    route: '/technical-admin/windows',
+    route: '/admin/windows',
     permissions: ['Windows.ViewAll'],
   },
   {
-    route: '/technical-admin/terminals',
+    route: '/admin/terminals',
     permissions: ['Terminals.ViewAll'],
   },
   {
-    route: '/technical-admin/displays',
+    route: '/admin/displays',
     permissions: ['Displays.ViewAll'],
   },
 ];
@@ -63,7 +63,7 @@ export class AuthNavigationService {
     }
 
     if (session.userType === 'TechnicalAdmin') {
-      return '/technical-admin/branch-editor';
+      return '/admin/branch-editor';
     }
 
     if (session.userType === 'OrganizationAdmin') {

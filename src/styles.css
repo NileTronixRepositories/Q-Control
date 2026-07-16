@@ -1,4 +1,4 @@
-﻿@import 'bootstrap/dist/css/bootstrap.min.css';
+@import 'bootstrap/dist/css/bootstrap.min.css';
 @layer theme, base, components, utilities;
 @import 'tailwindcss/theme.css' layer(theme);
 @import 'tailwindcss/utilities.css' layer(utilities);
@@ -8,7 +8,6 @@
 @import './app/features/auth/pages/login/login-brand-animation.css';
 @import './app/shared/styles/global/foundation.css';
 @import './app/shared/styles/global/responsive.css';
-@import './app/shared/styles/global/branch-legacy.css';
 @import './app/shared/styles/global/enterprise-normalization.css';
 @import './app/shared/styles/global/ui-refresh.css';
 @import './app/shared/styles/global/typography-rhythm.css';

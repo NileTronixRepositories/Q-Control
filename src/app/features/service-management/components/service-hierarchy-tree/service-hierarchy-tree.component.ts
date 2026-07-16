@@ -33,6 +33,7 @@ interface ServiceHierarchyTreeEntry {
   readonly canDelete: boolean;
   readonly canRestore: boolean;
   readonly canManageWorkflow: boolean;
+  readonly canManageSchedule: boolean;
 }
 
 interface ServiceHierarchyLoadingRow {
@@ -99,6 +100,9 @@ export class ServiceHierarchyTreeComponent {
   readonly canManageWorkflows = input(false);
   readonly canManageWorkflowNode = input<(node: ServiceTreeNode) => boolean>(() => false);
   readonly manageWorkflowsLabel = input('');
+  readonly canManageSchedules = input(false);
+  readonly canManageScheduleNode = input<(node: ServiceTreeNode) => boolean>(() => false);
+  readonly manageScheduleLabel = input('');
 
   readonly refresh = output<void>();
   readonly includeInactiveChange = output<boolean>();
@@ -117,6 +121,7 @@ export class ServiceHierarchyTreeComponent {
   readonly leafDropped = output<number>();
   readonly unassignNode = output<ServiceTreeNode>();
   readonly manageWorkflows = output<ServiceTreeNode>();
+  readonly manageSchedule = output<ServiceTreeNode>();
 
   public readonly isDropActive = signal(false);
 
@@ -160,6 +165,16 @@ export class ServiceHierarchyTreeComponent {
     }
 
     this.manageWorkflows.emit(node);
+  }
+
+  public requestManageSchedule(node: ServiceTreeNode, event: MouseEvent): void {
+    event.stopPropagation();
+
+    if (!this.canManageSchedules() || !this.canManageScheduleNode()(node)) {
+      return;
+    }
+
+    this.manageSchedule.emit(node);
   }
 
   public onLeafSelectionChange(node: ServiceTreeNode, event: Event): void {
@@ -338,6 +353,8 @@ export class ServiceHierarchyTreeComponent {
       canRestore: this.canRestore() && node.isDeleted && this.canRestoreNode()(node),
       canManageWorkflow:
         this.canManageWorkflows() && this.canManageWorkflowNode()(node),
+      canManageSchedule:
+        this.canManageSchedules() && this.canManageScheduleNode()(node),
     };
   }
 

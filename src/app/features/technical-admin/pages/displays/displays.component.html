@@ -1,4 +1,8 @@
-<section class="technical-admin-responsive-page display-management-page !mx-auto !w-full !max-w-[1600px] !gap-4 !p-3 sm:!p-4 lg:!p-5" [attr.dir]="direction()" [attr.lang]="language()">
+<section
+  class="technical-admin-responsive-page display-management-page container-fluid"
+  [attr.dir]="direction()"
+  [attr.lang]="language()"
+>
   <!-- Header -->
   <app-technical-admin-page-hero
     [eyebrow]="translations().title"
@@ -44,7 +48,7 @@
   <!-- No Access -->
   @if (!hasDisplayAccess()) {
     <section class="empty-state">
-      <i class="bi bi-shield-lock"></i>
+      <i class="bi bi-shield-lock-fill"></i>
 
       <h2>
         {{ translations().accessDenied }}
@@ -60,11 +64,11 @@
       @if (canViewActive()) {
         <button
           type="button"
-          
           [class.primary-action]="activeTab() === 'active'"
           [class.secondary-action]="activeTab() !== 'active'"
           (click)="switchTab('active')"
         >
+          <i class="bi bi-display me-1.5"></i>
           {{ translations().activeTab }}
         </button>
       }
@@ -72,11 +76,11 @@
       @if (canViewDeleted()) {
         <button
           type="button"
-          
           [class.primary-action]="activeTab() === 'deleted'"
           [class.secondary-action]="activeTab() !== 'deleted'"
           (click)="switchTab('deleted')"
         >
+          <i class="bi bi-archive me-1.5"></i>
           {{ translations().deletedTab }}
         </button>
       }
@@ -92,13 +96,16 @@
             <label class="filter-field">
               <span>{{ translations().searchPlaceholder }}</span>
 
-              <input
-                class="field-control"
-                type="search"
-                [value]="activeSearch()"
-                [placeholder]="translations().searchPlaceholder"
-                (input)="updateActiveSearch($event)"
-              />
+              <div class="search-input-wrapper">
+                <i class="bi bi-search search-icon"></i>
+                <input
+                  class="field-control has-search-icon"
+                  type="search"
+                  [value]="activeSearch()"
+                  [placeholder]="translations().searchPlaceholder"
+                  (input)="updateActiveSearch($event)"
+                />
+              </div>
             </label>
           </div>
 
@@ -161,7 +168,7 @@
         <!-- Loading -->
         @if (activeLoading()) {
           <p class="state-note">
-            <i class="bi bi-arrow-repeat"></i>
+            <i class="bi bi-arrow-repeat animate-spin"></i>
             {{ translations().loading }}
           </p>
         }
@@ -232,27 +239,71 @@
           </div>
           <div data-testid="displays-active-mobile" class="grid gap-3 md:hidden">
             @for (item of activeDisplaysPage().data; track item.id) {
-              <app-technical-admin-mobile-record-card [eyebrow]="translations().displayNumber" [title]="formatText(item.type)" icon="bi bi-display-fill" [recordId]="item.number">
+              <app-technical-admin-mobile-record-card
+                [eyebrow]="translations().displayNumber"
+                [title]="formatText(item.type)"
+                icon="bi bi-display-fill"
+                [recordId]="item.number"
+              >
                 <div record-fields>
-                  <dt class="text-[11px] font-extrabold text-slate-500">{{ translations().branch }}</dt>
-                  <dd class="mb-0 mt-1 break-words font-bold text-slate-800">{{ branchLabel(item.branchArabicName, item.branchEnglishName) }}</dd>
+                  <dt class="text-[11px] font-extrabold text-slate-500">
+                    {{ translations().branch }}
+                  </dt>
+                  <dd class="mb-0 mt-1 break-words font-bold text-slate-800">
+                    {{ branchLabel(item.branchArabicName, item.branchEnglishName) }}
+                  </dd>
                 </div>
                 <div record-fields>
-                  <dt class="text-[11px] font-extrabold text-slate-500">{{ translations().ipAddress }}</dt>
-                  <dd class="mb-0 mt-1 break-all font-bold text-slate-800" dir="ltr">{{ formatText(item.ipAddress) }}</dd>
+                  <dt class="text-[11px] font-extrabold text-slate-500">
+                    {{ translations().ipAddress }}
+                  </dt>
+                  <dd class="mb-0 mt-1 break-all font-bold text-slate-800" dir="ltr">
+                    {{ formatText(item.ipAddress) }}
+                  </dd>
                 </div>
                 <div record-fields class="min-[430px]:col-span-2">
-                  <dt class="text-[11px] font-extrabold text-slate-500">{{ translations().serialNumber }}</dt>
-                  <dd class="mb-0 mt-1 break-all font-bold text-slate-800" dir="ltr">{{ formatText(item.serialNo) }}</dd>
+                  <dt class="text-[11px] font-extrabold text-slate-500">
+                    {{ translations().serialNumber }}
+                  </dt>
+                  <dd class="mb-0 mt-1 break-all font-bold text-slate-800" dir="ltr">
+                    {{ formatText(item.serialNo) }}
+                  </dd>
                 </div>
                 @if (canViewDetails()) {
-                  <button record-actions type="button" class="icon-action" [attr.aria-label]="translations().view" [title]="translations().view" (click)="openView(item.id)"><i class="bi bi-eye"></i></button>
+                  <button
+                    record-actions
+                    type="button"
+                    class="icon-action"
+                    [attr.aria-label]="translations().view"
+                    [title]="translations().view"
+                    (click)="openView(item.id)"
+                  >
+                    <i class="bi bi-eye"></i>
+                  </button>
                 }
                 @if (canUpdate()) {
-                  <button record-actions type="button" class="icon-action" [attr.aria-label]="translations().edit" [title]="translations().edit" (click)="openEdit(item.id)"><i class="bi bi-pencil-square"></i></button>
+                  <button
+                    record-actions
+                    type="button"
+                    class="icon-action"
+                    [attr.aria-label]="translations().edit"
+                    [title]="translations().edit"
+                    (click)="openEdit(item.id)"
+                  >
+                    <i class="bi bi-pencil-square"></i>
+                  </button>
                 }
                 @if (canDeactivate()) {
-                  <button record-actions type="button" class="icon-action danger-action" [attr.aria-label]="translations().delete" [title]="translations().delete" (click)="requestSoftDelete(item)"><i class="bi bi-pause-circle"></i></button>
+                  <button
+                    record-actions
+                    type="button"
+                    class="icon-action danger-action"
+                    [attr.aria-label]="translations().delete"
+                    [title]="translations().delete"
+                    (click)="requestSoftDelete(item)"
+                  >
+                    <i class="bi bi-pause-circle"></i>
+                  </button>
                 }
               </app-technical-admin-mobile-record-card>
             }
@@ -262,7 +313,7 @@
         <!-- Empty -->
         @else if (!activeLoading()) {
           <div class="empty-state">
-            <i class="bi bi-hourglass-split"></i>
+            <i class="bi bi-inbox"></i>
 
             <h2>
               {{ translations().noItems }}
@@ -271,9 +322,7 @@
         }
 
         <!-- Pagination -->
-        <footer
-          class="pagination-bar"
-        >
+        <footer class="pagination-bar">
           <span>
             {{ translations().totalItems }}:
             {{ activeDisplaysPage().totalItems }}
@@ -316,13 +365,16 @@
             <label class="filter-field">
               <span>{{ translations().searchPlaceholder }}</span>
 
-              <input
-                class="field-control"
-                type="search"
-                [value]="deletedSearch()"
-                [placeholder]="translations().searchPlaceholder"
-                (input)="updateDeletedSearch($event)"
-              />
+              <div class="search-input-wrapper">
+                <i class="bi bi-search search-icon"></i>
+                <input
+                  class="field-control has-search-icon"
+                  type="search"
+                  [value]="deletedSearch()"
+                  [placeholder]="translations().searchPlaceholder"
+                  (input)="updateDeletedSearch($event)"
+                />
+              </div>
             </label>
           </div>
 
@@ -381,7 +433,7 @@
 
         @if (deletedLoading()) {
           <p class="state-note">
-            <i class="bi bi-arrow-repeat"></i>
+            <i class="bi bi-arrow-repeat animate-spin"></i>
             {{ translations().loading }}
           </p>
         }
@@ -419,7 +471,6 @@
                       {{ branchLabel(item.branchArabicName, item.branchEnglishName) }}
                     </td>
 
-
                     <td>
                       <div class="row-actions">
                         @if (canReactivate()) {
@@ -430,7 +481,7 @@
                             [title]="translations().restore"
                             (click)="requestRestore(item)"
                           >
-                            <i class="bi bi-play-circle"></i>
+                            <i class="bi bi-arrow-counterclockwise"></i>
                           </button>
                         }
 
@@ -442,7 +493,7 @@
                             [title]="translations().permanentDelete"
                             (click)="requestPermanentDelete(item)"
                           >
-                            <i class="bi bi-trash3-fill"></i>
+                            <i class="bi bi-trash-fill"></i>
                           </button>
                         }
                       </div>
@@ -454,32 +505,69 @@
           </div>
           <div data-testid="displays-deleted-mobile" class="grid gap-3 md:hidden">
             @for (item of deletedDisplaysPage().data; track item.id) {
-              <app-technical-admin-mobile-record-card [eyebrow]="translations().displayNumber" [title]="formatText(item.type)" icon="bi bi-display-fill" [recordId]="item.number">
-                <span record-badges class="status-pill status-inactive">{{ translations().deletedTab }}</span>
+              <app-technical-admin-mobile-record-card
+                [eyebrow]="translations().displayNumber"
+                [title]="formatText(item.type)"
+                icon="bi bi-display-fill"
+                [recordId]="item.number"
+              >
+                <span record-badges class="status-pill status-inactive">{{
+                  translations().deletedTab
+                }}</span>
                 <div record-fields>
-                  <dt class="text-[11px] font-extrabold text-slate-500">{{ translations().branch }}</dt>
-                  <dd class="mb-0 mt-1 break-words font-bold text-slate-800">{{ branchLabel(item.branchArabicName, item.branchEnglishName) }}</dd>
+                  <dt class="text-[11px] font-extrabold text-slate-500">
+                    {{ translations().branch }}
+                  </dt>
+                  <dd class="mb-0 mt-1 break-words font-bold text-slate-800">
+                    {{ branchLabel(item.branchArabicName, item.branchEnglishName) }}
+                  </dd>
                 </div>
                 <div record-fields>
-                  <dt class="text-[11px] font-extrabold text-slate-500">{{ translations().ipAddress }}</dt>
-                  <dd class="mb-0 mt-1 break-all font-bold text-slate-800" dir="ltr">{{ formatText(item.ipAddress) }}</dd>
+                  <dt class="text-[11px] font-extrabold text-slate-500">
+                    {{ translations().ipAddress }}
+                  </dt>
+                  <dd class="mb-0 mt-1 break-all font-bold text-slate-800" dir="ltr">
+                    {{ formatText(item.ipAddress) }}
+                  </dd>
                 </div>
                 <div record-fields class="min-[430px]:col-span-2">
-                  <dt class="text-[11px] font-extrabold text-slate-500">{{ translations().serialNumber }}</dt>
-                  <dd class="mb-0 mt-1 break-all font-bold text-slate-800" dir="ltr">{{ formatText(item.serialNo) }}</dd>
+                  <dt class="text-[11px] font-extrabold text-slate-500">
+                    {{ translations().serialNumber }}
+                  </dt>
+                  <dd class="mb-0 mt-1 break-all font-bold text-slate-800" dir="ltr">
+                    {{ formatText(item.serialNo) }}
+                  </dd>
                 </div>
                 @if (canReactivate()) {
-                  <button record-actions type="button" class="icon-action success-action" [attr.aria-label]="translations().restore" [title]="translations().restore" (click)="requestRestore(item)"><i class="bi bi-play-circle"></i></button>
+                  <button
+                    record-actions
+                    type="button"
+                    class="icon-action success-action"
+                    [attr.aria-label]="translations().restore"
+                    [title]="translations().restore"
+                    (click)="requestRestore(item)"
+                  >
+                    <i class="bi bi-arrow-counterclockwise"></i>
+                  </button>
                 }
                 @if (canDeletePermanent()) {
-                  <button record-actions type="button" class="icon-action danger-action" [attr.aria-label]="translations().permanentDelete" [title]="translations().permanentDelete" (click)="requestPermanentDelete(item)"><i class="bi bi-trash3-fill"></i></button>
+                  <button
+                    record-actions
+                    type="button"
+                    class="icon-action danger-action"
+                    [attr.aria-label]="translations().permanentDelete"
+                    [title]="translations().permanentDelete"
+                    (click)="requestPermanentDelete(item)"
+                  >
+                    <i class="bi bi-trash-fill"></i>
+                  </button>
                 }
               </app-technical-admin-mobile-record-card>
             }
           </div>
         } @else if (!deletedLoading()) {
           <div class="empty-state">
-            <i class="bi bi-hourglass-split"></i>
+            <i class="bi bi-archive"></i>
 
             <h2>
               {{ translations().noItems }}
@@ -487,9 +575,7 @@
           </div>
         }
 
-        <footer
-          class="pagination-bar"
-        >
+        <footer class="pagination-bar">
           <span>
             {{ translations().totalItems }}:
             {{ deletedDisplaysPage().totalItems }}
@@ -527,7 +613,11 @@
     @if (panelMode() !== 'closed') {
       <div class="editor-backdrop app-popup-overlay" (click)="closePanel()"></div>
 
-      <aside class="editor-panel app-popup-panel display-editor-panel notranslate" role="dialog" translate="no">
+      <aside
+        class="editor-panel app-popup-panel display-editor-panel notranslate"
+        role="dialog"
+        translate="no"
+      >
         <!-- Header -->
         <header class="display-editor-panel-header">
           <h2>
@@ -565,7 +655,12 @@
             <div>
               <dt>{{ translations().branch }}</dt>
               <dd>
-                {{ branchLabel(selectedDetails()!.branchArabicName, selectedDetails()!.branchEnglishName) }}
+                {{
+                  branchLabel(
+                    selectedDetails()!.branchArabicName,
+                    selectedDetails()!.branchEnglishName
+                  )
+                }}
               </dd>
             </div>
 
@@ -631,7 +726,9 @@
 
                 @if (hasDisplayFormError('number')) {
                   <small>
-                    @if (numberControl.hasError('required') || numberControl.hasError('whitespace')) {
+                    @if (
+                      numberControl.hasError('required') || numberControl.hasError('whitespace')
+                    ) {
                       {{ translations().requiredField }}
                     } @else if (numberControl.hasError('maxlength')) {
                       {{ translations().maxLength20 }}
@@ -648,7 +745,12 @@
                   {{ translations().ipAddress }}
                 </span>
 
-                <input class="field-control" type="text" maxlength="45" formControlName="ipAddress" />
+                <input
+                  class="field-control"
+                  type="text"
+                  maxlength="45"
+                  formControlName="ipAddress"
+                />
 
                 @if (hasDisplayFormError('ipAddress')) {
                   <small>
@@ -671,11 +773,18 @@
                   {{ translations().serialNumber }}
                 </span>
 
-                <input class="field-control" type="text" maxlength="100" formControlName="serialNo" />
+                <input
+                  class="field-control"
+                  type="text"
+                  maxlength="100"
+                  formControlName="serialNo"
+                />
 
                 @if (hasDisplayFormError('serialNo')) {
                   <small>
-                    @if (serialNoControl.hasError('required') || serialNoControl.hasError('whitespace')) {
+                    @if (
+                      serialNoControl.hasError('required') || serialNoControl.hasError('whitespace')
+                    ) {
                       {{ translations().requiredField }}
                     } @else if (serialNoControl.hasError('maxlength')) {
                       {{ translations().maxLength100 }}
@@ -723,7 +832,11 @@
     @if (confirmDialog()) {
       <div class="editor-backdrop app-popup-overlay" (click)="closeConfirmDialog()"></div>
 
-      <aside class="editor-panel app-popup-panel display-editor-panel display-confirm-panel notranslate" role="dialog" translate="no">
+      <aside
+        class="editor-panel app-popup-panel display-editor-panel display-confirm-panel notranslate"
+        role="dialog"
+        translate="no"
+      >
         <header class="display-editor-panel-header">
           <h2>
             @if (confirmDialog()?.kind === 'deactivate') {
@@ -735,7 +848,12 @@
             }
           </h2>
 
-          <button type="button" class="icon-action" [disabled]="deleting()" (click)="closeConfirmDialog()">
+          <button
+            type="button"
+            class="icon-action"
+            [disabled]="deleting()"
+            (click)="closeConfirmDialog()"
+          >
             <i class="bi bi-x-lg"></i>
           </button>
         </header>

@@ -9,17 +9,17 @@ import { resolveJwtPermissions } from '../../auth/utils/auth-permissions.util';
 import { TechnicalAdminI18nStore } from '../store/technical-admin-i18n.store';
 
 @Component({
-  selector: 'app-technical-admin-shell',
+  selector: 'app-admin-shell',
   imports: [AppShellComponent, RouterOutlet],
-  templateUrl: './technical-admin-shell.component.html',
+  templateUrl: './admin-shell.component.html',
   styleUrls: [
-    './technical-admin-shell.component.css',
-    './technical-admin-responsive.component.css'
+    './admin-shell.component.css',
+    './admin-responsive.component.css'
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
 })
-export class TechnicalAdminShellComponent {
+export class AdminShellComponent {
   private readonly router = inject(Router);
   private readonly authSessionService = inject(AuthSessionService);
   private readonly servicePermissionService = inject(ServiceManagementPermissionService);
@@ -33,7 +33,7 @@ export class TechnicalAdminShellComponent {
     if (this.canShow(['Services.ViewAll']) && this.servicePermissionService.canViewAll()) {
       serviceNavChildren.push({
         label: translations.serviceManagementLabel,
-        route: '/technical-admin/services/catalog',
+        route: '/admin/services/catalog',
         icon: 'bi-list-check',
       });
     }
@@ -44,7 +44,7 @@ export class TechnicalAdminShellComponent {
     ) {
       serviceNavChildren.push({
         label: translations.branchServicesLabel,
-        route: '/technical-admin/services/branch-services',
+        route: '/admin/services/branch-services',
         icon: 'bi-diagram-2',
       });
     }
@@ -54,8 +54,16 @@ export class TechnicalAdminShellComponent {
     ) {
       serviceNavChildren.push({
         label: translations.serviceWorkflowsLabel,
-        route: '/technical-admin/services/workflows',
+        route: '/admin/services/workflows',
         icon: 'bi-diagram-3',
+      });
+    }
+
+    if (this.canShowScheduleNavigation()) {
+      serviceNavChildren.push({
+        label: translations.serviceSchedulesLabel,
+        route: '/admin/services/schedules',
+        icon: 'bi-calendar-week',
       });
     }
 
@@ -65,7 +73,7 @@ export class TechnicalAdminShellComponent {
     ) {
       serviceNavChildren.push({
         label: translations.globalizationRequestsLabel,
-        route: '/technical-admin/services/globalization-requests',
+        route: '/admin/services/globalization-requests',
         icon: 'bi-patch-check',
       });
     }
@@ -76,7 +84,7 @@ export class TechnicalAdminShellComponent {
     ) {
       serviceNavChildren.push({
         label: translations.centralServiceTreeLabel,
-        route: '/technical-admin/services/central-tree',
+        route: '/admin/services/central-tree',
         icon: 'bi-diagram-3-fill',
       });
     }
@@ -94,7 +102,7 @@ export class TechnicalAdminShellComponent {
     ) {
       branchChildren.push({
         label: translations.branchEditorLabel,
-        route: '/technical-admin/branch-editor',
+        route: '/admin/branch-editor',
         icon: 'bi-building-gear',
       });
     }
@@ -102,7 +110,7 @@ export class TechnicalAdminShellComponent {
     if (this.canShow(['Branches.ViewDetails', 'Branches.Update'])) {
       branchChildren.push({
         label: translations.branchBrandingLabel,
-        route: '/technical-admin/branch-branding',
+        route: '/admin/branch-branding',
         icon: 'bi-brush',
       });
     }
@@ -111,7 +119,7 @@ export class TechnicalAdminShellComponent {
       branchChildren.push({
         label: translations.servicesLabel,
         icon: 'bi-ui-checks-grid',
-        expanded: this.router.url.startsWith('/technical-admin/services'),
+        expanded: this.router.url.startsWith('/admin/services'),
         children: serviceNavChildren,
       });
     }
@@ -119,7 +127,7 @@ export class TechnicalAdminShellComponent {
     if (this.canShow(['WaitingAreas.ViewAll'])) {
       branchChildren.push({
         label: translations.waitingAreasLabel,
-        route: '/technical-admin/waiting-areas',
+        route: '/admin/waiting-areas',
         icon: 'bi-hourglass-split',
       });
     }
@@ -127,7 +135,7 @@ export class TechnicalAdminShellComponent {
     if (this.canShow(['Windows.ViewAll'])) {
       branchChildren.push({
         label: translations.windowsManagementLabel,
-        route: '/technical-admin/windows',
+        route: '/admin/windows',
         icon: 'bi-window',
       });
     }
@@ -135,7 +143,7 @@ export class TechnicalAdminShellComponent {
     if (this.canShow(['Terminals.ViewAll'])) {
       branchChildren.push({
         label: translations.terminalsManagementLabel,
-        route: '/technical-admin/terminals',
+        route: '/admin/terminals',
         icon: 'bi-terminal',
       });
     }
@@ -143,7 +151,7 @@ export class TechnicalAdminShellComponent {
     if (this.canShow(['Displays.ViewAll'])) {
       branchChildren.push({
         label: translations.displaysManagementLabel,
-        route: '/technical-admin/displays',
+        route: '/admin/displays',
         icon: 'bi-display',
       });
     }
@@ -170,6 +178,18 @@ export class TechnicalAdminShellComponent {
     const permissions = resolveJwtPermissions(session.token);
     return requiredPermissions.some((permission) => permissions.has(permission));
   }
+
+  private canShowScheduleNavigation(): boolean {
+    if (!this.canShow(['ServiceSchedules.View'])) {
+      return false;
+    }
+
+    return (
+      this.authSessionService.currentSession()?.userType === 'TechnicalAdmin' ||
+      this.servicePermissionService.canViewSchedules()
+    );
+  }
+
   protected toggleLanguage(): void {
     this.i18nStore.toggleLanguage();
   }
@@ -179,3 +199,5 @@ export class TechnicalAdminShellComponent {
     void this.router.navigateByUrl('/login');
   }
 }
+
+

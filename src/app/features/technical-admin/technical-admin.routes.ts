@@ -1,13 +1,13 @@
 import { Routes } from '@angular/router';
 
-import { technicalAdminPermissionGuard } from './guards/technical-admin-permission.guard';
+import { adminPermissionGuard } from './guards/admin-permission.guard';
 
 export const TECHNICAL_ADMIN_ROUTES: Routes = [
   {
     path: '',
     loadComponent: () =>
-      import('./layout/technical-admin-shell.component').then(
-        (component) => component.TechnicalAdminShellComponent,
+      import('./layout/admin-shell.component').then(
+        (component) => component.AdminShellComponent,
       ),
     children: [
       {
@@ -17,7 +17,7 @@ export const TECHNICAL_ADMIN_ROUTES: Routes = [
       },
       {
         path: 'branch-editor',
-        canActivate: [technicalAdminPermissionGuard],
+        canActivate: [adminPermissionGuard],
         data: {
           pageKey: 'branch-editor',
           title: 'Branch Editor',
@@ -38,7 +38,7 @@ export const TECHNICAL_ADMIN_ROUTES: Routes = [
       },
       {
         path: 'branch-branding',
-        canActivate: [technicalAdminPermissionGuard],
+        canActivate: [adminPermissionGuard],
         data: {
           requiredAnyPermissions: ['Branches.ViewDetails'],
         },
@@ -49,13 +49,14 @@ export const TECHNICAL_ADMIN_ROUTES: Routes = [
       },
       {
         path: 'services',
-        canActivate: [technicalAdminPermissionGuard],
+        canActivate: [adminPermissionGuard],
         data: {
           requiredAnyPermissions: [
             'Services.ViewAll',
             'Services.ViewCentralTree',
             'BranchServices.View',
             'ServiceWorkflows.ViewAll',
+            'ServiceSchedules.View',
             'ServiceGlobalizationRequests.ViewAll',
             'ServiceGlobalizationRequests.ViewOwn',
           ],
@@ -67,7 +68,7 @@ export const TECHNICAL_ADMIN_ROUTES: Routes = [
       },
       {
         path: 'waiting-areas',
-        canActivate: [technicalAdminPermissionGuard],
+        canActivate: [adminPermissionGuard],
         data: {
           allowTechnicalAdminWithoutPermission: true,
           requiredAnyPermissions: ['WaitingAreas.ViewAll'],
@@ -79,7 +80,7 @@ export const TECHNICAL_ADMIN_ROUTES: Routes = [
       },
       {
         path: 'windows',
-        canActivate: [technicalAdminPermissionGuard],
+        canActivate: [adminPermissionGuard],
         data: {
           requiredAnyPermissions: ['Windows.ViewAll'],
         },
@@ -90,7 +91,7 @@ export const TECHNICAL_ADMIN_ROUTES: Routes = [
       },
       {
         path: 'displays',
-        canActivate: [technicalAdminPermissionGuard],
+        canActivate: [adminPermissionGuard],
         data: {
           requiredAnyPermissions: [
             'Displays.ViewAll',
@@ -107,7 +108,7 @@ export const TECHNICAL_ADMIN_ROUTES: Routes = [
       },
       {
         path: 'terminals',
-        canActivate: [technicalAdminPermissionGuard],
+        canActivate: [adminPermissionGuard],
         data: {
           requiredAnyPermissions: ['Terminals.ViewAll'],
         },

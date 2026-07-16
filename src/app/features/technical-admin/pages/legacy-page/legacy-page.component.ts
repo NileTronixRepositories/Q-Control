@@ -211,10 +211,7 @@ const EMPTY_BRANCH_TABLE_META: BranchTableMeta = {
     TechnicalAdminPageHeroComponent,
   ],
   templateUrl: './legacy-page.component.html',
-  styleUrls: [
-    './legacy-page.component.css',
-    './branch-editor-form.component.css'
-  ],
+  styleUrl: './legacy-page.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LegacyPageComponent implements OnInit, OnDestroy {
@@ -382,7 +379,7 @@ export class LegacyPageComponent implements OnInit, OnDestroy {
   }
 
   protected openBranchBranding(branchId: number): void {
-    void this.router.navigate(['/technical-admin/branch-branding'], {
+    void this.router.navigate(['/admin/branch-branding'], {
       queryParams: { branchId },
     });
   }

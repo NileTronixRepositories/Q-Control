@@ -213,6 +213,17 @@
                   <i class="bi bi-signpost-split" aria-hidden="true"></i>
                 </button>
               }
+              @if (entry.canManageSchedule) {
+                <button
+                  type="button"
+                  class="svc-tree-action-btn"
+                  [title]="manageScheduleLabel()"
+                  [attr.aria-label]="manageScheduleLabel()"
+                  (click)="requestManageSchedule(entry.node, $event)"
+                >
+                  <i class="bi bi-calendar-week" aria-hidden="true"></i>
+                </button>
+              }
               @if (entry.canUnassign) {
                 <button
                   type="button"

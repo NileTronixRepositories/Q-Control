@@ -231,7 +231,7 @@ export class ServiceWorkflowsComponent implements OnInit, OnDestroy {
   }
 
   backToScopeSelection(): void {
-    void this.router.navigateByUrl('/technical-admin/services/workflows');
+    void this.router.navigateByUrl('/admin/services/workflows');
   }
 
   readonly canManageWorkflowFor = (node: ServiceTreeNode): boolean =>

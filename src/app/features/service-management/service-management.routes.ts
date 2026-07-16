@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 
-import { technicalAdminPermissionGuard } from '../technical-admin/guards/technical-admin-permission.guard';
+import { adminPermissionGuard } from '../technical-admin/guards/admin-permission.guard';
+import { serviceSchedulePendingChangesGuard } from './guards/service-schedule-pending-changes.guard';
 
 export const SERVICE_MANAGEMENT_ROUTES: Routes = [
   {
@@ -10,7 +11,7 @@ export const SERVICE_MANAGEMENT_ROUTES: Routes = [
   },
   {
     path: 'catalog',
-    canActivate: [technicalAdminPermissionGuard],
+    canActivate: [adminPermissionGuard],
     data: {
       requiredAnyPermissions: ['Services.ViewAll', 'BranchServices.Assign'],
     },
@@ -19,7 +20,7 @@ export const SERVICE_MANAGEMENT_ROUTES: Routes = [
   },
   {
     path: 'branch-services',
-    canActivate: [technicalAdminPermissionGuard],
+    canActivate: [adminPermissionGuard],
     data: {
       requiredAnyPermissions: ['BranchServices.View'],
     },
@@ -30,7 +31,7 @@ export const SERVICE_MANAGEMENT_ROUTES: Routes = [
   },
   {
     path: 'workflows',
-    canActivate: [technicalAdminPermissionGuard],
+    canActivate: [adminPermissionGuard],
     data: {
       requiredAnyPermissions: ['ServiceWorkflows.ViewAll'],
     },
@@ -41,7 +42,7 @@ export const SERVICE_MANAGEMENT_ROUTES: Routes = [
   },
   {
     path: 'branches/:branchId/services/:leafServiceId/workflows',
-    canActivate: [technicalAdminPermissionGuard],
+    canActivate: [adminPermissionGuard],
     data: {
       requiredAnyPermissions: ['ServiceWorkflows.ViewAll'],
     },
@@ -51,8 +52,34 @@ export const SERVICE_MANAGEMENT_ROUTES: Routes = [
       ),
   },
   {
+    path: 'schedules',
+    canActivate: [adminPermissionGuard],
+    canDeactivate: [serviceSchedulePendingChangesGuard],
+    data: {
+      allowTechnicalAdminWithoutPermission: true,
+      requiredAnyPermissions: ['ServiceSchedules.View'],
+    },
+    loadComponent: () =>
+      import('./pages/service-schedules/service-schedules.component').then(
+        (component) => component.ServiceSchedulesComponent,
+      ),
+  },
+  {
+    path: 'branches/:branchId/services/:leafServiceId/schedule',
+    canActivate: [adminPermissionGuard],
+    canDeactivate: [serviceSchedulePendingChangesGuard],
+    data: {
+      allowTechnicalAdminWithoutPermission: true,
+      requiredAnyPermissions: ['ServiceSchedules.View'],
+    },
+    loadComponent: () =>
+      import('./pages/service-schedules/service-schedules.component').then(
+        (component) => component.ServiceSchedulesComponent,
+      ),
+  },
+  {
     path: 'globalization-requests',
-    canActivate: [technicalAdminPermissionGuard],
+    canActivate: [adminPermissionGuard],
     data: {
       requiredAnyPermissions: ['ServiceGlobalizationRequests.ViewAll'],
     },
@@ -63,7 +90,7 @@ export const SERVICE_MANAGEMENT_ROUTES: Routes = [
   },
   {
     path: 'central-tree',
-    canActivate: [technicalAdminPermissionGuard],
+    canActivate: [adminPermissionGuard],
     data: {
       requiredAnyPermissions: ['Services.ViewCentralTree'],
     },
@@ -73,3 +100,5 @@ export const SERVICE_MANAGEMENT_ROUTES: Routes = [
       ),
   },
 ];
+
+

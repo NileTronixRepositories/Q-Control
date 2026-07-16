@@ -125,17 +125,21 @@ interface BranchOption {
 const DISPLAY_TRANSLATIONS: Record<AppLanguage, DisplayTranslations> = {
   ar: {
     title: '\u0625\u062f\u0627\u0631\u0629 \u0627\u0644\u0634\u0627\u0634\u0627\u062a',
-    description: '\u0625\u062f\u0627\u0631\u0629 \u0634\u0627\u0634\u0627\u062a Display \u0627\u0644\u0645\u0631\u062a\u0628\u0637\u0629 \u0628\u0627\u0644\u0641\u0631\u0648\u0639 \u0648\u0639\u0645\u0644\u064a\u0627\u062a CRUD.',
+    description:
+      '\u0625\u062f\u0627\u0631\u0629 \u0634\u0627\u0634\u0627\u062a Display \u0627\u0644\u0645\u0631\u062a\u0628\u0637\u0629 \u0628\u0627\u0644\u0641\u0631\u0648\u0639 \u0648\u0639\u0645\u0644\u064a\u0627\u062a CRUD.',
     activeTab: '\u0627\u0644\u0634\u0627\u0634\u0627\u062a \u0627\u0644\u0646\u0634\u0637\u0629',
-    deletedTab: '\u0627\u0644\u0634\u0627\u0634\u0627\u062a \u063a\u064a\u0631 \u0627\u0644\u0646\u0634\u0637\u0629',
+    deletedTab:
+      '\u0627\u0644\u0634\u0627\u0634\u0627\u062a \u063a\u064a\u0631 \u0627\u0644\u0646\u0634\u0637\u0629',
     addDisplay: '\u0625\u0636\u0627\u0641\u0629 \u0634\u0627\u0634\u0629',
-    searchPlaceholder: '\u0628\u062d\u062b \u0628\u0631\u0642\u0645 Display \u0623\u0648 IP \u0623\u0648 Serial \u0623\u0648 \u0627\u0644\u0646\u0648\u0639',
+    searchPlaceholder:
+      '\u0628\u062d\u062b \u0628\u0631\u0642\u0645 Display \u0623\u0648 IP \u0623\u0648 Serial \u0623\u0648 \u0627\u0644\u0646\u0648\u0639',
     branchFilter: '\u0627\u0644\u0641\u0631\u0639',
     allBranches: '\u0643\u0644 \u0627\u0644\u0641\u0631\u0648\u0639',
     pageSize: '\u062d\u062c\u0645 \u0627\u0644\u0635\u0641\u062d\u0629',
     loading: '\u062c\u0627\u0631\u064a \u0627\u0644\u062a\u062d\u0645\u064a\u0644...',
     noItems: '\u0644\u0627 \u062a\u0648\u062c\u062f \u0634\u0627\u0634\u0627\u062a.',
-    noItemsWithFilter: '\u0644\u0627 \u062a\u0648\u062c\u062f \u0634\u0627\u0634\u0627\u062a \u062a\u0637\u0627\u0628\u0642 \u0627\u0644\u0645\u0631\u0634\u062d\u0627\u062a \u0627\u0644\u0645\u062e\u062a\u0627\u0631\u0629.',
+    noItemsWithFilter:
+      '\u0644\u0627 \u062a\u0648\u062c\u062f \u0634\u0627\u0634\u0627\u062a \u062a\u0637\u0627\u0628\u0642 \u0627\u0644\u0645\u0631\u0634\u062d\u0627\u062a \u0627\u0644\u0645\u062e\u062a\u0627\u0631\u0629.',
     totalItems: '\u0625\u062c\u0645\u0627\u0644\u064a \u0627\u0644\u0639\u0646\u0627\u0635\u0631',
     previous: '\u0627\u0644\u0633\u0627\u0628\u0642',
     next: '\u0627\u0644\u062a\u0627\u0644\u064a',
@@ -154,30 +158,45 @@ const DISPLAY_TRANSLATIONS: Record<AppLanguage, DisplayTranslations> = {
     createdOn: '\u062a\u0627\u0631\u064a\u062e \u0627\u0644\u0625\u0646\u0634\u0627\u0621',
     modifiedOn: '\u062a\u0627\u0631\u064a\u062e \u0622\u062e\u0631 \u062a\u0639\u062f\u064a\u0644',
     details: '\u0627\u0644\u062a\u0641\u0627\u0635\u064a\u0644',
-    displayDetails: '\u062a\u0641\u0627\u0635\u064a\u0644 \u0627\u0644\u062c\u0647\u0627\u0632 \u0627\u0644\u0637\u0631\u0641\u064a',
+    displayDetails:
+      '\u062a\u0641\u0627\u0635\u064a\u0644 \u0627\u0644\u062c\u0647\u0627\u0632 \u0627\u0644\u0637\u0631\u0641\u064a',
     createTitle: '\u0625\u0646\u0634\u0627\u0621 \u062c\u0647\u0627\u0632',
     editTitle: '\u062a\u0639\u062f\u064a\u0644 \u062c\u0647\u0627\u0632',
     close: '\u0625\u063a\u0644\u0627\u0642',
     cancel: '\u0625\u0644\u063a\u0627\u0621',
     save: '\u062d\u0641\u0638',
-    requiredField: '\u0647\u0630\u0627 \u0627\u0644\u062d\u0642\u0644 \u0645\u0637\u0644\u0648\u0628.',
-    maxLength20: '\u0627\u0644\u062d\u062f \u0627\u0644\u0623\u0642\u0635\u0649 20 \u062d\u0631\u0641.',
-    maxLength45: '\u0627\u0644\u062d\u062f \u0627\u0644\u0623\u0642\u0635\u0649 45 \u062d\u0631\u0641.',
-    maxLength100: '\u0627\u0644\u062d\u062f \u0627\u0644\u0623\u0642\u0635\u0649 100 \u062d\u0631\u0641.',
+    requiredField:
+      '\u0647\u0630\u0627 \u0627\u0644\u062d\u0642\u0644 \u0645\u0637\u0644\u0648\u0628.',
+    maxLength20:
+      '\u0627\u0644\u062d\u062f \u0627\u0644\u0623\u0642\u0635\u0649 20 \u062d\u0631\u0641.',
+    maxLength45:
+      '\u0627\u0644\u062d\u062f \u0627\u0644\u0623\u0642\u0635\u0649 45 \u062d\u0631\u0641.',
+    maxLength100:
+      '\u0627\u0644\u062d\u062f \u0627\u0644\u0623\u0642\u0635\u0649 100 \u062d\u0631\u0641.',
     invalidIp: '\u0639\u0646\u0648\u0627\u0646 IP \u063a\u064a\u0631 \u0635\u062d\u064a\u062d.',
     selectBranch: '\u0627\u062e\u062a\u0631 \u0641\u0631\u0639',
     refresh: '\u062a\u062d\u062f\u064a\u062b',
     loadingBranches: '\u062a\u062d\u0645\u064a\u0644 \u0627\u0644\u0641\u0631\u0648\u0639...',
-    deleteConfirm: '\u062a\u0623\u0643\u064a\u062f \u0625\u064a\u0642\u0627\u0641 \u0627\u0644\u062c\u0647\u0627\u0632',
-    restoreConfirm: '\u062a\u0623\u0643\u064a\u062f \u0625\u0639\u0627\u062f\u0629 \u062a\u0646\u0634\u064a\u0637 \u0627\u0644\u062c\u0647\u0627\u0632',
-    permanentDeleteConfirm: '\u062a\u0623\u0643\u064a\u062f \u062d\u0630\u0641 \u0627\u0644\u062c\u0647\u0627\u0632 \u0646\u0647\u0627\u0626\u064a\u0627',
-    deleteConfirmBody: '\u0647\u0644 \u062a\u0631\u064a\u062f \u0625\u064a\u0642\u0627\u0641 \u0647\u0630\u0627 \u0627\u0644\u062c\u0647\u0627\u0632\u061f',
-    restoreConfirmBody: '\u0647\u0644 \u062a\u0631\u064a\u062f \u0625\u0639\u0627\u062f\u0629 \u062a\u0646\u0634\u064a\u0637 \u0647\u0630\u0627 \u0627\u0644\u062c\u0647\u0627\u0632\u061f',
-    permanentDeleteConfirmBody: '\u0633\u064a\u062a\u0645 \u062d\u0630\u0641 \u0627\u0644\u062c\u0647\u0627\u0632 \u0628\u0634\u0643\u0644 \u062f\u0627\u0626\u0645 \u0648\u0644\u0627 \u064a\u0645\u0643\u0646 \u0627\u0644\u062a\u0631\u0627\u062c\u0639 \u0639\u0646\u0647.',
-    fallbackSuccess: '\u062a\u0645\u062a \u0627\u0644\u0639\u0645\u0644\u064a\u0629 \u0628\u0646\u062c\u0627\u062d.',
-    fallbackError: '\u062d\u062f\u062b \u062e\u0637\u0623 \u063a\u064a\u0631 \u0645\u062a\u0648\u0642\u0639.',
-    accessDenied: '\u0627\u0644\u0635\u0644\u0627\u062d\u064a\u0629 \u0627\u0644\u0645\u0637\u0644\u0648\u0628\u0629 \u063a\u064a\u0631 \u0643\u0627\u0641\u064a\u0629.',
-    noPermissionHint: '\u0644\u0627 \u062a\u0648\u062c\u062f \u0635\u0644\u0627\u062d\u064a\u0627\u062a \u0643\u0627\u0641\u064a\u0629 \u0644\u0647\u0630\u0627 \u0627\u0644\u0625\u062c\u0631\u0627\u0621.',
+    deleteConfirm:
+      '\u062a\u0623\u0643\u064a\u062f \u0625\u064a\u0642\u0627\u0641 \u0627\u0644\u062c\u0647\u0627\u0632',
+    restoreConfirm:
+      '\u062a\u0623\u0643\u064a\u062f \u0625\u0639\u0627\u062f\u0629 \u062a\u0646\u0634\u064a\u0637 \u0627\u0644\u062c\u0647\u0627\u0632',
+    permanentDeleteConfirm:
+      '\u062a\u0623\u0643\u064a\u062f \u062d\u0630\u0641 \u0627\u0644\u062c\u0647\u0627\u0632 \u0646\u0647\u0627\u0626\u064a\u0627',
+    deleteConfirmBody:
+      '\u0647\u0644 \u062a\u0631\u064a\u062f \u0625\u064a\u0642\u0627\u0641 \u0647\u0630\u0627 \u0627\u0644\u062c\u0647\u0627\u0632\u061f',
+    restoreConfirmBody:
+      '\u0647\u0644 \u062a\u0631\u064a\u062f \u0625\u0639\u0627\u062f\u0629 \u062a\u0646\u0634\u064a\u0637 \u0647\u0630\u0627 \u0627\u0644\u062c\u0647\u0627\u0632\u061f',
+    permanentDeleteConfirmBody:
+      '\u0633\u064a\u062a\u0645 \u062d\u0630\u0641 \u0627\u0644\u062c\u0647\u0627\u0632 \u0628\u0634\u0643\u0644 \u062f\u0627\u0626\u0645 \u0648\u0644\u0627 \u064a\u0645\u0643\u0646 \u0627\u0644\u062a\u0631\u0627\u062c\u0639 \u0639\u0646\u0647.',
+    fallbackSuccess:
+      '\u062a\u0645\u062a \u0627\u0644\u0639\u0645\u0644\u064a\u0629 \u0628\u0646\u062c\u0627\u062d.',
+    fallbackError:
+      '\u062d\u062f\u062b \u062e\u0637\u0623 \u063a\u064a\u0631 \u0645\u062a\u0648\u0642\u0639.',
+    accessDenied:
+      '\u0627\u0644\u0635\u0644\u0627\u062d\u064a\u0629 \u0627\u0644\u0645\u0637\u0644\u0648\u0628\u0629 \u063a\u064a\u0631 \u0643\u0627\u0641\u064a\u0629.',
+    noPermissionHint:
+      '\u0644\u0627 \u062a\u0648\u062c\u062f \u0635\u0644\u0627\u062d\u064a\u0627\u062a \u0643\u0627\u0641\u064a\u0629 \u0644\u0647\u0630\u0627 \u0627\u0644\u0625\u062c\u0631\u0627\u0621.',
     traceIdLabel: '\u0645\u0639\u0631\u0641 \u0627\u0644\u062a\u062a\u0628\u0639',
     notAvailable: '-',
   },
@@ -263,7 +282,11 @@ const EMPTY_DELETED_DISPLAY_PAGE: PaginationResponse<DeletedDisplayListItemRespo
 
 @Component({
   selector: 'app-displays',
-  imports: [ReactiveFormsModule, TechnicalAdminMobileRecordCardComponent, TechnicalAdminPageHeroComponent],
+  imports: [
+    ReactiveFormsModule,
+    TechnicalAdminMobileRecordCardComponent,
+    TechnicalAdminPageHeroComponent,
+  ],
   templateUrl: './displays.component.html',
   styleUrl: './displays.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -294,16 +317,20 @@ export class DisplaysComponent implements OnInit, OnDestroy {
   protected readonly canDeactivate = this.permissionService.canDeactivate;
   protected readonly canReactivate = this.permissionService.canReactivate;
   protected readonly canDeletePermanent = this.permissionService.canDeletePermanent;
-  protected readonly canViewDeleted = computed(() => this.canReactivate() || this.canDeletePermanent());
+  protected readonly canViewDeleted = computed(
+    () => this.canReactivate() || this.canDeletePermanent(),
+  );
 
   protected readonly activeTab = signal<DisplayTab>(this.canViewActive() ? 'active' : 'deleted');
-  protected readonly hasDisplayAccess = computed(() => this.canViewActive() || this.canViewDeleted());
-
-  protected readonly activeDisplaysPage = signal<PaginationResponse<DisplayListItemResponse>>(
-    EMPTY_DISPLAY_PAGE
+  protected readonly hasDisplayAccess = computed(
+    () => this.canViewActive() || this.canViewDeleted(),
   );
-  protected readonly deletedDisplaysPage =
-    signal<PaginationResponse<DeletedDisplayListItemResponse>>(EMPTY_DELETED_DISPLAY_PAGE);
+
+  protected readonly activeDisplaysPage =
+    signal<PaginationResponse<DisplayListItemResponse>>(EMPTY_DISPLAY_PAGE);
+  protected readonly deletedDisplaysPage = signal<
+    PaginationResponse<DeletedDisplayListItemResponse>
+  >(EMPTY_DELETED_DISPLAY_PAGE);
   protected readonly activeSearch = signal('');
   protected readonly deletedSearch = signal('');
   protected readonly activeBranchId = signal<number | null>(null);
@@ -326,7 +353,14 @@ export class DisplaysComponent implements OnInit, OnDestroy {
   protected readonly displayForm = this.formBuilder.group({
     branchId: [0, [Validators.required, Validators.min(1)]],
     number: ['', [Validators.required, Validators.maxLength(20), this.notWhitespaceValidator]],
-    ipAddress: ['', [Validators.required, Validators.maxLength(45), (control: AbstractControl<string>) => this.ipAddressValidator(control)]],
+    ipAddress: [
+      '',
+      [
+        Validators.required,
+        Validators.maxLength(45),
+        (control: AbstractControl<string>) => this.ipAddressValidator(control),
+      ],
+    ],
     serialNo: ['', [Validators.required, Validators.maxLength(100), this.notWhitespaceValidator]],
     type: ['', [Validators.required, Validators.maxLength(100), this.notWhitespaceValidator]],
   });
@@ -665,7 +699,10 @@ export class DisplaysComponent implements OnInit, OnDestroy {
     this.loadDeletedDisplays(1);
   }
 
-  private loadActiveDisplays(pageNumber = this.activeDisplaysPage().currentPage, force = false): void {
+  private loadActiveDisplays(
+    pageNumber = this.activeDisplaysPage().currentPage,
+    force = false,
+  ): void {
     if (!this.canViewActive() || (this.activeLoading() && !force)) {
       return;
     }
@@ -676,7 +713,15 @@ export class DisplaysComponent implements OnInit, OnDestroy {
     this.traceId.set(null);
 
     this.displayManagementApiService
-      .getDisplays(this.buildQuery(this.activeSearch(), this.activeBranchId(), pageNumber, this.activePageSize(), true))
+      .getDisplays(
+        this.buildQuery(
+          this.activeSearch(),
+          this.activeBranchId(),
+          pageNumber,
+          this.activePageSize(),
+          true,
+        ),
+      )
       .subscribe({
         next: (response) => {
           if (requestSerial !== this.activeDisplaysRequestSerial) {
@@ -707,7 +752,15 @@ export class DisplaysComponent implements OnInit, OnDestroy {
     this.traceId.set(null);
 
     this.displayManagementApiService
-      .getDisplays(this.buildQuery(this.deletedSearch(), this.deletedBranchId(), pageNumber, this.deletedPageSize(), false))
+      .getDisplays(
+        this.buildQuery(
+          this.deletedSearch(),
+          this.deletedBranchId(),
+          pageNumber,
+          this.deletedPageSize(),
+          false,
+        ),
+      )
       .subscribe({
         next: (response) => this.deletedDisplaysPage.set(response),
         error: (error: HttpErrorResponse) => this.handleApiError(error),
@@ -839,24 +892,26 @@ export class DisplaysComponent implements OnInit, OnDestroy {
 
     this.deleting.set(true);
 
-    this.displayManagementApiService.deactivateDisplay(action.displayId, action.rowVersion).subscribe({
-      next: (response) => {
-        this.showMessage('success', response.message || this.translations().fallbackSuccess);
-        this.confirmDialog.set(null);
-        const currentPage = this.activeDisplaysPage();
-        const nextPage =
-          currentPage.data.length === 1 && currentPage.currentPage > 1
-            ? currentPage.currentPage - 1
-            : currentPage.currentPage;
-        this.loadActiveDisplays(nextPage);
-        this.loadDeletedDisplays(this.deletedDisplaysPage().currentPage);
-      },
-      error: (error: HttpErrorResponse) => {
-        this.handleApiError(error);
-        this.confirmDialog.set(null);
-      },
-      complete: () => this.deleting.set(false),
-    });
+    this.displayManagementApiService
+      .deactivateDisplay(action.displayId, action.rowVersion)
+      .subscribe({
+        next: (response) => {
+          this.showMessage('success', response.message || this.translations().fallbackSuccess);
+          this.confirmDialog.set(null);
+          const currentPage = this.activeDisplaysPage();
+          const nextPage =
+            currentPage.data.length === 1 && currentPage.currentPage > 1
+              ? currentPage.currentPage - 1
+              : currentPage.currentPage;
+          this.loadActiveDisplays(nextPage);
+          this.loadDeletedDisplays(this.deletedDisplaysPage().currentPage);
+        },
+        error: (error: HttpErrorResponse) => {
+          this.handleApiError(error);
+          this.confirmDialog.set(null);
+        },
+        complete: () => this.deleting.set(false),
+      });
   }
 
   private reactivateDisplay(action: DisplayConfirmState): void {
@@ -867,24 +922,26 @@ export class DisplaysComponent implements OnInit, OnDestroy {
 
     this.deleting.set(true);
 
-    this.displayManagementApiService.reactivateDisplay(action.displayId, action.rowVersion).subscribe({
-      next: (response) => {
-        this.showMessage('success', response.message || this.translations().fallbackSuccess);
-        this.confirmDialog.set(null);
-        const currentPage = this.deletedDisplaysPage();
-        const nextPage =
-          currentPage.data.length === 1 && currentPage.currentPage > 1
-            ? currentPage.currentPage - 1
-            : currentPage.currentPage;
-        this.loadDeletedDisplays(nextPage);
-        this.loadActiveDisplays(this.activeDisplaysPage().currentPage);
-      },
-      error: (error: HttpErrorResponse) => {
-        this.handleApiError(error);
-        this.confirmDialog.set(null);
-      },
-      complete: () => this.deleting.set(false),
-    });
+    this.displayManagementApiService
+      .reactivateDisplay(action.displayId, action.rowVersion)
+      .subscribe({
+        next: (response) => {
+          this.showMessage('success', response.message || this.translations().fallbackSuccess);
+          this.confirmDialog.set(null);
+          const currentPage = this.deletedDisplaysPage();
+          const nextPage =
+            currentPage.data.length === 1 && currentPage.currentPage > 1
+              ? currentPage.currentPage - 1
+              : currentPage.currentPage;
+          this.loadDeletedDisplays(nextPage);
+          this.loadActiveDisplays(this.activeDisplaysPage().currentPage);
+        },
+        error: (error: HttpErrorResponse) => {
+          this.handleApiError(error);
+          this.confirmDialog.set(null);
+        },
+        complete: () => this.deleting.set(false),
+      });
   }
 
   private permanentlyDeleteDisplay(action: DisplayConfirmState): void {
@@ -895,26 +952,28 @@ export class DisplaysComponent implements OnInit, OnDestroy {
 
     this.deleting.set(true);
 
-    this.displayManagementApiService.permanentlyDeleteDisplay(action.displayId, action.rowVersion).subscribe({
-      next: (response: PermanentDeleteDisplayResponse) => {
-        this.showMessage('success', response.message || this.translations().fallbackSuccess);
-        this.confirmDialog.set(null);
-        const currentPage = this.deletedDisplaysPage();
-        const nextPage =
-          currentPage.data.length === 1 && currentPage.currentPage > 1
-            ? currentPage.currentPage - 1
-            : currentPage.currentPage;
-        this.loadDeletedDisplays(nextPage);
-      },
-      error: (error: HttpErrorResponse) => {
-        this.handleApiError(error);
-        if (error.status === 409 || error.status === 404) {
-          this.loadDeletedDisplays(this.deletedDisplaysPage().currentPage);
-        }
-        this.confirmDialog.set(null);
-      },
-      complete: () => this.deleting.set(false),
-    });
+    this.displayManagementApiService
+      .permanentlyDeleteDisplay(action.displayId, action.rowVersion)
+      .subscribe({
+        next: (response: PermanentDeleteDisplayResponse) => {
+          this.showMessage('success', response.message || this.translations().fallbackSuccess);
+          this.confirmDialog.set(null);
+          const currentPage = this.deletedDisplaysPage();
+          const nextPage =
+            currentPage.data.length === 1 && currentPage.currentPage > 1
+              ? currentPage.currentPage - 1
+              : currentPage.currentPage;
+          this.loadDeletedDisplays(nextPage);
+        },
+        error: (error: HttpErrorResponse) => {
+          this.handleApiError(error);
+          if (error.status === 409 || error.status === 404) {
+            this.loadDeletedDisplays(this.deletedDisplaysPage().currentPage);
+          }
+          this.confirmDialog.set(null);
+        },
+        complete: () => this.deleting.set(false),
+      });
   }
 
   private loadActiveDisplaysWithReset(): void {
@@ -933,7 +992,10 @@ export class DisplaysComponent implements OnInit, OnDestroy {
     this.deletedSearchDebounceId = setTimeout(() => this.loadDeletedDisplays(1), 350);
   }
 
-  private prependCreatedDisplay(response: CreateDisplayResponse, request: CreateDisplayRequest): void {
+  private prependCreatedDisplay(
+    response: CreateDisplayResponse,
+    request: CreateDisplayRequest,
+  ): void {
     const responseFallback = response as Partial<CreateDisplayResponse>;
     const branchId = responseFallback.branchId ?? request.branchId;
     const branch = this.branches().find((item) => item.id === branchId);
@@ -952,7 +1014,9 @@ export class DisplaysComponent implements OnInit, OnDestroy {
     };
 
     this.pendingCreatedDisplays.set(createdDisplay.id, createdDisplay);
-    this.activeDisplaysPage.update((page) => this.insertCreatedDisplayIntoPage(page, createdDisplay));
+    this.activeDisplaysPage.update((page) =>
+      this.insertCreatedDisplayIntoPage(page, createdDisplay),
+    );
   }
 
   private insertCreatedDisplayIntoPage(
@@ -992,7 +1056,9 @@ export class DisplaysComponent implements OnInit, OnDestroy {
 
     const serverIds = new Set(page.data.map((item) => item.id));
     const pendingItems = Array.from(this.pendingCreatedDisplays.values()).filter((item) => {
-      const existsOnServer = serverIds.has(item.id) || page.data.some((serverItem) => this.isSameDisplay(item, serverItem));
+      const existsOnServer =
+        serverIds.has(item.id) ||
+        page.data.some((serverItem) => this.isSameDisplay(item, serverItem));
 
       if (existsOnServer) {
         this.pendingCreatedDisplays.delete(item.id);
@@ -1048,8 +1114,9 @@ export class DisplaysComponent implements OnInit, OnDestroy {
       return true;
     }
 
-    return [item.number, item.ipAddress, item.serialNo, item.type]
-      .some((value) => value.toLowerCase().includes(search));
+    return [item.number, item.ipAddress, item.serialNo, item.type].some((value) =>
+      value.toLowerCase().includes(search),
+    );
   }
   private buildQuery(
     search: string,
@@ -1119,7 +1186,10 @@ export class DisplaysComponent implements OnInit, OnDestroy {
     }
 
     if (error.status === 403) {
-      this.showMessage('error', message === this.translations().fallbackError ? this.translations().accessDenied : message);
+      this.showMessage(
+        'error',
+        message === this.translations().fallbackError ? this.translations().accessDenied : message,
+      );
       return;
     }
 
@@ -1137,10 +1207,13 @@ export class DisplaysComponent implements OnInit, OnDestroy {
 
     this.message.set({ tone, text });
 
-    this.toastTimeoutId = setTimeout(() => {
-      this.message.set(null);
-      this.toastTimeoutId = null;
-    }, tone === 'error' ? 6500 : 4200);
+    this.toastTimeoutId = setTimeout(
+      () => {
+        this.message.set(null);
+        this.toastTimeoutId = null;
+      },
+      tone === 'error' ? 6500 : 4200,
+    );
   }
 
   private notWhitespaceValidator(control: AbstractControl<string>): ValidationErrors | null {

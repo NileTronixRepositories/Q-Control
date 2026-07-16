@@ -11,23 +11,25 @@ import {
 import { AuthSessionService } from '../../auth/services/auth-session.service';
 import { ServiceManagementPermissionService } from '../../service-management/services/service-management-permission.service';
 import { TechnicalAdminI18nStore } from '../store/technical-admin-i18n.store';
-import { TechnicalAdminShellComponent } from './technical-admin-shell.component';
+import { AdminShellComponent } from './admin-shell.component';
 
-describe('TechnicalAdminShellComponent', () => {
-  let fixture: ComponentFixture<TechnicalAdminShellComponent>;
+describe('AdminShellComponent', () => {
+  let fixture: ComponentFixture<AdminShellComponent>;
   let router: Router;
   const language = signal<AppLanguage>('en');
   const session = signal<AuthenticatedSession | null>(createSession('TechnicalAdmin'));
   const toggleLanguage = vi.fn();
   const clearSession = vi.fn();
+  const canViewSchedules = signal(true);
 
   beforeEach(async () => {
     vi.clearAllMocks();
     language.set('en');
     session.set(createSession('TechnicalAdmin'));
+    canViewSchedules.set(true);
 
     await TestBed.configureTestingModule({
-      imports: [TechnicalAdminShellComponent],
+      imports: [AdminShellComponent],
       providers: [
         provideRouter([]),
         TechnicalAdminI18nStore,
@@ -52,6 +54,7 @@ describe('TechnicalAdminShellComponent', () => {
             canViewAll: signal(true).asReadonly(),
             canViewBranchServices: signal(true).asReadonly(),
             canViewWorkflows: signal(true).asReadonly(),
+            canViewSchedules: canViewSchedules.asReadonly(),
             canViewGlobalizationRequests: signal(true).asReadonly(),
             canViewCentralTree: signal(true).asReadonly(),
           } satisfies Pick<
@@ -59,6 +62,7 @@ describe('TechnicalAdminShellComponent', () => {
             | 'canViewAll'
             | 'canViewBranchServices'
             | 'canViewWorkflows'
+            | 'canViewSchedules'
             | 'canViewGlobalizationRequests'
             | 'canViewCentralTree'
           >,
@@ -68,7 +72,7 @@ describe('TechnicalAdminShellComponent', () => {
 
     router = TestBed.inject(Router);
     vi.spyOn(router, 'navigateByUrl').mockResolvedValue(true);
-    fixture = TestBed.createComponent(TechnicalAdminShellComponent);
+    fixture = TestBed.createComponent(AdminShellComponent);
     fixture.detectChanges();
   });
 
@@ -83,6 +87,22 @@ describe('TechnicalAdminShellComponent', () => {
     expect(text).toContain('Windows');
     expect(text).toContain('Terminals');
     expect(text).toContain('Displays');
+    expect(text).toContain('Service Schedules');
+  });
+
+  it('shows service schedules navigation for a technical admin even before the JWT includes the new permission', () => {
+    canViewSchedules.set(false);
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.textContent).toContain('Service Schedules');
+  });
+
+  it('hides service schedules navigation for a scoped user without schedule permission', () => {
+    session.set(createSession('BranchAdmin', 'invalid-token'));
+    canViewSchedules.set(false);
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.textContent).not.toContain('Service Schedules');
   });
 
   it('hides protected navigation when a scoped user has no matching permissions', () => {
@@ -127,3 +147,4 @@ function createSession(
     passwordExpiresOnUtc: null,
   };
 }
+

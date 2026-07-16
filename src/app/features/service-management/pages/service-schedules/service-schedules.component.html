@@ -1,0 +1,364 @@
+<section
+  class="technical-admin-responsive-page service-schedule-page"
+  [attr.dir]="direction()"
+  [attr.lang]="language()"
+>
+  <app-technical-admin-page-hero
+    [eyebrow]="translations().title"
+    [title]="translations().title"
+    [description]="translations().description"
+    icon="bi bi-calendar-week-fill"
+  >
+    <div hero-actions class="schedule-hero-actions">
+      @if (hasRouteScope()) {
+        <button type="button" class="secondary-action" (click)="backToBranchServices()">
+          <i class="bi bi-arrow-left" aria-hidden="true"></i>
+          {{ translations().backToBranchServices }}
+        </button>
+      }
+      @if (schedule(); as currentSchedule) {
+        @if (canUpdate()) {
+          <button
+            type="button"
+            class="primary-action"
+            [disabled]="!currentSchedule.isCurrentlyOperational"
+            (click)="openEdit()"
+          >
+            <i class="bi bi-pencil-square" aria-hidden="true"></i>
+            {{ translations().editSchedule }}
+          </button>
+        }
+      } @else if (scope() && canCreate()) {
+        <button type="button" class="primary-action" (click)="openCreate()">
+          <i class="bi bi-plus-lg" aria-hidden="true"></i>
+          {{ translations().createSchedule }}
+        </button>
+      }
+    </div>
+  </app-technical-admin-page-hero>
+
+  @if (message(); as item) {
+    <div class="toast-stack schedule-toast" role="status" aria-live="polite" aria-atomic="true">
+      <div
+        class="toast-item"
+        [class.toast-success]="item.tone === 'success'"
+        [class.toast-error]="item.tone === 'error'"
+        [class.toast-info]="item.tone === 'info'"
+      >
+        <i
+          class="bi"
+          [class.bi-check-circle-fill]="item.tone === 'success'"
+          [class.bi-x-octagon-fill]="item.tone === 'error'"
+          [class.bi-info-circle-fill]="item.tone === 'info'"
+          aria-hidden="true"
+        ></i>
+        <p>{{ item.text }}</p>
+        <button
+          type="button"
+          class="toast-close"
+          [attr.aria-label]="translations().close"
+          (click)="clearMessage()"
+        >
+          <i class="bi bi-x-lg" aria-hidden="true"></i>
+        </button>
+      </div>
+    </div>
+  }
+
+  @if (!canView()) {
+    <section class="empty-state schedule-state-card">
+      <i class="bi bi-shield-lock" aria-hidden="true"></i>
+      <h2>{{ translations().accessDenied }}</h2>
+    </section>
+  } @else if (scopeError(); as error) {
+    <section class="empty-state schedule-state-card schedule-state-card--warning">
+      <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
+      <h2>{{ error }}</h2>
+      @if (hasRouteScope()) {
+        <button
+          type="button"
+          class="primary-action compact-action"
+          (click)="backToBranchServices()"
+        >
+          {{ translations().backToBranchServices }}
+        </button>
+      }
+    </section>
+  } @else if (treeLoading() || scheduleLoading()) {
+    <section class="list-panel schedule-state-card" role="status" aria-live="polite">
+      <i class="bi bi-arrow-repeat" aria-hidden="true"></i>
+      <h2>{{ translations().loading }}</h2>
+    </section>
+  } @else {
+    @if (!hasRouteScope()) {
+      <section class="list-panel schedule-selector-panel">
+        <header class="schedule-panel-header">
+          <div>
+            <p>{{ translations().manageSchedule }}</p>
+            <h2>{{ translations().service }}</h2>
+          </div>
+        </header>
+
+        <div class="schedule-selector-card w-100">
+          <div class="schedule-selector-copy">
+            <span>{{ translations().manageSchedule }}</span>
+            <strong>{{ translations().service }}</strong>
+          </div>
+
+          <div class="schedule-selector-fields">
+            @if (!isBranchAdmin()) {
+              <label class="schedule-selector-field">
+                <span>{{ translations().branch }}</span>
+                <select
+                  class="field-control"
+                  [disabled]="branchesLoading()"
+                  [value]="selectedBranchId() ?? ''"
+                  (change)="selectBranch($event)"
+                >
+                  <option value="">{{ translations().selectBranchFirst }}</option>
+                  @for (branch of branches(); track branch.branchId) {
+                    <option [value]="branch.branchId">
+                      {{ language() === 'ar' ? branch.arabicName : branch.englishName }}
+                    </option>
+                  }
+                </select>
+              </label>
+            }
+
+            @if (selectedBranchId() && scheduleTree().length > 0) {
+              @for (level of serviceSelectLevels(); track level.index) {
+                <label class="schedule-selector-field">
+                  <span>{{ translations().service }}</span>
+                  <select
+                    class="field-control"
+                    [value]="level.selectedId ?? ''"
+                    (change)="selectServiceLevel($event, level.index)"
+                  >
+                    <option value="">{{ translations().service }}</option>
+                    @for (service of level.options; track service.id) {
+                      <option [value]="service.id">
+                        {{ language() === 'ar' ? service.arabicName : service.englishName }}
+                      </option>
+                    }
+                  </select>
+                </label>
+              }
+            }
+          </div>
+        </div>
+        @if (selectedBranchId()) {
+          @if (scheduleTree().length === 0) {
+            <section class="empty-state schedule-empty-state">
+              <i class="bi bi-calendar-x" aria-hidden="true"></i>
+              <h2>{{ translations().invalidScheduleScope }}</h2>
+            </section>
+          }
+        } @else {
+          <section class="empty-state schedule-empty-state">
+            <i class="bi bi-building" aria-hidden="true"></i>
+            <h2>{{ translations().selectBranchFirst }}</h2>
+          </section>
+        }
+      </section>
+    }
+
+    @if (scope(); as currentScope) {
+      <section class="list-panel schedule-shell">
+        <header class="schedule-panel-header">
+          <div>
+            <p>{{ translations().scheduleDetails }}</p>
+            <h2>{{ currentScope.serviceName }}</h2>
+          </div>
+          <button type="button" class="secondary-action compact-action" (click)="reloadLatest()">
+            <i class="bi bi-arrow-clockwise" aria-hidden="true"></i>
+            {{ translations().refresh }}
+          </button>
+        </header>
+
+        <div class="schedule-summary-grid" aria-label="Schedule context">
+          <div>
+            <span>{{ translations().branch }}</span>
+            <strong>{{ currentScope.branchName }}</strong>
+          </div>
+          <div>
+            <span>{{ translations().service }}</span>
+            <strong>{{ currentScope.serviceName }}</strong>
+          </div>
+          @if (schedule(); as currentSchedule) {
+            <div>
+              <span>{{ translations().operationalStatus }}</span>
+              <strong
+                class="status-pill"
+                [class.status-active]="currentSchedule.isCurrentlyOperational"
+                [class.status-inactive]="!currentSchedule.isCurrentlyOperational"
+              >
+                {{
+                  currentSchedule.isCurrentlyOperational
+                    ? translations().operational
+                    : translations().currentlyUnavailable
+                }}
+              </strong>
+            </div>
+          }
+        </div>
+
+        @if (schedule(); as currentSchedule) {
+          @if (!currentSchedule.isCurrentlyOperational) {
+            <section class="state-note schedule-warning" role="note">
+              <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
+              <p>{{ translations().currentlyUnavailableHint }}</p>
+            </section>
+          }
+
+          <dl class="details-list schedule-details-list">
+            <div>
+              <dt>{{ translations().startTime }}</dt>
+              <dd>{{ displayTime(currentSchedule.startTime) }}</dd>
+            </div>
+            <div>
+              <dt>{{ translations().endTime }}</dt>
+              <dd>{{ displayTime(currentSchedule.endTime) }}</dd>
+            </div>
+            <div class="schedule-detail-wide">
+              <dt>{{ translations().workDays }}</dt>
+              <dd>{{ formatDays(currentSchedule.workDays) }}</dd>
+            </div>
+            <div>
+              <dt>{{ translations().slotCodeRequired }}</dt>
+              <dd>
+                {{ currentSchedule.isSlotCodeRequired ? translations().yes : translations().no }}
+              </dd>
+            </div>
+            <div>
+              <dt>{{ translations().slotCode }}</dt>
+              <dd>{{ displayValue(currentSchedule.slotCode) }}</dd>
+            </div>
+            <div>
+              <dt>{{ translations().createdOn }}</dt>
+              <dd>{{ displayValue(currentSchedule.createdOnUtc) }}</dd>
+            </div>
+            <div>
+              <dt>{{ translations().modifiedOn }}</dt>
+              <dd>{{ displayValue(currentSchedule.lastModifiedOnUtc) }}</dd>
+            </div>
+          </dl>
+        } @else {
+          <section class="empty-state schedule-empty-state">
+            <i class="bi bi-calendar-x" aria-hidden="true"></i>
+            <h2>{{ translations().noScheduleTitle }}</h2>
+            <p>{{ translations().noScheduleBody }}</p>
+            @if (canCreate()) {
+              <button type="button" class="primary-action compact-action" (click)="openCreate()">
+                <i class="bi bi-plus-lg" aria-hidden="true"></i>
+                {{ translations().createSchedule }}
+              </button>
+            }
+          </section>
+        }
+      </section>
+
+      @if (formMode() !== 'closed') {
+        <section class="list-panel schedule-form-panel" aria-label="Schedule form">
+          <header class="schedule-panel-header">
+            <div>
+              <p>
+                {{
+                  formMode() === 'create'
+                    ? translations().createSchedule
+                    : translations().editSchedule
+                }}
+              </p>
+              <h2>{{ currentScope.serviceName }}</h2>
+            </div>
+            <button type="button" class="secondary-action compact-action" (click)="closeForm()">
+              {{ translations().cancel }}
+            </button>
+          </header>
+
+          @if (reloadRequired()) {
+            <section class="state-note schedule-warning" role="alert">
+              <i class="bi bi-arrow-clockwise" aria-hidden="true"></i>
+              <p>{{ translations().concurrencyError }}</p>
+              <button
+                type="button"
+                class="secondary-action compact-action"
+                (click)="reloadLatest()"
+              >
+                {{ translations().reloadLatest }}
+              </button>
+            </section>
+          }
+
+          <form class="editor-form schedule-form" [formGroup]="scheduleForm" (ngSubmit)="submit()">
+            <label class="filter-field">
+              <span>{{ translations().startTime }}</span>
+              <input class="field-control" type="time" formControlName="startTime" />
+              @if (controlError('startTime'); as error) {
+                <small class="invalid-feedback d-block">{{ error }}</small>
+              }
+            </label>
+
+            <label class="filter-field">
+              <span>{{ translations().endTime }}</span>
+              <input class="field-control" type="time" formControlName="endTime" />
+              @if (controlError('endTime'); as error) {
+                <small class="invalid-feedback d-block">{{ error }}</small>
+              }
+            </label>
+
+            <fieldset class="schedule-day-fieldset">
+              <legend>{{ translations().workDays }}</legend>
+              <div class="schedule-day-grid">
+                @for (day of days; track day) {
+                  <label class="schedule-day-option">
+                    <input
+                      type="checkbox"
+                      [checked]="hasWorkDay(day)"
+                      (change)="toggleWorkDay(day, $any($event.target).checked)"
+                    />
+                    <span>{{ dayLabel(day) }}</span>
+                  </label>
+                }
+              </div>
+            </fieldset>
+
+            <label class="schedule-check-option">
+              <input type="checkbox" formControlName="isSlotCodeRequired" />
+              <span>{{ translations().slotCodeRequired }}</span>
+            </label>
+
+            <label class="filter-field">
+              <span>{{ translations().slotCode }}</span>
+              <input class="field-control" type="text" maxlength="100" formControlName="slotCode" />
+              @if (controlError('slotCode'); as error) {
+                <small class="invalid-feedback d-block">{{ error }}</small>
+              }
+            </label>
+
+            @if (formError(); as error) {
+              <p class="message message-error schedule-form-message">{{ error }}</p>
+            }
+
+            <footer class="form-actions schedule-form-actions">
+              <button type="button" class="secondary-action" (click)="closeForm()">
+                {{ translations().cancel }}
+              </button>
+              <button
+                type="submit"
+                class="primary-action"
+                [disabled]="!canSave() || scheduleForm.invalid"
+              >
+                @if (saving()) {
+                  <i class="bi bi-arrow-repeat" aria-hidden="true"></i>
+                } @else {
+                  <i class="bi bi-check2" aria-hidden="true"></i>
+                }
+                {{ translations().save }}
+              </button>
+            </footer>
+          </form>
+        </section>
+      }
+    }
+  }
+</section>

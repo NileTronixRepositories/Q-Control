@@ -1,4 +1,4 @@
-<section class="technical-admin-responsive-page waiting-areas-page container-fluid !mx-auto !w-full !max-w-[1600px] !gap-4 !p-3 sm:!p-4 lg:!p-5" [attr.dir]="direction()" [attr.lang]="language()">
+<section class="technical-admin-responsive-page waiting-areas-page container-fluid" [attr.dir]="direction()" [attr.lang]="language()">
   <!-- Header -->
   <app-technical-admin-page-hero
     [eyebrow]="translations().branch"
@@ -147,7 +147,7 @@
 
       <!-- Table -->
       @if (waitingAreaPage().data.length > 0) {
-        <div data-testid="waiting-areas-desktop" class="table-responsive hidden md:block">
+        <div data-testid="waiting-areas-desktop" class="table-responsive table-wrap hidden md:block">
           <table class="table align-middle custom-table">
             <thead>
               <tr>

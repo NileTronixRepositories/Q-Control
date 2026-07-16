@@ -876,3 +876,433 @@ body[data-admin-theme='niletronix-brand'] :is(th, .custom-table thead th, .table
     min-width: 0;
   }
 }
+
+/* Branch branding asset management surface. */
+body[data-admin-theme] .branch-branding-page :where(.upload-row, .pending-preview-header, .pending-preview-title, .advertisements-header, .advertisements-heading, .order-strip-copy, .advertisement-order-strip, .advertisement-footer, .order-summary, .advertisement-actions) {
+  display: flex;
+  align-items: center;
+}
+
+body[data-admin-theme] .branch-branding-page :where(.upload-row, .advertisements-heading, .advertisement-footer, .order-summary, .advertisement-actions) {
+  gap: 12px;
+}
+
+body[data-admin-theme] .branch-branding-page :where(.logo-block, .theme-form, .advertisement-upload-card, .advertisement-selection-actions) {
+  display: flex;
+  flex-direction: column;
+}
+
+body[data-admin-theme] .branch-branding-page :where(.logo-block, .color-field) {
+  gap: 12px;
+}
+
+body[data-admin-theme] .branch-branding-page .logo-preview {
+  display: flex;
+  min-height: 180px;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: var(--q-surface-muted);
+  border: 1px solid var(--q-border-subtle);
+  border-radius: var(--q-radius-md);
+}
+
+body[data-admin-theme] .branch-branding-page .logo-preview img {
+  max-width: 80%;
+  max-height: 110px;
+  object-fit: contain;
+}
+
+body[data-admin-theme] .branch-branding-page :where(.logo-empty, .advertisement-preview-empty) {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  color: var(--q-text-muted);
+  font-weight: 700;
+  text-align: center;
+}
+
+body[data-admin-theme] .branch-branding-page .upload-row {
+  margin-top: 8px;
+}
+
+body[data-admin-theme] .branch-branding-page :where(.upload-row > *, .advertisement-selection-actions > button, .upload-submit-btn) {
+  width: 100%;
+}
+
+body[data-admin-theme] .branch-branding-page .theme-form-title {
+  margin: 0 0 18px;
+}
+
+body[data-admin-theme] .branch-branding-page :where(.colors-grid, .pending-preview-grid, .advertisement-grid) {
+  display: grid;
+  gap: 18px;
+}
+
+body[data-admin-theme] .branch-branding-page .colors-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+body[data-admin-theme] .branch-branding-page .color-field {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  padding: 16px;
+  background: var(--q-surface-muted);
+  border: 1px solid var(--q-border-subtle);
+  border-radius: var(--q-radius-md);
+}
+
+body[data-admin-theme] .branch-branding-page .color-control {
+  display: grid;
+  grid-template-columns: 58px minmax(0, 1fr);
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid var(--q-border-subtle);
+  border-radius: var(--q-radius-md);
+}
+
+body[data-admin-theme] .branch-branding-page .color-control:focus-within {
+  border-color: var(--q-primary);
+  box-shadow: 0 0 0 4px rgb(var(--q-primary-rgb, 15 125 168) / 0.1);
+}
+
+body[data-admin-theme] .branch-branding-page .color-control.invalid-control {
+  border-color: rgba(210, 31, 53, 0.48);
+}
+
+body[data-admin-theme] .branch-branding-page .color-control :where(input[type='color'], input[type='text']) {
+  height: 48px;
+  border: 0;
+  border-radius: 0;
+}
+
+body[data-admin-theme] .branch-branding-page .color-control input[type='color'] {
+  width: 100%;
+  padding: 8px;
+  border-inline-end: 1px solid var(--q-border-subtle);
+}
+
+body[data-admin-theme] .branch-branding-page .color-control input[type='text'] {
+  min-width: 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
+  font-weight: 900;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+body[data-admin-theme] .branch-branding-page .theme-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--q-border-subtle);
+}
+
+body[data-admin-theme] .branch-branding-page :where(.validation-message, .color-field small) {
+  color: var(--q-danger);
+  font-weight: 700;
+}
+
+body[data-admin-theme] .branch-branding-page :where(.pending-preview-panel, .advertisement-order-strip) {
+  padding: 12px;
+  background: var(--q-surface-muted);
+  border: 1px solid var(--q-border-subtle);
+  border-radius: var(--q-radius-md);
+}
+
+body[data-admin-theme] .branch-branding-page .pending-preview-panel {
+  margin-top: 12px;
+}
+
+body[data-admin-theme] .branch-branding-page :where(.pending-preview-header, .advertisements-header, .advertisement-order-strip) {
+  justify-content: space-between;
+  gap: 12px;
+}
+
+body[data-admin-theme] .branch-branding-page .pending-preview-header {
+  margin-bottom: 10px;
+}
+
+body[data-admin-theme] .branch-branding-page :where(.pending-preview-title, .advertisements-heading, .order-strip-copy) {
+  min-width: 0;
+}
+
+body[data-admin-theme] .branch-branding-page .pending-preview-grid {
+  grid-template-columns: repeat(auto-fill, minmax(118px, 140px));
+  gap: 10px;
+}
+
+body[data-admin-theme] .branch-branding-page .pending-preview-card {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 8px;
+  background: var(--q-surface-card);
+  border: 1px solid var(--q-border-subtle);
+  border-radius: var(--q-radius-sm);
+}
+
+body[data-admin-theme] .branch-branding-page .pending-preview-card img {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: contain;
+}
+
+body[data-admin-theme] .branch-branding-page :where(.pending-preview-card figcaption, .order-strip-copy span) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+body[data-admin-theme] .branch-branding-page .advertisements-header {
+  padding-block: 4px 14px;
+}
+
+body[data-admin-theme] .branch-branding-page :where(.advertisements-icon, .order-strip-copy > i) {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  color: var(--q-primary);
+  background: rgb(var(--q-primary-rgb, 15 125 168) / 0.09);
+  border-radius: var(--q-radius-sm);
+}
+
+body[data-admin-theme] .branch-branding-page .advertisements-icon {
+  width: 42px;
+  height: 42px;
+}
+
+body[data-admin-theme] .branch-branding-page .advertisements-heading {
+  flex: 1 1 auto;
+}
+
+body[data-admin-theme] .branch-branding-page .advertisements-heading p {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  margin: 4px 0 0;
+}
+
+body[data-admin-theme] .branch-branding-page :where(.advertisements-heading p span, .order-dirty-chip) {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 9px;
+  color: var(--q-primary-hover);
+  background: rgb(var(--q-primary-rgb, 15 125 168) / 0.08);
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 850;
+}
+
+body[data-admin-theme] .branch-branding-page .save-order-action {
+  flex: 0 0 auto;
+  min-width: 140px;
+}
+
+body[data-admin-theme] .branch-branding-page .advertisement-order-strip {
+  margin: 16px 0 4px;
+}
+
+body[data-admin-theme] .branch-branding-page .order-strip-copy > i {
+  width: 30px;
+  height: 30px;
+  background: #fff;
+}
+
+body[data-admin-theme] .branch-branding-page .order-dirty-chip {
+  color: var(--q-danger);
+  background: var(--q-danger-soft);
+}
+
+body[data-admin-theme] .branch-branding-page .advertisement-grid {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+  align-items: start;
+  margin-top: 18px;
+}
+
+body[data-admin-theme] .branch-branding-page :where(.advertisement-upload-card, .advertisement-card) {
+  border-radius: var(--q-radius-md);
+}
+
+body[data-admin-theme] .branch-branding-page .advertisement-upload-card {
+  min-height: 286px;
+  justify-content: center;
+  gap: 16px;
+  padding: 18px;
+  background: var(--q-surface-muted);
+  border: 1px dashed rgb(var(--q-primary-rgb, 15 125 168) / 0.45);
+}
+
+body[data-admin-theme] .branch-branding-page .upload-dropzone {
+  min-height: 190px;
+  flex: 1;
+  flex-direction: column;
+  gap: 12px;
+  background: rgb(var(--q-primary-rgb, 15 125 168) / 0.045);
+  border-color: rgb(var(--q-primary-rgb, 15 125 168) / 0.22);
+  text-align: center;
+}
+
+body[data-admin-theme] .branch-branding-page .upload-dropzone i {
+  font-size: 2.1rem;
+}
+
+body[data-admin-theme] .branch-branding-page .visually-hidden-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+}
+
+body[data-admin-theme] .branch-branding-page .advertisement-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--q-surface-card);
+  border: 1px solid var(--q-border-subtle);
+}
+
+body[data-admin-theme] .branch-branding-page .advertisement-card[draggable='true'] {
+  cursor: grab;
+}
+
+body[data-admin-theme] .branch-branding-page .advertisement-card-dragging {
+  opacity: 0.82;
+  transform: translateY(-3px);
+}
+
+body[data-admin-theme] .branch-branding-page :where(.advertisement-card-drop-before, .advertisement-card-drop-after) {
+  border-color: var(--q-primary);
+}
+
+body[data-admin-theme] .branch-branding-page .advertisement-preview-shell {
+  position: relative;
+  display: flex;
+  height: 178px;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: var(--q-surface-muted);
+  border-bottom: 1px solid var(--q-border-subtle);
+}
+
+body[data-admin-theme] .branch-branding-page .advertisement-preview-shell img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+body[data-admin-theme] .branch-branding-page .inactive-advertisement .advertisement-preview-shell img {
+  filter: grayscale(1);
+  opacity: 0.55;
+}
+
+body[data-admin-theme] .branch-branding-page :where(.drag-handle, .order-badge, .status-badge) {
+  position: absolute;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgb(255 255 255 / 0.94);
+  border: 1px solid var(--q-border-subtle);
+}
+
+body[data-admin-theme] .branch-branding-page .drag-handle {
+  top: 10px;
+  inset-inline-start: 10px;
+  width: 32px;
+  height: 32px;
+  color: var(--q-primary);
+  border-radius: 999px;
+}
+
+body[data-admin-theme] .branch-branding-page :where(.order-badge, .status-badge) {
+  top: 10px;
+  min-height: 26px;
+  padding: 4px 9px;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 900;
+}
+
+body[data-admin-theme] .branch-branding-page .order-badge {
+  inset-inline-start: 50px;
+}
+
+body[data-admin-theme] .branch-branding-page .status-badge {
+  inset-inline-end: 10px;
+}
+
+body[data-admin-theme] .branch-branding-page .advertisement-footer {
+  padding: 10px 12px;
+}
+
+body[data-admin-theme] .branch-branding-page .order-position-indicator {
+  display: inline-flex;
+  flex: 0 0 auto;
+  min-width: 50px;
+  height: 38px;
+  align-items: baseline;
+  justify-content: center;
+  padding: 7px 9px;
+  color: var(--q-primary-hover);
+  background: rgb(var(--q-primary-rgb, 15 125 168) / 0.08);
+  border-radius: var(--q-radius-sm);
+}
+
+body[data-admin-theme] .branch-branding-page .order-input {
+  width: 68px;
+  text-align: center;
+}
+
+body[data-admin-theme] .branch-branding-page .advertisement-actions {
+  justify-content: flex-end;
+  margin-inline-start: auto;
+}
+
+body[data-admin-theme] .branch-branding-page :where(.disabled-drag, .disabled-upload) {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+@media (max-width: 1199.98px) {
+  body[data-admin-theme] .branch-branding-page .colors-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 991.98px) {
+  body[data-admin-theme] .branch-branding-page .colors-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 575.98px) {
+  body[data-admin-theme] .branch-branding-page :where(.advertisements-header, .advertisement-order-strip, .pending-preview-header) {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  body[data-admin-theme] .branch-branding-page .save-order-action {
+    width: 100%;
+  }
+
+  body[data-admin-theme] .branch-branding-page .advertisement-footer {
+    flex-wrap: wrap;
+  }
+
+  body[data-admin-theme] .branch-branding-page .advertisement-actions {
+    flex: 1 1 100%;
+    justify-content: stretch;
+    margin-inline-start: 0;
+  }
+
+  body[data-admin-theme] .branch-branding-page .advertisement-actions .icon-action {
+    flex: 1 1 0;
+  }
+}

@@ -679,3 +679,37 @@ body[data-admin-theme='niletronix-brand'] {
     radial-gradient(circle at 88% 12%, rgb(227 30 36 / 0.045), transparent 24rem),
     rgb(248 250 252 / 0.58);
 }
+
+html body[data-admin-theme]:has(.app-popup-overlay) .app-popup-panel > form.editor-form {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 16px !important;
+}
+
+html body[data-admin-theme]:has(.app-popup-overlay) .app-popup-panel > form.editor-form .form-cell-full,
+html body[data-admin-theme]:has(.app-popup-overlay) .app-popup-panel > form.editor-form .form-actions {
+  grid-column: 1 / -1 !important;
+}
+
+html body[data-admin-theme]:has(.app-popup-overlay) .app-popup-panel :where(.form-actions, .dialog-actions) {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 8px !important;
+}
+
+html body[data-admin-theme]:has(.app-popup-overlay) .app-popup-panel > .dialog-actions {
+  flex: 0 0 auto !important;
+  padding: 0 var(--q-popup-x) var(--q-popup-y) !important;
+}
+
+@media (max-width: 767.98px) {
+  html body[data-admin-theme]:has(.app-popup-overlay) .app-popup-panel > form.editor-form {
+    grid-template-columns: 1fr !important;
+  }
+
+  html body[data-admin-theme]:has(.app-popup-overlay) .app-popup-panel :where(.form-actions, .dialog-actions) {
+    align-items: stretch !important;
+    flex-direction: column !important;
+  }
+}

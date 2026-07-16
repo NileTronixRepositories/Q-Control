@@ -29,6 +29,7 @@ import { UnassignBranchServiceDialogComponent } from '../../components/unassign-
 import { BRANCH_SERVICES_TRANSLATIONS } from '../../i18n/branch-services.translations';
 import { SERVICE_GLOBALIZATION_TRANSLATIONS } from '../../i18n/service-globalization.translations';
 import { SERVICE_MANAGEMENT_TRANSLATIONS } from '../../i18n/service-management.translations';
+import { SERVICE_SCHEDULE_TRANSLATIONS } from '../../i18n/service-schedule.translations';
 import {
   BranchServiceLifecycleAction,
   CreateBranchServiceSubtreeResponse,
@@ -89,10 +90,14 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
   protected readonly globalizationTranslations = computed(
     () => SERVICE_GLOBALIZATION_TRANSLATIONS[this.i18nStore.language()],
   );
+  protected readonly scheduleTranslations = computed(
+    () => SERVICE_SCHEDULE_TRANSLATIONS[this.i18nStore.language()],
+  );
   protected readonly language = this.i18nStore.language;
   protected readonly direction = this.i18nStore.direction;
   protected readonly canViewBranchServices = this.permissionService.canViewBranchServices;
   protected readonly canViewWorkflows = this.permissionService.canViewWorkflows;
+  protected readonly canViewSchedules = this.permissionService.canViewSchedules;
   protected readonly canAssignBranchServices = this.permissionService.canAssignBranchServices;
   protected readonly canUnassignBranchServices =
     this.permissionService.canUnassignBranchServices;
@@ -130,15 +135,9 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
   protected readonly canUnassignBranchService = (node: ServiceTreeNode): boolean =>
     node.scope === 'Global';
   protected readonly canManageWorkflowFor = (node: ServiceTreeNode): boolean =>
-    this.canViewWorkflows() &&
-    node.isAssignedToCurrentBranch !== false &&
-    node.children.length === 0 &&
-    !node.hasChildren &&
-    node.isActive &&
-    !node.isDeleted &&
-    node.effectiveIsActive &&
-    node.isTicketIssuable &&
-    node.canIssueTicket;
+    this.canViewWorkflows() && this.isScheduleEligibleService(node);
+  protected readonly canManageScheduleFor = (node: ServiceTreeNode): boolean =>
+    this.canViewSchedules() && this.isScheduleEligibleService(node);
   protected readonly branchActionsDisabled = computed(
     () => this.store.lifecyclePreparing() || this.store.lifecycleMutating(),
   );
@@ -308,11 +307,28 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
     }
 
     void this.router.navigate([
-      '/technical-admin/services/branches',
+      '/admin/services/branches',
       branchId,
       'services',
       node.id,
       'workflows',
+    ]);
+  }
+
+  protected openServiceSchedule(node: ServiceTreeNode): void {
+    const branchId = this.store.selectedBranchId();
+
+    if (!branchId || !this.canManageScheduleFor(node)) {
+      this.showMessage('error', this.translations().accessDenied);
+      return;
+    }
+
+    void this.router.navigate([
+      '/admin/services/branches',
+      branchId,
+      'services',
+      node.id,
+      'schedule',
     ]);
   }
 
@@ -601,6 +617,19 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
   }
   private branchSessionName(branch: { readonly arabicName: string; readonly englishName: string }): string {
     return this.language() === 'ar' ? branch.arabicName : branch.englishName;
+  }
+
+  private isScheduleEligibleService(node: ServiceTreeNode): boolean {
+    return (
+      node.isAssignedToCurrentBranch !== false &&
+      node.children.length === 0 &&
+      !node.hasChildren &&
+      node.isActive &&
+      !node.isDeleted &&
+      node.effectiveIsActive &&
+      node.isTicketIssuable &&
+      node.canIssueTicket
+    );
   }
 
   private canManageBranchService(node: ServiceTreeNode): boolean {

@@ -1,9 +1,20 @@
-import { Routes } from '@angular/router';
+import { inject } from '@angular/core';
+import { RedirectFunction, Router, Routes } from '@angular/router';
 
 import {
+  adminConsoleAccessGuard,
   organizationAccessGuard,
-  technicalAdminAccessGuard,
 } from './features/auth/guards/auth-access.guard';
+
+const redirectLegacyTechnicalAdminRoute: RedirectFunction = (route) => {
+  const router = inject(Router);
+  const [, ...remainingPath] = route.url.map((segment) => segment.path);
+
+  return router.createUrlTree(['/admin', ...remainingPath], {
+    queryParams: route.queryParams,
+    fragment: route.fragment ?? undefined,
+  });
+};
 
 export const routes: Routes = [
   {
@@ -62,12 +73,16 @@ export const routes: Routes = [
       ),
   },
   {
-    path: 'technical-admin',
-    canMatch: [technicalAdminAccessGuard],
+    path: 'admin',
+    canMatch: [adminConsoleAccessGuard],
     loadChildren: () =>
       import('./features/technical-admin/technical-admin.routes').then(
         (routes) => routes.TECHNICAL_ADMIN_ROUTES,
       ),
+  },
+  {
+    path: 'technical-admin/**',
+    redirectTo: redirectLegacyTechnicalAdminRoute,
   },
   {
     path: 'service-request',

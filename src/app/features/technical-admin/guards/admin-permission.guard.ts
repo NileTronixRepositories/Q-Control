@@ -4,7 +4,7 @@ import { ActivatedRouteSnapshot, CanActivateFn, Router } from '@angular/router';
 import { AuthSessionService } from '../../auth/services/auth-session.service';
 import { hasAnyJwtPermission } from '../../auth/utils/auth-permissions.util';
 
-export const technicalAdminPermissionGuard: CanActivateFn = (route) => {
+export const adminPermissionGuard: CanActivateFn = (route) => {
   const router = inject(Router);
   const authSessionService = inject(AuthSessionService);
   const session = authSessionService.activeSession();

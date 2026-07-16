@@ -1,4 +1,4 @@
-<section class="technical-admin-responsive-page branch-services-page !mx-auto !w-full !max-w-[1600px] !gap-4 !p-3 sm:!p-4 lg:!p-5" [attr.dir]="direction()" [attr.lang]="language()">
+<section class="technical-admin-responsive-page branch-services-page" [attr.dir]="direction()" [attr.lang]="language()">
   <app-technical-admin-page-hero
     [eyebrow]="translations().title"
     [title]="translations().title"
@@ -128,6 +128,9 @@
         [canManageWorkflows]="canViewWorkflows()"
         [canManageWorkflowNode]="canManageWorkflowFor"
         [manageWorkflowsLabel]="serviceTranslations().workflows"
+        [canManageSchedules]="canViewSchedules()"
+        [canManageScheduleNode]="canManageScheduleFor"
+        [manageScheduleLabel]="scheduleTranslations().manageSchedule"
         [unassigning]="store.unassigning()"
         [unassignLabel]="translations().unassign"
         [actionsDisabled]="branchActionsDisabled()"
@@ -142,6 +145,7 @@
         (restoreNode)="requestLifecycle($event, 'restore')"
         (unassignNode)="requestUnassign($event)"
         (manageWorkflows)="openServiceWorkflows($event)"
+        (manageSchedule)="openServiceSchedule($event)"
       />
     }
   }

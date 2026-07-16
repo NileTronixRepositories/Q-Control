@@ -117,6 +117,7 @@ describe('BranchServicesComponent branch service actions', () => {
           useValue: {
             canViewBranchServices: signal(true).asReadonly(),
             canViewWorkflows: signal(false).asReadonly(),
+            canViewSchedules: signal(true).asReadonly(),
             canAssignBranchServices: signal(true).asReadonly(),
             canUnassignBranchServices: signal(true).asReadonly(),
             canDelete: signal(true).asReadonly(),
@@ -125,7 +126,7 @@ describe('BranchServicesComponent branch service actions', () => {
             canViewOwnGlobalizationRequests: canViewOwnRequests.asReadonly(),
           },
         },
-        { provide: Router, useValue: { navigateByUrl: vi.fn() } },
+        { provide: Router, useValue: { navigate: vi.fn(), navigateByUrl: vi.fn() } },
       ],
     }).compileComponents();
 
@@ -358,6 +359,23 @@ describe('BranchServicesComponent branch service actions', () => {
     });
   }
 
+  it('opens schedule management for an eligible branch service', () => {
+    const router = TestBed.inject(Router);
+    const scheduleButton = fixture.nativeElement.querySelector(
+      'button[aria-label="Manage Schedule"]',
+    ) as HTMLButtonElement | null;
+
+    expect(scheduleButton).not.toBeNull();
+    scheduleButton?.click();
+
+    expect(router.navigate).toHaveBeenCalledWith([
+      '/admin/services/branches',
+      5,
+      'services',
+      leaf.id,
+      'schedule',
+    ]);
+  });
   it('confirms once, calls the endpoint, closes the dialog, and refreshes both trees', () => {
     openAndConfirmUnassignment();
     clickConfirmButton();

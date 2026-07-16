@@ -2,11 +2,13 @@ import { computed, inject, Injectable } from '@angular/core';
 
 import { AuthSessionService } from '../../auth/services/auth-session.service';
 import { ServicePermission } from '../models/service-management.model';
+import { ServiceSchedulePermission } from '../models/service-schedule.model';
 import { ServiceWorkflowPermission } from '../models/service-workflow.model';
 import { ServiceGlobalizationPermission } from '../models/service-globalization.model';
 
 export type ServiceAreaPermission =
   | ServicePermission
+  | ServiceSchedulePermission
   | ServiceWorkflowPermission
   | ServiceGlobalizationPermission;
 
@@ -19,6 +21,8 @@ const PERMISSION_CLAIM_KEYS = [
   'services_permissions',
   'serviceWorkflowsPermissions',
   'service_workflows_permissions',
+  'serviceSchedulesPermissions',
+  'service_schedules_permissions',
   'scope',
   'scp',
 ] as const;
@@ -55,6 +59,12 @@ const WORKFLOW_PERMISSIONS = new Set<ServiceWorkflowPermission>([
   'ServiceWorkflows.Reactivate',
   'ServiceWorkflows.ViewCandidateServices',
   'ServiceWorkflows.ViewStartOptions',
+]);
+
+const SCHEDULE_PERMISSIONS = new Set<ServiceSchedulePermission>([
+  'ServiceSchedules.View',
+  'ServiceSchedules.Create',
+  'ServiceSchedules.Update',
 ]);
 
 @Injectable({ providedIn: 'root' })
@@ -117,6 +127,10 @@ export class ServiceManagementPermissionService {
   readonly canViewStartOptions = computed(() =>
     this.hasPermission('ServiceWorkflows.ViewStartOptions'),
   );
+
+  readonly canViewSchedules = computed(() => this.hasPermission('ServiceSchedules.View'));
+  readonly canCreateSchedule = computed(() => this.hasPermission('ServiceSchedules.Create'));
+  readonly canUpdateSchedule = computed(() => this.hasPermission('ServiceSchedules.Update'));
 
   hasPermission(permission: ServiceAreaPermission): boolean {
     return this.permissions().has(permission);
@@ -211,6 +225,7 @@ export class ServiceManagementPermissionService {
     return (
       SERVICE_PERMISSIONS.has(value as ServicePermission) ||
       WORKFLOW_PERMISSIONS.has(value as ServiceWorkflowPermission) ||
+      SCHEDULE_PERMISSIONS.has(value as ServiceSchedulePermission) ||
       GLOBALIZATION_PERMISSIONS.has(value as ServiceGlobalizationPermission)
     );
   }

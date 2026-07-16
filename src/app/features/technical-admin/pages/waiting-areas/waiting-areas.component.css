@@ -2,6 +2,10 @@
   display: block;
 }
 
+.waiting-areas-page {
+  --q-table-min-width: 920px;
+}
+
 .waiting-area-editor-panel {
   --q-popup-width: min(720px, calc(100dvw - 96px));
 }

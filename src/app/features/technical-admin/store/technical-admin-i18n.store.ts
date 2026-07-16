@@ -80,6 +80,7 @@ interface TechnicalAdminTranslations {
   readonly serviceManagementLabel: string;
   readonly branchServicesLabel: string;
   readonly serviceWorkflowsLabel: string;
+  readonly serviceSchedulesLabel: string;
   readonly globalizationRequestsLabel: string;
   readonly centralServiceTreeLabel: string;
   readonly managerLabel: string;
@@ -188,6 +189,7 @@ const TECHNICAL_ADMIN_TRANSLATIONS: Record<AppLanguage, TechnicalAdminTranslatio
     serviceManagementLabel: '\u0625\u062f\u0627\u0631\u0629 \u0627\u0644\u062e\u062f\u0645\u0627\u062a',
     branchServicesLabel: '\u062e\u062f\u0645\u0627\u062a \u0627\u0644\u0641\u0631\u0639',
     serviceWorkflowsLabel: '\u0645\u0633\u0627\u0631\u0627\u062a \u0627\u0644\u062e\u062f\u0645\u0627\u062a',
+    serviceSchedulesLabel: '\u062c\u062f\u0627\u0648\u0644 \u0627\u0644\u062e\u062f\u0645\u0627\u062a',
     globalizationRequestsLabel: '\u0637\u0644\u0628\u0627\u062a \u0627\u0639\u062a\u0645\u0627\u062f \u0627\u0644\u062e\u062f\u0645\u0627\u062a',
     centralServiceTreeLabel: '\u0634\u062c\u0631\u0629 \u0627\u0644\u062e\u062f\u0645\u0627\u062a \u0627\u0644\u0645\u0631\u0643\u0632\u064a\u0629',
     managerLabel: '\u0627\u0644\u0645\u062f\u064a\u0631',
@@ -297,6 +299,7 @@ const TECHNICAL_ADMIN_TRANSLATIONS: Record<AppLanguage, TechnicalAdminTranslatio
     serviceManagementLabel: 'Service Management',
     branchServicesLabel: 'Branch Services',
     serviceWorkflowsLabel: 'Service Workflows',
+    serviceSchedulesLabel: 'Service Schedules',
     globalizationRequestsLabel: 'Globalization Requests',
     centralServiceTreeLabel: 'Central Service Tree',
     managerLabel: 'Manager',

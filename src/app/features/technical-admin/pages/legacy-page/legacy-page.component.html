@@ -1,5 +1,5 @@
 <section
-  class="technical-admin-responsive-page branch-page container-fluid !mx-auto !w-full !max-w-[1600px] !gap-4 !p-3 sm:!p-4 lg:!p-5"
+  class="technical-admin-responsive-page branch-page container-fluid"
   [attr.dir]="direction()"
   [attr.lang]="language()"
 >
@@ -280,57 +280,127 @@
                 class="status-pill"
                 [class.status-active]="branch.isActive"
                 [class.status-inactive]="!branch.isActive"
-              >{{ branchStatusLabel(branch) }}</span>
+                >{{ branchStatusLabel(branch) }}</span
+              >
               <span
                 record-badges
                 class="status-pill"
                 [class.status-active]="branch.effectiveIsActive"
                 [class.status-inactive]="!branch.effectiveIsActive"
-              >{{ branchOperationalLabel(branch) }}</span>
+                >{{ branchOperationalLabel(branch) }}</span
+              >
               <div record-fields>
-                <dt class="text-[11px] font-extrabold text-slate-500">{{ translations().englishNameLabel }}</dt>
-                <dd class="mb-0 mt-1 break-words font-bold text-slate-800">{{ branch.englishName }}</dd>
+                <dt class="text-[11px] font-extrabold text-slate-500">
+                  {{ translations().englishNameLabel }}
+                </dt>
+                <dd class="mb-0 mt-1 break-words font-bold text-slate-800">
+                  {{ branch.englishName }}
+                </dd>
               </div>
               <div record-fields>
-                <dt class="text-[11px] font-extrabold text-slate-500">{{ translations().ipAddressLabel }}</dt>
-                <dd class="mb-0 mt-1 break-all font-bold text-slate-800" dir="ltr">{{ branch.ipAddress }}</dd>
+                <dt class="text-[11px] font-extrabold text-slate-500">
+                  {{ translations().ipAddressLabel }}
+                </dt>
+                <dd class="mb-0 mt-1 break-all font-bold text-slate-800" dir="ltr">
+                  {{ branch.ipAddress }}
+                </dd>
               </div>
               <div record-fields>
-                <dt class="text-[11px] font-extrabold text-slate-500">{{ translations().governorateLabel }}</dt>
-                <dd class="mb-0 mt-1 break-words font-bold text-slate-800">{{ branch.governorate }}</dd>
+                <dt class="text-[11px] font-extrabold text-slate-500">
+                  {{ translations().governorateLabel }}
+                </dt>
+                <dd class="mb-0 mt-1 break-words font-bold text-slate-800">
+                  {{ branch.governorate }}
+                </dd>
               </div>
               <div record-fields>
-                <dt class="text-[11px] font-extrabold text-slate-500">{{ translations().cityLabel }}</dt>
+                <dt class="text-[11px] font-extrabold text-slate-500">
+                  {{ translations().cityLabel }}
+                </dt>
                 <dd class="mb-0 mt-1 break-words font-bold text-slate-800">{{ branch.city }}</dd>
               </div>
               <div record-fields class="min-[430px]:col-span-2">
-                <dt class="text-[11px] font-extrabold text-slate-500">{{ translations().createdByLabel }}</dt>
-                <dd class="mb-0 mt-1 break-words font-bold text-slate-800">{{ branch.createdBy }}</dd>
+                <dt class="text-[11px] font-extrabold text-slate-500">
+                  {{ translations().createdByLabel }}
+                </dt>
+                <dd class="mb-0 mt-1 break-words font-bold text-slate-800">
+                  {{ branch.createdBy }}
+                </dd>
               </div>
-              <button record-actions type="button" class="icon-action" [title]="branchEditorTranslations().view" [attr.aria-label]="branchEditorTranslations().view" (click)="openViewBranch(branch.id)">
+              <button
+                record-actions
+                type="button"
+                class="icon-action"
+                [title]="branchEditorTranslations().view"
+                [attr.aria-label]="branchEditorTranslations().view"
+                (click)="openViewBranch(branch.id)"
+              >
                 <i class="bi bi-eye" aria-hidden="true"></i>
               </button>
-              <button record-actions type="button" class="icon-action" [title]="branchEditorTranslations().edit" [attr.aria-label]="branchEditorTranslations().edit" (click)="openEditBranch(branch.id)">
+              <button
+                record-actions
+                type="button"
+                class="icon-action"
+                [title]="branchEditorTranslations().edit"
+                [attr.aria-label]="branchEditorTranslations().edit"
+                (click)="openEditBranch(branch.id)"
+              >
                 <i class="bi bi-pencil-square" aria-hidden="true"></i>
               </button>
-              <button record-actions type="button" class="icon-action" [title]="branchEditorTranslations().branding" [attr.aria-label]="branchEditorTranslations().branding" (click)="openBranchBranding(branch.id)">
+              <button
+                record-actions
+                type="button"
+                class="icon-action"
+                [title]="branchEditorTranslations().branding"
+                [attr.aria-label]="branchEditorTranslations().branding"
+                (click)="openBranchBranding(branch.id)"
+              >
                 <i class="bi bi-brush" aria-hidden="true"></i>
               </button>
               @if (canCreateBranchAdmin() && branch.isActive) {
-                <button record-actions type="button" class="icon-action success-action" [title]="branchAdminTranslations().addBranchAdmin" [attr.aria-label]="branchAdminTranslations().addBranchAdmin" (click)="openCreateBranchAdmin(branch)">
+                <button
+                  record-actions
+                  type="button"
+                  class="icon-action success-action"
+                  [title]="branchAdminTranslations().addBranchAdmin"
+                  [attr.aria-label]="branchAdminTranslations().addBranchAdmin"
+                  (click)="openCreateBranchAdmin(branch)"
+                >
                   <i class="bi bi-person-plus" aria-hidden="true"></i>
                 </button>
               }
               @if (branch.isActive) {
-                <button record-actions type="button" class="icon-action warning-action" [disabled]="deletingBranchId() === branch.id" [title]="branchEditorTranslations().deactivate" [attr.aria-label]="branchEditorTranslations().deactivate" (click)="deactivateBranch(branch)">
+                <button
+                  record-actions
+                  type="button"
+                  class="icon-action warning-action"
+                  [disabled]="deletingBranchId() === branch.id"
+                  [title]="branchEditorTranslations().deactivate"
+                  [attr.aria-label]="branchEditorTranslations().deactivate"
+                  (click)="deactivateBranch(branch)"
+                >
                   <i class="bi bi-pause-circle" aria-hidden="true"></i>
                 </button>
               } @else {
                 <ng-container record-actions>
-                  <button type="button" class="icon-action success-action" [disabled]="deletingBranchId() === branch.id" [title]="branchEditorTranslations().reactivate" [attr.aria-label]="branchEditorTranslations().reactivate" (click)="reactivateBranch(branch)">
+                  <button
+                    type="button"
+                    class="icon-action success-action"
+                    [disabled]="deletingBranchId() === branch.id"
+                    [title]="branchEditorTranslations().reactivate"
+                    [attr.aria-label]="branchEditorTranslations().reactivate"
+                    (click)="reactivateBranch(branch)"
+                  >
                     <i class="bi bi-play-circle" aria-hidden="true"></i>
                   </button>
-                  <button type="button" class="icon-action danger-action" [disabled]="deletingBranchId() === branch.id" [title]="branchEditorTranslations().permanentDelete" [attr.aria-label]="branchEditorTranslations().permanentDelete" (click)="permanentlyDeleteBranch(branch)">
+                  <button
+                    type="button"
+                    class="icon-action danger-action"
+                    [disabled]="deletingBranchId() === branch.id"
+                    [title]="branchEditorTranslations().permanentDelete"
+                    [attr.aria-label]="branchEditorTranslations().permanentDelete"
+                    (click)="permanentlyDeleteBranch(branch)"
+                  >
                     <i class="bi bi-trash3" aria-hidden="true"></i>
                   </button>
                 </ng-container>
@@ -379,7 +449,9 @@
         ></div>
         <aside
           class="editor-panel app-popup-panel app-popup-wide modal-content"
-          [class.branch-mutation-dialog]="branchPanelMode() === 'create' || branchPanelMode() === 'edit'"
+          [class.branch-mutation-dialog]="
+            branchPanelMode() === 'create' || branchPanelMode() === 'edit'
+          "
           role="dialog"
           aria-modal="true"
           [attr.aria-label]="branchFormTitle()"
