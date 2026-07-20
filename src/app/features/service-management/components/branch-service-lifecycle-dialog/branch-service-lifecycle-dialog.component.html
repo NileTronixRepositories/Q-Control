@@ -1,8 +1,8 @@
-﻿<div class="modal d-block bg-dark bg-opacity-50" role="presentation" tabindex="-1" (click)="closeFromBackdrop($event)"
+<div class="modal d-block bg-dark bg-opacity-50" role="presentation" tabindex="-1" (click)="closeFromBackdrop($event)"
 >
 <section class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="dialog" aria-modal="true" aria-labelledby="branch-service-lifecycle-title" aria-describedby="branch-service-lifecycle-description" >
 <div class="modal-content overflow-hidden border-0 shadow-lg">
-<header class="modal-header align-items-start gap-3">
+<header class="modal-header align-items-start gap-2">
 <div class="d-flex align-items-start gap-3">
 <span class="rounded-circle d-inline-flex flex-shrink-0 align-items-center justify-content-center service-lifecycle-icon" [class.bg-danger-subtle]="isDelete() || isPermanentDelete()" [class.text-danger]="isDelete() || isPermanentDelete()" [class.bg-success-subtle]="!isDelete() && !isPermanentDelete()" [class.text-success]="!isDelete() && !isPermanentDelete()" >
 <i class="bi fs-5" [class.bi-trash3]="isDelete() || isPermanentDelete()" [class.bi-arrow-counterclockwise]="!isDelete() && !isPermanentDelete()" aria-hidden="true" ></i>
@@ -15,7 +15,7 @@
 </div>
 <button type="button" class="btn-close flex-shrink-0" [disabled]="mutating()" [attr.aria-label]="translations().close" (click)="requestClose()" ></button>
 </header>
-<div class="modal-body d-grid gap-3">
+<div class="modal-body d-grid gap-2">
 <p id="branch-service-lifecycle-description" class="mb-0 lh-lg text-secondary"> {{ body() }}
 </p>
 @if (isDelete() && state().hasChildren) { <div class="alert alert-warning d-flex gap-3 mb-0" role="alert">

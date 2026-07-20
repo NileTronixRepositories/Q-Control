@@ -1,12 +1,12 @@
 .svc-ticket-grid {
   display: grid;
-  gap: 8px;
+  gap: 6px;
 }
 
 .svc-segment-switch,
 .svc-toggle-grid {
   display: grid;
-  gap: 8px;
+  gap: 6px;
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
@@ -32,16 +32,19 @@
   align-items: center;
   background: #ffffff;
   border: 1px solid #dbeafe;
-  border-radius: 6px;
+  border-radius: 8px;
   color: #334155;
   display: flex;
   font-size: 10px;
   font-weight: 800;
-  gap: 8px;
+  gap: 6px;
   min-height: 34px;
   min-width: 0;
   padding: 0 10px;
-  transition: background-color 0.16s ease, border-color 0.16s ease, color 0.16s ease;
+  transition:
+    background-color 0.16s ease,
+    border-color 0.16s ease,
+    color 0.16s ease;
 }
 
 .svc-segment-control > span:last-child,
@@ -91,7 +94,7 @@
   height: 18px;
   padding: 2px;
   transition: background-color 0.16s ease;
-  width: 36px;
+  width: 34px;
 }
 
 .svc-switch-thumb {
@@ -115,13 +118,50 @@
 }
 
 .svc-switch-option input:checked + .svc-switch-control .svc-switch-thumb {
-  transform: translateX(18px);
+  transform: translateX(16px);
 }
 
-:host-context([dir='rtl']) .svc-switch-option input:checked + .svc-switch-control .svc-switch-thumb {
-  transform: translateX(-18px);
+:host-context([dir='rtl'])
+  .svc-switch-option
+  input:checked
+  + .svc-switch-control
+  .svc-switch-thumb {
+  transform: translateX(-16px);
 }
 
+
+.svc-code-toggle-field {
+  inline-size: fit-content;
+  max-inline-size: 100%;
+}
+
+.svc-code-toggle-field .svc-switch-control {
+  gap: 5px;
+  min-height: 30px;
+  padding-inline: 8px;
+}
+
+.svc-code-toggle-field .svc-switch-track {
+  height: 16px;
+  width: 30px;
+}
+
+.svc-code-toggle-field .svc-switch-thumb {
+  height: 12px;
+  width: 12px;
+}
+
+.svc-code-toggle-field input:checked + .svc-switch-control .svc-switch-thumb {
+  transform: translateX(14px);
+}
+
+:host-context([dir='rtl'])
+  .svc-code-toggle-field
+  input:checked
+  + .svc-switch-control
+  .svc-switch-thumb {
+  transform: translateX(-14px);
+}
 @media (max-width: 767.98px) {
   .svc-segment-switch,
   .svc-toggle-grid {

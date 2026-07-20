@@ -37,6 +37,41 @@ describe('ServiceManagementApiService lifecycle requests', () => {
 
   afterEach(() => httpTestingController.verify());
 
+  it('updates a service through the shared service endpoint with language and auth headers', () => {
+    const body = {
+      parentServiceId: null,
+      arabicName: 'خدمة',
+      englishName: 'Service',
+      arabicUserMessage: null,
+      englishUserMessage: null,
+      serviceCode: 'SVC-1',
+      isServiceCodeRequired: true,
+      isTicketIssuable: true,
+      isClientInputRequired: false,
+      hasReservation: false,
+      orderNo: 1,
+      priority: 2,
+      weight: 0,
+      rangePrefix: 'S',
+      rangeStartNumber: 1,
+      rangeEndNumber: 99,
+      waitingDuration: 0,
+      noOfTicketCopies: 1,
+      rowVersion: 'service-rv-1',
+    };
+
+    service.updateService(122, body).subscribe();
+
+    const endpoint = new URL('api/services/122', environment.apiBaseUrl).toString();
+    const request = httpTestingController.expectOne(endpoint);
+
+    expect(request.request.method).toBe('PUT');
+    expect(request.request.body).toEqual(body);
+    expect(request.request.headers.get('Authorization')).toBe('Bearer branch-admin-token');
+    expect(request.request.headers.get('Accept-Language')).toBe('en');
+    expect(request.request.headers.get('Content-Type')).toBe('application/json');
+    request.flush({ id: 122, rowVersion: 'service-rv-2', message: 'Updated' });
+  });
   it('sends soft delete with the current row version', () => {
     service.deleteService(100, 'row-version-1').subscribe();
 

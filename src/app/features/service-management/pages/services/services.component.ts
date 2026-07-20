@@ -1,3 +1,4 @@
+import { NgTemplateOutlet } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import {
   ChangeDetectionStrategy,
@@ -58,6 +59,7 @@ type BooleanSelectValue = 'all' | 'true' | 'false';
 type TicketIssuableValue = '' | 'true' | 'false';
 type ServiceScopeFilterValue = 'all' | ServiceScope;
 type TreeMutationAction = ServiceConfirmAction;
+type ServiceNameControlName = 'arabicName' | 'englishName';
 type FormControlName =
   | 'arabicName'
   | 'englishName'
@@ -75,6 +77,7 @@ type FormControlName =
   selector: 'app-service-management-services',
   standalone: true,
   imports: [
+    NgTemplateOutlet,
     ReactiveFormsModule,
     ServiceHierarchyTreeComponent,
     ServiceMediaManagerComponent,
@@ -135,6 +138,7 @@ export class ServicesComponent implements OnInit, OnDestroy {
   public readonly includeInactiveTree = signal(false);
   public readonly includeDeletedTree = signal(false);
   public readonly formError = signal<string | null>(null);
+  public readonly reloadConflictServiceId = signal<number | null>(null);
   public readonly createParentLabel = computed(
     () => this.store.createParentName() ?? this.translations().treeRoot,
   );
@@ -142,8 +146,24 @@ export class ServicesComponent implements OnInit, OnDestroy {
   public readonly serviceForm = this.formBuilder.group(
     {
       parentServiceId: [0],
-      arabicName: ['', [Validators.required, Validators.maxLength(100), this.notWhitespace]],
-      englishName: ['', [Validators.required, Validators.maxLength(100), this.notWhitespace]],
+      arabicName: [
+        '',
+        [
+          Validators.required,
+          Validators.maxLength(100),
+          this.notWhitespace,
+          (control: AbstractControl<string>) => this.nameConflictValidator('arabicName', control),
+        ],
+      ],
+      englishName: [
+        '',
+        [
+          Validators.required,
+          Validators.maxLength(100),
+          this.notWhitespace,
+          (control: AbstractControl<string>) => this.nameConflictValidator('englishName', control),
+        ],
+      ],
       arabicUserMessage: ['', [Validators.maxLength(500)]],
       englishUserMessage: ['', [Validators.maxLength(500)]],
       isServiceCodeRequired: [false],
@@ -178,6 +198,7 @@ export class ServicesComponent implements OnInit, OnDestroy {
   private toastTimeoutId: ReturnType<typeof setTimeout> | null = null;
   private panelRequestId = 0;
   private serviceCodeConflict = false;
+  private nameConflictControl: ServiceNameControlName | null = null;
 
   ngOnInit(): void {
     this.store.activeTab.set('tree');
@@ -383,7 +404,9 @@ export class ServicesComponent implements OnInit, OnDestroy {
     this.panelRequestId += 1;
     this.store.closePanel();
     this.formError.set(null);
+    this.reloadConflictServiceId.set(null);
     this.serviceCodeConflict = false;
+    this.nameConflictControl = null;
     this.serviceForm.markAsPristine();
     this.serviceForm.enable({ emitEvent: false });
   }
@@ -630,6 +653,21 @@ export class ServicesComponent implements OnInit, OnDestroy {
     return this.serviceForm.touched && this.serviceForm.hasError('rangeOrder');
   }
 
+  public nameError(controlName: ServiceNameControlName): string {
+    const control = this.serviceForm.controls[controlName];
+
+    if (control.hasError('duplicateName')) {
+      return controlName === 'arabicName'
+        ? this.translations().duplicateArabicName
+        : this.translations().duplicateEnglishName;
+    }
+
+    if (control.hasError('maxlength')) {
+      return this.translations().maxLength100;
+    }
+
+    return this.translations().requiredField;
+  }
   public serviceCodeError(): string {
     const control = this.serviceCodeControl;
 
@@ -663,6 +701,26 @@ export class ServicesComponent implements OnInit, OnDestroy {
   public onServiceCodeInput(): void {
     this.clearServiceCodeConflict();
     this.applyServiceCodeValidation();
+  }
+
+  public onNameInput(controlName: ServiceNameControlName): void {
+    if (this.nameConflictControl !== controlName) {
+      return;
+    }
+
+    this.nameConflictControl = null;
+    this.serviceForm.controls[controlName].updateValueAndValidity({ emitEvent: false });
+  }
+
+  public reloadLatestServiceDetails(): void {
+    const serviceId = this.reloadConflictServiceId() ?? this.store.selectedDetails()?.id;
+
+    if (!serviceId) {
+      return;
+    }
+
+    this.reloadConflictServiceId.set(null);
+    this.loadDetails(serviceId, 'edit');
   }
 
   public readInputValue(event: Event): string {
@@ -738,7 +796,9 @@ export class ServicesComponent implements OnInit, OnDestroy {
     this.store.setCreateParentContext(parentServiceId, parentName);
     this.store.openPanel('create');
     this.formError.set(null);
+    this.reloadConflictServiceId.set(null);
     this.serviceCodeConflict = false;
+    this.nameConflictControl = null;
     this.loadParentOptions();
     this.serviceForm.enable({ emitEvent: false });
     this.serviceForm.reset({
@@ -1092,6 +1152,8 @@ export class ServicesComponent implements OnInit, OnDestroy {
 
   private populateForm(details: ServiceDetails): void {
     this.serviceCodeConflict = false;
+    this.nameConflictControl = null;
+    this.reloadConflictServiceId.set(null);
     this.serviceForm.enable({ emitEvent: false });
     this.serviceForm.reset({
       parentServiceId: details.parentServiceId ?? 0,
@@ -1270,6 +1332,7 @@ export class ServicesComponent implements OnInit, OnDestroy {
   }
 
   private handleApiError(error: HttpErrorResponse): void {
+    this.reloadConflictServiceId.set(null);
     if (this.authSessionService.shouldClearSessionForHttpStatus(error.status)) {
       this.authSessionService.clearSession();
       void this.router.navigateByUrl('/login');
@@ -1278,6 +1341,16 @@ export class ServicesComponent implements OnInit, OnDestroy {
 
     if (error.status === 403) {
       this.showMessage('error', this.translations().accessDenied);
+      return;
+    }
+
+    if (this.containsErrorCode(error, 'DuplicateArabicName')) {
+      this.markNameConflict('arabicName', this.translations().duplicateArabicName);
+      return;
+    }
+
+    if (this.containsErrorCode(error, 'DuplicateEnglishName')) {
+      this.markNameConflict('englishName', this.translations().duplicateEnglishName);
       return;
     }
 
@@ -1290,8 +1363,18 @@ export class ServicesComponent implements OnInit, OnDestroy {
       return;
     }
 
-    if (error.status === 409 || this.isConcurrencyError(error)) {
+    if (this.isConcurrencyError(error)) {
+      const serviceId = this.store.panelMode() === 'edit' ? this.store.selectedDetails()?.id ?? null : null;
+      this.reloadConflictServiceId.set(serviceId);
+      this.formError.set(this.translations().concurrencyError);
       this.showMessage('error', this.translations().concurrencyError);
+      return;
+    }
+
+    if (error.status === 409) {
+      const message = formatTechnicalAdminApiError(error, this.translations().fallbackError);
+      this.formError.set(message);
+      this.showMessage('error', message);
       return;
     }
 
@@ -1320,6 +1403,21 @@ export class ServicesComponent implements OnInit, OnDestroy {
     this.serviceCodeControl.updateValueAndValidity({ emitEvent: false });
   }
 
+
+  private markNameConflict(controlName: ServiceNameControlName, message: string): void {
+    this.nameConflictControl = controlName;
+    this.serviceForm.controls[controlName].updateValueAndValidity({ emitEvent: false });
+    this.serviceForm.controls[controlName].markAsTouched();
+    this.formError.set(message);
+    this.showMessage('error', message);
+  }
+
+  private nameConflictValidator(
+    controlName: ServiceNameControlName,
+    _control: AbstractControl<string>,
+  ): ValidationErrors | null {
+    return this.nameConflictControl === controlName ? { duplicateName: true } : null;
+  }
   private serviceCodeValidator(control: AbstractControl<string>): ValidationErrors | null {
     const errors: ValidationErrors = {};
     const normalizedCode = control.value.trim();

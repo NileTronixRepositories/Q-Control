@@ -1,5 +1,3 @@
-﻿/* Component-specific workflow surfaces and interactions. Bootstrap owns generic grid, spacing, and form layout. */
-
 :host {
   display: block;
   min-width: 0;
@@ -10,7 +8,7 @@
 }
 
 .workflow-page {
-  /* colours */
+
   --b: var(--q-border-subtle, var(--nt-border));
   --bg: var(--q-surface-card, var(--nt-card));
   --m: var(--q-surface-muted, #f8fafc);
@@ -19,14 +17,14 @@
   --p: var(--q-primary-rgb, 15 125 168);
   --ps: var(--q-primary-soft, var(--nt-primary-soft));
   --ph: var(--q-primary-hover, var(--nt-primary-dark));
-  /* radii */
+
   --r: var(--q-radius-md, var(--nt-radius-md));
-  --pr: var(--q-panel-radius, 14px);
+  --pr: var(--q-panel-radius, 12px);
   --pb: var(--q-panel-border, var(--nt-border));
-  /* panels */
+
   --panel: var(--q-panel-bg, var(--nt-card));
   --shadow: var(--q-panel-shadow, var(--nt-shadow-soft));
-  /* gradient origin â€“ flipped for LTR */
+
   --cgx: 90%;
 
   min-width: 0;
@@ -37,13 +35,10 @@
   --cgx: 10%;
 }
 
-/* ============================================================
-   2. Grid stacks (page-level sections & content areas)
-   ============================================================ */
 .workflow-scope-stack,
 .workflow-content-stack {
   display: grid;
-  gap: var(--nt-section-gap, 18px);
+  gap: var(--nt-section-gap, 12px);
   min-width: 0;
 }
 
@@ -54,16 +49,12 @@
   min-width: 0;
 }
 
-/* View-mode detail section (read-only layout) */
 .workflow-detail-view {
   display: grid;
-  gap: 14px;
+  gap: 8px;
   min-width: 0;
 }
 
-/* ============================================================
-   3. Panel / card surfaces (shared border + shadow contract)
-   ============================================================ */
 .workflow-branch-panel,
 .workflow-tree-shell,
 .workflow-owner-card,
@@ -80,11 +71,9 @@
 .workflow-branch-panel,
 .workflow-detail-card,
 .workflow-form-section {
-  padding: 18px 20px;
+  padding: 14px 16px;
 }
 
-/* Branch panel on scope-selection page: constrain width &    */
-/* lay label + select vertically in a single column           */
 .workflow-branch-panel {
   max-width: 440px;
 }
@@ -95,15 +84,12 @@
   width: 100%;
 }
 
-/* ============================================================
-   4. Owner card (scope header)
-   ============================================================ */
 .workflow-owner-card {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  padding: 18px 22px;
+  gap: 12px;
+  padding: 14px 16px;
   background: linear-gradient(90deg, rgb(var(--p) / 0.07), transparent 52%), var(--panel);
 }
 
@@ -141,9 +127,6 @@
   font-size: 1.22rem;
 }
 
-/* ============================================================
-   5. List panel
-   ============================================================ */
 .workflow-list-panel {
   padding: 0;
   overflow: hidden;
@@ -154,25 +137,21 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  min-height: 58px;
-  padding: 14px 18px;
+  min-height: 50px;
+  padding: 10px 12px;
   border-bottom: 1px solid var(--pb);
 }
 
-/* Workflow list area â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .workflow-list {
-  padding: 16px 18px;
+  padding: 10px 12px;
 }
 
-/* ============================================================
-   6. Workflow card
-   ============================================================ */
 .workflow-card {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   grid-template-rows: auto auto;
-  gap: 10px 16px;
-  padding: 16px 18px;
+  gap: 8px 12px;
+  padding: 10px 12px;
   background: var(--bg);
   border: 1px solid var(--b);
   border-radius: var(--r);
@@ -205,7 +184,6 @@
   margin-top: 4px;
 }
 
-/* â”€â”€ Badges â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .workflow-badge {
   display: inline-flex;
   align-items: center;
@@ -236,7 +214,6 @@
   border: 1px solid rgb(var(--p) / 0.22);
 }
 
-/* â”€â”€ Path strip (chip row) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .workflow-path-strip {
   grid-column: 1 / -1;
   display: flex;
@@ -257,7 +234,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  padding: 6px 12px;
+  padding: 5px 10px;
   color: var(--t);
   background:
     radial-gradient(circle at var(--cgx) 50%, rgb(var(--p) / 0.13), transparent 56px),
@@ -270,7 +247,7 @@
 }
 
 .workflow-path-chip--large {
-  padding: 8px 16px;
+  padding: 6px 12px;
   font-size: var(--q-font-size-base, 0.88rem);
 }
 
@@ -280,78 +257,61 @@
   flex: 0 0 auto;
 }
 
-/* ============================================================
-   7. Side-panel (workflow editor)
-   ============================================================ */
 .workflow-backdrop {
   z-index: 2147483000;
 }
 
 .workflow-panel {
   position: fixed;
-  inset-block: 20px;
-  inset-inline-end: 20px;
+  inset-block: 16px;
+  inset-inline-end: 16px;
   z-index: 2147483010;
   display: flex;
-  width: min(52rem, calc(100vw - 40px));
-  height: calc(100dvh - 40px);
+  width: min(48rem, calc(100vw - 32px));
+  height: calc(100dvh - 32px);
   flex-direction: column;
   padding: 0;
   overflow: hidden;
-  border-radius: 18px;
+  border-radius: 12px;
   box-shadow: 0 28px 70px rgb(15 23 42 / 0.18);
 }
 
-/* â”€â”€ Panel header â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-.workflow-panel-header {
-  /* inherits from .editor-panel-header via dialogs.css */
-}
-
-/* â”€â”€ Panel body â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .workflow-panel-body {
   display: flex;
   min-height: 0;
   flex: 1 1 auto;
   flex-direction: column;
   overflow-y: auto;
-  /* No gap here â€“ the workflow-form / workflow-detail-view    */
-  /* inside manage their own gaps.                              */
-  padding: 18px;
+
+  padding: 14px;
   background: var(--m);
 }
 
-/* ============================================================
-   8. Editor form layout
-   ============================================================ */
 .workflow-detail-view {
   display: grid;
-  gap: 16px;
+  gap: 12px;
 }
 
 .workflow-form {
   display: flex;
-  /* Do NOT use min-height: 100% â€“ it creates a giant gap      */
-  /* between the last section and the sticky footer.           */
+
   height: auto;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
 }
 
-/* Builder section should grow so empty state fills nicely    */
 .workflow-builder {
   flex: 0 0 auto;
 }
 
-/* Candidates section grows to fill any leftover space         */
 .workflow-candidates {
   display: grid;
   gap: 12px;
   min-width: 0;
-  /* flex-grow so it fills remaining panel height */
+
   flex: 1 1 auto;
 }
 
-/* Candidate filter header row â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .workflow-candidate-filters {
   display: grid;
   grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
@@ -360,28 +320,25 @@
   border-bottom: 1px solid var(--b);
 }
 
-/* â”€â”€ Section head (title + hint inside a form section) â”€â”€â”€â”€â”€ */
 .workflow-section-head {
   display: grid;
   gap: 4px;
   margin-bottom: 12px;
 }
 
-/* â”€â”€ Drop zone active state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .workflow-drop-active {
   background: var(--ps);
   border-color: rgb(var(--p) / 0.42);
   box-shadow: var(--nt-focus);
 }
 
-/* â”€â”€ Builder row (drag-reorder list item) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .workflow-builder-row {
   display: grid;
-  grid-template-columns: 36px minmax(0, 1fr) auto;
+  grid-template-columns: 32px minmax(0, 1fr) auto;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   min-width: 0;
-  padding: 12px 14px;
+  padding: 10px 12px;
   background: var(--bg);
   border: 1px solid var(--b);
   border-radius: var(--r);
@@ -401,7 +358,6 @@
   box-shadow: inset 4px 0 0 var(--q-primary, var(--nt-primary));
 }
 
-/* â”€â”€ Step index chip â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .workflow-step-index,
 .workflow-candidate-icon {
   display: grid;
@@ -413,12 +369,11 @@
 }
 
 .workflow-step-index {
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   font-size: 0.82rem;
 }
 
-/* â”€â”€ Step / candidate copy â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .workflow-step-copy,
 .workflow-candidate-copy {
   display: grid;
@@ -447,17 +402,15 @@
   white-space: nowrap;
 }
 
-/* â”€â”€ Step actions cluster â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .workflow-step-actions {
   display: flex;
   align-items: center;
   gap: 4px;
 }
 
-/* â”€â”€ Empty / placeholder states â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .workflow-drop-empty,
 .workflow-candidate-empty {
-  padding: 22px;
+  padding: 16px;
   color: var(--tm);
   background: var(--m);
   border: 1px dashed var(--b);
@@ -466,27 +419,24 @@
   text-align: center;
 }
 
-/* ============================================================
-   9. Candidate grid
-   ============================================================ */
 .workflow-candidate-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
+  gap: 8px;
 }
 
 .workflow-candidate-card {
   display: grid;
-  grid-template-columns: 40px minmax(0, 1fr);
+  grid-template-columns: 36px minmax(0, 1fr);
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   min-width: 0;
-  padding: 14px 12px;
+  padding: 10px 12px;
   background:
     radial-gradient(circle at var(--cgx) 50%, rgb(var(--p) / 0.15), transparent 70px),
     linear-gradient(135deg, var(--bg), var(--ps));
   border: 1px solid rgb(var(--p) / 0.18);
-  border-radius: 14px;
+  border-radius: 10px;
   box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.82);
   cursor: grab;
   transition:
@@ -504,8 +454,8 @@
 }
 
 .workflow-candidate-icon {
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   font-size: 1rem;
 }
 
@@ -514,7 +464,6 @@
   margin: 0;
 }
 
-/* â”€â”€ Candidate footer (count + pagination) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .workflow-candidate-footer {
   justify-content: space-between;
   padding-top: 10px;
@@ -522,9 +471,6 @@
   flex-wrap: wrap;
 }
 
-/* ============================================================
-   10. Form actions (sticky footer inside panel)
-   ============================================================ */
 .workflow-form-actions {
   position: sticky;
   bottom: 0;
@@ -533,25 +479,19 @@
   align-items: center;
   justify-content: flex-end;
   gap: 8px;
-  /* margin-top: 0 â€“ do NOT use auto; that causes the big gap */
+
   margin-top: 0;
-  margin-inline: -18px;
-  margin-bottom: -18px;
-  padding: 14px 18px;
+  margin-inline: -14px;
+  margin-bottom: -14px;
+  padding: 10px 12px;
   background: linear-gradient(0deg, #ffffff 60%, rgb(248 250 252 / 0));
   border-top: 1px solid var(--b);
 }
 
-/* ============================================================
-   11. Replace-mode note
-   ============================================================ */
 .workflow-replace-note {
   margin-bottom: 8px;
 }
 
-/* ============================================================
-   12. Confirm dialog (modal overlay)
-   ============================================================ */
 .workflow-confirm-panel {
   position: fixed;
   inset: 50% auto auto 50%;
@@ -563,7 +503,7 @@
 
 .workflow-confirm-header,
 .workflow-confirm-actions {
-  padding: 16px 20px;
+  padding: 12px 16px;
 }
 
 .workflow-confirm-header {
@@ -572,7 +512,7 @@
 
 .workflow-confirm-name {
   display: block;
-  padding: 10px 14px;
+  padding: 8px 12px;
   margin-top: 4px;
   background: var(--m);
   border-radius: var(--r);
@@ -586,9 +526,6 @@
   border-top: 1px solid var(--b);
 }
 
-/* ============================================================
-   13. Toast
-   ============================================================ */
 .workflow-toast {
   position: fixed;
   inset-inline-end: 18px;
@@ -597,22 +534,19 @@
   width: min(420px, calc(100dvw - 36px));
 }
 
-/* ============================================================
-   14. State cards (empty / access denied / warning)
-   ============================================================ */
 .workflow-state-card {
-  min-height: 200px;
-  padding: 32px 24px;
+  min-height: 160px;
+  padding: 24px 18px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 14px;
+  gap: 8px;
   text-align: center;
 }
 
 .workflow-state-card i {
-  font-size: 2.2rem;
+  font-size: 1.8rem;
   color: var(--tm);
   opacity: 0.6;
 }
@@ -624,9 +558,8 @@
   color: var(--tm);
 }
 
-/* Tree shell: fills the remaining scope-stack height         */
 .workflow-tree-shell {
-  min-height: 240px;
+  min-height: 220px;
 }
 
 .workflow-state-card--warning {
@@ -634,9 +567,6 @@
   background: #fffcf5;
 }
 
-/* ============================================================
-   15. Detail view
-   ============================================================ */
 .workflow-detail-card {
   background: var(--panel);
 }
@@ -647,21 +577,15 @@
   border-top: 1px solid var(--b);
 }
 
-/* ============================================================
-   16. Pagination bar
-   ============================================================ */
 .workflow-pagination {
   justify-content: space-between;
-  padding: 12px 18px;
+  padding: 10px 14px;
   border-top: 1px solid var(--pb);
   font-size: var(--q-font-size-small, 0.82rem);
   font-weight: 700;
   color: var(--tm);
 }
 
-/* ============================================================
-   17. Responsive â€“ tablet (â‰¤ 900px)
-   ============================================================ */
 @media (max-width: 900px) {
   .workflow-owner-card,
   .workflow-list-header,
@@ -681,22 +605,17 @@
     justify-content: flex-start;
   }
 
-  /* Branch panel on tablet: allow full width */
   .workflow-branch-panel {
     max-width: 100%;
   }
 }
 
-/* ============================================================
-   18. Responsive â€“ mobile (â‰¤ 640px)
-   ============================================================ */
 @media (max-width: 640px) {
   .workflow-page {
     padding: var(--nt-workspace-padding-md, 12px);
-    gap: 14px;
+    gap: 8px;
   }
 
-  /* Panel goes full screen on mobile */
   .workflow-panel {
     inset: 0;
     width: 100dvw;
@@ -704,7 +623,6 @@
     border-radius: 0;
   }
 
-  /* 1-column grids on small screens */
   .workflow-name-grid,
   .workflow-candidate-filters,
   .workflow-candidate-grid,
@@ -713,16 +631,14 @@
   }
 
   .workflow-builder-row {
-    grid-template-columns: 36px minmax(0, 1fr);
+    grid-template-columns: 32px minmax(0, 1fr);
   }
 
-  /* Builder step actions move below copy on tiny screens */
   .workflow-builder-row .workflow-step-actions {
     grid-column: 1 / -1;
     justify-content: flex-start;
   }
 
-  /* Full-width elements */
   .workflow-branch-field,
   .workflow-owner-metric,
   .workflow-hero-actions > *,

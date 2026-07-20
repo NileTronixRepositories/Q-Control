@@ -1,4 +1,4 @@
-﻿<section class="svc-tree-panel" [attr.aria-busy]="loading()" [class.svc-tree-panel--drop-target]="dropTarget()" [class.svc-tree-panel--drop-active]="isDropActive()" (dragover)="onDropTargetDragOver($event)" (dragleave)="onDropTargetDragLeave($event)" (drop)="onDropTargetDrop($event)"
+<section class="svc-tree-panel" [attr.aria-busy]="loading()" [class.svc-tree-panel--drop-target]="dropTarget()" [class.svc-tree-panel--drop-active]="isDropActive()" (dragover)="onDropTargetDragOver($event)" (dragleave)="onDropTargetDragLeave($event)" (drop)="onDropTargetDrop($event)"
 >
 <header class="svc-tree-header">
 <div class="svc-tree-title">
@@ -24,20 +24,20 @@
 </button>
 </div>
 <div class="svc-tree-body">
-@if (loading() && flatNodes().length === 0) { <div class="d-grid py-5 gap-5 overflow-hidden rounded-3 border border-info-subtle p-4" role="status" aria-live="polite" aria-atomic="true" data-testid="svc-tree-initial-loading" >
+@if (loading() && flatNodes().length === 0) { <div class="d-grid py-4 gap-3 overflow-hidden rounded-3 border border-info-subtle p-3" role="status" aria-live="polite" aria-atomic="true" data-testid="svc-tree-initial-loading" >
 <app-niletronix-loading-state [title]="translations().loading" icon="bi bi-diagram-3-fill" variant="inline" size="sm" />
 <div class="d-grid gap-2" aria-hidden="true">
 @for (row of loadingSkeletonRows; track $index) { <div class="d-grid align-items-center gap-3 rounded-3 border p-2 shadow-sm p-3" [style.margin-inline-start.px]="row.indent" [style.animation-delay.ms]="$index * 110" data-testid="svc-tree-skeleton-row" >
 <span class="rounded-3 bg-sky-100"></span>
 <span class="d-grid gap-2">
-<span class=".5 rounded-pill" [style.width.%]="row.nameWidth" ></span>
+<span class="rounded-pill bg-secondary-subtle" [style.width.%]="row.nameWidth" ></span>
 <span class="d-flex gap-1">
 @for (chipWidth of row.chipWidths; track $index) { <span class="rounded-pill bg-info-subtle" [style.width.px]="chipWidth * 4" ></span> }
 </span>
 </span>
-<span class="d-none gap-1 rounded-3 bg-light p-1 flex">
-<span class="rounded-md bg-slate-200"></span>
-<span class="rounded-md bg-sky-100"></span>
+<span class="d-none d-lg-flex gap-1 rounded-3 bg-light p-1">
+<span class="rounded-2 bg-secondary-subtle"></span>
+<span class="rounded-2 bg-info-subtle"></span>
 </span>
 </div> }
 </div>
@@ -113,4 +113,3 @@
 </div> }
 </div>
 </section>
-

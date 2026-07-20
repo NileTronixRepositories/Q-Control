@@ -7,7 +7,7 @@
   border: 1px solid #d7e8ff;
   border-radius: 8px;
   box-shadow: 0 8px 18px #0f172a0d;
-  min-height: 420px;
+  min-height: 360px;
   overflow: hidden;
 }
 
@@ -95,7 +95,7 @@
 .svc-tree-filters {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 8px;
 }
 
 .svc-tree-filter {
@@ -127,7 +127,7 @@
 
 .svc-tree-node {
   --tree-offset: 0px;
-  --tree-toggle-size: 30px;
+  --tree-toggle-size: 28px;
   --tree-guide-start: calc(var(--tree-offset) - 4px);
   align-items: center;
   background: #fff;
@@ -137,8 +137,8 @@
   display: grid;
   gap: 8px;
   grid-template-columns: var(--tree-toggle-size) minmax(0, 1fr) auto;
-  min-height: 58px;
-  padding: 7px 8px;
+  min-height: 50px;
+  padding: 6px 8px;
   padding-inline-start: calc(var(--tree-offset) + 8px);
   position: relative;
 }
@@ -338,19 +338,19 @@
   display: grid;
   justify-items: center;
   min-height: 180px;
-  padding: 20px;
+  padding: 16px;
   text-align: center;
 }
 
 .svc-tree-empty-icon {
   color: #0369a1;
-  font-size: 22px;
+  font-size: 18px;
   margin-bottom: 8px;
 }
 
 .svc-tree-empty h3 {
   color: #0f172a;
-  font-size: 17px;
+  font-size: 16px;
   font-weight: 800;
   margin: 0 0 8px;
 }

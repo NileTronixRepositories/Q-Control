@@ -1,4 +1,4 @@
-﻿:host {
+:host {
   display: block;
 }
 
@@ -65,14 +65,14 @@
 .branch-services-secondary-btn {
   align-items: center;
   border: 1px solid transparent;
-  border-radius: 10px;
+  border-radius: 8px;
   display: inline-flex;
   font-size: 11px;
   font-weight: 850;
   gap: 5px;
   justify-content: center;
-  min-height: 38px;
-  padding: 0 14px;
+  min-height: 34px;
+  padding: 0 12px;
   white-space: nowrap;
   transition: all 0.18s ease;
 }
@@ -113,7 +113,7 @@
   border-radius: 8px;
   color: var(--q-text-primary, #0f172a);
   font-size: 11px;
-  min-height: 38px;
+  min-height: 34px;
   padding: 0 8px;
   outline: 0;
   transition: all 0.2s;
@@ -142,19 +142,19 @@
   border-style: dashed;
   display: grid;
   justify-items: center;
-  min-height: 250px;
-  padding: 20px;
+  min-height: 180px;
+  padding: 16px;
   text-align: center;
 }
 
 .branch-services-empty .bi {
   color: #0284c7;
-  font-size: 24px;
+  font-size: 18px;
 }
 
 .branch-services-empty h2 {
   color: #0f172a;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 900;
   margin: 8px 0 0;
 }
@@ -222,7 +222,7 @@
 .branch-services-media-dialog {
   background: #fff;
   border: 1px solid #d7e8ff;
-  border-radius: 10px;
+  border-radius: 8px;
   box-shadow: 0 24px 70px #0f172a33;
   display: grid;
   gap: 0;
@@ -230,7 +230,7 @@
   max-height: calc(100vh - 32px);
   max-width: calc(100vw - 24px);
   overflow: auto;
-  padding: 10px;
+  padding: 8px;
   position: fixed;
   top: 50%;
   transform: translate(-50%, -50%);
@@ -239,7 +239,7 @@
 }
 
 .branch-services-media-dialog--loading {
-  min-height: 220px;
+  min-height: 180px;
   place-items: center;
   width: min(460px, calc(100vw - 24px));
 }
@@ -275,8 +275,8 @@
   border-radius: 8px;
   color: #0369a1;
   display: inline-flex;
-  height: 30px;
+  height: 28px;
   justify-content: center;
   padding: 0;
-  width: 30px;
+  width: 28px;
 }

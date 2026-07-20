@@ -1,4 +1,4 @@
-﻿import { HttpErrorResponse } from '@angular/common/http';
+import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { finalize, Observable } from 'rxjs';
@@ -231,8 +231,7 @@ export class GlobalizationRequestsComponent implements OnInit, OnDestroy {
 
   protected parentName(item: ServiceGlobalizationRequestListItem): string {
     return (
-      (this.language() === 'ar' ? item.parentServiceArabicName : item.parentServiceEnglishName) ||
-      'â€”'
+      (this.language() === 'ar' ? item.parentServiceArabicName : item.parentServiceEnglishName) || '-'
     );
   }
 

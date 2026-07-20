@@ -14,7 +14,7 @@
       [attr.aria-labelledby]="'branch-globalization-requests-title'"
     >
       <div
-        class="branch-globalization-content modal-content overflow-hidden rounded-4 border border-info-subtle bg-white shadow-lg"
+        class="branch-globalization-content modal-content overflow-hidden rounded-3 border border-info-subtle bg-white shadow-lg"
       >
         <header
           class="modal-header align-items-start justify-content-between gap-3 border-info-subtle p-3 p-lg-4"
@@ -50,11 +50,11 @@
             class="position-absolute top-0 bottom-0 start-0 end-0 z-2 d-grid align-items-end p-3"
           >
             <section
-              class="branch-globalization-decision modal-content overflow-hidden rounded-4 border border-white bg-white shadow-lg"
+              class="branch-globalization-decision modal-content overflow-hidden rounded-3 border border-white bg-white shadow-lg"
               role="dialog"
               aria-modal="true"
             >
-              <header class="d-flex align-items-center gap-3 border-bottom border-light p-4">
+              <header class="d-flex align-items-center gap-3 border-bottom border-light p-3">
                 <span
                   class="branch-globalization-icon d-grid flex-shrink-0 rounded-3 text-white shadow-sm"
                   [class.bg-success]="decision.action === 'approve'"
@@ -79,7 +79,7 @@
                 </div>
               </header>
 
-              <div class="p-4">
+              <div class="p-3">
                 @if (decision.action === 'approve') {
                   <div
                     class="rounded-3 border border-success-subtle bg-success-subtle p-3 lh-lg text-success"
@@ -105,7 +105,7 @@
               </div>
 
               <footer
-                class="d-flex flex-wrap justify-content-end gap-2 border-top border-light p-4"
+                class="d-flex flex-wrap justify-content-end gap-2 border-top border-light p-3"
               >
                 <button
                   type="button"
@@ -228,7 +228,7 @@
 
           @if (loading()) {
             <div
-              class="mt-4 d-grid rounded-3 border border-info-subtle bg-white py-5 text-center shadow-sm"
+              class="mt-4 d-grid rounded-3 border border-info-subtle bg-white py-4 text-center shadow-sm"
             >
               <div>
                 <span
@@ -241,7 +241,7 @@
             </div>
           } @else if (page().data.length === 0) {
             <div
-              class="mt-4 d-grid rounded-3 border border-secondary-subtle bg-white py-5 text-center shadow-sm"
+              class="mt-4 d-grid rounded-3 border border-secondary-subtle bg-white py-4 text-center shadow-sm"
             >
               <div>
                 <span

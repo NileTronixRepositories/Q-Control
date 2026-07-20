@@ -1,5 +1,5 @@
-﻿import { HttpErrorResponse } from '@angular/common/http';
-import { computed, signal } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
+import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { of, throwError } from 'rxjs';
@@ -25,6 +25,22 @@ const emptyPage = {
 
 describe('ServicesComponent', () => {
   let fixture: ComponentFixture<ServicesComponent>;
+  let authSessionState: ReturnType<typeof signal<{ userType: 'TechnicalAdmin' | 'BranchAdmin'; activeBranchId: number | null }>>;
+  let permissionState: {
+    readonly canViewAll: ReturnType<typeof signal<boolean>>;
+    readonly canViewDetails: ReturnType<typeof signal<boolean>>;
+    readonly canCreate: ReturnType<typeof signal<boolean>>;
+    readonly canUpdate: ReturnType<typeof signal<boolean>>;
+    readonly canDelete: ReturnType<typeof signal<boolean>>;
+    readonly canRestore: ReturnType<typeof signal<boolean>>;
+    readonly canDeletePermanent: ReturnType<typeof signal<boolean>>;
+    readonly canAssignBranchServices: ReturnType<typeof signal<boolean>>;
+    readonly canViewStartOptions: ReturnType<typeof signal<boolean>>;
+  };
+  let branchServicesApi: {
+    readonly getBranchServicesTree: ReturnType<typeof vi.fn>;
+    readonly assignServices: ReturnType<typeof vi.fn>;
+  };
   let api: {
     readonly getServiceTree: ReturnType<typeof vi.fn>;
     readonly getAvailableParents: ReturnType<typeof vi.fn>;
@@ -57,7 +73,25 @@ describe('ServicesComponent', () => {
       deleteServiceImage: vi.fn(),
       permanentlyDeleteService: vi.fn(() => of({ serviceId: 101, message: 'Deleted permanently' })),
     };
-
+    authSessionState = signal<{ userType: 'TechnicalAdmin' | 'BranchAdmin'; activeBranchId: number | null }>({
+      userType: 'TechnicalAdmin',
+      activeBranchId: null,
+    });
+    permissionState = {
+      canViewAll: signal(true),
+      canViewDetails: signal(true),
+      canCreate: signal(true),
+      canUpdate: signal(true),
+      canDelete: signal(true),
+      canRestore: signal(true),
+      canDeletePermanent: signal(true),
+      canAssignBranchServices: signal(false),
+      canViewStartOptions: signal(false),
+    };
+    branchServicesApi = {
+      getBranchServicesTree: vi.fn(() => of([])),
+      assignServices: vi.fn(() => of({ createdAssignmentsCount: 1, message: 'Assigned' })),
+    };
     await TestBed.configureTestingModule({
       imports: [ServicesComponent],
       providers: [
@@ -65,10 +99,7 @@ describe('ServicesComponent', () => {
         {
           provide: AuthSessionService,
           useValue: {
-            currentSession: computed(() => ({
-              userType: 'TechnicalAdmin' as const,
-              activeBranchId: null,
-            })),
+            currentSession: authSessionState.asReadonly(),
             shouldClearSessionForHttpStatus: () => false,
             clearSession: vi.fn(),
           },
@@ -81,20 +112,20 @@ describe('ServicesComponent', () => {
           },
         },
         { provide: ServiceManagementApiService, useValue: api },
-        { provide: BranchServicesApiService, useValue: {} },
+        { provide: BranchServicesApiService, useValue: branchServicesApi },
         { provide: ServiceWorkflowApiService, useValue: {} },
         {
           provide: ServiceManagementPermissionService,
           useValue: {
-            canViewAll: signal(true).asReadonly(),
-            canViewDetails: signal(true).asReadonly(),
-            canCreate: signal(true).asReadonly(),
-            canUpdate: signal(true).asReadonly(),
-            canDelete: signal(true).asReadonly(),
-            canRestore: signal(true).asReadonly(),
-            canDeletePermanent: signal(true).asReadonly(),
-            canAssignBranchServices: signal(false).asReadonly(),
-            canViewStartOptions: signal(false).asReadonly(),
+            canViewAll: permissionState.canViewAll.asReadonly(),
+            canViewDetails: permissionState.canViewDetails.asReadonly(),
+            canCreate: permissionState.canCreate.asReadonly(),
+            canUpdate: permissionState.canUpdate.asReadonly(),
+            canDelete: permissionState.canDelete.asReadonly(),
+            canRestore: permissionState.canRestore.asReadonly(),
+            canDeletePermanent: permissionState.canDeletePermanent.asReadonly(),
+            canAssignBranchServices: permissionState.canAssignBranchServices.asReadonly(),
+            canViewStartOptions: permissionState.canViewStartOptions.asReadonly(),
           },
         },
       ],
@@ -118,8 +149,8 @@ describe('ServicesComponent', () => {
     const filters = fixture.nativeElement.querySelectorAll('.svc-central-filters .svc-field');
 
     expect(workspace?.classList.contains('row')).toBe(true);
-    expect(editor?.classList.contains('col-xl-5')).toBe(true);
-    expect(tree?.classList.contains('col-xl-7')).toBe(true);
+    expect(editor?.classList.contains('col-xl-7')).toBe(true);
+    expect(tree?.classList.contains('col-xl-5')).toBe(true);
     expect(Array.from(filters).every((field) => (field as HTMLElement).classList.contains('col-xl-4'))).toBe(true);
   });
   it('loads the hierarchy and parent lookup on initialization', () => {
@@ -142,6 +173,53 @@ describe('ServicesComponent', () => {
     );
   });
 
+  it('renders the create form with Bootstrap-first section columns and conditional service code', () => {
+    fixture.componentInstance.openCreateRoot();
+    fixture.detectChanges();
+
+    const form = fixture.nativeElement.querySelector('form.svc-form') as HTMLFormElement | null;
+    const sections = Array.from(fixture.nativeElement.querySelectorAll('.svc-form-section')) as HTMLElement[];
+    const sectionColumns = sections.filter((section) =>
+      Array.from(section.classList).some((className) => className.startsWith('col-')),
+    );
+    const lowerColumns = Array.from(fixture.nativeElement.querySelectorAll('form.svc-form > .row > .col-12')) as HTMLElement[];
+    const basicGrid = fixture.nativeElement.querySelector('form.svc-form .row-cols-xxl-4') as HTMLElement | null;
+    const arabicName = fixture.nativeElement.querySelector('[formControlName="arabicName"]') as HTMLElement | null;
+    const englishName = fixture.nativeElement.querySelector('[formControlName="englishName"]') as HTMLElement | null;
+    const arabicMessage = fixture.nativeElement.querySelector('[formControlName="arabicUserMessage"]') as HTMLElement | null;
+    const englishMessage = fixture.nativeElement.querySelector('[formControlName="englishUserMessage"]') as HTMLElement | null;
+    const orderingGrid = fixture.nativeElement.querySelector('[formControlName="orderNo"]')?.closest('.row') as HTMLElement | null;
+    const serviceCodeToggle = fixture.nativeElement.querySelector('[formControlName="isServiceCodeRequired"]') as HTMLInputElement | null;
+    const serviceCodeToggleField = serviceCodeToggle?.closest('label') as HTMLElement | null;
+    const numberControls = ['orderNo', 'priority', 'weight'].map((controlName) =>
+      fixture.nativeElement.querySelector(`[formControlName="${controlName}"]`) as HTMLElement | null,
+    );
+
+    expect(form?.classList.contains('d-grid')).toBe(true);
+    expect(sections.length).toBeGreaterThanOrEqual(5);
+    expect(sectionColumns).toHaveLength(0);
+    expect(lowerColumns[0].classList.contains('col-xl-4')).toBe(true);
+    expect(lowerColumns[1].classList.contains('col-xl-8')).toBe(true);
+    expect(lowerColumns[2].classList.contains('col-xl-4')).toBe(true);
+    expect(lowerColumns[3].classList.contains('col-xl-8')).toBe(true);
+    expect(basicGrid).not.toBeNull();
+    expect(arabicName?.closest('label')?.classList.contains('col')).toBe(true);
+    expect(englishName?.closest('label')?.classList.contains('col')).toBe(true);
+    expect(arabicMessage?.closest('label')?.classList.contains('col')).toBe(true);
+    expect(englishMessage?.closest('label')?.classList.contains('col')).toBe(true);
+    expect(orderingGrid?.classList.contains('row-cols-sm-3')).toBe(true);
+    expect(serviceCodeToggle).not.toBeNull();
+    expect(serviceCodeToggleField?.classList.contains('svc-code-toggle-field')).toBe(true);
+    expect(serviceCodeToggleField?.classList.contains('col-md-auto')).toBe(true);
+    expect(numberControls.every((control) => control?.classList.contains('svc-number-input'))).toBe(true);
+    expect(fixture.nativeElement.querySelector('[formControlName="serviceCode"]')).toBeNull();
+
+    serviceCodeToggle?.click();
+    fixture.detectChanges();
+
+    expect(fixture.componentInstance.serviceForm.controls.isServiceCodeRequired.value).toBe(true);
+    expect(fixture.nativeElement.querySelector('[formControlName="serviceCode"]')).not.toBeNull();
+  });
   it('submits null service-code fields by default when creating a service', () => {
     fixture.componentInstance.openCreateRoot();
     fillRequiredServiceFields();
@@ -206,6 +284,125 @@ describe('ServicesComponent', () => {
   });
 
 
+  it('allows Branch Admin to edit an editable assigned BranchScoped service from the assignment tree', () => {
+    recreateAsBranchAdmin([
+      createBranchScopedNode({ id: 122, canEditDefinition: true, isDeleted: false }),
+    ]);
+    api.getServiceDetails.mockReturnValueOnce(of(createServiceDetails({
+      id: 122,
+      scope: 'BranchScoped',
+      ownerBranchId: 5,
+      ownerBranchEnglishName: 'Current Branch',
+      isOwnedByCurrentBranch: true,
+      isAssignedToCurrentBranch: true,
+      rowVersion: 'branch-rv',
+    })));
+    fixture.detectChanges();
+
+    const editButton = fixture.nativeElement.querySelector('.svc-branch-assignment-workspace [title="Edit"]') as HTMLButtonElement | null;
+    expect(editButton).not.toBeNull();
+
+    editButton?.click();
+    fixture.detectChanges();
+
+    expect(api.getServiceDetails).toHaveBeenCalledWith(122);
+    expect(fixture.componentInstance.store.panelMode()).toBe('edit');
+    expect(fixture.nativeElement.textContent).toContain('Ownership Information');
+    expect(fixture.nativeElement.querySelector('[formControlName="arabicName"]')).not.toBeNull();
+  });
+
+  it('hides Branch Admin edit action when the assigned service is not editable or is deleted', () => {
+    recreateAsBranchAdmin([
+      createBranchScopedNode({ id: 122, canEditDefinition: false, isDeleted: false }),
+      createBranchScopedNode({ id: 123, canEditDefinition: true, isDeleted: true }),
+    ]);
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('.svc-branch-assignment-workspace [title="Edit"]')).toBeNull();
+  });
+
+  it('blocks edit when refreshed details are no longer editable', () => {
+    recreateAsBranchAdmin([
+      createBranchScopedNode({ id: 122, canEditDefinition: true, isDeleted: false }),
+    ]);
+    api.getServiceDetails.mockReturnValueOnce(of(createServiceDetails({ id: 122, canEditDefinition: false })));
+    fixture.detectChanges();
+
+    const editButton = fixture.nativeElement.querySelector('.svc-branch-assignment-workspace [title="Edit"]') as HTMLButtonElement;
+    editButton.click();
+    fixture.detectChanges();
+
+    expect(fixture.componentInstance.store.panelMode()).toBe('closed');
+    expect(fixture.nativeElement.textContent).toContain('permission');
+  });
+
+  it('updates an editable BranchScoped service with rowVersion and no ownership fields', () => {
+    const details = createServiceDetails({
+      id: 122,
+      scope: 'BranchScoped',
+      ownerBranchId: 5,
+      ownerBranchEnglishName: 'Current Branch',
+      isOwnedByCurrentBranch: true,
+      isAssignedToCurrentBranch: true,
+      rowVersion: 'branch-rv',
+    });
+    api.getServiceDetails.mockReturnValueOnce(of(details));
+    fixture.componentInstance.openEdit(122);
+    fillRequiredServiceFields();
+    fixture.componentInstance.serviceForm.controls.arabicName.setValue('Updated Arabic');
+    fixture.componentInstance.serviceForm.controls.englishName.setValue('Updated English');
+
+    fixture.componentInstance.saveService();
+
+    expect(api.updateService).toHaveBeenCalledWith(
+      122,
+      expect.objectContaining({
+        rowVersion: 'branch-rv',
+        arabicName: 'Updated Arabic',
+        englishName: 'Updated English',
+      }),
+    );
+    const request = api.updateService.mock.calls[0][1] as Record<string, unknown>;
+    expect(request).not.toHaveProperty('scope');
+    expect(request).not.toHaveProperty('ownerBranchId');
+    expect(request).not.toHaveProperty('isOwnedByCurrentBranch');
+    expect(request).not.toHaveProperty('canEditDefinition');
+  });
+
+  it('keeps edit form open and marks Arabic name on duplicate-name conflict', () => {
+    api.getServiceDetails.mockReturnValueOnce(of(createServiceDetails({ id: 122, rowVersion: 'branch-rv' })));
+    api.updateService.mockReturnValueOnce(
+      throwError(() => new HttpErrorResponse({ status: 409, error: { code: 'Services.Update.DuplicateArabicName' } })),
+    );
+    fixture.componentInstance.openEdit(122);
+    fillRequiredServiceFields();
+
+    fixture.componentInstance.saveService();
+    fixture.detectChanges();
+
+    expect(fixture.componentInstance.store.panelMode()).toBe('edit');
+    expect(fixture.componentInstance.serviceForm.controls.arabicName.hasError('duplicateName')).toBe(true);
+    expect(fixture.nativeElement.textContent).toContain('Arabic name is already used');
+  });
+
+  it('shows a reload action for update concurrency conflicts', () => {
+    api.getServiceDetails.mockReturnValueOnce(of(createServiceDetails({ id: 122, rowVersion: 'stale-rv' })));
+    api.updateService.mockReturnValueOnce(
+      throwError(() => new HttpErrorResponse({ status: 409, error: { code: 'Services.Update.ConcurrencyConflict' } })),
+    );
+    fixture.componentInstance.openEdit(122);
+    fillRequiredServiceFields();
+
+    fixture.componentInstance.saveService();
+    fixture.detectChanges();
+
+    const reloadButton = fixture.nativeElement.querySelector('.svc-inline-action-btn') as HTMLButtonElement | null;
+    expect(reloadButton).not.toBeNull();
+    api.getServiceDetails.mockReturnValueOnce(of(createServiceDetails({ id: 122, rowVersion: 'fresh-rv' })));
+    reloadButton?.click();
+
+    expect(api.getServiceDetails).toHaveBeenLastCalledWith(122);
+  });
   it('renders the service media manager after service details load', () => {
     fixture.componentInstance.openView(101);
     fixture.detectChanges();
@@ -214,6 +411,44 @@ describe('ServicesComponent', () => {
     expect(api.getServiceImages).toHaveBeenCalledWith(101, undefined);
     expect(fixture.nativeElement.querySelector('app-service-media-manager')).not.toBeNull();
   });
+
+  function recreateAsBranchAdmin(nodes: readonly ReturnType<typeof createBranchScopedNode>[]): void {
+    fixture.destroy();
+    authSessionState.set({ userType: 'BranchAdmin', activeBranchId: 5 });
+    permissionState.canViewAll.set(false);
+    permissionState.canCreate.set(false);
+    permissionState.canAssignBranchServices.set(true);
+    permissionState.canUpdate.set(true);
+    branchServicesApi.getBranchServicesTree.mockReturnValue(of(nodes));
+    fixture = TestBed.createComponent(ServicesComponent);
+  }
+
+  function createBranchScopedNode(overrides = {}) {
+    return {
+      id: 122,
+      parentServiceId: null,
+      scope: 'BranchScoped' as const,
+      ownerBranchId: 5,
+      ownerBranchArabicName: 'فرع حالي',
+      ownerBranchEnglishName: 'Current Branch',
+      isOwnedByCurrentBranch: true,
+      isAssignedToCurrentBranch: true,
+      canEditDefinition: true,
+      arabicName: 'خدمة فرع',
+      englishName: 'Branch Service',
+      serviceCode: null,
+      isServiceCodeRequired: false,
+      isActive: true,
+      effectiveIsActive: true,
+      isTicketIssuable: true,
+      hasChildren: false,
+      canIssueTicket: true,
+      isDeleted: false,
+      orderNo: 1,
+      children: [],
+      ...overrides,
+    };
+  }
   function fillRequiredServiceFields(): void {
     fixture.componentInstance.serviceForm.patchValue({
       arabicName: 'Arabic Service',
@@ -222,7 +457,7 @@ describe('ServicesComponent', () => {
       rangePrefix: 'S',
     });
   }
-function createServiceDetails() {
+function createServiceDetails(overrides = {}) {
   return {
     id: 101,
     parentServiceId: null,
@@ -259,6 +494,7 @@ function createServiceDetails() {
     rangeEndNumber: 999,
     waitingDuration: 0,
     noOfTicketCopies: 1,
+    ...overrides,
   };
   }
 });

@@ -46,6 +46,8 @@ export interface ServiceManagementTranslations {
   readonly serviceCodeMustBeEmpty: string;
   readonly serviceCodeMaxLength: string;
   readonly serviceCodeAlreadyExists: string;
+  readonly duplicateArabicName: string;
+  readonly duplicateEnglishName: string;
   readonly parent: string;
   readonly logo: string;
   readonly status: string;
@@ -125,6 +127,7 @@ export interface ServiceManagementTranslations {
   readonly accessDenied: string;
   readonly noPermissionHint: string;
   readonly concurrencyError: string;
+  readonly reloadService: string;
   readonly deleteConfirmTitle: string;
   readonly restoreConfirmTitle: string;
   readonly permanentDeleteConfirmTitle: string;
@@ -140,6 +143,7 @@ export interface ServiceManagementTranslations {
   readonly globalScope: string;
   readonly branchScopedScope: string;
   readonly ownerBranch: string;
+  readonly ownershipInfo: string;
   readonly assignedToCurrentBranch: string;
   readonly notAssignedToCurrentBranch: string;
   readonly ownedByCurrentBranch: string;
@@ -212,6 +216,8 @@ export const SERVICE_MANAGEMENT_TRANSLATIONS: Record<AppLanguage, ServiceManagem
     serviceCodeMustBeEmpty: 'يجب ترك كود الخدمة فارغًا عندما لا يكون مطلوبًا.',
     serviceCodeMaxLength: 'لا يمكن أن يتجاوز كود الخدمة 100 حرف.',
     serviceCodeAlreadyExists: 'كود الخدمة المحدد مستخدم بالفعل في خدمة أخرى.',
+    duplicateArabicName: 'الاسم العربي مستخدم بالفعل داخل نفس النطاق والفرع.',
+    duplicateEnglishName: 'الاسم الإنجليزي مستخدم بالفعل داخل نفس النطاق والفرع.',
     parent: 'الخدمة الرئيسية',
     logo: 'الشعار',
     status: 'الحالة',
@@ -290,7 +296,8 @@ export const SERVICE_MANAGEMENT_TRANSLATIONS: Record<AppLanguage, ServiceManagem
     fallbackError: 'حدث خطأ غير متوقع.',
     accessDenied: 'تم رفض الوصول.',
     noPermissionHint: 'ليست لديك صلاحية لهذا الإجراء.',
-    concurrencyError: 'تم تعديل السجل بواسطة مستخدم آخر. يرجى التحديث والمحاولة مرة أخرى.',
+    concurrencyError: 'تم تعديل الخدمة بواسطة مستخدم آخر. يرجى إعادة تحميل أحدث البيانات قبل الحفظ مرة أخرى.',
+    reloadService: 'إعادة تحميل الخدمة',
     deleteConfirmTitle: 'حذف الخدمة',
     restoreConfirmTitle: 'استعادة الخدمة',
     permanentDeleteConfirmTitle: 'حذف الخدمة نهائيًا',
@@ -306,6 +313,7 @@ export const SERVICE_MANAGEMENT_TRANSLATIONS: Record<AppLanguage, ServiceManagem
     globalScope: 'عام',
     branchScopedScope: 'خاص بالفرع',
     ownerBranch: 'الفرع المالك',
+    ownershipInfo: 'معلومات الملكية',
     assignedToCurrentBranch: 'مسندة إلى الفرع الحالي',
     notAssignedToCurrentBranch: 'غير مسندة إلى الفرع الحالي',
     ownedByCurrentBranch: 'مملوكة للفرع الحالي',
@@ -377,6 +385,8 @@ export const SERVICE_MANAGEMENT_TRANSLATIONS: Record<AppLanguage, ServiceManagem
     serviceCodeMustBeEmpty: 'Service code must be empty when it is not required.',
     serviceCodeMaxLength: 'Service code cannot exceed 100 characters.',
     serviceCodeAlreadyExists: 'The specified service code is already used by another service.',
+    duplicateArabicName: 'The Arabic name is already used in the same scope and owner branch.',
+    duplicateEnglishName: 'The English name is already used in the same scope and owner branch.',
     parent: 'Parent',
     logo: 'Logo',
     status: 'Status',
@@ -455,7 +465,8 @@ export const SERVICE_MANAGEMENT_TRANSLATIONS: Record<AppLanguage, ServiceManagem
     fallbackError: 'Unexpected error occurred.',
     accessDenied: 'Access denied.',
     noPermissionHint: 'You do not have permission for this action.',
-    concurrencyError: 'The record was modified by another user. Please refresh and try again.',
+    concurrencyError: 'This service was modified by another user. Reload the latest service details before saving again.',
+    reloadService: 'Reload Service',
     deleteConfirmTitle: 'Delete Service',
     restoreConfirmTitle: 'Restore Service',
     permanentDeleteConfirmTitle: 'Permanently Delete Service',
@@ -473,6 +484,7 @@ export const SERVICE_MANAGEMENT_TRANSLATIONS: Record<AppLanguage, ServiceManagem
     globalScope: 'Global',
     branchScopedScope: 'Branch Scoped',
     ownerBranch: 'Owner Branch',
+    ownershipInfo: 'Ownership Information',
     assignedToCurrentBranch: 'Assigned to current branch',
     notAssignedToCurrentBranch: 'Not assigned to current branch',
     ownedByCurrentBranch: 'Owned by current branch',
