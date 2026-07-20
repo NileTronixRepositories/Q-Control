@@ -255,14 +255,16 @@ describe('ServiceSchedulesComponent', () => {
     fixture.detectChanges();
 
     const rows = fixture.nativeElement.querySelectorAll('.schedule-week-table tbody tr');
-    const timeInputs = fixture.nativeElement.querySelectorAll('.schedule-week-table input[placeholder="HH:mm"]');
-    const addActions = fixture.nativeElement.querySelectorAll('button[aria-label="Add Schedule"]');
+    const timeInputs = fixture.nativeElement.querySelectorAll('.schedule-week-table input[type="time"]');
+    const addActions = fixture.nativeElement.querySelectorAll('.schedule-actions-cell button[aria-label="Add Schedule"]');
+    const misplacedAddActions = fixture.nativeElement.querySelectorAll('.schedule-slots-cell button[aria-label="Add Schedule"]');
 
     expect(rows).toHaveLength(7);
     expect(timeInputs).toHaveLength(4);
     expect(fixture.nativeElement.textContent).toContain('Closed');
     expect(fixture.nativeElement.textContent).toContain('Add Schedule');
     expect(addActions).toHaveLength(7);
+    expect(misplacedAddActions).toHaveLength(0);
   });
   it('renders the final summary strip, single table, and sticky save footer', () => {
     fixture.detectChanges();
@@ -273,10 +275,14 @@ describe('ServiceSchedulesComponent', () => {
     const footerButtons = footer?.querySelectorAll('.schedule-form-action') ?? [];
     const rowFormActions = fixture.nativeElement.querySelectorAll('tbody .schedule-form-action');
 
+    const summaryItems = summary?.querySelectorAll('.summary-item') ?? [];
+
     expect(summary).not.toBeNull();
-    expect(summary?.textContent).toContain('Issue Certificate');
-    expect(summary?.textContent).toContain('Branch');
+    expect(summaryItems[0]?.textContent).toContain('Branch');
+    expect(summaryItems[1]?.textContent).toContain('Service');
+    expect(summaryItems[1]?.textContent).toContain('Issue Certificate');
     expect(summary?.textContent).toContain('Code');
+    expect(summary?.textContent).toContain('Code required');
     expect(summary?.textContent).toContain('Operational');
     expect(table).toHaveLength(1);
     expect(footer).not.toBeNull();
@@ -638,7 +644,7 @@ describe('ServiceSchedulesComponent', () => {
     );
     const saveButton = buttonsByText('Save Changes')[0];
     const firstTimeInput = fixture.nativeElement.querySelector(
-      'input[placeholder="HH:mm"]',
+      'input[type="time"]',
     ) as HTMLInputElement | null;
 
     expect(fixture.nativeElement.textContent).toContain('Currently Unavailable');
@@ -705,7 +711,7 @@ describe('ServiceSchedulesComponent', () => {
 
   function timeInputValues(): readonly string[] {
     return Array.from(
-      fixture.nativeElement.querySelectorAll('input[placeholder="HH:mm"]'),
+      fixture.nativeElement.querySelectorAll('input[type="time"]'),
     ).map((input) => (input as HTMLInputElement).value);
   }
 

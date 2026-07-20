@@ -84,7 +84,7 @@ describe('AdminShellComponent', () => {
     expect(text).toContain('Branch Editor');
     expect(text).toContain('Branding & Advertisements');
     expect(text).toContain('Waiting Areas');
-    expect(text).toContain('Windows');
+    expect(text).toContain('Service Locations');
     expect(text).toContain('Terminals');
     expect(text).toContain('Displays');
     expect(text).toContain('Service Schedules');
@@ -114,6 +114,36 @@ describe('AdminShellComponent', () => {
     expect(fixture.nativeElement.querySelectorAll('nav a').length).toBe(0);
   });
 
+
+  it('renders translated breadcrumbs for the service schedules route', () => {
+    fixture.destroy();
+    Object.defineProperty(router, 'url', {
+      configurable: true,
+      value: '/admin/services/schedules',
+    });
+    fixture = TestBed.createComponent(AdminShellComponent);
+    fixture.detectChanges();
+
+    const breadcrumb = fixture.nativeElement.querySelector('app-breadcrumb') as HTMLElement;
+    const current = fixture.nativeElement.querySelector('[aria-current="page"]') as HTMLElement;
+
+    expect(breadcrumb).not.toBeNull();
+    expect(fixture.nativeElement.textContent).toContain('Operations Dashboard');
+    expect(fixture.nativeElement.textContent).toContain('Services');
+    expect(current.textContent).toContain('Service Schedules');
+  });
+
+  it('renders the current logged-in user in the workspace header', () => {
+    session.set({ ...createSession('TechnicalAdmin'), displayName: 'Nour Admin' });
+    fixture.detectChanges();
+
+    const user = fixture.nativeElement.querySelector('.workspace-user') as HTMLElement;
+
+    expect(user).not.toBeNull();
+    expect(user.textContent).toContain('Current user');
+    expect(user.textContent).toContain('Nour Admin');
+    expect(user.textContent).toContain('Technical Admin');
+  });
   it('forwards language and logout actions to their services', () => {
     const languageButton = fixture.nativeElement.querySelector(
       '.sidebar-action-button:not(.sidebar-logout-button)',

@@ -16,6 +16,9 @@ export interface AuthenticatedBranch {
 export interface AuthenticatedSession {
   readonly token: string;
   readonly userType: AuthenticatedUserType;
+  readonly displayName?: string;
+  readonly userName?: string;
+  readonly email?: string;
   readonly requiresBranchSelection: boolean;
   readonly activeBranchId: number | null;
   readonly branches: readonly AuthenticatedBranch[];

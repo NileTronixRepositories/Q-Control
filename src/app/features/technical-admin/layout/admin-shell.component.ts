@@ -1,8 +1,13 @@
-import { ChangeDetectionStrategy, Component, computed, inject, ViewEncapsulation } from '@angular/core';
-import { Router, RouterOutlet } from '@angular/router';
+import { ChangeDetectionStrategy, Component, ViewEncapsulation, computed, inject, signal } from '@angular/core';
+import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
+
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { filter } from 'rxjs';
 
 import { AppShellComponent } from '../../../shared/layouts/app-shell/app-shell.component';
+import { AppBreadcrumbItem } from '../../../shared/models/breadcrumb.model';
 import { AppNavigationItem } from '../../../shared/models/navigation.model';
+import { AuthenticatedUserType } from '../../auth/models/login-credentials.model';
 import { AuthSessionService } from '../../auth/services/auth-session.service';
 import { ServiceManagementPermissionService } from '../../service-management/services/service-management-permission.service';
 import { resolveJwtPermissions } from '../../auth/utils/auth-permissions.util';
@@ -23,9 +28,57 @@ export class AdminShellComponent {
   private readonly router = inject(Router);
   private readonly authSessionService = inject(AuthSessionService);
   private readonly servicePermissionService = inject(ServiceManagementPermissionService);
+  private readonly currentUrl = signal(this.normalizeUrl(this.router.url));
 
   protected readonly i18nStore = inject(TechnicalAdminI18nStore);
   protected readonly translations = this.i18nStore.translations;
+  protected readonly currentUserDisplayName = computed(() => {
+    const session = this.authSessionService.currentSession();
+
+    if (!session) {
+      return '';
+    }
+
+    return (
+      session.displayName?.trim() ||
+      session.userName?.trim() ||
+      session.email?.trim() ||
+      this.currentUserRoleLabel()
+    );
+  });
+  protected readonly currentUserRoleLabel = computed(() => {
+    const session = this.authSessionService.currentSession();
+    return session ? this.roleLabel(session.userType) : '';
+  });
+  private readonly routerUrlSubscription = this.router.events
+    .pipe(
+      filter((event): event is NavigationEnd => event instanceof NavigationEnd),
+      takeUntilDestroyed(),
+    )
+    .subscribe((event) => this.currentUrl.set(this.normalizeUrl(event.urlAfterRedirects)));
+  protected readonly breadcrumbs = computed<readonly AppBreadcrumbItem[]>(() => {
+    const translations = this.translations();
+    const navigationPath = this.findNavigationPath(this.navigationItems(), this.currentUrl());
+    const root: AppBreadcrumbItem = {
+      label: translations.topbarEyebrow,
+      route: '/admin/branch-editor',
+      icon: 'bi-speedometer2',
+    };
+
+    if (navigationPath.length === 0) {
+      return [root];
+    }
+
+    return [
+      root,
+      ...navigationPath.map((item, index) => ({
+        label: item.label,
+        route:
+          index === navigationPath.length - 1 ? undefined : item.route ?? this.firstChildRoute(item),
+        icon: item.icon,
+      })),
+    ];
+  });
   protected readonly navigationItems = computed<readonly AppNavigationItem[]>(() => {
     const translations = this.translations();
     const serviceNavChildren: AppNavigationItem[] = [];
@@ -119,7 +172,7 @@ export class AdminShellComponent {
       branchChildren.push({
         label: translations.servicesLabel,
         icon: 'bi-ui-checks-grid',
-        expanded: this.router.url.startsWith('/admin/services'),
+        expanded: this.currentUrl().startsWith('/admin/services'),
         children: serviceNavChildren,
       });
     }
@@ -190,8 +243,74 @@ export class AdminShellComponent {
     );
   }
 
+  private roleLabel(userType: AuthenticatedUserType): string {
+    const translations = this.translations();
+
+    switch (userType) {
+      case 'TechnicalAdmin':
+        return translations.technicalAdminRoleLabel;
+      case 'BranchAdmin':
+        return translations.branchAdminRoleLabel;
+      case 'OrganizationAdmin':
+        return translations.organizationAdminRoleLabel;
+    }
+  }
+
   protected toggleLanguage(): void {
     this.i18nStore.toggleLanguage();
+  }
+
+  private findNavigationPath(
+    items: readonly AppNavigationItem[],
+    currentUrl: string,
+    ancestors: readonly AppNavigationItem[] = [],
+  ): readonly AppNavigationItem[] {
+    const normalizedUrl = this.resolveCanonicalAdminUrl(currentUrl);
+
+    for (const item of items) {
+      const nextPath = [...ancestors, item];
+
+      if (item.route && this.normalizeUrl(item.route) === normalizedUrl) {
+        return nextPath;
+      }
+
+      if (item.children) {
+        const childPath = this.findNavigationPath(item.children, normalizedUrl, nextPath);
+
+        if (childPath.length > 0) {
+          return childPath;
+        }
+      }
+    }
+
+    return [];
+  }
+
+  private resolveCanonicalAdminUrl(url: string): string {
+    const normalizedUrl = this.normalizeUrl(url);
+
+    if (/^\/admin\/services\/branches\/[^/]+\/services\/[^/]+\/schedule$/.test(normalizedUrl)) {
+      return '/admin/services/schedules';
+    }
+
+    if (/^\/admin\/services\/branches\/[^/]+\/services\/[^/]+\/workflows$/.test(normalizedUrl)) {
+      return '/admin/services/workflows';
+    }
+
+    return normalizedUrl;
+  }
+
+  private normalizeUrl(url: string): string {
+    const [path] = url.split(/[?#]/);
+    return path.replace(/\/$/, '') || '/';
+  }
+
+  private firstChildRoute(item: AppNavigationItem): string | undefined {
+    if (item.route) {
+      return item.route;
+    }
+
+    return item.children?.map((child) => this.firstChildRoute(child)).find(Boolean);
   }
 
   protected logout(): void {

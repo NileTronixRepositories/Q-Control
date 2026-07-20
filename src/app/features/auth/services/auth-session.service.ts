@@ -32,6 +32,9 @@ interface UserTokenApiResult {
   readonly value?: UserTokenApiValue;
   readonly token?: string;
   readonly userType?: string;
+  readonly displayName?: string | null;
+  readonly userName?: string | null;
+  readonly email?: string | null;
   readonly requiresBranchSelection?: boolean;
   readonly activeBranchId?: number | string | null;
   readonly branches?: readonly LoginBranchApiValue[];
@@ -44,6 +47,9 @@ interface UserTokenApiResult {
 interface UserTokenApiValue {
   readonly token: string;
   readonly userType: string;
+  readonly displayName?: string | null;
+  readonly userName?: string | null;
+  readonly email?: string | null;
   readonly requiresBranchSelection: boolean;
   readonly activeBranchId: number | string | null;
   readonly branches?: readonly LoginBranchApiValue[];
@@ -128,7 +134,9 @@ export class AuthSessionService {
     return this.httpClient
       .post<UserTokenApiResult>(this.loginEndpoint, request, { headers: this.createJsonHeaders() })
       .pipe(
-        map((response) => this.mapTokenResponse(response, credentials.rememberSession)),
+        map((response) =>
+          this.mapTokenResponse(response, credentials.rememberSession, credentials.username.trim()),
+        ),
         catchError((error: HttpErrorResponse) => of(this.resolveAuthError(error))),
       );
   }
@@ -143,7 +151,9 @@ export class AuthSessionService {
         headers: this.createJsonHeaders(),
       })
       .pipe(
-        map((response) => this.mapTokenResponse(response, this.shouldRememberCurrentSession())),
+        map((response) =>
+          this.mapTokenResponse(response, this.shouldRememberCurrentSession(), this.currentIdentityFallback()),
+        ),
         catchError((error: HttpErrorResponse) => of(this.resolveAuthError(error))),
       );
   }
@@ -157,6 +167,7 @@ export class AuthSessionService {
   private mapTokenResponse(
     response: UserTokenApiResult,
     rememberSession: boolean,
+    identityFallback?: string,
   ): LoginSubmissionResult {
     const tokenValue = this.resolveTokenValue(response);
 
@@ -167,7 +178,7 @@ export class AuthSessionService {
       };
     }
 
-    const session = this.createSession(tokenValue);
+    const session = this.createSession(tokenValue, identityFallback);
     this.storeSession(session, rememberSession);
 
     return {
@@ -207,10 +218,13 @@ export class AuthSessionService {
     );
   }
 
-  private createSession(value: UserTokenApiValue): AuthenticatedSession {
+  private createSession(value: UserTokenApiValue, identityFallback?: string): AuthenticatedSession {
+    const identity = this.resolveSessionIdentity(value, identityFallback);
+
     return {
       token: value.token,
       userType: this.resolveUserType(value.userType),
+      ...identity,
       requiresBranchSelection: value.requiresBranchSelection,
       activeBranchId: this.toNullableNumber(value.activeBranchId),
       branches: this.resolveBranches(value.branches),
@@ -219,6 +233,65 @@ export class AuthSessionService {
       passwordChangedOnUtc: value.passwordChangedOnUtc ?? null,
       passwordExpiresOnUtc: value.passwordExpiresOnUtc ?? null,
     };
+  }
+
+  private resolveSessionIdentity(
+    value: UserTokenApiValue,
+    identityFallback?: string,
+  ): Pick<AuthenticatedSession, 'displayName' | 'userName' | 'email'> {
+    const payload = decodeJwtPayload(value.token) ?? {};
+    const givenName = this.firstString(payload['given_name']);
+    const familyName = this.firstString(payload['family_name']);
+    const composedName = [givenName, familyName].filter(Boolean).join(' ');
+    const fallback = this.firstString(identityFallback);
+    const email = this.firstString(
+      value.email,
+      payload['email'],
+      payload['emailaddress'],
+      payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'],
+      fallback?.includes('@') ? fallback : undefined,
+    );
+    const userName = this.firstString(
+      value.userName,
+      payload['preferred_username'],
+      payload['unique_name'],
+      payload['username'],
+      payload['nameid'],
+      payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'],
+      fallback && !fallback.includes('@') ? fallback : undefined,
+    );
+    const displayName = this.firstString(
+      value.displayName,
+      payload['name'],
+      payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'],
+      composedName,
+      userName,
+      email,
+      fallback,
+      payload['sub'],
+    );
+
+    return { displayName, userName, email };
+  }
+
+  private currentIdentityFallback(): string | undefined {
+    const session = this.currentSessionSignal();
+    return this.firstString(session?.displayName, session?.userName, session?.email);
+  }
+
+  private firstString(...values: readonly unknown[]): string | undefined {
+    for (const value of values) {
+      if (typeof value !== 'string') {
+        continue;
+      }
+
+      const trimmedValue = value.trim();
+      if (trimmedValue.length > 0) {
+        return trimmedValue;
+      }
+    }
+
+    return undefined;
   }
 
   private resolveBranches(value: readonly LoginBranchApiValue[] | undefined): readonly AuthenticatedBranch[] {
@@ -408,6 +481,9 @@ export class AuthSessionService {
       (record['userType'] === 'TechnicalAdmin' ||
         record['userType'] === 'OrganizationAdmin' ||
         record['userType'] === 'BranchAdmin') &&
+      this.isOptionalStoredString(record['displayName']) &&
+      this.isOptionalStoredString(record['userName']) &&
+      this.isOptionalStoredString(record['email']) &&
       typeof record['requiresBranchSelection'] === 'boolean' &&
       (record['activeBranchId'] === null || typeof record['activeBranchId'] === 'number') &&
       Array.isArray(record['branches']) &&
@@ -416,6 +492,10 @@ export class AuthSessionService {
       (record['passwordChangedOnUtc'] === null || typeof record['passwordChangedOnUtc'] === 'string') &&
       (record['passwordExpiresOnUtc'] === null || typeof record['passwordExpiresOnUtc'] === 'string')
     );
+  }
+
+  private isOptionalStoredString(value: unknown): boolean {
+    return value === undefined || typeof value === 'string';
   }
 
   private isCurrentSessionExpired(): boolean {

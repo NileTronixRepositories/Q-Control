@@ -13,14 +13,16 @@ import {
 } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 
+import { AppBreadcrumbComponent } from '../../components/app-breadcrumb/app-breadcrumb.component';
 import { ThemeSwitcherComponent } from '../../components/theme-switcher/theme-switcher.component';
 
 import { AppDirection, AppLanguage } from '../../models/app-language.model';
+import { AppBreadcrumbItem } from '../../models/breadcrumb.model';
 import { AppNavigationItem } from '../../models/navigation.model';
 
 @Component({
   selector: 'app-shell',
-  imports: [RouterLink, RouterLinkActive, ThemeSwitcherComponent],
+  imports: [RouterLink, RouterLinkActive, ThemeSwitcherComponent, AppBreadcrumbComponent],
   templateUrl: './app-shell.component.html',
   styleUrl: './app-shell.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -38,6 +40,11 @@ export class AppShellComponent implements OnInit, OnDestroy {
   readonly topbarLogoAlt = input('Niletronix');
   readonly languageButtonLabel = input('Language');
   readonly logoutLabel = input('Logout');
+  readonly breadcrumbs = input<readonly AppBreadcrumbItem[]>([]);
+  readonly breadcrumbLabel = input('Breadcrumb');
+  readonly currentUserDisplayName = input('');
+  readonly currentUserRoleLabel = input('');
+  readonly currentUserLabel = input('Current user');
   readonly showLanguageAction = input(true);
   readonly mobileNavigationMode = input<'rail' | 'overlay'>('rail');
 
@@ -52,6 +59,12 @@ export class AppShellComponent implements OnInit, OnDestroy {
   );
   protected readonly logoutIconClass = computed(() =>
     this.direction() === 'rtl' ? 'bi bi-box-arrow-left' : 'bi bi-box-arrow-right',
+  );
+  protected readonly trimmedCurrentUserDisplayName = computed(() => this.currentUserDisplayName().trim());
+  protected readonly trimmedCurrentUserRoleLabel = computed(() => this.currentUserRoleLabel().trim());
+  protected readonly hasCurrentUser = computed(() => this.trimmedCurrentUserDisplayName().length > 0);
+  protected readonly hasWorkspaceHeader = computed(
+    () => this.breadcrumbs().length > 0 || this.hasCurrentUser(),
   );
 
   private readonly mobileMenuButton = viewChild<ElementRef<HTMLButtonElement>>('mobileMenuButton');

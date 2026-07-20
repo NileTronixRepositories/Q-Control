@@ -25,6 +25,9 @@
       <div class="mobile-topbar-identity">
         <img src="/images/nile.png" [alt]="topbarLogoAlt()" />
         <strong>{{ topbarTitle() }}</strong>
+        @if (hasCurrentUser()) {
+          <span>{{ trimmedCurrentUserDisplayName() }}</span>
+        }
       </div>
     </header>
   }
@@ -218,15 +221,35 @@
 
   <!-- Main workspace -->
   <section class="workspace" [attr.dir]="direction()" [attr.lang]="language()">
-    <!-- <header class="topbar">
-      <div class="topbar-title">
-        <p>{{ topbarEyebrow() }}</p>
-        <h2>{{ topbarTitle() }}</h2>
+    @if (hasWorkspaceHeader()) {
+      <div class="workspace-header">
+        @if (breadcrumbs().length > 0) {
+          <div class="workspace-breadcrumb">
+            <app-breadcrumb
+              [items]="breadcrumbs()"
+              [direction]="direction()"
+              [language]="language()"
+              [ariaLabel]="breadcrumbLabel()"
+            />
+          </div>
+        }
+
+        @if (hasCurrentUser()) {
+          <div class="workspace-user" [attr.aria-label]="currentUserLabel()">
+            <span class="workspace-user-avatar" aria-hidden="true">
+              <i class="bi bi-person-circle"></i>
+            </span>
+            <span class="workspace-user-copy">
+              <span>{{ currentUserLabel() }}</span>
+              <strong>{{ trimmedCurrentUserDisplayName() }}</strong>
+              @if (trimmedCurrentUserRoleLabel()) {
+                <small>{{ trimmedCurrentUserRoleLabel() }}</small>
+              }
+            </span>
+          </div>
+        }
       </div>
-      <div class="topbar-actions">
-        <img src="/images/nile.png" [alt]="topbarLogoAlt()" class="topbar-logo" />
-      </div>
-    </header> -->
+    }
 
     <div class="workspace-content">
       <ng-content />

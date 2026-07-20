@@ -12,6 +12,10 @@ interface TechnicalAdminTranslations {
   readonly topbarTitle: string;
   readonly languageButtonLabel: string;
   readonly logoutLabel: string;
+  readonly currentUserLabel: string;
+  readonly technicalAdminRoleLabel: string;
+  readonly branchAdminRoleLabel: string;
+  readonly organizationAdminRoleLabel: string;
   readonly themeConfigurationLabel: string;
   readonly generalLabel: string;
   readonly serviceRequestLabel: string;
@@ -121,6 +125,10 @@ const TECHNICAL_ADMIN_TRANSLATIONS: Record<AppLanguage, TechnicalAdminTranslatio
     topbarTitle: '\u0627\u0644\u0645\u0633\u0624\u0648\u0644 \u0627\u0644\u062a\u0642\u0646\u064a',
     languageButtonLabel: 'English',
     logoutLabel: '\u062a\u0633\u062c\u064a\u0644 \u062e\u0631\u0648\u062c',
+    currentUserLabel: 'المستخدم الحالي',
+    technicalAdminRoleLabel: 'مسؤول تقني',
+    branchAdminRoleLabel: 'مسؤول فرع',
+    organizationAdminRoleLabel: 'مسؤول مؤسسة',
     themeConfigurationLabel: 'الهوية البصرية والإعدادات',
     generalLabel: '\u0639\u0627\u0645',
     serviceRequestLabel: '\u0637\u0644\u0628 \u0627\u0644\u062e\u062f\u0645\u0629',
@@ -228,6 +236,10 @@ const TECHNICAL_ADMIN_TRANSLATIONS: Record<AppLanguage, TechnicalAdminTranslatio
     topbarTitle: 'Technical Admin',
     languageButtonLabel: 'Arabic',
     logoutLabel: 'Logout',
+    currentUserLabel: 'Current user',
+    technicalAdminRoleLabel: 'Technical Admin',
+    branchAdminRoleLabel: 'Branch Admin',
+    organizationAdminRoleLabel: 'Organization Admin',
     themeConfigurationLabel: 'Visual Identity & Configuration',
     generalLabel: 'General',
     serviceRequestLabel: 'Service Request',

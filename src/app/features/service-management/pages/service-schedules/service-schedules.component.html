@@ -1,4 +1,4 @@
-<section
+﻿<section
   class="technical-admin-responsive-page service-schedule-page"
   [attr.dir]="direction()"
   [attr.lang]="language()"
@@ -150,18 +150,18 @@
       <form class="editor-form schedule-form" [formGroup]="scheduleForm" (ngSubmit)="submit()">
         <section class="schedule-summary-strip" [attr.aria-label]="translations().scheduleDetails">
           <article class="summary-item summary-item--primary">
-            <span class="summary-icon"><i class="bi bi-hospital" aria-hidden="true"></i></span>
-            <div>
-              <strong>{{ currentScope.serviceName }}</strong>
-              <span>{{ translations().service }}</span>
-            </div>
-          </article>
-
-          <article class="summary-item">
             <span class="summary-icon"><i class="bi bi-buildings" aria-hidden="true"></i></span>
             <div>
               <strong>{{ currentScope.branchName }}</strong>
               <span>{{ translations().branch }}</span>
+            </div>
+          </article>
+
+          <article class="summary-item">
+            <span class="summary-icon"><i class="bi bi-hospital" aria-hidden="true"></i></span>
+            <div>
+              <strong>{{ currentScope.serviceName }}</strong>
+              <span>{{ translations().service }}</span>
             </div>
           </article>
 
@@ -201,17 +201,22 @@
                   [class.bi-dash-circle]="!scheduleForm.controls.isSlotCodeRequired.value"
                   aria-hidden="true"
                 ></i>
-                {{ scheduleForm.controls.isSlotCodeRequired.value ? translations().yes : translations().no }}
+                {{
+                  scheduleForm.controls.isSlotCodeRequired.value
+                    ? translations().yes
+                    : translations().no
+                }}
               </span>
             } @else {
               <label class="summary-toggle">
-                <input
-                  type="checkbox"
-                  [formControl]="scheduleForm.controls.isSlotCodeRequired"
-                />
+                <input type="checkbox" [formControl]="scheduleForm.controls.isSlotCodeRequired" />
                 <span class="status-badge status-active">
                   <i class="bi bi-check-circle-fill" aria-hidden="true"></i>
-                  {{ scheduleForm.controls.isSlotCodeRequired.value ? translations().yes : translations().no }}
+                  {{
+                    scheduleForm.controls.isSlotCodeRequired.value
+                      ? translations().yes
+                      : translations().no
+                  }}
                 </span>
               </label>
             }
@@ -231,7 +236,11 @@
                   [class.bi-x-circle-fill]="!currentSchedule.isCurrentlyOperational"
                   aria-hidden="true"
                 ></i>
-                {{ currentSchedule.isCurrentlyOperational ? translations().operational : translations().currentlyUnavailable }}
+                {{
+                  currentSchedule.isCurrentlyOperational
+                    ? translations().operational
+                    : translations().currentlyUnavailable
+                }}
               </span>
             } @else {
               <span class="status-badge status-active">
@@ -282,7 +291,11 @@
               <div>
                 <h2>{{ translations().weeklySchedule }}</h2>
                 <span>
-                  {{ language() === 'ar' ? 'يمكنك إضافة أكثر من موعد لكل يوم' : 'You can add more than one schedule per day' }}
+                  {{
+                    language() === 'ar'
+                      ? 'يمكنك إضافة أكثر من موعد لكل يوم'
+                      : 'You can add more than one schedule per day'
+                  }}
                 </span>
               </div>
             </div>
@@ -298,11 +311,17 @@
                   </th>
                   <th scope="col" class="col-code">{{ translations().slotCode }}</th>
                   <th scope="col" class="col-status">{{ translations().operationalStatus }}</th>
-                  <th scope="col" class="col-actions">{{ language() === 'ar' ? 'الإجراءات' : 'Actions' }}</th>
+                  <th scope="col" class="col-actions">
+                    {{ language() === 'ar' ? 'الإجراءات' : 'Actions' }}
+                  </th>
                 </tr>
               </thead>
               <tbody>
-                @for (dayGroup of dayGroups(); track dayGroup.controls.dayOfWeek.value; let dayIndex = $index) {
+                @for (
+                  dayGroup of dayGroups();
+                  track dayGroup.controls.dayOfWeek.value;
+                  let dayIndex = $index
+                ) {
                   <tr class="schedule-day-row" [class.is-closed]="!dayIsWorking(dayIndex)">
                     <td class="schedule-day-cell">
                       <span
@@ -321,7 +340,13 @@
                       @if (dayIsWorking(dayIndex)) {
                         <span class="schedule-day-count">
                           {{ timeSlotGroups(dayIndex).length }}
-                          {{ language() === 'ar' ? 'فترات' : (timeSlotGroups(dayIndex).length === 1 ? 'slot' : 'slots') }}
+                          {{
+                            language() === 'ar'
+                              ? 'فترات'
+                              : timeSlotGroups(dayIndex).length === 1
+                                ? 'slot'
+                                : 'slots'
+                          }}
                         </span>
                       }
                     </td>
@@ -329,7 +354,11 @@
                     <td class="schedule-slots-cell">
                       <div class="schedule-slot-stack">
                         @if (dayIsWorking(dayIndex) && timeSlotGroups(dayIndex).length > 0) {
-                          @for (slotGroup of timeSlotGroups(dayIndex); track $index; let slotIndex = $index) {
+                          @for (
+                            slotGroup of timeSlotGroups(dayIndex);
+                            track $index;
+                            let slotIndex = $index
+                          ) {
                             <div class="schedule-range-row">
                               <label class="time-input-wrap">
                                 <i class="bi bi-clock" aria-hidden="true"></i>
@@ -359,10 +388,14 @@
                                 />
                               </label>
                               @if (slotControlError(dayIndex, slotIndex, 'startTime'); as error) {
-                                <small class="invalid-feedback d-block schedule-inline-error">{{ error }}</small>
+                                <small class="invalid-feedback d-block schedule-inline-error">{{
+                                  error
+                                }}</small>
                               }
                               @if (slotControlError(dayIndex, slotIndex, 'endTime'); as error) {
-                                <small class="invalid-feedback d-block schedule-inline-error">{{ error }}</small>
+                                <small class="invalid-feedback d-block schedule-inline-error">{{
+                                  error
+                                }}</small>
                               }
                             </div>
                           }
@@ -372,18 +405,6 @@
                             {{ translations().closedDay }}
                           </div>
                         }
-
-                        <button
-                          type="button"
-                          class="secondary-action compact-action schedule-add-day-slot-action"
-                          [disabled]="inlineControlsDisabled()"
-                          [attr.aria-label]="translations().addTimeSlot"
-                          [attr.title]="translations().addTimeSlot"
-                          (click)="addTimeSlot(dayIndex)"
-                        >
-                          <i class="bi bi-plus-lg" aria-hidden="true"></i>
-                          {{ translations().addTimeSlot }}
-                        </button>
                       </div>
                     </td>
 
@@ -392,13 +413,18 @@
                         @if (dayIsWorking(dayIndex) && timeSlotGroups(dayIndex).length > 0) {
                           @for (slotGroup of timeSlotGroups(dayIndex); track $index) {
                             <span class="schedule-data-row schedule-code-value">
-                              {{ scheduleForm.controls.isSlotCodeRequired.value ? displayValue(scheduleForm.controls.slotCode.value) : translations().notAvailable }}
+                              {{
+                                scheduleForm.controls.isSlotCodeRequired.value
+                                  ? displayValue(scheduleForm.controls.slotCode.value)
+                                  : translations().notAvailable
+                              }}
                             </span>
                           }
                         } @else {
-                          <span class="schedule-data-row schedule-muted-value">{{ translations().notAvailable }}</span>
+                          <span class="schedule-data-row schedule-muted-value">{{
+                            translations().notAvailable
+                          }}</span>
                         }
-                        <span class="schedule-add-row-spacer" aria-hidden="true"></span>
                       </div>
                     </td>
 
@@ -421,14 +447,17 @@
                             </span>
                           </span>
                         }
-                        <span class="schedule-add-row-spacer" aria-hidden="true"></span>
                       </div>
                     </td>
 
                     <td class="schedule-actions-cell">
                       <div class="schedule-cell-stack schedule-action-stack">
                         @if (dayIsWorking(dayIndex) && timeSlotGroups(dayIndex).length > 0) {
-                          @for (slotGroup of timeSlotGroups(dayIndex); track $index; let slotIndex = $index) {
+                          @for (
+                            slotGroup of timeSlotGroups(dayIndex);
+                            track $index;
+                            let slotIndex = $index
+                          ) {
                             <span class="schedule-data-row">
                               <button
                                 type="button"
@@ -442,10 +471,18 @@
                               </button>
                             </span>
                           }
-                        } @else {
-                          <span class="schedule-data-row schedule-muted-value">{{ translations().notAvailable }}</span>
                         }
-                        <span class="schedule-add-row-spacer" aria-hidden="true"></span>
+                        <button
+                          type="button"
+                          class="secondary-action compact-action schedule-add-day-slot-action"
+                          [disabled]="inlineControlsDisabled()"
+                          [attr.aria-label]="translations().addTimeSlot"
+                          [attr.title]="translations().addTimeSlot"
+                          (click)="addTimeSlot(dayIndex)"
+                        >
+                          <i class="bi bi-plus-lg" aria-hidden="true"></i>
+                          {{ translations().addTimeSlot }}
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -461,7 +498,11 @@
 
         <footer class="schedule-sticky-footer">
           <p>
-            {{ language() === 'ar' ? 'سيتم حفظ جميع التغييرات عند الضغط على حفظ التغييرات' : 'All changes will be saved when you select Save Changes.' }}
+            {{
+              language() === 'ar'
+                ? 'سيتم حفظ جميع التغييرات عند الضغط على حفظ التغييرات'
+                : 'All changes will be saved when you select Save Changes.'
+            }}
           </p>
           <div class="schedule-footer-actions">
             <button
@@ -496,7 +537,13 @@
           </div>
           <h2>{{ translations().weeklySchedule }}</h2>
           <p>
-            {{ selectedBranchId() ? (language() === 'ar' ? 'الرجاء اختيار الخدمة لعرض تفاصيل الجدول.' : 'Please select a service to view the schedule details.') : translations().selectBranchFirst }}
+            {{
+              selectedBranchId()
+                ? language() === 'ar'
+                  ? 'الرجاء اختيار الخدمة لعرض تفاصيل الجدول.'
+                  : 'Please select a service to view the schedule details.'
+                : translations().selectBranchFirst
+            }}
           </p>
         </div>
       </section>
