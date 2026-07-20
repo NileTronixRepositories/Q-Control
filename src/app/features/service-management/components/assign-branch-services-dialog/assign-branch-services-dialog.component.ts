@@ -24,6 +24,7 @@ export class AssignBranchServicesDialogComponent {
   readonly serviceTranslations = input.required<ServiceManagementTranslations>();
   readonly language = input.required<AppLanguage>();
   readonly direction = input<AppDirection>('ltr');
+  readonly canSelectNode = input<(node: ServiceTreeNode) => boolean>(() => true);
 
   readonly closed = output<void>();
   readonly refresh = output<void>();
@@ -34,6 +35,10 @@ export class AssignBranchServicesDialogComponent {
   readonly selectedCount = computed(() => this.selectedLeafIds().size);
 
   protected updateSelection(event: { readonly node: ServiceTreeNode; readonly selected: boolean }): void {
+    if (event.selected && !this.canSelectNode()(event.node)) {
+      return;
+    }
+
     this.selectedLeafIds.update((current) => {
       const next = new Set(current);
 
@@ -52,9 +57,33 @@ export class AssignBranchServicesDialogComponent {
       return;
     }
 
-    this.assigned.emit([...this.selectedLeafIds()]);
+    const selectedIds = [...this.selectedLeafIds()].filter((serviceId) =>
+      this.hasSelectableNode(this.nodes(), serviceId),
+    );
+
+    if (selectedIds.length === 0) {
+      this.selectedLeafIds.set(new Set());
+      return;
+    }
+
+    this.selectedLeafIds.set(new Set(selectedIds));
+    this.assigned.emit(selectedIds);
   }
 
+
+  private hasSelectableNode(nodes: readonly ServiceTreeNode[], serviceId: number): boolean {
+    for (const node of nodes) {
+      if (node.id === serviceId) {
+        return this.canSelectNode()(node);
+      }
+
+      if (this.hasSelectableNode(node.children, serviceId)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
   protected close(): void {
     if (!this.assigning()) {
       this.selectedLeafIds.set(new Set());

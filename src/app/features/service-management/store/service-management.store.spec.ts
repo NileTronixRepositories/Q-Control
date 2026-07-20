@@ -32,6 +32,21 @@ describe('ServiceManagementStore available branch assignment tree', () => {
     expect(store.serviceTree()).toBe(sourceTree);
   });
 
+
+  it('excludes BranchScoped leaves from the branch assignment source', () => {
+    const branchScopedLeaf = createNode(70, {
+      scope: 'BranchScoped',
+      ownerBranchId: 5,
+      isOwnedByCurrentBranch: true,
+      isAssignedToCurrentBranch: false,
+    });
+    const globalLeaf = createNode(71, { isAssignedToCurrentBranch: false });
+    const store = new ServiceManagementStore();
+
+    store.serviceTree.set([branchScopedLeaf, globalLeaf]);
+
+    expect(store.availableBranchAssignmentTree()).toEqual([globalLeaf]);
+  });
   it('reactively removes a stale source leaf when it appears in the assigned branch tree', () => {
     const sourceLeaf = createNode(10, { isAssignedToCurrentBranch: false });
     const store = new ServiceManagementStore();
@@ -89,8 +104,10 @@ function createNode(id: number, overrides: Partial<ServiceTreeNode> = {}): Servi
     isOwnedByCurrentBranch: false,
     isAssignedToCurrentBranch: null,
     canEditDefinition: false,
-    arabicName: `خدمة ${id}`,
+    arabicName: `Ø®Ø¯Ù…Ø© ${id}`,
     englishName: `Service ${id}`,
+    serviceCode: null,
+    isServiceCodeRequired: false,
     isActive: true,
     effectiveIsActive: true,
     isTicketIssuable: true,

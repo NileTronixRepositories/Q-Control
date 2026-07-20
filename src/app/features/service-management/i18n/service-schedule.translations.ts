@@ -16,9 +16,14 @@ export interface ServiceScheduleTranslations {
   readonly backToBranchServices: string;
   readonly branch: string;
   readonly service: string;
+  readonly day: string;
   readonly startTime: string;
   readonly endTime: string;
   readonly workDays: string;
+  readonly weeklySchedule: string;
+  readonly addTimeSlot: string;
+  readonly removeTimeSlot: string;
+  readonly closedDay: string;
   readonly slotCodeRequired: string;
   readonly slotCode: string;
   readonly operationalStatus: string;
@@ -30,6 +35,7 @@ export interface ServiceScheduleTranslations {
   readonly modifiedOn: string;
   readonly loading: string;
   readonly save: string;
+  readonly saveChanges: string;
   readonly cancel: string;
   readonly close: string;
   readonly refresh: string;
@@ -47,6 +53,12 @@ export interface ServiceScheduleTranslations {
   readonly invalidTime: string;
   readonly timeRangeInvalid: string;
   readonly workDaysRequired: string;
+  readonly timeSlotsRequired: string;
+  readonly startTimeRequired: string;
+  readonly endTimeRequired: string;
+  readonly duplicateTimeSlot: string;
+  readonly overlappingTimeSlots: string;
+  readonly disableDayConfirm: string;
   readonly slotCodeRequiredError: string;
   readonly slotCodeMaxLength: string;
   readonly slotCodeAlreadyExists: string;
@@ -72,21 +84,26 @@ export const SERVICE_SCHEDULE_TRANSLATIONS: Record<AppLanguage, ServiceScheduleT
     backToBranchServices: 'العودة إلى خدمات الفرع',
     branch: 'الفرع',
     service: 'الخدمة',
+    day: 'اليوم',
     startTime: 'وقت البداية',
     endTime: 'وقت النهاية',
     workDays: 'أيام العمل',
-    slotCodeRequired: 'يتطلب كود شباك',
-    slotCode: 'كود الشباك',
+    weeklySchedule: 'الجدول الأسبوعي',
+    addTimeSlot: 'إضافة موعد',
+    removeTimeSlot: 'حذف الموعد',
+    closedDay: 'مغلق',
+    slotCodeRequired: 'يتطلب كود',
+    slotCode: 'الكود',
     operationalStatus: 'الحالة التشغيلية',
     operational: 'تعمل',
     currentlyUnavailable: 'غير متاحة حاليا',
-    currentlyUnavailableHint:
-      'الجدول محفوظ، لكن الخدمة غير متاحة حاليا بسبب حالة الفرع أو الخدمة. لا يمكن حفظ تغييرات حتى تصبح متاحة.',
+    currentlyUnavailableHint: 'الجدول محفوظ، لكن الخدمة غير متاحة حاليا بسبب حالة الفرع أو الخدمة. لا يمكن حفظ تغييرات حتى تصبح متاحة.',
     rowVersion: 'إصدار السجل',
     createdOn: 'تاريخ الإنشاء',
     modifiedOn: 'آخر تعديل',
     loading: 'جاري التحميل...',
     save: 'حفظ',
+    saveChanges: 'حفظ التغييرات',
     cancel: 'إلغاء',
     close: 'إغلاق',
     refresh: 'تحديث',
@@ -104,9 +121,15 @@ export const SERVICE_SCHEDULE_TRANSLATIONS: Record<AppLanguage, ServiceScheduleT
     invalidTime: 'أدخل وقتا صحيحا.',
     timeRangeInvalid: 'وقت النهاية يجب أن يكون بعد وقت البداية.',
     workDaysRequired: 'اختر يوم عمل واحدا على الأقل.',
-    slotCodeRequiredError: 'كود الشباك مطلوب عند تفعيل هذا الخيار.',
+    timeSlotsRequired: 'يجب إضافة فترة زمنية واحدة على الأقل لهذا اليوم.',
+    startTimeRequired: 'وقت البداية مطلوب.',
+    endTimeRequired: 'وقت النهاية مطلوب.',
+    duplicateTimeSlot: 'لا يمكن تكرار نفس الفترة داخل اليوم.',
+    overlappingTimeSlots: 'لا يمكن أن تتداخل الفترات داخل اليوم.',
+    disableDayConfirm: 'تعطيل هذا اليوم سيحذف كل الفترات المضبوطة له.',
+    slotCodeRequiredError: 'الكود مطلوب عند تفعيل هذا الخيار.',
     slotCodeMaxLength: 'الحد الأقصى 100 حرف.',
-    slotCodeAlreadyExists: 'كود الشباك مستخدم بالفعل.',
+    slotCodeAlreadyExists: 'الكود مستخدم بالفعل.',
     scheduleAlreadyExists: 'تم إنشاء جدول لهذه الخدمة بالفعل. تم تحميل آخر نسخة.',
     concurrencyError: 'تم تعديل الجدول بواسطة مستخدم آخر. حمل آخر نسخة قبل الحفظ.',
     discardChangesConfirm: 'لديك تغييرات غير محفوظة. هل تريد تجاهلها؟',
@@ -135,11 +158,16 @@ export const SERVICE_SCHEDULE_TRANSLATIONS: Record<AppLanguage, ServiceScheduleT
     backToBranchServices: 'Back to Branch Services',
     branch: 'Branch',
     service: 'Service',
+    day: 'Day',
     startTime: 'Start Time',
     endTime: 'End Time',
     workDays: 'Work Days',
-    slotCodeRequired: 'Slot code required',
-    slotCode: 'Slot Code',
+    weeklySchedule: 'Weekly Schedule',
+    addTimeSlot: 'Add Schedule',
+    removeTimeSlot: 'Delete Schedule',
+    closedDay: 'Closed',
+    slotCodeRequired: 'Code required',
+    slotCode: 'Code',
     operationalStatus: 'Operational Status',
     operational: 'Operational',
     currentlyUnavailable: 'Currently Unavailable',
@@ -150,6 +178,7 @@ export const SERVICE_SCHEDULE_TRANSLATIONS: Record<AppLanguage, ServiceScheduleT
     modifiedOn: 'Last Modified',
     loading: 'Loading...',
     save: 'Save',
+    saveChanges: 'Save Changes',
     cancel: 'Cancel',
     close: 'Close',
     refresh: 'Refresh',
@@ -166,10 +195,16 @@ export const SERVICE_SCHEDULE_TRANSLATIONS: Record<AppLanguage, ServiceScheduleT
     requiredField: 'This field is required.',
     invalidTime: 'Enter a valid time.',
     timeRangeInvalid: 'End time must be after start time.',
-    workDaysRequired: 'Select at least one work day.',
-    slotCodeRequiredError: 'Slot code is required when this option is enabled.',
+    workDaysRequired: 'Select at least one working day.',
+    timeSlotsRequired: 'Add at least one time slot for this day.',
+    startTimeRequired: 'Start time is required.',
+    endTimeRequired: 'End time is required.',
+    duplicateTimeSlot: 'Duplicate time slots are not allowed for the same day.',
+    overlappingTimeSlots: 'Time slots cannot overlap within the same day.',
+    disableDayConfirm: 'Disabling this day will remove all configured time slots for it.',
+    slotCodeRequiredError: 'Code is required when this option is enabled.',
     slotCodeMaxLength: 'Maximum length is 100 characters.',
-    slotCodeAlreadyExists: 'This slot code is already used.',
+    slotCodeAlreadyExists: 'This code is already used.',
     scheduleAlreadyExists: 'A schedule already exists. The latest schedule was loaded.',
     concurrencyError: 'The schedule was modified by another user. Reload the latest data before saving.',
     discardChangesConfirm: 'You have unsaved changes. Discard them?',

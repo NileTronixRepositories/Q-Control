@@ -64,18 +64,12 @@
         aria-atomic="true"
         data-testid="svc-tree-initial-loading"
       >
-        <div class="flex items-center gap-3 text-sky-800">
-          <span
-            class="relative grid size-10 shrink-0 place-items-center rounded-xl border border-sky-100 bg-white text-lg shadow-sm"
-            aria-hidden="true"
-          >
-            <i class="bi bi-diagram-3-fill"></i>
-            <span
-              class="absolute -end-1 -top-1 size-3 rounded-full border-2 border-white bg-cyan-500 motion-safe:animate-pulse motion-reduce:animate-none"
-            ></span>
-          </span>
-          <span class="text-xs font-black sm:text-sm">{{ translations().loading }}</span>
-        </div>
+        <app-niletronix-loading-state
+          [title]="translations().loading"
+          icon="bi bi-diagram-3-fill"
+          variant="inline"
+          size="sm"
+        />
         <div class="grid gap-2.5" aria-hidden="true">
           @for (row of loadingSkeletonRows; track $index) {
             <div
@@ -115,17 +109,11 @@
         aria-atomic="true"
         data-testid="svc-tree-refresh-loading"
       >
-        <div class="flex items-center gap-2 text-xs font-extrabold">
-          <i
-            class="bi bi-arrow-repeat motion-safe:animate-spin motion-reduce:animate-none"
-            aria-hidden="true"
-          ></i>
-          <span>{{ translations().loading }}</span>
-        </div>
-        <span
-          class="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-cyan-500 via-sky-400 to-cyan-500 motion-safe:animate-pulse motion-reduce:animate-none"
-          aria-hidden="true"
-        ></span>
+        <app-niletronix-loading-state
+          [title]="translations().loading"
+          variant="inline"
+          size="sm"
+        />
       </div>
     }
 
@@ -170,6 +158,9 @@
             <div class="svc-tree-content">
               <div class="svc-tree-meta">
                 <strong class="svc-tree-name">{{ entry.name }}</strong>
+                @if (entry.serviceCodeLabel) {
+                  <span class="svc-tree-code">{{ entry.serviceCodeLabel }}</span>
+                }
                 <span class="svc-tree-order"
                   >{{ translations().orderNo }}: {{ entry.node.orderNo }}</span
                 >
@@ -202,6 +193,17 @@
             </div>
 
             <div class="svc-tree-actions">
+              @if (entry.canManageMedia) {
+                <button
+                  type="button"
+                  class="svc-tree-action-btn"
+                  [title]="manageMediaLabel()"
+                  [attr.aria-label]="manageMediaLabel()"
+                  (click)="requestManageMedia(entry.node, $event)"
+                >
+                  <i class="bi bi-images" aria-hidden="true"></i>
+                </button>
+              }
               @if (entry.canManageWorkflow) {
                 <button
                   type="button"
@@ -291,6 +293,18 @@
                   (click)="requestRestore(entry.node, $event)"
                 >
                   <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
+                </button>
+              }
+              @if (entry.canPermanentDelete) {
+                <button
+                  type="button"
+                  class="svc-tree-action-btn svc-tree-action-btn--danger"
+                  [disabled]="actionsDisabled()"
+                  [title]="translations().permanentlyDelete"
+                  [attr.aria-label]="translations().permanentlyDelete"
+                  (click)="requestPermanentDelete(entry.node, $event)"
+                >
+                  <i class="bi bi-trash-fill" aria-hidden="true"></i>
                 </button>
               }
             </div>

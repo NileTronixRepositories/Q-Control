@@ -240,6 +240,22 @@
   white-space: nowrap;
 }
 
+
+.svc-tree-code {
+  background: #ecfeff;
+  border: 1px solid #a5f3fc;
+  border-radius: 999px;
+  color: #0e7490;
+  flex: 0 1 auto;
+  font-size: 10px;
+  font-weight: 900;
+  line-height: 1;
+  max-width: 14rem;
+  overflow: hidden;
+  padding: 4px 7px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .svc-tree-order {
   color: #64748b;
   flex: 0 0 auto;

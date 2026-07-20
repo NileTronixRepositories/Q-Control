@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
 
+import { NiletronixLoadingStateComponent } from '../../../../shared/components/niletronix-loading-state/niletronix-loading-state.component';
 import { AppDirection, AppLanguage } from '../../../../shared/models/app-language.model';
 import { ServiceManagementTranslations } from '../../i18n/service-management.translations';
 import { ServiceTreeNode } from '../../models/service-management.model';
@@ -9,6 +10,7 @@ interface ServiceHierarchyTreeEntry {
   readonly level: number;
   readonly offset: number;
   readonly name: string;
+  readonly serviceCodeLabel: string | null;
   readonly isExpanded: boolean;
   readonly hasChildren: boolean;
   readonly rowClassList: string;
@@ -32,8 +34,10 @@ interface ServiceHierarchyTreeEntry {
   readonly canUnassign: boolean;
   readonly canDelete: boolean;
   readonly canRestore: boolean;
+  readonly canPermanentDelete: boolean;
   readonly canManageWorkflow: boolean;
   readonly canManageSchedule: boolean;
+  readonly canManageMedia: boolean;
 }
 
 interface ServiceHierarchyLoadingRow {
@@ -57,7 +61,7 @@ const INFO_STATUS_CLASSES = 'svc-tree-chip--info';
 @Component({
   selector: 'app-service-hierarchy-tree',
   standalone: true,
-  imports: [],
+  imports: [NiletronixLoadingStateComponent],
   templateUrl: './service-hierarchy-tree.component.html',
   styleUrl: './service-hierarchy-tree.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -85,16 +89,20 @@ export class ServiceHierarchyTreeComponent {
   readonly canUpdate = input.required<boolean>();
   readonly canDelete = input.required<boolean>();
   readonly canRestore = input.required<boolean>();
+  readonly canPermanentDelete = input(false);
   readonly canCreateChildFor = input<(node: ServiceTreeNode) => boolean>(() => true);
   readonly selectableLeaves = input(false);
+  readonly canSelectLeafNode = input<(node: ServiceTreeNode) => boolean>(() => true);
   readonly selectedLeafIds = input<ReadonlySet<number>>(new Set());
   readonly draggableLeaves = input(false);
+  readonly canDragLeafNode = input<(node: ServiceTreeNode) => boolean>(() => true);
   readonly dropTarget = input(false);
   readonly canUnassign = input(false);
   readonly unassigning = input(false);
   readonly unassignLabel = input('');
   readonly canDeleteNode = input<(node: ServiceTreeNode) => boolean>(() => true);
   readonly canRestoreNode = input<(node: ServiceTreeNode) => boolean>(() => true);
+  readonly canPermanentDeleteNode = input<(node: ServiceTreeNode) => boolean>(() => true);
   readonly canUnassignNode = input<(node: ServiceTreeNode) => boolean>(() => true);
   readonly actionsDisabled = input(false);
   readonly canManageWorkflows = input(false);
@@ -103,6 +111,9 @@ export class ServiceHierarchyTreeComponent {
   readonly canManageSchedules = input(false);
   readonly canManageScheduleNode = input<(node: ServiceTreeNode) => boolean>(() => false);
   readonly manageScheduleLabel = input('');
+  readonly canManageMedia = input(false);
+  readonly canManageMediaNode = input<(node: ServiceTreeNode) => boolean>(() => false);
+  readonly manageMediaLabel = input('');
 
   readonly refresh = output<void>();
   readonly includeInactiveChange = output<boolean>();
@@ -115,6 +126,7 @@ export class ServiceHierarchyTreeComponent {
   readonly editNode = output<ServiceTreeNode>();
   readonly deleteNode = output<ServiceTreeNode>();
   readonly restoreNode = output<ServiceTreeNode>();
+  readonly permanentDeleteNode = output<ServiceTreeNode>();
   readonly leafSelectionChange = output<{ readonly node: ServiceTreeNode; readonly selected: boolean }>();
   readonly leafDragStarted = output<ServiceTreeNode>();
   readonly leafDragEnded = output<void>();
@@ -122,6 +134,7 @@ export class ServiceHierarchyTreeComponent {
   readonly unassignNode = output<ServiceTreeNode>();
   readonly manageWorkflows = output<ServiceTreeNode>();
   readonly manageSchedule = output<ServiceTreeNode>();
+  readonly manageMedia = output<ServiceTreeNode>();
 
   public readonly isDropActive = signal(false);
 
@@ -177,6 +190,16 @@ export class ServiceHierarchyTreeComponent {
     this.manageSchedule.emit(node);
   }
 
+
+  public requestManageMedia(node: ServiceTreeNode, event: MouseEvent): void {
+    event.stopPropagation();
+
+    if (!this.canManageMedia() || !this.canManageMediaNode()(node)) {
+      return;
+    }
+
+    this.manageMedia.emit(node);
+  }
   public onLeafSelectionChange(node: ServiceTreeNode, event: Event): void {
     const checked = (event.target as HTMLInputElement).checked;
     this.leafSelectionChange.emit({ node, selected: checked });
@@ -293,6 +316,21 @@ export class ServiceHierarchyTreeComponent {
     this.restoreNode.emit(node);
   }
 
+  public requestPermanentDelete(node: ServiceTreeNode, event: MouseEvent): void {
+    event.stopPropagation();
+
+    if (
+      this.actionsDisabled() ||
+      !this.canPermanentDelete() ||
+      !node.isDeleted ||
+      !this.canPermanentDeleteNode()(node)
+    ) {
+      return;
+    }
+
+    this.permanentDeleteNode.emit(node);
+  }
+
   private flattenNodes(
     nodes: readonly ServiceTreeNode[],
     expandedIds: ReadonlySet<number>,
@@ -326,6 +364,7 @@ export class ServiceHierarchyTreeComponent {
       level: depth + 1,
       offset: depth * 22,
       name: this.language() === 'ar' ? node.arabicName : node.englishName,
+      serviceCodeLabel: this.serviceCodeLabel(node),
       isExpanded,
       hasChildren,
       rowClassList: `${ROW_BASE_CLASSES} ${isSelected ? ROW_SELECTED_CLASSES : ROW_DEFAULT_CLASSES}`,
@@ -351,10 +390,12 @@ export class ServiceHierarchyTreeComponent {
       canUnassign: this.isUnassignableLeaf(node),
       canDelete: this.canDelete() && !node.isDeleted && this.canDeleteNode()(node),
       canRestore: this.canRestore() && node.isDeleted && this.canRestoreNode()(node),
+      canPermanentDelete: this.canPermanentDelete() && node.isDeleted && this.canPermanentDeleteNode()(node),
       canManageWorkflow:
         this.canManageWorkflows() && this.canManageWorkflowNode()(node),
       canManageSchedule:
         this.canManageSchedules() && this.canManageScheduleNode()(node),
+      canManageMedia: this.canManageMedia() && this.canManageMediaNode()(node),
     };
   }
 
@@ -374,7 +415,8 @@ export class ServiceHierarchyTreeComponent {
       !node.hasChildren &&
       !node.isDeleted &&
       node.isActive &&
-      node.effectiveIsActive
+      node.effectiveIsActive &&
+      this.canSelectLeafNode()(node)
     );
   }
 
@@ -386,7 +428,8 @@ export class ServiceHierarchyTreeComponent {
       !node.isDeleted &&
       node.isActive &&
       node.effectiveIsActive &&
-      node.isAssignedToCurrentBranch !== true
+      node.isAssignedToCurrentBranch !== true &&
+      this.canDragLeafNode()(node)
     );
   }
 
@@ -403,6 +446,11 @@ export class ServiceHierarchyTreeComponent {
     return node.isAssignedToCurrentBranch
       ? this.translations().assignedToCurrentBranch
       : this.translations().notAssignedToCurrentBranch;
+  }
+
+  private serviceCodeLabel(node: ServiceTreeNode): string | null {
+    const code = node.serviceCode?.trim();
+    return code ? code : null;
   }
 
   private statusClasses(node: ServiceTreeNode): string {

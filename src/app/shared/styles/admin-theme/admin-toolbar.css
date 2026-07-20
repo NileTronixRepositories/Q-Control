@@ -73,13 +73,13 @@ body :where(.waiting-areas-page) .admin-filter-field :where(.form-control, .form
   min-height: 46px !important;
   padding-block: 0 !important;
   padding-inline: 42px 14px !important;
-  color: var(--q-text-primary) !important;
+  color: var(--q-text-secondary) !important;
   background: rgb(var(--q-surface-card-rgb, 255 255 255) / 0.96) !important;
   border: 1px solid rgb(var(--q-primary-rgb) / 0.18) !important;
   border-radius: 12px !important;
   box-shadow: 0 8px 18px rgb(var(--q-primary-rgb) / 0.04) !important;
   font-size: 0.86rem !important;
-  font-weight: 750 !important;
+  font-weight: 500 !important;
   line-height: 46px !important;
   transition:
     border-color var(--nt-motion-base, 160ms) var(--nt-motion-ease, ease),

@@ -167,10 +167,7 @@
 
         <!-- Loading -->
         @if (activeLoading()) {
-          <p class="state-note">
-            <i class="bi bi-arrow-repeat animate-spin"></i>
-            {{ translations().loading }}
-          </p>
+          <app-niletronix-loading-state [title]="translations().loading" variant="inline" size="sm" />
         }
 
         <!-- Table -->
@@ -432,10 +429,7 @@
         </div>
 
         @if (deletedLoading()) {
-          <p class="state-note">
-            <i class="bi bi-arrow-repeat animate-spin"></i>
-            {{ translations().loading }}
-          </p>
+          <app-niletronix-loading-state [title]="translations().loading" variant="inline" size="sm" />
         }
 
         @if (deletedDisplaysPage().data.length > 0) {
@@ -677,10 +671,7 @@
         }
 
         @if (panelMode() === 'view' && !selectedDetails()) {
-          <p class="state-note">
-            <i class="bi bi-arrow-repeat"></i>
-            {{ translations().loading }}
-          </p>
+          <app-niletronix-loading-state [title]="translations().loading" variant="inline" size="sm" />
         }
         <!-- Form -->
         @if (panelMode() === 'create' || panelMode() === 'edit') {

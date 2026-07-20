@@ -1,7 +1,8 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { computed, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { vi } from 'vitest';
 
 import { AuthSessionService } from '../../../auth/services/auth-session.service';
@@ -29,6 +30,15 @@ describe('ServicesComponent', () => {
     readonly getAvailableParents: ReturnType<typeof vi.fn>;
     readonly getServices: ReturnType<typeof vi.fn>;
     readonly resolveMediaUrl: ReturnType<typeof vi.fn>;
+    readonly createService: ReturnType<typeof vi.fn>;
+    readonly updateService: ReturnType<typeof vi.fn>;
+    readonly getServiceDetails: ReturnType<typeof vi.fn>;
+    readonly getServiceImages: ReturnType<typeof vi.fn>;
+    readonly uploadServiceLogo: ReturnType<typeof vi.fn>;
+    readonly uploadServiceIcon: ReturnType<typeof vi.fn>;
+    readonly uploadServiceAds: ReturnType<typeof vi.fn>;
+    readonly deleteServiceImage: ReturnType<typeof vi.fn>;
+    readonly permanentlyDeleteService: ReturnType<typeof vi.fn>;
   };
 
   beforeEach(async () => {
@@ -37,6 +47,15 @@ describe('ServicesComponent', () => {
       getAvailableParents: vi.fn(() => of([])),
       getServices: vi.fn(() => of(emptyPage)),
       resolveMediaUrl: vi.fn((value: string | null) => value),
+      createService: vi.fn(() => of({ id: 101, rowVersion: 'rv', message: 'Created' })),
+      updateService: vi.fn(() => of({ id: 101, rowVersion: 'rv', message: 'Updated' })),
+      getServiceDetails: vi.fn(() => of(createServiceDetails())),
+      getServiceImages: vi.fn(() => of([])),
+      uploadServiceLogo: vi.fn(),
+      uploadServiceIcon: vi.fn(),
+      uploadServiceAds: vi.fn(),
+      deleteServiceImage: vi.fn(),
+      permanentlyDeleteService: vi.fn(() => of({ serviceId: 101, message: 'Deleted permanently' })),
     };
 
     await TestBed.configureTestingModule({
@@ -73,6 +92,7 @@ describe('ServicesComponent', () => {
             canUpdate: signal(true).asReadonly(),
             canDelete: signal(true).asReadonly(),
             canRestore: signal(true).asReadonly(),
+            canDeletePermanent: signal(true).asReadonly(),
             canAssignBranchServices: signal(false).asReadonly(),
             canViewStartOptions: signal(false).asReadonly(),
           },
@@ -102,4 +122,124 @@ describe('ServicesComponent', () => {
       expect.objectContaining({ scope: 'BranchScoped', pageNumber: 1 }),
     );
   });
+
+  it('submits null service-code fields by default when creating a service', () => {
+    fixture.componentInstance.openCreateRoot();
+    fillRequiredServiceFields();
+
+    fixture.componentInstance.saveService();
+
+    expect(api.createService).toHaveBeenCalledWith(
+      expect.objectContaining({ serviceCode: null, isServiceCodeRequired: false }),
+    );
+  });
+
+  it('trims the service code when the toggle is enabled', () => {
+    fixture.componentInstance.openCreateRoot();
+    fillRequiredServiceFields();
+    fixture.componentInstance.serviceForm.controls.isServiceCodeRequired.setValue(true);
+    fixture.componentInstance.serviceForm.controls.serviceCode.setValue(' MED-001 ');
+
+    fixture.componentInstance.saveService();
+
+    expect(api.createService).toHaveBeenCalledWith(
+      expect.objectContaining({ serviceCode: 'MED-001', isServiceCodeRequired: true }),
+    );
+  });
+
+  it('clears and submits null when service-code requirement is disabled', () => {
+    fixture.componentInstance.openCreateRoot();
+    fillRequiredServiceFields();
+    fixture.componentInstance.serviceForm.controls.isServiceCodeRequired.setValue(false);
+    fixture.componentInstance.serviceForm.controls.serviceCode.setValue('OLD-001');
+    fixture.componentInstance.onServiceCodeRequiredChange({ target: { checked: false } } as unknown as Event);
+
+    fixture.componentInstance.saveService();
+
+    expect(fixture.componentInstance.serviceForm.controls.serviceCode.value).toBe('');
+    expect(api.createService).toHaveBeenCalledWith(
+      expect.objectContaining({ serviceCode: null, isServiceCodeRequired: false }),
+    );
+  });
+
+  it('keeps the create form open and marks service code on duplicate-code conflict', () => {
+    fixture.componentInstance.openCreateRoot();
+    fillRequiredServiceFields();
+    fixture.componentInstance.serviceForm.controls.isServiceCodeRequired.setValue(true);
+    fixture.componentInstance.serviceForm.controls.serviceCode.setValue('MED-001');
+
+    api.createService.mockReturnValueOnce(
+      throwError(
+        () =>
+          new HttpErrorResponse({
+            status: 409,
+            error: { code: 'Services.Create.ServiceCodeAlreadyExists' },
+          }),
+      ),
+    );
+
+    fixture.componentInstance.saveService();
+    fixture.detectChanges();
+
+    expect(fixture.componentInstance.store.panelMode()).toBe('create');
+    expect(fixture.componentInstance.serviceForm.controls.serviceCode.hasError('serviceCodeExists')).toBe(true);
+    expect(fixture.nativeElement.textContent).toContain('already used');
+  });
+
+
+  it('renders the service media manager after service details load', () => {
+    fixture.componentInstance.openView(101);
+    fixture.detectChanges();
+
+    expect(api.getServiceDetails).toHaveBeenCalledWith(101);
+    expect(api.getServiceImages).toHaveBeenCalledWith(101, undefined);
+    expect(fixture.nativeElement.querySelector('app-service-media-manager')).not.toBeNull();
+  });
+  function fillRequiredServiceFields(): void {
+    fixture.componentInstance.serviceForm.patchValue({
+      arabicName: 'Arabic Service',
+      englishName: 'Service',
+      isTicketIssuable: 'true',
+      rangePrefix: 'S',
+    });
+  }
+function createServiceDetails() {
+  return {
+    id: 101,
+    parentServiceId: null,
+    scope: 'Global' as const,
+    ownerBranchId: null,
+    ownerBranchArabicName: null,
+    ownerBranchEnglishName: null,
+    isOwnedByCurrentBranch: false,
+    isAssignedToCurrentBranch: null,
+    canEditDefinition: true,
+    arabicName: 'Arabic Service',
+    englishName: 'Service',
+    parentServiceNameAr: null,
+    parentServiceNameEn: null,
+    logoUrl: null,
+    serviceCode: null,
+    isServiceCodeRequired: false,
+    isActive: true,
+    effectiveIsActive: true,
+    isTicketIssuable: true,
+    hasChildren: false,
+    canIssueTicket: true,
+    isDeleted: false,
+    orderNo: 0,
+    priority: 0,
+    weight: 0,
+    rowVersion: 'rv',
+    arabicUserMessage: null,
+    englishUserMessage: null,
+    isClientInputRequired: false,
+    hasReservation: false,
+    rangePrefix: 'S',
+    rangeStartNumber: 1,
+    rangeEndNumber: 999,
+    waitingDuration: 0,
+    noOfTicketCopies: 1,
+  };
+  }
 });

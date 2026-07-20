@@ -3,6 +3,7 @@ import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, computed, inject
 import { Router } from '@angular/router';
 import { finalize, Observable } from 'rxjs';
 
+import { NiletronixLoadingStateComponent } from '../../../../shared/components/niletronix-loading-state/niletronix-loading-state.component';
 import { TechnicalAdminPageHeroComponent } from '../../../../shared/components/technical-admin-page-hero/technical-admin-page-hero.component';
 
 import { AuthSessionService } from '../../../auth/services/auth-session.service';
@@ -33,7 +34,7 @@ interface FlatRequestServiceNode {
 @Component({
   selector: 'app-globalization-requests',
   standalone: true,
-  imports: [TechnicalAdminPageHeroComponent],
+  imports: [TechnicalAdminPageHeroComponent, NiletronixLoadingStateComponent],
   providers: [ServiceGlobalizationStore],
   templateUrl: './globalization-requests.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,

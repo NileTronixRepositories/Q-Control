@@ -6,7 +6,7 @@
     icon="bi bi-diagram-3-fill"
   >
     <div hero-actions class="branch-services-actions">
-      @if (canViewOwnGlobalizationRequests() && store.hasSelectedBranch()) {
+      @if (canOpenGlobalizationRequests() && store.hasSelectedBranch()) {
         <button
           type="button"
           class="branch-services-secondary-btn relative"
@@ -121,8 +121,10 @@
         [canUpdate]="false"
         [canDelete]="canDeleteBranchServices()"
         [canRestore]="canRestoreBranchServices()"
+        [canPermanentDelete]="canDeletePermanentBranchServices()"
         [canDeleteNode]="canDeleteBranchService"
         [canRestoreNode]="canRestoreBranchService"
+        [canPermanentDeleteNode]="canPermanentDeleteBranchService"
         [canUnassign]="canUnassignBranchServices()"
         [canUnassignNode]="canUnassignBranchService"
         [canManageWorkflows]="canViewWorkflows()"
@@ -131,6 +133,9 @@
         [canManageSchedules]="canViewSchedules()"
         [canManageScheduleNode]="canManageScheduleFor"
         [manageScheduleLabel]="scheduleTranslations().manageSchedule"
+        [canManageMedia]="canViewDetails()"
+        [canManageMediaNode]="canManageMediaFor"
+        [manageMediaLabel]="serviceTranslations().serviceMedia"
         [unassigning]="store.unassigning()"
         [unassignLabel]="translations().unassign"
         [actionsDisabled]="branchActionsDisabled()"
@@ -143,14 +148,16 @@
         (createChild)="openCreateSubtreeDialog($event)"
         (deleteNode)="requestLifecycle($event, 'delete')"
         (restoreNode)="requestLifecycle($event, 'restore')"
+        (permanentDeleteNode)="requestLifecycle($event, 'permanentDelete')"
         (unassignNode)="requestUnassign($event)"
         (manageWorkflows)="openServiceWorkflows($event)"
         (manageSchedule)="openServiceSchedule($event)"
+        (manageMedia)="openServiceMedia($event)"
       />
     }
   }
 
-  @if (canViewOwnGlobalizationRequests() && store.selectedBranchId(); as branchId) {
+  @if (canOpenGlobalizationRequests() && store.selectedBranchId(); as branchId) {
     <app-branch-globalization-requests
       [branchId]="branchId"
       [open]="store.globalizationRequestsDialogOpen()"
@@ -168,6 +175,7 @@
     [serviceTranslations]="serviceTranslations()"
     [language]="language()"
     [direction]="direction()"
+    [canSelectNode]="canAssignBranchService"
     (closed)="store.closeAssignDialog()"
     (refresh)="loadServiceCentralTree()"
     (toggleNode)="toggleCentralNode($event)"
@@ -205,5 +213,33 @@
       (closed)="store.closeLifecycleConfirm()"
       (confirmed)="confirmLifecycle()"
     />
+  }
+
+  @if (mediaDetails(); as details) {
+    <div class="branch-services-media-backdrop" (click)="closeServiceMedia()"></div>
+    <aside class="branch-services-media-dialog" role="dialog" [attr.aria-label]="serviceTranslations().serviceMedia">
+      <header class="branch-services-media-header">
+        <div>
+          <p>{{ serviceTranslations().serviceMedia }}</p>
+          <h2>{{ language() === 'ar' ? details.arabicName : details.englishName }}</h2>
+        </div>
+        <button type="button" [attr.aria-label]="translations().close" (click)="closeServiceMedia()">
+          <i class="bi bi-x-lg" aria-hidden="true"></i>
+        </button>
+      </header>
+      <app-service-media-manager
+        [service]="details"
+        [translations]="serviceTranslations()"
+        [canManage]="canManageLoadedMedia(details)"
+        (message)="handleMediaMessage($event)"
+        (serviceChange)="handleMediaServiceChange($event)"
+        (mediaChanged)="handleMediaChanged()"
+      />
+    </aside>
+  } @else if (mediaLoading()) {
+    <div class="branch-services-media-backdrop"></div>
+    <aside class="branch-services-media-dialog branch-services-media-dialog--loading" role="dialog" [attr.aria-label]="serviceTranslations().serviceMedia">
+      <app-niletronix-loading-state [title]="serviceTranslations().loading" variant="panel" />
+    </aside>
   }
 </section>

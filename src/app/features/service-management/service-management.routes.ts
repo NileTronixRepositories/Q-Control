@@ -16,7 +16,9 @@ export const SERVICE_MANAGEMENT_ROUTES: Routes = [
       requiredAnyPermissions: ['Services.ViewAll', 'BranchServices.Assign'],
     },
     loadComponent: () =>
-      import('./pages/services/services.component').then((component) => component.ServicesComponent),
+      import('./pages/services/services.component').then(
+        (component) => component.ServicesComponent,
+      ),
   },
   {
     path: 'branch-services',
@@ -100,5 +102,3 @@ export const SERVICE_MANAGEMENT_ROUTES: Routes = [
       ),
   },
 ];
-
-

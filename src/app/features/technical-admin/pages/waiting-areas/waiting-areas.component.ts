@@ -2,6 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TechnicalAdminMobileRecordCardComponent } from '../../../../shared/components/technical-admin-mobile-record-card/technical-admin-mobile-record-card.component';
+import { NiletronixLoadingStateComponent } from '../../../../shared/components/niletronix-loading-state/niletronix-loading-state.component';
 import { TechnicalAdminPageHeroComponent } from '../../../../shared/components/technical-admin-page-hero/technical-admin-page-hero.component';
 import { Router } from '@angular/router';
 
@@ -98,7 +99,7 @@ const WAITING_AREA_TRANSLATIONS: Record<AppLanguage, WaitingAreaPageTranslations
     branch: '\u0627\u0644\u0641\u0631\u0639',
     audioDevice: '\u062c\u0647\u0627\u0632 \u0627\u0644\u0635\u0648\u062a',
     controlDevice: '\u062c\u0647\u0627\u0632 \u0627\u0644\u062a\u062d\u0643\u0645',
-    windowsCount: '\u0639\u062f\u062f \u0627\u0644\u0634\u0628\u0627\u0628\u064a\u0643',
+    windowsCount: 'عدد أماكن الخدمات',
     actions: '\u0627\u0644\u0625\u062c\u0631\u0627\u0621\u0627\u062a',
     view: '\u0639\u0631\u0636',
     edit: '\u062a\u0639\u062f\u064a\u0644',
@@ -135,7 +136,7 @@ const WAITING_AREA_TRANSLATIONS: Record<AppLanguage, WaitingAreaPageTranslations
   },
   en: {
     title: 'Waiting Areas',
-    description: 'Manage branch waiting areas, audio devices, control devices, and related windows.',
+    description: 'Manage branch waiting areas, audio devices, control devices, and related service locations.',
     addButton: 'Add Waiting Area',
     searchPlaceholder: 'Search by name, device, or number',
     branchFilter: 'Branch',
@@ -146,7 +147,7 @@ const WAITING_AREA_TRANSLATIONS: Record<AppLanguage, WaitingAreaPageTranslations
     branch: 'Branch',
     audioDevice: 'Audio Device',
     controlDevice: 'Control Device',
-    windowsCount: 'Windows Count',
+    windowsCount: 'Service Locations Count',
     actions: 'Actions',
     view: 'View',
     edit: 'Edit',
@@ -195,7 +196,7 @@ const EMPTY_PAGE: Pagination<WaitingAreaListItem> = {
 
 @Component({
   selector: 'app-waiting-areas',
-  imports: [ReactiveFormsModule, TechnicalAdminMobileRecordCardComponent, TechnicalAdminPageHeroComponent],
+  imports: [ReactiveFormsModule, TechnicalAdminMobileRecordCardComponent, TechnicalAdminPageHeroComponent, NiletronixLoadingStateComponent],
   templateUrl: './waiting-areas.component.html',
   styleUrl: './waiting-areas.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush

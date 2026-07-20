@@ -1,7 +1,8 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
-import { of, Subject } from 'rxjs';
+import { of, Subject, throwError } from 'rxjs';
 
 import { AuthSessionService } from '../../../auth/services/auth-session.service';
 import { BranchManagementApiService } from '../../../technical-admin/services/branch-management-api.service';
@@ -20,6 +21,7 @@ describe('GlobalizationRequestsComponent responsive presentation', () => {
   let fixture: ComponentFixture<GlobalizationRequestsComponent>;
   let api: {
     readonly getRequests: ReturnType<typeof vi.fn>;
+    readonly getRequestDetails: ReturnType<typeof vi.fn>;
     readonly approveRequest: ReturnType<typeof vi.fn>;
     readonly rejectRequest: ReturnType<typeof vi.fn>;
   };
@@ -27,6 +29,7 @@ describe('GlobalizationRequestsComponent responsive presentation', () => {
   beforeEach(async () => {
     api = {
       getRequests: vi.fn(() => of(createPage())),
+      getRequestDetails: vi.fn(() => of(createDetails())),
       approveRequest: vi.fn(),
       rejectRequest: vi.fn(),
     };
@@ -177,6 +180,47 @@ describe('GlobalizationRequestsComponent responsive presentation', () => {
     expect(api.getRequests).toHaveBeenCalledTimes(2);
     expect(component.store.page().data[0].status).toBe('Approved');
   });
+  it('loads request details only through the details endpoint', () => {
+    const component = fixture.componentInstance as unknown as {
+      openDetails(requestId: number): void;
+      readonly store: ServiceGlobalizationStore;
+    };
+
+    component.openDetails(1);
+    fixture.detectChanges();
+
+    expect(api.getRequestDetails).toHaveBeenCalledWith(1);
+    expect(component.store.selectedDetails()?.requestId).toBe(1);
+  });
+
+  it('closes the decision and reloads the list after a concurrency conflict', () => {
+    api.approveRequest.mockReturnValueOnce(
+      throwError(() =>
+        new HttpErrorResponse({
+          status: 409,
+          error: { detail: 'Request is no longer pending' },
+        }),
+      ),
+    );
+    const component = fixture.componentInstance as unknown as {
+      confirmDecision(): void;
+      readonly store: ServiceGlobalizationStore;
+    };
+    component.store.decisionState.set({
+      action: 'approve',
+      requestId: 1,
+      serviceName: 'Service 1',
+      rowVersion: 'row-version-1',
+    });
+
+    component.confirmDecision();
+    fixture.detectChanges();
+
+    expect(api.approveRequest).toHaveBeenCalledWith(1, 'row-version-1');
+    expect(component.store.decisionState()).toBeNull();
+    expect(component.store.message()?.text).toContain('Request is no longer pending');
+    expect(api.getRequests).toHaveBeenCalledTimes(2);
+  });
 });
 
 function createPage(): PagedServiceGlobalizationRequestsResponse {
@@ -223,5 +267,37 @@ function createItem(
     reviewedOnUtc: status === 'Pending' ? null : '2026-07-13T11:00:00Z',
     rejectionReason: status === 'Rejected' ? 'Needs changes' : null,
     rowVersion: `row-version-${requestId}`,
+  };
+}
+
+function createDetails() {
+  return {
+    requestId: 1,
+    requestType: 'BranchServiceTree' as const,
+    status: 'Pending' as const,
+    branchId: 5,
+    branchArabicName: 'الفرع الرئيسي',
+    branchEnglishName: 'Main Branch',
+    rootServiceId: 101,
+    requestedByApplicationUserId: 'user-1',
+    requestedOnUtc: '2026-07-13T10:00:00Z',
+    reviewedByApplicationUserId: null,
+    reviewedOnUtc: null,
+    rejectionReason: null,
+    parentService: null,
+    services: [
+      {
+        serviceId: 101,
+        parentServiceId: null,
+        arabicName: 'خدمة 1',
+        englishName: 'Service 1',
+        scope: 'BranchScoped' as const,
+        ownerBranchId: 5,
+        isActive: true,
+        isDeleted: false,
+        children: [],
+      },
+    ],
+    rowVersion: 'details-row-version',
   };
 }

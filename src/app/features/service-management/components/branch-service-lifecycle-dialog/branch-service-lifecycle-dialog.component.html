@@ -14,15 +14,15 @@
       <div class="flex min-w-0 items-start gap-3">
         <span
           class="flex size-10 shrink-0 items-center justify-center rounded-full"
-          [class.bg-rose-100]="isDelete()"
-          [class.text-rose-700]="isDelete()"
-          [class.bg-emerald-100]="!isDelete()"
-          [class.text-emerald-700]="!isDelete()"
+          [class.bg-rose-100]="isDelete() || isPermanentDelete()"
+          [class.text-rose-700]="isDelete() || isPermanentDelete()"
+          [class.bg-emerald-100]="!isDelete() && !isPermanentDelete()"
+          [class.text-emerald-700]="!isDelete() && !isPermanentDelete()"
         >
           <i
             class="bi text-lg"
-            [class.bi-trash3]="isDelete()"
-            [class.bi-arrow-counterclockwise]="!isDelete()"
+            [class.bi-trash3]="isDelete() || isPermanentDelete()"
+            [class.bi-arrow-counterclockwise]="!isDelete() && !isPermanentDelete()"
             aria-hidden="true"
           ></i>
         </span>
@@ -54,7 +54,7 @@
           <p>{{ translations().lifecycleDeleteParentWarning }}</p>
         </div>
       }
-      @if (!isDelete()) {
+      @if (!isDelete() && !isPermanentDelete()) {
         <div class="flex gap-3 rounded-xl border border-sky-200 bg-sky-50 p-4 text-sm leading-6 text-sky-900">
           <i class="bi bi-info-circle mt-0.5 shrink-0" aria-hidden="true"></i>
           <p>{{ translations().lifecycleRestoreOperationalWarning }}</p>

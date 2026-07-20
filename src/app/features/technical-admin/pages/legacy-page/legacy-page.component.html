@@ -132,10 +132,7 @@
         }
 
         @if (branchTableLoading()) {
-          <p class="api-note loading-note" role="status">
-            <i class="bi bi-arrow-repeat" aria-hidden="true"></i>
-            {{ translations().loadingLabel }}
-          </p>
+          <app-niletronix-loading-state [title]="translations().loadingLabel" variant="inline" size="sm" />
         }
 
         <div data-testid="branches-desktop" class="table-responsive table-wrap hidden md:block">
@@ -469,8 +466,8 @@
           </header>
 
           @if (branchPanelLoading()) {
-            <p class="api-note loading-note" role="status">{{ translations().loadingLabel }}</p>
-          }
+          <app-niletronix-loading-state [title]="translations().loadingLabel" variant="inline" size="sm" />
+        }
 
           @if (branchPanelMode() === 'view' && selectedBranchDetails(); as details) {
             <dl class="details-list">

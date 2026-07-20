@@ -30,6 +30,7 @@
         [canRestore]="false"
         [selectableLeaves]="true"
         [selectedLeafIds]="selectedLeafIds()"
+        [canSelectLeafNode]="canSelectNode()"
         (refresh)="refresh.emit()"
         (toggleNode)="toggleNode.emit($event)"
         (leafSelectionChange)="updateSelection($event)"

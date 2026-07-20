@@ -18,16 +18,19 @@ import {
 import { Router } from '@angular/router';
 import { finalize } from 'rxjs';
 
+import { NiletronixLoadingStateComponent } from '../../../../shared/components/niletronix-loading-state/niletronix-loading-state.component';
 import { TechnicalAdminPageHeroComponent } from '../../../../shared/components/technical-admin-page-hero/technical-admin-page-hero.component';
 
 import { AuthSessionService } from '../../../auth/services/auth-session.service';
 import { TechnicalAdminI18nStore } from '../../../technical-admin/store/technical-admin-i18n.store';
 import { formatTechnicalAdminApiError } from '../../../technical-admin/utils/api-error-message.util';
 import { ServiceHierarchyTreeComponent } from '../../components/service-hierarchy-tree/service-hierarchy-tree.component';
+import { ServiceMediaManagerComponent } from '../../components/service-media-manager/service-media-manager.component';
 import { SERVICE_MANAGEMENT_TRANSLATIONS } from '../../i18n/service-management.translations';
 import {
   CreateServiceRequest,
   ServiceBooleanFilter,
+  ServiceConfirmAction,
   ServiceConfirmState,
   ServiceDetails,
   ServiceListItem,
@@ -42,23 +45,31 @@ import { BranchServicesApiService } from '../../services/branch-services-api.ser
 import { ServiceManagementApiService } from '../../services/service-management-api.service';
 import { ServiceManagementPermissionService } from '../../services/service-management-permission.service';
 import { ServiceManagementStore } from '../../store/service-management.store';
+import {
+  ServiceActionPermissions,
+  canAssignServiceLeaf as canAssignServiceLeafRule,
+  canPermanentDeleteService as canPermanentDeleteServiceRule,
+  canRestoreService as canRestoreServiceRule,
+  canSoftDeleteService as canSoftDeleteServiceRule,
+  canUpdateService as canUpdateServiceRule,
+} from '../../utils/service-action-rules.util';
 
 type BooleanSelectValue = 'all' | 'true' | 'false';
 type TicketIssuableValue = '' | 'true' | 'false';
 type ServiceScopeFilterValue = 'all' | ServiceScope;
-type TreeMutationAction = 'delete' | 'restore';
+type TreeMutationAction = ServiceConfirmAction;
 type FormControlName =
   | 'arabicName'
   | 'englishName'
   | 'arabicUserMessage'
   | 'englishUserMessage'
   | 'rangePrefix'
+  | 'serviceCode'
   | 'isTicketIssuable'
   | 'noOfTicketCopies'
   | 'rangeStartNumber'
   | 'rangeEndNumber';
 
-const LOGO_TYPES = new Set(['image/png', 'image/jpeg', 'image/webp']);
 
 @Component({
   selector: 'app-service-management-services',
@@ -66,7 +77,9 @@ const LOGO_TYPES = new Set(['image/png', 'image/jpeg', 'image/webp']);
   imports: [
     ReactiveFormsModule,
     ServiceHierarchyTreeComponent,
+    ServiceMediaManagerComponent,
     TechnicalAdminPageHeroComponent,
+    NiletronixLoadingStateComponent,
   ],
   providers: [ServiceManagementStore],
   templateUrl: './services.component.html',
@@ -83,8 +96,16 @@ export class ServicesComponent implements OnInit, OnDestroy {
   private readonly permissionService = inject(ServiceManagementPermissionService);
 
   public readonly store = inject(ServiceManagementStore);
-  public readonly canManageDefinitionNode = (node: ServiceTreeNode): boolean =>
-    node.canEditDefinition;
+  public readonly canUpdateServiceDefinition = (service: ServiceListItem | ServiceDetails | ServiceTreeNode): boolean =>
+    canUpdateServiceRule(service, this.serviceActionPermissions());
+  public readonly canSoftDeleteService = (service: ServiceListItem | ServiceDetails | ServiceTreeNode): boolean =>
+    canSoftDeleteServiceRule(service, this.serviceActionPermissions());
+  public readonly canRestoreService = (service: ServiceListItem | ServiceDetails | ServiceTreeNode): boolean =>
+    canRestoreServiceRule(service, this.serviceActionPermissions());
+  public readonly canPermanentDeleteService = (service: ServiceListItem | ServiceDetails | ServiceTreeNode): boolean =>
+    canPermanentDeleteServiceRule(service, this.serviceActionPermissions());
+  public readonly canAssignBranchService = (node: ServiceTreeNode): boolean =>
+    canAssignServiceLeafRule(node, this.serviceActionPermissions());
   public readonly translations = computed(
     () => SERVICE_MANAGEMENT_TRANSLATIONS[this.i18nStore.language()],
   );
@@ -96,6 +117,7 @@ export class ServicesComponent implements OnInit, OnDestroy {
   public readonly canUpdate = this.permissionService.canUpdate;
   public readonly canDelete = this.permissionService.canDelete;
   public readonly canRestore = this.permissionService.canRestore;
+  public readonly canDeletePermanent = this.permissionService.canDeletePermanent;
   public readonly canAssignBranchServices = this.permissionService.canAssignBranchServices;
   public readonly isBranchAdmin = computed(
     () => this.authSessionService.currentSession()?.userType === 'BranchAdmin',
@@ -113,7 +135,6 @@ export class ServicesComponent implements OnInit, OnDestroy {
   public readonly includeInactiveTree = signal(false);
   public readonly includeDeletedTree = signal(false);
   public readonly formError = signal<string | null>(null);
-  public readonly selectedLogoName = signal<string | null>(null);
   public readonly createParentLabel = computed(
     () => this.store.createParentName() ?? this.translations().treeRoot,
   );
@@ -125,6 +146,8 @@ export class ServicesComponent implements OnInit, OnDestroy {
       englishName: ['', [Validators.required, Validators.maxLength(100), this.notWhitespace]],
       arabicUserMessage: ['', [Validators.maxLength(500)]],
       englishUserMessage: ['', [Validators.maxLength(500)]],
+      isServiceCodeRequired: [false],
+      serviceCode: ['', [Validators.maxLength(100), (control: AbstractControl<string>) => this.serviceCodeValidator(control)]],
       isTicketIssuable: ['' as TicketIssuableValue, [Validators.required]],
       isClientInputRequired: [false],
       hasReservation: [false],
@@ -144,6 +167,7 @@ export class ServicesComponent implements OnInit, OnDestroy {
   public readonly englishNameControl = this.serviceForm.controls.englishName;
   public readonly arabicUserMessageControl = this.serviceForm.controls.arabicUserMessage;
   public readonly englishUserMessageControl = this.serviceForm.controls.englishUserMessage;
+  public readonly serviceCodeControl = this.serviceForm.controls.serviceCode;
   public readonly rangePrefixControl = this.serviceForm.controls.rangePrefix;
   public readonly isTicketIssuableControl = this.serviceForm.controls.isTicketIssuable;
   public readonly noOfTicketCopiesControl = this.serviceForm.controls.noOfTicketCopies;
@@ -153,6 +177,7 @@ export class ServicesComponent implements OnInit, OnDestroy {
   private searchDebounceId: ReturnType<typeof setTimeout> | null = null;
   private toastTimeoutId: ReturnType<typeof setTimeout> | null = null;
   private panelRequestId = 0;
+  private serviceCodeConflict = false;
 
   ngOnInit(): void {
     this.store.activeTab.set('tree');
@@ -358,7 +383,7 @@ export class ServicesComponent implements OnInit, OnDestroy {
     this.panelRequestId += 1;
     this.store.closePanel();
     this.formError.set(null);
-    this.selectedLogoName.set(null);
+    this.serviceCodeConflict = false;
     this.serviceForm.markAsPristine();
     this.serviceForm.enable({ emitEvent: false });
   }
@@ -384,66 +409,57 @@ export class ServicesComponent implements OnInit, OnDestroy {
   }
 
   public requestDelete(item: ServiceListItem | ServiceDetails): void {
-    if (!this.canDelete() || !item.canEditDefinition || item.isDeleted) {
+    if (!this.canSoftDeleteService(item)) {
       this.showMessage('error', this.translations().noPermissionHint);
       return;
     }
 
-    this.store.confirmState.set({
-      action: 'delete',
-      serviceId: item.id,
-      rowVersion: item.rowVersion,
-      serviceName: this.serviceName(item),
-      hasChildren: item.hasChildren,
-    });
+    this.prepareLifecycleAction(item.id, 'delete');
   }
 
   public requestRestore(item: ServiceListItem | ServiceDetails): void {
-    if (!this.canRestore() || !item.canEditDefinition || !item.isDeleted) {
+    if (!this.canRestoreService(item)) {
       this.showMessage('error', this.translations().noPermissionHint);
       return;
     }
 
-    this.store.confirmState.set({
-      action: 'restore',
-      serviceId: item.id,
-      rowVersion: item.rowVersion,
-      serviceName: this.serviceName(item),
-      hasChildren: item.hasChildren,
-    });
+    this.prepareLifecycleAction(item.id, 'restore');
+  }
+
+  public requestPermanentDelete(item: ServiceListItem | ServiceDetails): void {
+    if (!this.canPermanentDeleteService(item)) {
+      this.showMessage('error', this.translations().noPermissionHint);
+      return;
+    }
+
+    this.prepareLifecycleAction(item.id, 'permanentDelete');
   }
 
   public requestTreeDelete(node: ServiceTreeNode): void {
-    if (!this.canDelete() || !node.canEditDefinition || node.isDeleted) {
+    if (!this.canSoftDeleteService(node)) {
       this.showMessage('error', this.translations().noPermissionHint);
       return;
     }
 
-    this.loadDetailsForTreeAction(node.id, 'delete');
+    this.prepareLifecycleAction(node.id, 'delete');
   }
 
   public requestTreeRestore(node: ServiceTreeNode): void {
-    if (!this.canRestore() || !node.canEditDefinition || !node.isDeleted) {
+    if (!this.canRestoreService(node)) {
       this.showMessage('error', this.translations().noPermissionHint);
       return;
     }
 
-    this.loadDetailsForTreeAction(node.id, 'restore');
+    this.prepareLifecycleAction(node.id, 'restore');
   }
 
-  public requestRemoveLogo(details: ServiceDetails): void {
-    if (!this.canUpdate() || !details.logoUrl || details.isDeleted) {
+  public requestTreePermanentDelete(node: ServiceTreeNode): void {
+    if (!this.canPermanentDeleteService(node)) {
       this.showMessage('error', this.translations().noPermissionHint);
       return;
     }
 
-    this.store.confirmState.set({
-      action: 'removeLogo',
-      serviceId: details.id,
-      rowVersion: details.rowVersion,
-      serviceName: this.serviceName(details),
-      hasChildren: details.hasChildren,
-    });
+    this.prepareLifecycleAction(node.id, 'permanentDelete');
   }
 
   public closeConfirmDialog(): void {
@@ -469,56 +485,24 @@ export class ServicesComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.removeLogo(state);
+    this.permanentlyDeleteService(state);
   }
 
-  public uploadLogo(event: Event): void {
-    const details = this.store.selectedDetails();
-    const input = event.target as HTMLInputElement;
-    const file = input.files?.item(0) ?? null;
-
-    if (!details || !file || file.size <= 0 || !LOGO_TYPES.has(file.type)) {
-      this.showMessage('error', this.translations().invalidLogo);
-      input.value = '';
-      return;
-    }
-
-    if (!this.canUpdate() || !details.canEditDefinition || details.isDeleted) {
-      this.showMessage('error', this.translations().noPermissionHint);
-      input.value = '';
-      return;
-    }
-
-    this.selectedLogoName.set(file.name);
-    this.store.uploadingLogo.set(true);
-
-    this.apiService
-      .uploadLogo(details.id, file, details.rowVersion)
-      .pipe(
-        finalize(() => {
-          this.store.uploadingLogo.set(false);
-          input.value = '';
-        }),
-      )
-      .subscribe({
-        next: (response) => {
-          this.store.selectedDetails.update((current) =>
-            current
-              ? {
-                  ...current,
-                  logoUrl: response.logoUrl,
-                  rowVersion: response.rowVersion,
-                }
-              : current,
-          );
-          this.showMessage('success', response.message || this.translations().fallbackSuccess);
-          this.loadServices(this.store.servicePage().currentPage || 1);
-          this.loadTree();
-        },
-        error: (error: HttpErrorResponse) => this.handleApiError(error),
-      });
+  public handleMediaMessage(message: { readonly tone: 'success' | 'error' | 'info'; readonly text: string }): void {
+    this.showMessage(message.tone, message.text);
   }
 
+  public handleMediaServiceChange(details: ServiceDetails): void {
+    this.store.selectedDetails.set(details);
+    this.store.selectTreeNode(details.id);
+    this.loadServices(this.store.servicePage().currentPage || 1);
+    this.loadTree();
+  }
+
+  public handleMediaChanged(): void {
+    this.loadServices(this.store.servicePage().currentPage || 1);
+    this.loadTree();
+  }
   public updateTreeToggle(kind: 'inactive' | 'deleted', checked: boolean): void {
     if (kind === 'inactive') {
       this.includeInactiveTree.set(checked);
@@ -603,41 +587,40 @@ export class ServicesComponent implements OnInit, OnDestroy {
   }
 
   public confirmTitle(state: ServiceConfirmState): string {
-    if (state.action === 'delete') {
-      return this.translations().deleteConfirmTitle;
+    if (state.action === 'permanentDelete') {
+      return this.translations().permanentDeleteConfirmTitle;
     }
 
     if (state.action === 'restore') {
       return this.translations().restoreConfirmTitle;
     }
 
-    return this.translations().removeLogoConfirmTitle;
+    return this.translations().deleteConfirmTitle;
   }
 
   public confirmBody(state: ServiceConfirmState): string {
-    if (state.action === 'delete') {
-      return this.translations().deleteConfirmBody;
+    if (state.action === 'permanentDelete') {
+      return this.translations().permanentDeleteConfirmBody;
     }
 
     if (state.action === 'restore') {
       return this.translations().restoreConfirmBody;
     }
 
-    return this.translations().removeLogoConfirmBody;
+    return this.translations().deleteConfirmBody;
   }
 
   public confirmButtonLabel(state: ServiceConfirmState): string {
-    if (state.action === 'delete') {
-      return this.translations().delete;
+    if (state.action === 'permanentDelete') {
+      return this.translations().deletePermanently;
     }
 
     if (state.action === 'restore') {
       return this.translations().restore;
     }
 
-    return this.translations().removeLogo;
+    return this.translations().delete;
   }
-
   public hasControlError(controlName: FormControlName): boolean {
     const control = this.serviceForm.controls[controlName];
     return control.touched && control.invalid;
@@ -645,6 +628,41 @@ export class ServicesComponent implements OnInit, OnDestroy {
 
   public hasRangeError(): boolean {
     return this.serviceForm.touched && this.serviceForm.hasError('rangeOrder');
+  }
+
+  public serviceCodeError(): string {
+    const control = this.serviceCodeControl;
+
+    if (control.hasError('serviceCodeExists')) {
+      return this.translations().serviceCodeAlreadyExists;
+    }
+
+    if (control.hasError('maxlength')) {
+      return this.translations().serviceCodeMaxLength;
+    }
+
+    if (control.hasError('serviceCodeMustBeEmpty')) {
+      return this.translations().serviceCodeMustBeEmpty;
+    }
+
+    return this.translations().serviceCodeRequiredError;
+  }
+
+  public onServiceCodeRequiredChange(event: Event): void {
+    const checked = (event.target as HTMLInputElement).checked;
+
+    if (!checked) {
+      this.serviceCodeControl.setValue('', { emitEvent: false });
+      this.serviceCodeControl.markAsPristine();
+    }
+
+    this.clearServiceCodeConflict();
+    this.applyServiceCodeValidation();
+  }
+
+  public onServiceCodeInput(): void {
+    this.clearServiceCodeConflict();
+    this.applyServiceCodeValidation();
   }
 
   public readInputValue(event: Event): string {
@@ -720,7 +738,7 @@ export class ServicesComponent implements OnInit, OnDestroy {
     this.store.setCreateParentContext(parentServiceId, parentName);
     this.store.openPanel('create');
     this.formError.set(null);
-    this.selectedLogoName.set(null);
+    this.serviceCodeConflict = false;
     this.loadParentOptions();
     this.serviceForm.enable({ emitEvent: false });
     this.serviceForm.reset({
@@ -729,6 +747,8 @@ export class ServicesComponent implements OnInit, OnDestroy {
       englishName: '',
       arabicUserMessage: '',
       englishUserMessage: '',
+      isServiceCodeRequired: false,
+      serviceCode: '',
       isTicketIssuable: '',
       isClientInputRequired: false,
       hasReservation: false,
@@ -868,7 +888,6 @@ export class ServicesComponent implements OnInit, OnDestroy {
     this.store.clearCreateParentContext();
     this.store.detailsLoading.set(true);
     this.formError.set(null);
-    this.selectedLogoName.set(null);
 
     this.apiService
       .getServiceDetails(serviceId)
@@ -902,7 +921,7 @@ export class ServicesComponent implements OnInit, OnDestroy {
       });
   }
 
-  private loadDetailsForTreeAction(serviceId: number, action: TreeMutationAction): void {
+  private prepareLifecycleAction(serviceId: number, action: TreeMutationAction): void {
     if (this.store.detailsLoading()) {
       return;
     }
@@ -915,18 +934,34 @@ export class ServicesComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (details) => {
           this.store.selectTreeNode(details.id);
-
-          if (action === 'delete') {
-            this.requestDelete(details);
-            return;
-          }
-
-          this.requestRestore(details);
+          this.openLifecycleConfirm(details, action);
         },
         error: (error: HttpErrorResponse) => this.handleApiError(error),
       });
   }
 
+  private openLifecycleConfirm(details: ServiceDetails, action: TreeMutationAction): void {
+    const canUseAction =
+      action === 'delete'
+        ? this.canSoftDeleteService(details)
+        : action === 'restore'
+          ? this.canRestoreService(details)
+          : this.canPermanentDeleteService(details);
+
+    if (!canUseAction) {
+      this.showMessage('error', this.translations().noPermissionHint);
+      this.loadTree();
+      return;
+    }
+
+    this.store.confirmState.set({
+      action,
+      serviceId: details.id,
+      rowVersion: details.rowVersion,
+      serviceName: this.serviceName(details),
+      hasChildren: details.hasChildren,
+    });
+  }
   private createService(): void {
     const parentServiceId = this.serviceForm.getRawValue().parentServiceId;
     this.store.saving.set(true);
@@ -1011,43 +1046,52 @@ export class ServicesComponent implements OnInit, OnDestroy {
       });
   }
 
-  private removeLogo(state: ServiceConfirmState): void {
+  private permanentlyDeleteService(state: ServiceConfirmState): void {
     this.store.mutating.set(true);
 
     this.apiService
-      .removeLogo(state.serviceId, state.rowVersion)
+      .permanentlyDeleteService(state.serviceId, state.rowVersion)
       .pipe(finalize(() => this.store.mutating.set(false)))
       .subscribe({
         next: (response) => {
-          this.store.selectedDetails.update((details) =>
-            details
-              ? {
-                  ...details,
-                  logoUrl: null,
-                  rowVersion: response.rowVersion,
-                }
-              : details,
-          );
           this.showMessage('success', response.message || this.translations().fallbackSuccess);
-          this.loadServices(this.store.servicePage().currentPage || 1);
-          this.loadTree();
+          this.afterMutation(state.serviceId, true);
           this.store.confirmState.set(null);
         },
         error: (error: HttpErrorResponse) => this.handleApiError(error),
       });
   }
 
-  private afterMutation(serviceId: number): void {
+  private afterMutation(serviceId: number, permanentlyDeleted = false): void {
     this.loadServices(this.store.servicePage().currentPage || 1);
     this.loadParentOptions();
     this.loadTree();
 
+    if (this.canUseBranchAssignment()) {
+      this.loadAssignedBranchTree();
+    }
+
     if (this.store.selectedDetails()?.id === serviceId) {
       this.closePanel();
     }
+
+    if (permanentlyDeleted && this.store.selectedTreeServiceId() === serviceId) {
+      this.store.selectTreeNode(null);
+    }
+  }
+
+  private serviceActionPermissions(): ServiceActionPermissions {
+    return {
+      canAssignBranchServices: this.canAssignBranchServices(),
+      canUpdate: this.canUpdate(),
+      canDelete: this.canDelete(),
+      canRestore: this.canRestore(),
+      canDeletePermanent: this.canDeletePermanent(),
+    };
   }
 
   private populateForm(details: ServiceDetails): void {
+    this.serviceCodeConflict = false;
     this.serviceForm.enable({ emitEvent: false });
     this.serviceForm.reset({
       parentServiceId: details.parentServiceId ?? 0,
@@ -1055,6 +1099,8 @@ export class ServicesComponent implements OnInit, OnDestroy {
       englishName: details.englishName,
       arabicUserMessage: details.arabicUserMessage ?? '',
       englishUserMessage: details.englishUserMessage ?? '',
+      isServiceCodeRequired: details.isServiceCodeRequired,
+      serviceCode: details.serviceCode ?? '',
       isTicketIssuable: details.isTicketIssuable ? 'true' : 'false',
       isClientInputRequired: details.isClientInputRequired,
       hasReservation: details.hasReservation,
@@ -1071,6 +1117,8 @@ export class ServicesComponent implements OnInit, OnDestroy {
 
   private isServiceFormValid(): boolean {
     this.formError.set(null);
+
+    this.applyServiceCodeValidation();
 
     if (this.serviceForm.invalid) {
       return false;
@@ -1107,6 +1155,8 @@ export class ServicesComponent implements OnInit, OnDestroy {
       englishName: value.englishName.trim(),
       arabicUserMessage: this.toOptionalString(value.arabicUserMessage),
       englishUserMessage: this.toOptionalString(value.englishUserMessage),
+      serviceCode: value.isServiceCodeRequired ? this.toOptionalString(value.serviceCode) : null,
+      isServiceCodeRequired: value.isServiceCodeRequired,
       isTicketIssuable: value.isTicketIssuable === 'true',
       isClientInputRequired: value.isClientInputRequired,
       hasReservation: value.hasReservation,
@@ -1186,13 +1236,7 @@ export class ServicesComponent implements OnInit, OnDestroy {
   }
 
   private isAssignableBranchService(node: ServiceTreeNode): boolean {
-    return (
-      node.children.length === 0 &&
-      !node.hasChildren &&
-      !node.isDeleted &&
-      node.isActive &&
-      node.effectiveIsActive
-    );
+    return this.canAssignBranchService(node);
   }
 
   private expandAssignedPathFor(serviceId: number): void {
@@ -1237,6 +1281,15 @@ export class ServicesComponent implements OnInit, OnDestroy {
       return;
     }
 
+    if (this.containsErrorCode(error, 'ServiceCodeAlreadyExists')) {
+      this.serviceCodeConflict = true;
+      this.serviceCodeControl.updateValueAndValidity({ emitEvent: false });
+      this.serviceCodeControl.markAsTouched();
+      this.formError.set(this.translations().serviceCodeAlreadyExists);
+      this.showMessage('error', this.translations().serviceCodeAlreadyExists);
+      return;
+    }
+
     if (error.status === 409 || this.isConcurrencyError(error)) {
       this.showMessage('error', this.translations().concurrencyError);
       return;
@@ -1246,22 +1299,45 @@ export class ServicesComponent implements OnInit, OnDestroy {
   }
 
   private isConcurrencyError(error: HttpErrorResponse): boolean {
-    const body = error.error;
-
-    if (typeof body === 'string') {
-      return body.toLowerCase().includes('concurrency');
-    }
-
-    if (!body || typeof body !== 'object') {
-      return false;
-    }
-
-    const values = Object.values(body as Record<string, unknown>);
-    return values.some((value) =>
-      typeof value === 'string' && value.toLowerCase().includes('concurrency'),
-    );
+    return this.containsErrorCode(error, 'concurrency') || this.containsErrorCode(error, 'rowversion');
   }
 
+  private containsErrorCode(error: HttpErrorResponse, expected: string): boolean {
+    const body = typeof error.error === 'string' ? error.error : JSON.stringify(error.error ?? '');
+    return body.toLowerCase().includes(expected.toLowerCase());
+  }
+
+  private applyServiceCodeValidation(): void {
+    this.serviceCodeControl.updateValueAndValidity({ emitEvent: false });
+  }
+
+  private clearServiceCodeConflict(): void {
+    if (!this.serviceCodeConflict) {
+      return;
+    }
+
+    this.serviceCodeConflict = false;
+    this.serviceCodeControl.updateValueAndValidity({ emitEvent: false });
+  }
+
+  private serviceCodeValidator(control: AbstractControl<string>): ValidationErrors | null {
+    const errors: ValidationErrors = {};
+    const normalizedCode = control.value.trim();
+
+    if (this.serviceCodeConflict) {
+      errors['serviceCodeExists'] = true;
+    }
+
+    if (this.serviceForm?.controls.isServiceCodeRequired.value) {
+      if (!normalizedCode) {
+        errors['serviceCodeRequired'] = true;
+      }
+    } else if (normalizedCode) {
+      errors['serviceCodeMustBeEmpty'] = true;
+    }
+
+    return Object.keys(errors).length > 0 ? errors : null;
+  }
   private showMessage(tone: 'success' | 'error' | 'info', text: string): void {
     if (this.toastTimeoutId) {
       clearTimeout(this.toastTimeoutId);

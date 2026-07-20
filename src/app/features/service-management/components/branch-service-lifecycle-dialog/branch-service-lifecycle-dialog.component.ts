@@ -21,27 +21,38 @@ export class BranchServiceLifecycleDialogComponent {
   readonly confirmed = output<void>();
 
   readonly isDelete = computed(() => this.state().action === 'delete');
+  readonly isPermanentDelete = computed(() => this.state().action === 'permanentDelete');
   readonly title = computed(() =>
-    this.isDelete()
-      ? this.translations().lifecycleDeleteTitle
-      : this.translations().lifecycleRestoreTitle,
+    this.isPermanentDelete()
+      ? this.translations().lifecyclePermanentDeleteTitle
+      : this.isDelete()
+        ? this.translations().lifecycleDeleteTitle
+        : this.translations().lifecycleRestoreTitle,
   );
   readonly body = computed(() =>
-    this.isDelete()
-      ? this.translations().lifecycleDeleteBody
-      : this.translations().lifecycleRestoreBody,
+    this.isPermanentDelete()
+      ? this.translations().lifecyclePermanentDeleteBody
+      : this.isDelete()
+        ? this.translations().lifecycleDeleteBody
+        : this.translations().lifecycleRestoreBody,
   );
   readonly confirmLabel = computed(() =>
-    this.isDelete() ? this.serviceTranslations().delete : this.serviceTranslations().restore,
+    this.isPermanentDelete()
+      ? this.serviceTranslations().deletePermanently
+      : this.isDelete()
+        ? this.serviceTranslations().delete
+        : this.serviceTranslations().restore,
   );
   readonly progressLabel = computed(() =>
-    this.isDelete()
-      ? this.translations().lifecycleDeleting
-      : this.translations().lifecycleRestoring,
+    this.isPermanentDelete()
+      ? this.translations().lifecyclePermanentlyDeleting
+      : this.isDelete()
+        ? this.translations().lifecycleDeleting
+        : this.translations().lifecycleRestoring,
   );
   readonly confirmButtonClass = computed(() =>
     `inline-flex items-center justify-center gap-2 rounded-lg px-5 py-2.5 font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-60 ${
-      this.isDelete()
+      this.isDelete() || this.isPermanentDelete()
         ? 'bg-rose-600 hover:bg-rose-700'
         : 'bg-emerald-600 hover:bg-emerald-700'
     }`,

@@ -23,8 +23,17 @@ body {
 label {
   color: var(--q-text-secondary) !important;
   font-size: var(--q-font-size-label) !important;
-  font-weight: 600 !important;
+  font-weight: 700 !important;
   margin-bottom: 2px !important;
+}
+
+.text-muted,
+.form-text,
+.field-help,
+.header-description,
+small {
+  color: var(--q-text-muted) !important;
+  font-weight: 500 !important;
 }
 
 /* Unified Compact Form Controls */
@@ -36,17 +45,31 @@ textarea,
   min-height: var(--q-control-height) !important;
   height: var(--q-control-height) !important;
   padding: 4px 10px !important;
-  color: var(--q-text-primary) !important;
+  color: var(--q-text-secondary) !important;
   background-color: var(--q-surface-card) !important;
   border: 1px solid var(--q-border-strong) !important;
   border-radius: var(--q-radius-sm) !important;
   font-size: var(--q-font-size-base) !important;
   font-family: inherit !important;
+  font-weight: 500 !important;
   outline: none !important;
   box-shadow: none !important;
   transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out !important;
 }
 
+input::placeholder,
+textarea::placeholder,
+.form-control::placeholder {
+  color: var(--q-text-muted) !important;
+  font-weight: 400 !important;
+  opacity: 1 !important;
+}
+
+select option,
+.form-select option {
+  color: var(--q-text-secondary) !important;
+  font-weight: 500 !important;
+}
 textarea {
   min-height: 60px !important;
   height: auto !important;
@@ -57,6 +80,7 @@ select:focus,
 textarea:focus,
 .form-control:focus,
 .form-select:focus {
+  color: var(--q-text-secondary) !important;
   background-color: var(--q-surface-card) !important;
   border-color: var(--q-primary) !important;
   box-shadow: 0 0 0 3px rgba(15, 125, 168, 0.12) !important;

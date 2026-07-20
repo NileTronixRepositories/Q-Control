@@ -20,6 +20,8 @@ const leaf: ServiceTreeNode = {
   canEditDefinition: true,
   arabicName: 'خدمة',
   englishName: 'Service',
+  serviceCode: null,
+  isServiceCodeRequired: false,
   isActive: true,
   effectiveIsActive: true,
   isTicketIssuable: true,

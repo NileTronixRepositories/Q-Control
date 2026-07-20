@@ -28,11 +28,16 @@ describe('ServiceManagementPermissionService', () => {
     expect(service.hasPermission('BranchServices.Unassign')).toBe(true);
   });
 
-  it('enables delete and restore for a new JWT containing both permissions', () => {
-    const service = createServiceForPermissions(['Services.Delete', 'Services.Restore']);
+  it('enables delete, restore, and permanent delete for a new JWT containing the permissions', () => {
+    const service = createServiceForPermissions([
+      'Services.Delete',
+      'Services.Restore',
+      'Services.DeletePermanent',
+    ]);
 
     expect(service.canDelete()).toBe(true);
     expect(service.canRestore()).toBe(true);
+    expect(service.canDeletePermanent()).toBe(true);
   });
 
   it('keeps delete and restore disabled for an older JWT without the permissions', () => {
@@ -40,6 +45,7 @@ describe('ServiceManagementPermissionService', () => {
 
     expect(service.canDelete()).toBe(false);
     expect(service.canRestore()).toBe(false);
+    expect(service.canDeletePermanent()).toBe(false);
   });
 
   it('recognizes globalization and central-tree permissions', () => {

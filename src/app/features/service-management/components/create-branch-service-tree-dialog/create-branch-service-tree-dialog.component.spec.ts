@@ -21,25 +21,125 @@ describe('CreateBranchServiceTreeDialogComponent', () => {
     const created = vi.fn<(request: CreateBranchServiceTreeRequest) => void>();
     fixture.componentInstance.created.subscribe(created);
 
-    (fixture.nativeElement.querySelector('.branch-tree-primary-btn') as HTMLButtonElement).click();
+    submit();
     fixture.detectChanges();
 
     expect(created).not.toHaveBeenCalled();
     expect(fixture.nativeElement.textContent).toContain(BRANCH_SERVICES_TRANSLATIONS.en.requiredField);
   });
 
-  it('trims valid names and emits a new root tree', () => {
+  it('trims valid names and emits default empty service-code fields', () => {
     const created = vi.fn<(request: CreateBranchServiceTreeRequest) => void>();
     fixture.componentInstance.created.subscribe(created);
-    fixture.componentInstance.root.controls.arabicName.setValue('  المدفوعات  ');
+    fixture.componentInstance.root.controls.arabicName.setValue('  Ø§Ù„Ù…Ø¯ÙÙˆØ¹Ø§Øª  ');
     fixture.componentInstance.root.controls.englishName.setValue('  Payments  ');
 
-    (fixture.nativeElement.querySelector('.branch-tree-primary-btn') as HTMLButtonElement).click();
+    submit();
 
     expect(created).toHaveBeenCalledWith(
       expect.objectContaining({
-        root: expect.objectContaining({ arabicName: 'المدفوعات', englishName: 'Payments', children: [] }),
+        root: expect.objectContaining({
+          arabicName: 'Ø§Ù„Ù…Ø¯ÙÙˆØ¹Ø§Øª',
+          englishName: 'Payments',
+          serviceCode: null,
+          isServiceCodeRequired: false,
+          children: [],
+        }),
       }),
     );
   });
+
+  it('emits a trimmed service code when the node requires one', () => {
+    const created = vi.fn<(request: CreateBranchServiceTreeRequest) => void>();
+    fixture.componentInstance.created.subscribe(created);
+    fixture.componentInstance.root.controls.arabicName.setValue('Ø§Ù„Ù…Ø®ØªØ¨Ø±');
+    fixture.componentInstance.root.controls.englishName.setValue('Laboratory');
+    fixture.componentInstance.root.controls.isServiceCodeRequired.setValue(true);
+    fixture.componentInstance.root.controls.serviceCode.setValue(' LAB-001 ');
+
+    submit();
+
+    expect(created).toHaveBeenCalledWith(
+      expect.objectContaining({
+        root: expect.objectContaining({ serviceCode: 'LAB-001', isServiceCodeRequired: true }),
+      }),
+    );
+  });
+
+  it('blocks whitespace-only service codes when the node requires one', () => {
+    const created = vi.fn<(request: CreateBranchServiceTreeRequest) => void>();
+    fixture.componentInstance.created.subscribe(created);
+    fixture.componentInstance.root.controls.arabicName.setValue('Ø§Ù„Ù…Ø®ØªØ¨Ø±');
+    fixture.componentInstance.root.controls.englishName.setValue('Laboratory');
+    fixture.componentInstance.root.controls.isServiceCodeRequired.setValue(true);
+    fixture.componentInstance.root.controls.serviceCode.setValue('   ');
+
+    submit();
+    fixture.detectChanges();
+
+    expect(created).not.toHaveBeenCalled();
+    expect(fixture.nativeElement.textContent).toContain(BRANCH_SERVICES_TRANSLATIONS.en.serviceCodeRequiredError);
+  });
+
+  it('marks duplicate service codes inside the tree before emitting', () => {
+    const created = vi.fn<(request: CreateBranchServiceTreeRequest) => void>();
+    fixture.componentInstance.created.subscribe(created);
+    const component = fixture.componentInstance as unknown as {
+      addChild: (group: typeof fixture.componentInstance.root) => void;
+    };
+    const root = fixture.componentInstance.root;
+
+    root.controls.arabicName.setValue('Ø§Ù„Ø£ØµÙ„');
+    root.controls.englishName.setValue('Root');
+    root.controls.isServiceCodeRequired.setValue(true);
+    root.controls.serviceCode.setValue('DUP-001');
+    component.addChild(root);
+
+    const child = root.controls.children.at(0);
+    child.controls.arabicName.setValue('Ø§Ù„ÙØ±Ø¹');
+    child.controls.englishName.setValue('Child');
+    child.controls.isServiceCodeRequired.setValue(true);
+    child.controls.serviceCode.setValue(' DUP-001 ');
+
+    (fixture.componentInstance as unknown as { submit: () => void }).submit();
+    fixture.detectChanges();
+
+    expect(created).not.toHaveBeenCalled();
+    expect(root.controls.serviceCode.hasError('duplicateServiceCode')).toBe(true);
+    expect(child.controls.serviceCode.hasError('duplicateServiceCode')).toBe(true);
+    expect(fixture.nativeElement.textContent).toContain(BRANCH_SERVICES_TRANSLATIONS.en.duplicateServiceCodeInTree);
+  });
+  it('keeps global-parent leaf creation childless', () => {
+    const created = vi.fn<(request: CreateBranchServiceTreeRequest) => void>();
+    fixture.componentInstance.created.subscribe(created);
+    fixture.componentRef.setInput('mode', 'subtree');
+    fixture.componentRef.setInput('leafOnly', true);
+    fixture.componentRef.setInput('parentLabel', 'Global parent');
+    fixture.detectChanges();
+
+    const component = fixture.componentInstance as unknown as {
+      addChild: (group: typeof fixture.componentInstance.root) => void;
+    };
+    const root = fixture.componentInstance.root;
+    root.controls.arabicName.setValue('Ø®Ø¯Ù…Ø© ÙØ±Ø¹Ù� Ø©');
+    root.controls.englishName.setValue('Leaf service');
+
+    component.addChild(root);
+    fixture.detectChanges();
+
+    expect(root.controls.children.length).toBe(0);
+    expect(fixture.nativeElement.querySelector('.branch-tree-node-actions .branch-tree-secondary-btn')).toBeNull();
+
+    submit();
+
+    expect(created).toHaveBeenCalledWith(
+      expect.objectContaining({
+        root: expect.objectContaining({ children: [] }),
+      }),
+    );
+  });
+
+  function submit(): void {
+    (fixture.nativeElement.querySelector('.branch-tree-primary-btn') as HTMLButtonElement).click();
+  }
 });

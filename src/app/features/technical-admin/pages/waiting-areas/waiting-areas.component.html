@@ -138,11 +138,7 @@
 
       <!-- Loading -->
       @if (loading()) {
-        <p class="state-note">
-          <i class="bi bi-arrow-clockwise"></i>
-
-          {{ translations().loading }}
-        </p>
+        <app-niletronix-loading-state [title]="translations().loading" variant="inline" size="sm" />
       }
 
       <!-- Table -->
@@ -376,11 +372,8 @@
 
         <!-- Loading -->
         @if (panelLoading()) {
-          <p class="state-note">
-            <i class="bi bi-arrow-clockwise" aria-hidden="true"></i>
-            {{ translations().loading }}
-          </p>
-        }
+        <app-niletronix-loading-state [title]="translations().loading" variant="inline" size="sm" />
+      }
 
         <!-- View -->
         @if (panelMode() === 'view' && selectedDetails(); as details) {

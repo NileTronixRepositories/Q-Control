@@ -14,6 +14,7 @@ import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angula
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { AppLanguage } from '../../../../shared/models/app-language.model';
+import { NiletronixLoadingStateComponent } from '../../../../shared/components/niletronix-loading-state/niletronix-loading-state.component';
 import { TechnicalAdminPageHeroComponent } from '../../../../shared/components/technical-admin-page-hero/technical-admin-page-hero.component';
 import { AuthSessionService } from '../../../auth/services/auth-session.service';
 import {
@@ -110,7 +111,7 @@ const PAGE_TRANSLATIONS: Record<AppLanguage, BranchBrandingPageTranslations> = {
   ar: {
     pageEyebrow: 'إدارة الفروع',
     pageTitle: 'الهوية البصرية والإعلانات',
-    pageDescription: 'تحكم في شعار الفرع وألوان الثيم وصور الإعلانات لكل فرع من لوحة المسؤول التقني.',
+    pageDescription: 'تحكم في شعار الفرع وألوان الهوية البصرية وصور الإعلانات لكل فرع من لوحة المسؤول التقني.',
     branchLabel: 'الفرع',
     selectBranchPlaceholder: 'اختر فرعا',
     refreshLabel: 'تحديث',
@@ -122,11 +123,11 @@ const PAGE_TRANSLATIONS: Record<AppLanguage, BranchBrandingPageTranslations> = {
     chooseLogo: 'اختيار شعار',
     uploadLogo: 'رفع الشعار',
     selectedFile: 'الملف المحدد',
-    themeColors: 'ألوان الثيم',
+    themeColors: 'ألوان الهوية البصرية',
     mainColor: 'اللون الرئيسي',
     secondaryColor: 'اللون الثانوي',
     backgroundColor: 'لون الخلفية',
-    saveTheme: 'حفظ الثيم',
+    saveTheme: 'حفظ الهوية البصرية',
     noBranding: 'لم يتم إعداد الهوية البصرية لهذا الفرع بعد.',
     colorRequired: 'هذا اللون مطلوب.',
     colorInvalid: 'استخدم صيغة #RRGGBB فقط.',
@@ -154,7 +155,7 @@ const PAGE_TRANSLATIONS: Record<AppLanguage, BranchBrandingPageTranslations> = {
     invalidImage: 'نوع الصورة غير مدعوم. استخدم PNG أو JPG أو JPEG أو WEBP فقط.',
     tooManyImages: 'عدد الصور المحددة يتجاوز الحد المتاح لهذا الفرع.',
     genericError: 'حدث خطأ غير متوقع.',
-    themeSaved: 'تم حفظ الثيم بنجاح.',
+    themeSaved: 'تم حفظ الهوية البصرية بنجاح.',
     advertisementsUploaded: 'تم رفع الإعلانات بنجاح.',
     orderSaved: 'تم حفظ ترتيب الإعلانات بنجاح.',
     close: 'إغلاق',
@@ -162,7 +163,7 @@ const PAGE_TRANSLATIONS: Record<AppLanguage, BranchBrandingPageTranslations> = {
   en: {
     pageEyebrow: 'Branch Management',
     pageTitle: 'Branding & Advertisements',
-    pageDescription: 'Control each branch logo, theme colors, and advertisement images from Technical Admin.',
+    pageDescription: 'Control each branch logo, visual identity colors, and advertisement images from Technical Admin.',
     branchLabel: 'Branch',
     selectBranchPlaceholder: 'Select a branch',
     refreshLabel: 'Refresh',
@@ -174,11 +175,11 @@ const PAGE_TRANSLATIONS: Record<AppLanguage, BranchBrandingPageTranslations> = {
     chooseLogo: 'Choose logo',
     uploadLogo: 'Upload logo',
     selectedFile: 'Selected file',
-    themeColors: 'Theme colors',
+    themeColors: 'Visual identity colors',
     mainColor: 'Main color',
     secondaryColor: 'Secondary color',
     backgroundColor: 'Background color',
-    saveTheme: 'Save theme',
+    saveTheme: 'Save visual identity',
     noBranding: 'No branding has been configured for this branch.',
     colorRequired: 'This color is required.',
     colorInvalid: 'Use #RRGGBB format only.',
@@ -206,7 +207,7 @@ const PAGE_TRANSLATIONS: Record<AppLanguage, BranchBrandingPageTranslations> = {
     invalidImage: 'Unsupported image type. Use PNG, JPG, JPEG, or WEBP only.',
     tooManyImages: 'Selected images exceed the available slots for this branch.',
     genericError: 'Unexpected error occurred.',
-    themeSaved: 'Theme saved successfully.',
+    themeSaved: 'Visual identity saved successfully.',
     advertisementsUploaded: 'Advertisements uploaded successfully.',
     orderSaved: 'Advertisement order saved successfully.',
     close: 'Close',
@@ -215,7 +216,7 @@ const PAGE_TRANSLATIONS: Record<AppLanguage, BranchBrandingPageTranslations> = {
 
 @Component({
   selector: 'app-branch-branding',
-  imports: [ReactiveFormsModule, TechnicalAdminPageHeroComponent],
+  imports: [ReactiveFormsModule, TechnicalAdminPageHeroComponent, NiletronixLoadingStateComponent],
   templateUrl: './branch-branding.component.html',
   styleUrl: './branch-branding.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

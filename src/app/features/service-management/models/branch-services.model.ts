@@ -1,4 +1,4 @@
-import { ServiceScope, ServiceTreeNode } from './service-management.model';
+import { ServiceCodeFields, ServiceScope, ServiceTreeNode } from './service-management.model';
 import { ServiceGlobalizationRequestSummary } from './service-globalization.model';
 
 export interface BranchServicesTreeQuery {
@@ -30,7 +30,7 @@ export interface CreateBranchServiceTreeRequest {
   readonly root: CreateBranchServiceTreeNodeRequest;
 }
 
-export interface CreateBranchServiceTreeNodeRequest {
+export interface CreateBranchServiceTreeNodeRequest extends ServiceCodeFields {
   readonly arabicName: string;
   readonly englishName: string;
   readonly arabicUserMessage: string | null;
@@ -48,7 +48,7 @@ export interface CreateBranchServiceTreeNodeRequest {
   readonly children: readonly CreateBranchServiceTreeNodeRequest[];
 }
 
-export interface CreatedBranchServiceTreeNode {
+export interface CreatedBranchServiceTreeNode extends ServiceCodeFields {
   readonly id: number;
   readonly parentServiceId: number | null;
   readonly arabicName: string;
@@ -78,7 +78,7 @@ export interface CreateBranchServiceSubtreeResponse extends CreateBranchServiceT
   readonly globalizationRequest: ServiceGlobalizationRequestSummary | null;
 }
 
-export interface BranchServiceTreeDraftNode {
+export interface BranchServiceTreeDraftNode extends ServiceCodeFields {
   readonly clientId: string;
   readonly arabicName: string;
   readonly englishName: string;
@@ -108,7 +108,7 @@ export interface BranchServiceUnassignConfirmState {
   readonly serviceName: string;
 }
 
-export type BranchServiceLifecycleAction = 'delete' | 'restore';
+export type BranchServiceLifecycleAction = 'delete' | 'restore' | 'permanentDelete';
 
 export interface BranchServiceLifecycleConfirmState {
   readonly action: BranchServiceLifecycleAction;

@@ -13,6 +13,7 @@ import {
 import { Router } from '@angular/router';
 import { finalize, Observable } from 'rxjs';
 
+import { NiletronixLoadingStateComponent } from '../../../../shared/components/niletronix-loading-state/niletronix-loading-state.component';
 import { TechnicalAdminPageHeroComponent } from '../../../../shared/components/technical-admin-page-hero/technical-admin-page-hero.component';
 
 import { AuthSessionService } from '../../../auth/services/auth-session.service';
@@ -25,6 +26,7 @@ import { BranchGlobalizationRequestsComponent } from '../../components/branch-gl
 import { BranchServiceLifecycleDialogComponent } from '../../components/branch-service-lifecycle-dialog/branch-service-lifecycle-dialog.component';
 import { CreateBranchServiceTreeDialogComponent } from '../../components/create-branch-service-tree-dialog/create-branch-service-tree-dialog.component';
 import { ServiceHierarchyTreeComponent } from '../../components/service-hierarchy-tree/service-hierarchy-tree.component';
+import { ServiceMediaManagerComponent } from '../../components/service-media-manager/service-media-manager.component';
 import { UnassignBranchServiceDialogComponent } from '../../components/unassign-branch-service-dialog/unassign-branch-service-dialog.component';
 import { BRANCH_SERVICES_TRANSLATIONS } from '../../i18n/branch-services.translations';
 import { SERVICE_GLOBALIZATION_TRANSLATIONS } from '../../i18n/service-globalization.translations';
@@ -40,6 +42,7 @@ import { ServiceGlobalizationRequestSummary } from '../../models/service-globali
 import {
   ServiceDeleteResponse,
   ServiceDetails,
+  ServicePermanentDeleteResponse,
   ServiceRestoreResponse,
   ServiceTreeNode,
 } from '../../models/service-management.model';
@@ -49,6 +52,14 @@ import { ServiceManagementPermissionService } from '../../services/service-manag
 import { ServiceGlobalizationApiService } from '../../services/service-globalization-api.service';
 import { BranchServicesStore } from '../../store/branch-services.store';
 import { ServiceDataInvalidationService } from '../../services/service-data-invalidation.service';
+import {
+  ServiceActionPermissions,
+  canAssignServiceLeaf,
+  canPermanentDeleteService,
+  canRestoreService,
+  canSoftDeleteService,
+  canUnassignService,
+} from '../../utils/service-action-rules.util';
 
 const STATUS_POLL_INTERVAL_MS = 15_000;
 
@@ -61,6 +72,8 @@ const STATUS_POLL_INTERVAL_MS = 15_000;
     BranchServiceLifecycleDialogComponent,
     CreateBranchServiceTreeDialogComponent,
     ServiceHierarchyTreeComponent,
+    ServiceMediaManagerComponent,
+    NiletronixLoadingStateComponent,
     TechnicalAdminPageHeroComponent,
     UnassignBranchServiceDialogComponent,
   ],
@@ -96,6 +109,8 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
   protected readonly language = this.i18nStore.language;
   protected readonly direction = this.i18nStore.direction;
   protected readonly canViewBranchServices = this.permissionService.canViewBranchServices;
+  protected readonly canViewDetails = this.permissionService.canViewDetails;
+  protected readonly canUpdate = this.permissionService.canUpdate;
   protected readonly canViewWorkflows = this.permissionService.canViewWorkflows;
   protected readonly canViewSchedules = this.permissionService.canViewSchedules;
   protected readonly canAssignBranchServices = this.permissionService.canAssignBranchServices;
@@ -103,10 +118,26 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
     this.permissionService.canUnassignBranchServices;
   protected readonly canDeleteBranchServices = this.permissionService.canDelete;
   protected readonly canRestoreBranchServices = this.permissionService.canRestore;
+  protected readonly canDeletePermanentBranchServices = this.permissionService.canDeletePermanent;
   protected readonly canCreateBranchServiceTree = this.permissionService.canCreateBranchServiceTree;
   protected readonly canViewOwnGlobalizationRequests =
     this.permissionService.canViewOwnGlobalizationRequests ?? computed(() => false);
+  protected readonly canViewGlobalizationRequests =
+    this.permissionService.canViewGlobalizationRequests ?? computed(() => false);
+  protected readonly canApproveGlobalizationRequests =
+    this.permissionService.canApproveGlobalizationRequests ?? computed(() => false);
+  protected readonly canRejectGlobalizationRequests =
+    this.permissionService.canRejectGlobalizationRequests ?? computed(() => false);
+  protected readonly canOpenGlobalizationRequests = computed(
+    () =>
+      this.canViewOwnGlobalizationRequests() ||
+      this.canViewGlobalizationRequests() ||
+      this.canApproveGlobalizationRequests() ||
+      this.canRejectGlobalizationRequests(),
+  );
   protected readonly branches = signal<readonly BranchListItem[]>([]);
+  protected readonly mediaDetails = signal<ServiceDetails | null>(null);
+  protected readonly mediaLoading = signal(false);
   protected readonly createTreeResetKey = signal(0);
   protected readonly creationRequestSummary = signal<ServiceGlobalizationRequestSummary | null>(null);
   protected readonly pendingRequestsBadge = computed(() => {
@@ -128,16 +159,25 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
     !node.isDeleted &&
     (node.scope === 'Global' ||
       (node.scope === 'BranchScoped' && node.isOwnedByCurrentBranch && node.canEditDefinition));
+  protected readonly canAssignBranchService = (node: ServiceTreeNode): boolean =>
+    canAssignServiceLeaf(node, this.branchActionPermissions());
   protected readonly canDeleteBranchService = (node: ServiceTreeNode): boolean =>
-    this.canManageBranchService(node) && this.canDeleteBranchServices() && !node.isDeleted;
+    canSoftDeleteService(node, this.branchActionPermissions()) &&
+    node.ownerBranchId === this.store.selectedBranchId();
   protected readonly canRestoreBranchService = (node: ServiceTreeNode): boolean =>
-    this.canManageBranchService(node) && this.canRestoreBranchServices() && node.isDeleted;
+    canRestoreService(node, this.branchActionPermissions()) &&
+    node.ownerBranchId === this.store.selectedBranchId();
+  protected readonly canPermanentDeleteBranchService = (node: ServiceTreeNode): boolean =>
+    canPermanentDeleteService(node, this.branchActionPermissions()) &&
+    node.ownerBranchId === this.store.selectedBranchId();
   protected readonly canUnassignBranchService = (node: ServiceTreeNode): boolean =>
-    node.scope === 'Global';
+    canUnassignService(node, this.branchActionPermissions());
   protected readonly canManageWorkflowFor = (node: ServiceTreeNode): boolean =>
     this.canViewWorkflows() && this.isScheduleEligibleService(node);
   protected readonly canManageScheduleFor = (node: ServiceTreeNode): boolean =>
     this.canViewSchedules() && this.isScheduleEligibleService(node);
+  protected readonly canManageMediaFor = (node: ServiceTreeNode): boolean =>
+    this.canViewDetails() && node.canEditDefinition;
   protected readonly branchActionsDisabled = computed(
     () => this.store.lifecyclePreparing() || this.store.lifecycleMutating(),
   );
@@ -152,7 +192,7 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
   constructor() {
     effect(() => {
       const branchId = this.store.selectedBranchId();
-      const canViewRequests = this.canViewOwnGlobalizationRequests();
+      const canViewRequests = this.canOpenGlobalizationRequests();
       const invalidation = this.invalidationService.branchRequestsInvalidation();
       const branchChanged = branchId !== this.pendingCountBranchId;
       this.pendingCountBranchId = branchId;
@@ -258,13 +298,13 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
     this.loadBranchTree();
 
     const branchId = this.store.selectedBranchId();
-    if (branchId && this.canViewOwnGlobalizationRequests()) {
+    if (branchId && this.canOpenGlobalizationRequests()) {
       this.loadPendingRequestsCount(branchId, true);
     }
   }
 
   protected openGlobalizationRequests(): void {
-    if (!this.canViewOwnGlobalizationRequests() || !this.store.hasSelectedBranch()) {
+    if (!this.canOpenGlobalizationRequests() || !this.store.hasSelectedBranch()) {
       return;
     }
 
@@ -332,6 +372,53 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
     ]);
   }
 
+
+  protected openServiceMedia(node: ServiceTreeNode): void {
+    if (!this.canManageMediaFor(node) || this.mediaLoading()) {
+      this.showMessage('error', this.translations().accessDenied);
+      return;
+    }
+
+    this.mediaLoading.set(true);
+    this.serviceManagementApiService
+      .getServiceDetails(node.id)
+      .pipe(finalize(() => this.mediaLoading.set(false)))
+      .subscribe({
+        next: (details) => {
+          if (!details.canEditDefinition) {
+            this.showMessage('error', this.translations().accessDenied);
+            return;
+          }
+
+          this.store.selectBranchNode(details.id);
+          this.mediaDetails.set(details);
+        },
+        error: (error: HttpErrorResponse) => this.handleApiError(error),
+      });
+  }
+
+  protected closeServiceMedia(): void {
+    if (!this.mediaLoading()) {
+      this.mediaDetails.set(null);
+    }
+  }
+
+  protected canManageLoadedMedia(details: ServiceDetails): boolean {
+    return this.canUpdate() && details.canEditDefinition && !details.isDeleted;
+  }
+
+  protected handleMediaMessage(message: { readonly tone: 'success' | 'error' | 'info'; readonly text: string }): void {
+    this.showMessage(message.tone, message.text);
+  }
+
+  protected handleMediaServiceChange(details: ServiceDetails): void {
+    this.mediaDetails.set(details);
+    this.loadBranchTree();
+  }
+
+  protected handleMediaChanged(): void {
+    this.loadBranchTree();
+  }
   protected openAssignDialog(): void {
     if (!this.canAssignBranchServices() || !this.store.selectedBranchId()) {
       this.showMessage('error', this.translations().accessDenied);
@@ -375,7 +462,7 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
       return;
     }
 
-    if (node.scope !== 'Global' || node.children.length > 0 || node.hasChildren) {
+    if (!this.canUnassignBranchService(node)) {
       this.showMessage('error', this.translations().invalidSelection);
       return;
     }
@@ -392,21 +479,16 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
     action: BranchServiceLifecycleAction,
   ): void {
     const branchId = this.store.selectedBranchId();
-    const hasPermission =
-      action === 'delete' ? this.canDeleteBranchServices() : this.canRestoreBranchServices();
+    const hasPermission = this.hasLifecyclePermission(action);
+    const canUseAction = this.canUseLifecycleAction(node, action);
 
     if (
       !branchId ||
       !hasPermission ||
-      !this.canManageBranchService(node) ||
+      !canUseAction ||
       this.store.lifecyclePreparing() ||
       this.store.lifecycleMutating()
     ) {
-      this.showMessage('error', this.translations().lifecycleActionUnavailable);
-      return;
-    }
-
-    if ((action === 'delete' && node.isDeleted) || (action === 'restore' && !node.isDeleted)) {
       this.showMessage('error', this.translations().lifecycleActionUnavailable);
       return;
     }
@@ -423,13 +505,12 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
 
   protected confirmLifecycle(): void {
     const state = this.store.lifecycleConfirmState();
-    const hasPermission = state?.action === 'delete'
-      ? this.canDeleteBranchServices()
-      : this.canRestoreBranchServices();
 
     if (!state || this.store.lifecycleMutating()) {
       return;
     }
+
+    const hasPermission = this.hasLifecyclePermission(state.action);
 
     if (
       !this.isBranchAdmin() ||
@@ -441,10 +522,12 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const request$: Observable<ServiceDeleteResponse | ServiceRestoreResponse> =
+    const request$: Observable<ServiceDeleteResponse | ServiceRestoreResponse | ServicePermanentDeleteResponse> =
       state.action === 'delete'
         ? this.serviceManagementApiService.deleteService(state.serviceId, state.rowVersion)
-        : this.serviceManagementApiService.restoreService(state.serviceId, state.rowVersion);
+        : state.action === 'restore'
+          ? this.serviceManagementApiService.restoreService(state.serviceId, state.rowVersion)
+          : this.serviceManagementApiService.permanentlyDeleteService(state.serviceId, state.rowVersion);
 
     this.store.lifecycleMutating.set(true);
     request$
@@ -455,6 +538,10 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
             state.action === 'restore' &&
             'effectiveIsActive' in response &&
             !response.effectiveIsActive;
+
+          if (state.action === 'permanentDelete' && this.mediaDetails()?.id === state.serviceId) {
+            this.mediaDetails.set(null);
+          }
 
           this.store.lifecycleConfirmState.set(null);
           this.store.selectBranchNode(null);
@@ -523,8 +610,16 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
   protected assignServices(serviceIds: readonly number[]): void {
     const branchId = this.store.selectedBranchId();
 
-    if (!branchId || serviceIds.length === 0) {
+    const selectedNodes = serviceIds
+      .map((serviceId) => this.findTreeNode(this.store.serviceCentralTree(), serviceId))
+      .filter((node): node is ServiceTreeNode => node !== null);
+    const hasInvalidSelection =
+      selectedNodes.length !== serviceIds.length ||
+      selectedNodes.some((node) => !this.canAssignBranchService(node));
+
+    if (!branchId || serviceIds.length === 0 || hasInvalidSelection) {
       this.showMessage('error', this.translations().invalidSelection);
+      this.loadServiceCentralTree();
       return;
     }
 
@@ -632,14 +727,64 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
     );
   }
 
-  private canManageBranchService(node: ServiceTreeNode): boolean {
-    return (
-      this.isBranchAdmin() &&
-      node.scope === 'BranchScoped' &&
-      node.isOwnedByCurrentBranch &&
-      node.canEditDefinition &&
-      node.ownerBranchId === this.store.selectedBranchId()
-    );
+  private branchActionPermissions(): ServiceActionPermissions {
+    return {
+      canAssignBranchServices: this.canAssignBranchServices(),
+      canUnassignBranchServices: this.canUnassignBranchServices(),
+      canUpdate: this.canUpdate(),
+      canDelete: this.canDeleteBranchServices(),
+      canRestore: this.canRestoreBranchServices(),
+      canDeletePermanent: this.canDeletePermanentBranchServices(),
+    };
+  }
+
+  private hasLifecyclePermission(action: BranchServiceLifecycleAction): boolean {
+    if (action === 'delete') {
+      return this.canDeleteBranchServices();
+    }
+
+    if (action === 'restore') {
+      return this.canRestoreBranchServices();
+    }
+
+    return this.canDeletePermanentBranchServices();
+  }
+
+  private canUseLifecycleAction(
+    service: ServiceTreeNode | ServiceDetails,
+    action: BranchServiceLifecycleAction,
+  ): boolean {
+    const ownedBySelectedBranch = service.ownerBranchId === this.store.selectedBranchId();
+
+    if (!this.isBranchAdmin() || !ownedBySelectedBranch) {
+      return false;
+    }
+
+    if (action === 'delete') {
+      return canSoftDeleteService(service, this.branchActionPermissions());
+    }
+
+    if (action === 'restore') {
+      return canRestoreService(service, this.branchActionPermissions());
+    }
+
+    return canPermanentDeleteService(service, this.branchActionPermissions());
+  }
+
+  private findTreeNode(nodes: readonly ServiceTreeNode[], serviceId: number): ServiceTreeNode | null {
+    for (const node of nodes) {
+      if (node.id === serviceId) {
+        return node;
+      }
+
+      const child = this.findTreeNode(node.children, serviceId);
+
+      if (child) {
+        return child;
+      }
+    }
+
+    return null;
   }
 
   private openLifecycleConfirm(
@@ -649,11 +794,8 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
   ): void {
     const hasValidState =
       this.store.selectedBranchId() === branchId &&
-      details.scope === 'BranchScoped' &&
-      details.isOwnedByCurrentBranch &&
       details.ownerBranchId === branchId &&
-      ((action === 'delete' && !details.isDeleted) ||
-        (action === 'restore' && details.isDeleted));
+      this.canUseLifecycleAction(details, action);
 
     if (!hasValidState) {
       this.showMessage('error', this.translations().lifecycleActionUnavailable);
@@ -770,7 +912,7 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
 
       if (
         !branchId ||
-        !this.canViewOwnGlobalizationRequests() ||
+        !this.canOpenGlobalizationRequests() ||
         this.store.pendingGlobalizationRequestsLoading()
       ) {
         return;
@@ -787,7 +929,12 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
 
     this.store.centralTreeLoading.set(true);
     this.serviceManagementApiService
-      .getServiceTree({ includeInactive: false, includeDeleted: false, scope: 'Global' })
+      .getServiceTree({
+        includeInactive: false,
+        includeDeleted: false,
+        scope: 'Global',
+        isAssignedToCurrentBranch: false,
+      })
       .pipe(finalize(() => this.store.centralTreeLoading.set(false)))
       .subscribe({
         next: (response) => this.store.serviceCentralTree.set(response),
@@ -816,6 +963,16 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
         this.loadBranches();
       }
 
+      return;
+    }
+
+    if (this.containsErrorCode(error, 'ServiceCodeAlreadyExists')) {
+      this.showMessage('error', formatTechnicalAdminApiError(error, this.translations().serviceCodeAlreadyExists));
+      return;
+    }
+
+    if (this.containsErrorCode(error, 'DuplicateServiceCodeInTreePayload')) {
+      this.showMessage('error', formatTechnicalAdminApiError(error, this.translations().duplicateServiceCodeInTree));
       return;
     }
 
@@ -873,6 +1030,11 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
     }
 
     this.handleApiError(error);
+  }
+
+  private containsErrorCode(error: HttpErrorResponse, expected: string): boolean {
+    const body = typeof error.error === 'string' ? error.error : JSON.stringify(error.error ?? '');
+    return body.toLowerCase().includes(expected.toLowerCase());
   }
 
   private showMessage(tone: 'success' | 'error' | 'info', text: string): void {

@@ -1,0 +1,13 @@
+<section [class]="classList()" role="status" aria-live="polite" aria-atomic="true">
+  <span class="nt-loading-orb" aria-hidden="true">
+    <span class="nt-loading-ring"></span>
+    <i [class]="icon()"></i>
+  </span>
+  <span class="nt-loading-copy">
+    <strong>{{ title() }}</strong>
+    @if (description()) {
+      <small>{{ description() }}</small>
+    }
+  </span>
+  <span class="nt-loading-bar" aria-hidden="true"></span>
+</section>

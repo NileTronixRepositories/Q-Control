@@ -10,6 +10,9 @@ import {
 } from '@angular/core';
 import {
   AbstractControl,
+  FormArray,
+  FormControl,
+  FormGroup,
   NonNullableFormBuilder,
   ReactiveFormsModule,
   ValidationErrors,
@@ -19,6 +22,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { finalize } from 'rxjs';
 
 import { TechnicalAdminPageHeroComponent } from '../../../../shared/components/technical-admin-page-hero/technical-admin-page-hero.component';
+import { NiletronixLoadingStateComponent } from '../../../../shared/components/niletronix-loading-state/niletronix-loading-state.component';
 import { AuthSessionService } from '../../../auth/services/auth-session.service';
 import { BranchListItem } from '../../../technical-admin/models/branch-management.model';
 import { BranchManagementApiService } from '../../../technical-admin/services/branch-management-api.service';
@@ -31,30 +35,116 @@ import {
   DayOfWeek,
   SERVICE_SCHEDULE_DAYS,
   ServiceSchedule,
-  ServiceScheduleFormMode,
   ServiceSchedulePendingChanges,
   ServiceScheduleScope,
+  ServiceScheduleTimeSlot,
   ServiceScheduleUiMessage,
 } from '../../models/service-schedule.model';
 import { BranchServicesApiService } from '../../services/branch-services-api.service';
 import { ServiceManagementPermissionService } from '../../services/service-management-permission.service';
 import { ServiceScheduleApiService } from '../../services/service-schedule-api.service';
 
-const TIME_PATTERN = /^([01]\d|2[0-3]):[0-5]\d(?::[0-5]\d)?$/;
+const TIME_PATTERN = /^([01]\d|2[0-3]):[0-5]\d$/;
+const API_TIME_PATTERN = /^([01]\d|2[0-3]):[0-5]\d(?::[0-5]\d)?$/;
+const AM_PM_TIME_PATTERN = /^(0?[1-9]|1[0-2]):([0-5]\d)(?::[0-5]\d)?\s*([AP]M)$/i;
 
-function serviceScheduleTimeValidator(control: AbstractControl): ValidationErrors | null {
-  const startTime = String(control.get('startTime')?.value ?? '').trim();
-  const endTime = String(control.get('endTime')?.value ?? '').trim();
+type TimeSlotGroup = FormGroup<{
+  startTime: FormControl<string>;
+  endTime: FormControl<string>;
+}>;
 
-  if (!startTime || !endTime) {
+type ScheduleDayGroup = FormGroup<{
+  dayOfWeek: FormControl<DayOfWeek>;
+  isWorkingDay: FormControl<boolean>;
+  timeSlots: FormArray<TimeSlotGroup>;
+}>;
+
+type ScheduleForm = FormGroup<{
+  days: FormArray<ScheduleDayGroup>;
+  isSlotCodeRequired: FormControl<boolean>;
+  slotCode: FormControl<string>;
+}>;
+
+function serviceScheduleDaysValidator(control: AbstractControl): ValidationErrors | null {
+  const daysControl = control.get('days');
+
+  if (!(daysControl instanceof FormArray)) {
     return null;
   }
 
-  if (!TIME_PATTERN.test(startTime) || !TIME_PATTERN.test(endTime)) {
-    return { invalidTime: true };
+  let hasWorkingDay = false;
+  let hasMissingSlot = false;
+  let hasInvalidTime = false;
+  let hasInvalidRange = false;
+  let hasDuplicateSlot = false;
+  let hasOverlap = false;
+
+  for (const dayControl of daysControl.controls) {
+    if (!dayControl.get('isWorkingDay')?.value) {
+      continue;
+    }
+
+    hasWorkingDay = true;
+    const slotsControl = dayControl.get('timeSlots');
+
+    if (!(slotsControl instanceof FormArray) || slotsControl.length === 0) {
+      hasMissingSlot = true;
+      continue;
+    }
+
+    const slots = slotsControl.controls.map((slotControl) => ({
+      startTime: String(slotControl.get('startTime')?.value ?? '').trim(),
+      endTime: String(slotControl.get('endTime')?.value ?? '').trim(),
+    }));
+
+    if (slots.some((slot) => !slot.startTime || !slot.endTime)) {
+      hasMissingSlot = true;
+    }
+
+    if (slots.some((slot) => !TIME_PATTERN.test(slot.startTime) || !TIME_PATTERN.test(slot.endTime))) {
+      hasInvalidTime = true;
+      continue;
+    }
+
+    const sortedSlots = slots
+      .map((slot) => ({
+        ...slot,
+        startMinutes: timeToMinutes(slot.startTime),
+        endMinutes: timeToMinutes(slot.endTime),
+      }))
+      .sort((first, second) => first.startMinutes - second.startMinutes || first.endMinutes - second.endMinutes);
+
+    if (sortedSlots.some((slot) => slot.startMinutes >= slot.endMinutes)) {
+      hasInvalidRange = true;
+    }
+
+    const seenSlots = new Set<string>();
+    for (const slot of sortedSlots) {
+      const key = `${slot.startTime}-${slot.endTime}`;
+      if (seenSlots.has(key)) {
+        hasDuplicateSlot = true;
+      }
+      seenSlots.add(key);
+    }
+
+    for (let index = 1; index < sortedSlots.length; index += 1) {
+      const previous = sortedSlots[index - 1];
+      const current = sortedSlots[index];
+      if (current.startMinutes < previous.endMinutes && current.endMinutes > previous.startMinutes) {
+        hasOverlap = true;
+      }
+    }
   }
 
-  return timeToMinutes(startTime) < timeToMinutes(endTime) ? null : { timeRange: true };
+  const errors: ValidationErrors = {};
+  if (!hasWorkingDay) errors['daysRequired'] = true;
+  if (hasMissingSlot) errors['timeSlotsRequired'] = true;
+  if (hasInvalidTime) errors['invalidTime'] = true;
+  if (hasInvalidRange) errors['timeRange'] = true;
+  if (hasDuplicateSlot) errors['duplicateTimeSlot'] = true;
+  if (hasOverlap) errors['overlappingTimeSlots'] = true;
+
+  return Object.keys(errors).length > 0 ? errors : null;
 }
 
 function timeToMinutes(value: string): number {
@@ -71,7 +161,7 @@ interface ServiceScheduleSelectLevel {
 @Component({
   selector: 'app-service-schedules',
   standalone: true,
-  imports: [ReactiveFormsModule, TechnicalAdminPageHeroComponent],
+  imports: [ReactiveFormsModule, TechnicalAdminPageHeroComponent, NiletronixLoadingStateComponent],
   templateUrl: './service-schedules.component.html',
   styleUrl: './service-schedules.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -133,25 +223,20 @@ export class ServiceSchedulesComponent implements OnInit, OnDestroy, ServiceSche
   protected readonly treeLoading = signal(false);
   protected readonly scheduleLoading = signal(false);
   protected readonly saving = signal(false);
-  protected readonly formMode = signal<ServiceScheduleFormMode>('closed');
   protected readonly reloadRequired = signal(false);
   protected readonly slotCodeConflict = signal(false);
-  protected readonly selectedWorkDays = computed(() => this.scheduleForm.controls.workDays.value);
-  protected readonly canSave = computed(() => {
+  protected readonly lacksInlinePermission = computed(() => {
     const current = this.schedule();
-    return !this.saving() && !this.reloadRequired() && (current?.isCurrentlyOperational ?? true);
+    return current ? !this.canUpdate() : !this.canCreate();
   });
+  protected readonly canEditInline = computed(() => {
+    const current = this.schedule();
+    return !this.lacksInlinePermission() && !this.reloadRequired() && (current?.isCurrentlyOperational ?? true);
+  });
+  protected readonly inlineControlsDisabled = computed(() => !this.canEditInline() || this.saving());
+  protected readonly canSave = computed(() => this.canEditInline() && !this.saving());
 
-  protected readonly scheduleForm = this.formBuilder.group(
-    {
-      startTime: ['', [Validators.required]],
-      endTime: ['', [Validators.required]],
-      workDays: this.formBuilder.control<readonly DayOfWeek[]>([], [Validators.required]),
-      isSlotCodeRequired: [false],
-      slotCode: ['', [Validators.maxLength(100)]],
-    },
-    { validators: serviceScheduleTimeValidator },
-  );
+  protected readonly scheduleForm = this.createScheduleForm();
 
   private readonly routeBranchId = this.readPositiveInt(
     this.route.snapshot.paramMap.get('branchId'),
@@ -276,136 +361,154 @@ export class ServiceSchedulesComponent implements OnInit, OnDestroy, ServiceSche
     }
   }
 
-  protected openCreate(): void {
-    if (!this.canCreate() || this.schedule()) {
-      this.showMessage('error', this.translations().accessDenied);
-      return;
-    }
-
-    this.reloadRequired.set(false);
-    this.slotCodeConflict.set(false);
-    this.scheduleForm.reset({
-      startTime: '',
-      endTime: '',
-      workDays: [],
-      isSlotCodeRequired: false,
-      slotCode: '',
-    });
-    this.formMode.set('create');
-  }
-
-  protected openEdit(): void {
-    const current = this.schedule();
-
-    if (!current || !this.canUpdate()) {
-      this.showMessage('error', this.translations().accessDenied);
-      return;
-    }
-
-    if (!current.isCurrentlyOperational) {
-      this.showMessage('error', this.translations().currentlyUnavailableHint);
-      return;
-    }
-
-    this.reloadRequired.set(false);
-    this.slotCodeConflict.set(false);
-    this.scheduleForm.reset({
-      startTime: this.toInputTime(current.startTime),
-      endTime: this.toInputTime(current.endTime),
-      workDays: [...current.workDays],
-      isSlotCodeRequired: current.isSlotCodeRequired,
-      slotCode: current.slotCode ?? '',
-    });
-    this.formMode.set('edit');
-  }
-
-  protected closeForm(): void {
+  protected resetInlineChanges(): void {
     if (!this.canDeactivatePendingChanges()) {
       return;
     }
 
-    this.formMode.set('closed');
     this.reloadRequired.set(false);
-    this.scheduleForm.markAsPristine();
+    this.slotCodeConflict.set(false);
+    this.resetScheduleForm(this.schedule());
   }
 
   protected reloadLatest(): void {
+    if (!this.canDeactivatePendingChanges()) {
+      return;
+    }
+
     this.reloadRequired.set(false);
     this.loadSchedule();
   }
 
-  protected toggleWorkDay(day: DayOfWeek, checked: boolean): void {
-    const selected = new Set(this.scheduleForm.controls.workDays.value);
+  protected dayGroups(): readonly ScheduleDayGroup[] {
+    return this.scheduleForm.controls.days.controls;
+  }
 
-    if (checked) {
-      selected.add(day);
-    } else {
-      selected.delete(day);
+  protected timeSlotGroups(dayIndex: number): readonly TimeSlotGroup[] {
+    return this.dayGroup(dayIndex).controls.timeSlots.controls;
+  }
+
+  protected openNativeTimePicker(input: HTMLInputElement): void {
+    if (this.inlineControlsDisabled()) {
+      return;
     }
 
-    this.scheduleForm.controls.workDays.setValue(
-      SERVICE_SCHEDULE_DAYS.filter((item) => selected.has(item)),
-    );
-    this.scheduleForm.controls.workDays.markAsDirty();
-    this.scheduleForm.controls.workDays.markAsTouched();
+    const picker = input as { showPicker?: () => void };
+
+    if (typeof picker.showPicker === 'function') {
+      picker.showPicker();
+    }
   }
 
-  protected hasWorkDay(day: DayOfWeek): boolean {
-    return this.selectedWorkDays().includes(day);
+  protected dayIsWorking(dayIndex: number): boolean {
+    return this.dayGroup(dayIndex).controls.isWorkingDay.value;
   }
 
+  protected toggleWorkingDay(dayIndex: number, checked: boolean): void {
+    if (!this.canEditInline()) {
+      return;
+    }
+
+    const dayGroup = this.dayGroup(dayIndex);
+    const slots = dayGroup.controls.timeSlots;
+
+    if (checked) {
+      dayGroup.controls.isWorkingDay.setValue(true);
+      if (slots.length === 0) {
+        slots.push(this.createTimeSlotGroup());
+      }
+    } else {
+      if (this.hasEnteredTimeSlots(slots) && !window.confirm(this.translations().disableDayConfirm)) {
+        return;
+      }
+
+      slots.clear();
+      dayGroup.controls.isWorkingDay.setValue(false);
+    }
+
+    dayGroup.markAsDirty();
+    dayGroup.markAsTouched();
+    this.scheduleForm.updateValueAndValidity();
+  }
+
+  protected addTimeSlot(dayIndex: number): void {
+    if (!this.canEditInline()) {
+      return;
+    }
+
+    const dayGroup = this.dayGroup(dayIndex);
+
+    dayGroup.controls.isWorkingDay.setValue(true);
+    dayGroup.controls.timeSlots.push(this.createTimeSlotGroup());
+    dayGroup.markAsDirty();
+    dayGroup.markAsTouched();
+    this.scheduleForm.updateValueAndValidity();
+  }
+
+  protected removeTimeSlot(dayIndex: number, slotIndex: number): void {
+    if (!this.canEditInline()) {
+      return;
+    }
+
+    const dayGroup = this.dayGroup(dayIndex);
+    const slots = dayGroup.controls.timeSlots;
+
+    slots.removeAt(slotIndex);
+
+    if (slots.length === 0) {
+      dayGroup.controls.isWorkingDay.setValue(false);
+    }
+
+    dayGroup.markAsDirty();
+    dayGroup.markAsTouched();
+    this.scheduleForm.updateValueAndValidity();
+  }
   protected submit(): void {
     const currentScope = this.scope();
     this.scheduleForm.markAllAsTouched();
     this.slotCodeConflict.set(false);
     this.applySlotCodeValidation();
+    this.scheduleForm.updateValueAndValidity();
 
     if (!currentScope || this.scheduleForm.invalid || !this.canSave()) {
       return;
     }
 
     const request = this.mapRequest();
-    const mode = this.formMode();
-    const mutation$ =
-      mode === 'create'
-        ? this.apiService.createSchedule(currentScope.branchId, currentScope.leafServiceId, request)
-        : this.apiService.updateSchedule(currentScope.branchId, currentScope.leafServiceId, {
-            ...request,
-            rowVersion: this.schedule()?.rowVersion ?? '',
-          });
+    const isCreate = this.schedule() === null;
+    const mutation$ = isCreate
+      ? this.apiService.createSchedule(currentScope.branchId, currentScope.leafServiceId, request)
+      : this.apiService.updateSchedule(currentScope.branchId, currentScope.leafServiceId, {
+          ...request,
+          rowVersion: this.schedule()?.rowVersion ?? '',
+        });
 
     this.saving.set(true);
     mutation$.pipe(finalize(() => this.saving.set(false))).subscribe({
       next: (response) => {
         this.schedule.set(response);
-        this.formMode.set('closed');
+        this.syncSelectorState(response.branchId, response.serviceId);
         this.reloadRequired.set(false);
-        this.scheduleForm.markAsPristine();
+        this.resetScheduleForm(response);
         this.showMessage(
           'success',
           response.message ||
-            (mode === 'create'
-              ? this.translations().scheduleCreated
-              : this.translations().scheduleUpdated),
+            (isCreate ? this.translations().scheduleCreated : this.translations().scheduleUpdated),
         );
       },
       error: (error: HttpErrorResponse) => this.handleMutationError(error),
     });
   }
 
-  protected controlError(controlName: 'startTime' | 'endTime' | 'slotCode'): string | null {
+  protected controlError(controlName: 'slotCode'): string | null {
     const control = this.scheduleForm.controls[controlName];
 
-    if (controlName === 'slotCode' && this.slotCodeConflict()) {
+    if (this.slotCodeConflict()) {
       return this.translations().slotCodeAlreadyExists;
     }
 
     if (!control.touched || !control.invalid) {
       return null;
-    }
-
-    if (control.hasError('required')) {
-      return this.translations().requiredField;
     }
 
     if (control.hasError('maxlength')) {
@@ -423,9 +526,40 @@ export class ServiceSchedulesComponent implements OnInit, OnDestroy, ServiceSche
     return null;
   }
 
+  protected slotControlError(
+    dayIndex: number,
+    slotIndex: number,
+    controlName: 'startTime' | 'endTime',
+  ): string | null {
+    const control = this.timeSlotGroup(dayIndex, slotIndex).controls[controlName];
+
+    if (!control.touched || !control.invalid) {
+      return null;
+    }
+
+    if (control.hasError('required')) {
+      return controlName === 'startTime'
+        ? this.translations().startTimeRequired
+        : this.translations().endTimeRequired;
+    }
+
+    if (control.hasError('pattern')) {
+      return this.translations().invalidTime;
+    }
+
+    return null;
+  }
   protected formError(): string | null {
     if (!this.scheduleForm.touched) {
       return null;
+    }
+
+    if (this.scheduleForm.hasError('daysRequired')) {
+      return this.translations().workDaysRequired;
+    }
+
+    if (this.scheduleForm.hasError('timeSlotsRequired')) {
+      return this.translations().timeSlotsRequired;
     }
 
     if (this.scheduleForm.hasError('invalidTime')) {
@@ -436,19 +570,18 @@ export class ServiceSchedulesComponent implements OnInit, OnDestroy, ServiceSche
       return this.translations().timeRangeInvalid;
     }
 
-    if (this.scheduleForm.controls.workDays.touched && this.selectedWorkDays().length === 0) {
-      return this.translations().workDaysRequired;
+    if (this.scheduleForm.hasError('duplicateTimeSlot')) {
+      return this.translations().duplicateTimeSlot;
+    }
+
+    if (this.scheduleForm.hasError('overlappingTimeSlots')) {
+      return this.translations().overlappingTimeSlots;
     }
 
     return null;
   }
-
   protected dayLabel(day: DayOfWeek): string {
     return this.translations().dayLabels[day];
-  }
-
-  protected formatDays(days: readonly DayOfWeek[]): string {
-    return days.map((day) => this.dayLabel(day)).join(', ');
   }
 
   protected displayTime(value: string): string {
@@ -488,6 +621,14 @@ export class ServiceSchedulesComponent implements OnInit, OnDestroy, ServiceSche
 
           if (this.routeLeafServiceId) {
             this.activateRouteScope(branchId, this.routeLeafServiceId);
+            return;
+          }
+
+          const currentLeafServiceId =
+            this.scope()?.leafServiceId ?? this.schedule()?.serviceId ?? null;
+
+          if (currentLeafServiceId) {
+            this.syncSelectorState(branchId, currentLeafServiceId);
           }
         },
         error: (error: HttpErrorResponse) => this.handleApiError(error),
@@ -502,8 +643,7 @@ export class ServiceSchedulesComponent implements OnInit, OnDestroy, ServiceSche
       return;
     }
 
-    this.selectedBranchId.set(branchId);
-    this.selectedServicePath.set(this.findTreePath(this.scheduleTree(), leafServiceId));
+    this.syncSelectorState(branchId, leafServiceId);
     this.scope.set({
       branchId,
       leafServiceId,
@@ -511,6 +651,16 @@ export class ServiceSchedulesComponent implements OnInit, OnDestroy, ServiceSche
       serviceName: this.serviceName(node),
     });
     this.loadSchedule();
+  }
+
+  private syncSelectorState(branchId: number, leafServiceId: number): void {
+    this.selectedBranchId.set(branchId);
+
+    const servicePath = this.findTreePath(this.scheduleTree(), leafServiceId);
+
+    if (servicePath.length > 0) {
+      this.selectedServicePath.set(servicePath);
+    }
   }
 
   private loadSchedule(): void {
@@ -527,16 +677,15 @@ export class ServiceSchedulesComponent implements OnInit, OnDestroy, ServiceSche
       .subscribe({
         next: (response) => {
           this.schedule.set(response);
-          this.formMode.set('closed');
+          this.syncSelectorState(response.branchId, response.serviceId);
           this.reloadRequired.set(false);
-          this.scheduleForm.markAsPristine();
+          this.resetScheduleForm(response);
         },
         error: (error: HttpErrorResponse) => {
           if (error.status === 404 && this.containsErrorCode(error, 'ScheduleNotFound')) {
             this.schedule.set(null);
-            this.formMode.set('closed');
             this.reloadRequired.set(false);
-            this.scheduleForm.markAsPristine();
+            this.resetScheduleForm(null);
             return;
           }
 
@@ -552,10 +701,9 @@ export class ServiceSchedulesComponent implements OnInit, OnDestroy, ServiceSche
     if (options.clearServicePath !== false) {
       this.selectedServicePath.set([]);
     }
-    this.formMode.set('closed');
     this.reloadRequired.set(false);
     this.slotCodeConflict.set(false);
-    this.scheduleForm.markAsPristine();
+    this.resetScheduleForm(null);
   }
 
   private filterScheduleTree(nodes: readonly ServiceTreeNode[]): readonly ServiceTreeNode[] {
@@ -587,19 +735,97 @@ export class ServiceSchedulesComponent implements OnInit, OnDestroy, ServiceSche
     );
   }
 
+  private createScheduleForm(): ScheduleForm {
+    return this.formBuilder.group(
+      {
+        days: this.formBuilder.array(SERVICE_SCHEDULE_DAYS.map((day) => this.createDayGroup(day))),
+        isSlotCodeRequired: [false],
+        slotCode: ['', [Validators.maxLength(100)]],
+      },
+      { validators: serviceScheduleDaysValidator },
+    ) as ScheduleForm;
+  }
+
+  private createDayGroup(
+    dayOfWeek: DayOfWeek,
+    timeSlots: readonly ServiceScheduleTimeSlot[] = [],
+  ): ScheduleDayGroup {
+    return this.formBuilder.group({
+      dayOfWeek: this.formBuilder.control(dayOfWeek),
+      isWorkingDay: this.formBuilder.control(timeSlots.length > 0),
+      timeSlots: this.formBuilder.array(
+        timeSlots.map((slot) =>
+          this.createTimeSlotGroup(this.toInputTime(slot.startTime), this.toInputTime(slot.endTime)),
+        ),
+      ),
+    }) as ScheduleDayGroup;
+  }
+
+  private createTimeSlotGroup(startTime = '', endTime = ''): TimeSlotGroup {
+    return this.formBuilder.group({
+      startTime: [startTime, [Validators.required, Validators.pattern(TIME_PATTERN)]],
+      endTime: [endTime, [Validators.required, Validators.pattern(TIME_PATTERN)]],
+    }) as TimeSlotGroup;
+  }
+
+  private resetScheduleForm(schedule: ServiceSchedule | null = null): void {
+    const daysByName = new Map(schedule?.days.map((day) => [day.dayOfWeek, day]) ?? []);
+    const daysArray = this.scheduleForm.controls.days;
+
+    daysArray.clear();
+    SERVICE_SCHEDULE_DAYS.forEach((day) => {
+      daysArray.push(this.createDayGroup(day, daysByName.get(day)?.timeSlots ?? []));
+    });
+
+    this.scheduleForm.controls.isSlotCodeRequired.setValue(schedule?.isSlotCodeRequired ?? false);
+    this.scheduleForm.controls.slotCode.setValue(schedule?.slotCode ?? '');
+    this.scheduleForm.markAsPristine();
+    this.scheduleForm.markAsUntouched();
+    this.scheduleForm.updateValueAndValidity();
+  }
+
+  private dayGroup(dayIndex: number): ScheduleDayGroup {
+    return this.scheduleForm.controls.days.at(dayIndex);
+  }
+
+  private timeSlotGroup(dayIndex: number, slotIndex: number): TimeSlotGroup {
+    return this.dayGroup(dayIndex).controls.timeSlots.at(slotIndex);
+  }
+
+  private hasEnteredTimeSlots(slots: FormArray<TimeSlotGroup>): boolean {
+    return slots.controls.some((slot) =>
+      Boolean(slot.controls.startTime.value.trim() || slot.controls.endTime.value.trim()),
+    );
+  }
   private mapRequest(): CreateServiceScheduleRequest {
     const value = this.scheduleForm.getRawValue();
     const slotCode = value.slotCode.trim();
+    const days = this.scheduleForm.controls.days.controls
+      .filter((dayGroup) => dayGroup.controls.isWorkingDay.value)
+      .map((dayGroup) => ({
+        dayOfWeek: dayGroup.controls.dayOfWeek.value,
+        timeSlots: dayGroup.controls.timeSlots.controls
+          .map((slotGroup) => ({
+            startTime: this.toApiTime(slotGroup.controls.startTime.value),
+            endTime: this.toApiTime(slotGroup.controls.endTime.value),
+          }))
+          .sort((first, second) => this.compareTimeSlots(first, second)),
+      }));
 
     return {
-      startTime: this.toApiTime(value.startTime),
-      endTime: this.toApiTime(value.endTime),
-      workDays: SERVICE_SCHEDULE_DAYS.filter((day) => value.workDays.includes(day)),
+      days,
       isSlotCodeRequired: value.isSlotCodeRequired,
       slotCode: value.isSlotCodeRequired ? slotCode : null,
     };
   }
 
+  private compareTimeSlots(
+    first: ServiceScheduleTimeSlot,
+    second: ServiceScheduleTimeSlot,
+  ): number {
+    const startCompare = first.startTime.localeCompare(second.startTime);
+    return startCompare === 0 ? first.endTime.localeCompare(second.endTime) : startCompare;
+  }
   private applySlotCodeValidation(): void {
     const slotControl = this.scheduleForm.controls.slotCode;
     const currentErrors = { ...(slotControl.errors ?? {}) };
@@ -746,11 +972,33 @@ export class ServiceSchedulesComponent implements OnInit, OnDestroy, ServiceSche
   }
 
   private toInputTime(value: string): string {
-    return TIME_PATTERN.test(value) ? value.slice(0, 5) : '';
+    const normalizedValue = value.trim();
+
+    if (API_TIME_PATTERN.test(normalizedValue)) {
+      return normalizedValue.slice(0, 5);
+    }
+
+    const amPmMatch = AM_PM_TIME_PATTERN.exec(normalizedValue);
+
+    if (!amPmMatch) {
+      return '';
+    }
+
+    const period = amPmMatch[3].toUpperCase();
+    const hour = Number(amPmMatch[1]);
+    const minute = amPmMatch[2];
+    const normalizedHour = period === 'AM'
+      ? hour % 12
+      : hour === 12
+        ? 12
+        : hour + 12;
+
+    return `${String(normalizedHour).padStart(2, '0')}:${minute}`;
   }
 
   private toApiTime(value: string): string {
-    return value.length === 5 ? `${value}:00` : value;
+    const normalizedValue = this.toInputTime(value);
+    return normalizedValue ? `${normalizedValue}:00` : value.trim();
   }
 
   private readPositiveInt(value: string | null): number | null {

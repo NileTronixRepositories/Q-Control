@@ -10,6 +10,8 @@ import {
   DayOfWeek,
   SERVICE_SCHEDULE_DAYS,
   ServiceSchedule,
+  ServiceScheduleDay,
+  ServiceScheduleTimeSlot,
   UpdateServiceScheduleRequest,
 } from '../models/service-schedule.model';
 
@@ -85,9 +87,7 @@ export class ServiceScheduleApiService {
       scheduleId: this.readNumber(record, ['scheduleId', 'id']) ?? 0,
       branchId: this.readNumber(record, ['branchId']) ?? branchId,
       serviceId: this.readNumber(record, ['serviceId', 'leafServiceId']) ?? leafServiceId,
-      startTime: this.readString(record, ['startTime']) ?? '',
-      endTime: this.readString(record, ['endTime']) ?? '',
-      workDays: this.normalizeWorkDays(record['workDays']),
+      days: this.normalizeDays(record['days']),
       isSlotCodeRequired: this.readBoolean(record, ['isSlotCodeRequired']) ?? false,
       slotCode: this.readString(record, ['slotCode']) ?? null,
       isCurrentlyOperational: this.readBoolean(record, ['isCurrentlyOperational']) ?? true,
@@ -103,14 +103,59 @@ export class ServiceScheduleApiService {
     };
   }
 
-  private normalizeWorkDays(value: unknown): readonly DayOfWeek[] {
+  private normalizeDays(value: unknown): readonly ServiceScheduleDay[] {
     if (!Array.isArray(value)) {
       return [];
     }
 
-    return [...new Set(value)].filter(
-      (item): item is DayOfWeek => typeof item === 'string' && DAY_VALUES.has(item),
-    );
+    const daysByName = new Map<DayOfWeek, ServiceScheduleDay>();
+
+    for (const item of value) {
+      const record = this.asRecord(item);
+      const dayOfWeek = this.readDay(record['dayOfWeek']);
+
+      if (!dayOfWeek || daysByName.has(dayOfWeek)) {
+        continue;
+      }
+
+      const timeSlots = this.normalizeTimeSlots(record['timeSlots']);
+      if (timeSlots.length === 0) {
+        continue;
+      }
+
+      daysByName.set(dayOfWeek, { dayOfWeek, timeSlots });
+    }
+
+    return SERVICE_SCHEDULE_DAYS.flatMap((day) => {
+      const scheduleDay = daysByName.get(day);
+      return scheduleDay ? [scheduleDay] : [];
+    });
+  }
+
+  private normalizeTimeSlots(value: unknown): readonly ServiceScheduleTimeSlot[] {
+    if (!Array.isArray(value)) {
+      return [];
+    }
+
+    return value
+      .map((item): ServiceScheduleTimeSlot | null => {
+        const record = this.asRecord(item);
+        const startTime = this.readString(record, ['startTime']);
+        const endTime = this.readString(record, ['endTime']);
+
+        return startTime && endTime ? { startTime, endTime } : null;
+      })
+      .filter((item): item is ServiceScheduleTimeSlot => item !== null)
+      .sort((first, second) => this.compareTimeSlots(first, second));
+  }
+
+  private readDay(value: unknown): DayOfWeek | null {
+    return typeof value === 'string' && DAY_VALUES.has(value) ? (value as DayOfWeek) : null;
+  }
+
+  private compareTimeSlots(first: ServiceScheduleTimeSlot, second: ServiceScheduleTimeSlot): number {
+    const startCompare = first.startTime.localeCompare(second.startTime);
+    return startCompare === 0 ? first.endTime.localeCompare(second.endTime) : startCompare;
   }
 
   private unwrapResponse(source: unknown): unknown {

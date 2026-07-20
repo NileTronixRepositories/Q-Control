@@ -127,8 +127,10 @@
   gap: 8px !important;
   min-height: 38px !important;
   padding: 0 14px !important;
-  font: inherit !important;
+  color: var(--q-text-secondary, #243647) !important;
+  font-family: inherit !important;
   font-size: 0.82rem !important;
+  font-weight: 500 !important;
   font-weight: 800 !important;
   line-height: 1.2 !important;
   text-align: center !important;
@@ -242,8 +244,10 @@
   ) {
   min-height: 38px !important;
   border: 1px solid #d7e1ec !important;
-  font: inherit !important;
+  color: var(--q-text-secondary, #243647) !important;
+  font-family: inherit !important;
   font-size: 0.82rem !important;
+  font-weight: 500 !important;
   outline: 0 !important;
   box-shadow: none !important;
 }

@@ -1,4 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
+import { Router } from '@angular/router';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -12,13 +13,18 @@ import {
   signal,
   untracked,
 } from '@angular/core';
-import { finalize } from 'rxjs';
+import { finalize, Observable } from 'rxjs';
 
+import { AuthSessionService } from '../../../auth/services/auth-session.service';
 import { TechnicalAdminI18nStore } from '../../../technical-admin/store/technical-admin-i18n.store';
 import { formatTechnicalAdminApiError } from '../../../technical-admin/utils/api-error-message.util';
 import { SERVICE_GLOBALIZATION_TRANSLATIONS } from '../../i18n/service-globalization.translations';
 import {
+  ApproveServiceGlobalizationRequestResponse,
   PagedServiceGlobalizationRequestsResponse,
+  RejectServiceGlobalizationRequestResponse,
+  ServiceGlobalizationDecisionAction,
+  ServiceGlobalizationDecisionState,
   ServiceGlobalizationOrderSort,
   ServiceGlobalizationRequestListItem,
   ServiceGlobalizationRequestStatus,
@@ -26,6 +32,7 @@ import {
 } from '../../models/service-globalization.model';
 import { ServiceDataInvalidationService } from '../../services/service-data-invalidation.service';
 import { ServiceGlobalizationApiService } from '../../services/service-globalization-api.service';
+import { ServiceManagementPermissionService } from '../../services/service-management-permission.service';
 
 const STATUS_POLL_INTERVAL_MS = 15_000;
 
@@ -36,9 +43,12 @@ const STATUS_POLL_INTERVAL_MS = 15_000;
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BranchGlobalizationRequestsComponent implements OnDestroy {
+  private readonly router = inject(Router);
+  private readonly authSessionService = inject(AuthSessionService);
   private readonly apiService = inject(ServiceGlobalizationApiService);
   private readonly i18nStore = inject(TechnicalAdminI18nStore);
   private readonly invalidationService = inject(ServiceDataInvalidationService);
+  private readonly permissionService = inject(ServiceManagementPermissionService);
   readonly branchId = input.required<number>();
   readonly open = input(false);
   readonly refreshKey = input(0);
@@ -53,7 +63,12 @@ export class BranchGlobalizationRequestsComponent implements OnDestroy {
   protected readonly orderSort = signal<ServiceGlobalizationOrderSort>('Newest');
   protected readonly searchText = signal('');
   protected readonly loading = signal(false);
+  protected readonly mutating = signal(false);
   protected readonly error = signal<string | null>(null);
+  protected readonly decisionState = signal<ServiceGlobalizationDecisionState | null>(null);
+  protected readonly rejectionReason = signal('');
+  protected readonly canApprove = this.permissionService.canApproveGlobalizationRequests;
+  protected readonly canReject = this.permissionService.canRejectGlobalizationRequests;
   protected readonly totalPages = computed(() => Math.max(1, Math.ceil(this.page().totalItems / this.page().pageSize)));
   private requestId = 0;
   private activeBranchId: number | null = null;
@@ -112,7 +127,14 @@ export class BranchGlobalizationRequestsComponent implements OnDestroy {
   }
 
   protected close(): void {
+    if (this.mutating()) return;
     this.closed.emit();
+  }
+
+  protected closeDecision(): void {
+    if (this.mutating()) return;
+    this.decisionState.set(null);
+    this.rejectionReason.set('');
   }
 
   protected load(
@@ -137,7 +159,7 @@ export class BranchGlobalizationRequestsComponent implements OnDestroy {
       },
       error: (error: HttpErrorResponse) => {
         if (requestId === this.requestId && this.branchId() === branchId) {
-          this.error.set(formatTechnicalAdminApiError(error, this.translations().fallbackError));
+          this.handleError(error);
         }
       },
     });
@@ -187,6 +209,61 @@ export class BranchGlobalizationRequestsComponent implements OnDestroy {
 
     return 'bi bi-hourglass-split';
   }
+  protected requestDecision(
+    item: ServiceGlobalizationRequestListItem,
+    action: ServiceGlobalizationDecisionAction,
+  ): void {
+    if (!this.canStartDecision(item.status, action)) return;
+    this.error.set(null);
+    this.rejectionReason.set('');
+    this.decisionState.set({
+      action,
+      requestId: item.requestId,
+      serviceName: this.serviceName(item),
+      rowVersion: item.rowVersion,
+    });
+  }
+
+  protected confirmDecision(): void {
+    const decision = this.decisionState();
+    if (!decision || this.mutating()) return;
+    if (decision.action === 'reject' && this.rejectionReason().length > 1000) return;
+
+    this.mutating.set(true);
+    this.error.set(null);
+
+    const request$: Observable<
+      ApproveServiceGlobalizationRequestResponse | RejectServiceGlobalizationRequestResponse
+    > =
+      decision.action === 'approve'
+        ? this.apiService.approveRequest(decision.requestId, decision.rowVersion)
+        : this.apiService.rejectRequest(decision.requestId, decision.rowVersion, {
+            rejectionReason: this.rejectionReason().trim() || null,
+          });
+
+    request$.pipe(finalize(() => this.mutating.set(false))).subscribe({
+      next: (response) => {
+        this.decisionState.set(null);
+        this.rejectionReason.set('');
+
+        if (response.status === 'Approved') {
+          this.invalidationService.invalidateAfterApproval(response.branchId);
+        } else {
+          this.invalidationService.invalidateAfterRejection(response.branchId);
+        }
+
+        this.load(this.page().currentPage, response.branchId, true);
+      },
+      error: (error: HttpErrorResponse) => this.handleMutationError(error),
+    });
+  }
+
+  protected canStartDecision(
+    status: ServiceGlobalizationRequestStatus,
+    action: ServiceGlobalizationDecisionAction,
+  ): boolean {
+    return status === 'Pending' && (action === 'approve' ? this.canApprove() : this.canReject());
+  }
 
   protected typeLabel(type: ServiceGlobalizationRequestType): string {
     return type === 'BranchServiceTree' ? this.translations().branchServiceTree : this.translations().leafUnderGlobalParent;
@@ -197,6 +274,38 @@ export class BranchGlobalizationRequestsComponent implements OnDestroy {
     const date = new Date(value);
     return Number.isNaN(date.getTime()) ? value : new Intl.DateTimeFormat(this.language() === 'ar' ? 'ar-EG' : 'en-GB', { dateStyle: 'medium' }).format(date);
   }
+  private handleMutationError(error: HttpErrorResponse): void {
+    if (error.status === 409) {
+      const message = formatTechnicalAdminApiError(error, this.translations().conflictReloaded);
+      this.decisionState.set(null);
+      this.rejectionReason.set('');
+      this.load(this.page().currentPage, this.branchId(), true);
+      this.error.set(message);
+      return;
+    }
+
+    if (error.status === 404) {
+      const message = formatTechnicalAdminApiError(error, this.translations().fallbackError);
+      this.decisionState.set(null);
+      this.rejectionReason.set('');
+      this.load(this.page().currentPage, this.branchId(), true);
+      this.error.set(message);
+      return;
+    }
+
+    this.handleError(error);
+  }
+
+  private handleError(error: HttpErrorResponse): void {
+    if (this.authSessionService.shouldClearSessionForHttpStatus(error.status)) {
+      this.authSessionService.clearSession();
+      void this.router.navigateByUrl('/auth/login');
+      return;
+    }
+
+    const fallback = error.status === 403 ? this.translations().accessDenied : this.translations().fallbackError;
+    this.error.set(formatTechnicalAdminApiError(error, fallback));
+  }
 
   private resetForBranch(): void {
     this.requestId += 1;
@@ -206,6 +315,9 @@ export class BranchGlobalizationRequestsComponent implements OnDestroy {
     this.orderSort.set('Newest');
     this.searchText.set('');
     this.loading.set(false);
+    this.mutating.set(false);
     this.error.set(null);
+    this.decisionState.set(null);
+    this.rejectionReason.set('');
   }
 }

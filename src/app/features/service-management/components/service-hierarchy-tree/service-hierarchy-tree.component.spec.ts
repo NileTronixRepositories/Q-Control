@@ -34,6 +34,7 @@ describe('ServiceHierarchyTreeComponent', () => {
     fixture.componentRef.setInput('canUpdate', false);
     fixture.componentRef.setInput('canDelete', false);
     fixture.componentRef.setInput('canRestore', false);
+    fixture.componentRef.setInput('canPermanentDelete', false);
     fixture.componentRef.setInput('canUnassign', true);
     fixture.componentRef.setInput('unassignLabel', 'Unassign');
     fixture.detectChanges();
@@ -95,8 +96,10 @@ describe('ServiceHierarchyTreeComponent', () => {
     fixture.componentRef.setInput('expandedNodeIds', new Set([ownedParent.id]));
     fixture.componentRef.setInput('canDelete', true);
     fixture.componentRef.setInput('canRestore', true);
+    fixture.componentRef.setInput('canPermanentDelete', true);
     fixture.componentRef.setInput('canDeleteNode', isOwnedBranchService);
     fixture.componentRef.setInput('canRestoreNode', isOwnedBranchService);
+    fixture.componentRef.setInput('canPermanentDeleteNode', isOwnedBranchService);
     fixture.componentRef.setInput(
       'canUnassignNode',
       (node: ServiceTreeNode) => node.scope === 'Global',
@@ -105,6 +108,7 @@ describe('ServiceHierarchyTreeComponent', () => {
 
     expect(fixture.nativeElement.querySelectorAll('button[aria-label="Delete"]').length).toBe(2);
     expect(fixture.nativeElement.querySelectorAll('button[aria-label="Restore"]').length).toBe(1);
+    expect(fixture.nativeElement.querySelectorAll('button[aria-label="Permanently Delete"]').length).toBe(1);
     expect(fixture.nativeElement.querySelectorAll('button[aria-label="Unassign"]').length).toBe(1);
   });
 
@@ -182,6 +186,21 @@ describe('ServiceHierarchyTreeComponent', () => {
     expect(rows[2].style.marginInlineStart).toBe('44px');
   });
 
+  it('renders service code only when the node has a value', () => {
+    fixture.componentRef.setInput('nodes', [
+      createNode(50, [], { serviceCode: ' LAB-001 ', isServiceCodeRequired: true }),
+      createNode(51),
+    ]);
+    fixture.componentRef.setInput('expandedNodeIds', new Set<number>());
+    fixture.detectChanges();
+
+    const codeChips = fixture.nativeElement.querySelectorAll('.svc-tree-code') as NodeListOf<HTMLElement>;
+
+    expect(codeChips.length).toBe(1);
+    expect(codeChips[0].textContent?.trim()).toBe('LAB-001');
+    expect(fixture.nativeElement.textContent).toContain('Service 51');
+  });
+
   it('emits the optional workflow action only for eligible nodes', () => {
     const emitted: ServiceTreeNode[] = [];
     component.manageWorkflows.subscribe((node) => emitted.push(node));
@@ -218,8 +237,10 @@ function createNode(
     isOwnedByCurrentBranch: false,
     isAssignedToCurrentBranch: true,
     canEditDefinition: false,
-    arabicName: `خدمة ${id}`,
+    arabicName: `Ø®Ø¯Ù…Ø© ${id}`,
     englishName: `Service ${id}`,
+    serviceCode: null,
+    isServiceCodeRequired: false,
     isActive: true,
     effectiveIsActive: true,
     isTicketIssuable: children.length === 0,

@@ -33,9 +33,7 @@ export interface ServiceSchedule {
   readonly scheduleId: number;
   readonly branchId: number;
   readonly serviceId: number;
-  readonly startTime: string;
-  readonly endTime: string;
-  readonly workDays: readonly DayOfWeek[];
+  readonly days: readonly ServiceScheduleDay[];
   readonly isSlotCodeRequired: boolean;
   readonly slotCode: string | null;
   readonly isCurrentlyOperational: boolean;
@@ -47,10 +45,18 @@ export interface ServiceSchedule {
   readonly message: string | null;
 }
 
-export interface CreateServiceScheduleRequest {
+export interface ServiceScheduleTimeSlot {
   readonly startTime: string;
   readonly endTime: string;
-  readonly workDays: readonly DayOfWeek[];
+}
+
+export interface ServiceScheduleDay {
+  readonly dayOfWeek: DayOfWeek;
+  readonly timeSlots: readonly ServiceScheduleTimeSlot[];
+}
+
+export interface CreateServiceScheduleRequest {
+  readonly days: readonly ServiceScheduleDay[];
   readonly isSlotCodeRequired: boolean;
   readonly slotCode: string | null;
 }

@@ -12,9 +12,12 @@ import {
   ServiceDetails,
   ServiceListItem,
   ServiceListQuery,
-  ServiceLogoResponse,
+  ServiceImageDeleteResponse,
+  ServiceImageResponse,
+  ServiceImageType,
   ServiceMutationResponse,
   ServiceParentOption,
+  ServicePermanentDeleteResponse,
   ServiceParentQuery,
   ServiceRestoreResponse,
   ServiceSelectionOptionsResponse,
@@ -119,24 +122,64 @@ export class ServiceManagementApiService {
     });
   }
 
-  uploadLogo(serviceId: number, logo: File, rowVersion: string): Observable<ServiceLogoResponse> {
-    const formData = new FormData();
-    formData.append('logo', logo);
-    formData.append('rowVersion', rowVersion);
+  getServiceImages(
+    serviceId: number,
+    imageType?: ServiceImageType,
+  ): Observable<readonly ServiceImageResponse[]> {
+    let params = new HttpParams();
 
-    return this.httpClient.put<ServiceLogoResponse>(
-      `${this.createItemUrl(serviceId)}/logo`,
+    if (imageType) {
+      params = params.set('imageType', imageType);
+    }
+
+    return this.httpClient.get<readonly ServiceImageResponse[]>(
+      `${this.createItemUrl(serviceId)}/images`,
+      { headers: this.createJsonHeaders(), params },
+    );
+  }
+
+  uploadServiceLogo(
+    serviceId: number,
+    image: File,
+    serviceRowVersion: string,
+  ): Observable<ServiceImageResponse> {
+    return this.uploadSingleServiceImage(serviceId, 'logo', image, serviceRowVersion);
+  }
+
+  uploadServiceIcon(
+    serviceId: number,
+    image: File,
+    serviceRowVersion: string,
+  ): Observable<ServiceImageResponse> {
+    return this.uploadSingleServiceImage(serviceId, 'icon', image, serviceRowVersion);
+  }
+
+  uploadServiceAds(
+    serviceId: number,
+    images: readonly File[],
+    serviceRowVersion: string,
+  ): Observable<readonly ServiceImageResponse[]> {
+    const formData = new FormData();
+    images.forEach((image) => formData.append('Images', image));
+    formData.append('RowVersion', serviceRowVersion);
+
+    return this.httpClient.post<readonly ServiceImageResponse[]>(
+      `${this.createItemUrl(serviceId)}/images/ads`,
       formData,
       { headers: this.createMultipartHeaders() },
     );
   }
 
-  removeLogo(serviceId: number, rowVersion: string): Observable<ServiceLogoResponse> {
-    return this.httpClient.delete<ServiceLogoResponse>(`${this.createItemUrl(serviceId)}/logo`, {
-      headers: this.createJsonHeaders(rowVersion),
-    });
+  deleteServiceImage(
+    serviceId: number,
+    imageId: number,
+    imageRowVersion: string,
+  ): Observable<ServiceImageDeleteResponse> {
+    return this.httpClient.delete<ServiceImageDeleteResponse>(
+      `${this.createItemUrl(serviceId)}/images/${imageId}`,
+      { headers: this.createJsonHeaders(imageRowVersion) },
+    );
   }
-
   deleteService(serviceId: number, rowVersion: string): Observable<ServiceDeleteResponse> {
     return this.httpClient.delete<ServiceDeleteResponse>(this.createItemUrl(serviceId), {
       headers: this.createJsonHeaders(rowVersion),
@@ -147,6 +190,16 @@ export class ServiceManagementApiService {
     return this.httpClient.post<ServiceRestoreResponse>(
       `${this.createItemUrl(serviceId)}/restore`,
       null,
+      { headers: this.createJsonHeaders(rowVersion) },
+    );
+  }
+
+  permanentlyDeleteService(
+    serviceId: number,
+    rowVersion: string,
+  ): Observable<ServicePermanentDeleteResponse> {
+    return this.httpClient.delete<ServicePermanentDeleteResponse>(
+      `${this.createItemUrl(serviceId)}/permanent`,
       { headers: this.createJsonHeaders(rowVersion) },
     );
   }
@@ -163,6 +216,22 @@ export class ServiceManagementApiService {
     }
   }
 
+  private uploadSingleServiceImage(
+    serviceId: number,
+    kind: 'logo' | 'icon',
+    image: File,
+    serviceRowVersion: string,
+  ): Observable<ServiceImageResponse> {
+    const formData = new FormData();
+    formData.append('Image', image);
+    formData.append('RowVersion', serviceRowVersion);
+
+    return this.httpClient.post<ServiceImageResponse>(
+      `${this.createItemUrl(serviceId)}/images/${kind}`,
+      formData,
+      { headers: this.createMultipartHeaders() },
+    );
+  }
   private createItemUrl(serviceId: number): string {
     return new URL(String(serviceId), `${this.servicesEndpoint}/`).toString();
   }

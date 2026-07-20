@@ -46,10 +46,7 @@
   }
 
   @if (branchesLoading()) {
-    <p class="api-note loading-note" role="status">
-      <i class="bi bi-arrow-repeat" aria-hidden="true"></i>
-      {{ copy().loading }}
-    </p>
+    <app-niletronix-loading-state [title]="copy().loading" variant="inline" size="sm" />
   }
 
   @if (selectedBranchId()) {
@@ -89,8 +86,8 @@
         </div>
 
         @if (brandingLoading()) {
-          <p class="api-note loading-note" role="status">{{ copy().loading }}</p>
-        }
+    <app-niletronix-loading-state [title]="copy().loading" variant="inline" size="sm" />
+  }
 
         @if (hasUnconfiguredBranding()) {
           <p class="empty-state compact-empty">{{ copy().noBranding }}</p>
@@ -291,8 +288,8 @@
         }
 
         @if (advertisementsLoading()) {
-          <p class="api-note loading-note" role="status">{{ copy().loading }}</p>
-        }
+    <app-niletronix-loading-state [title]="copy().loading" variant="inline" size="sm" />
+  }
 
         @if (canUpdate()) {
           @if (selectedAdvertisementPreviews().length > 0) {

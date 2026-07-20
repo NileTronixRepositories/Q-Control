@@ -5,6 +5,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 
 import { AppLanguage } from '../../../../shared/models/app-language.model';
 import { TechnicalAdminMobileRecordCardComponent } from '../../../../shared/components/technical-admin-mobile-record-card/technical-admin-mobile-record-card.component';
+import { NiletronixLoadingStateComponent } from '../../../../shared/components/niletronix-loading-state/niletronix-loading-state.component';
 import { TechnicalAdminPageHeroComponent } from '../../../../shared/components/technical-admin-page-hero/technical-admin-page-hero.component';
 import { CreateBranchAdminDialogComponent } from '../../../branch-admins/components/create-branch-admin-dialog/create-branch-admin-dialog.component';
 import { BRANCH_ADMINS_TRANSLATIONS } from '../../../branch-admins/i18n/branch-admins.translations';
@@ -208,8 +209,7 @@ const EMPTY_BRANCH_TABLE_META: BranchTableMeta = {
     ReactiveFormsModule,
     CreateBranchAdminDialogComponent,
     TechnicalAdminMobileRecordCardComponent,
-    TechnicalAdminPageHeroComponent,
-  ],
+    TechnicalAdminPageHeroComponent, NiletronixLoadingStateComponent],
   templateUrl: './legacy-page.component.html',
   styleUrl: './legacy-page.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush

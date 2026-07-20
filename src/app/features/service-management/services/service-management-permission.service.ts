@@ -34,6 +34,7 @@ const SERVICE_PERMISSIONS = new Set<ServicePermission>([
   'Services.Update',
   'Services.Delete',
   'Services.Restore',
+  'Services.DeletePermanent',
   'Services.ViewCentralTree',
   'BranchServices.View',
   'BranchServices.Assign',
@@ -81,6 +82,7 @@ export class ServiceManagementPermissionService {
   readonly canUpdate = computed(() => this.hasPermission('Services.Update'));
   readonly canDelete = computed(() => this.hasPermission('Services.Delete'));
   readonly canRestore = computed(() => this.hasPermission('Services.Restore'));
+  readonly canDeletePermanent = computed(() => this.hasPermission('Services.DeletePermanent'));
   readonly canViewCentralTree = computed(() => this.hasPermission('Services.ViewCentralTree'));
   readonly canViewGlobalizationRequests = computed(() =>
     this.hasPermission('ServiceGlobalizationRequests.ViewAll'),

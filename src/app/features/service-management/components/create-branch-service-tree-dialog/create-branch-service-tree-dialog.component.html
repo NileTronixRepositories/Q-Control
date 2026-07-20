@@ -7,10 +7,17 @@
         <h2>{{ dialogTitle() }}</h2>
         <span>{{ dialogDescription() }}</span>
         @if (mode() === 'subtree' && parentLabel()) {
-          <small class="branch-tree-parent-label">{{ translations().createSubtreeUnder }}: {{ parentLabel() }}</small>
+          <small class="branch-tree-parent-label"
+            >{{ translations().createSubtreeUnder }}: {{ parentLabel() }}</small
+          >
         }
       </div>
-      <button type="button" class="branch-tree-icon-btn" [attr.aria-label]="translations().close" (click)="close()">
+      <button
+        type="button"
+        class="branch-tree-icon-btn"
+        [attr.aria-label]="translations().close"
+        (click)="close()"
+      >
         <i class="bi bi-x-lg" aria-hidden="true"></i>
       </button>
     </header>
@@ -24,15 +31,28 @@
       }
 
       <ng-container
-        *ngTemplateOutlet="nodeTemplate; context: { $implicit: root, level: 0, parent: null, index: 0 }"
+        *ngTemplateOutlet="
+          nodeTemplate;
+          context: { $implicit: root, level: 0, parent: null, index: 0 }
+        "
       />
     </div>
 
     <footer class="branch-tree-actions">
-      <button type="button" class="branch-tree-secondary-btn" [disabled]="saving()" (click)="close()">
+      <button
+        type="button"
+        class="branch-tree-secondary-btn"
+        [disabled]="saving()"
+        (click)="close()"
+      >
         {{ translations().cancel }}
       </button>
-      <button type="button" class="branch-tree-primary-btn" [disabled]="saving()" (click)="submit()">
+      <button
+        type="button"
+        class="branch-tree-primary-btn"
+        [disabled]="saving()"
+        (click)="submit()"
+      >
         <i class="bi bi-check2" aria-hidden="true"></i>
         {{ translations().save }}
       </button>
@@ -69,6 +89,28 @@
         <span>{{ translations().englishName }}</span>
         <input type="text" maxlength="100" formControlName="englishName" />
       </label>
+      <label class="branch-tree-check">
+        <input
+          type="checkbox"
+          formControlName="isServiceCodeRequired"
+          (change)="onNodeServiceCodeRequiredChange(group, $event)"
+        />
+        <span>{{ translations().serviceCodeRequired }}</span>
+      </label>
+      @if (group.controls.isServiceCodeRequired.value) {
+        <label class="branch-tree-field">
+          <span>{{ translations().serviceCode }}</span>
+          <input
+            type="text"
+            maxlength="100"
+            formControlName="serviceCode"
+            (input)="onNodeServiceCodeInput(group)"
+          />
+          @if (group.controls.serviceCode.touched && group.controls.serviceCode.invalid) {
+            <small>{{ nodeServiceCodeError(group) }}</small>
+          }
+        </label>
+      }
       <label class="branch-tree-field">
         <span>{{ translations().arabicUserMessage }}</span>
         <textarea rows="2" maxlength="500" formControlName="arabicUserMessage"></textarea>
@@ -129,7 +171,10 @@
       <div class="branch-tree-children">
         @for (child of childrenControls(group).controls; track child; let childIndex = $index) {
           <ng-container
-            *ngTemplateOutlet="nodeTemplate; context: { $implicit: child, level: level + 1, parent: group, index: childIndex }"
+            *ngTemplateOutlet="
+              nodeTemplate;
+              context: { $implicit: child, level: level + 1, parent: group, index: childIndex }
+            "
           />
         }
       </div>

@@ -95,8 +95,8 @@ body[data-admin-theme='niletronix-admin'] {
   --q-readable-heading: #101828;
   --q-readable-body: #1f2a37;
   --q-readable-label: #123f4f;
-  --q-readable-muted: #475467;
-  --q-readable-placeholder: #667085;
+  --q-readable-muted: #6b7785;
+  --q-readable-placeholder: #87909c;
   --q-hover-soft-bg: rgba(11, 138, 168, 0.075);
   --q-hover-soft-border: rgba(11, 138, 168, 0.24);
 }
@@ -105,8 +105,8 @@ body[data-admin-theme='beach-sunset'] {
   --q-readable-heading: #102f43;
   --q-readable-body: #183f52;
   --q-readable-label: #1b4965;
-  --q-readable-muted: #446a7d;
-  --q-readable-placeholder: #607f90;
+  --q-readable-muted: #6d8290;
+  --q-readable-placeholder: #8799a3;
   --q-hover-soft-bg: rgba(95, 168, 211, 0.14);
   --q-hover-soft-border: rgba(27, 73, 101, 0.26);
 }
@@ -115,8 +115,8 @@ body[data-admin-theme='niletronix-brand'] {
   --q-readable-heading: #101418;
   --q-readable-body: #202a33;
   --q-readable-label: #0a526f;
-  --q-readable-muted: #4b5865;
-  --q-readable-placeholder: #66727e;
+  --q-readable-muted: #727d87;
+  --q-readable-placeholder: #89939d;
   --q-hover-soft-bg: rgba(13, 120, 166, 0.09);
   --q-hover-soft-border: rgba(13, 120, 166, 0.28);
 }
@@ -589,11 +589,10 @@ body[data-admin-theme]
     dt,
     th,
     .eyebrow,
-    .panel-header h2,
-    .panel-header p
+    .panel-header h2
   ) {
   color: var(--q-readable-label);
-  font-weight: 800;
+  font-weight: 750;
 }
 
 body[data-admin-theme]
@@ -601,18 +600,30 @@ body[data-admin-theme]
   :is(
     .header-description,
     .field-hint,
+    .field-help,
+    .form-text,
+    .text-muted,
+    small,
     .logo-empty,
     .api-note,
     .permission-note,
-    .upload-placeholder span
+    .upload-placeholder span,
+    .panel-header p
   ) {
   color: var(--q-readable-muted);
+  font-weight: 500;
 }
 
 body[data-admin-theme]
   :is(input::placeholder, textarea::placeholder, .form-control::placeholder) {
   color: var(--q-readable-placeholder);
+  font-weight: 400;
   opacity: 1;
+}
+
+body[data-admin-theme] :is(select option, .form-select option) {
+  color: var(--q-readable-body);
+  font-weight: 500;
 }
 
 body[data-admin-theme]
@@ -628,6 +639,7 @@ body[data-admin-theme]
   color: var(--q-readable-body);
   background: rgba(255, 255, 255, 0.96);
   border-color: var(--q-border-strong);
+  font-weight: 500;
 }
 
 body[data-admin-theme]
@@ -653,7 +665,7 @@ body[data-admin-theme]
     .form-select:focus,
     .order-input:focus
   ) {
-  color: var(--q-readable-heading);
+  color: var(--q-readable-body);
   background: #ffffff;
   border-color: var(--q-primary);
   box-shadow: var(--nt-focus);

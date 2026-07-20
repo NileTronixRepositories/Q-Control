@@ -277,31 +277,6 @@
   width: 50px;
 }
 
-.svc-logo-tools {
-  align-items: center;
-  display: flex;
-  flex: 1;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.svc-logo-tools > div {
-  flex: 1 1 150px;
-}
-
-.svc-file-btn {
-  cursor: pointer;
-  overflow: hidden;
-  position: relative;
-}
-
-.svc-file-btn input {
-  height: 1px;
-  opacity: 0;
-  overflow: hidden;
-  position: absolute;
-  width: 1px;
-}
 
 .svc-details-grid {
   display: grid;

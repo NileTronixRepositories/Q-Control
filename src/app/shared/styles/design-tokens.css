@@ -84,8 +84,8 @@
   --q-border-strong: #bdd0db;
   --q-surface-warm: #fff7ed;
   --q-text-primary: #0f172a;
-  --q-text-secondary: #334155;
-  --q-text-muted: #64748b;
+  --q-text-secondary: #243647;
+  --q-text-muted: #7a8796;
 
   /* Utility */
   --q-transition-base: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);

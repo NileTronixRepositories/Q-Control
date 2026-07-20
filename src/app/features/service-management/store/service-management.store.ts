@@ -56,14 +56,18 @@ function filterAvailableBranchAssignmentNodes(
   const availableNodes: ServiceTreeNode[] = [];
 
   nodes.forEach((node) => {
-    const isLeaf = node.children.length === 0 && !node.hasChildren;
-    const isAssignedLeaf =
-      isLeaf && (node.isAssignedToCurrentBranch === true || assignedNodeIds.has(node.id));
-
-    if (isAssignedLeaf) {
+    if (node.scope !== 'Global') {
       return;
     }
 
+    const isLeaf = node.children.length === 0 && !node.hasChildren;
+    const isUnavailableLeaf =
+      isLeaf &&
+      (node.isAssignedToCurrentBranch === true || assignedNodeIds.has(node.id));
+
+    if (isUnavailableLeaf) {
+      return;
+    }
     const filteredChildren = filterAvailableBranchAssignmentNodes(node.children, assignedNodeIds);
     const hadLoadedChildren = node.children.length > 0;
 
@@ -108,7 +112,6 @@ export class ServiceManagementStore {
   readonly parentsLoading = signal(false);
   readonly saving = signal(false);
   readonly mutating = signal(false);
-  readonly uploadingLogo = signal(false);
 
   readonly isPanelOpen = computed(() => this.panelMode() !== 'closed');
   readonly availableBranchAssignmentTree = computed(() =>
@@ -228,6 +231,5 @@ export class ServiceManagementStore {
     this.parentsLoading.set(false);
     this.saving.set(false);
     this.mutating.set(false);
-    this.uploadingLogo.set(false);
   }
 }

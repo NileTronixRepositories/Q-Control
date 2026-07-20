@@ -50,6 +50,81 @@
           <i class="bi bi-x-lg" aria-hidden="true"></i>
         </button>
       </header>
+      @if (decisionState(); as decision) {
+        <div class="absolute inset-0 z-20 grid items-end justify-items-center bg-slate-950/45 p-3 backdrop-blur-sm sm:place-items-center sm:p-5">
+          <section
+            class="w-full max-w-lg overflow-hidden rounded-t-3xl border border-white/70 bg-white shadow-[0_32px_80px_-24px_rgba(15,23,42,0.6)] sm:rounded-3xl"
+            role="dialog"
+            aria-modal="true"
+          >
+            <header class="flex items-center gap-3 border-b border-slate-100 bg-gradient-to-br from-white to-slate-50 p-5">
+              <span
+                class="grid size-11 shrink-0 place-items-center rounded-2xl text-xl text-white shadow-lg"
+                [class.bg-emerald-600]="decision.action === 'approve'"
+                [class.bg-rose-600]="decision.action === 'reject'"
+              >
+                <i
+                  [class]="decision.action === 'approve' ? 'bi bi-check2-circle' : 'bi bi-slash-circle'"
+                  aria-hidden="true"
+                ></i>
+              </span>
+              <div>
+                <h3 class="text-xl font-black leading-[1.3] text-slate-900">
+                  {{ decision.action === 'approve' ? translations().confirmApproveTitle : translations().rejectTitle }}
+                </h3>
+                <p class="mb-0 mt-1 font-bold text-slate-500">{{ decision.serviceName }}</p>
+              </div>
+            </header>
+            <div class="p-5">
+              @if (decision.action === 'approve') {
+                <div class="rounded-2xl border border-emerald-100 bg-emerald-50 p-4 leading-relaxed text-emerald-900">
+                  <i class="bi bi-info-circle-fill me-1" aria-hidden="true"></i>
+                  {{ translations().confirmApproveBody }}
+                </div>
+              } @else {
+                <p class="mb-0 text-sm leading-relaxed text-slate-600">
+                  {{ translations().rejectHint }}
+                </p>
+                <textarea
+                  class="mt-3 min-h-36 w-full resize-y rounded-2xl border border-slate-200 bg-slate-50 p-3 outline-none transition placeholder:text-slate-400 focus:border-rose-400 focus:bg-white focus:ring-4 focus:ring-rose-100"
+                  maxlength="1000"
+                  [placeholder]="translations().rejectPlaceholder"
+                  [value]="rejectionReason()"
+                  (input)="rejectionReason.set($any($event.target).value)"
+                ></textarea>
+                <small class="mt-1 block text-end font-bold text-slate-400">{{ rejectionReason().length }} / 1000</small>
+              }
+            </div>
+            <footer class="flex flex-wrap justify-end gap-2 border-t border-slate-100 bg-slate-50/80 p-4">
+              <button
+                type="button"
+                class="min-h-10 rounded-xl border border-slate-200 bg-white px-5 font-bold text-slate-600 transition hover:bg-slate-100 disabled:opacity-50"
+                [disabled]="mutating()"
+                (click)="closeDecision()"
+              >
+                {{ translations().cancel }}
+              </button>
+              <button
+                type="button"
+                class="inline-flex min-h-10 items-center gap-2 rounded-xl px-5 font-extrabold text-white shadow-lg transition hover:-translate-y-0.5 disabled:translate-y-0 disabled:cursor-not-allowed disabled:opacity-50"
+                [class.bg-emerald-600]="decision.action === 'approve'"
+                [class.shadow-emerald-700/20]="decision.action === 'approve'"
+                [class.bg-rose-600]="decision.action === 'reject'"
+                [class.shadow-rose-700/20]="decision.action === 'reject'"
+                [disabled]="mutating()"
+                (click)="confirmDecision()"
+              >
+                @if (mutating()) {
+                  <i class="bi bi-arrow-repeat animate-spin" aria-hidden="true"></i>
+                } @else {
+                  <i [class]="decision.action === 'approve' ? 'bi bi-check-lg' : 'bi bi-x-lg'" aria-hidden="true"></i>
+                }
+                {{ decision.action === 'approve' ? translations().approve : translations().reject }}
+              </button>
+            </footer>
+          </section>
+        </div>
+      }
 
       <div class="min-h-0 flex-1 overflow-y-auto bg-slate-50/70 p-4 sm:p-5">
         <form
@@ -160,7 +235,7 @@
         } @else {
           <div class="mt-4 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
             <div class="overflow-x-auto">
-              <table class="w-full min-w-[900px] text-sm">
+              <table class="w-full min-w-[1000px] text-sm">
                 <thead
                   class="sticky top-0 z-10 bg-gradient-to-r from-cyan-800 to-sky-800 text-white shadow-sm"
                 >
@@ -177,6 +252,9 @@
                     <th class="p-3.5 text-start font-extrabold">
                       {{ translations().rejectionReason }}
                     </th>
+                    @if (canApprove() || canReject()) {
+                      <th class="p-3.5 text-start font-extrabold">{{ translations().actions }}</th>
+                    }
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100">
@@ -226,6 +304,34 @@
                           >{{ item.rejectionReason || translations().noReason }}</span
                         >
                       </td>
+                      @if (canApprove() || canReject()) {
+                        <td class="p-3.5">
+                          <div class="flex flex-wrap items-center gap-2">
+                            @if (canStartDecision(item.status, 'approve')) {
+                              <button
+                                type="button"
+                                data-action="approve"
+                                class="inline-flex h-9 items-center gap-1.5 rounded-xl border border-emerald-200 bg-emerald-50 px-3 font-extrabold text-emerald-700 transition hover:bg-emerald-100 disabled:cursor-not-allowed disabled:opacity-50"
+                                [disabled]="mutating()"
+                                (click)="requestDecision(item, 'approve')"
+                              >
+                                <i class="bi bi-check-lg" aria-hidden="true"></i>{{ translations().approve }}
+                              </button>
+                            }
+                            @if (canStartDecision(item.status, 'reject')) {
+                              <button
+                                type="button"
+                                data-action="reject"
+                                class="inline-flex h-9 items-center gap-1.5 rounded-xl border border-rose-200 bg-rose-50 px-3 font-extrabold text-rose-700 transition hover:bg-rose-100 disabled:cursor-not-allowed disabled:opacity-50"
+                                [disabled]="mutating()"
+                                (click)="requestDecision(item, 'reject')"
+                              >
+                                <i class="bi bi-x-lg" aria-hidden="true"></i>{{ translations().reject }}
+                              </button>
+                            }
+                          </div>
+                        </td>
+                      }
                     </tr>
                   }
                 </tbody>

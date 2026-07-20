@@ -24,6 +24,8 @@ const rootNode: ServiceTreeNode = {
   canEditDefinition: true,
   arabicName: 'الخدمات',
   englishName: 'Services',
+  serviceCode: null,
+  isServiceCodeRequired: false,
   isActive: true,
   effectiveIsActive: true,
   isTicketIssuable: false,

@@ -5,6 +5,7 @@ export type ServicePermission =
   | 'Services.Update'
   | 'Services.Delete'
   | 'Services.Restore'
+  | 'Services.DeletePermanent'
   | 'Services.ViewCentralTree'
   | 'BranchServices.View'
   | 'BranchServices.Assign'
@@ -13,6 +14,12 @@ export type ServicePermission =
 
 export type ServiceBooleanFilter = boolean | null;
 export type ServiceScope = 'Global' | 'BranchScoped';
+export type ServiceImageType = 'Logo' | 'Icon' | 'Ads';
+
+export interface ServiceCodeFields {
+  readonly serviceCode: string | null;
+  readonly isServiceCodeRequired: boolean;
+}
 
 export interface ServiceListQuery {
   readonly pageNumber: number;
@@ -38,7 +45,7 @@ export interface PagedServiceResponse<TItem> {
   readonly hasNextPage: boolean;
 }
 
-export interface ServiceListItem {
+export interface ServiceListItem extends ServiceCodeFields {
   readonly id: number;
   readonly parentServiceId: number | null;
   readonly scope: ServiceScope;
@@ -53,6 +60,7 @@ export interface ServiceListItem {
   readonly parentServiceNameAr?: string | null;
   readonly parentServiceNameEn?: string | null;
   readonly logoUrl: string | null;
+  readonly iconUrl?: string | null;
   readonly isActive: boolean;
   readonly effectiveIsActive: boolean;
   readonly isTicketIssuable: boolean;
@@ -77,9 +85,10 @@ export interface ServiceDetails extends ServiceListItem {
   readonly rangeEndNumber: number;
   readonly waitingDuration: number;
   readonly noOfTicketCopies: number;
+  readonly adsImages?: readonly ServiceImageResponse[] | null;
 }
 
-export interface ServiceTreeNode {
+export interface ServiceTreeNode extends ServiceCodeFields {
   readonly id: number;
   readonly parentServiceId: number | null;
   readonly scope: ServiceScope;
@@ -154,7 +163,7 @@ export interface ServiceParentQuery {
   readonly searchText?: string;
 }
 
-export interface ServiceMutationRequest {
+export interface ServiceMutationRequest extends ServiceCodeFields {
   readonly parentServiceId: number | null;
   readonly arabicName: string;
   readonly englishName: string;
@@ -185,11 +194,22 @@ export interface ServiceMutationResponse extends Partial<ServiceDetails> {
   readonly message?: string | null;
 }
 
-export interface ServiceLogoResponse {
+export interface ServiceImageResponse {
   readonly id: number;
-  readonly logoUrl: string | null;
+  readonly serviceId: number;
+  readonly imageUrl: string;
+  readonly imageType: ServiceImageType;
+  readonly displayOrder: number;
+  readonly isActive: boolean;
   readonly rowVersion: string;
-  readonly message: string;
+  readonly message: string | null;
+}
+
+export interface ServiceImageDeleteResponse {
+  readonly id: number;
+  readonly serviceId: number;
+  readonly imageType: ServiceImageType;
+  readonly message: string | null;
 }
 
 export interface ServiceDeleteResponse {
@@ -210,9 +230,14 @@ export interface ServiceRestoreResponse {
   readonly message: string;
 }
 
+export interface ServicePermanentDeleteResponse {
+  readonly serviceId: number;
+  readonly message: string;
+}
+
 export type ServiceManagementTab = 'list' | 'tree';
 export type ServicePanelMode = 'closed' | 'create' | 'edit' | 'view';
-export type ServiceConfirmAction = 'delete' | 'restore' | 'removeLogo';
+export type ServiceConfirmAction = 'delete' | 'restore' | 'permanentDelete';
 export type ServiceMessageTone = 'success' | 'error' | 'info';
 
 export interface ServiceUiMessage {

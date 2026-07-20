@@ -10,6 +10,7 @@ import { TechnicalAdminI18nStore } from '../../../technical-admin/store/technica
 import {
   ServiceDeleteResponse,
   ServiceDetails,
+  ServicePermanentDeleteResponse,
   ServiceRestoreResponse,
   ServiceTreeNode,
 } from '../../models/service-management.model';
@@ -26,7 +27,7 @@ import { BranchServicesComponent } from './branch-services.component';
 describe('BranchServicesComponent branch service actions', () => {
   let fixture: ComponentFixture<BranchServicesComponent>;
   let unassignResult: Subject<UnassignBranchLeafServiceResponse>;
-  let lifecycleResult: Subject<ServiceDeleteResponse | ServiceRestoreResponse>;
+  let lifecycleResult: Subject<ServiceDeleteResponse | ServiceRestoreResponse | ServicePermanentDeleteResponse>;
   let branchServicesApi: {
     readonly getBranchServicesTree: ReturnType<typeof vi.fn>;
     readonly unassignLeafService: ReturnType<typeof vi.fn>;
@@ -36,8 +37,16 @@ describe('BranchServicesComponent branch service actions', () => {
     readonly getServiceDetails: ReturnType<typeof vi.fn>;
     readonly deleteService: ReturnType<typeof vi.fn>;
     readonly restoreService: ReturnType<typeof vi.fn>;
+    readonly permanentlyDeleteService: ReturnType<typeof vi.fn>;
+    readonly getServiceImages: ReturnType<typeof vi.fn>;
+    readonly uploadServiceLogo: ReturnType<typeof vi.fn>;
+    readonly uploadServiceIcon: ReturnType<typeof vi.fn>;
+    readonly uploadServiceAds: ReturnType<typeof vi.fn>;
+    readonly deleteServiceImage: ReturnType<typeof vi.fn>;
   };
   let canViewOwnRequests: WritableSignal<boolean>;
+  let canViewDetails: WritableSignal<boolean>;
+  let canUpdateServices: WritableSignal<boolean>;
   let currentUserType: WritableSignal<'BranchAdmin' | 'TechnicalAdmin'>;
   let globalizationApi: { readonly getBranchRequests: ReturnType<typeof vi.fn> };
 
@@ -49,8 +58,10 @@ describe('BranchServicesComponent branch service actions', () => {
   beforeEach(async () => {
     vi.useFakeTimers();
     unassignResult = new Subject<UnassignBranchLeafServiceResponse>();
-    lifecycleResult = new Subject<ServiceDeleteResponse | ServiceRestoreResponse>();
+    lifecycleResult = new Subject<ServiceDeleteResponse | ServiceRestoreResponse | ServicePermanentDeleteResponse>();
     canViewOwnRequests = signal(false);
+    canViewDetails = signal(false);
+    canUpdateServices = signal(true);
     currentUserType = signal<'BranchAdmin' | 'TechnicalAdmin'>('BranchAdmin');
     globalizationApi = {
       getBranchRequests: vi.fn((_: number, query: { readonly pageSize: number }) =>
@@ -75,6 +86,12 @@ describe('BranchServicesComponent branch service actions', () => {
       ),
       deleteService: vi.fn(() => lifecycleResult.asObservable()),
       restoreService: vi.fn(() => lifecycleResult.asObservable()),
+      permanentlyDeleteService: vi.fn(() => lifecycleResult.asObservable()),
+      getServiceImages: vi.fn(() => of([])),
+      uploadServiceLogo: vi.fn(),
+      uploadServiceIcon: vi.fn(),
+      uploadServiceAds: vi.fn(),
+      deleteServiceImage: vi.fn(),
     };
 
     await TestBed.configureTestingModule({
@@ -92,7 +109,7 @@ describe('BranchServicesComponent branch service actions', () => {
                 {
                   branchId: 5,
                   englishName: 'Main Branch',
-                  arabicName: 'الفرع الرئيسي',
+                  arabicName: 'Ã˜Â§Ã™â€žÃ™ÂÃ˜Â±Ã˜Â¹ Ã˜Â§Ã™â€žÃ˜Â±Ã˜Â¦Ã™Å Ã˜Â³Ã™Å ',
                   isActive: true,
                 },
               ],
@@ -116,14 +133,20 @@ describe('BranchServicesComponent branch service actions', () => {
           provide: ServiceManagementPermissionService,
           useValue: {
             canViewBranchServices: signal(true).asReadonly(),
+            canViewDetails: canViewDetails.asReadonly(),
+            canUpdate: canUpdateServices.asReadonly(),
             canViewWorkflows: signal(false).asReadonly(),
             canViewSchedules: signal(true).asReadonly(),
             canAssignBranchServices: signal(true).asReadonly(),
             canUnassignBranchServices: signal(true).asReadonly(),
             canDelete: signal(true).asReadonly(),
             canRestore: signal(true).asReadonly(),
+            canDeletePermanent: signal(true).asReadonly(),
             canCreateBranchServiceTree: signal(false).asReadonly(),
             canViewOwnGlobalizationRequests: canViewOwnRequests.asReadonly(),
+            canViewGlobalizationRequests: signal(false).asReadonly(),
+            canApproveGlobalizationRequests: signal(false).asReadonly(),
+            canRejectGlobalizationRequests: signal(false).asReadonly(),
           },
         },
         { provide: Router, useValue: { navigate: vi.fn(), navigateByUrl: vi.fn() } },
@@ -475,8 +498,10 @@ function createLeafNode(): ServiceTreeNode {
     isOwnedByCurrentBranch: false,
     isAssignedToCurrentBranch: true,
     canEditDefinition: false,
-    arabicName: 'القلب',
+    arabicName: 'Ã˜Â§Ã™â€žÃ™â€šÃ™â€žÃ˜Â¨',
     englishName: 'Cardiology',
+    serviceCode: null,
+    isServiceCodeRequired: false,
     isActive: true,
     effectiveIsActive: true,
     isTicketIssuable: true,
@@ -498,13 +523,15 @@ function createOwnedBranchNode(
     parentServiceId: null,
     scope: 'BranchScoped',
     ownerBranchId,
-    ownerBranchArabicName: 'الفرع',
+    ownerBranchArabicName: 'Ã˜Â§Ã™â€žÃ™ÂÃ˜Â±Ã˜Â¹',
     ownerBranchEnglishName: 'Branch',
     isOwnedByCurrentBranch: ownerBranchId === 5,
     isAssignedToCurrentBranch: true,
     canEditDefinition: ownerBranchId === 5,
-    arabicName: `خدمة ${id}`,
+    arabicName: `Ã˜Â®Ã˜Â¯Ã™â€¦Ã˜Â© ${id}`,
     englishName: `Owned Service ${id}`,
+    serviceCode: null,
+    isServiceCodeRequired: false,
     isActive: !isDeleted,
     effectiveIsActive: !isDeleted,
     isTicketIssuable: true,
@@ -555,10 +582,10 @@ function pendingRequestsPage(
               requestType: 'BranchServiceTree',
               status: 'Pending',
               branchId: 5,
-              branchArabicName: 'الفرع الرئيسي',
+              branchArabicName: 'Ã˜Â§Ã™â€žÃ™ÂÃ˜Â±Ã˜Â¹ Ã˜Â§Ã™â€žÃ˜Â±Ã˜Â¦Ã™Å Ã˜Â³Ã™Å ',
               branchEnglishName: 'Main Branch',
               rootServiceId: 100,
-              rootServiceArabicName: 'الخدمة',
+              rootServiceArabicName: 'Ã˜Â§Ã™â€žÃ˜Â®Ã˜Â¯Ã™â€¦Ã˜Â©',
               rootServiceEnglishName: 'Service',
               parentServiceId: null,
               parentServiceArabicName: null,

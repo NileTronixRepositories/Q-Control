@@ -125,9 +125,7 @@
             </button>
           </div>
           @if (activeLoading()) {
-            <p class="state-note" role="status">
-              <i class="bi bi-arrow-repeat" aria-hidden="true"> </i> {{ translations().loading }}
-            </p>
+            <app-niletronix-loading-state [title]="translations().loading" variant="inline" size="sm" />
           }
           @if (activeWindowsPage().data.length > 0) {
             <div data-testid="windows-active-desktop" class="table-responsive table-wrap hidden md:block">
@@ -311,9 +309,7 @@
             </button>
           </div>
           @if (deletedLoading()) {
-            <p class="state-note" role="status">
-              <i class="bi bi-arrow-repeat" aria-hidden="true"> </i> {{ translations().loading }}
-            </p>
+            <app-niletronix-loading-state [title]="translations().loading" variant="inline" size="sm" />
           }
           @if (deletedWindowsPage().data.length > 0) {
             <div data-testid="windows-deleted-desktop" class="table-responsive table-wrap hidden md:block">

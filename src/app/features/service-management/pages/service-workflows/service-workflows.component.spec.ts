@@ -38,6 +38,8 @@ const eligibleLeaf: ServiceTreeNode = {
   canEditDefinition: false,
   arabicName: 'إصدار شهادة',
   englishName: 'Issue Certificate',
+  serviceCode: null,
+  isServiceCodeRequired: false,
   isActive: true,
   effectiveIsActive: true,
   isTicketIssuable: true,

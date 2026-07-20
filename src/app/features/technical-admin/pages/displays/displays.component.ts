@@ -16,6 +16,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { TechnicalAdminMobileRecordCardComponent } from '../../../../shared/components/technical-admin-mobile-record-card/technical-admin-mobile-record-card.component';
+import { NiletronixLoadingStateComponent } from '../../../../shared/components/niletronix-loading-state/niletronix-loading-state.component';
 import { TechnicalAdminPageHeroComponent } from '../../../../shared/components/technical-admin-page-hero/technical-admin-page-hero.component';
 import { Router } from '@angular/router';
 
@@ -286,6 +287,7 @@ const EMPTY_DELETED_DISPLAY_PAGE: PaginationResponse<DeletedDisplayListItemRespo
     ReactiveFormsModule,
     TechnicalAdminMobileRecordCardComponent,
     TechnicalAdminPageHeroComponent,
+    NiletronixLoadingStateComponent,
   ],
   templateUrl: './displays.component.html',
   styleUrl: './displays.component.css',

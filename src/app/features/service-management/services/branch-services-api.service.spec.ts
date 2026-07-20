@@ -7,6 +7,7 @@ import { environment } from '../../../../environments/environment';
 import { AppLanguageStore } from '../../../shared/store/app-language.store';
 import { AuthSessionService } from '../../auth/services/auth-session.service';
 import {
+  CreateBranchServiceSubtreeResponse,
   CreateBranchServiceTreeResponse,
   UnassignBranchLeafServiceResponse,
 } from '../models/branch-services.model';
@@ -70,16 +71,70 @@ describe('BranchServicesApiService', () => {
     const response: CreateBranchServiceTreeResponse = {
       branchId: 5, scope: 'BranchScoped', ownerBranchId: 5,
       createdServicesCount: 1, createdAssignmentsCount: 1,
-      root: { id: 301, parentServiceId: null, arabicName: 'خدمة', englishName: 'Service', scope: 'BranchScoped', ownerBranchId: 5, isTicketIssuable: true, children: [] },
+      root: { id: 301, parentServiceId: null, arabicName: 'خدمة', englishName: 'Service', serviceCode: 'SVC-001', isServiceCodeRequired: true, scope: 'BranchScoped', ownerBranchId: 5, isTicketIssuable: true, children: [] },
       globalizationRequest: { requestId: 45, requestType: 'BranchServiceTree', status: 'Pending', requestedOnUtc: '2026-07-13T09:30:00Z' },
       message: 'Created',
     };
     service.createBranchServiceTree(5, {
-      root: { arabicName: 'خدمة', englishName: 'Service', arabicUserMessage: null, englishUserMessage: null, isTicketIssuable: true, isClientInputRequired: false, hasReservation: false, orderNo: 1, priority: 1, rangePrefix: 'S', rangeStartNumber: 1, rangeEndNumber: 9, waitingDuration: 5, noOfTicketCopies: 1, children: [] },
+      root: { arabicName: 'خدمة', englishName: 'Service', serviceCode: 'SVC-001', isServiceCodeRequired: true, arabicUserMessage: null, englishUserMessage: null, isTicketIssuable: true, isClientInputRequired: false, hasReservation: false, orderNo: 1, priority: 1, rangePrefix: 'S', rangeStartNumber: 1, rangeEndNumber: 9, waitingDuration: 5, noOfTicketCopies: 1, children: [] },
     }).subscribe((result) => expect(result.globalizationRequest.requestId).toBe(45));
     const endpoint = new URL('api/branches/5/service-trees', environment.apiBaseUrl).toString();
     const request = httpTestingController.expectOne(endpoint);
     expect(request.request.method).toBe('POST');
+    request.flush(response);
+  });
+  it('maps a branch-scoped subtree response when no globalization request is created', () => {
+    const response: CreateBranchServiceSubtreeResponse = {
+      branchId: 5,
+      parentServiceId: 301,
+      scope: 'BranchScoped',
+      ownerBranchId: 5,
+      createdServicesCount: 1,
+      createdAssignmentsCount: 1,
+      root: {
+        id: 302,
+        parentServiceId: 301,
+        arabicName: 'خدمة فرعية',
+        englishName: 'Branch child',
+        serviceCode: null,
+        isServiceCodeRequired: false,
+        scope: 'BranchScoped',
+        ownerBranchId: 5,
+        isTicketIssuable: false,
+        children: [],
+      },
+      globalizationRequest: null,
+      message: 'Created',
+    };
+
+    service
+      .createBranchServiceSubtree(5, 301, {
+        root: {
+          arabicName: 'خدمة فرعية',
+          englishName: 'Branch child',
+          serviceCode: null,
+          isServiceCodeRequired: false,
+          arabicUserMessage: null,
+          englishUserMessage: null,
+          isTicketIssuable: false,
+          isClientInputRequired: false,
+          hasReservation: false,
+          orderNo: 1,
+          priority: 1,
+          rangePrefix: null,
+          rangeStartNumber: null,
+          rangeEndNumber: null,
+          waitingDuration: null,
+          noOfTicketCopies: null,
+          children: [],
+        },
+      })
+      .subscribe((result) => expect(result.globalizationRequest).toBeNull());
+
+    const endpoint = new URL('api/branches/5/services/301/subtree', environment.apiBaseUrl).toString();
+    const request = httpTestingController.expectOne(endpoint);
+    expect(request.request.method).toBe('POST');
+    expect(request.request.body.root.children).toEqual([]);
     request.flush(response);
   });
 });

@@ -1,11 +1,20 @@
 import { NgTemplateOutlet } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input, output, signal } from '@angular/core';
 import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  input,
+  output,
+  signal,
+} from '@angular/core';
+import {
+  AbstractControl,
   FormArray,
   FormControl,
   FormGroup,
-  NonNullableFormBuilder,
   ReactiveFormsModule,
+  ValidationErrors,
   Validators,
 } from '@angular/forms';
 
@@ -20,6 +29,8 @@ export type CreateBranchServiceTreeMode = 'root' | 'subtree';
 type NodeForm = FormGroup<{
   arabicName: FormControl<string>;
   englishName: FormControl<string>;
+  isServiceCodeRequired: FormControl<boolean>;
+  serviceCode: FormControl<string>;
   arabicUserMessage: FormControl<string>;
   englishUserMessage: FormControl<string>;
   isTicketIssuable: FormControl<boolean>;
@@ -44,7 +55,6 @@ type NodeForm = FormGroup<{
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CreateBranchServiceTreeDialogComponent {
-  private readonly formBuilder = inject(NonNullableFormBuilder);
 
   readonly open = input.required<boolean>();
   readonly saving = input.required<boolean>();
@@ -58,6 +68,10 @@ export class CreateBranchServiceTreeDialogComponent {
   readonly created = output<CreateBranchServiceTreeRequest>();
 
   readonly validationError = signal<string | null>(null);
+
+  private currentResetKey = this.resetKey();
+  private readonly duplicateServiceCodeControls = new Set<FormControl<string>>();
+
   readonly root = this.createNodeForm();
 
   protected readonly dialogTitle = computed(() =>
@@ -71,15 +85,21 @@ export class CreateBranchServiceTreeDialogComponent {
     this.leafOnly()
       ? this.translations().createLeafDescription
       : this.mode() === 'subtree'
-      ? this.translations().createSubtreeDescription
-      : this.translations().createTreeDescription,
+        ? this.translations().createSubtreeDescription
+        : this.translations().createTreeDescription,
   );
   protected readonly dialogActionLabel = computed(() =>
     this.mode() === 'subtree' ? this.translations().addChild : this.translations().createBranchTree,
   );
 
   private readonly resetOnKeyChange = effect(() => {
-    this.resetKey();
+    const resetKey = this.resetKey();
+
+    if (resetKey === this.currentResetKey) {
+      return;
+    }
+
+    this.currentResetKey = resetKey;
     this.reset();
   });
 
@@ -94,12 +114,54 @@ export class CreateBranchServiceTreeDialogComponent {
   }
 
   protected removeChild(parent: NodeForm, index: number): void {
+    this.clearDuplicateServiceCodeErrors(this.childrenControls(parent).at(index));
     this.childrenControls(parent).removeAt(index);
+  }
+
+  protected nodeServiceCodeError(group: NodeForm): string {
+    const control = group.controls.serviceCode;
+
+    if (control.hasError('duplicateServiceCode')) {
+      return this.translations().duplicateServiceCodeInTree;
+    }
+
+    if (control.hasError('maxlength')) {
+      return this.translations().serviceCodeMaxLength;
+    }
+
+    if (control.hasError('serviceCodeMustBeEmpty')) {
+      return this.translations().serviceCodeMustBeEmpty;
+    }
+
+    return this.translations().serviceCodeRequiredError;
+  }
+
+  protected onNodeServiceCodeRequiredChange(group: NodeForm, event: Event): void {
+    const checked = (event.target as HTMLInputElement).checked;
+
+    if (!checked) {
+      group.controls.serviceCode.setValue('', { emitEvent: false });
+      group.controls.serviceCode.markAsPristine();
+    }
+
+    this.clearServiceCodeError(group, 'duplicateServiceCode');
+    this.applyNodeServiceCodeValidation(group);
+  }
+
+  protected onNodeServiceCodeInput(group: NodeForm): void {
+    this.clearServiceCodeError(group, 'duplicateServiceCode');
+    this.applyNodeServiceCodeValidation(group);
   }
 
   protected submit(): void {
     this.validationError.set(null);
     this.root.markAllAsTouched();
+    this.clearDuplicateServiceCodeErrors(this.root);
+
+    if (this.hasDuplicateServiceCodes()) {
+      this.validationError.set(this.translations().duplicateServiceCodeInTree);
+      return;
+    }
 
     const error = this.validateNode(this.root);
 
@@ -120,26 +182,58 @@ export class CreateBranchServiceTreeDialogComponent {
   }
 
   private createNodeForm(): NodeForm {
-    return this.formBuilder.group({
-      arabicName: ['', [Validators.required, Validators.maxLength(100)]],
-      englishName: ['', [Validators.required, Validators.maxLength(100)]],
-      arabicUserMessage: ['', [Validators.maxLength(500)]],
-      englishUserMessage: ['', [Validators.maxLength(500)]],
-      isTicketIssuable: [false],
-      isClientInputRequired: [false],
-      hasReservation: [false],
-      orderNo: [1, [Validators.required, Validators.min(0)]],
-      priority: [0, [Validators.required, Validators.min(0)]],
-      rangePrefix: [''],
+    return new FormGroup({
+      arabicName: new FormControl('', {
+        nonNullable: true,
+        validators: [Validators.required, Validators.maxLength(100)],
+      }),
+      englishName: new FormControl('', {
+        nonNullable: true,
+        validators: [Validators.required, Validators.maxLength(100)],
+      }),
+      isServiceCodeRequired: new FormControl(false, { nonNullable: true }),
+      serviceCode: new FormControl('', {
+        nonNullable: true,
+        validators: [
+          Validators.maxLength(100),
+          (control: AbstractControl<string>) => this.nodeServiceCodeValidator(control),
+        ],
+      }),
+      arabicUserMessage: new FormControl('', {
+        nonNullable: true,
+        validators: [Validators.maxLength(500)],
+      }),
+      englishUserMessage: new FormControl('', {
+        nonNullable: true,
+        validators: [Validators.maxLength(500)],
+      }),
+      isTicketIssuable: new FormControl(false, { nonNullable: true }),
+      isClientInputRequired: new FormControl(false, { nonNullable: true }),
+      hasReservation: new FormControl(false, { nonNullable: true }),
+      orderNo: new FormControl(1, {
+        nonNullable: true,
+        validators: [Validators.required, Validators.min(0)],
+      }),
+      priority: new FormControl(0, {
+        nonNullable: true,
+        validators: [Validators.required, Validators.min(0)],
+      }),
+      rangePrefix: new FormControl('', { nonNullable: true }),
       rangeStartNumber: new FormControl<number | null>(null),
       rangeEndNumber: new FormControl<number | null>(null),
       waitingDuration: new FormControl<number | null>(null),
       noOfTicketCopies: new FormControl<number | null>(null),
-      children: this.formBuilder.array<NodeForm>([]),
+      children: new FormArray<NodeForm>([]),
     });
   }
 
   private validateNode(group: NodeForm): string | null {
+    this.applyNodeServiceCodeValidation(group);
+
+    if (group.controls.serviceCode.touched && group.controls.serviceCode.invalid) {
+      return this.nodeServiceCodeError(group);
+    }
+
     if (group.invalid) {
       return this.translations().requiredField;
     }
@@ -163,7 +257,10 @@ export class CreateBranchServiceTreeDialogComponent {
       const arabicName = childValue.arabicName.trim().toLocaleLowerCase();
       const englishName = childValue.englishName.trim().toLocaleLowerCase();
 
-      if ((arabicName && arabicNames.has(arabicName)) || (englishName && englishNames.has(englishName))) {
+      if (
+        (arabicName && arabicNames.has(arabicName)) ||
+        (englishName && englishNames.has(englishName))
+      ) {
         return this.translations().duplicateSiblingName;
       }
 
@@ -178,6 +275,93 @@ export class CreateBranchServiceTreeDialogComponent {
     }
 
     return null;
+  }
+
+  private hasDuplicateServiceCodes(): boolean {
+    const byCode = new Map<string, NodeForm[]>();
+
+    for (const node of this.collectNodes(this.root)) {
+      const value = node.getRawValue();
+      const code = value.isServiceCodeRequired ? value.serviceCode.trim() : '';
+
+      if (!code) {
+        continue;
+      }
+
+      byCode.set(code, [...(byCode.get(code) ?? []), node]);
+    }
+
+    let hasDuplicates = false;
+
+    byCode.forEach((nodes) => {
+      if (nodes.length <= 1) {
+        return;
+      }
+
+      hasDuplicates = true;
+      nodes.forEach((node) => this.setServiceCodeError(node, 'duplicateServiceCode'));
+    });
+
+    return hasDuplicates;
+  }
+
+  private collectNodes(group: NodeForm): NodeForm[] {
+    return [
+      group,
+      ...this.childrenControls(group).controls.flatMap((child) => this.collectNodes(child)),
+    ];
+  }
+
+  private applyNodeServiceCodeValidation(group: NodeForm): void {
+    group.controls.serviceCode.updateValueAndValidity({ emitEvent: false });
+  }
+
+  private clearDuplicateServiceCodeErrors(group: NodeForm): void {
+    this.clearServiceCodeError(group, 'duplicateServiceCode');
+    this.childrenControls(group).controls.forEach((child) =>
+      this.clearDuplicateServiceCodeErrors(child),
+    );
+  }
+
+  private setServiceCodeError(group: NodeForm, key: string): void {
+    const control = group.controls.serviceCode;
+
+    if (key === 'duplicateServiceCode') {
+      this.duplicateServiceCodeControls.add(control);
+    }
+
+    control.updateValueAndValidity({ emitEvent: false });
+    control.markAsTouched();
+  }
+
+  private clearServiceCodeError(group: NodeForm, key: string): void {
+    const control = group.controls.serviceCode;
+
+    if (key === 'duplicateServiceCode') {
+      this.duplicateServiceCodeControls.delete(control);
+    }
+
+    control.updateValueAndValidity({ emitEvent: false });
+  }
+
+  private nodeServiceCodeValidator(control: AbstractControl<string>): ValidationErrors | null {
+    const group = control.parent as NodeForm | null;
+    const errors: ValidationErrors = {};
+    const normalizedCode = control.value.trim();
+
+    if (this.duplicateServiceCodeControls.has(control as FormControl<string>)) {
+      errors['duplicateServiceCode'] = true;
+    }
+
+    if (group?.controls.isServiceCodeRequired.value) {
+      if (!normalizedCode) {
+        errors['serviceCodeRequired'] = true;
+      }
+    } else if (normalizedCode) {
+      errors['serviceCodeMustBeEmpty'] = true;
+    }
+
+    return Object.keys(errors).length > 0 ? errors : null;
   }
 
   private hasTicketSettings(value: ReturnType<NodeForm['getRawValue']>): boolean {
@@ -199,6 +383,8 @@ export class CreateBranchServiceTreeDialogComponent {
     return {
       arabicName: value.arabicName.trim(),
       englishName: value.englishName.trim(),
+      serviceCode: value.isServiceCodeRequired ? this.toOptionalString(value.serviceCode) : null,
+      isServiceCodeRequired: value.isServiceCodeRequired,
       arabicUserMessage: this.toOptionalString(value.arabicUserMessage),
       englishUserMessage: this.toOptionalString(value.englishUserMessage),
       isTicketIssuable,
@@ -222,9 +408,12 @@ export class CreateBranchServiceTreeDialogComponent {
 
   private reset(): void {
     this.validationError.set(null);
+    this.duplicateServiceCodeControls.clear();
     this.root.reset({
       arabicName: '',
       englishName: '',
+      isServiceCodeRequired: false,
+      serviceCode: '',
       arabicUserMessage: '',
       englishUserMessage: '',
       isTicketIssuable: false,

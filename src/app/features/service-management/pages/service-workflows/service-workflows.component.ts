@@ -16,6 +16,7 @@ import {
 import { ActivatedRoute, Router } from '@angular/router';
 import { finalize } from 'rxjs';
 
+import { NiletronixLoadingStateComponent } from '../../../../shared/components/niletronix-loading-state/niletronix-loading-state.component';
 import { TechnicalAdminPageHeroComponent } from '../../../../shared/components/technical-admin-page-hero/technical-admin-page-hero.component';
 import { AuthSessionService } from '../../../auth/services/auth-session.service';
 import { BranchListItem } from '../../../technical-admin/models/branch-management.model';
@@ -58,7 +59,7 @@ interface WorkflowParentOption {
 @Component({
   selector: 'app-service-workflows',
   standalone: true,
-  imports: [ReactiveFormsModule, TechnicalAdminPageHeroComponent, ServiceHierarchyTreeComponent],
+  imports: [ReactiveFormsModule, TechnicalAdminPageHeroComponent, ServiceHierarchyTreeComponent, NiletronixLoadingStateComponent],
   providers: [ServiceWorkflowStore],
   templateUrl: './service-workflows.component.html',
   styleUrl: './service-workflows.component.css',
