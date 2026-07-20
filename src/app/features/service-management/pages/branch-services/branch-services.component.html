@@ -1,15 +1,22 @@
-<section class="technical-admin-responsive-page branch-services-page" [attr.dir]="direction()" [attr.lang]="language()">
+﻿<section
+  class="technical-admin-responsive-page branch-services-page container-fluid d-grid gap-3 p-3 p-lg-4 w-100"
+  [attr.dir]="direction()"
+  [attr.lang]="language()"
+>
   <app-technical-admin-page-hero
     [eyebrow]="translations().title"
     [title]="translations().title"
     [description]="translations().description"
     icon="bi bi-diagram-3-fill"
   >
-    <div hero-actions class="branch-services-actions">
+    <div
+      hero-actions
+      class="branch-services-actions d-flex align-items-center justify-content-between flex-wrap gap-2"
+    >
       @if (canOpenGlobalizationRequests() && store.hasSelectedBranch()) {
         <button
           type="button"
-          class="branch-services-secondary-btn relative"
+          class="branch-services-secondary-btn position-relative d-inline-flex align-items-center justify-content-center gap-2"
           [attr.aria-busy]="store.pendingGlobalizationRequestsLoading()"
           (click)="openGlobalizationRequests()"
         >
@@ -17,31 +24,39 @@
           {{ globalizationTranslations().branchRequestsTitle }}
           @if (pendingRequestsBadge()) {
             <span
-              data-testid='pending-requests-shadow'
-              class='pointer-events-none absolute inset-0 rounded-[inherit] shadow-[0_0_8px_rgba(14,165,233,0.12)] motion-safe:animate-pulse'
-              aria-hidden='true'
+              data-testid="pending-requests-shadow"
+              class="position-absolute top-0 bottom-0 start-0 end-0 rounded-pill shadow-sm"
+              aria-hidden="true"
             ></span>
           }
           @if (pendingRequestsBadge(); as badge) {
-            <span class="absolute -end-2 -top-2 grid min-h-5 min-w-5 place-items-center rounded-full bg-rose-600 px-1 text-[10px] font-black leading-none text-white">{{ badge }}</span>
+            <span
+              class="pending-requests-badge position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+              >{{ badge }}</span
+            >
           }
         </button>
       }
       @if (canAssignBranchServices() && store.hasSelectedBranch()) {
-        <button type="button" class="branch-services-primary-btn" (click)="openAssignDialog()">
-          <i class="bi bi-node-plus" aria-hidden="true"></i>
-          {{ translations().addServices }}
+        <button
+          type="button"
+          class="branch-services-primary-btn d-inline-flex align-items-center justify-content-center gap-2"
+          (click)="openAssignDialog()"
+        >
+          <i class="bi bi-node-plus" aria-hidden="true"></i> {{ translations().addServices }}
         </button>
       }
       @if (canOpenCreateTree()) {
-        <button type="button" class="branch-services-secondary-btn" (click)="openCreateTreeDialog()">
-          <i class="bi bi-diagram-3" aria-hidden="true"></i>
-          {{ translations().createBranchTree }}
+        <button
+          type="button"
+          class="branch-services-secondary-btn d-inline-flex align-items-center justify-content-center gap-2"
+          (click)="openCreateTreeDialog()"
+        >
+          <i class="bi bi-diagram-3" aria-hidden="true"></i> {{ translations().createBranchTree }}
         </button>
       }
     </div>
   </app-technical-admin-page-hero>
-
   @if (store.message(); as currentMessage) {
     <div class="branch-services-toast" role="status" aria-live="polite" aria-atomic="true">
       <div
@@ -57,23 +72,28 @@
       </div>
     </div>
   }
-
   @if (!canViewBranchServices()) {
     <section class="branch-services-empty branch-services-denied">
       <i class="bi bi-shield-lock" aria-hidden="true"></i>
       <h2>{{ translations().accessDenied }}</h2>
     </section>
   } @else {
-    <section class="branch-services-toolbar">
+    <section
+      class="branch-services-toolbar d-flex align-items-center justify-content-between flex-wrap gap-2"
+    >
       @if (isBranchAdmin()) {
-        <div class="branch-services-active-branch">
+        <div class="branch-services-active-branch d-grid gap-1">
           <span>{{ translations().activeBranch }}</span>
           <strong>{{ store.selectedBranchLabel() }}</strong>
         </div>
       } @else {
-        <label class="branch-services-field">
+        <label class="branch-services-field d-grid gap-1 m-0">
           <span>{{ translations().branchSelector }}</span>
-          <select [disabled]="store.branchesLoading()" (change)="onBranchChange($event)">
+          <select
+            class="form-select"
+            [disabled]="store.branchesLoading()"
+            (change)="onBranchChange($event)"
+          >
             <option value="">{{ translations().selectBranch }}</option>
             @for (branch of branches(); track branch.branchId) {
               <option [value]="branch.branchId">{{ branchName(branch) }}</option>
@@ -81,13 +101,15 @@
           </select>
         </label>
       }
-
-      <button type="button" class="branch-services-secondary-btn" [disabled]="!store.hasSelectedBranch()" (click)="refresh()">
-        <i class="bi bi-arrow-clockwise" aria-hidden="true"></i>
-        {{ translations().refresh }}
+      <button
+        type="button"
+        class="branch-services-secondary-btn d-inline-flex align-items-center justify-content-center gap-2"
+        [disabled]="!store.hasSelectedBranch()"
+        (click)="refresh()"
+      >
+        <i class="bi bi-arrow-clockwise" aria-hidden="true"></i> {{ translations().refresh }}
       </button>
     </section>
-
     @if (!store.hasSelectedBranch()) {
       <section class="branch-services-empty">
         <i class="bi bi-building" aria-hidden="true"></i>
@@ -95,13 +117,23 @@
       </section>
     } @else {
       @if (creationRequestSummary(); as request) {
-        <section class="mb-4 rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
-          <h2 class="font-black text-emerald-900">{{ globalizationTranslations().requestSent }}</h2>
-          <p class="mt-1 text-sm text-emerald-800">{{ globalizationTranslations().availableWhilePending }}</p>
-          <div class="mt-3 flex flex-wrap items-center gap-3 text-sm">
+        <section class="mb-4 rounded-3 border border-success-subtle bg-success-subtle p-4">
+          <h2 class="fw-bolder text-success">{{ globalizationTranslations().requestSent }}</h2>
+          <p class="mt-1 text-success">
+            {{ globalizationTranslations().availableWhilePending }}
+          </p>
+          <div class="mt-3 d-flex flex-wrap align-items-center gap-3 small">
             <strong>#{{ request.requestId }}</strong>
-            <span>{{ request.status === 'Pending' ? globalizationTranslations().pending : request.status }}</span>
-            <button type="button" class="primary-action compact-action success-primary" (click)="openGlobalizationRequests()">{{ globalizationTranslations().openRequests }}</button>
+            <span>{{
+              request.status === 'Pending' ? globalizationTranslations().pending : request.status
+            }}</span>
+            <button
+              type="button"
+              class="primary-action compact-action success-primary"
+              (click)="openGlobalizationRequests()"
+            >
+              {{ globalizationTranslations().openRequests }}
+            </button>
           </div>
         </section>
       }
@@ -156,7 +188,6 @@
       />
     }
   }
-
   @if (canOpenGlobalizationRequests() && store.selectedBranchId(); as branchId) {
     <app-branch-globalization-requests
       [branchId]="branchId"
@@ -164,7 +195,6 @@
       (closed)="store.closeGlobalizationRequestsDialog()"
     />
   }
-
   <app-assign-branch-services-dialog
     [open]="store.assignDialogOpen()"
     [nodes]="store.serviceCentralTree()"
@@ -181,7 +211,6 @@
     (toggleNode)="toggleCentralNode($event)"
     (assigned)="assignServices($event)"
   />
-
   <app-create-branch-service-tree-dialog
     [open]="store.createTreeDialogOpen()"
     [saving]="store.creatingTree()"
@@ -193,7 +222,6 @@
     (closed)="store.closeCreateTreeDialog()"
     (created)="createBranchTree($event)"
   />
-
   @if (store.unassignConfirmState(); as unassignState) {
     <app-unassign-branch-service-dialog
       [state]="unassignState"
@@ -203,7 +231,6 @@
       (confirmed)="confirmUnassign()"
     />
   }
-
   @if (store.lifecycleConfirmState(); as lifecycleState) {
     <app-branch-service-lifecycle-dialog
       [state]="lifecycleState"
@@ -214,16 +241,23 @@
       (confirmed)="confirmLifecycle()"
     />
   }
-
   @if (mediaDetails(); as details) {
     <div class="branch-services-media-backdrop" (click)="closeServiceMedia()"></div>
-    <aside class="branch-services-media-dialog" role="dialog" [attr.aria-label]="serviceTranslations().serviceMedia">
+    <aside
+      class="branch-services-media-dialog"
+      role="dialog"
+      [attr.aria-label]="serviceTranslations().serviceMedia"
+    >
       <header class="branch-services-media-header">
         <div>
           <p>{{ serviceTranslations().serviceMedia }}</p>
           <h2>{{ language() === 'ar' ? details.arabicName : details.englishName }}</h2>
         </div>
-        <button type="button" [attr.aria-label]="translations().close" (click)="closeServiceMedia()">
+        <button
+          type="button"
+          [attr.aria-label]="translations().close"
+          (click)="closeServiceMedia()"
+        >
           <i class="bi bi-x-lg" aria-hidden="true"></i>
         </button>
       </header>
@@ -238,8 +272,13 @@
     </aside>
   } @else if (mediaLoading()) {
     <div class="branch-services-media-backdrop"></div>
-    <aside class="branch-services-media-dialog branch-services-media-dialog--loading" role="dialog" [attr.aria-label]="serviceTranslations().serviceMedia">
+    <aside
+      class="branch-services-media-dialog branch-services-media-dialog--loading"
+      role="dialog"
+      [attr.aria-label]="serviceTranslations().serviceMedia"
+    >
       <app-niletronix-loading-state [title]="serviceTranslations().loading" variant="panel" />
     </aside>
   }
 </section>
+

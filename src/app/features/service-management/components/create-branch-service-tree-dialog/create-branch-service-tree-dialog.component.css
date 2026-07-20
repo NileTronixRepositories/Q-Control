@@ -1,74 +1,63 @@
-.branch-tree-backdrop {
-  background: #0f172a66;
-  inset: 0;
+﻿.branch-tree-backdrop {
   position: fixed;
+  inset: 0;
   z-index: 1000;
+  background: #0f172a66;
 }
 
 .branch-tree-dialog {
+  position: fixed;
+  inset: 50% auto auto 50%;
+  z-index: 1001;
+  display: grid;
+  width: 980px;
+  max-width: calc(100vw - 24px);
+  max-height: calc(100vh - 32px);
+  overflow: hidden;
   background: #fff;
   border: 1px solid #d7e8ff;
   border-radius: 8px;
   box-shadow: 0 24px 60px #0f172a40;
-  display: grid;
-  left: 50%;
-  max-height: calc(100vh - 32px);
-  max-width: calc(100vw - 24px);
-  overflow: hidden;
-  position: fixed;
-  top: 50%;
   transform: translate(-50%, -50%);
-  width: 980px;
-  z-index: 1001;
-}
-
-.branch-tree-header,
-.branch-tree-actions,
-.branch-tree-node-header,
-.branch-tree-node-actions {
-  align-items: center;
-  display: flex;
-  gap: 8px;
-  justify-content: space-between;
 }
 
 .branch-tree-header {
+  padding: 10px 12px;
   background: #f8fbff;
   border-bottom: 1px solid #dbeafe;
-  padding: 10px 12px;
 }
 
 .branch-tree-header p,
 .branch-tree-header span {
+  margin: 0;
   color: #64748b;
   font-size: 11px;
   font-weight: 800;
-  margin: 0;
 }
 
 .branch-tree-header h2 {
+  margin: 1px 0;
   color: #0f172a;
   font-size: 18px;
   font-weight: 900;
-  margin: 1px 0;
 }
 
 .branch-tree-body {
   display: grid;
   gap: 10px;
   max-height: calc(100vh - 185px);
-  overflow: auto;
   padding: 10px;
+  overflow: auto;
 }
 
 .branch-tree-node {
+  display: grid;
+  gap: 8px;
+  padding: 9px;
+  margin-inline-start: calc(var(--node-level) * 14px);
   background: #f8fbff;
   border: 1px solid #dbeafe;
   border-radius: 8px;
-  display: grid;
-  gap: 8px;
-  margin-inline-start: calc(var(--node-level) * 14px);
-  padding: 9px;
 }
 
 .branch-tree-node-header strong {
@@ -77,23 +66,8 @@
   font-weight: 900;
 }
 
-.branch-tree-grid {
-  display: grid;
-  gap: 8px;
-}
-
-.branch-tree-grid.two-cols {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.branch-tree-grid.five-cols {
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-}
-
 .branch-tree-field,
 .branch-tree-check {
-  display: grid;
-  gap: 4px;
   min-width: 0;
 }
 
@@ -104,43 +78,31 @@
   font-weight: 850;
 }
 
-.branch-tree-field input,
-
-.branch-tree-field small {
-  color: #dc2626;
-  font-size: 11px;
-  font-weight: 700;
-}
-.branch-tree-field textarea {
-  background: #fff;
-  border: 1px solid #cbd5e1;
-  border-radius: 7px;
-  color: #0f172a;
-  font-size: 11px;
+.branch-tree-field .form-control {
   min-height: 30px;
-  padding: 0 8px;
-  width: 100%;
-}
-
-
-.branch-tree-field small {
-  color: #dc2626;
+  color: #0f172a;
+  border-color: #cbd5e1;
+  border-radius: 7px;
   font-size: 11px;
-  font-weight: 700;
 }
-.branch-tree-field textarea {
+
+.branch-tree-field textarea.form-control {
   padding-block: 6px;
   resize: vertical;
 }
 
+.branch-tree-field small {
+  color: #dc2626;
+  font-size: 11px;
+  font-weight: 700;
+}
+
 .branch-tree-check {
-  align-content: center;
+  min-height: 30px;
+  padding: 0 8px;
   background: #fff;
   border: 1px solid #e2e8f0;
   border-radius: 7px;
-  grid-template-columns: auto 1fr;
-  min-height: 30px;
-  padding: 0 8px;
 }
 
 .branch-tree-check input {
@@ -153,83 +115,70 @@
 }
 
 .branch-tree-actions {
-  border-top: 1px solid #e2e8f0;
-  justify-content: flex-end;
   padding: 10px 12px;
+  border-top: 1px solid #e2e8f0;
 }
 
 .branch-tree-primary-btn,
 .branch-tree-secondary-btn,
 .branch-tree-danger-btn,
 .branch-tree-icon-btn {
-  align-items: center;
-  border: 1px solid transparent;
-  border-radius: 7px;
-  display: inline-flex;
-  font-size: 11px;
-  font-weight: 850;
-  gap: 5px;
-  justify-content: center;
   min-height: 30px;
   padding: 0 10px;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  font-size: 11px;
+  font-weight: 850;
 }
 
 .branch-tree-primary-btn {
+  color: #fff;
   background: #0284c7;
   border-color: #0284c7;
-  color: #fff;
 }
 
 .branch-tree-secondary-btn,
 .branch-tree-icon-btn {
+  color: #0369a1;
   background: #fff;
   border-color: #bae6fd;
-  color: #0369a1;
 }
 
 .branch-tree-danger-btn {
+  color: #e11d48;
   background: #fff;
   border-color: #fecdd3;
-  color: #e11d48;
 }
 
 .branch-tree-icon-btn {
-  padding: 0;
   width: 30px;
+  padding: 0;
 }
 
 .branch-tree-error {
+  padding: 7px 9px;
+  margin: 0;
+  color: #be123c;
   background: #fff1f2;
   border: 1px solid #fecaca;
   border-radius: 7px;
-  color: #be123c;
-  display: inline-flex;
   font-size: 11px;
   font-weight: 800;
-  gap: 6px;
-  margin: 0;
-  padding: 7px 9px;
+}
+
+.branch-tree-parent-label {
+  display: block;
+  margin-top: 3px;
+  color: #0369a1;
+  font-size: 10px;
+  font-weight: 850;
 }
 
 @media (max-width: 900px) {
-  .branch-tree-grid.two-cols,
-  .branch-tree-grid.five-cols {
-    grid-template-columns: 1fr;
-  }
-
   .branch-tree-header,
   .branch-tree-actions,
   .branch-tree-node-header {
     align-items: stretch;
     flex-direction: column;
   }
-}
-
-
-.branch-tree-parent-label {
-  color: #0369a1;
-  display: block;
-  font-size: 10px;
-  font-weight: 850;
-  margin-top: 3px;
 }

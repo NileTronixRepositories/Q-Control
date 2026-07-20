@@ -2,19 +2,8 @@
   display: block;
 }
 
-.summary-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 16px;
-}
-
 .summary-card {
   position: relative;
-  display: flex;
-  min-width: 0;
-  flex-direction: column;
-  gap: 8px;
-  overflow: hidden;
 }
 
 .summary-card::before {
@@ -59,28 +48,6 @@
   position: relative;
 }
 
-.branch-api-filters {
-  display: grid;
-  grid-template-columns: minmax(220px, 2fr) repeat(3, minmax(150px, 1fr));
-  gap: 16px;
-  margin-bottom: 16px;
-}
-
-.branch-api-filters label {
-  display: flex;
-  min-width: 0;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.pagination-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-top: 16px;
-}
-
 .pagination-bar .total-items {
   color: var(--q-text-muted);
   font-size: 0.85rem;
@@ -110,29 +77,7 @@
   border-top: 1px solid rgb(var(--q-primary-rgb) / 0.12);
 }
 
-@media (max-width: 1199.98px) {
-  .summary-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
 @media (max-width: 767.98px) {
-  .branch-api-filters,
-  .summary-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .pagination-bar,
-  .pagination-bar > div {
-    align-items: stretch;
-    flex-direction: column;
-  }
-
-  .pagination-bar .compact-action,
-  .branch-mutation-form .branch-form-actions :where(.primary-action, .secondary-action) {
-    width: 100%;
-  }
-
   .branch-mutation-dialog {
     --q-popup-wide-width: min(100dvw - 24px, 720px);
   }

@@ -1,0 +1,98 @@
+﻿:host {
+  display: block;
+}
+
+.technical-admin-mobile-record-card {
+  border-color: #e2e8f0;
+  border-radius: 16px;
+  transition: box-shadow 160ms ease;
+}
+
+.technical-admin-mobile-record-card:hover {
+  box-shadow: 0 12px 26px rgb(15 23 42 / 0.1);
+}
+
+.record-card-header {
+  padding: 14px;
+  background: linear-gradient(135deg, rgb(236 254 255 / 0.8), #ffffff, #f0f9ff);
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.record-card-icon {
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  color: #155e75;
+  background: #cffafe;
+  border: 1px solid #a5f3fc;
+  border-radius: 12px;
+  font-size: 1.125rem;
+}
+
+.record-card-main,
+.record-card-title {
+  min-width: 0;
+}
+
+.record-card-eyebrow {
+  color: #0e7490;
+  font-size: 0.6875rem;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+}
+
+.record-card-heading {
+  color: #020617;
+  font-size: 1rem;
+  font-weight: 900;
+  line-height: 1.35;
+}
+
+.record-card-id {
+  padding: 4px 10px;
+  color: #ffffff;
+  background: #0f172a;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 900;
+}
+
+.record-card-badges:empty {
+  display: none;
+}
+
+.record-card-fields {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 10px;
+  padding: 14px;
+}
+
+:host ::ng-deep [record-fields] {
+  min-width: 0;
+  margin: 0;
+  padding: 10px;
+  background: rgb(248 250 252 / 0.72);
+  border: 1px solid #f1f5f9;
+  border-radius: 12px;
+}
+
+.record-card-actions {
+  padding: 12px;
+  background: rgb(248 250 252 / 0.72);
+  border-top: 1px solid #f1f5f9;
+}
+
+:host ::ng-deep [record-actions] {
+  flex: 1 1 44px;
+  min-height: 44px;
+}
+
+@media (min-width: 430px) {
+  .record-card-fields {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  :host ::ng-deep [record-fields].record-field-wide {
+    grid-column: 1 / -1;
+  }
+}

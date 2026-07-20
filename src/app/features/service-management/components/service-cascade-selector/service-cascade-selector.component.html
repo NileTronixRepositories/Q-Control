@@ -1,80 +1,39 @@
-<header
-  class="workflow-selection-head d-flex align-items-center justify-content-between flex-wrap gap-2"
+﻿<header class="workflow-selection-head d-flex align-items-center justify-content-between flex-wrap gap-2"
 >
-  <div>
-    <p class="workflow-eyebrow">
-      <i class="bi bi-layers" aria-hidden="true"></i> {{ translations().serviceSelection }}
-    </p>
-    <!-- <h2>{{ selectionModeLabel() }}</h2> -->
-    <!-- <span>{{ translations().serviceSelectionHint }}</span> -->
-  </div>
-  @if (selectionMode === 'replace') {
-    <button
-      type="button"
-      class="workflow-secondary-btn"
-      (click)="cancelSelection()"
-    >
-      <i class="bi bi-x-lg" aria-hidden="true"></i>{{ translations().cancel }}
-    </button>
-  }
+<div>
+<p class="workflow-eyebrow">
+<i class="bi bi-layers" aria-hidden="true"></i> {{ translations().serviceSelection }}
+</p>
+<!-- <h2>{{ selectionModeLabel() }}</h2> -->
+<!-- <span>{{ translations().serviceSelectionHint }}</span> -->
+</div>
+@if (selectionMode === 'replace') { <button type="button" class="workflow-secondary-btn" (click)="cancelSelection()" >
+<i class="bi bi-x-lg" aria-hidden="true"></i>{{ translations().cancel }}
+</button> }
 </header>
-
-@if (!canUseServiceSelection()) {
-  <p class="workflow-note danger">
-    <i class="bi bi-shield-lock" aria-hidden="true"></i
-    >{{ translations().selectionAccessDenied }}
-  </p>
-} @else {
-  @if (selectionError(); as error) {
-    <p class="workflow-note danger">
-      <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>{{ error }}
-    </p>
-  }
-
-  <div class="workflow-selection-levels row g-2 align-items-start">
-    @for (level of selectionLevels(); track $index; let levelIndex = $index) {
-      <label class="workflow-field workflow-selection-level col-12 col-md-4">
-        <span>{{ translations().level }} {{ levelIndex + 1 }}</span>
-        <select
-          class="workflow-input"
-          [value]="level.selectedServiceId ?? 0"
-          [disabled]="level.loading || level.items.length === 0"
-          (change)="selectSelectionOption(levelIndex, $event)"
-        >
-          <option [value]="0">
-            {{ level.loading ? translations().loading : translations().selectService }}
-          </option>
-          @for (option of level.items; track option.serviceId) {
-            <option
-              [value]="option.serviceId"
-              [disabled]="!isSelectionOptionSelectable(option)"
-            >
-              {{ selectionOptionName(option) }}
-            </option>
-          }
-        </select>
-        @if (level.error; as levelError) {
-          <small>{{ levelError }}</small>
-        }
-      </label>
-    }
-  </div>
-
-  @if (selectedSelectionPath().length > 0) {
-    <div
-      class="workflow-selection-path d-flex align-items-center flex-wrap gap-2 p-2"
-      [attr.aria-label]="translations().selectedPath"
-    >
-      <span>{{ translations().selectedPath }}</span>
-      @for (option of selectedSelectionPath(); track option.serviceId; let isLast = $last) {
-        <b>{{ selectionOptionName(option) }}</b>
-        @if (!isLast) {
-          <i
-            [class]="direction() === 'rtl' ? 'bi bi-arrow-left' : 'bi bi-arrow-right'"
-            aria-hidden="true"
-          ></i>
-        }
-      }
-    </div>
-  }
+@if (!canUseServiceSelection()) { <p class="workflow-note danger">
+<i class="bi bi-shield-lock" aria-hidden="true"></i >{{ translations().selectionAccessDenied }}
+</p>
+}
+@else {
+@if (selectionError(); as error) { <p class="workflow-note danger">
+<i class="bi bi-exclamation-triangle" aria-hidden="true"></i>{{ error }}
+</p> }
+<div class="workflow-selection-levels row g-2 align-items-start">
+@for (level of selectionLevels(); track $index; let levelIndex = $index) { <label class="workflow-field workflow-selection-level col-12 col-md-4">
+<span>{{ translations().level }} {{ levelIndex + 1 }}</span>
+<select class="workflow-input" [value]="level.selectedServiceId ?? 0" [disabled]="level.loading || level.items.length === 0" (change)="selectSelectionOption(levelIndex, $event)" >
+<option [value]="0"> {{ level.loading ? translations().loading : translations().selectService }}
+</option>
+@for (option of level.items; track option.serviceId) { <option [value]="option.serviceId" [disabled]="!isSelectionOptionSelectable(option)" > {{ selectionOptionName(option) }}
+</option> }
+</select>
+@if (level.error; as levelError) { <small>{{ levelError }}</small> }
+</label> }
+</div>
+@if (selectedSelectionPath().length > 0) { <div class="workflow-selection-path d-flex align-items-center flex-wrap gap-2 p-2" [attr.aria-label]="translations().selectedPath" >
+<span>{{ translations().selectedPath }}</span>
+@for (option of selectedSelectionPath(); track option.serviceId; let isLast = $last) { <b>{{ selectionOptionName(option) }}</b>
+@if (!isLast) { <i [class]="direction() === 'rtl' ? 'bi bi-arrow-left' : 'bi bi-arrow-right'" aria-hidden="true" ></i> } }
+</div> }
 }

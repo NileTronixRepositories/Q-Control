@@ -1,4 +1,4 @@
-import { HttpErrorResponse } from '@angular/common/http';
+﻿import { HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 import {
   ChangeDetectionStrategy,
@@ -40,6 +40,7 @@ const STATUS_POLL_INTERVAL_MS = 15_000;
   selector: 'app-branch-globalization-requests',
   standalone: true,
   templateUrl: './branch-globalization-requests.component.html',
+  styleUrl: './branch-globalization-requests.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BranchGlobalizationRequestsComponent implements OnDestroy {
@@ -188,14 +189,14 @@ export class BranchGlobalizationRequestsComponent implements OnDestroy {
 
   protected statusClasses(status: ServiceGlobalizationRequestStatus): string {
     if (status === 'Approved') {
-      return 'bg-emerald-50 text-emerald-700 ring-emerald-200';
+      return 'bg-success-subtle text-success border border-success-subtle';
     }
 
     if (status === 'Rejected') {
-      return 'bg-rose-50 text-rose-700 ring-rose-200';
+      return 'bg-danger-subtle text-danger border border-danger-subtle';
     }
 
-    return 'bg-amber-50 text-amber-700 ring-amber-200';
+    return 'bg-warning-subtle text-warning-emphasis border border-warning-subtle';
   }
 
   protected statusIcon(status: ServiceGlobalizationRequestStatus): string {
@@ -321,3 +322,7 @@ export class BranchGlobalizationRequestsComponent implements OnDestroy {
     this.rejectionReason.set('');
   }
 }
+
+
+
+

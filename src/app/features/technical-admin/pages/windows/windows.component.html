@@ -1,4 +1,4 @@
-<section class="technical-admin-responsive-page window-management-page container-fluid" [attr.dir]="direction()" [attr.lang]="language()">
+﻿<section class="technical-admin-responsive-page window-management-page container-fluid" [attr.dir]="direction()" [attr.lang]="language()">
   <app-technical-admin-page-hero
     [eyebrow]="translations().title"
     [title]="translations().title"
@@ -11,7 +11,6 @@
       </button>
     }
   </app-technical-admin-page-hero>
-  <!-- Toast -->
   @if (message(); as currentMessage) {
     <div class="toast-stack" role="status" aria-live="polite" aria-atomic="true">
       <div
@@ -81,21 +80,23 @@
       </div>
       @if (activeTab() === 'active') {
         <div class="list-panel mt-3">
-          <div class="toolbar">
-            <label class="filter-field search-field">
+          <div class="toolbar row g-3 align-items-end">
+            <label class="filter-field col-12 col-lg-5">
               <span>{{ translations().searchPlaceholder }}</span>
               <i class="bi bi-search window-filter-icon" aria-hidden="true"></i>
               <input
+                class="form-control"
                 type="search"
                 [value]="activeSearch()"
                 [placeholder]="translations().searchPlaceholder"
                 (input)="updateActiveSearch($event)"
               />
             </label>
-            <label class="filter-field">
+            <label class="filter-field col-12 col-md-4 col-lg-3">
               <span>{{ translations().waitingAreaFilter }}</span>
               <i class="bi bi-hourglass-split window-filter-icon" aria-hidden="true"></i>
               <select
+                class="form-select"
                 [value]="activeWaitingAreaId() ?? ''"
                 (change)="updateActiveWaitingAreaFilter($event)"
               >
@@ -105,10 +106,10 @@
                 }
               </select>
             </label>
-            <label class="filter-field compact-field">
+            <label class="filter-field col-12 col-md-4 col-lg-2">
               <span>{{ translations().pageSize }}</span>
               <i class="bi bi-list-ol window-filter-icon" aria-hidden="true"></i>
-              <select [value]="activePageSize()" (change)="updateActivePageSize($event)">
+              <select class="form-select" [value]="activePageSize()" (change)="updateActivePageSize($event)">
                 <option value="10">10</option>
                 <option value="25">25</option>
                 <option value="50">50</option>
@@ -117,7 +118,7 @@
             </label>
             <button
               type="button"
-              class="secondary-action toolbar-action"
+              class="secondary-action col-12 col-md-4 col-lg-2"
               [disabled]="activeLoading()"
               (click)="refreshActive()"
             >
@@ -128,7 +129,7 @@
             <app-niletronix-loading-state [title]="translations().loading" variant="inline" size="sm" />
           }
           @if (activeWindowsPage().data.length > 0) {
-            <div data-testid="windows-active-desktop" class="table-responsive table-wrap hidden md:block">
+            <div data-testid="windows-active-desktop" class="table-responsive table-wrap d-none d-md-block">
               <table class="table align-middle custom-table">
                 <thead>
                   <tr>
@@ -156,7 +157,7 @@
                       <td>{{ displayBoolean(item.enableTicketBooking) }}</td>
                       <td>{{ displayBoolean(item.enableDirectCall) }}</td>
                       <td>
-                        <div class="action-group">
+                        <div class="action-group d-flex align-items-center justify-content-center gap-2 flex-wrap">
                           @if (canViewDetails()) {
                             <button
                               type="button"
@@ -197,24 +198,24 @@
                 </tbody>
               </table>
             </div>
-            <div data-testid="windows-active-mobile" class="grid gap-3 md:hidden">
+            <div data-testid="windows-active-mobile" class="d-grid gap-3 d-md-none">
               @for (item of activeWindowsPage().data; track item.id) {
                 <app-technical-admin-mobile-record-card [eyebrow]="translations().windowNumber" [title]="formatText(item.descriptiveName)" icon="bi bi-window-stack" [recordId]="item.number">
                   <div record-fields>
-                    <dt class="text-[11px] font-extrabold text-slate-500">{{ translations().waitingAreaNumberLabel }}</dt>
-                    <dd class="mb-0 mt-1 break-words font-bold text-slate-800">{{ item.waitingAreaNumber }} - {{ formatText(item.waitingAreaDescriptiveName) }}</dd>
+                    <dt class="small fw-bold text-muted text-uppercase">{{ translations().waitingAreaNumberLabel }}</dt>
+                    <dd class="mb-0 mt-1 text-break fw-bold">{{ item.waitingAreaNumber }} - {{ formatText(item.waitingAreaDescriptiveName) }}</dd>
                   </div>
                   <div record-fields>
-                    <dt class="text-[11px] font-extrabold text-slate-500">{{ translations().ipAddress }}</dt>
-                    <dd class="mb-0 mt-1 break-all font-bold text-slate-800" dir="ltr">{{ formatText(item.ipAddress) }}</dd>
+                    <dt class="small fw-bold text-muted text-uppercase">{{ translations().ipAddress }}</dt>
+                    <dd class="mb-0 mt-1 text-break fw-bold" dir="ltr">{{ formatText(item.ipAddress) }}</dd>
                   </div>
                   <div record-fields>
-                    <dt class="text-[11px] font-extrabold text-slate-500">{{ translations().ticketBooking }}</dt>
-                    <dd class="mb-0 mt-1 font-bold text-slate-800">{{ displayBoolean(item.enableTicketBooking) }}</dd>
+                    <dt class="small fw-bold text-muted text-uppercase">{{ translations().ticketBooking }}</dt>
+                    <dd class="mb-0 mt-1 fw-bold">{{ displayBoolean(item.enableTicketBooking) }}</dd>
                   </div>
                   <div record-fields>
-                    <dt class="text-[11px] font-extrabold text-slate-500">{{ translations().directCall }}</dt>
-                    <dd class="mb-0 mt-1 font-bold text-slate-800">{{ displayBoolean(item.enableDirectCall) }}</dd>
+                    <dt class="small fw-bold text-muted text-uppercase">{{ translations().directCall }}</dt>
+                    <dd class="mb-0 mt-1 fw-bold">{{ displayBoolean(item.enableDirectCall) }}</dd>
                   </div>
                   @if (canViewDetails()) {
                     <button record-actions type="button" class="icon-action" [attr.aria-label]="translations().view" [title]="translations().view" (click)="openView(item.id)"><i class="bi bi-eye" aria-hidden="true"></i></button>
@@ -234,9 +235,9 @@
               <h2>{{ translations().noItems }}</h2>
             </div>
           }
-          <footer class="pagination-bar">
+          <footer class="pagination-bar d-flex align-items-center justify-content-between gap-3 mt-3 flex-column flex-md-row">
             <span>{{ translations().totalItems }}: {{ activeWindowsPage().totalItems }}</span>
-            <div class="pager-actions">
+            <div class="pager-actions d-flex align-items-center gap-2 flex-wrap justify-content-center">
               <button
                 type="button"
                 class="secondary-action compact-action"
@@ -265,21 +266,23 @@
       }
       @if (activeTab() === 'deleted') {
         <div class="list-panel mt-3">
-          <div class="toolbar">
-            <label class="filter-field search-field">
+          <div class="toolbar row g-3 align-items-end">
+            <label class="filter-field col-12 col-lg-5">
               <span>{{ translations().searchPlaceholder }}</span>
               <i class="bi bi-search window-filter-icon" aria-hidden="true"></i>
               <input
+                class="form-control"
                 type="search"
                 [value]="deletedSearch()"
                 [placeholder]="translations().searchPlaceholder"
                 (input)="updateDeletedSearch($event)"
               />
             </label>
-            <label class="filter-field">
+            <label class="filter-field col-12 col-md-4 col-lg-3">
               <span>{{ translations().waitingAreaFilter }}</span>
               <i class="bi bi-hourglass-split window-filter-icon" aria-hidden="true"></i>
               <select
+                class="form-select"
                 [value]="deletedWaitingAreaId() ?? ''"
                 (change)="updateDeletedWaitingAreaFilter($event)"
               >
@@ -289,10 +292,10 @@
                 }
               </select>
             </label>
-            <label class="filter-field compact-field">
+            <label class="filter-field col-12 col-md-4 col-lg-2">
               <span>{{ translations().pageSize }}</span>
               <i class="bi bi-list-ol window-filter-icon" aria-hidden="true"></i>
-              <select [value]="deletedPageSize()" (change)="updateDeletedPageSize($event)">
+              <select class="form-select" [value]="deletedPageSize()" (change)="updateDeletedPageSize($event)">
                 <option value="10">10</option>
                 <option value="25">25</option>
                 <option value="50">50</option>
@@ -301,7 +304,7 @@
             </label>
             <button
               type="button"
-              class="secondary-action toolbar-action"
+              class="secondary-action col-12 col-md-4 col-lg-2"
               [disabled]="deletedLoading()"
               (click)="refreshDeleted()"
             >
@@ -312,7 +315,7 @@
             <app-niletronix-loading-state [title]="translations().loading" variant="inline" size="sm" />
           }
           @if (deletedWindowsPage().data.length > 0) {
-            <div data-testid="windows-deleted-desktop" class="table-responsive table-wrap hidden md:block">
+            <div data-testid="windows-deleted-desktop" class="table-responsive table-wrap d-none d-md-block">
               <table class="table align-middle custom-table">
                 <thead>
                   <tr>
@@ -340,7 +343,7 @@
                       <td>{{ displayBoolean(item.enableTicketBooking) }}</td>
                       <td>{{ displayBoolean(item.enableDirectCall) }}</td>
                       <td>
-                        <div class="action-group">
+                        <div class="action-group d-flex align-items-center justify-content-center gap-2 flex-wrap">
                           @if (canReactivate()) {
                             <button
                               type="button"
@@ -370,25 +373,25 @@
                 </tbody>
               </table>
             </div>
-            <div data-testid="windows-deleted-mobile" class="grid gap-3 md:hidden">
+            <div data-testid="windows-deleted-mobile" class="d-grid gap-3 d-md-none">
               @for (item of deletedWindowsPage().data; track item.id) {
                 <app-technical-admin-mobile-record-card [eyebrow]="translations().windowNumber" [title]="formatText(item.descriptiveName)" icon="bi bi-window-stack" [recordId]="item.number">
                   <span record-badges class="status-pill status-inactive">{{ translations().deletedTab }}</span>
                   <div record-fields>
-                    <dt class="text-[11px] font-extrabold text-slate-500">{{ translations().waitingAreaNumberLabel }}</dt>
-                    <dd class="mb-0 mt-1 break-words font-bold text-slate-800">{{ item.waitingAreaNumber }} - {{ formatText(item.waitingAreaDescriptiveName) }}</dd>
+                    <dt class="small fw-bold text-muted text-uppercase">{{ translations().waitingAreaNumberLabel }}</dt>
+                    <dd class="mb-0 mt-1 text-break fw-bold">{{ item.waitingAreaNumber }} - {{ formatText(item.waitingAreaDescriptiveName) }}</dd>
                   </div>
                   <div record-fields>
-                    <dt class="text-[11px] font-extrabold text-slate-500">{{ translations().ipAddress }}</dt>
-                    <dd class="mb-0 mt-1 break-all font-bold text-slate-800" dir="ltr">{{ formatText(item.ipAddress) }}</dd>
+                    <dt class="small fw-bold text-muted text-uppercase">{{ translations().ipAddress }}</dt>
+                    <dd class="mb-0 mt-1 text-break fw-bold" dir="ltr">{{ formatText(item.ipAddress) }}</dd>
                   </div>
                   <div record-fields>
-                    <dt class="text-[11px] font-extrabold text-slate-500">{{ translations().ticketBooking }}</dt>
-                    <dd class="mb-0 mt-1 font-bold text-slate-800">{{ displayBoolean(item.enableTicketBooking) }}</dd>
+                    <dt class="small fw-bold text-muted text-uppercase">{{ translations().ticketBooking }}</dt>
+                    <dd class="mb-0 mt-1 fw-bold">{{ displayBoolean(item.enableTicketBooking) }}</dd>
                   </div>
                   <div record-fields>
-                    <dt class="text-[11px] font-extrabold text-slate-500">{{ translations().directCall }}</dt>
-                    <dd class="mb-0 mt-1 font-bold text-slate-800">{{ displayBoolean(item.enableDirectCall) }}</dd>
+                    <dt class="small fw-bold text-muted text-uppercase">{{ translations().directCall }}</dt>
+                    <dd class="mb-0 mt-1 fw-bold">{{ displayBoolean(item.enableDirectCall) }}</dd>
                   </div>
                   @if (canReactivate()) {
                     <button record-actions type="button" class="icon-action success-action" [attr.aria-label]="translations().reactivate" [title]="translations().reactivate" (click)="requestReactivate(item)"><i class="bi bi-play-circle" aria-hidden="true"></i></button>
@@ -405,9 +408,9 @@
               <h2>{{ translations().noItems }}</h2>
             </div>
           }
-          <footer class="pagination-bar">
+          <footer class="pagination-bar d-flex align-items-center justify-content-between gap-3 mt-3 flex-column flex-md-row">
             <span>{{ translations().totalItems }}: {{ deletedWindowsPage().totalItems }}</span>
-            <div class="pager-actions">
+            <div class="pager-actions d-flex align-items-center gap-2 flex-wrap justify-content-center">
               <button
                 type="button"
                 class="secondary-action compact-action"
@@ -557,9 +560,9 @@
                 </label>
               </div>
               <div class="col-12 col-md-6">
-                <label class="check-row window-check-field">
+                <label class="check-row window-check-field d-flex align-items-center gap-2 m-0 p-2">
                   <input
-                    class="form-check-input"
+                    class="form-check-input flex-shrink-0 m-0"
                     type="checkbox"
                     formControlName="enableTicketBooking"
                   />
@@ -567,9 +570,9 @@
                 </label>
               </div>
               <div class="col-12 col-md-6">
-                <label class="check-row window-check-field">
+                <label class="check-row window-check-field d-flex align-items-center gap-2 m-0 p-2">
                   <input
-                    class="form-check-input"
+                    class="form-check-input flex-shrink-0 m-0"
                     type="checkbox"
                     formControlName="enableDirectCall"
                   />
@@ -659,3 +662,7 @@
     </section>
   }
 </section>
+
+
+
+

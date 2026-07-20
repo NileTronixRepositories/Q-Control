@@ -1,38 +1,31 @@
-<article
-  data-testid="technical-admin-mobile-record-card"
-  class="min-w-0 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-shadow hover:shadow-md"
->
-  <header class="flex min-w-0 items-start gap-3 border-b border-slate-100 bg-gradient-to-br from-cyan-50/80 via-white to-sky-50 p-3.5">
-    <span class="grid size-11 shrink-0 place-items-center rounded-xl bg-cyan-100 text-lg text-cyan-800 ring-1 ring-cyan-200">
+<article data-testid="technical-admin-mobile-record-card" class="technical-admin-mobile-record-card overflow-hidden border bg-white shadow-sm">
+  <header class="record-card-header d-flex align-items-start gap-3">
+    <span class="record-card-icon d-grid flex-shrink-0">
       <i [class]="icon()" aria-hidden="true"></i>
     </span>
-    <div class="min-w-0 flex-1">
-      <div class="flex min-w-0 flex-wrap items-start justify-between gap-2">
-        <div class="min-w-0 flex-1">
+    <div class="record-card-main flex-grow-1">
+      <div class="d-flex flex-wrap align-items-start justify-content-between gap-2">
+        <div class="record-card-title flex-grow-1">
           @if (eyebrow()) {
-            <p class="mb-1 text-[11px] font-black uppercase tracking-wide text-cyan-700">{{ eyebrow() }}</p>
+            <p class="record-card-eyebrow mb-1 text-uppercase">{{ eyebrow() }}</p>
           }
-          <h3 class="m-0 break-words text-base font-black leading-[1.35] text-slate-950">{{ title() }}</h3>
+          <h3 class="record-card-heading m-0 text-break">{{ title() }}</h3>
         </div>
         @if (recordId() !== null) {
-          <strong class="shrink-0 rounded-lg bg-slate-900 px-2.5 py-1 text-xs font-black text-white">{{ recordId() }}</strong>
+          <strong class="record-card-id flex-shrink-0">{{ recordId() }}</strong>
         }
       </div>
-      <div class="mt-2 flex flex-wrap gap-1.5 empty:hidden">
+      <div class="record-card-badges d-flex flex-wrap gap-1 mt-2">
         <ng-content select="[record-badges]" />
       </div>
     </div>
   </header>
 
-  <dl
-    class="m-0 grid grid-cols-1 gap-2.5 p-3.5 min-[430px]:grid-cols-2 [&>[record-fields]]:m-0 [&>[record-fields]]:min-w-0 [&>[record-fields]]:rounded-xl [&>[record-fields]]:border [&>[record-fields]]:border-slate-100 [&>[record-fields]]:bg-slate-50/70 [&>[record-fields]]:p-2.5"
-  >
+  <dl class="record-card-fields m-0 d-grid">
     <ng-content select="[record-fields]" />
   </dl>
 
-  <footer
-    class="flex flex-wrap items-stretch gap-2 border-t border-slate-100 bg-slate-50/70 p-3 [&>[record-actions]]:min-h-11 [&>[record-actions]]:flex-1"
-  >
+  <footer class="record-card-actions d-flex flex-wrap align-items-stretch gap-2">
     <ng-content select="[record-actions]" />
   </footer>
 </article>

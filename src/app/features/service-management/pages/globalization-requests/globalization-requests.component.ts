@@ -1,4 +1,4 @@
-import { HttpErrorResponse } from '@angular/common/http';
+﻿import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { finalize, Observable } from 'rxjs';
@@ -232,7 +232,7 @@ export class GlobalizationRequestsComponent implements OnInit, OnDestroy {
   protected parentName(item: ServiceGlobalizationRequestListItem): string {
     return (
       (this.language() === 'ar' ? item.parentServiceArabicName : item.parentServiceEnglishName) ||
-      '—'
+      'â€”'
     );
   }
 
@@ -250,9 +250,9 @@ export class GlobalizationRequestsComponent implements OnInit, OnDestroy {
   }
 
   protected statusClasses(status: ServiceGlobalizationRequestStatus): string {
-    if (status === 'Approved') return 'bg-emerald-50 text-emerald-700 ring-emerald-200';
-    if (status === 'Rejected') return 'bg-rose-50 text-rose-700 ring-rose-200';
-    return 'bg-amber-50 text-amber-700 ring-amber-200';
+    if (status === 'Approved') return 'bg-success-subtle text-success border border-success-subtle';
+    if (status === 'Rejected') return 'bg-danger-subtle text-danger border border-danger-subtle';
+    return 'bg-warning-subtle text-warning-emphasis border border-warning-subtle';
   }
 
   protected statusIcon(status: ServiceGlobalizationRequestStatus): string {
@@ -262,21 +262,21 @@ export class GlobalizationRequestsComponent implements OnInit, OnDestroy {
   }
 
   protected messageClasses(tone: 'success' | 'error' | 'info'): string {
-    if (tone === 'success') return 'border-emerald-200 text-emerald-800';
-    if (tone === 'error') return 'border-rose-200 text-rose-800';
-    return 'border-sky-200 text-sky-800';
+    if (tone === 'success') return 'border-success-subtle text-success bg-success-subtle';
+    if (tone === 'error') return 'border-danger-subtle text-danger bg-danger-subtle';
+    return 'border-info-subtle text-primary bg-info-subtle';
   }
 
   protected messageIcon(tone: 'success' | 'error' | 'info'): string {
-    if (tone === 'success') return 'bi bi-check-circle-fill text-emerald-600';
-    if (tone === 'error') return 'bi bi-exclamation-triangle-fill text-rose-600';
-    return 'bi bi-info-circle-fill text-sky-600';
+    if (tone === 'success') return 'bi bi-check-circle-fill text-success';
+    if (tone === 'error') return 'bi bi-exclamation-triangle-fill text-danger';
+    return 'bi bi-info-circle-fill text-primary';
   }
 
   protected nodeScopeClasses(node: ServiceGlobalizationRequestServiceNode): string {
     return node.scope === 'Global'
-      ? 'bg-violet-50 text-violet-700 ring-violet-200'
-      : 'bg-cyan-50 text-cyan-700 ring-cyan-200';
+      ? 'bg-primary-subtle text-primary border border-primary-subtle'
+      : 'bg-info-subtle text-primary border border-info-subtle';
   }
 
   protected nodeScopeLabel(node: ServiceGlobalizationRequestServiceNode): string {
@@ -284,9 +284,9 @@ export class GlobalizationRequestsComponent implements OnInit, OnDestroy {
   }
 
   protected nodeStateClasses(node: ServiceGlobalizationRequestServiceNode): string {
-    if (node.isDeleted) return 'bg-rose-50 text-rose-700 ring-rose-200';
-    if (node.isActive) return 'bg-emerald-50 text-emerald-700 ring-emerald-200';
-    return 'bg-slate-100 text-slate-600 ring-slate-200';
+    if (node.isDeleted) return 'bg-danger-subtle text-danger border border-danger-subtle';
+    if (node.isActive) return 'bg-success-subtle text-success border border-success-subtle';
+    return 'bg-light text-secondary border border-secondary-subtle';
   }
 
   protected nodeStateLabel(node: ServiceGlobalizationRequestServiceNode): string {
@@ -395,3 +395,5 @@ export class GlobalizationRequestsComponent implements OnInit, OnDestroy {
     this.toastTimeoutId = setTimeout(() => this.store.message.set(null), tone === 'error' ? 6500 : 4200);
   }
 }
+
+

@@ -1,746 +1,385 @@
-<section
-  class="technical-admin-responsive-page service-management-page !mx-auto !w-full !max-w-[1600px] !gap-4 !p-3 sm:!p-4 lg:!p-5"
-  [attr.dir]="direction()"
-  [attr.lang]="language()"
->
-  <app-technical-admin-page-hero
-    [eyebrow]="translations().title"
-    [title]="translations().title"
-    [description]="translations().description"
-    icon="bi bi-grid-1x2-fill"
-  >
-    @if (canCreateGlobal() && canViewAll()) {
-      <button hero-actions type="button" class="svc-primary-btn" (click)="openCreateRoot()">
-        <i class="bi bi-plus-lg" aria-hidden="true"></i>
-        {{ translations().addRootService }}
-      </button>
-    }
-  </app-technical-admin-page-hero>
-
-  @if (store.message(); as currentMessage) {
-    <div class="toast-stack" role="status" aria-live="polite" aria-atomic="true">
-      <div
-        class="toast-item"
-        [class.toast-success]="currentMessage.tone === 'success'"
-        [class.toast-error]="currentMessage.tone === 'error'"
-        [class.toast-info]="currentMessage.tone === 'info'"
-      >
-        <i
-          class="bi"
-          [class.bi-check-circle-fill]="currentMessage.tone === 'success'"
-          [class.bi-x-octagon-fill]="currentMessage.tone === 'error'"
-          [class.bi-info-circle-fill]="currentMessage.tone === 'info'"
-          aria-hidden="true"
-        ></i>
-        <p>{{ currentMessage.text }}</p>
-        <button
-          type="button"
-          class="toast-close"
-          [attr.aria-label]="translations().close"
-          (click)="clearMessage()"
-        >
-          <i class="bi bi-x-lg" aria-hidden="true"></i>
-        </button>
-      </div>
-    </div>
-  }
-
-  @if (!canUseCatalog()) {
-    <section class="svc-empty svc-access-denied">
-      <i class="bi bi-shield-lock" aria-hidden="true"></i>
-      <h2>{{ translations().accessDenied }}</h2>
-      <p>{{ translations().noPermissionHint }}</p>
-    </section>
-  } @else {
-    <section class="svc-central-filters">
-      <label class="svc-field">
-        <span>{{ translations().scopeFilter }}</span>
-        <select class="svc-input" [value]="scopeFilterValue()" (change)="updateScopeFilter($event)">
-          <option value="all">{{ translations().all }}</option>
-          <option value="Global">{{ translations().globalScope }}</option>
-          <option value="BranchScoped">{{ translations().branchScopedScope }}</option>
-        </select>
-      </label>
-      <label class="svc-field">
-        <span>{{ translations().ownerBranchFilter }}</span>
-        <input
-          class="svc-input"
-          type="number"
-          min="1"
-          [value]="store.listQuery().ownerBranchId ?? ''"
-          (change)="updateOwnerBranchFilter($event)"
-        />
-      </label>
-      @if (!isTechnicalAdmin()) {
-        <label class="svc-field">
-          <span>{{ translations().assignedFilter }}</span>
-          <select
-            class="svc-input"
-            [value]="assignedFilterValue()"
-            (change)="updateAssignedFilter($event)"
-          >
-            <option value="all">{{ translations().all }}</option>
-            <option value="true">{{ translations().yes }}</option>
-            <option value="false">{{ translations().no }}</option>
-          </select>
-        </label>
-      }
-    </section>
-
-    @if (canUseBranchAssignment()) {
-      <section class="svc-hero">
-        <div>
-          <p class="svc-eyebrow">{{ translations().branchAssignmentTitle }}</p>
-          <h1>{{ translations().branchAssignmentTitle }}</h1>
-          <span>{{ translations().branchAssignmentDescription }}</span>
-        </div>
-        @if (store.branchAssigning()) {
-          <span class="svc-mini-loading">{{ translations().loading }}</span>
-        }
-      </section>
-
-      <section class="svc-branch-assignment-workspace">
-        <div class="svc-branch-assignment-column">
-          <header class="svc-panel-header">
-            <div>
-              <p class="svc-eyebrow">{{ translations().serviceCentral }}</p>
-              <h2>{{ translations().branchAssignmentSourceTitle }}</h2>
-            </div>
-          </header>
-          <app-service-hierarchy-tree
-            [nodes]="store.availableBranchAssignmentTree()"
-            [expandedNodeIds]="store.expandedTreeNodeIds()"
-            [selectedServiceId]="store.selectedTreeServiceId()"
-            [translations]="translations()"
-            [language]="language()"
-            [direction]="direction()"
-            [loading]="store.treeLoading()"
-            [includeInactive]="includeInactiveTree()"
-            [includeDeleted]="includeDeletedTree()"
-            [canCreate]="false"
-            [canViewDetails]="canViewDetails()"
-            [canUpdate]="false"
-            [canDelete]="false"
-            [canRestore]="false"
-            [draggableLeaves]="canUseBranchAssignment() && !store.branchAssigning()"
-            [canDragLeafNode]="canAssignBranchService"
-            (refresh)="refresh()"
-            (includeInactiveChange)="updateTreeToggle('inactive', $event)"
-            (includeDeletedChange)="updateTreeToggle('deleted', $event)"
-            (toggleNode)="toggleTreeNode($event)"
-            (selectNode)="selectTreeNode($event)"
-            (viewNode)="openViewFromTree($event)"
-            (leafDragStarted)="startBranchAssignmentDrag($event)"
-            (leafDragEnded)="clearBranchAssignmentDrag()"
-          />
-        </div>
-
-        <div class="svc-branch-assignment-column">
-          <header class="svc-panel-header">
-            <div>
-              <p class="svc-eyebrow">{{ translations().branchAssignmentTargetTitle }}</p>
-              <h2>{{ translations().branchAssignmentTargetTitle }}</h2>
-              <span>{{ translations().branchAssignmentDropHint }}</span>
-            </div>
-          </header>
-          <app-service-hierarchy-tree
-            [nodes]="store.assignedBranchServiceTree()"
-            [expandedNodeIds]="store.expandedAssignedBranchNodeIds()"
-            [selectedServiceId]="store.selectedTreeServiceId()"
-            [translations]="translations()"
-            [language]="language()"
-            [direction]="direction()"
-            [loading]="store.assignedBranchTreeLoading() || store.branchAssigning()"
-            [includeInactive]="includeInactiveTree()"
-            [includeDeleted]="includeDeletedTree()"
-            [canCreate]="false"
-            [canViewDetails]="false"
-            [canUpdate]="false"
-            [canDelete]="false"
-            [canRestore]="false"
-            [dropTarget]="canUseBranchAssignment() && !store.branchAssigning()"
-            (refresh)="refresh()"
-            (includeInactiveChange)="updateTreeToggle('inactive', $event)"
-            (includeDeletedChange)="updateTreeToggle('deleted', $event)"
-            (toggleNode)="toggleAssignedBranchNode($event)"
-            (selectNode)="selectAssignedBranchNode($event)"
-            (leafDropped)="dropBranchAssignment($event)"
-          />
-        </div>
-      </section>
-    } @else {
-      <section class="svc-workspace">
-        <article class="svc-editor">
-          <header class="svc-panel-header">
-            <div>
-              <p class="svc-eyebrow">{{ translations().selectedService }}</p>
-              <h2>{{ panelTitle() }}</h2>
-              @if (store.panelMode() === 'create') {
-                <span>{{ translations().createUnder }}: {{ createParentLabel() }}</span>
-              }
-            </div>
-
-            @if (store.isPanelOpen()) {
-              <button
-                type="button"
-                class="svc-icon-btn"
-                [attr.aria-label]="translations().close"
-                (click)="closePanel()"
-              >
-                <i class="bi bi-x-lg" aria-hidden="true"></i>
-              </button>
-            }
-          </header>
-
-          <div class="svc-panel-body">
-            @if (store.detailsLoading()) {
-              <app-niletronix-loading-state
-                [title]="translations().loading"
-                variant="inline"
-                size="sm"
-              />
-            }
-
-            @if (store.panelMode() === 'closed') {
-              <section class="svc-empty">
-                <i class="bi bi-diagram-3" aria-hidden="true"></i>
-                <h2>{{ translations().editorEmptyTitle }}</h2>
-                <p>{{ translations().editorEmptyBody }}</p>
-                @if (canCreateGlobal()) {
-                  <button type="button" class="svc-primary-btn" (click)="openCreateRoot()">
-                    <i class="bi bi-plus-lg" aria-hidden="true"></i>
-                    {{ translations().addRootService }}
-                  </button>
-                }
-              </section>
-            }
-
-            @if (store.panelMode() === 'view') {
-              @if (store.selectedDetails(); as details) {
-                <section class="svc-details-view">
-                  <div class="svc-logo-summary">
-                    @if (logoUrl(details.logoUrl); as url) {
-                      <img class="svc-logo" [src]="url" [alt]="serviceName(details)" />
-                    } @else {
-                      <span class="svc-logo svc-logo-empty">
-                        <i class="bi bi-grid" aria-hidden="true"></i>
-                      </span>
-                    }
-                    <div>
-                      <h3>{{ serviceName(details) }}</h3>
-                      <p>{{ translations().parent }}: {{ parentName(details) }}</p>
-                    </div>
-                  </div>
-
-                  @if (!details.effectiveIsActive) {
-                    <p class="svc-note svc-note-danger">
-                      <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
-                      {{ translations().operationallyDisabled }}
-                    </p>
-                  }
-
-                  <dl class="svc-details-grid">
-                    <div>
-                      <dt>{{ translations().arabicName }}</dt>
-                      <dd>{{ details.arabicName }}</dd>
-                    </div>
-                    <div>
-                      <dt>{{ translations().englishName }}</dt>
-                      <dd>{{ details.englishName }}</dd>
-                    </div>
-                    <div>
-                      <dt>{{ translations().serviceCodeRequired }}</dt>
-                      <dd>{{ displayBoolean(details.isServiceCodeRequired) }}</dd>
-                    </div>
-                    <div>
-                      <dt>{{ translations().serviceCode }}</dt>
-                      <dd>{{ formatText(details.serviceCode) }}</dd>
-                    </div>
-                    <div>
-                      <dt>{{ translations().scope }}</dt>
-                      <dd>{{ scopeLabel(details.scope) }}</dd>
-                    </div>
-                    <div>
-                      <dt>{{ translations().ownerBranch }}</dt>
-                      <dd>{{ ownerBranchLabel(details) }}</dd>
-                    </div>
-                    <div>
-                      <dt>{{ translations().status }}</dt>
-                      <dd>{{ statusLabel(details) }}</dd>
-                    </div>
-                    <div>
-                      <dt>{{ translations().effectiveActive }}</dt>
-                      <dd>{{ effectiveStatusLabel(details) }}</dd>
-                    </div>
-                    <div>
-                      <dt>{{ translations().ticketIssuable }}</dt>
-                      <dd>{{ displayBoolean(details.isTicketIssuable) }}</dd>
-                    </div>
-                    <div>
-                      <dt>{{ translations().canIssueTicket }}</dt>
-                      <dd>{{ displayBoolean(details.canIssueTicket) }}</dd>
-                    </div>
-                    <div>
-                      <dt>{{ translations().clientInputRequired }}</dt>
-                      <dd>{{ displayBoolean(details.isClientInputRequired) }}</dd>
-                    </div>
-                    <div>
-                      <dt>{{ translations().hasReservation }}</dt>
-                      <dd>{{ displayBoolean(details.hasReservation) }}</dd>
-                    </div>
-                    <div>
-                      <dt>{{ translations().rangePrefix }}</dt>
-                      <dd>{{ details.rangePrefix }}</dd>
-                    </div>
-                    <div>
-                      <dt>{{ translations().rangeStartNumber }}</dt>
-                      <dd>{{ details.rangeStartNumber }}</dd>
-                    </div>
-                    <div>
-                      <dt>{{ translations().rangeEndNumber }}</dt>
-                      <dd>{{ details.rangeEndNumber }}</dd>
-                    </div>
-                    <div>
-                      <dt>{{ translations().noOfTicketCopies }}</dt>
-                      <dd>{{ details.noOfTicketCopies }}</dd>
-                    </div>
-                  </dl>
-                  <app-service-media-manager
-                    [service]="details"
-                    [translations]="translations()"
-                    [canManage]="canUpdate() && details.canEditDefinition && !details.isDeleted"
-                    (message)="handleMediaMessage($event)"
-                    (serviceChange)="handleMediaServiceChange($event)"
-                    (mediaChanged)="handleMediaChanged()"
-                  />
-                  <footer class="svc-actions">
-                    @if (canUpdateServiceDefinition(details)) {
-                      <button
-                        type="button"
-                        class="svc-secondary-btn"
-                        (click)="openEdit(details.id)"
-                      >
-                        <i class="bi bi-pencil-square" aria-hidden="true"></i>
-                        {{ translations().edit }}
-                      </button>
-                    }
-                    @if (canSoftDeleteService(details)) {
-                      <button type="button" class="svc-danger-btn" (click)="requestDelete(details)">
-                        <i class="bi bi-trash3" aria-hidden="true"></i>
-                        {{ translations().delete }}
-                      </button>
-                    }
-                    @if (canRestoreService(details)) {
-                      <button
-                        type="button"
-                        class="svc-success-btn"
-                        (click)="requestRestore(details)"
-                      >
-                        <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
-                        {{ translations().restore }}
-                      </button>
-                    }
-                    @if (canPermanentDeleteService(details)) {
-                      <button
-                        type="button"
-                        class="svc-danger-btn"
-                        (click)="requestPermanentDelete(details)"
-                      >
-                        <i class="bi bi-trash-fill" aria-hidden="true"></i>
-                        {{ translations().permanentlyDelete }}
-                      </button>
-                    }
-                  </footer>
-                </section>
-              }
-            }
-
-            @if (store.panelMode() === 'create' || store.panelMode() === 'edit') {
-              @if (store.panelMode() === 'edit') {
-                @if (store.selectedDetails(); as details) {
-                  <app-service-media-manager
-                    [service]="details"
-                    [translations]="translations()"
-                    [canManage]="canUpdate() && details.canEditDefinition && !details.isDeleted"
-                    (message)="handleMediaMessage($event)"
-                    (serviceChange)="handleMediaServiceChange($event)"
-                    (mediaChanged)="handleMediaChanged()"
-                  />
-                }
-              }
-              @if (formError(); as error) {
-                <p class="svc-note svc-note-danger">
-                  <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
-                  {{ error }}
-                </p>
-              }
-
-              <form
-                class="svc-form svc-compact-form"
-                [formGroup]="serviceForm"
-                (ngSubmit)="saveService()"
-                novalidate
-              >
-                <section class="svc-form-section svc-basic-section">
-                  <h3>{{ translations().basicInfo }}</h3>
-                  <div class="svc-form-grid two-cols svc-basic-grid">
-                    <label class="svc-field">
-                      <span>{{ translations().arabicName }}</span>
-                      <input
-                        class="svc-input"
-                        type="text"
-                        maxlength="100"
-                        formControlName="arabicName"
-                      />
-                      @if (hasControlError('arabicName')) {
-                        <small>{{
-                          arabicNameControl.hasError('maxlength')
-                            ? translations().maxLength100
-                            : translations().requiredField
-                        }}</small>
-                      }
-                    </label>
-                    <label class="svc-field">
-                      <span>{{ translations().englishName }}</span>
-                      <input
-                        class="svc-input"
-                        type="text"
-                        maxlength="100"
-                        formControlName="englishName"
-                      />
-                      @if (hasControlError('englishName')) {
-                        <small>{{
-                          englishNameControl.hasError('maxlength')
-                            ? translations().maxLength100
-                            : translations().requiredField
-                        }}</small>
-                      }
-                    </label>
-                    <label class="svc-field">
-                      <span>{{ translations().arabicUserMessage }}</span>
-                      <textarea
-                        class="svc-input compact-textarea"
-                        maxlength="500"
-                        rows="1"
-                        formControlName="arabicUserMessage"
-                      ></textarea>
-                      @if (hasControlError('arabicUserMessage')) {
-                        <small>{{ translations().maxLength500 }}</small>
-                      }
-                    </label>
-                    <label class="svc-field">
-                      <span>{{ translations().englishUserMessage }}</span>
-                      <textarea
-                        class="svc-input compact-textarea"
-                        maxlength="500"
-                        rows="1"
-                        formControlName="englishUserMessage"
-                      ></textarea>
-                      @if (hasControlError('englishUserMessage')) {
-                        <small>{{ translations().maxLength500 }}</small>
-                      }
-                    </label>
-                    <label class="svc-switch-option">
-                      <input
-                        type="checkbox"
-                        formControlName="isServiceCodeRequired"
-                        (change)="onServiceCodeRequiredChange($event)"
-                      />
-                      <span class="svc-switch-control">
-                        <span class="svc-switch-track" aria-hidden="true">
-                          <span class="svc-switch-thumb"></span>
-                        </span>
-                        <span>{{ translations().serviceCodeRequired }}</span>
-                      </span>
-                    </label>
-                    @if (serviceForm.controls.isServiceCodeRequired.value) {
-                      <label class="svc-field">
-                        <span>{{ translations().serviceCode }}</span>
-                        <input
-                          class="svc-input"
-                          type="text"
-                          maxlength="100"
-                          formControlName="serviceCode"
-                          (input)="onServiceCodeInput()"
-                        />
-                        @if (hasControlError('serviceCode')) {
-                          <small>{{ serviceCodeError() }}</small>
-                        }
-                      </label>
-                    }
-                  </div>
-                </section>
-
-                <div class="svc-form-row svc-form-row-support">
-                  <section class="svc-form-section svc-hierarchy-section">
-                    <h3>{{ translations().hierarchy }}</h3>
-                    @if (store.panelMode() === 'create') {
-                      <div class="svc-parent-lock">
-                        <span>{{ translations().createUnder }}</span>
-                        <strong>{{ createParentLabel() }}</strong>
-                      </div>
-                    } @else {
-                      <label class="svc-field d-flex flex-column">
-                        <span class="">{{ translations().parent }}</span>
-                        <select class="svc-input" formControlName="parentServiceId">
-                          <option [value]="0">{{ translations().noParent }}</option>
-                          @for (parent of store.parentOptions(); track parent.id) {
-                            <option [value]="parent.id">{{ serviceName(parent) }}</option>
-                          }
-                        </select>
-                      </label>
-                    }
-                  </section>
-
-                  <section class="svc-form-section svc-ticket-section">
-                    <h3>{{ translations().ticketBehavior }}</h3>
-                    <div class="svc-ticket-grid">
-                      <div
-                        class="svc-segment-switch"
-                        role="radiogroup"
-                        [attr.aria-label]="translations().ticketBehavior"
-                      >
-                        <label class="svc-segment-option">
-                          <input
-                            type="radio"
-                            value="true"
-                            formControlName="isTicketIssuable"
-                            [disabled]="store.selectedDetails()?.hasChildren === true"
-                          />
-                          <span class="svc-segment-control">
-                            <span class="svc-segment-indicator" aria-hidden="true"></span>
-                            <span>{{ translations().ticketIssuable }}</span>
-                          </span>
-                        </label>
-                        <label class="svc-segment-option">
-                          <input type="radio" value="false" formControlName="isTicketIssuable" />
-                          <span class="svc-segment-control">
-                            <span class="svc-segment-indicator" aria-hidden="true"></span>
-                            <span>{{ translations().categoryOnly }}</span>
-                          </span>
-                        </label>
-                      </div>
-
-                      <div class="svc-toggle-grid">
-                        <label class="svc-switch-option">
-                          <input type="checkbox" formControlName="isClientInputRequired" />
-                          <span class="svc-switch-control">
-                            <span class="svc-switch-track" aria-hidden="true">
-                              <span class="svc-switch-thumb"></span>
-                            </span>
-                            <span>{{ translations().clientInputRequired }}</span>
-                          </span>
-                        </label>
-                        <label class="svc-switch-option">
-                          <input type="checkbox" formControlName="hasReservation" />
-                          <span class="svc-switch-control">
-                            <span class="svc-switch-track" aria-hidden="true">
-                              <span class="svc-switch-thumb"></span>
-                            </span>
-                            <span>{{ translations().hasReservation }}</span>
-                          </span>
-                        </label>
-                      </div>
-
-                      @if (hasControlError('isTicketIssuable')) {
-                        <small class="svc-field-error wide">{{
-                          translations().ticketRequired
-                        }}</small>
-                      }
-                      @if (store.selectedDetails()?.hasChildren) {
-                        <small class="svc-field-help wide">{{
-                          translations().childTicketDisabled
-                        }}</small>
-                      }
-                    </div>
-                  </section>
-                </div>
-
-                <div class="svc-form-row svc-form-row-metrics">
-                  <section class="svc-form-section svc-ordering-section">
-                    <h3>{{ translations().ordering }}</h3>
-                    <div class="svc-form-grid three-cols compact-number-grid">
-                      <label class="svc-field">
-                        <span>{{ translations().orderNo }}</span>
-                        <input class="svc-input" type="number" min="0" formControlName="orderNo" />
-                      </label>
-                      <label class="svc-field">
-                        <span>{{ translations().priority }}</span>
-                        <input class="svc-input" type="number" min="0" formControlName="priority" />
-                      </label>
-                      <label class="svc-field">
-                        <span>{{ translations().weight }}</span>
-                        <input class="svc-input" type="number" min="0" formControlName="weight" />
-                      </label>
-                    </div>
-                  </section>
-
-                  <section class="svc-form-section svc-ticket-numbers-section">
-                    <h3>{{ translations().ticketNumbers }}</h3>
-                    <div class="svc-form-grid five-cols compact-number-grid">
-                      <label class="svc-field">
-                        <span>{{ translations().rangePrefix }}</span>
-                        <input
-                          class="svc-input"
-                          type="text"
-                          maxlength="10"
-                          formControlName="rangePrefix"
-                        />
-                        @if (hasControlError('rangePrefix')) {
-                          <small>{{
-                            rangePrefixControl.hasError('maxlength')
-                              ? translations().maxLength10
-                              : translations().requiredField
-                          }}</small>
-                        }
-                      </label>
-                      <label class="svc-field">
-                        <span>{{ translations().noOfTicketCopies }}</span>
-                        <input
-                          class="svc-input"
-                          type="number"
-                          min="1"
-                          formControlName="noOfTicketCopies"
-                        />
-                        @if (hasControlError('noOfTicketCopies')) {
-                          <small>{{ translations().copiesMin }}</small>
-                        }
-                      </label>
-                      <label class="svc-field">
-                        <span>{{ translations().waitingDuration }}</span>
-                        <input
-                          class="svc-input"
-                          type="number"
-                          min="0"
-                          formControlName="waitingDuration"
-                        />
-                      </label>
-                      <label class="svc-field">
-                        <span>{{ translations().rangeStartNumber }}</span>
-                        <input
-                          class="svc-input"
-                          type="number"
-                          min="0"
-                          formControlName="rangeStartNumber"
-                        />
-                        @if (hasControlError('rangeStartNumber')) {
-                          <small>{{ translations().minZero }}</small>
-                        }
-                      </label>
-                      <label class="svc-field">
-                        <span>{{ translations().rangeEndNumber }}</span>
-                        <input
-                          class="svc-input"
-                          type="number"
-                          min="0"
-                          formControlName="rangeEndNumber"
-                        />
-                        @if (hasControlError('rangeEndNumber')) {
-                          <small>{{ translations().minZero }}</small>
-                        }
-                      </label>
-                    </div>
-                    @if (hasRangeError()) {
-                      <small class="svc-field-error">{{ translations().rangeInvalid }}</small>
-                    }
-                  </section>
-                </div>
-
-                <footer class="svc-actions svc-form-actions">
-                  <button type="button" class="svc-secondary-btn" (click)="closePanel()">
-                    <i class="bi bi-x-lg" aria-hidden="true"></i>
-                    {{ translations().cancel }}
-                  </button>
-                  <button type="submit" class="svc-primary-btn" [disabled]="store.saving()">
-                    <i class="bi bi-check2" aria-hidden="true"></i>
-                    {{ translations().save }}
-                  </button>
-                </footer>
-              </form>
-            }
-          </div>
-        </article>
-
-        <app-service-hierarchy-tree
-          [nodes]="store.serviceTree()"
-          [expandedNodeIds]="store.expandedTreeNodeIds()"
-          [selectedServiceId]="store.selectedTreeServiceId()"
-          [translations]="translations()"
-          [language]="language()"
-          [direction]="direction()"
-          [loading]="store.treeLoading()"
-          [includeInactive]="includeInactiveTree()"
-          [includeDeleted]="includeDeletedTree()"
-          [canCreate]="canCreateGlobal()"
-          [canViewDetails]="canViewDetails()"
-          [canUpdate]="canUpdate()"
-          [canDelete]="canDelete()"
-          [canRestore]="canRestore()"
-          [canPermanentDelete]="canDeletePermanent()"
-          [canDeleteNode]="canSoftDeleteService"
-          [canRestoreNode]="canRestoreService"
-          [canPermanentDeleteNode]="canPermanentDeleteService"
-          (refresh)="refresh()"
-          (includeInactiveChange)="updateTreeToggle('inactive', $event)"
-          (includeDeletedChange)="updateTreeToggle('deleted', $event)"
-          (toggleNode)="toggleTreeNode($event)"
-          (selectNode)="selectTreeNode($event)"
-          (createRoot)="openCreateRoot()"
-          (createChild)="openCreateChild($event)"
-          (viewNode)="openViewFromTree($event)"
-          (editNode)="openEditFromTree($event)"
-          (deleteNode)="requestTreeDelete($event)"
-          (restoreNode)="requestTreeRestore($event)"
-          (permanentDeleteNode)="requestTreePermanentDelete($event)"
-        />
-      </section>
-    }
-  }
-
-  @if (store.confirmState(); as state) {
-    <div class="svc-dialog-backdrop" (click)="closeConfirmDialog()"></div>
-    <aside class="svc-dialog" role="dialog" [attr.aria-label]="confirmTitle(state)">
-      <header class="svc-panel-header">
-        <h2>{{ confirmTitle(state) }}</h2>
-        <button
-          type="button"
-          class="svc-icon-btn"
-          [attr.aria-label]="translations().close"
-          (click)="closeConfirmDialog()"
-        >
-          <i class="bi bi-x-lg" aria-hidden="true"></i>
-        </button>
-      </header>
-      <div class="svc-panel-body">
-        <p>{{ confirmBody(state) }}</p>
-        <strong>{{ state.serviceName }}</strong>
-        @if (state.action === 'delete' && state.hasChildren) {
-          <p class="svc-note svc-note-warning">
-            <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
-            {{ translations().deleteChildrenWarning }}
-          </p>
-        }
-      </div>
-      <footer class="svc-dialog-actions">
-        <button
-          type="button"
-          class="svc-secondary-btn"
-          [disabled]="store.mutating()"
-          (click)="closeConfirmDialog()"
-        >
-          {{ translations().cancel }}
-        </button>
-        <button
-          type="button"
-          class="svc-primary-btn"
-          [class.svc-danger-fill]="state.action !== 'restore'"
-          [class.svc-success-fill]="state.action === 'restore'"
-          [disabled]="store.mutating()"
-          (click)="confirmAction()"
-        >
-          {{ confirmButtonLabel(state) }}
-        </button>
-      </footer>
-    </aside>
-  }
+﻿<section class="technical-admin-responsive-page service-management-page container-fluid d-grid gap-3 p-3 p-lg-4 w-100" [attr.dir]="direction()" [attr.lang]="language()">
+<app-technical-admin-page-hero [eyebrow]="translations().title" [title]="translations().title" [description]="translations().description" icon="bi bi-grid-1x2-fill" >
+@if (canCreateGlobal() && canViewAll()) { <button hero-actions type="button" class="svc-primary-btn d-inline-flex align-items-center justify-content-center gap-2" (click)="openCreateRoot()">
+<i class="bi bi-plus-lg" aria-hidden="true"></i> {{ translations().addRootService }}
+</button> }
+</app-technical-admin-page-hero>
+@if (store.message(); as currentMessage) { <div class="toast-stack" role="status" aria-live="polite" aria-atomic="true">
+<div class="toast-item" [class.toast-success]="currentMessage.tone === 'success'" [class.toast-error]="currentMessage.tone === 'error'" [class.toast-info]="currentMessage.tone === 'info'" >
+<i class="bi" [class.bi-check-circle-fill]="currentMessage.tone === 'success'" [class.bi-x-octagon-fill]="currentMessage.tone === 'error'" [class.bi-info-circle-fill]="currentMessage.tone === 'info'" aria-hidden="true" ></i>
+<p>{{ currentMessage.text }}</p>
+<button type="button" class="toast-close" [attr.aria-label]="translations().close" (click)="clearMessage()" >
+<i class="bi bi-x-lg" aria-hidden="true"></i>
+</button>
+</div>
+</div> }
+@if (!canUseCatalog()) { <section class="svc-empty svc-access-denied">
+<i class="bi bi-shield-lock" aria-hidden="true"></i>
+<h2>{{ translations().accessDenied }}</h2>
+<p>{{ translations().noPermissionHint }}</p>
+</section> }
+@else { <section class="svc-central-filters row g-2">
+<label class="svc-field d-grid gap-1 m-0 col-12 col-md-6 col-xl-4">
+<span>{{ translations().scopeFilter }}</span>
+<select class="svc-input form-select" [value]="scopeFilterValue()" (change)="updateScopeFilter($event)">
+<option value="all">{{ translations().all }}</option>
+<option value="Global">{{ translations().globalScope }}</option>
+<option value="BranchScoped">{{ translations().branchScopedScope }}</option>
+</select>
+</label>
+<label class="svc-field d-grid gap-1 m-0 col-12 col-md-6 col-xl-4">
+<span>{{ translations().ownerBranchFilter }}</span>
+<input class="svc-input form-control" type="number" min="1" [value]="store.listQuery().ownerBranchId ?? ''" (change)="updateOwnerBranchFilter($event)" />
+</label>
+@if (!isTechnicalAdmin()) { <label class="svc-field d-grid gap-1 m-0 col-12 col-md-6 col-xl-4">
+<span>{{ translations().assignedFilter }}</span>
+<select class="svc-input form-control" [value]="assignedFilterValue()" (change)="updateAssignedFilter($event)" >
+<option value="all">{{ translations().all }}</option>
+<option value="true">{{ translations().yes }}</option>
+<option value="false">{{ translations().no }}</option>
+</select>
+</label> }
 </section>
+@if (canUseBranchAssignment()) { <section class="svc-hero">
+<div>
+<p class="svc-eyebrow">{{ translations().branchAssignmentTitle }}</p>
+<h1>{{ translations().branchAssignmentTitle }}</h1>
+<span>{{ translations().branchAssignmentDescription }}</span>
+</div>
+@if (store.branchAssigning()) { <span class="svc-mini-loading">{{ translations().loading }}</span> }
+</section>
+<section class="svc-branch-assignment-workspace row g-2 align-items-start">
+<div class="svc-branch-assignment-column col-12 col-xl-6">
+<header class="svc-panel-header d-flex align-items-center justify-content-between gap-2">
+<div>
+<p class="svc-eyebrow">{{ translations().serviceCentral }}</p>
+<h2>{{ translations().branchAssignmentSourceTitle }}</h2>
+</div>
+</header>
+<app-service-hierarchy-tree [nodes]="store.availableBranchAssignmentTree()" [expandedNodeIds]="store.expandedTreeNodeIds()" [selectedServiceId]="store.selectedTreeServiceId()" [translations]="translations()" [language]="language()" [direction]="direction()" [loading]="store.treeLoading()" [includeInactive]="includeInactiveTree()" [includeDeleted]="includeDeletedTree()" [canCreate]="false" [canViewDetails]="canViewDetails()" [canUpdate]="false" [canDelete]="false" [canRestore]="false" [draggableLeaves]="canUseBranchAssignment() && !store.branchAssigning()" [canDragLeafNode]="canAssignBranchService" (refresh)="refresh()" (includeInactiveChange)="updateTreeToggle('inactive', $event)" (includeDeletedChange)="updateTreeToggle('deleted', $event)" (toggleNode)="toggleTreeNode($event)" (selectNode)="selectTreeNode($event)" (viewNode)="openViewFromTree($event)" (leafDragStarted)="startBranchAssignmentDrag($event)" (leafDragEnded)="clearBranchAssignmentDrag()" />
+</div>
+<div class="svc-branch-assignment-column col-12 col-xl-6">
+<header class="svc-panel-header d-flex align-items-center justify-content-between gap-2">
+<div>
+<p class="svc-eyebrow">{{ translations().branchAssignmentTargetTitle }}</p>
+<h2>{{ translations().branchAssignmentTargetTitle }}</h2>
+<span>{{ translations().branchAssignmentDropHint }}</span>
+</div>
+</header>
+<app-service-hierarchy-tree [nodes]="store.assignedBranchServiceTree()" [expandedNodeIds]="store.expandedAssignedBranchNodeIds()" [selectedServiceId]="store.selectedTreeServiceId()" [translations]="translations()" [language]="language()" [direction]="direction()" [loading]="store.assignedBranchTreeLoading() || store.branchAssigning()" [includeInactive]="includeInactiveTree()" [includeDeleted]="includeDeletedTree()" [canCreate]="false" [canViewDetails]="false" [canUpdate]="false" [canDelete]="false" [canRestore]="false" [dropTarget]="canUseBranchAssignment() && !store.branchAssigning()" (refresh)="refresh()" (includeInactiveChange)="updateTreeToggle('inactive', $event)" (includeDeletedChange)="updateTreeToggle('deleted', $event)" (toggleNode)="toggleAssignedBranchNode($event)" (selectNode)="selectAssignedBranchNode($event)" (leafDropped)="dropBranchAssignment($event)" />
+</div>
+</section> }
+@else { <section class="svc-workspace row g-2 align-items-start">
+<article class="svc-editor col-12 col-xl-5">
+<header class="svc-panel-header d-flex align-items-center justify-content-between gap-2">
+<div>
+<p class="svc-eyebrow">{{ translations().selectedService }}</p>
+<h2>{{ panelTitle() }}</h2>
+@if (store.panelMode() === 'create') { <span>{{ translations().createUnder }}: {{ createParentLabel() }}</span> }
+</div>
+@if (store.isPanelOpen()) { <button type="button" class="svc-icon-btn d-inline-flex align-items-center justify-content-center" [attr.aria-label]="translations().close" (click)="closePanel()" >
+<i class="bi bi-x-lg" aria-hidden="true"></i>
+</button> }
+</header>
+<div class="svc-panel-body">
+@if (store.detailsLoading()) { <app-niletronix-loading-state [title]="translations().loading" variant="inline" size="sm" /> }
+@if (store.panelMode() === 'closed') { <section class="svc-empty">
+<i class="bi bi-diagram-3" aria-hidden="true"></i>
+<h2>{{ translations().editorEmptyTitle }}</h2>
+<p>{{ translations().editorEmptyBody }}</p>
+@if (canCreateGlobal()) { <button type="button" class="svc-primary-btn d-inline-flex align-items-center justify-content-center gap-2" (click)="openCreateRoot()">
+<i class="bi bi-plus-lg" aria-hidden="true"></i> {{ translations().addRootService }}
+</button> }
+</section> }
+@if (store.panelMode() === 'view') {
+@if (store.selectedDetails(); as details) { <section class="svc-details-view">
+<div class="svc-logo-summary d-flex align-items-center gap-2">
+@if (logoUrl(details.logoUrl); as url) { <img class="svc-logo" [src]="url" [alt]="serviceName(details)" /> }
+@else { <span class="svc-logo svc-logo-empty">
+<i class="bi bi-grid" aria-hidden="true"></i>
+</span> }
+<div>
+<h3>{{ serviceName(details) }}</h3>
+<p>{{ translations().parent }}: {{ parentName(details) }}</p>
+</div>
+</div>
+@if (!details.effectiveIsActive) { <p class="svc-note svc-note-danger">
+<i class="bi bi-exclamation-triangle" aria-hidden="true"></i> {{ translations().operationallyDisabled }}
+</p> }
+<dl class="svc-details-grid row g-2">
+<div class="col-12 col-sm-6 col-xl-3">
+<dt>{{ translations().arabicName }}</dt>
+<dd>{{ details.arabicName }}</dd>
+</div>
+<div class="col-12 col-sm-6 col-xl-3">
+<dt>{{ translations().englishName }}</dt>
+<dd>{{ details.englishName }}</dd>
+</div>
+<div class="col-12 col-sm-6 col-xl-3">
+<dt>{{ translations().serviceCodeRequired }}</dt>
+<dd>{{ displayBoolean(details.isServiceCodeRequired) }}</dd>
+</div>
+<div class="col-12 col-sm-6 col-xl-3">
+<dt>{{ translations().serviceCode }}</dt>
+<dd>{{ formatText(details.serviceCode) }}</dd>
+</div>
+<div class="col-12 col-sm-6 col-xl-3">
+<dt>{{ translations().scope }}</dt>
+<dd>{{ scopeLabel(details.scope) }}</dd>
+</div>
+<div class="col-12 col-sm-6 col-xl-3">
+<dt>{{ translations().ownerBranch }}</dt>
+<dd>{{ ownerBranchLabel(details) }}</dd>
+</div>
+<div class="col-12 col-sm-6 col-xl-3">
+<dt>{{ translations().status }}</dt>
+<dd>{{ statusLabel(details) }}</dd>
+</div>
+<div class="col-12 col-sm-6 col-xl-3">
+<dt>{{ translations().effectiveActive }}</dt>
+<dd>{{ effectiveStatusLabel(details) }}</dd>
+</div>
+<div class="col-12 col-sm-6 col-xl-3">
+<dt>{{ translations().ticketIssuable }}</dt>
+<dd>{{ displayBoolean(details.isTicketIssuable) }}</dd>
+</div>
+<div class="col-12 col-sm-6 col-xl-3">
+<dt>{{ translations().canIssueTicket }}</dt>
+<dd>{{ displayBoolean(details.canIssueTicket) }}</dd>
+</div>
+<div class="col-12 col-sm-6 col-xl-3">
+<dt>{{ translations().clientInputRequired }}</dt>
+<dd>{{ displayBoolean(details.isClientInputRequired) }}</dd>
+</div>
+<div class="col-12 col-sm-6 col-xl-3">
+<dt>{{ translations().hasReservation }}</dt>
+<dd>{{ displayBoolean(details.hasReservation) }}</dd>
+</div>
+<div class="col-12 col-sm-6 col-xl-3">
+<dt>{{ translations().rangePrefix }}</dt>
+<dd>{{ details.rangePrefix }}</dd>
+</div>
+<div class="col-12 col-sm-6 col-xl-3">
+<dt>{{ translations().rangeStartNumber }}</dt>
+<dd>{{ details.rangeStartNumber }}</dd>
+</div>
+<div class="col-12 col-sm-6 col-xl-3">
+<dt>{{ translations().rangeEndNumber }}</dt>
+<dd>{{ details.rangeEndNumber }}</dd>
+</div>
+<div class="col-12 col-sm-6 col-xl-3">
+<dt>{{ translations().noOfTicketCopies }}</dt>
+<dd>{{ details.noOfTicketCopies }}</dd>
+</div>
+</dl>
+<app-service-media-manager [service]="details" [translations]="translations()" [canManage]="canUpdate() && details.canEditDefinition && !details.isDeleted" (message)="handleMediaMessage($event)" (serviceChange)="handleMediaServiceChange($event)" (mediaChanged)="handleMediaChanged()" />
+<footer class="svc-actions d-flex align-items-center flex-wrap gap-2">
+@if (canUpdateServiceDefinition(details)) { <button type="button" class="svc-secondary-btn d-inline-flex align-items-center justify-content-center gap-2" (click)="openEdit(details.id)" >
+<i class="bi bi-pencil-square" aria-hidden="true"></i> {{ translations().edit }}
+</button> }
+@if (canSoftDeleteService(details)) { <button type="button" class="svc-danger-btn d-inline-flex align-items-center justify-content-center gap-2" (click)="requestDelete(details)">
+<i class="bi bi-trash3" aria-hidden="true"></i> {{ translations().delete }}
+</button> }
+@if (canRestoreService(details)) { <button type="button" class="svc-success-btn d-inline-flex align-items-center justify-content-center gap-2" (click)="requestRestore(details)" >
+<i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i> {{ translations().restore }}
+</button> }
+@if (canPermanentDeleteService(details)) { <button type="button" class="svc-danger-btn d-inline-flex align-items-center justify-content-center gap-2" (click)="requestPermanentDelete(details)" >
+<i class="bi bi-trash-fill" aria-hidden="true"></i> {{ translations().permanentlyDelete }}
+</button> }
+</footer>
+</section> } }
+@if (store.panelMode() === 'create' || store.panelMode() === 'edit') {
+@if (store.panelMode() === 'edit') {
+@if (store.selectedDetails(); as details) { <app-service-media-manager [service]="details" [translations]="translations()" [canManage]="canUpdate() && details.canEditDefinition && !details.isDeleted" (message)="handleMediaMessage($event)" (serviceChange)="handleMediaServiceChange($event)" (mediaChanged)="handleMediaChanged()" /> } }
+@if (formError(); as error) { <p class="svc-note svc-note-danger">
+<i class="bi bi-exclamation-triangle" aria-hidden="true"></i> {{ error }}
+</p> }
+<form class="svc-form svc-compact-form" [formGroup]="serviceForm" (ngSubmit)="saveService()" novalidate >
+<section class="svc-form-section svc-basic-section">
+<h3>{{ translations().basicInfo }}</h3>
+<div class="svc-form-grid row g-2 svc-basic-grid">
+<label class="svc-field d-grid gap-1 m-0 col-12 col-md">
+<span>{{ translations().arabicName }}</span>
+<input class="svc-input form-control" type="text" maxlength="100" formControlName="arabicName" />
+@if (hasControlError('arabicName')) { <small>{{ arabicNameControl.hasError('maxlength') ? translations().maxLength100 : translations().requiredField }}</small> }
+</label>
+<label class="svc-field d-grid gap-1 m-0 col-12 col-md">
+<span>{{ translations().englishName }}</span>
+<input class="svc-input form-control" type="text" maxlength="100" formControlName="englishName" />
+@if (hasControlError('englishName')) { <small>{{ englishNameControl.hasError('maxlength') ? translations().maxLength100 : translations().requiredField }}</small> }
+</label>
+<label class="svc-field d-grid gap-1 m-0 col-12 col-md">
+<span>{{ translations().arabicUserMessage }}</span>
+<textarea class="svc-input compact-textarea form-control" maxlength="500" rows="1" formControlName="arabicUserMessage" ></textarea>
+@if (hasControlError('arabicUserMessage')) { <small>{{ translations().maxLength500 }}</small> }
+</label>
+<label class="svc-field d-grid gap-1 m-0 col-12 col-md">
+<span>{{ translations().englishUserMessage }}</span>
+<textarea class="svc-input compact-textarea form-control" maxlength="500" rows="1" formControlName="englishUserMessage" ></textarea>
+@if (hasControlError('englishUserMessage')) { <small>{{ translations().maxLength500 }}</small> }
+</label>
+<label class="svc-switch-option">
+<input type="checkbox" formControlName="isServiceCodeRequired" (change)="onServiceCodeRequiredChange($event)" />
+<span class="svc-switch-control">
+<span class="svc-switch-track" aria-hidden="true">
+<span class="svc-switch-thumb"></span>
+</span>
+<span>{{ translations().serviceCodeRequired }}</span>
+</span>
+</label>
+@if (serviceForm.controls.isServiceCodeRequired.value) { <label class="svc-field d-grid gap-1 m-0 col-12 col-md">
+<span>{{ translations().serviceCode }}</span>
+<input class="svc-input form-control" type="text" maxlength="100" formControlName="serviceCode" (input)="onServiceCodeInput()" />
+@if (hasControlError('serviceCode')) { <small>{{ serviceCodeError() }}</small> }
+</label> }
+</div>
+</section>
+<div class="svc-form-row svc-form-row-support">
+<section class="svc-form-section svc-hierarchy-section">
+<h3>{{ translations().hierarchy }}</h3>
+@if (store.panelMode() === 'create') { <div class="svc-parent-lock">
+<span>{{ translations().createUnder }}</span>
+<strong>{{ createParentLabel() }}</strong>
+</div> }
+@else { <label class="svc-field d-flex flex-column">
+<span class="d-block">{{ translations().parent }}</span>
+<select class="svc-input form-select" formControlName="parentServiceId">
+<option [value]="0">{{ translations().noParent }}</option>
+@for (parent of store.parentOptions(); track parent.id) { <option [value]="parent.id">{{ serviceName(parent) }}</option> }
+</select>
+</label> }
+</section>
+<section class="svc-form-section svc-ticket-section">
+<h3>{{ translations().ticketBehavior }}</h3>
+<div class="svc-ticket-grid">
+<div class="svc-segment-switch" role="radiogroup" [attr.aria-label]="translations().ticketBehavior" >
+<label class="svc-segment-option">
+<input type="radio" value="true" formControlName="isTicketIssuable" [disabled]="store.selectedDetails()?.hasChildren === true" />
+<span class="svc-segment-control">
+<span class="svc-segment-indicator" aria-hidden="true"></span>
+<span>{{ translations().ticketIssuable }}</span>
+</span>
+</label>
+<label class="svc-segment-option">
+<input type="radio" value="false" formControlName="isTicketIssuable" />
+<span class="svc-segment-control">
+<span class="svc-segment-indicator" aria-hidden="true"></span>
+<span>{{ translations().categoryOnly }}</span>
+</span>
+</label>
+</div>
+<div class="svc-toggle-grid">
+<label class="svc-switch-option">
+<input type="checkbox" formControlName="isClientInputRequired" />
+<span class="svc-switch-control">
+<span class="svc-switch-track" aria-hidden="true">
+<span class="svc-switch-thumb"></span>
+</span>
+<span>{{ translations().clientInputRequired }}</span>
+</span>
+</label>
+<label class="svc-switch-option">
+<input type="checkbox" formControlName="hasReservation" />
+<span class="svc-switch-control">
+<span class="svc-switch-track" aria-hidden="true">
+<span class="svc-switch-thumb"></span>
+</span>
+<span>{{ translations().hasReservation }}</span>
+</span>
+</label>
+</div>
+@if (hasControlError('isTicketIssuable')) { <small class="svc-field-error wide">{{ translations().ticketRequired }}</small> }
+@if (store.selectedDetails()?.hasChildren) { <small class="svc-field-help wide">{{ translations().childTicketDisabled }}</small> }
+</div>
+</section>
+</div>
+<div class="svc-form-row svc-form-row-metrics">
+<section class="svc-form-section svc-ordering-section">
+<h3>{{ translations().ordering }}</h3>
+<div class="svc-form-grid row g-2 compact-number-grid">
+<label class="svc-field d-grid gap-1 m-0 col-12 col-md">
+<span>{{ translations().orderNo }}</span>
+<input class="svc-input form-control" type="number" min="0" formControlName="orderNo" />
+</label>
+<label class="svc-field d-grid gap-1 m-0 col-12 col-md">
+<span>{{ translations().priority }}</span>
+<input class="svc-input form-control" type="number" min="0" formControlName="priority" />
+</label>
+<label class="svc-field d-grid gap-1 m-0 col-12 col-md">
+<span>{{ translations().weight }}</span>
+<input class="svc-input form-control" type="number" min="0" formControlName="weight" />
+</label>
+</div>
+</section>
+<section class="svc-form-section svc-ticket-numbers-section">
+<h3>{{ translations().ticketNumbers }}</h3>
+<div class="svc-form-grid row g-2 compact-number-grid">
+<label class="svc-field d-grid gap-1 m-0 col-12 col-md">
+<span>{{ translations().rangePrefix }}</span>
+<input class="svc-input form-control" type="text" maxlength="10" formControlName="rangePrefix" />
+@if (hasControlError('rangePrefix')) { <small>{{ rangePrefixControl.hasError('maxlength') ? translations().maxLength10 : translations().requiredField }}</small> }
+</label>
+<label class="svc-field d-grid gap-1 m-0 col-12 col-md">
+<span>{{ translations().noOfTicketCopies }}</span>
+<input class="svc-input form-control" type="number" min="1" formControlName="noOfTicketCopies" />
+@if (hasControlError('noOfTicketCopies')) { <small>{{ translations().copiesMin }}</small> }
+</label>
+<label class="svc-field d-grid gap-1 m-0 col-12 col-md">
+<span>{{ translations().waitingDuration }}</span>
+<input class="svc-input form-control" type="number" min="0" formControlName="waitingDuration" />
+</label>
+<label class="svc-field d-grid gap-1 m-0 col-12 col-md">
+<span>{{ translations().rangeStartNumber }}</span>
+<input class="svc-input form-control" type="number" min="0" formControlName="rangeStartNumber" />
+@if (hasControlError('rangeStartNumber')) { <small>{{ translations().minZero }}</small> }
+</label>
+<label class="svc-field d-grid gap-1 m-0 col-12 col-md">
+<span>{{ translations().rangeEndNumber }}</span>
+<input class="svc-input form-control" type="number" min="0" formControlName="rangeEndNumber" />
+@if (hasControlError('rangeEndNumber')) { <small>{{ translations().minZero }}</small> }
+</label>
+</div>
+@if (hasRangeError()) { <small class="svc-field-error">{{ translations().rangeInvalid }}</small> }
+</section>
+</div>
+<footer class="svc-actions svc-form-actions d-flex align-items-center justify-content-end flex-wrap gap-2">
+<button type="button" class="svc-secondary-btn d-inline-flex align-items-center justify-content-center gap-2" (click)="closePanel()">
+<i class="bi bi-x-lg" aria-hidden="true"></i> {{ translations().cancel }}
+</button>
+<button type="submit" class="svc-primary-btn d-inline-flex align-items-center justify-content-center gap-2" [disabled]="store.saving()">
+<i class="bi bi-check2" aria-hidden="true"></i> {{ translations().save }}
+</button>
+</footer>
+</form> }
+</div>
+</article>
+<app-service-hierarchy-tree class="col-12 col-xl-7" [nodes]="store.serviceTree()" [expandedNodeIds]="store.expandedTreeNodeIds()" [selectedServiceId]="store.selectedTreeServiceId()" [translations]="translations()" [language]="language()" [direction]="direction()" [loading]="store.treeLoading()" [includeInactive]="includeInactiveTree()" [includeDeleted]="includeDeletedTree()" [canCreate]="canCreateGlobal()" [canViewDetails]="canViewDetails()" [canUpdate]="canUpdate()" [canDelete]="canDelete()" [canRestore]="canRestore()" [canPermanentDelete]="canDeletePermanent()" [canDeleteNode]="canSoftDeleteService" [canRestoreNode]="canRestoreService" [canPermanentDeleteNode]="canPermanentDeleteService" (refresh)="refresh()" (includeInactiveChange)="updateTreeToggle('inactive', $event)" (includeDeletedChange)="updateTreeToggle('deleted', $event)" (toggleNode)="toggleTreeNode($event)" (selectNode)="selectTreeNode($event)" (createRoot)="openCreateRoot()" (createChild)="openCreateChild($event)" (viewNode)="openViewFromTree($event)" (editNode)="openEditFromTree($event)" (deleteNode)="requestTreeDelete($event)" (restoreNode)="requestTreeRestore($event)" (permanentDeleteNode)="requestTreePermanentDelete($event)" />
+</section> } }
+@if (store.confirmState(); as state) { <div class="svc-dialog-backdrop" (click)="closeConfirmDialog()"></div>
+<aside class="svc-dialog" role="dialog" [attr.aria-label]="confirmTitle(state)">
+<header class="svc-panel-header d-flex align-items-center justify-content-between gap-2">
+<h2>{{ confirmTitle(state) }}</h2>
+<button type="button" class="svc-icon-btn d-inline-flex align-items-center justify-content-center" [attr.aria-label]="translations().close" (click)="closeConfirmDialog()" >
+<i class="bi bi-x-lg" aria-hidden="true"></i>
+</button>
+</header>
+<div class="svc-panel-body">
+<p>{{ confirmBody(state) }}</p>
+<strong>{{ state.serviceName }}</strong>
+@if (state.action === 'delete' && state.hasChildren) { <p class="svc-note svc-note-warning">
+<i class="bi bi-exclamation-triangle" aria-hidden="true"></i> {{ translations().deleteChildrenWarning }}
+</p> }
+</div>
+<footer class="svc-dialog-actions d-flex align-items-center justify-content-end flex-wrap gap-2">
+<button type="button" class="svc-secondary-btn d-inline-flex align-items-center justify-content-center gap-2" [disabled]="store.mutating()" (click)="closeConfirmDialog()" > {{ translations().cancel }}
+</button>
+<button type="button" class="svc-primary-btn d-inline-flex align-items-center justify-content-center gap-2" [class.svc-danger-fill]="state.action !== 'restore'" [class.svc-success-fill]="state.action === 'restore'" [disabled]="store.mutating()" (click)="confirmAction()" > {{ confirmButtonLabel(state) }}
+</button>
+</footer>
+</aside> }
+</section>
+
+
+
+
+

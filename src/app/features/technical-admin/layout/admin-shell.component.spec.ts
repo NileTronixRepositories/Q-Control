@@ -115,6 +115,35 @@ describe('AdminShellComponent', () => {
   });
 
 
+  it('passes English direction and language to the app shell by default', () => {
+    const shell = fixture.nativeElement.querySelector('.app-shell') as HTMLElement;
+    const breadcrumb = fixture.nativeElement.querySelector('nav.app-breadcrumb') as HTMLElement;
+    const sidebar = fixture.nativeElement.querySelector('.sidebar') as HTMLElement;
+
+    expect(shell.getAttribute('dir')).toBe('ltr');
+    expect(shell.getAttribute('lang')).toBe('en');
+    expect(shell.classList.contains('app-shell-ltr')).toBe(true);
+    expect(breadcrumb.getAttribute('dir')).toBe('ltr');
+    expect(sidebar.getAttribute('dir')).toBe('ltr');
+  });
+
+  it('passes Arabic direction and language to the app shell', () => {
+    language.set('ar');
+    fixture.detectChanges();
+
+    const shell = fixture.nativeElement.querySelector('.app-shell') as HTMLElement;
+    const breadcrumb = fixture.nativeElement.querySelector('nav.app-breadcrumb') as HTMLElement;
+    const sidebar = fixture.nativeElement.querySelector('.sidebar') as HTMLElement;
+    const user = fixture.nativeElement.querySelector('.workspace-user') as HTMLElement;
+
+    expect(shell.getAttribute('dir')).toBe('rtl');
+    expect(shell.getAttribute('lang')).toBe('ar');
+    expect(shell.classList.contains('app-shell-rtl')).toBe(true);
+    expect(breadcrumb.getAttribute('dir')).toBe('rtl');
+    expect(sidebar.getAttribute('dir')).toBe('rtl');
+    expect(user).not.toBeNull();
+  });
+
   it('renders translated breadcrumbs for the service schedules route', () => {
     fixture.destroy();
     Object.defineProperty(router, 'url', {

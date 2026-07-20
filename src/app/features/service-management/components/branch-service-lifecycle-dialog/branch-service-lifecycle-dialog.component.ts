@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, HostListener, input, output } from '@angular/core';
+﻿import { ChangeDetectionStrategy, Component, computed, HostListener, input, output } from '@angular/core';
 
 import { BranchServicesTranslations } from '../../i18n/branch-services.translations';
 import { ServiceManagementTranslations } from '../../i18n/service-management.translations';
@@ -51,11 +51,9 @@ export class BranchServiceLifecycleDialogComponent {
         : this.translations().lifecycleRestoring,
   );
   readonly confirmButtonClass = computed(() =>
-    `inline-flex items-center justify-center gap-2 rounded-lg px-5 py-2.5 font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-60 ${
-      this.isDelete() || this.isPermanentDelete()
-        ? 'bg-rose-600 hover:bg-rose-700'
-        : 'bg-emerald-600 hover:bg-emerald-700'
-    }`,
+    this.isDelete() || this.isPermanentDelete()
+      ? 'btn btn-danger d-inline-flex align-items-center justify-content-center gap-2'
+      : 'btn btn-success d-inline-flex align-items-center justify-content-center gap-2',
   );
 
   @HostListener('document:keydown.escape')
@@ -77,3 +75,5 @@ export class BranchServiceLifecycleDialogComponent {
     }
   }
 }
+
+

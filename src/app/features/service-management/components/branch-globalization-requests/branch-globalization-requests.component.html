@@ -1,381 +1,402 @@
 @if (open()) {
-  <div
-    class="fixed inset-0 z-[1250] flex items-end justify-center p-0 sm:items-center sm:p-6"
-    [attr.dir]="direction()"
-    [attr.lang]="language()"
-  >
+  <div class="modal d-block" [attr.dir]="direction()" [attr.lang]="language()">
     <button
       type="button"
-      class="absolute inset-0 cursor-default bg-slate-950/55"
+      class="branch-globalization-backdrop position-fixed top-0 bottom-0 start-0 end-0 border-0 p-0"
       [attr.aria-label]="translations().close"
       (click)="close()"
     ></button>
 
     <section
-      class="relative z-10 flex h-[100dvh] max-h-[100dvh] w-full max-w-6xl flex-col overflow-hidden rounded-none border border-cyan-100 bg-white shadow-[0_32px_80px_-24px_rgba(15,23,42,0.45)] sm:h-auto sm:max-h-[90vh] sm:rounded-3xl"
+      class="branch-globalization-dialog modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable position-relative"
       role="dialog"
       aria-modal="true"
       [attr.aria-labelledby]="'branch-globalization-requests-title'"
     >
-      <header
-        class="relative flex items-start justify-between gap-4 overflow-hidden border-b border-cyan-100 bg-gradient-to-br from-cyan-50 via-white to-sky-50 p-4 sm:p-5"
+      <div
+        class="branch-globalization-content modal-content overflow-hidden rounded-4 border border-info-subtle bg-white shadow-lg"
       >
-        <div
-          class="pointer-events-none absolute -start-16 -top-20 size-44 rounded-full bg-cyan-200/30 blur-3xl"
-        ></div>
-        <div class="relative flex items-start gap-3">
-          <span
-            class="grid size-11 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-cyan-600 to-sky-700 text-lg text-white shadow-lg shadow-cyan-700/20"
-          >
-            <i class="bi bi-bell-fill" aria-hidden="true"></i>
-          </span>
-          <div>
-            <h2
-              id="branch-globalization-requests-title"
-              class="text-xl font-black leading-[1.3] text-slate-900"
-            >
-              {{ translations().branchRequestsTitle }}
-            </h2>
-            <p class="mt-1 text-sm leading-relaxed text-slate-500">
-              {{ translations().branchRequestsDescription }}
-            </p>
-          </div>
-        </div>
-        <button
-          type="button"
-          class="relative grid size-10 shrink-0 place-items-center rounded-xl border border-white/80 bg-white/80 text-lg text-slate-600 shadow-sm backdrop-blur transition hover:-translate-y-0.5 hover:border-cyan-200 hover:text-cyan-700 hover:shadow-md"
-          [attr.aria-label]="translations().close"
-          (click)="close()"
+        <header
+          class="modal-header align-items-start justify-content-between gap-3 border-info-subtle p-3 p-lg-4"
         >
-          <i class="bi bi-x-lg" aria-hidden="true"></i>
-        </button>
-      </header>
-      @if (decisionState(); as decision) {
-        <div class="absolute inset-0 z-20 grid items-end justify-items-center bg-slate-950/45 p-3 backdrop-blur-sm sm:place-items-center sm:p-5">
-          <section
-            class="w-full max-w-lg overflow-hidden rounded-t-3xl border border-white/70 bg-white shadow-[0_32px_80px_-24px_rgba(15,23,42,0.6)] sm:rounded-3xl"
-            role="dialog"
-            aria-modal="true"
+          <div class="d-flex align-items-start gap-3">
+            <span
+              class="branch-globalization-icon d-grid flex-shrink-0 rounded-3 text-white shadow-sm"
+            >
+              <i class="bi bi-bell-fill" aria-hidden="true"></i>
+            </span>
+            <div class="min-w-0">
+              <h2 id="branch-globalization-requests-title" class="h4 mb-1 fw-bolder text-dark">
+                {{ translations().branchRequestsTitle }}
+              </h2>
+              <p class="mb-0 small lh-lg text-muted">
+                {{ translations().branchRequestsDescription }}
+              </p>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            class="btn btn-light btn-sm flex-shrink-0 rounded-3 border border-secondary-subtle text-secondary shadow-sm"
+            [attr.aria-label]="translations().close"
+            (click)="close()"
           >
-            <header class="flex items-center gap-3 border-b border-slate-100 bg-gradient-to-br from-white to-slate-50 p-5">
-              <span
-                class="grid size-11 shrink-0 place-items-center rounded-2xl text-xl text-white shadow-lg"
-                [class.bg-emerald-600]="decision.action === 'approve'"
-                [class.bg-rose-600]="decision.action === 'reject'"
+            <i class="bi bi-x-lg" aria-hidden="true"></i>
+          </button>
+        </header>
+
+        @if (decisionState(); as decision) {
+          <div
+            class="position-absolute top-0 bottom-0 start-0 end-0 z-2 d-grid align-items-end p-3"
+          >
+            <section
+              class="branch-globalization-decision modal-content overflow-hidden rounded-4 border border-white bg-white shadow-lg"
+              role="dialog"
+              aria-modal="true"
+            >
+              <header class="d-flex align-items-center gap-3 border-bottom border-light p-4">
+                <span
+                  class="branch-globalization-icon d-grid flex-shrink-0 rounded-3 text-white shadow-sm"
+                  [class.bg-success]="decision.action === 'approve'"
+                  [class.bg-danger]="decision.action === 'reject'"
+                >
+                  <i
+                    [class]="
+                      decision.action === 'approve' ? 'bi bi-check2-circle' : 'bi bi-slash-circle'
+                    "
+                    aria-hidden="true"
+                  ></i>
+                </span>
+                <div class="min-w-0">
+                  <h3 class="h5 mb-1 fw-bolder text-dark">
+                    {{
+                      decision.action === 'approve'
+                        ? translations().confirmApproveTitle
+                        : translations().rejectTitle
+                    }}
+                  </h3>
+                  <p class="mb-0 fw-bold text-muted">{{ decision.serviceName }}</p>
+                </div>
+              </header>
+
+              <div class="p-4">
+                @if (decision.action === 'approve') {
+                  <div
+                    class="rounded-3 border border-success-subtle bg-success-subtle p-3 lh-lg text-success"
+                  >
+                    <i class="bi bi-info-circle-fill me-1" aria-hidden="true"></i>
+                    {{ translations().confirmApproveBody }}
+                  </div>
+                } @else {
+                  <p class="mb-0 lh-lg text-secondary">
+                    {{ translations().rejectHint }}
+                  </p>
+                  <textarea
+                    class="form-control mt-3 w-100 rounded-3 border border-secondary-subtle bg-light p-3"
+                    maxlength="1000"
+                    [placeholder]="translations().rejectPlaceholder"
+                    [value]="rejectionReason()"
+                    (input)="rejectionReason.set($any($event.target).value)"
+                  ></textarea>
+                  <small class="mt-1 d-block text-end fw-bold text-muted"
+                    >{{ rejectionReason().length }} / 1000</small
+                  >
+                }
+              </div>
+
+              <footer
+                class="d-flex flex-wrap justify-content-end gap-2 border-top border-light p-4"
               >
+                <button
+                  type="button"
+                  class="btn btn-outline-secondary rounded-3 px-4 fw-bold"
+                  [disabled]="mutating()"
+                  (click)="closeDecision()"
+                >
+                  {{ translations().cancel }}
+                </button>
+                <button
+                  type="button"
+                  class="btn d-inline-flex align-items-center gap-2 rounded-3 px-4 fw-bold text-white shadow-sm"
+                  [class.btn-success]="decision.action === 'approve'"
+                  [class.btn-danger]="decision.action === 'reject'"
+                  [disabled]="mutating()"
+                  (click)="confirmDecision()"
+                >
+                  @if (mutating()) {
+                    <i class="bi bi-arrow-repeat animate-spin" aria-hidden="true"></i>
+                  } @else {
+                    <i
+                      [class]="decision.action === 'approve' ? 'bi bi-check-lg' : 'bi bi-x-lg'"
+                      aria-hidden="true"
+                    ></i>
+                  }
+                  {{
+                    decision.action === 'approve' ? translations().approve : translations().reject
+                  }}
+                </button>
+              </footer>
+            </section>
+          </div>
+        }
+
+        <div class="branch-globalization-body modal-body overflow-y-auto p-3 p-lg-4">
+          <form
+            class="row g-3 align-items-end rounded-3 border border-info-subtle bg-light-subtle p-3"
+            (submit)="search($event)"
+          >
+            <label class="col-12 col-lg-4 d-grid gap-1">
+              <span class="d-flex align-items-center gap-1 fw-bold text-secondary">
+                <i class="bi bi-search text-primary" aria-hidden="true"></i>
+                {{ translations().search }}
+              </span>
+              <span class="position-relative d-block">
                 <i
-                  [class]="decision.action === 'approve' ? 'bi bi-check2-circle' : 'bi bi-slash-circle'"
+                  class="branch-globalization-input-icon bi bi-search position-absolute top-50 text-muted"
                   aria-hidden="true"
                 ></i>
+                <input
+                  class="form-control w-100 rounded-3 border border-secondary-subtle bg-white py-2 text-dark"
+                  type="search"
+                  maxlength="200"
+                  [placeholder]="translations().search"
+                  [value]="searchText()"
+                  (input)="searchText.set($any($event.target).value)"
+                />
               </span>
+            </label>
+
+            <label class="col-12 col-lg-4 d-grid gap-1">
+              <span class="d-flex align-items-center gap-1 fw-bold text-secondary">
+                <i class="bi bi-activity text-primary" aria-hidden="true"></i>
+                {{ translations().status }}
+              </span>
+              <select
+                class="form-select w-100 rounded-3 border border-secondary-subtle bg-white py-2 text-dark"
+                [value]="status() ?? ''"
+                (change)="updateFilter($event, 'status')"
+              >
+                <option value="">{{ translations().allStatuses }}</option>
+                <option value="Pending">{{ translations().pending }}</option>
+                <option value="Approved">{{ translations().approved }}</option>
+                <option value="Rejected">{{ translations().rejected }}</option>
+              </select>
+            </label>
+
+            <label class="col-12 col-lg-4 d-grid gap-1">
+              <span class="d-flex align-items-center gap-1 fw-bold text-secondary">
+                <i class="bi bi-diagram-3 text-primary" aria-hidden="true"></i>
+                {{ translations().requestType }}
+              </span>
+              <select
+                class="form-select w-100 rounded-3 border border-secondary-subtle bg-white py-2 text-dark"
+                [value]="requestType() ?? ''"
+                (change)="updateFilter($event, 'type')"
+              >
+                <option value="">{{ translations().allTypes }}</option>
+                <option value="BranchServiceTree">{{ translations().branchServiceTree }}</option>
+                <option value="LeafUnderGlobalParent">
+                  {{ translations().leafUnderGlobalParent }}
+                </option>
+              </select>
+            </label>
+
+            <div class="col-12 col-lg-auto">
+              <button
+                type="submit"
+                class="btn btn-primary d-flex w-100 align-items-center justify-content-center gap-2 rounded-3 px-4 fw-bold shadow-sm"
+              >
+                <i class="bi bi-search" aria-hidden="true"></i>
+                {{ translations().search }}
+              </button>
+            </div>
+          </form>
+
+          @if (error()) {
+            <div
+              class="mt-4 d-flex align-items-start gap-3 rounded-3 border border-danger-subtle bg-danger-subtle p-3 text-danger"
+              role="alert"
+            >
+              <span
+                class="branch-globalization-icon-sm d-grid flex-shrink-0 rounded-3 bg-danger-subtle"
+              >
+                <i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>
+              </span>
+              <p class="m-0 lh-lg">{{ error() }}</p>
+            </div>
+          }
+
+          @if (loading()) {
+            <div
+              class="mt-4 d-grid rounded-3 border border-info-subtle bg-white py-5 text-center shadow-sm"
+            >
               <div>
-                <h3 class="text-xl font-black leading-[1.3] text-slate-900">
-                  {{ decision.action === 'approve' ? translations().confirmApproveTitle : translations().rejectTitle }}
-                </h3>
-                <p class="mb-0 mt-1 font-bold text-slate-500">{{ decision.serviceName }}</p>
-              </div>
-            </header>
-            <div class="p-5">
-              @if (decision.action === 'approve') {
-                <div class="rounded-2xl border border-emerald-100 bg-emerald-50 p-4 leading-relaxed text-emerald-900">
-                  <i class="bi bi-info-circle-fill me-1" aria-hidden="true"></i>
-                  {{ translations().confirmApproveBody }}
-                </div>
-              } @else {
-                <p class="mb-0 text-sm leading-relaxed text-slate-600">
-                  {{ translations().rejectHint }}
-                </p>
-                <textarea
-                  class="mt-3 min-h-36 w-full resize-y rounded-2xl border border-slate-200 bg-slate-50 p-3 outline-none transition placeholder:text-slate-400 focus:border-rose-400 focus:bg-white focus:ring-4 focus:ring-rose-100"
-                  maxlength="1000"
-                  [placeholder]="translations().rejectPlaceholder"
-                  [value]="rejectionReason()"
-                  (input)="rejectionReason.set($any($event.target).value)"
-                ></textarea>
-                <small class="mt-1 block text-end font-bold text-slate-400">{{ rejectionReason().length }} / 1000</small>
-              }
-            </div>
-            <footer class="flex flex-wrap justify-end gap-2 border-t border-slate-100 bg-slate-50/80 p-4">
-              <button
-                type="button"
-                class="min-h-10 rounded-xl border border-slate-200 bg-white px-5 font-bold text-slate-600 transition hover:bg-slate-100 disabled:opacity-50"
-                [disabled]="mutating()"
-                (click)="closeDecision()"
-              >
-                {{ translations().cancel }}
-              </button>
-              <button
-                type="button"
-                class="inline-flex min-h-10 items-center gap-2 rounded-xl px-5 font-extrabold text-white shadow-lg transition hover:-translate-y-0.5 disabled:translate-y-0 disabled:cursor-not-allowed disabled:opacity-50"
-                [class.bg-emerald-600]="decision.action === 'approve'"
-                [class.shadow-emerald-700/20]="decision.action === 'approve'"
-                [class.bg-rose-600]="decision.action === 'reject'"
-                [class.shadow-rose-700/20]="decision.action === 'reject'"
-                [disabled]="mutating()"
-                (click)="confirmDecision()"
-              >
-                @if (mutating()) {
-                  <i class="bi bi-arrow-repeat animate-spin" aria-hidden="true"></i>
-                } @else {
-                  <i [class]="decision.action === 'approve' ? 'bi bi-check-lg' : 'bi bi-x-lg'" aria-hidden="true"></i>
-                }
-                {{ decision.action === 'approve' ? translations().approve : translations().reject }}
-              </button>
-            </footer>
-          </section>
-        </div>
-      }
-
-      <div class="min-h-0 flex-1 overflow-y-auto bg-slate-50/70 p-4 sm:p-5">
-        <form
-          class="grid gap-3 rounded-2xl border border-cyan-100 bg-gradient-to-br from-white to-cyan-50/60 p-3 shadow-sm md:grid-cols-4 sm:p-4"
-          (submit)="search($event)"
-        >
-          <label class="grid gap-1.5">
-            <span class="flex items-center gap-1.5 text-xs font-extrabold text-slate-600">
-              <i class="bi bi-search text-cyan-700" aria-hidden="true"></i>
-              {{ translations().search }}
-            </span>
-            <span class="relative block">
-              <i
-                class="bi bi-search pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-slate-400"
-                aria-hidden="true"
-              ></i>
-              <input
-                type="search"
-                maxlength="200"
-                class="h-11 w-full rounded-xl border border-slate-200 bg-white pe-3 ps-9 text-slate-800 outline-none transition placeholder:text-slate-400 hover:border-cyan-300 focus:border-cyan-500 focus:ring-4 focus:ring-cyan-100"
-                [placeholder]="translations().search"
-                [value]="searchText()"
-                (input)="searchText.set($any($event.target).value)"
-              />
-            </span>
-          </label>
-
-          <label class="grid gap-1.5">
-            <span class="flex items-center gap-1.5 text-xs font-extrabold text-slate-600">
-              <i class="bi bi-activity text-cyan-700" aria-hidden="true"></i>
-              {{ translations().status }}
-            </span>
-            <select
-              class="h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-slate-800 outline-none transition hover:border-cyan-300 focus:border-cyan-500 focus:ring-4 focus:ring-cyan-100"
-              [value]="status() ?? ''"
-              (change)="updateFilter($event, 'status')"
-            >
-              <option value="">{{ translations().allStatuses }}</option>
-              <option value="Pending">{{ translations().pending }}</option>
-              <option value="Approved">{{ translations().approved }}</option>
-              <option value="Rejected">{{ translations().rejected }}</option>
-            </select>
-          </label>
-
-          <label class="grid gap-1.5">
-            <span class="flex items-center gap-1.5 text-xs font-extrabold text-slate-600">
-              <i class="bi bi-diagram-3 text-cyan-700" aria-hidden="true"></i>
-              {{ translations().requestType }}
-            </span>
-            <select
-              class="h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-slate-800 outline-none transition hover:border-cyan-300 focus:border-cyan-500 focus:ring-4 focus:ring-cyan-100"
-              [value]="requestType() ?? ''"
-              (change)="updateFilter($event, 'type')"
-            >
-              <option value="">{{ translations().allTypes }}</option>
-              <option value="BranchServiceTree">{{ translations().branchServiceTree }}</option>
-              <option value="LeafUnderGlobalParent">
-                {{ translations().leafUnderGlobalParent }}
-              </option>
-            </select>
-          </label>
-
-          <button
-            type="submit"
-            class="mt-auto rounded flex h-11 items-center justify-center gap-2 rounded-xl border border-cyan-700 bg-gradient-to-r from-cyan-700 to-sky-700 px-4 font-extrabold text-white shadow-lg shadow-cyan-800/15 transition hover:-translate-y-0.5 hover:from-cyan-800 hover:to-sky-800 hover:shadow-xl active:translate-y-0"
-          >
-            <i class="bi bi-search" aria-hidden="true"></i>
-            {{ translations().search }}
-          </button>
-        </form>
-
-        @if (error()) {
-          <div
-            class="mt-4 flex items-start gap-3 rounded-2xl border border-rose-200 bg-rose-50 p-4 text-rose-800 shadow-sm"
-            role="alert"
-          >
-            <span class="grid size-9 shrink-0 place-items-center rounded-xl bg-rose-100 text-lg"
-              ><i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i
-            ></span>
-            <p class="m-0 pt-1 leading-relaxed">{{ error() }}</p>
-          </div>
-        }
-
-        @if (loading()) {
-          <div
-            class="mt-4 grid min-h-52 place-items-center rounded-2xl border border-cyan-100 bg-white p-8 text-center shadow-sm"
-          >
-            <div>
-              <span
-                class="mx-auto grid size-12 place-items-center rounded-2xl bg-cyan-50 text-2xl text-cyan-700"
-                ><i class="bi bi-arrow-repeat animate-spin" aria-hidden="true"></i
-              ></span>
-              <p class="mb-0 mt-3 font-bold text-slate-600">{{ translations().loading }}</p>
-            </div>
-          </div>
-        } @else if (page().data.length === 0) {
-          <div
-            class="mt-4 grid min-h-52 place-items-center rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center shadow-sm"
-          >
-            <div>
-              <span
-                class="mx-auto grid size-14 place-items-center rounded-2xl bg-slate-100 text-2xl text-slate-400"
-                ><i class="bi bi-inbox" aria-hidden="true"></i
-              ></span>
-              <p class="mb-0 mt-3 font-bold text-slate-500">{{ translations().empty }}</p>
-            </div>
-          </div>
-        } @else {
-          <div class="mt-4 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-            <div class="overflow-x-auto">
-              <table class="w-full min-w-[1000px] text-sm">
-                <thead
-                  class="sticky top-0 z-10 bg-gradient-to-r from-cyan-800 to-sky-800 text-white shadow-sm"
+                <span
+                  class="branch-globalization-icon d-grid mx-auto rounded-3 bg-info-subtle text-primary"
                 >
-                  <tr>
-                    <th class="p-3.5 text-start font-extrabold">{{ translations().service }}</th>
-                    <th class="p-3.5 text-start font-extrabold">
-                      {{ translations().requestType }}
-                    </th>
-                    <th class="p-3.5 text-start font-extrabold">{{ translations().status }}</th>
-                    <th class="p-3.5 text-start font-extrabold">
-                      {{ translations().requestedOn }}
-                    </th>
-                    <th class="p-3.5 text-start font-extrabold">{{ translations().reviewedOn }}</th>
-                    <th class="p-3.5 text-start font-extrabold">
-                      {{ translations().rejectionReason }}
-                    </th>
-                    @if (canApprove() || canReject()) {
-                      <th class="p-3.5 text-start font-extrabold">{{ translations().actions }}</th>
-                    }
-                  </tr>
-                </thead>
-                <tbody class="divide-y divide-slate-100">
-                  @for (item of page().data; track item.requestId; let even = $even) {
-                    <tr class="group transition hover:bg-cyan-50/70" [class.bg-slate-50/60]="even">
-                      <td class="p-3.5">
-                        <div class="flex items-center gap-2.5">
-                          <span
-                            class="grid size-9 shrink-0 place-items-center rounded-xl bg-cyan-50 text-cyan-700 ring-1 ring-cyan-100 transition group-hover:bg-cyan-100"
-                            ><i class="bi bi-grid-1x2-fill" aria-hidden="true"></i
-                          ></span>
-                          <strong class="font-extrabold text-slate-900">{{
-                            serviceName(item)
-                          }}</strong>
-                        </div>
-                      </td>
-                      <td class="p-3.5">
-                        <span
-                          class="inline-flex items-center gap-1.5 rounded-full bg-indigo-50 px-2.5 py-1 font-bold text-indigo-700 ring-1 ring-inset ring-indigo-100"
-                          ><i class="bi bi-diagram-3" aria-hidden="true"></i
-                          >{{ typeLabel(item.requestType) }}</span
-                        >
-                      </td>
-                      <td class="p-3.5">
-                        <span
-                          class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 font-extrabold ring-1 ring-inset"
-                          [class]="statusClasses(item.status)"
-                          ><i [class]="statusIcon(item.status)" aria-hidden="true"></i
-                          >{{ statusLabel(item.status) }}</span
-                        >
-                      </td>
-                      <td class="p-3.5 text-slate-600">
-                        <span class="inline-flex items-center gap-1.5"
-                          ><i class="bi bi-calendar3 text-slate-400" aria-hidden="true"></i
-                          >{{ formatDate(item.requestedOnUtc) }}</span
-                        >
-                      </td>
-                      <td class="p-3.5 text-slate-600">
-                        <span class="inline-flex items-center gap-1.5"
-                          ><i class="bi bi-calendar-check text-slate-400" aria-hidden="true"></i
-                          >{{ formatDate(item.reviewedOnUtc) }}</span
-                        >
-                      </td>
-                      <td class="max-w-sm p-3.5">
-                        <span
-                          class="inline-block rounded-lg bg-slate-100 px-2.5 py-1.5 leading-relaxed text-slate-600"
-                          >{{ item.rejectionReason || translations().noReason }}</span
-                        >
-                      </td>
+                  <i class="bi bi-arrow-repeat animate-spin" aria-hidden="true"></i>
+                </span>
+                <p class="mb-0 mt-3 fw-bold text-secondary">{{ translations().loading }}</p>
+              </div>
+            </div>
+          } @else if (page().data.length === 0) {
+            <div
+              class="mt-4 d-grid rounded-3 border border-secondary-subtle bg-white py-5 text-center shadow-sm"
+            >
+              <div>
+                <span
+                  class="branch-globalization-empty-icon d-grid mx-auto rounded-3 bg-light text-muted"
+                >
+                  <i class="bi bi-inbox" aria-hidden="true"></i>
+                </span>
+                <p class="mb-0 mt-3 fw-bold text-muted">{{ translations().empty }}</p>
+              </div>
+            </div>
+          } @else {
+            <div
+              class="mt-4 overflow-hidden rounded-3 border border-secondary-subtle bg-white shadow-sm"
+            >
+              <div class="table-responsive">
+                <table class="table table-sm align-middle mb-0 w-100">
+                  <thead
+                    class="branch-globalization-table-head sticky-top z-1 text-white shadow-sm"
+                  >
+                    <tr>
+                      <th class="p-3 text-start fw-bold">{{ translations().service }}</th>
+                      <th class="p-3 text-start fw-bold">{{ translations().requestType }}</th>
+                      <th class="p-3 text-start fw-bold">{{ translations().status }}</th>
+                      <th class="p-3 text-start fw-bold">{{ translations().requestedOn }}</th>
+                      <th class="p-3 text-start fw-bold">{{ translations().reviewedOn }}</th>
+                      <th class="p-3 text-start fw-bold">{{ translations().rejectionReason }}</th>
                       @if (canApprove() || canReject()) {
-                        <td class="p-3.5">
-                          <div class="flex flex-wrap items-center gap-2">
-                            @if (canStartDecision(item.status, 'approve')) {
-                              <button
-                                type="button"
-                                data-action="approve"
-                                class="inline-flex h-9 items-center gap-1.5 rounded-xl border border-emerald-200 bg-emerald-50 px-3 font-extrabold text-emerald-700 transition hover:bg-emerald-100 disabled:cursor-not-allowed disabled:opacity-50"
-                                [disabled]="mutating()"
-                                (click)="requestDecision(item, 'approve')"
-                              >
-                                <i class="bi bi-check-lg" aria-hidden="true"></i>{{ translations().approve }}
-                              </button>
-                            }
-                            @if (canStartDecision(item.status, 'reject')) {
-                              <button
-                                type="button"
-                                data-action="reject"
-                                class="inline-flex h-9 items-center gap-1.5 rounded-xl border border-rose-200 bg-rose-50 px-3 font-extrabold text-rose-700 transition hover:bg-rose-100 disabled:cursor-not-allowed disabled:opacity-50"
-                                [disabled]="mutating()"
-                                (click)="requestDecision(item, 'reject')"
-                              >
-                                <i class="bi bi-x-lg" aria-hidden="true"></i>{{ translations().reject }}
-                              </button>
-                            }
-                          </div>
-                        </td>
+                        <th class="p-3 text-start fw-bold">{{ translations().actions }}</th>
                       }
                     </tr>
-                  }
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    @for (item of page().data; track item.requestId) {
+                      <tr>
+                        <td class="p-3">
+                          <div class="d-flex align-items-center gap-2">
+                            <span
+                              class="branch-globalization-icon-sm d-grid flex-shrink-0 rounded-3 bg-info-subtle text-primary"
+                            >
+                              <i class="bi bi-grid-1x2-fill" aria-hidden="true"></i>
+                            </span>
+                            <strong class="fw-bold text-dark">{{ serviceName(item) }}</strong>
+                          </div>
+                        </td>
+                        <td class="p-3">
+                          <span
+                            class="d-inline-flex align-items-center gap-1 rounded-pill bg-primary-subtle px-2 py-1 fw-bold text-primary"
+                          >
+                            <i class="bi bi-diagram-3" aria-hidden="true"></i>
+                            {{ typeLabel(item.requestType) }}
+                          </span>
+                        </td>
+                        <td class="p-3">
+                          <span
+                            class="d-inline-flex align-items-center gap-1 rounded-pill px-2 py-1 fw-bold"
+                            [class]="statusClasses(item.status)"
+                          >
+                            <i [class]="statusIcon(item.status)" aria-hidden="true"></i>
+                            {{ statusLabel(item.status) }}
+                          </span>
+                        </td>
+                        <td class="p-3 text-secondary">
+                          <span class="d-inline-flex align-items-center gap-1">
+                            <i class="bi bi-calendar3 text-muted" aria-hidden="true"></i>
+                            {{ formatDate(item.requestedOnUtc) }}
+                          </span>
+                        </td>
+                        <td class="p-3 text-secondary">
+                          <span class="d-inline-flex align-items-center gap-1">
+                            <i class="bi bi-calendar-check text-muted" aria-hidden="true"></i>
+                            {{ formatDate(item.reviewedOnUtc) }}
+                          </span>
+                        </td>
+                        <td class="p-3">
+                          <span
+                            class="d-inline-block rounded-3 bg-light px-2 py-1 lh-lg text-secondary"
+                          >
+                            {{ item.rejectionReason || translations().noReason }}
+                          </span>
+                        </td>
+                        @if (canApprove() || canReject()) {
+                          <td class="p-3">
+                            <div class="d-flex align-items-center gap-2 justify-content-end">
+                              @if (canStartDecision(item.status, 'approve')) {
+                                <button
+                                  type="button"
+                                  data-action="approve"
+                                  class="btn btn-sm btn-outline-success d-inline-flex align-items-center gap-1 rounded-3 fw-bold"
+                                  [disabled]="mutating()"
+                                  (click)="requestDecision(item, 'approve')"
+                                >
+                                  <i class="bi bi-check-lg" aria-hidden="true"></i>
+                                  {{ translations().approve }}
+                                </button>
+                              }
+                              @if (canStartDecision(item.status, 'reject')) {
+                                <button
+                                  type="button"
+                                  data-action="reject"
+                                  class="btn btn-sm btn-outline-danger d-inline-flex align-items-center gap-1 rounded-3 fw-bold"
+                                  [disabled]="mutating()"
+                                  (click)="requestDecision(item, 'reject')"
+                                >
+                                  <i class="bi bi-x-lg" aria-hidden="true"></i>
+                                  {{ translations().reject }}
+                                </button>
+                              }
+                            </div>
+                          </td>
+                        }
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </div>
-        }
-      </div>
-
-      <footer
-        class="flex flex-wrap items-center justify-between gap-3 border-t border-cyan-100 bg-gradient-to-r from-white to-cyan-50/70 p-4"
-      >
-        <span
-          class="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1.5 font-extrabold text-slate-700 shadow-sm ring-1 ring-slate-200"
-          ><i class="bi bi-layers text-cyan-700" aria-hidden="true"></i>{{ translations().total }}:
-          <strong class="text-cyan-800">{{ page().totalItems }}</strong></span
-        >
-        <div
-          class="flex items-center gap-2 rounded-2xl bg-white p-1.5 shadow-sm ring-1 ring-slate-200"
-        >
-          <button
-            type="button"
-            class="inline-flex h-9 items-center gap-1.5 rounded-xl border border-transparent px-3 font-bold text-slate-600 transition hover:border-cyan-100 hover:bg-cyan-50 hover:text-cyan-800 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-transparent disabled:hover:bg-transparent"
-            [disabled]="page().currentPage <= 1 || loading()"
-            (click)="load(page().currentPage - 1)"
-          >
-            <i class="bi bi-chevron-right rtl:rotate-0 ltr:rotate-180" aria-hidden="true"></i
-            >{{ translations().previous }}
-          </button>
-          <strong
-            class="grid min-w-20 place-items-center rounded-xl bg-gradient-to-r from-cyan-700 to-sky-700 px-3 py-2 text-white shadow-sm"
-            >{{ page().currentPage }} / {{ totalPages() }}</strong
-          >
-          <button
-            type="button"
-            class="inline-flex h-9 items-center gap-1.5 rounded-xl border border-transparent px-3 font-bold text-slate-600 transition hover:border-cyan-100 hover:bg-cyan-50 hover:text-cyan-800 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-transparent disabled:hover:bg-transparent"
-            [disabled]="page().currentPage >= totalPages() || loading()"
-            (click)="load(page().currentPage + 1)"
-          >
-            {{ translations().next
-            }}<i class="bi bi-chevron-left rtl:rotate-0 ltr:rotate-180" aria-hidden="true"></i>
-          </button>
+          }
         </div>
-      </footer>
+
+        <footer
+          class="modal-footer d-flex flex-wrap align-items-center justify-content-between gap-3 border-info-subtle p-3"
+        >
+          <span
+            class="d-inline-flex align-items-center gap-2 rounded-pill bg-white px-3 py-1 fw-bold text-secondary shadow-sm"
+          >
+            <i class="bi bi-layers text-primary" aria-hidden="true"></i>
+            {{ translations().total }}:
+            <strong class="text-primary">{{ page().totalItems }}</strong>
+          </span>
+
+          <div class="d-flex align-items-center gap-2 rounded-3 bg-white p-2 shadow-sm">
+            <button
+              type="button"
+              class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-1 rounded-3 fw-bold"
+              [disabled]="page().currentPage <= 1 || loading()"
+              (click)="load(page().currentPage - 1)"
+            >
+              <i class="bi bi-chevron-right" aria-hidden="true"></i>
+              {{ translations().previous }}
+            </button>
+            <strong class="rounded-3 bg-primary px-3 py-2 text-white shadow-sm">
+              {{ page().currentPage }} / {{ totalPages() }}
+            </strong>
+            <button
+              type="button"
+              class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-1 rounded-3 fw-bold"
+              [disabled]="page().currentPage >= totalPages() || loading()"
+              (click)="load(page().currentPage + 1)"
+            >
+              {{ translations().next }}
+              <i class="bi bi-chevron-left" aria-hidden="true"></i>
+            </button>
+          </div>
+        </footer>
+      </div>
     </section>
   </div>
 }

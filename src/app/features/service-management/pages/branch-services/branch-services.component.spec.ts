@@ -193,7 +193,14 @@ describe('BranchServicesComponent branch service actions', () => {
     expect(globalizationApi.getBranchRequests.mock.calls[1][1]).toEqual(
       expect.objectContaining({ status: null, pageNumber: 1, pageSize: 10 }),
     );
-    expect(fixture.nativeElement.querySelector('[role="dialog"]')).not.toBeNull();
+    const dialog = fixture.nativeElement.querySelector('[role="dialog"]') as HTMLElement | null;
+    expect(dialog).not.toBeNull();
+    expect(dialog?.classList.contains('branch-globalization-dialog')).toBe(true);
+    expect(dialog?.classList.contains('modal-dialog')).toBe(true);
+    expect(dialog?.querySelector('.branch-globalization-content.modal-content')).not.toBeNull();
+    expect(fixture.nativeElement.querySelector('.branch-globalization-backdrop')).not.toBeNull();
+    expect(fixture.nativeElement.querySelector('.modal-backdrop')).toBeNull();
+    expect(dialog?.classList.contains('w-100')).toBe(false);
   });
 
   it('keeps the badge hidden for the same request and restores it for a newer request', () => {

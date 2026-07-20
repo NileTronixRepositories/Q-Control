@@ -1,4 +1,4 @@
-import { HttpErrorResponse } from '@angular/common/http';
+﻿import { HttpErrorResponse } from '@angular/common/http';
 import { computed, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
@@ -103,6 +103,25 @@ describe('ServicesComponent', () => {
     fixture.detectChanges();
   });
 
+  it('uses the shared full-width admin workspace root without stale utility classes', () => {
+    const root = fixture.nativeElement.querySelector('.service-management-page') as HTMLElement | null;
+
+    expect(root).not.toBeNull();
+    expect(root?.classList.contains('container-fluid')).toBe(true);
+    expect(root?.classList.contains('w-100')).toBe(true);
+    expect(root?.className).not.toContain('!');
+  });
+  it('uses professional Bootstrap columns for the editor and hierarchy tree', () => {
+    const workspace = fixture.nativeElement.querySelector('.svc-workspace') as HTMLElement | null;
+    const editor = fixture.nativeElement.querySelector('.svc-editor') as HTMLElement | null;
+    const tree = fixture.nativeElement.querySelector('.svc-workspace app-service-hierarchy-tree') as HTMLElement | null;
+    const filters = fixture.nativeElement.querySelectorAll('.svc-central-filters .svc-field');
+
+    expect(workspace?.classList.contains('row')).toBe(true);
+    expect(editor?.classList.contains('col-xl-5')).toBe(true);
+    expect(tree?.classList.contains('col-xl-7')).toBe(true);
+    expect(Array.from(filters).every((field) => (field as HTMLElement).classList.contains('col-xl-4'))).toBe(true);
+  });
   it('loads the hierarchy and parent lookup on initialization', () => {
     expect(api.getServiceTree).toHaveBeenCalledWith(
       expect.objectContaining({ includeInactive: false, includeDeleted: false }),
@@ -243,3 +262,5 @@ function createServiceDetails() {
   };
   }
 });
+
+

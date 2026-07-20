@@ -1,230 +1,129 @@
-<section class="service-media" [attr.aria-busy]="state().loading">
-  <header class="service-media-header">
-    <div>
-      <p>{{ translations().serviceMedia }}</p>
-      <h3>{{ serviceName() }}</h3>
-      <span>{{ supportedTypes() }}</span>
-    </div>
-    @if (state().loading) {
-      <app-niletronix-loading-state
-        [title]="translations().loading"
-        variant="inline"
-        size="sm"
-      />
-    }
-  </header>
-
-  @if (validationError(); as error) {
-    <p class="service-media-alert" role="alert">
-      <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
-      {{ error }}
-    </p>
-  }
-
-  <div class="service-media-grid">
-    <article class="service-media-card service-media-card--single">
-      <header>
-        <span class="service-media-icon"><i class="bi bi-image" aria-hidden="true"></i></span>
-        <div>
-          <h4>{{ translations().serviceLogo }}</h4>
-          <p>{{ state().logo ? translations().replaceLogo : translations().noLogoUploaded }}</p>
-        </div>
-      </header>
-
-      <div class="service-media-preview service-media-preview--logo">
-        @if (resolvedUrl(state().logo); as url) {
-          <img [src]="url" [alt]="imageAlt(state().logo!)" />
-        } @else {
-          <span><i class="bi bi-image" aria-hidden="true"></i></span>
-        }
-      </div>
-
-      <footer>
-        @if (canManage()) {
-          <label class="service-media-btn service-media-btn--secondary">
-            <i class="bi bi-upload" aria-hidden="true"></i>
-            {{ state().logo ? translations().replaceLogo : translations().uploadLogo }}
-            <input
-              type="file"
-              accept="image/png,image/jpeg,image/webp"
-              [disabled]="state().uploadingLogo"
-              (change)="onSingleImageSelected('Logo', $event)"
-            />
-          </label>
-          @if (state().logo; as logo) {
-            <button
-              type="button"
-              class="service-media-btn service-media-btn--danger"
-              [disabled]="deleting(logo)"
-              (click)="requestDelete(logo)"
-            >
-              <i class="bi bi-trash3" aria-hidden="true"></i>
-              {{ deleting(logo) ? translations().loading : translations().deleteLogo }}
-            </button>
-          }
-        }
-      </footer>
-    </article>
-
-    <article class="service-media-card service-media-card--single">
-      <header>
-        <span class="service-media-icon"><i class="bi bi-app-indicator" aria-hidden="true"></i></span>
-        <div>
-          <h4>{{ translations().serviceIcon }}</h4>
-          <p>{{ state().icon ? translations().replaceIcon : translations().noIconUploaded }}</p>
-        </div>
-      </header>
-
-      <div class="service-media-preview service-media-preview--icon">
-        @if (resolvedUrl(state().icon); as url) {
-          <img [src]="url" [alt]="imageAlt(state().icon!)" />
-        } @else {
-          <span><i class="bi bi-app" aria-hidden="true"></i></span>
-        }
-      </div>
-
-      <footer>
-        @if (canManage()) {
-          <label class="service-media-btn service-media-btn--secondary">
-            <i class="bi bi-upload" aria-hidden="true"></i>
-            {{ state().icon ? translations().replaceIcon : translations().uploadIcon }}
-            <input
-              type="file"
-              accept="image/png,image/jpeg,image/webp"
-              [disabled]="state().uploadingIcon"
-              (change)="onSingleImageSelected('Icon', $event)"
-            />
-          </label>
-          @if (state().icon; as icon) {
-            <button
-              type="button"
-              class="service-media-btn service-media-btn--danger"
-              [disabled]="deleting(icon)"
-              (click)="requestDelete(icon)"
-            >
-              <i class="bi bi-trash3" aria-hidden="true"></i>
-              {{ deleting(icon) ? translations().loading : translations().deleteIcon }}
-            </button>
-          }
-        }
-      </footer>
-    </article>
-
-    <article class="service-media-card service-media-card--ads">
-      <header>
-        <span class="service-media-icon"><i class="bi bi-images" aria-hidden="true"></i></span>
-        <div>
-          <h4>{{ translations().advertisementImages }}</h4>
-          <p>{{ state().ads.length ? translations().advertisementImages : translations().noAdvertisementImages }}</p>
-        </div>
-      </header>
-
-      @if (state().ads.length) {
-        <div class="service-media-gallery">
-          @for (image of state().ads; track image.id) {
-            <figure class="service-media-ad" [class.is-deleting]="deleting(image)">
-              @if (resolvedUrl(image); as url) {
-                <img [src]="url" [alt]="imageAlt(image)" />
-              }
-              <figcaption>
-                <span>#{{ image.displayOrder }}</span>
-                @if (canManage()) {
-                  <button
-                    type="button"
-                    [disabled]="deleting(image)"
-                    [attr.aria-label]="translations().deleteImage"
-                    (click)="requestDelete(image)"
-                  >
-                    <i class="bi bi-trash3" aria-hidden="true"></i>
-                  </button>
-                }
-              </figcaption>
-            </figure>
-          }
-        </div>
-      } @else {
-        <div class="service-media-empty">
-          <i class="bi bi-images" aria-hidden="true"></i>
-          <span>{{ translations().noAdvertisementImages }}</span>
-        </div>
-      }
-
-      @if (canManage()) {
-        <div class="service-media-uploader">
-          <label class="service-media-btn service-media-btn--secondary">
-            <i class="bi bi-plus-lg" aria-hidden="true"></i>
-            {{ translations().uploadAdvertisements }}
-            <input
-              type="file"
-              accept="image/png,image/jpeg,image/webp"
-              multiple
-              [disabled]="state().uploadingAds"
-              (change)="onAdsSelected($event)"
-            />
-          </label>
-          <button
-            type="button"
-            class="service-media-btn service-media-btn--primary"
-            [disabled]="!canUploadAds()"
-            (click)="uploadAds()"
-          >
-            <i class="bi bi-cloud-arrow-up" aria-hidden="true"></i>
-            {{ state().uploadingAds ? translations().loading : translations().uploadAdvertisements }}
-          </button>
-        </div>
-
-        @if (selectedAds().length) {
-          <div class="service-media-selected">
-            <strong>{{ selectedAds().length }} {{ translations().selectedImages }}</strong>
-            <div class="service-media-selected-grid">
-              @for (preview of selectedAds(); track preview.id) {
-                <figure>
-                  <img [src]="preview.previewUrl" [alt]="preview.file.name" />
-                  <figcaption>
-                    <span>{{ preview.file.name }}</span>
-                    <button
-                      type="button"
-                      [attr.aria-label]="translations().removeSelectedImage"
-                      (click)="removeSelectedAd(preview.id)"
-                    >
-                      <i class="bi bi-x-lg" aria-hidden="true"></i>
-                    </button>
-                  </figcaption>
-                </figure>
-              }
-            </div>
-          </div>
-        }
-      }
-    </article>
-  </div>
+﻿<section class="service-media" [attr.aria-busy]="state().loading">
+<header class="service-media-header">
+<div>
+<p>{{ translations().serviceMedia }}</p>
+<h3>{{ serviceName() }}</h3>
+<span>{{ supportedTypes() }}</span>
+</div>
+@if (state().loading) { <app-niletronix-loading-state [title]="translations().loading" variant="inline" size="sm" /> }
+</header>
+@if (validationError(); as error) { <p class="service-media-alert" role="alert">
+<i class="bi bi-exclamation-triangle" aria-hidden="true"></i> {{ error }}
+</p> }
+<div class="service-media-grid">
+<article class="service-media-card service-media-card--single">
+<header>
+<span class="service-media-icon"><i class="bi bi-image" aria-hidden="true"></i></span>
+<div>
+<h4>{{ translations().serviceLogo }}</h4>
+<p>{{ state().logo ? translations().replaceLogo : translations().noLogoUploaded }}</p>
+</div>
+</header>
+<div class="service-media-preview service-media-preview--logo">
+@if (resolvedUrl(state().logo); as url) { <img [src]="url" [alt]="imageAlt(state().logo!)" /> }
+@else { <span><i class="bi bi-image" aria-hidden="true"></i></span> }
+</div>
+<footer>
+@if (canManage()) { <label class="service-media-btn service-media-btn--secondary">
+<i class="bi bi-upload" aria-hidden="true"></i> {{ state().logo ? translations().replaceLogo : translations().uploadLogo }}
+<input type="file" accept="image/png,image/jpeg,image/webp" [disabled]="state().uploadingLogo" (change)="onSingleImageSelected('Logo', $event)" />
+</label>
+@if (state().logo; as logo) { <button type="button" class="service-media-btn service-media-btn--danger" [disabled]="deleting(logo)" (click)="requestDelete(logo)" >
+<i class="bi bi-trash3" aria-hidden="true"></i> {{ deleting(logo) ? translations().loading : translations().deleteLogo }}
+</button> } }
+</footer>
+</article>
+<article class="service-media-card service-media-card--single">
+<header>
+<span class="service-media-icon"><i class="bi bi-app-indicator" aria-hidden="true"></i></span>
+<div>
+<h4>{{ translations().serviceIcon }}</h4>
+<p>{{ state().icon ? translations().replaceIcon : translations().noIconUploaded }}</p>
+</div>
+</header>
+<div class="service-media-preview service-media-preview--icon">
+@if (resolvedUrl(state().icon); as url) { <img [src]="url" [alt]="imageAlt(state().icon!)" /> }
+@else { <span><i class="bi bi-app" aria-hidden="true"></i></span> }
+</div>
+<footer>
+@if (canManage()) { <label class="service-media-btn service-media-btn--secondary">
+<i class="bi bi-upload" aria-hidden="true"></i> {{ state().icon ? translations().replaceIcon : translations().uploadIcon }}
+<input type="file" accept="image/png,image/jpeg,image/webp" [disabled]="state().uploadingIcon" (change)="onSingleImageSelected('Icon', $event)" />
+</label>
+@if (state().icon; as icon) { <button type="button" class="service-media-btn service-media-btn--danger" [disabled]="deleting(icon)" (click)="requestDelete(icon)" >
+<i class="bi bi-trash3" aria-hidden="true"></i> {{ deleting(icon) ? translations().loading : translations().deleteIcon }}
+</button> } }
+</footer>
+</article>
+<article class="service-media-card service-media-card--ads">
+<header>
+<span class="service-media-icon"><i class="bi bi-images" aria-hidden="true"></i></span>
+<div>
+<h4>{{ translations().advertisementImages }}</h4>
+<p>{{ state().ads.length ? translations().advertisementImages : translations().noAdvertisementImages }}</p>
+</div>
+</header>
+@if (state().ads.length) { <div class="service-media-gallery">
+@for (image of state().ads; track image.id) { <figure class="service-media-ad" [class.is-deleting]="deleting(image)">
+@if (resolvedUrl(image); as url) { <img [src]="url" [alt]="imageAlt(image)" /> }
+<figcaption>
+<span>#{{ image.displayOrder }}</span>
+@if (canManage()) { <button type="button" [disabled]="deleting(image)" [attr.aria-label]="translations().deleteImage" (click)="requestDelete(image)" >
+<i class="bi bi-trash3" aria-hidden="true"></i>
+</button> }
+</figcaption>
+</figure> }
+</div> }
+@else { <div class="service-media-empty">
+<i class="bi bi-images" aria-hidden="true"></i>
+<span>{{ translations().noAdvertisementImages }}</span>
+</div> }
+@if (canManage()) { <div class="service-media-uploader">
+<label class="service-media-btn service-media-btn--secondary">
+<i class="bi bi-plus-lg" aria-hidden="true"></i> {{ translations().uploadAdvertisements }}
+<input type="file" accept="image/png,image/jpeg,image/webp" multiple [disabled]="state().uploadingAds" (change)="onAdsSelected($event)" />
+</label>
+<button type="button" class="service-media-btn service-media-btn--primary" [disabled]="!canUploadAds()" (click)="uploadAds()" >
+<i class="bi bi-cloud-arrow-up" aria-hidden="true"></i> {{ state().uploadingAds ? translations().loading : translations().uploadAdvertisements }}
+</button>
+</div>
+@if (selectedAds().length) { <div class="service-media-selected">
+<strong>{{ selectedAds().length }} {{ translations().selectedImages }}</strong>
+<div class="service-media-selected-grid">
+@for (preview of selectedAds(); track preview.id) { <figure>
+<img [src]="preview.previewUrl" [alt]="preview.file.name" />
+<figcaption>
+<span>{{ preview.file.name }}</span>
+<button type="button" [attr.aria-label]="translations().removeSelectedImage" (click)="removeSelectedAd(preview.id)" >
+<i class="bi bi-x-lg" aria-hidden="true"></i>
+</button>
+</figcaption>
+</figure> }
+</div>
+</div> } }
+</article>
+</div>
 </section>
-
-@if (confirmState(); as confirm) {
-  <div class="service-media-dialog-backdrop" (click)="closeDeleteConfirm()"></div>
-  <aside class="service-media-dialog" role="dialog" [attr.aria-label]="confirm.title">
-    <header>
-      <h3>{{ confirm.title }}</h3>
-      <button type="button" [attr.aria-label]="translations().close" (click)="closeDeleteConfirm()">
-        <i class="bi bi-x-lg" aria-hidden="true"></i>
-      </button>
-    </header>
-    <div class="service-media-dialog-body">
-      @if (resolvedUrl(confirm.image); as url) {
-        <img [src]="url" [alt]="imageAlt(confirm.image)" />
-      }
-      <div>
-        <strong>{{ imageTypeLabel(confirm.image.imageType) }}</strong>
-        <p>{{ confirm.body }}</p>
-      </div>
-    </div>
-    <footer>
-      <button type="button" class="service-media-btn service-media-btn--secondary" (click)="closeDeleteConfirm()">
-        {{ translations().cancel }}
-      </button>
-      <button type="button" class="service-media-btn service-media-btn--danger-fill" (click)="confirmDelete()">
-        {{ translations().deleteImage }}
-      </button>
-    </footer>
-  </aside>
+@if (confirmState(); as confirm) { <div class="service-media-dialog-backdrop" (click)="closeDeleteConfirm()"></div>
+<aside class="service-media-dialog" role="dialog" [attr.aria-label]="confirm.title">
+<header>
+<h3>{{ confirm.title }}</h3>
+<button type="button" [attr.aria-label]="translations().close" (click)="closeDeleteConfirm()">
+<i class="bi bi-x-lg" aria-hidden="true"></i>
+</button>
+</header>
+<div class="service-media-dialog-body">
+@if (resolvedUrl(confirm.image); as url) { <img [src]="url" [alt]="imageAlt(confirm.image)" /> }
+<div>
+<strong>{{ imageTypeLabel(confirm.image.imageType) }}</strong>
+<p>{{ confirm.body }}</p>
+</div>
+</div>
+<footer>
+<button type="button" class="service-media-btn service-media-btn--secondary" (click)="closeDeleteConfirm()"> {{ translations().cancel }}
+</button>
+<button type="button" class="service-media-btn service-media-btn--danger-fill" (click)="confirmDelete()"> {{ translations().deleteImage }}
+</button>
+</footer>
+</aside>
 }

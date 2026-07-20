@@ -1,5 +1,4 @@
-<section class="technical-admin-responsive-page waiting-areas-page container-fluid" [attr.dir]="direction()" [attr.lang]="language()">
-  <!-- Header -->
+﻿<section class="technical-admin-responsive-page waiting-areas-page container-fluid" [attr.dir]="direction()" [attr.lang]="language()">
   <app-technical-admin-page-hero
     [eyebrow]="translations().branch"
     [title]="translations().title"
@@ -11,8 +10,6 @@
       {{ translations().addButton }}
     </button>
   </app-technical-admin-page-hero>
-
-  <!-- Toast -->
   @if (message(); as currentMessage) {
     <div class="toast-stack" role="status" aria-live="polite" aria-atomic="true">
       <div
@@ -39,14 +36,10 @@
       </div>
     </div>
   }
-
-  <!-- Content -->
   <section class="content-grid">
     <div class="list-panel">
-      <!-- Toolbar -->
-      <div class="admin-filter-toolbar">
-        <!-- Search -->
-        <div class="admin-filter-cell admin-filter-cell-search">
+      <div class="row g-3 align-items-end">
+        <div class="col-12 col-lg-5">
           <label class="filter-field admin-filter-field">
             <span>
               {{ translations().searchPlaceholder }}
@@ -63,9 +56,7 @@
             />
           </label>
         </div>
-
-        <!-- Branch -->
-        <div class="admin-filter-cell">
+        <div class="admin-col-12 col-md-4 col-lg-3">
           <label class="filter-field admin-filter-field">
             <span>
               {{ translations().branchFilter }}
@@ -90,9 +81,7 @@
             </select>
           </label>
         </div>
-
-        <!-- Status -->
-        <div class="admin-filter-cell">
+        <div class="admin-col-12 col-md-4 col-lg-3">
           <label class="filter-field admin-filter-field">
             <span>{{ translations().status }}</span>
             <i class="bi bi-check2-circle filter-icon" aria-hidden="true"></i>
@@ -103,8 +92,7 @@
             </select>
           </label>
         </div>
-        <!-- Page Size -->
-        <div class="admin-filter-cell admin-filter-cell-compact">
+        <div class="col-12 col-md-4 col-lg-2">
           <label class="filter-field admin-filter-field">
             <span>
               {{ translations().pageSize }}
@@ -120,12 +108,10 @@
             </select>
           </label>
         </div>
-
-        <!-- Refresh -->
-        <div class="admin-filter-cell admin-filter-cell-compact">
+        <div class="col-12 col-md-4 col-lg-2">
           <button
             type="button"
-            class="btn secondary-action toolbar-action"
+            class="btn secondary-action"
             [disabled]="loading()"
             (click)="refresh()"
           >
@@ -135,15 +121,11 @@
           </button>
         </div>
       </div>
-
-      <!-- Loading -->
       @if (loading()) {
         <app-niletronix-loading-state [title]="translations().loading" variant="inline" size="sm" />
       }
-
-      <!-- Table -->
       @if (waitingAreaPage().data.length > 0) {
-        <div data-testid="waiting-areas-desktop" class="table-responsive table-wrap hidden md:block">
+        <div data-testid="waiting-areas-desktop" class="table-responsive table-wrap d-none d-md-block">
           <table class="table align-middle custom-table">
             <thead>
               <tr>
@@ -260,7 +242,7 @@
           </table>
         </div>
 
-        <div data-testid="waiting-areas-mobile" class="grid gap-3 md:hidden">
+        <div data-testid="waiting-areas-mobile" class="d-grid gap-3 d-md-none">
           @for (item of waitingAreaPage().data; track item.id) {
             <app-technical-admin-mobile-record-card
               [eyebrow]="translations().number"
@@ -270,20 +252,20 @@
             >
               <span record-badges class="status-pill" [class.status-active]="item.isActive" [class.status-inactive]="!item.isActive">{{ statusLabel(item) }}</span>
               <div record-fields>
-                <dt class="text-[11px] font-extrabold text-slate-500">{{ translations().branch }}</dt>
-                <dd class="mb-0 mt-1 break-words font-bold text-slate-800">{{ branchName(item) }}</dd>
+                <dt class="small fw-bold text-muted text-uppercase">{{ translations().branch }}</dt>
+                <dd class="mb-0 mt-1 text-break fw-bold">{{ branchName(item) }}</dd>
               </div>
               <div record-fields>
-                <dt class="text-[11px] font-extrabold text-slate-500">{{ translations().windowsCount }}</dt>
-                <dd class="mb-0 mt-1 font-bold text-slate-800">{{ item.windowsCount }}</dd>
+                <dt class="small fw-bold text-muted text-uppercase">{{ translations().windowsCount }}</dt>
+                <dd class="mb-0 mt-1 fw-bold">{{ item.windowsCount }}</dd>
               </div>
               <div record-fields>
-                <dt class="text-[11px] font-extrabold text-slate-500">{{ translations().audioDevice }}</dt>
-                <dd class="mb-0 mt-1 break-words font-bold text-slate-800">{{ textOrFallback(item.audioDevice) }}</dd>
+                <dt class="small fw-bold text-muted text-uppercase">{{ translations().audioDevice }}</dt>
+                <dd class="mb-0 mt-1 text-break fw-bold">{{ textOrFallback(item.audioDevice) }}</dd>
               </div>
               <div record-fields>
-                <dt class="text-[11px] font-extrabold text-slate-500">{{ translations().controlDevice }}</dt>
-                <dd class="mb-0 mt-1 break-words font-bold text-slate-800">{{ textOrFallback(item.controlDevice) }}</dd>
+                <dt class="small fw-bold text-muted text-uppercase">{{ translations().controlDevice }}</dt>
+                <dd class="mb-0 mt-1 text-break fw-bold">{{ textOrFallback(item.controlDevice) }}</dd>
               </div>
               <button record-actions type="button" class="icon-action" [attr.aria-label]="translations().view" [title]="translations().view" (click)="openView(item.id)"><i class="bi bi-eye"></i></button>
               <button record-actions type="button" class="icon-action" [attr.aria-label]="translations().edit" [title]="translations().edit" (click)="openEdit(item.id)"><i class="bi bi-pencil-square"></i></button>
@@ -299,8 +281,6 @@
           }
         </div>
       }
-
-      <!-- Empty -->
       @else if (!loading()) {
         <div class="empty-state">
           <i class="bi bi-hourglass-split"></i>
@@ -314,8 +294,6 @@
           </p>
         </div>
       }
-
-      <!-- Pagination -->
       <footer
         class="pagination-bar d-flex flex-column flex-md-row align-items-center justify-content-between gap-3 mt-4"
       >
@@ -353,13 +331,10 @@
         </div>
       </footer>
     </div>
-
-    <!-- Popup -->
     @if (panelMode() !== 'closed') {
       <div class="editor-backdrop app-popup-overlay" (click)="closePanel()"></div>
 
       <aside class="editor-panel app-popup-panel waiting-area-editor-panel" role="dialog">
-        <!-- Header -->
         <header class="panel-header">
           <h2>
             {{ formTitle() }}
@@ -369,13 +344,9 @@
             <i class="bi bi-x-lg"></i>
           </button>
         </header>
-
-        <!-- Loading -->
         @if (panelLoading()) {
         <app-niletronix-loading-state [title]="translations().loading" variant="inline" size="sm" />
       }
-
-        <!-- View -->
         @if (panelMode() === 'view' && selectedDetails(); as details) {
           <dl class="details-list">
             <div>
@@ -404,8 +375,6 @@
             </div>
           </dl>
         }
-
-        <!-- Form -->
         @if (panelMode() === 'create' || panelMode() === 'edit') {
           <form
             class="waiting-area-form row g-3"
@@ -413,7 +382,6 @@
             (ngSubmit)="save()"
             novalidate
           >
-            <!-- Branch -->
             <div class="col-12">
               <label class="form-field has-field-icon w-100">
                 <span>
@@ -435,8 +403,6 @@
                 </select>
               </label>
             </div>
-
-            <!-- Number -->
             <div class="col-12 col-md-6">
               <label class="form-field has-field-icon w-100">
                 <span>
@@ -448,8 +414,6 @@
                 <input class="form-control" type="number" formControlName="number" />
               </label>
             </div>
-
-            <!-- Name -->
             <div class="col-12 col-md-6">
               <label class="form-field has-field-icon w-100">
                 <span>
@@ -461,8 +425,6 @@
                 <input class="form-control" type="text" formControlName="descriptiveName" />
               </label>
             </div>
-
-            <!-- Audio -->
             <div class="col-12 col-md-6">
               <label class="form-field has-field-icon w-100">
                 <span>
@@ -474,8 +436,6 @@
                 <input class="form-control" type="text" formControlName="audioDevice" />
               </label>
             </div>
-
-            <!-- Control -->
             <div class="col-12 col-md-6">
               <label class="form-field has-field-icon w-100">
                 <span>
@@ -487,8 +447,6 @@
                 <input class="form-control" type="text" formControlName="controlDevice" />
               </label>
             </div>
-
-            <!-- Actions -->
             <div class="col-12 d-flex flex-column flex-sm-row justify-content-end gap-2 mt-2">
               <button type="button" class="btn secondary-action" (click)="closePanel()">
                 <i class="bi bi-x-lg" aria-hidden="true"></i>
@@ -506,3 +464,6 @@
     }
   </section>
 </section>
+
+
+

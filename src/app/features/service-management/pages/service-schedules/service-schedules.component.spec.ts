@@ -258,13 +258,20 @@ describe('ServiceSchedulesComponent', () => {
     const timeInputs = fixture.nativeElement.querySelectorAll('.schedule-week-table input[type="time"]');
     const addActions = fixture.nativeElement.querySelectorAll('.schedule-actions-cell button[aria-label="Add Schedule"]');
     const misplacedAddActions = fixture.nativeElement.querySelectorAll('.schedule-slots-cell button[aria-label="Add Schedule"]');
+    const timeRows = fixture.nativeElement.querySelectorAll('.schedule-range-row');
+    const deleteActions = fixture.nativeElement.querySelectorAll('.schedule-slot-delete.icon-action.danger-action');
+    const closedRow = Array.from(rows).find((row) => (row as HTMLElement).classList.contains('is-closed')) as HTMLElement | undefined;
 
     expect(rows).toHaveLength(7);
     expect(timeInputs).toHaveLength(4);
+    expect(timeRows).toHaveLength(2);
+    expect(deleteActions).toHaveLength(2);
     expect(fixture.nativeElement.textContent).toContain('Closed');
     expect(fixture.nativeElement.textContent).toContain('Add Schedule');
     expect(addActions).toHaveLength(7);
     expect(misplacedAddActions).toHaveLength(0);
+    expect(closedRow?.querySelector('.schedule-closed-row-text')).not.toBeNull();
+    expect(closedRow?.querySelector('input[type="time"]')).toBeNull();
   });
   it('renders the final summary strip, single table, and sticky save footer', () => {
     fixture.detectChanges();
@@ -278,12 +285,16 @@ describe('ServiceSchedulesComponent', () => {
     const summaryItems = summary?.querySelectorAll('.summary-item') ?? [];
 
     expect(summary).not.toBeNull();
+    expect(summaryItems).toHaveLength(5);
+    expect(summary?.classList.contains('row')).toBe(true);
+    expect(summary?.classList.contains('row-cols-xl-5')).toBe(true);
     expect(summaryItems[0]?.textContent).toContain('Branch');
     expect(summaryItems[1]?.textContent).toContain('Service');
     expect(summaryItems[1]?.textContent).toContain('Issue Certificate');
     expect(summary?.textContent).toContain('Code');
     expect(summary?.textContent).toContain('Code required');
     expect(summary?.textContent).toContain('Operational');
+    expect(fixture.nativeElement.querySelector('.schedule-table-shell.table-responsive')).not.toBeNull();
     expect(table).toHaveLength(1);
     expect(footer).not.toBeNull();
     expect(footer?.textContent).toContain('Cancel');
@@ -875,4 +886,3 @@ function createSchedule(overrides: Partial<ServiceSchedule> = {}): ServiceSchedu
     ...overrides,
   };
 }
-

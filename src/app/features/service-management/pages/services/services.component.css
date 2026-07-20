@@ -1,12 +1,10 @@
-:host {
+﻿:host {
   display: block;
 }
 
 .service-management-page {
-  display: grid;
-  gap: 10px;
   font-size: 11px;
-  padding: 0 8px 12px;
+  min-width: 0;
 }
 
 .svc-hero,
@@ -14,31 +12,12 @@
 .svc-dialog,
 .svc-form-section,
 .svc-workflow-context,
-.svc-workflow-start-options {
+.svc-workflow-start-options,
+.svc-central-filters {
   background: #fff;
   border: 1px solid #d7e8ff;
   border-radius: 8px;
   box-shadow: 0 8px 18px #0f172a0d;
-}
-
-.svc-hero,
-.svc-panel-header,
-.svc-actions,
-.svc-dialog-actions,
-.svc-logo-summary,
-.svc-workflow-context-header,
-.svc-related-workflow-title,
-.svc-start-option-summary {
-  align-items: center;
-  display: flex;
-}
-
-.svc-hero,
-.svc-panel-header,
-.svc-workflow-context-header,
-.svc-related-workflow-title,
-.svc-start-option-summary {
-  justify-content: space-between;
 }
 
 .svc-hero {
@@ -46,21 +25,32 @@
   padding: 8px 14px;
 }
 
+.svc-panel-header {
+  min-height: 44px;
+  padding: 7px 10px;
+  background: #f8fbff;
+  border-bottom: 1px solid #dbeafe;
+}
+
+.svc-panel-body {
+  padding: 8px;
+}
+
 .svc-eyebrow {
+  margin: 0 0 4px;
   color: #0369a1;
   font-size: 9px;
   font-weight: 900;
   line-height: var(--q-line-height-label, 1.4);
-  margin: 0 0 4px;
   text-transform: uppercase;
 }
 
 .svc-hero h1,
 .svc-panel-header h2 {
+  margin: 0 0 4px;
   color: #0f172a;
   font-size: 18px;
   font-weight: 900;
-  margin: 0 0 4px;
 }
 
 .svc-hero span,
@@ -68,46 +58,15 @@
 .svc-empty p,
 .svc-logo-summary p,
 .svc-workflow-context-header p {
+  margin: 0;
   color: #64748b;
   font-size: 10px;
-  margin: 0;
 }
 
-.svc-workspace {
-  align-items: start;
-  display: grid;
-  gap: 10px;
-  grid-template-columns: minmax(470px, 1fr) minmax(390px, .82fr);
-}
-
-
-.svc-branch-assignment-workspace {
-  align-items: start;
-  display: grid;
-  gap: 10px;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-}
-
-.svc-branch-assignment-column {
-  overflow: hidden;
-}
-
-
+.svc-branch-assignment-column,
 .svc-editor {
-  overflow: visible;
-}
-
-.svc-panel-header {
-  background: #f8fbff;
-  border-bottom: 1px solid #dbeafe;
-  min-height: 44px;
-  padding: 7px 10px;
-}
-
-.svc-panel-body {
-  display: grid;
-  gap: 8px;
-  padding: 8px;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .svc-primary-btn,
@@ -115,43 +74,39 @@
 .svc-danger-btn,
 .svc-success-btn,
 .svc-icon-btn {
-  align-items: center;
-  border: 1px solid transparent;
-  border-radius: 7px;
-  display: inline-flex;
-  font-size: 11px;
-  font-weight: 850;
-  gap: 5px;
-  justify-content: center;
   min-height: 29px;
   padding: 0 10px;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  font-size: 11px;
+  font-weight: 850;
   white-space: nowrap;
 }
 
 .svc-primary-btn {
+  color: #fff;
   background: #0284c7;
   border-color: #0284c7;
-  color: #fff;
 }
 
 .svc-secondary-btn {
+  color: #0369a1;
   background: #fff;
   border-color: #bae6fd;
-  color: #0369a1;
 }
 
 .svc-danger-btn,
 .svc-danger-fill {
+  color: #e11d48;
   background: #fff;
   border-color: #fecdd3;
-  color: #e11d48;
 }
 
 .svc-success-btn,
 .svc-success-fill {
+  color: #047857;
   background: #fff;
   border-color: #bbf7d0;
-  color: #047857;
 }
 
 .svc-danger-fill,
@@ -170,37 +125,34 @@
 }
 
 .svc-icon-btn {
-  background: #fff;
-  border-color: #dbeafe;
-  color: #0369a1;
+  width: 28px;
   height: 28px;
   min-height: 28px;
   padding: 0;
-  width: 28px;
+  color: #0369a1;
+  background: #fff;
+  border-color: #dbeafe;
 }
 
 :where(button, input, select, textarea):disabled {
-  opacity: .55;
+  opacity: 0.55;
 }
 
 .svc-empty {
-  align-content: center;
-  background: #f8fbff;
-  border: 1px dashed #7dd3fc;
-  border-radius: 8px;
-  display: grid;
-  justify-items: center;
   min-height: 250px;
   padding: 20px;
   text-align: center;
+  background: #f8fbff;
+  border: 1px dashed #7dd3fc;
+  border-radius: 8px;
 }
 
 .svc-empty h2,
 .svc-empty h3 {
+  margin: 8px 0 0;
   color: #0f172a;
   font-size: 22px;
   font-weight: 800;
-  margin: 8px 0 0;
 }
 
 .svc-empty > .bi,
@@ -210,89 +162,68 @@
 }
 
 .svc-access-denied {
-  border-color: #fecaca;
   color: #be123c;
+  border-color: #fecaca;
 }
 
 .svc-note {
+  margin: 0 0 6px;
+  padding: 5px 7px;
+  color: #0369a1;
   background: #f0f9ff;
   border: 1px solid #bae6fd;
   border-radius: 7px;
-  color: #0369a1;
-  display: inline-flex;
   font-size: 10px;
   font-weight: 800;
-  gap: 5px;
-  margin: 0 0 6px;
-  padding: 5px 7px;
 }
 
 .svc-note-danger {
+  color: #be123c;
   background: #fff1f2;
   border-color: #fecaca;
-  color: #be123c;
 }
 
 .svc-note-warning {
+  color: #c2410c;
   background: #fffbeb;
   border-color: #fed7aa;
-  color: #c2410c;
-}
-
-.svc-details-view,
-.svc-form,
-.svc-related-workflows {
-  display: grid;
-  gap: 8px;
 }
 
 .svc-logo-summary {
+  padding: 8px;
   background: #f8fbff;
   border: 1px solid #dbeafe;
   border-radius: 8px;
-  gap: 8px;
-  padding: 8px;
 }
 
 .svc-logo-summary h3,
 .svc-form-section h3,
 .svc-workflow-context-header h3 {
+  margin: 0 0 5px;
   color: #0f172a;
   font-size: 14px;
   font-weight: 900;
-  margin: 0 0 5px;
 }
 
 .svc-logo {
-  align-items: center;
+  width: 50px;
+  height: 50px;
+  flex: 0 0 auto;
+  object-fit: contain;
+  color: #0369a1;
   background: #fff;
   border: 1px solid #dbeafe;
   border-radius: 8px;
-  color: #0369a1;
-  display: inline-flex;
-  flex: 0 0 auto;
-  height: 50px;
-  justify-content: center;
-  object-fit: contain;
-  width: 50px;
-}
-
-
-.svc-details-grid {
-  display: grid;
-  gap: 7px;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  margin: 0;
 }
 
 .svc-details-grid > div,
 .svc-parent-lock,
 .svc-related-workflow-card,
 .svc-start-option-summary {
+  padding: 7px;
   background: #fff;
   border: 1px solid #e2e8f0;
   border-radius: 8px;
-  padding: 7px;
 }
 
 .svc-details-grid dt,
@@ -305,11 +236,11 @@
 
 .svc-details-grid dd,
 .svc-parent-lock strong {
+  margin: 2px 0 0;
+  overflow: hidden;
   color: #0f172a;
   font-size: 11px;
   font-weight: 800;
-  margin: 2px 0 0;
-  overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -317,38 +248,23 @@
 .svc-workflow-context,
 .svc-workflow-start-options,
 .svc-form-section {
-  display: grid;
-  gap: 7px;
   padding: 8px;
-}
-
-.svc-workflow-context-header {
-  gap: 8px;
 }
 
 .svc-mini-loading,
 .svc-workflow-path span,
 .svc-start-option-list span {
+  padding: 4px 7px;
+  color: #0369a1;
   background: #eff6ff;
   border-radius: 999px;
-  color: #0369a1;
-  display: inline-flex;
   font-size: 10px;
   font-weight: 800;
-  padding: 4px 7px;
-}
-
-.svc-workflow-path,
-.svc-start-option-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-  margin-top: 6px;
 }
 
 .svc-workflow-path span.matched {
-  background: #fff7ed;
   color: #c2410c;
+  background: #fff7ed;
 }
 
 .svc-related-workflow-title strong {
@@ -367,48 +283,26 @@
   font-size: 10px;
 }
 
-.svc-form-grid,
-.svc-form-row {
+.svc-form-row-support,
+.svc-form-row-metrics {
   display: grid;
   gap: 8px;
 }
 
-.svc-form-grid.two-cols {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.svc-form-grid.three-cols {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-
-.svc-form-grid.five-cols {
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-}
-
 .svc-form-row-support {
-  grid-template-columns: minmax(210px, .68fr) minmax(0, 1.32fr);
+  grid-template-columns: minmax(210px, 0.68fr) minmax(0, 1.32fr);
 }
 
 .svc-form-row-metrics {
-  grid-template-columns: minmax(240px, .62fr) minmax(0, 1.38fr);
-}
-
-.svc-field {
-  display: grid;
-  gap: 3px;
-  min-width: 0;
+  grid-template-columns: minmax(240px, 0.62fr) minmax(0, 1.38fr);
 }
 
 .svc-input {
-  background: #fff;
-  border: 1px solid #cbd5e1;
-  border-radius: 7px;
-  color: #0f172a;
-  font-size: 11px;
   min-height: 30px;
-  outline: 0;
-  padding: 0 8px;
-  width: 100%;
+  color: #0f172a;
+  border-color: #cbd5e1;
+  border-radius: 7px;
+  font-size: 11px;
 }
 
 textarea.svc-input,
@@ -423,7 +317,6 @@ textarea.svc-input,
   box-shadow: 0 0 0 2px #bae6fd;
 }
 
- .svc-field small,
 .svc-field-error,
 .svc-field-error.wide,
 .svc-field-help,
@@ -433,7 +326,7 @@ textarea.svc-input,
   font-weight: 750;
 }
 
- .svc-field-help,
+.svc-field-help,
 .svc-field-help.wide {
   color: #0369a1;
 }
@@ -442,35 +335,26 @@ textarea.svc-input,
   grid-column: 1 / -1;
 }
 
-.svc-actions,
-.svc-dialog-actions {
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
 .svc-form-actions,
 .svc-dialog-actions {
-  border-top: 1px solid #e2e8f0;
-  justify-content: flex-end;
   padding-top: 8px;
+  border-top: 1px solid #e2e8f0;
 }
 
 .toast-stack {
   position: fixed;
-  right: 16px;
-  top: 16px;
+  inset-block-start: 16px;
+  inset-inline-end: 16px;
   z-index: 1200;
 }
 
 .toast-item {
+  max-width: 400px;
+  padding: 9px 11px;
   background: #fff;
   border: 1px solid #bae6fd;
   border-radius: 8px;
   box-shadow: 0 14px 28px #0f172a24;
-  display: flex;
-  gap: 7px;
-  max-width: 400px;
-  padding: 9px 11px;
 }
 
 .toast-item p {
@@ -482,69 +366,45 @@ textarea.svc-input,
 .toast-info { color: #0369a1; }
 
 .toast-close {
+  padding: 0;
+  margin-inline-start: auto;
+  color: inherit;
   background: transparent;
   border: 0;
-  color: inherit;
-  margin-inline-start: auto;
-  padding: 0;
 }
 
 .svc-dialog-backdrop {
-  background: #0f172a66;
-  inset: 0;
   position: fixed;
+  inset: 0;
   z-index: 1000;
+  background: #0f172a66;
 }
 
 .svc-dialog {
-  left: 50%;
-  max-width: calc(100vw - 24px);
   position: fixed;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  width: 440px;
+  inset: 50% auto auto 50%;
   z-index: 1001;
+  width: 440px;
+  max-width: calc(100vw - 24px);
+  transform: translate(-50%, -50%);
 }
 
 .svc-dialog .svc-panel-body p {
-  color: #475569;
   margin: 0;
+  color: #475569;
+}
+
+.svc-central-filters {
+  padding: 9px 12px;
 }
 
 @media (max-width: 1199.98px) {
-  .svc-workspace,
-  .svc-branch-assignment-workspace,
   .svc-form-row-support,
   .svc-form-row-metrics {
     grid-template-columns: 1fr;
   }
-
-  .svc-details-grid,
-  .svc-form-grid.five-cols {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
 }
-
 @media (max-width: 767.98px) {
-  .service-management-page {
-    padding-inline: 7px;
-  }
-
-  .svc-hero,
-  .svc-panel-header,
-  .svc-logo-summary,
-  .svc-workflow-context-header,
-  .svc-start-option-summary {
-    align-items: stretch;
-    flex-direction: column;
-  }
-
-  .svc-details-grid,
-  .svc-form-grid.two-cols,
-  .svc-form-grid.three-cols,
-  .svc-form-grid.five-cols {
-    grid-template-columns: 1fr;
-  }
 
   .svc-primary-btn,
   .svc-secondary-btn,
@@ -552,25 +412,5 @@ textarea.svc-input,
   .svc-success-btn {
     width: 100%;
   }
-
-  .svc-actions,
-  .svc-dialog-actions {
-    justify-content: stretch;
-  }
-}
-.svc-central-filters {
-  background: #fff;
-  border: 1px solid #d7e8ff;
-  border-radius: 8px;
-  box-shadow: 0 8px 18px #0f172a0d;
-  display: grid;
-  gap: 8px;
-  grid-template-columns: repeat(3, minmax(160px, 1fr));
-  padding: 9px 12px;
 }
 
-@media (max-width: 767.98px) {
-  .svc-central-filters {
-    grid-template-columns: 1fr;
-  }
-}

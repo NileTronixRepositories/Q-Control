@@ -1,5 +1,4 @@
-<section class="technical-admin-responsive-page terminal-management-page container-fluid" [attr.dir]="direction()" [attr.lang]="language()">
-  <!-- Header -->
+﻿<section class="technical-admin-responsive-page terminal-management-page container-fluid" [attr.dir]="direction()" [attr.lang]="language()">
   <app-technical-admin-page-hero
     [eyebrow]="translations().title"
     [title]="translations().title"
@@ -13,8 +12,6 @@
       </button>
     }
   </app-technical-admin-page-hero>
-
-  <!-- Toast -->
   @if (message(); as currentMessage) {
     <div class="toast-stack" role="status" aria-live="polite" aria-atomic="true">
       <div
@@ -40,8 +37,6 @@
       </div>
     </div>
   }
-
-  <!-- No Access -->
   @if (!hasTerminalAccess()) {
     <section class="empty-state">
       <i class="bi bi-shield-lock"></i>
@@ -55,7 +50,6 @@
       </p>
     </section>
   } @else {
-    <!-- Tabs -->
     <div class="tabs">
       @if (canViewActive()) {
         <button
@@ -81,19 +75,15 @@
         </button>
       }
     </div>
-
-    <!-- Active -->
     @if (activeTab() === 'active') {
       <section class="list-panel">
-        <!-- Toolbar -->
-        <div class="filters-grid">
-          <!-- Search -->
-          <div class="filter-cell filter-cell-wide">
+        <div class="row g-3 align-items-end">
+          <div class="col-12 col-lg-5">
             <label class="filter-field">
               <span>{{ translations().searchPlaceholder }}</span>
 
               <input
-                class="field-control"
+                class="form-control"
                 type="search"
                 [value]="activeSearch()"
                 [placeholder]="translations().searchPlaceholder"
@@ -101,14 +91,12 @@
               />
             </label>
           </div>
-
-          <!-- Window -->
-          <div class="filter-cell">
+          <div class="col-12 col-md-4 col-lg-3">
             <label class="filter-field">
               <span>{{ translations().windowFilter }}</span>
 
               <select
-                class="field-control"
+                class="form-select"
                 [value]="activeWindowId() ?? ''"
                 (change)="updateActiveWindowFilter($event)"
               >
@@ -124,14 +112,12 @@
               </select>
             </label>
           </div>
-
-          <!-- Page Size -->
-          <div class="filter-cell filter-cell-small">
+          <div class="col-12 col-md-4 col-lg-2">
             <label class="filter-field">
               <span>{{ translations().pageSize }}</span>
 
               <select
-                class="field-control"
+                class="form-select"
                 [value]="activePageSize()"
                 (change)="updateActivePageSize($event)"
               >
@@ -142,9 +128,7 @@
               </select>
             </label>
           </div>
-
-          <!-- Refresh -->
-          <div class="filter-cell filter-cell-small">
+          <div class="col-12 col-md-4 col-lg-2">
             <button
               type="button"
               class="secondary-action"
@@ -157,16 +141,12 @@
             </button>
           </div>
         </div>
-
-        <!-- Loading -->
         @if (activeLoading()) {
           <app-niletronix-loading-state [title]="translations().loading" variant="inline" size="sm" />
         }
-
-        <!-- Table -->
         @if (activeTerminalsPage().data.length > 0) {
-          <div data-testid="terminals-active-desktop" class="table-wrap hidden md:block">
-            <table class="custom-table">
+          <div data-testid="terminals-active-desktop" class="table-responsive table-wrap d-none d-md-block">
+            <table class="table align-middle custom-table">
               <thead>
                 <tr>
                   <th>{{ translations().terminalNumber }}</th>
@@ -204,7 +184,7 @@
                     </td>
 
                     <td>
-                      <div class="row-actions">
+                      <div class="row-actions d-flex align-items-center justify-content-center gap-2 flex-wrap">
                         @if (canViewDetails()) {
                           <button
                             type="button"
@@ -250,28 +230,28 @@
               </tbody>
             </table>
           </div>
-          <div data-testid="terminals-active-mobile" class="grid gap-3 md:hidden">
+          <div data-testid="terminals-active-mobile" class="d-grid gap-3 d-md-none">
             @for (item of activeTerminalsPage().data; track terminalIdentity(item)) {
               <app-technical-admin-mobile-record-card [eyebrow]="translations().terminalNumber" [title]="formatText(item.type)" icon="bi bi-pc-display-horizontal" [recordId]="item.number">
                 <div record-fields>
-                  <dt class="text-[11px] font-extrabold text-slate-500">{{ translations().branch }}</dt>
-                  <dd class="mb-0 mt-1 break-words font-bold text-slate-800">{{ branchLabel(item.branchArabicName, item.branchEnglishName) }}</dd>
+                  <dt class="small fw-bold text-muted text-uppercase">{{ translations().branch }}</dt>
+                  <dd class="mb-0 mt-1 text-break fw-bold">{{ branchLabel(item.branchArabicName, item.branchEnglishName) }}</dd>
                 </div>
                 <div record-fields>
-                  <dt class="text-[11px] font-extrabold text-slate-500">{{ translations().windowNumber }}</dt>
-                  <dd class="mb-0 mt-1 font-bold text-slate-800">{{ item.windowNumber }}</dd>
+                  <dt class="small fw-bold text-muted text-uppercase">{{ translations().windowNumber }}</dt>
+                  <dd class="mb-0 mt-1 fw-bold">{{ item.windowNumber }}</dd>
                 </div>
                 <div record-fields>
-                  <dt class="text-[11px] font-extrabold text-slate-500">{{ translations().waitingAreaNumber }}</dt>
-                  <dd class="mb-0 mt-1 font-bold text-slate-800">{{ item.waitingAreaNumber }}</dd>
+                  <dt class="small fw-bold text-muted text-uppercase">{{ translations().waitingAreaNumber }}</dt>
+                  <dd class="mb-0 mt-1 fw-bold">{{ item.waitingAreaNumber }}</dd>
                 </div>
                 <div record-fields>
-                  <dt class="text-[11px] font-extrabold text-slate-500">{{ translations().ipAddress }}</dt>
-                  <dd class="mb-0 mt-1 break-all font-bold text-slate-800" dir="ltr">{{ formatText(item.ipAddress) }}</dd>
+                  <dt class="small fw-bold text-muted text-uppercase">{{ translations().ipAddress }}</dt>
+                  <dd class="mb-0 mt-1 text-break fw-bold" dir="ltr">{{ formatText(item.ipAddress) }}</dd>
                 </div>
-                <div record-fields class="min-[430px]:col-span-2">
-                  <dt class="text-[11px] font-extrabold text-slate-500">{{ translations().serialNumber }}</dt>
-                  <dd class="mb-0 mt-1 break-all font-bold text-slate-800" dir="ltr">{{ formatText(item.serialNo) }}</dd>
+                <div record-fields class="record-field-wide">
+                  <dt class="small fw-bold text-muted text-uppercase">{{ translations().serialNumber }}</dt>
+                  <dd class="mb-0 mt-1 text-break fw-bold" dir="ltr">{{ formatText(item.serialNo) }}</dd>
                 </div>
                 @if (canViewDetails()) {
                   <button record-actions type="button" class="icon-action" [attr.aria-label]="translations().view" [title]="translations().view" [disabled]="!hasTerminalIdentity(item)" (click)="openView(item)"><i class="bi bi-eye"></i></button>
@@ -286,8 +266,6 @@
             }
           </div>
         }
-
-        <!-- Empty -->
         @else if (!activeLoading()) {
           <div class="empty-state">
             <i class="bi bi-hourglass-split"></i>
@@ -297,17 +275,15 @@
             </h2>
           </div>
         }
-
-        <!-- Pagination -->
         <footer
-          class="pagination-bar"
+          class="pagination-bar d-flex align-items-center justify-content-between gap-3 mt-3 flex-column flex-md-row"
         >
           <span>
             {{ translations().totalItems }}:
             {{ activeTerminalsPage().totalItems }}
           </span>
 
-          <div class="pagination-actions">
+          <div class="pagination-actions d-flex align-items-center gap-2 flex-wrap justify-content-center">
             <button
               type="button"
               class="secondary-action compact-action"
@@ -335,17 +311,15 @@
         </footer>
       </section>
     }
-
-    <!-- Deleted -->
     @if (activeTab() === 'deleted') {
       <section class="list-panel">
-        <div class="filters-grid">
-          <div class="filter-cell filter-cell-wide">
+        <div class="row g-3 align-items-end">
+          <div class="col-12 col-lg-5">
             <label class="filter-field">
               <span>{{ translations().searchPlaceholder }}</span>
 
               <input
-                class="field-control"
+                class="form-control"
                 type="search"
                 [value]="deletedSearch()"
                 [placeholder]="translations().searchPlaceholder"
@@ -354,12 +328,12 @@
             </label>
           </div>
 
-          <div class="filter-cell">
+          <div class="col-12 col-md-4 col-lg-3">
             <label class="filter-field">
               <span>{{ translations().windowFilter }}</span>
 
               <select
-                class="field-control"
+                class="form-select"
                 [value]="deletedWindowId() ?? ''"
                 (change)="updateDeletedWindowFilter($event)"
               >
@@ -376,12 +350,12 @@
             </label>
           </div>
 
-          <div class="filter-cell filter-cell-small">
+          <div class="col-12 col-md-4 col-lg-2">
             <label class="filter-field">
               <span>{{ translations().pageSize }}</span>
 
               <select
-                class="field-control"
+                class="form-select"
                 [value]="deletedPageSize()"
                 (change)="updateDeletedPageSize($event)"
               >
@@ -393,7 +367,7 @@
             </label>
           </div>
 
-          <div class="filter-cell filter-cell-small">
+          <div class="col-12 col-md-4 col-lg-2">
             <button
               type="button"
               class="secondary-action"
@@ -412,8 +386,8 @@
         }
 
         @if (deletedTerminalsPage().data.length > 0) {
-          <div data-testid="terminals-deleted-desktop" class="table-wrap hidden md:block">
-            <table class="custom-table">
+          <div data-testid="terminals-deleted-desktop" class="table-responsive table-wrap d-none d-md-block">
+            <table class="table align-middle custom-table">
               <thead>
                 <tr>
                   <th>{{ translations().terminalNumber }}</th>
@@ -452,7 +426,7 @@
 
 
                     <td>
-                      <div class="row-actions">
+                      <div class="row-actions d-flex align-items-center justify-content-center gap-2 flex-wrap">
                         @if (canReactivate()) {
                           <button
                             type="button"
@@ -485,29 +459,29 @@
               </tbody>
             </table>
           </div>
-          <div data-testid="terminals-deleted-mobile" class="grid gap-3 md:hidden">
+          <div data-testid="terminals-deleted-mobile" class="d-grid gap-3 d-md-none">
             @for (item of deletedTerminalsPage().data; track terminalIdentity(item)) {
               <app-technical-admin-mobile-record-card [eyebrow]="translations().terminalNumber" [title]="formatText(item.type)" icon="bi bi-pc-display-horizontal" [recordId]="item.number">
                 <span record-badges class="status-pill status-inactive">{{ translations().deletedTab }}</span>
                 <div record-fields>
-                  <dt class="text-[11px] font-extrabold text-slate-500">{{ translations().branch }}</dt>
-                  <dd class="mb-0 mt-1 break-words font-bold text-slate-800">{{ branchLabel(item.branchArabicName, item.branchEnglishName) }}</dd>
+                  <dt class="small fw-bold text-muted text-uppercase">{{ translations().branch }}</dt>
+                  <dd class="mb-0 mt-1 text-break fw-bold">{{ branchLabel(item.branchArabicName, item.branchEnglishName) }}</dd>
                 </div>
                 <div record-fields>
-                  <dt class="text-[11px] font-extrabold text-slate-500">{{ translations().windowNumber }}</dt>
-                  <dd class="mb-0 mt-1 font-bold text-slate-800">{{ item.windowNumber }}</dd>
+                  <dt class="small fw-bold text-muted text-uppercase">{{ translations().windowNumber }}</dt>
+                  <dd class="mb-0 mt-1 fw-bold">{{ item.windowNumber }}</dd>
                 </div>
                 <div record-fields>
-                  <dt class="text-[11px] font-extrabold text-slate-500">{{ translations().waitingAreaNumber }}</dt>
-                  <dd class="mb-0 mt-1 font-bold text-slate-800">{{ item.waitingAreaNumber }}</dd>
+                  <dt class="small fw-bold text-muted text-uppercase">{{ translations().waitingAreaNumber }}</dt>
+                  <dd class="mb-0 mt-1 fw-bold">{{ item.waitingAreaNumber }}</dd>
                 </div>
                 <div record-fields>
-                  <dt class="text-[11px] font-extrabold text-slate-500">{{ translations().ipAddress }}</dt>
-                  <dd class="mb-0 mt-1 break-all font-bold text-slate-800" dir="ltr">{{ formatText(item.ipAddress) }}</dd>
+                  <dt class="small fw-bold text-muted text-uppercase">{{ translations().ipAddress }}</dt>
+                  <dd class="mb-0 mt-1 text-break fw-bold" dir="ltr">{{ formatText(item.ipAddress) }}</dd>
                 </div>
-                <div record-fields class="min-[430px]:col-span-2">
-                  <dt class="text-[11px] font-extrabold text-slate-500">{{ translations().serialNumber }}</dt>
-                  <dd class="mb-0 mt-1 break-all font-bold text-slate-800" dir="ltr">{{ formatText(item.serialNo) }}</dd>
+                <div record-fields class="record-field-wide">
+                  <dt class="small fw-bold text-muted text-uppercase">{{ translations().serialNumber }}</dt>
+                  <dd class="mb-0 mt-1 text-break fw-bold" dir="ltr">{{ formatText(item.serialNo) }}</dd>
                 </div>
                 @if (canReactivate()) {
                   <button record-actions type="button" class="icon-action success-action" [attr.aria-label]="translations().restore" [title]="translations().restore" [disabled]="!hasTerminalIdentity(item)" (click)="requestRestore(item)"><i class="bi bi-play-circle"></i></button>
@@ -529,14 +503,14 @@
         }
 
         <footer
-          class="pagination-bar"
+          class="pagination-bar d-flex align-items-center justify-content-between gap-3 mt-3 flex-column flex-md-row"
         >
           <span>
             {{ translations().totalItems }}:
             {{ deletedTerminalsPage().totalItems }}
           </span>
 
-          <div class="pagination-actions">
+          <div class="pagination-actions d-flex align-items-center gap-2 flex-wrap justify-content-center">
             <button
               type="button"
               class="secondary-action compact-action"
@@ -564,12 +538,10 @@
         </footer>
       </section>
     }
-    <!-- Popup -->
     @if (panelMode() !== 'closed') {
       <div class="editor-backdrop app-popup-overlay" (click)="closePanel()"></div>
 
       <aside class="editor-panel app-popup-panel terminal-editor-panel" role="dialog">
-        <!-- Header -->
         <header class="terminal-editor-panel-header">
           <h2>
             {{ panelTitle() }}
@@ -579,8 +551,6 @@
             <i class="bi bi-x-lg"></i>
           </button>
         </header>
-
-        <!-- Details -->
         @if (panelMode() === 'view' && selectedDetails()) {
           <dl class="details-list">
             <div>
@@ -635,22 +605,20 @@
         @if (panelMode() === 'view' && !selectedDetails()) {
           <app-niletronix-loading-state [title]="translations().loading" variant="inline" size="sm" />
         }
-        <!-- Form -->
         @if (panelMode() === 'create' || panelMode() === 'edit') {
           <form
-            class="editor-form terminal-editor-form"
+            class="editor-form terminal-editor-form row g-3"
             [formGroup]="terminalForm"
             (ngSubmit)="saveTerminal()"
             novalidate
           >
-            <!-- Window -->
-            <div class="form-cell form-cell-full">
+            <div class="form-cell form-cell-full col-12">
               <label class="form-field">
                 <span>
                   {{ translations().windowFilter }}
                 </span>
 
-                <select class="field-control" formControlName="windowId">
+                <select class="form-select" formControlName="windowId">
                   <option [value]="0">
                     {{ translations().selectWindow }}
                   </option>
@@ -667,15 +635,13 @@
                 }
               </label>
             </div>
-
-            <!-- Number -->
-            <div class="form-cell">
+            <div class="form-cell col-12 col-md-6">
               <label class="form-field">
                 <span>
                   {{ translations().terminalNumber }}
                 </span>
 
-                <input class="field-control" type="text" maxlength="20" formControlName="number" />
+                <input class="form-control" type="text" maxlength="20" formControlName="number" />
 
                 @if (hasTerminalFormError('number')) {
                   <small>
@@ -688,15 +654,13 @@
                 }
               </label>
             </div>
-
-            <!-- IP -->
-            <div class="form-cell">
+            <div class="form-cell col-12 col-md-6">
               <label class="form-field">
                 <span>
                   {{ translations().ipAddress }}
                 </span>
 
-                <input class="field-control" type="text" maxlength="45" formControlName="ipAddress" />
+                <input class="form-control" type="text" maxlength="45" formControlName="ipAddress" />
 
                 @if (hasTerminalFormError('ipAddress')) {
                   <small>
@@ -711,15 +675,13 @@
                 }
               </label>
             </div>
-
-            <!-- Serial -->
-            <div class="form-cell">
+            <div class="form-cell col-12 col-md-6">
               <label class="form-field">
                 <span>
                   {{ translations().serialNumber }}
                 </span>
 
-                <input class="field-control" type="text" maxlength="100" formControlName="serialNo" />
+                <input class="form-control" type="text" maxlength="100" formControlName="serialNo" />
 
                 @if (hasTerminalFormError('serialNo')) {
                   <small>
@@ -732,15 +694,13 @@
                 }
               </label>
             </div>
-
-            <!-- Type -->
-            <div class="form-cell">
+            <div class="form-cell col-12 col-md-6">
               <label class="form-field">
                 <span>
                   {{ translations().typeLabel }}
                 </span>
 
-                <input class="field-control" type="text" maxlength="100" formControlName="type" />
+                <input class="form-control" type="text" maxlength="100" formControlName="type" />
 
                 @if (hasTerminalFormError('type')) {
                   <small>
@@ -753,9 +713,7 @@
                 }
               </label>
             </div>
-
-            <!-- Actions -->
-            <div class="form-actions">
+            <div class="form-actions col-12 d-flex flex-wrap justify-content-end gap-2">
               <button type="button" class="secondary-action" (click)="closePanel()">
                 {{ translations().cancel }}
               </button>
@@ -835,3 +793,6 @@
     }
   }
 </section>
+
+
+

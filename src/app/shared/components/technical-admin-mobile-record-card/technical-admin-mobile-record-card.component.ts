@@ -4,6 +4,7 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
   selector: 'app-technical-admin-mobile-record-card',
   standalone: true,
   templateUrl: './technical-admin-mobile-record-card.component.html',
+  styleUrl: './technical-admin-mobile-record-card.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TechnicalAdminMobileRecordCardComponent {

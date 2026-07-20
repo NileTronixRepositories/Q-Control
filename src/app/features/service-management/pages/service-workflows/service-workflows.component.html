@@ -1,5 +1,5 @@
-<section
-  class="technical-admin-responsive-page workflow-page"
+﻿<section
+  class="technical-admin-responsive-page workflow-page container-fluid d-grid gap-3 p-3 p-lg-4 w-100"
   [attr.dir]="direction()"
   [attr.lang]="language()"
 >
@@ -10,11 +10,10 @@
     icon="bi bi-signpost-split-fill"
   >
     @if (store.scope()) {
-      <div hero-actions class="workflow-hero-actions">
+      <div hero-actions class="workflow-hero-actions d-flex align-items-center flex-wrap gap-2">
         @if (canCreate()) {
           <button type="button" class="primary-action" (click)="openCreate()">
-            <i class="bi bi-plus-lg" aria-hidden="true"></i>
-            {{ translations().createWorkflow }}
+            <i class="bi bi-plus-lg" aria-hidden="true"></i> {{ translations().createWorkflow }}
           </button>
         }
         <button type="button" class="secondary-action" (click)="backToScopeSelection()">
@@ -23,7 +22,6 @@
       </div>
     }
   </app-technical-admin-page-hero>
-
   @if (store.message(); as message) {
     <div class="toast-stack workflow-toast" role="status" aria-live="polite" aria-atomic="true">
       <div
@@ -51,7 +49,6 @@
       </div>
     </div>
   }
-
   @if (!canViewAll()) {
     <section class="empty-state workflow-state-card">
       <i class="bi bi-shield-lock" aria-hidden="true"></i>
@@ -66,13 +63,13 @@
       </button>
     </section>
   } @else if (!store.scope()) {
-    <section class="workflow-scope-stack">
+    <section class="workflow-scope-stack d-grid gap-3">
       @if (!isBranchAdmin()) {
         <section class="list-panel workflow-branch-panel">
           <label class="filter-field workflow-branch-field">
             <span>{{ translations().branch }}</span>
             <select
-              class="field-control"
+              class="form-select"
               [disabled]="store.branchesLoading()"
               [value]="store.selectedBranchId() ?? ''"
               (change)="selectBranch($event)"
@@ -85,7 +82,6 @@
           </label>
         </section>
       }
-
       @if (store.selectedBranchId()) {
         <section class="workflow-tree-shell">
           <app-service-hierarchy-tree
@@ -119,8 +115,10 @@
       }
     </section>
   } @else if (store.scope(); as scope) {
-    <section class="workflow-content-stack">
-      <header class="workflow-owner-card">
+    <section class="workflow-content-stack d-grid gap-3">
+      <header
+        class="workflow-owner-card d-flex align-items-center justify-content-between flex-wrap gap-3"
+      >
         <div class="workflow-owner-copy">
           <p>{{ translations().workflowOwner }}</p>
           <h2>{{ scope.ownerServiceName }}</h2>
@@ -133,11 +131,12 @@
           </div>
         }
       </header>
-
       <section class="list-panel workflow-list-panel">
-        <header class="workflow-list-header">
+        <header
+          class="workflow-list-header d-flex align-items-center justify-content-between flex-wrap gap-3"
+        >
           <h2>{{ translations().workflowList }}</h2>
-          <div class="workflow-toolbar-actions">
+          <div class="workflow-toolbar-actions d-flex align-items-center flex-wrap gap-2">
             <button type="button" class="secondary-action compact-action" (click)="toggleFilters()">
               {{ filtersExpanded() ? translations().hideFilters : translations().showFilters }}
             </button>
@@ -147,30 +146,28 @@
               [disabled]="store.listLoading()"
               (click)="refresh()"
             >
-              <i class="bi bi-arrow-clockwise" aria-hidden="true"></i>
-              {{ translations().refresh }}
+              <i class="bi bi-arrow-clockwise" aria-hidden="true"></i> {{ translations().refresh }}
             </button>
           </div>
         </header>
-
         @if (filtersExpanded()) {
-          <div class="filters-grid workflow-filter-grid">
-            <div class="filter-cell filter-cell-wide">
-              <label class="filter-field">
+          <div class="workflow-filter-grid row g-3 p-3 border-bottom">
+            <div class="col-12 col-lg-5">
+              <label class="filter-field d-grid gap-2 m-0">
                 <span>{{ translations().search }}</span>
                 <input
-                  class="field-control"
+                  class="form-control"
                   type="search"
                   [value]="store.query().searchText"
                   (input)="updateSearch($event)"
                 />
               </label>
             </div>
-            <div class="filter-cell">
-              <label class="filter-field">
+            <div class="col-12 col-md-6 col-lg-3">
+              <label class="filter-field d-grid gap-2 m-0">
                 <span>{{ translations().status }}</span>
                 <select
-                  class="field-control"
+                  class="form-select"
                   [value]="isActiveFilterValue()"
                   (change)="updateStatusFilter($event)"
                 >
@@ -180,11 +177,11 @@
                 </select>
               </label>
             </div>
-            <div class="filter-cell">
-              <label class="filter-field">
+            <div class="col-12 col-md-6 col-lg-3">
+              <label class="filter-field d-grid gap-2 m-0">
                 <span>{{ translations().sortOrder }}</span>
                 <select
-                  class="field-control"
+                  class="form-select"
                   [value]="store.query().orderSort"
                   (change)="updateSort($event)"
                 >
@@ -193,11 +190,11 @@
                 </select>
               </label>
             </div>
-            <div class="filter-cell filter-cell-small">
-              <label class="filter-field">
+            <div class="col-12 col-md-6 col-lg-2">
+              <label class="filter-field d-grid gap-2 m-0">
                 <span>{{ translations().pageSize }}</span>
                 <select
-                  class="field-control"
+                  class="form-select"
                   [value]="store.query().pageSize"
                   (change)="updatePageSize($event)"
                 >
@@ -209,12 +206,14 @@
             </div>
           </div>
         }
-
-        <div class="workflow-list" [attr.aria-busy]="store.listLoading()">
+        <div class="workflow-list d-grid gap-3" [attr.aria-busy]="store.listLoading()">
           @if (store.listLoading()) {
-            <app-niletronix-loading-state [title]="translations().loading" variant="inline" size="sm" />
+            <app-niletronix-loading-state
+              [title]="translations().loading"
+              variant="inline"
+              size="sm"
+            />
           }
-
           @for (workflow of workflows(); track workflow.workflowId) {
             <article class="workflow-card">
               <div class="workflow-card-main">
@@ -241,8 +240,7 @@
                   >
                 </div>
               </div>
-
-              <div class="workflow-card-actions">
+              <div class="workflow-card-actions d-flex align-items-center flex-wrap gap-2">
                 @if (canViewDetails()) {
                   <button
                     type="button"
@@ -295,7 +293,6 @@
                   </button>
                 }
               </div>
-
               <div
                 class="workflow-path-strip"
                 [attr.aria-label]="translations().currentWorkflowPath"
@@ -324,10 +321,11 @@
             }
           }
         </div>
-
-        <footer class="pagination-bar workflow-pagination">
+        <footer
+          class="pagination-bar workflow-pagination d-flex align-items-center justify-content-between flex-wrap gap-3"
+        >
           <span>{{ translations().totalItems }}: {{ store.page().totalItems }}</span>
-          <div class="pagination-actions">
+          <div class="pagination-actions d-flex align-items-center flex-wrap gap-2">
             <button
               type="button"
               class="secondary-action compact-action"
@@ -350,7 +348,6 @@
           </div>
         </footer>
       </section>
-
       @if (store.isPanelOpen()) {
         <div
           class="editor-backdrop app-popup-overlay workflow-backdrop"
@@ -382,11 +379,14 @@
               <i class="bi bi-x-lg" aria-hidden="true"></i>
             </button>
           </header>
-
           <div class="workflow-panel-body">
             @if (store.detailsLoading()) {
-            <app-niletronix-loading-state [title]="translations().loading" variant="inline" size="sm" />
-          } @else if (store.panelMode() === 'view' && store.selectedDetails(); as details) {
+              <app-niletronix-loading-state
+                [title]="translations().loading"
+                variant="inline"
+                size="sm"
+              />
+            } @else if (store.panelMode() === 'view' && store.selectedDetails(); as details) {
               <section class="workflow-detail-view">
                 <div class="workflow-detail-card">
                   <div class="workflow-title-row">
@@ -399,7 +399,6 @@
                   </div>
                   <p>{{ translations().workflowOwner }}: {{ store.scope()?.ownerServiceName }}</p>
                 </div>
-
                 <div class="workflow-path-strip workflow-path-strip--detail">
                   @for (step of sortedSteps(details); track $index; let last = $last) {
                     <span class="workflow-path-chip workflow-path-chip--large">{{
@@ -417,8 +416,7 @@
                     }
                   }
                 </div>
-
-                <div class="workflow-detail-actions">
+                <div class="workflow-detail-actions d-flex align-items-center flex-wrap gap-2">
                   @if (canUpdate() && details.isActive) {
                     <button
                       type="button"
@@ -468,22 +466,19 @@
                 @if (formError(); as error) {
                   <p class="message message-error">{{ error }}</p>
                 }
-
-                <section
-                  class="workflow-form-section workflow-name-grid d-flex flex-column flex-md-row gap-3 flex-wrap"
-                >
-                  <label class="form-field">
+                <section class="workflow-form-section workflow-name-grid row g-3">
+                  <label class="form-field col-12 col-md-6 d-grid gap-2 m-0">
                     <span>{{ translations().arabicName }}</span>
-                    <input class="field-control" maxlength="100" formControlName="arabicName" />
+                    <input class="form-control" maxlength="100" formControlName="arabicName" />
                     @if (hasControlError('arabicName')) {
                       <small class="invalid-feedback d-block">{{
                         translations().maxLength100
                       }}</small>
                     }
                   </label>
-                  <label class="form-field">
+                  <label class="form-field col-12 col-md-6 d-grid gap-2 m-0">
                     <span>{{ translations().englishName }}</span>
-                    <input class="field-control" maxlength="100" formControlName="englishName" />
+                    <input class="form-control" maxlength="100" formControlName="englishName" />
                     @if (hasControlError('englishName')) {
                       <small class="invalid-feedback d-block">{{
                         translations().maxLength100
@@ -491,7 +486,6 @@
                     }
                   </label>
                 </section>
-
                 <section
                   class="workflow-form-section workflow-builder"
                   [class.workflow-drop-active]="activeDropIndex() === builderSteps().length"
@@ -504,7 +498,6 @@
                     <h3>{{ translations().currentWorkflowPath }}</h3>
                     <p>{{ translations().duplicateAllowed }}</p>
                   </header>
-
                   <div class="workflow-builder-list">
                     @for (step of builderSteps(); track step.uid; let index = $index) {
                       <article
@@ -566,22 +559,21 @@
                     }
                   </div>
                 </section>
-
                 <section class="workflow-form-section workflow-candidates">
                   <header class="workflow-candidate-filters">
-                    <label class="filter-field">
+                    <label class="filter-field d-grid gap-2 m-0">
                       <span>{{ translations().searchCandidates }}</span>
                       <input
-                        class="field-control"
+                        class="form-control"
                         type="search"
                         [value]="store.candidateQuery().searchText"
                         (input)="updateCandidateSearch($event)"
                       />
                     </label>
-                    <label class="filter-field">
+                    <label class="filter-field d-grid gap-2 m-0">
                       <span>{{ translations().parent }}</span>
                       <select
-                        class="field-control"
+                        class="form-select"
                         [value]="store.candidateQuery().parentServiceId ?? ''"
                         (change)="updateCandidateParent($event)"
                       >
@@ -592,13 +584,11 @@
                       </select>
                     </label>
                   </header>
-
                   @if (replacingStepUid()) {
                     <p class="message message-info workflow-replace-note">
                       {{ translations().replaceStepMode }}
                     </p>
                   }
-
                   <div class="workflow-candidate-grid">
                     @for (candidate of candidateOptions(); track candidate.serviceId) {
                       <button
@@ -628,13 +618,12 @@
                       </p>
                     }
                   </div>
-
                   <footer class="workflow-candidate-footer">
                     <span
                       >{{ store.candidates().totalItems }}
                       {{ translations().candidateServices }}</span
                     >
-                    <div class="workflow-toolbar-actions">
+                    <div class="workflow-toolbar-actions d-flex align-items-center flex-wrap gap-2">
                       <button
                         type="button"
                         class="secondary-action compact-action"
@@ -654,8 +643,9 @@
                     </div>
                   </footer>
                 </section>
-
-                <footer class="form-actions workflow-form-actions">
+                <footer
+                  class="form-actions workflow-form-actions d-flex align-items-center justify-content-end flex-wrap gap-2"
+                >
                   <button type="button" class="secondary-action" (click)="closePanel()">
                     {{ translations().cancel }}
                   </button>
@@ -668,7 +658,6 @@
           </div>
         </aside>
       }
-
       @if (store.confirmState(); as state) {
         <div
           class="editor-backdrop app-popup-overlay workflow-backdrop"
@@ -686,7 +675,9 @@
             <p>{{ confirmBody(state.action) }}</p>
             <strong class="workflow-confirm-name">{{ state.workflowName }}</strong>
           </div>
-          <footer class="dialog-actions workflow-confirm-actions">
+          <footer
+            class="dialog-actions workflow-confirm-actions d-flex align-items-center justify-content-end flex-wrap gap-2"
+          >
             <button
               type="button"
               class="secondary-action"

@@ -1,12 +1,10 @@
-:host {
+﻿:host {
   display: block;
 }
 
 .branch-services-page {
-  display: grid;
-  gap: 10px;
   font-size: 11px;
-  padding: 0 8px 12px;
+  min-width: 0;
 }
 
 .branch-services-hero,

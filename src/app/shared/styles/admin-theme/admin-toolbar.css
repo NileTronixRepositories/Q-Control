@@ -1,4 +1,4 @@
-/* Q-SYSTEM admin toolbar contract for technical admin list pages. */
+﻿/* Q-SYSTEM admin toolbar contract for technical admin list pages. */
 body
   :where(
     .waiting-areas-page,
@@ -8,479 +8,231 @@ body
   ) {
   --q-admin-control-height: 44px;
   --q-admin-control-radius: 10px;
-  --q-admin-toolbar-gap-x: 18px;
-  --q-admin-toolbar-gap-y: 14px;
 }
 
-body :where(.display-management-page, .terminal-management-page) .list-panel > .row:first-child {
-  display: grid !important;
-  grid-template-columns: minmax(320px, 2fr) minmax(220px, 1.1fr) minmax(150px, 0.65fr) minmax(
-      150px,
-      auto
-    ) !important;
-  align-items: end !important;
-  gap: var(--q-admin-toolbar-gap-y) var(--q-admin-toolbar-gap-x) !important;
-  margin: 0 0 18px !important;
+body
+  :where(
+    .waiting-areas-page,
+    .window-management-page,
+    .display-management-page,
+    .terminal-management-page
+  )
+  .list-panel
+  > .row:first-child {
+  margin-bottom: 18px;
 }
 
-body .waiting-areas-page .list-panel > .row:first-child {
-  display: grid !important;
-  grid-template-columns:
-    minmax(320px, 2fr) minmax(180px, 1fr) minmax(180px, 1fr) minmax(150px, 0.75fr)
-    minmax(150px, auto) !important;
-  align-items: end !important;
-  gap: var(--q-admin-toolbar-gap-y) var(--q-admin-toolbar-gap-x) !important;
-  margin: 0 0 18px !important;
-}
-
-
-body :where(.waiting-areas-page) .admin-filter-toolbar {
-  display: grid !important;
-  grid-template-columns:
-    minmax(320px, 2fr) minmax(180px, 1fr) minmax(180px, 1fr) minmax(150px, 0.75fr)
-    minmax(150px, auto) !important;
-  align-items: end !important;
-  gap: 14px 18px !important;
-  margin: 0 0 18px !important;
-  padding: 2px 0 18px !important;
-  border-bottom: 1px solid rgb(var(--q-primary-rgb) / 0.1) !important;
-}
-
-body :where(.waiting-areas-page) .admin-filter-cell {
-  min-width: 0 !important;
-}
-
-body :where(.waiting-areas-page) .admin-filter-field {
-  position: relative !important;
-  display: flex !important;
-  min-width: 0 !important;
-  flex-direction: column !important;
-  gap: 8px !important;
-  margin: 0 !important;
-}
-
-body :where(.waiting-areas-page) .admin-filter-field > span {
-  min-height: 15px !important;
-  margin: 0 !important;
-  color: var(--q-text-secondary) !important;
-  font-size: 0.73rem !important;
-  font-weight: 850 !important;
-  line-height: var(--q-line-height-label, 1.4) !important;
-}
-
-body :where(.waiting-areas-page) .admin-filter-field :where(.form-control, .form-select) {
-  height: 46px !important;
-  min-height: 46px !important;
-  padding-block: 0 !important;
-  padding-inline: 42px 14px !important;
-  color: var(--q-text-secondary) !important;
-  background: rgb(var(--q-surface-card-rgb, 255 255 255) / 0.96) !important;
-  border: 1px solid rgb(var(--q-primary-rgb) / 0.18) !important;
-  border-radius: 12px !important;
-  box-shadow: 0 8px 18px rgb(var(--q-primary-rgb) / 0.04) !important;
-  font-size: 0.86rem !important;
-  font-weight: 500 !important;
-  line-height: 46px !important;
-  transition:
-    border-color var(--nt-motion-base, 160ms) var(--nt-motion-ease, ease),
-    box-shadow var(--nt-motion-base, 160ms) var(--nt-motion-ease, ease),
-    background-color var(--nt-motion-base, 160ms) var(--nt-motion-ease, ease) !important;
-}
-
-body :where(.waiting-areas-page) .admin-filter-field :where(.form-control::placeholder) {
-  color: var(--q-text-muted) !important;
-  opacity: 0.82 !important;
-}
-
-body .waiting-areas-page .admin-filter-cell-search .admin-filter-field > .form-control {
-  padding-inline-start: 50px !important;
-}
-
-body :where(.waiting-areas-page) .admin-filter-field :where(.form-control:hover, .form-select:hover) {
-  background: #ffffff !important;
-  border-color: rgb(var(--q-primary-rgb) / 0.34) !important;
-}
-
-body :where(.waiting-areas-page) .admin-filter-field:focus-within :where(.form-control, .form-select) {
-  background: #ffffff !important;
-  border-color: var(--q-primary) !important;
-  box-shadow: 0 0 0 3px rgb(var(--q-primary-rgb) / 0.13) !important;
-}
-
-body :where(.waiting-areas-page) .admin-filter-field .filter-icon {
-  position: absolute !important;
-  inset-block-end: 16px !important;
-  inset-inline-start: 16px !important;
-  z-index: 2 !important;
-  display: inline-flex !important;
-  width: 14px !important;
-  height: 14px !important;
-  align-items: center !important;
-  justify-content: center !important;
-  color: var(--q-primary) !important;
-  font-size: 0.78rem !important;
-  line-height: 1 !important;
-  opacity: 0.82 !important;
-  pointer-events: none !important;
-}
-
-body :where(.waiting-areas-page) .admin-filter-toolbar .toolbar-action {
-  width: 100% !important;
-  min-width: 150px !important;
-  height: 46px !important;
-  min-height: 46px !important;
-  align-self: end !important;
-  border-radius: 12px !important;
-}
-
-body :where(.waiting-areas-page) .admin-filter-toolbar .toolbar-action > .bi {
-  font-size: 0.82rem !important;
-  line-height: 1 !important;
-}
-
-body .app-shell-rtl :where(.waiting-areas-page) .admin-filter-field :where(.form-control, .form-select) {
-  padding-inline: 14px 42px !important;
-}
-
-body .app-shell-rtl .waiting-areas-page .admin-filter-cell-search .admin-filter-field > .form-control {
-  padding-inline: 14px 50px !important;
-}
-
-body .app-shell-rtl :where(.waiting-areas-page) .admin-filter-field .filter-icon {
-  inset-inline-start: auto !important;
-  inset-inline-end: 15px !important;
-}
 body .window-management-page .toolbar {
-  display: grid !important;
-  grid-template-columns: minmax(280px, 1.8fr) minmax(210px, 1fr) minmax(112px, 0.45fr) minmax(132px, auto) !important;
-  align-items: end !important;
-  gap: 14px 18px !important;
-  margin-bottom: 14px !important;
+  margin-bottom: 14px;
+}
+
+body
+  :where(
+    .waiting-areas-page,
+    .window-management-page,
+    .display-management-page,
+    .terminal-management-page
+  )
+  :is(.filter-field, .admin-filter-field) {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 7px;
+  margin: 0;
+}
+
+body
+  :where(
+    .waiting-areas-page,
+    .window-management-page,
+    .display-management-page,
+    .terminal-management-page
+  )
+  :is(.filter-field, .admin-filter-field)
+  > span {
+  display: flex;
+  min-height: 16px;
+  align-items: center;
+  overflow: hidden;
+  color: var(--q-text-secondary);
+  font-size: var(--q-font-size-small);
+  font-weight: 850;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+body
+  :where(
+    .waiting-areas-page,
+    .window-management-page,
+    .display-management-page,
+    .terminal-management-page
+  )
+  :is(.filter-field, .admin-filter-field)
+  :is(.form-control, .form-select, input, select) {
+  min-width: 0;
+  min-height: var(--q-admin-control-height);
+  border-radius: var(--q-admin-control-radius);
+}
+
+body
+  :where(
+    .waiting-areas-page,
+    .window-management-page,
+    .display-management-page,
+    .terminal-management-page
+  )
+  :is(.filter-field, .admin-filter-field):has(:is(.filter-icon, .window-filter-icon, .search-icon))
+  :is(.form-control, .form-select, input, select) {
+  padding-inline-start: 40px;
+}
+
+body
+  :where(.waiting-areas-page, .window-management-page)
+  :is(.filter-icon, .window-filter-icon),
+body :where(.display-management-page, .terminal-management-page) .search-icon {
+  position: absolute;
+  inset-inline-start: 14px;
+  z-index: 2;
+  color: var(--q-primary);
+  font-size: 0.9rem;
+  line-height: 1;
+  pointer-events: none;
+}
+
+body :where(.waiting-areas-page, .window-management-page) :is(.filter-icon, .window-filter-icon) {
+  inset-block-end: 14px;
+}
+
+body :where(.display-management-page, .terminal-management-page) .search-input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+body :where(.display-management-page, .terminal-management-page) .search-input-wrapper .search-icon {
+  inset-block-start: 50%;
+  transform: translateY(-50%);
+}
+
+body
+  .app-shell-rtl
+  :where(.waiting-areas-page, .window-management-page, .display-management-page, .terminal-management-page)
+  :is(.filter-field, .admin-filter-field):has(:is(.filter-icon, .window-filter-icon, .search-icon))
+  :is(.form-control, .form-select, input, select) {
+  padding-inline: 6px 40px;
+}
+
+body
+  .app-shell-rtl
+  :where(.waiting-areas-page, .window-management-page)
+  :is(.filter-icon, .window-filter-icon),
+body .app-shell-rtl :where(.display-management-page, .terminal-management-page) .search-icon {
+  inset-inline: auto 14px;
+}
+
+body .window-management-page .tabs {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+body .window-management-page .tabs :where(.primary-action, .secondary-action) {
+  min-width: 132px;
+}
+
+body :where(.waiting-areas-page, .window-management-page) :where(.primary-action, .secondary-action, .compact-action) {
+  min-height: var(--q-admin-control-height);
+  padding: 0 18px;
+  border-radius: var(--q-admin-control-radius);
+}
+
+body
+  :where(.display-management-page, .terminal-management-page, .waiting-areas-page, .window-management-page)
+  .list-panel
+  > .row:first-child
+  > div:last-child,
+body .window-management-page .toolbar > button:last-child {
+  display: flex;
+  align-self: end;
 }
 
 body
   :where(.display-management-page, .terminal-management-page, .waiting-areas-page)
   .list-panel
   > .row:first-child
-  > [class*='col-'] {
-  width: auto !important;
-  max-width: none !important;
-  padding: 0 !important;
-}
-
-body :where(.display-management-page, .terminal-management-page) .filter-field,
-body .window-management-page .filter-field {
-  position: relative !important;
-  display: flex !important;
-  min-width: 0 !important;
-  flex-direction: column !important;
-  justify-content: flex-end !important;
-  gap: 7px !important;
-  margin: 0 !important;
-}
-
-body .waiting-areas-page :where(.filter-field:not(.admin-filter-field), .has-field-icon) {
-  position: relative !important;
-  display: block !important;
-}
-
-body
-  :where(.display-management-page, .terminal-management-page, .waiting-areas-page, .window-management-page)
-  :where(.filter-field span, .form-field span) {
-  display: flex !important;
-  min-height: 16px !important;
-  align-items: center !important;
-  overflow: hidden !important;
-  color: var(--q-text-secondary) !important;
-  font-size: var(--q-font-size-small) !important;
-  font-weight: 850 !important;
-  line-height: 1.2 !important;
-  text-overflow: ellipsis !important;
-  white-space: nowrap !important;
-}
-
-body
-  :where(.display-management-page, .terminal-management-page, .waiting-areas-page, .window-management-page)
-  :where(.filter-field, .has-field-icon)
-  :where(input, select, .form-control, .form-select) {
-  width: 100% !important;
-  min-width: 0 !important;
-  height: var(--q-admin-control-height) !important;
-  min-height: var(--q-admin-control-height) !important;
-  padding-block: 0 !important;
-  border-radius: var(--q-admin-control-radius) !important;
-  line-height: var(--q-admin-control-height) !important;
-}
-
-body
-  :where(.display-management-page, .terminal-management-page, .waiting-areas-page, .window-management-page)
-  .filter-field:has(:where(.filter-icon, .window-filter-icon, .form-field-icon))
-  :where(input, select, .form-control, .form-select),
-body
-  :where(.waiting-areas-page, .window-management-page)
-  .has-field-icon:has(:where(.filter-icon, .window-filter-icon, .form-field-icon))
-  :where(input, select, .form-control, .form-select) {
-  padding-inline-start: 40px !important;
-}
-
-body .waiting-areas-page :where(.filter-field:not(.admin-filter-field) .filter-icon, .form-field-icon) {
-  position: absolute !important;
-  inset-inline-start: 14px !important;
-  bottom: 14px !important;
-  z-index: 2 !important;
-  color: var(--q-primary) !important;
-  font-size: 0.92rem !important;
-  line-height: 1 !important;
-  pointer-events: none !important;
-}
-
-body .window-management-page .window-filter-icon {
-  position: absolute !important;
-  inset-block-end: 14px !important;
-  inset-inline-start: 14px !important;
-  z-index: 2 !important;
-  display: inline-flex !important;
-  width: 16px !important;
-  height: 16px !important;
-  align-items: center !important;
-  justify-content: center !important;
-  color: var(--q-primary) !important;
-  font-size: 0.88rem !important;
-  line-height: 1 !important;
-  pointer-events: none !important;
-}
-
-body
-  :where(.display-management-page, .terminal-management-page)
-  .list-panel
-  > .row:first-child
-  > div:last-child {
-  display: flex !important;
-  align-self: end !important;
-}
-
-body
-  :where(.display-management-page, .terminal-management-page)
-  .list-panel
-  > .row:first-child
   > div:last-child
   > :where(button, .btn),
-body
-  :where(.waiting-areas-page, .window-management-page)
-  :where(.toolbar-action, .list-panel > .row:first-child .secondary-action) {
-  width: 100% !important;
-  min-width: 150px !important;
-  height: var(--q-admin-control-height) !important;
-  min-height: var(--q-admin-control-height) !important;
-  align-self: end !important;
-}
-
-body .window-management-page .tabs {
-  display: inline-flex !important;
-  flex-wrap: wrap !important;
-  align-items: center !important;
-  gap: 8px !important;
-}
-
-body .window-management-page .tabs :where(.primary-action, .secondary-action) {
-  min-width: 132px !important;
-}
-
-body :where(.waiting-areas-page, .window-management-page) :where(.primary-action, .secondary-action, .toolbar-action, .compact-action) {
-  min-height: var(--q-admin-control-height) !important;
-  padding: 0 18px !important;
-  border-radius: var(--q-admin-control-radius) !important;
+body .window-management-page .toolbar > button:last-child {
+  width: 100%;
+  min-height: var(--q-admin-control-height);
 }
 
 body
   :where(.display-management-page, .terminal-management-page, .waiting-areas-page, .window-management-page)
-  :where(.pagination-bar) {
-  justify-content: space-between !important;
-  margin-top: 18px !important;
-  padding-top: 12px !important;
+  .pagination-bar {
+  margin-top: 18px;
+  padding-top: 12px;
 }
 
-body :where(.window-management-page) :where(.pagination-bar) {
-  gap: 14px !important;
-  margin-top: 14px !important;
-}
-
-body
-  :where(.display-management-page, .terminal-management-page, .waiting-areas-page, .window-management-page)
-  :where(.pager-actions, .pagination-bar > div) {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: flex-end !important;
-  gap: 10px !important;
+body :where(.window-management-page) .pagination-bar {
+  gap: 14px;
+  margin-top: 14px;
 }
 
 body
   :where(.display-management-page, .terminal-management-page, .waiting-areas-page, .window-management-page)
   :where(.compact-action) {
-  min-width: 110px !important;
+  min-width: 110px;
 }
 
 body
   :where(.display-management-page, .terminal-management-page, .waiting-areas-page, .window-management-page)
   :where(.page-indicator) {
-  display: inline-flex !important;
-  min-width: 52px !important;
-  align-items: center !important;
-  justify-content: center !important;
-  line-height: 1 !important;
+  display: inline-flex;
+  min-width: 52px;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
 }
 
 body :where(.waiting-areas-page, .window-management-page) :where(.status-pill) {
-  display: inline-flex !important;
-  min-width: 52px !important;
-  align-items: center !important;
-  justify-content: center !important;
-  line-height: 1 !important;
-}
-
-body .window-management-page :where(.action-group) {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  gap: 8px !important;
+  display: inline-flex;
+  min-width: 52px;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
 }
 
 body :where(.waiting-areas-page, .window-management-page) :where(.icon-action) {
-  width: 36px !important;
-  min-width: 36px !important;
-  height: 36px !important;
-  min-height: 36px !important;
-  border-radius: 10px !important;
+  width: 36px;
+  min-width: 36px;
+  height: 36px;
+  min-height: 36px;
+  border-radius: 10px;
 }
 
 body :where(.waiting-areas-page, .window-management-page) :where(th, td) {
-  vertical-align: middle !important;
-}
-
-body .app-shell-rtl .waiting-areas-page :where(.filter-field:not(.admin-filter-field) .filter-icon, .form-field-icon),
-body .app-shell-rtl .window-management-page .window-filter-icon {
-  inset-inline-start: auto !important;
-  inset-inline-end: 14px !important;
-}
-
-@media (max-width: 1199.98px) {
-  body :where(.display-management-page, .terminal-management-page, .waiting-areas-page) .list-panel > .row:first-child,
-  body .window-management-page .toolbar {
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-  }
+  vertical-align: middle;
 }
 
 @media (max-width: 767.98px) {
-  body :where(.display-management-page, .terminal-management-page, .waiting-areas-page) .list-panel > .row:first-child,
-  body .window-management-page .toolbar {
-    grid-template-columns: 1fr !important;
-  }
-
+  body
+    :where(.display-management-page, .terminal-management-page, .waiting-areas-page)
+    .list-panel
+    > .row:first-child
+    > div:last-child,
+  body .window-management-page .toolbar > button:last-child,
   body
     :where(.display-management-page, .terminal-management-page, .waiting-areas-page, .window-management-page)
-    :where(
-      .list-panel > .row:first-child > div:last-child,
-      .toolbar-action,
-      .tabs .primary-action,
-      .tabs .secondary-action,
-      .compact-action,
-      .pagination-bar,
-      .pager-actions,
-      .pagination-bar > div
-    ) {
-    width: 100% !important;
+    :where(.tabs .primary-action, .tabs .secondary-action, .compact-action, .pagination-bar, .pager-actions, .pagination-bar > div) {
+    width: 100%;
   }
 
   body :where(.window-management-page) :where(.pagination-bar, .pager-actions) {
-    align-items: stretch !important;
-  }
-}
-@media (max-width: 1199.98px) {
-  body :where(.waiting-areas-page) .admin-filter-toolbar {
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-  }
-}
-
-@media (max-width: 767.98px) {
-  body :where(.waiting-areas-page) .admin-filter-toolbar {
-    grid-template-columns: 1fr !important;
-  }
-
-  body :where(.waiting-areas-page) .admin-filter-toolbar :where(.toolbar-action) {
-    width: 100% !important;
-  }
-}
-
-body :where(.display-management-page, .terminal-management-page) .filters-grid {
-  display: grid !important;
-  grid-template-columns: minmax(320px, 2fr) minmax(220px, 1.1fr) minmax(150px, 0.65fr) minmax(150px, auto) !important;
-  align-items: end !important;
-  gap: var(--q-admin-toolbar-gap-y) var(--q-admin-toolbar-gap-x) !important;
-  margin: 0 0 18px !important;
-}
-
-body :where(.display-management-page, .terminal-management-page) .filters-grid > .filter-cell {
-  min-width: 0 !important;
-}
-
-body :where(.display-management-page, .terminal-management-page) .filters-grid > .filter-cell:last-child {
-  display: flex !important;
-  align-self: end !important;
-}
-
-body :where(.display-management-page, .terminal-management-page) .filters-grid > .filter-cell:last-child > :where(button, .btn) {
-  width: 100% !important;
-  min-width: 150px !important;
-  height: var(--q-admin-control-height) !important;
-  min-height: var(--q-admin-control-height) !important;
-}
-
-body :where(.display-management-page, .terminal-management-page) .search-input-wrapper {
-  position: relative !important;
-  width: 100% !important;
-}
-
-body :where(.display-management-page, .terminal-management-page) .search-input-wrapper .search-icon {
-  position: absolute !important;
-  inset-block-start: 50% !important;
-  inset-inline-start: 14px !important;
-  z-index: 2 !important;
-  color: var(--q-primary) !important;
-  font-size: 0.92rem !important;
-  line-height: 1 !important;
-  pointer-events: none !important;
-  transform: translateY(-50%) !important;
-}
-
-body :where(.display-management-page, .terminal-management-page) .search-input-wrapper .has-search-icon {
-  padding-inline-start: 40px !important;
-}
-
-body .app-shell-rtl :where(.display-management-page, .terminal-management-page) .search-input-wrapper .search-icon {
-  inset-inline: auto 14px !important;
-}
-
-body .app-shell-rtl :where(.display-management-page, .terminal-management-page) .search-input-wrapper .has-search-icon {
-  padding-inline: 14px 40px !important;
-}
-
-@media (max-width: 1199.98px) {
-  body :where(.display-management-page, .terminal-management-page) .filters-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-  }
-
-  body :where(.display-management-page, .terminal-management-page) .filters-grid .filter-cell-wide {
-    grid-column: 1 / -1 !important;
-  }
-}
-
-@media (max-width: 767.98px) {
-  body :where(.display-management-page, .terminal-management-page) .filters-grid {
-    grid-template-columns: 1fr !important;
-  }
-
-  body :where(.display-management-page, .terminal-management-page) .filters-grid > .filter-cell:last-child,
-  body :where(.display-management-page, .terminal-management-page) .filters-grid > .filter-cell:last-child > :where(button, .btn) {
-    width: 100% !important;
+    align-items: stretch;
   }
 }

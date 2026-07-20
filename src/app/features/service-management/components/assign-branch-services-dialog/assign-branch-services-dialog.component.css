@@ -1,33 +1,29 @@
-.branch-services-backdrop {
-  background: #0f172a66;
-  inset: 0;
+﻿.branch-services-backdrop {
   position: fixed;
+  inset: 0;
   z-index: 1000;
+  background: #0f172a66;
 }
 
 .branch-services-dialog {
+  position: fixed;
+  inset-block-start: 32px;
+  inset-inline-start: 50%;
+  z-index: 1001;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  width: min(760px, calc(100vw - 40px));
+  max-height: calc(100vh - 64px);
+  overflow: hidden;
   background: #fff;
   border: 1px solid #d7e8ff;
   border-radius: 8px;
   box-shadow: 0 24px 60px #0f172a40;
-  display: grid;
-  grid-template-rows: auto minmax(0, 1fr) auto;
-  left: 50%;
-  max-height: calc(100vh - 64px);
-  overflow: hidden;
-  position: fixed;
-  top: 32px;
   transform: translateX(-50%);
-  width: min(760px, calc(100vw - 40px));
-  z-index: 1001;
 }
 
 .branch-services-dialog-header,
 .branch-services-dialog-actions {
-  align-items: center;
-  display: flex;
-  gap: 8px;
-  justify-content: space-between;
   padding: 8px 10px;
 }
 
@@ -43,19 +39,19 @@
 .branch-services-dialog-header p,
 .branch-services-dialog-header span,
 .branch-services-dialog-actions span {
+  margin: 0;
   color: #64748b;
   font-size: 10px;
   font-weight: 800;
   line-height: var(--q-line-height-supporting, 1.5);
-  margin: 0;
 }
 
 .branch-services-dialog-header h2 {
+  margin: var(--q-text-stack-gap-sm, 4px) 0;
   color: #0f172a;
   font-size: 16px;
   font-weight: 900;
   line-height: var(--q-line-height-title, 1.3);
-  margin: var(--q-text-stack-gap-sm, 4px) 0;
 }
 
 .branch-services-dialog-header span {
@@ -67,14 +63,13 @@
 
 .branch-services-dialog-body {
   min-height: 0;
-  overflow: auto;
   padding: 8px;
+  overflow: auto;
 }
 
 .branch-services-dialog-actions {
   background: #fff;
   border-top: 1px solid #e2e8f0;
-  justify-content: flex-end;
 }
 
 .branch-services-dialog-actions span {
@@ -84,41 +79,36 @@
 .branch-services-primary-btn,
 .branch-services-secondary-btn,
 .branch-services-icon-btn {
-  align-items: center;
-  border: 1px solid transparent;
-  border-radius: 7px;
-  display: inline-flex;
-  font-size: 11px;
-  font-weight: 850;
-  gap: 5px;
-  justify-content: center;
   min-height: 30px;
   padding: 0 10px;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  font-size: 11px;
+  font-weight: 850;
 }
 
 .branch-services-primary-btn {
+  color: #fff;
   background: #0284c7;
   border-color: #0284c7;
-  color: #fff;
 }
 
 .branch-services-secondary-btn,
 .branch-services-icon-btn {
+  color: #0369a1;
   background: #fff;
   border-color: #bae6fd;
-  color: #0369a1;
 }
 
 .branch-services-icon-btn {
-  flex: 0 0 auto;
-  padding: 0;
   width: 30px;
+  padding: 0;
 }
 
 .branch-services-dialog-tree ::ng-deep .svc-tree-panel {
+  min-height: 0;
   border-radius: 7px;
   box-shadow: none;
-  min-height: 0;
 }
 
 .branch-services-dialog-tree ::ng-deep .svc-tree-header,
@@ -159,8 +149,8 @@
 }
 
 .branch-services-dialog-tree ::ng-deep .svc-tree-chip {
-  font-size: 8px;
   padding: 3px 6px;
+  font-size: 8px;
 }
 
 .branch-services-dialog-tree ::ng-deep .svc-tree-actions {
@@ -174,15 +164,9 @@
 
 @media (max-width: 767.98px) {
   .branch-services-dialog {
-    max-height: calc(100vh - 20px);
-    top: 10px;
+    inset-block-start: 10px;
     width: calc(100vw - 20px);
-  }
-
-  .branch-services-dialog-header,
-  .branch-services-dialog-actions {
-    align-items: stretch;
-    flex-wrap: wrap;
+    max-height: calc(100vh - 20px);
   }
 
   .branch-services-dialog-header span {

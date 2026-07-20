@@ -9,31 +9,17 @@
   --sidebar-border: var(--nt-border, #e7ecf2);
   --sidebar-text: var(--nt-text, #1b2430);
   --sidebar-overlay: rgba(27, 36, 48, 0.32);
-  display: flex;
   flex-direction: row;
-  direction: ltr;
   min-width: 0;
-  min-height: 100vh;
-  width: 100%;
   color: var(--sidebar-text);
   background: var(--nt-bg, var(--bg-base));
 }
 
-.app-shell.app-shell-rtl {
-  flex-direction: row-reverse;
-}
-
 .sidebar {
-  position: sticky;
-  top: 0;
   z-index: 100;
-  display: flex;
   flex: 0 0 var(--sidebar-width);
-  flex-direction: column;
   width: var(--sidebar-width);
   height: 100vh;
-  overflow-x: hidden;
-  overflow-y: auto;
   color: var(--sidebar-text);
   background: var(--nt-card, #ffffff);
   border-inline-end: 1px solid var(--sidebar-border);
@@ -44,7 +30,6 @@
 }
 
 .app-shell-rtl .sidebar {
-  border-inline: 1px solid var(--sidebar-border) 0;
   box-shadow: -18px 0 42px rgba(27, 36, 48, 0.065);
 }
 
@@ -54,12 +39,9 @@
 }
 
 .workspace {
-  display: flex;
   flex: 1 1 0;
-  flex-direction: column;
   width: 0;
   min-width: 0;
-  min-height: 100vh;
 }
 
 .workspace-content {
@@ -69,9 +51,6 @@
 }
 
 .workspace-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
   gap: 18px;
   min-width: 0;
   padding: var(--nt-workspace-padding-y, 40px) var(--nt-workspace-padding-x, 38px) 0;
@@ -82,9 +61,7 @@
 }
 
 .workspace-user {
-  display: inline-flex;
   flex: 0 0 auto;
-  align-items: center;
   gap: 10px;
   max-width: min(360px, 42vw);
   padding: 8px 12px;
@@ -96,10 +73,7 @@
 }
 
 .workspace-user-avatar {
-  display: inline-flex;
   flex: 0 0 34px;
-  align-items: center;
-  justify-content: center;
   width: 34px;
   height: 34px;
   color: var(--nt-accent, #f3182d);
@@ -108,27 +82,20 @@
 }
 
 .workspace-user-copy {
-  display: grid;
   min-width: 0;
   line-height: 1.2;
 }
 
 .workspace-user-copy span,
 .workspace-user-copy small {
-  overflow: hidden;
   color: var(--nt-muted, #687386);
   font-size: 0.72rem;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .workspace-user-copy strong {
-  overflow: hidden;
   color: var(--nt-text, #1b2430);
   font-size: 0.86rem;
   font-weight: 700;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .workspace-header + .workspace-content {
@@ -136,10 +103,6 @@
 }
 
 .sidebar-header {
-  display: flex;
-  flex-shrink: 0;
-  align-items: flex-start;
-  justify-content: space-between;
   gap: 12px;
   min-height: var(--nt-sidebar-header-height, 150px);
   padding: var(--nt-sidebar-header-padding, 26px 24px 20px);
@@ -152,15 +115,12 @@
 }
 
 .logo-container {
-  display: flex;
   flex: 1 1 auto;
   min-width: 0;
-  align-items: center;
   gap: 10px;
 }
 
 .sidebar-logo {
-  display: block;
   width: var(--nt-sidebar-logo-width, 224px);
   height: var(--nt-sidebar-logo-height, 74px);
   object-fit: contain;
@@ -179,10 +139,6 @@
 }
 
 .sidebar-toggle {
-  display: inline-flex;
-  flex: 0 0 auto;
-  align-items: center;
-  justify-content: center;
   width: 38px;
   height: 38px;
   padding: 0;
@@ -190,22 +146,16 @@
   border-radius: 12px;
 }
 
-.toggle-icon,
-.group-icon,
-.child-icon,
-.chevron-icon,
 .sidebar-action-button i {
   display: inline-flex;
+  flex: 0 0 18px;
   align-items: center;
   justify-content: center;
   line-height: 1;
 }
 
 .sidebar-nav {
-  flex: 1;
   padding: var(--nt-sidebar-nav-padding, 24px);
-  overflow-x: hidden;
-  overflow-y: auto;
 }
 
 .nav-group + .nav-group {
@@ -215,24 +165,21 @@
 }
 
 .sidebar-group-header {
-  display: flex;
-  align-items: center;
   gap: 10px;
-  width: 100%;
   min-height: 30px;
   padding: 0 4px;
-  color: var(--nt-text, #1b2430) !important;
+  color: var(--nt-text, #1b2430);
   cursor: pointer;
   background: transparent;
   border: 0;
 }
 
 .sidebar-group-header:hover {
-  color: var(--nt-accent, #f3182d) !important;
+  color: var(--nt-accent, #f3182d);
 }
 
 .sidebar-group-header.active {
-  color: var(--nt-text, #1b2430) !important;
+  color: var(--nt-text, #1b2430);
 }
 
 .app-shell.sidebar-collapsed .sidebar-group-header {
@@ -244,19 +191,15 @@
   display: none;
 }
 
-.group-text {
-  flex: 1;
+.group-text,
+.link-text,
+.link-text strong {
   min-width: 0;
-  overflow: hidden;
-  color: inherit !important;
-  text-overflow: ellipsis;
-  text-transform: uppercase;
-  white-space: nowrap;
+  color: inherit;
 }
 
 .chevron-icon {
-  flex: 0 0 auto;
-  color: currentColor !important;
+  color: currentColor;
   transition: transform 160ms ease;
 }
 
@@ -265,12 +208,8 @@
 }
 
 .sidebar-group-children {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
   max-height: 0;
   padding: 0;
-  overflow: hidden;
   opacity: 0;
   transition:
     max-height 220ms ease,
@@ -285,26 +224,19 @@
 }
 
 .sidebar-link {
-  position: relative;
-  display: flex;
-  align-items: center;
   gap: 10px;
   min-height: var(--nt-sidebar-link-height, 54px);
-  padding: 0 var(--nt-sidebar-link-padding-end, 14px) 0 var(--nt-sidebar-link-padding-start, 64px);
-  overflow: hidden;
-  color: var(--nt-text, #1b2430) !important;
-  text-decoration: none;
+  padding-block: 0;
+  padding-inline: var(--nt-sidebar-link-padding-start, 64px)
+    var(--nt-sidebar-link-padding-end, 14px);
+  color: var(--nt-text, #1b2430);
   border: 1px solid transparent;
   border-radius: 12px;
 }
 
-.app-shell-rtl .sidebar-link {
-  padding: 0 var(--nt-sidebar-link-padding-start, 64px) 0 var(--nt-sidebar-link-padding-end, 14px);
-}
-
 .sidebar-link:hover,
 .sidebar-link-active {
-  color: var(--nt-accent, #f3182d) !important;
+  color: var(--nt-accent, #f3182d);
 }
 
 .sidebar-link::before {
@@ -338,12 +270,7 @@
   position: absolute;
   inset-inline-start: var(--nt-sidebar-icon-offset, 24px);
   flex: 0 0 18px;
-  color: currentColor !important;
-}
-
-.app-shell-rtl .child-icon,
-.app-shell-rtl .child-dot {
-  inset-inline: auto var(--nt-sidebar-icon-offset, 24px);
+  color: currentColor;
 }
 
 .child-dot {
@@ -353,29 +280,14 @@
   border-radius: 999px;
 }
 
-.link-text,
-.link-text strong {
-  min-width: 0;
-  overflow: hidden;
-  color: inherit !important;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
 .sidebar-actions {
-  display: flex;
-  flex-shrink: 0;
-  flex-direction: column;
   gap: 12px;
   padding: var(--nt-sidebar-actions-padding, 22px 30px 28px);
-  margin-top: auto;
   border-top: 1px solid var(--sidebar-border);
 }
 
 .sidebar-action-button {
-  display: flex;
-  align-items: center;
   gap: 10px;
-  width: 100%;
   min-height: var(--nt-sidebar-action-height, 54px);
   padding: 0 18px;
   cursor: pointer;
@@ -387,12 +299,14 @@
   padding-inline: 0;
 }
 
-.sidebar-action-button i {
-  flex: 0 0 18px;
-}
-
 .sidebar-backdrop {
   display: none;
+}
+
+@media (min-width: 768px) {
+  .workspace-header {
+    flex-direction: row;
+  }
 }
 
 @media (max-width: 1399.98px) {
@@ -420,8 +334,7 @@
 }
 
 @media (max-width: 767.98px) {
-  .app-shell,
-  .app-shell.app-shell-rtl {
+  .app-shell {
     display: block;
     min-height: 100dvh;
     overflow: visible;
@@ -437,11 +350,6 @@
     flex-basis: auto;
   }
 
-  .app-shell-rtl .sidebar {
-    inset-inline-start: auto;
-    inset-inline-end: 0;
-  }
-
   .app-shell.sidebar-collapsed .sidebar {
     width: var(--sidebar-collapsed-width);
     flex-basis: auto;
@@ -453,16 +361,11 @@
     padding-inline-start: var(--sidebar-collapsed-width);
   }
 
-  .app-shell-rtl .workspace {
-    padding-inline: 0 var(--sidebar-collapsed-width);
-  }
-
   .workspace-content {
     padding: 18px;
   }
+
   .workspace-header {
-    align-items: stretch;
-    flex-direction: column;
     gap: 10px;
     padding: 14px 18px 0;
   }
@@ -494,53 +397,16 @@
     background: var(--sidebar-overlay);
     border: 0;
   }
-
-}
-.app-shell-ltr .sidebar-group-header,
-.app-shell-ltr .sidebar-link,
-.app-shell-ltr .sidebar-action-button {
-  direction: ltr;
-  text-align: left;
 }
 
-.app-shell-rtl .sidebar-group-header,
-.app-shell-rtl .sidebar-link,
-.app-shell-rtl .sidebar-action-button {
-  direction: rtl;
-  text-align: right;
-}
-
-.app-shell-ltr .sidebar-link::before {
-  right: auto;
-  left: 0;
-}
-
-.app-shell-rtl .sidebar-link::before {
-  right: 0;
-  left: auto;
-}
-
-.app-shell-ltr .child-icon,
-.app-shell-ltr .child-dot {
-  right: auto;
-  left: var(--nt-sidebar-icon-offset, 24px);
-}
-
-.app-shell-rtl .child-icon,
-.app-shell-rtl .child-dot {
-  right: var(--nt-sidebar-icon-offset, 24px);
-  left: auto;
-}
-
-.app-shell-rtl .sidebar-link-active {
-  background-position: right center;
+.sidebar-group-header,
+.sidebar-link,
+.sidebar-action-button {
+  text-align: start;
 }
 
 .mobile-topbar-identity span {
-  overflow: hidden;
   max-width: 140px;
   color: var(--nt-muted, #687386);
   font-size: 0.78rem;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }

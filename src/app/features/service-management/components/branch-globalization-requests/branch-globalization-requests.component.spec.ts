@@ -177,14 +177,40 @@ describe('BranchGlobalizationRequestsComponent request triggers', () => {
     expect(api.getBranchRequests).toHaveBeenCalledTimes(2);
   });
 
+  it('renders a constrained Bootstrap modal with column-based filters', () => {
+    openPopup();
+    requests[0].next(pageWith([requestItem({ status: 'Pending' })]));
+    requests[0].complete();
+    fixture.detectChanges();
+
+    const dialog = fixture.nativeElement.querySelector('.branch-globalization-dialog') as HTMLElement | null;
+    const content = fixture.nativeElement.querySelector('.branch-globalization-content.modal-content');
+    const form = fixture.nativeElement.querySelector('form') as HTMLFormElement | null;
+    const fields = fixture.nativeElement.querySelectorAll('form label');
+    const submit = fixture.nativeElement.querySelector('form button[type="submit"]') as HTMLButtonElement | null;
+
+    expect(dialog?.classList.contains('modal-dialog')).toBe(true);
+    expect(dialog?.classList.contains('w-100')).toBe(false);
+    expect(content).not.toBeNull();
+    expect(fixture.nativeElement.querySelector('.branch-globalization-backdrop')).not.toBeNull();
+    expect(fixture.nativeElement.querySelector('.modal-backdrop')).toBeNull();
+    expect((content as HTMLElement).className).not.toContain('opacity');
+    const searchIcon = fixture.nativeElement.querySelector('.branch-globalization-input-icon') as HTMLElement | null;
+
+    expect(fixture.nativeElement.querySelector('.table-responsive')).not.toBeNull();
+    expect(searchIcon?.classList.contains('start-0')).toBe(false);
+    expect(form?.classList.contains('row')).toBe(true);
+    expect(Array.from(fields).every((field) => (field as HTMLElement).classList.contains('col-lg-4'))).toBe(true);
+    expect(submit?.closest('.col-lg-auto')).not.toBeNull();
+  });
   it('uses distinct enterprise badge colors for every request status', () => {
     const component = fixture.componentInstance as unknown as {
       statusClasses(status: 'Pending' | 'Approved' | 'Rejected'): string;
     };
 
-    expect(component.statusClasses('Pending')).toContain('amber');
-    expect(component.statusClasses('Approved')).toContain('emerald');
-    expect(component.statusClasses('Rejected')).toContain('rose');
+    expect(component.statusClasses('Pending')).toContain('bg-warning-subtle');
+    expect(component.statusClasses('Approved')).toContain('bg-success-subtle');
+    expect(component.statusClasses('Rejected')).toContain('bg-danger-subtle');
   });
 
   it('keeps branch-only users in read-only mode', () => {

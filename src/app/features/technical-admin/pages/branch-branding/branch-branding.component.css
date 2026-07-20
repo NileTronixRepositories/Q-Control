@@ -2,36 +2,18 @@
   display: block;
 }
 
-.branding-grid {
-  display: grid;
-  gap: 24px;
-}
-
 .branding-layout {
   display: grid;
   grid-template-columns: minmax(260px, 320px) minmax(0, 1fr);
   gap: 24px;
 }
 
-.branch-selector {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 12px;
-}
-
-.branch-selector select {
+.branch-selector-control {
   min-width: min(100%, 260px);
 }
 
 @media (max-width: 991.98px) {
   .branding-layout {
     grid-template-columns: 1fr;
-  }
-
-  .branch-selector {
-    width: 100%;
-    align-items: stretch;
-    flex-direction: column;
   }
 }

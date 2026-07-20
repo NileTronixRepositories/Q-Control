@@ -1,4 +1,4 @@
-<section
+﻿<section
   class="technical-admin-responsive-page branch-page container-fluid"
   [attr.dir]="direction()"
   [attr.lang]="language()"
@@ -16,8 +16,6 @@
       </button>
     }
   </app-technical-admin-page-hero>
-
-  <!-- Toast -->
   @if (branchMessage(); as currentMessage) {
     <div class="toast-stack" role="status" aria-live="polite" aria-atomic="true">
       <div
@@ -48,14 +46,19 @@
     </div>
   }
 
-  <section class="summary-grid" aria-label="Branch summary">
+  <!-- <section class="summary-grid row g-3" aria-label="Branch summary">
     @for (summary of summaries(); track summary.label) {
-      <article class="summary-card" [class]="'summary-card tone-' + summary.tone">
+      <article
+        [class]="
+          'summary-card col-12 col-sm-6 col-xl-3 h-100 d-flex flex-column gap-2 overflow-hidden tone-' +
+          summary.tone
+        "
+      >
         <span>{{ summary.label }}</span>
         <strong>{{ summary.value }}</strong>
       </article>
     }
-  </section>
+  </section> -->
 
   @if (pageKey() === 'branch-editor') {
     <section class="branch-editor-grid" [class.panel-open]="branchPanelMode() !== 'closed'">
@@ -76,19 +79,21 @@
           </button>
         </div>
 
-        <div class="filter-grid branch-api-filters">
-          <label>
-            <span>{{ translations().searchLabel }}</span>
+        <div class="branch-api-filters row g-3 mb-3">
+          <label class="col-12 col-lg-6 col-xl-4 d-flex flex-column gap-2"
+            ><span>{{ translations().searchLabel }}</span>
             <input
+              class="form-control"
               type="search"
               [value]="branchSearchText()"
               [attr.aria-label]="translations().searchLabel"
               (change)="updateBranchSearch($event)"
             />
           </label>
-          <label>
-            <span>{{ translations().sortLabel }}</span>
+          <label class="col-12 col-md-4 col-lg-2 d-flex flex-column gap-2"
+            ><span>{{ translations().sortLabel }}</span>
             <select
+              class="form-select"
               [value]="branchOrderSort()"
               [attr.aria-label]="translations().sortLabel"
               (change)="updateBranchOrderSort($event)"
@@ -97,9 +102,10 @@
               <option value="Oldest">{{ translations().oldestLabel }}</option>
             </select>
           </label>
-          <label>
-            <span>{{ branchEditorTranslations().status }}</span>
+          <label class="col-12 col-md-4 col-lg-3 d-flex flex-column gap-2"
+            ><span>{{ branchEditorTranslations().status }}</span>
             <select
+              class="form-select"
               [value]="branchStatusFilter() === null ? '' : branchStatusFilter()"
               [attr.aria-label]="branchEditorTranslations().status"
               (change)="updateBranchStatusFilter($event)"
@@ -109,9 +115,10 @@
               <option value="false">{{ branchEditorTranslations().inactive }}</option>
             </select>
           </label>
-          <label>
-            <span>{{ translations().pageSizeLabel }}</span>
+          <label class="col-12 col-md-4 col-lg-3 d-flex flex-column gap-2"
+            ><span>{{ translations().pageSizeLabel }}</span>
             <select
+              class="form-select"
               [value]="branchPageSize()"
               [attr.aria-label]="translations().pageSizeLabel"
               (change)="updateBranchPageSize($event)"
@@ -132,10 +139,14 @@
         }
 
         @if (branchTableLoading()) {
-          <app-niletronix-loading-state [title]="translations().loadingLabel" variant="inline" size="sm" />
+          <app-niletronix-loading-state
+            [title]="translations().loadingLabel"
+            variant="inline"
+            size="sm"
+          />
         }
 
-        <div data-testid="branches-desktop" class="table-responsive table-wrap hidden md:block">
+        <div data-testid="branches-desktop" class="table-responsive table-wrap d-none d-md-block">
           <table class="table align-middle custom-table">
             <thead>
               <tr>
@@ -265,7 +276,7 @@
           </table>
         </div>
 
-        <div data-testid="branches-mobile" class="grid gap-3 md:hidden">
+        <div data-testid="branches-mobile" class="d-grid gap-3 d-md-none">
           @for (branch of branches(); track branch.id) {
             <app-technical-admin-mobile-record-card
               eyebrow="BR-{{ branch.id }}"
@@ -287,40 +298,40 @@
                 >{{ branchOperationalLabel(branch) }}</span
               >
               <div record-fields>
-                <dt class="text-[11px] font-extrabold text-slate-500">
+                <dt class="small fw-bold text-muted text-uppercase">
                   {{ translations().englishNameLabel }}
                 </dt>
-                <dd class="mb-0 mt-1 break-words font-bold text-slate-800">
+                <dd class="mb-0 mt-1 text-break fw-bold">
                   {{ branch.englishName }}
                 </dd>
               </div>
               <div record-fields>
-                <dt class="text-[11px] font-extrabold text-slate-500">
+                <dt class="small fw-bold text-muted text-uppercase">
                   {{ translations().ipAddressLabel }}
                 </dt>
-                <dd class="mb-0 mt-1 break-all font-bold text-slate-800" dir="ltr">
+                <dd class="mb-0 mt-1 text-break fw-bold" dir="ltr">
                   {{ branch.ipAddress }}
                 </dd>
               </div>
               <div record-fields>
-                <dt class="text-[11px] font-extrabold text-slate-500">
+                <dt class="small fw-bold text-muted text-uppercase">
                   {{ translations().governorateLabel }}
                 </dt>
-                <dd class="mb-0 mt-1 break-words font-bold text-slate-800">
+                <dd class="mb-0 mt-1 text-break fw-bold">
                   {{ branch.governorate }}
                 </dd>
               </div>
               <div record-fields>
-                <dt class="text-[11px] font-extrabold text-slate-500">
+                <dt class="small fw-bold text-muted text-uppercase">
                   {{ translations().cityLabel }}
                 </dt>
-                <dd class="mb-0 mt-1 break-words font-bold text-slate-800">{{ branch.city }}</dd>
+                <dd class="mb-0 mt-1 text-break fw-bold">{{ branch.city }}</dd>
               </div>
-              <div record-fields class="min-[430px]:col-span-2">
-                <dt class="text-[11px] font-extrabold text-slate-500">
+              <div record-fields class="record-field-wide">
+                <dt class="small fw-bold text-muted text-uppercase">
                   {{ translations().createdByLabel }}
                 </dt>
-                <dd class="mb-0 mt-1 break-words font-bold text-slate-800">
+                <dd class="mb-0 mt-1 text-break fw-bold">
                   {{ branch.createdBy }}
                 </dd>
               </div>
@@ -410,7 +421,9 @@
           <p class="empty-state">{{ translations().emptyBranchesLabel }}</p>
         }
 
-        <div class="pagination-bar">
+        <div
+          class="pagination-bar d-flex align-items-center justify-content-between gap-3 mt-3 flex-column flex-md-row"
+        >
           <span class="total-items">
             {{ translations().totalItemsLabel }}: {{ branchTableMeta().totalItems }}
           </span>
@@ -466,8 +479,12 @@
           </header>
 
           @if (branchPanelLoading()) {
-          <app-niletronix-loading-state [title]="translations().loadingLabel" variant="inline" size="sm" />
-        }
+            <app-niletronix-loading-state
+              [title]="translations().loadingLabel"
+              variant="inline"
+              size="sm"
+            />
+          }
 
           @if (branchPanelMode() === 'view' && selectedBranchDetails(); as details) {
             <dl class="details-list">

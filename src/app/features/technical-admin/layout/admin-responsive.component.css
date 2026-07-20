@@ -1,8 +1,3 @@
-/* Responsive shell mode enabled explicitly by the Technical Admin layout. */
-.app-shell .mobile-topbar {
-  display: none;
-}
-
 .app-shell.mobile-navigation-overlay :where(
   .technical-admin-responsive-page,
   .branch-page,
@@ -20,16 +15,6 @@
 }
 
 @media (min-width: 768px) and (max-width: 1199.98px) {
-  .app-shell.mobile-navigation-overlay :where(
-    .filter-grid,
-    .branch-api-filters,
-    .filters-grid,
-    .admin-filter-toolbar,
-    .window-management-page .toolbar
-  ) {
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-  }
-
   .app-shell.mobile-navigation-overlay :where(.branding-layout, .svc-workspace, .svc-form-row-support, .svc-form-row-metrics) {
     grid-template-columns: minmax(0, 1fr) !important;
   }
@@ -47,10 +32,7 @@
     position: sticky;
     top: 0;
     z-index: 1080;
-    display: flex;
     min-height: calc(60px + env(safe-area-inset-top));
-    align-items: center;
-    justify-content: space-between;
     gap: 12px;
     padding: calc(8px + env(safe-area-inset-top)) 12px 8px;
     background: rgb(255 255 255 / 0.94);
@@ -60,7 +42,6 @@
   }
 
   .app-shell.mobile-navigation-overlay .mobile-menu-button {
-    display: inline-grid;
     width: 44px;
     min-width: 44px;
     height: 44px;
@@ -79,10 +60,8 @@
   }
 
   .app-shell.mobile-navigation-overlay .mobile-topbar-identity {
-    display: flex;
     min-width: 0;
     flex: 1;
-    align-items: center;
     justify-content: flex-end;
     gap: 10px;
   }
@@ -106,7 +85,6 @@
   .app-shell.mobile-navigation-overlay .sidebar,
   .app-shell.mobile-navigation-overlay.sidebar-collapsed .sidebar {
     inset-inline-start: 0;
-    inset-inline-end: auto;
     z-index: 1200;
     width: min(88vw, var(--sidebar-width));
     max-width: 320px;
@@ -120,8 +98,6 @@
 
   .app-shell.app-shell-rtl.mobile-navigation-overlay .sidebar,
   .app-shell.app-shell-rtl.mobile-navigation-overlay.sidebar-collapsed .sidebar {
-    inset-inline-start: auto;
-    inset-inline-end: 0;
     transform: translateX(105%);
   }
 
@@ -171,11 +147,6 @@
   }
 
   .app-shell.mobile-navigation-overlay :where(
-    .filter-grid,
-    .branch-api-filters,
-    .filters-grid,
-    .admin-filter-toolbar,
-    .window-management-page .toolbar,
     .details-list,
     .editor-form,
     .colors-grid,
@@ -191,13 +162,8 @@
   }
 
   .app-shell.mobile-navigation-overlay :where(
-    .filter-field,
-    .filter-cell,
-    .branch-selector,
-    .branch-selector select,
     .branch-services-field,
-    .branch-services-active-branch,
-    .toolbar-action
+    .branch-services-active-branch
   ) {
     width: 100% !important;
     min-width: 0 !important;
@@ -337,11 +303,6 @@
   .app-shell.mobile-navigation-overlay :where(.branch-context-bar) {
     margin-bottom: 16px;
     padding: 12px;
-  }
-
-  .app-shell.mobile-navigation-overlay :where(.branch-selector) {
-    align-items: stretch;
-    flex-direction: column;
   }
 }
 

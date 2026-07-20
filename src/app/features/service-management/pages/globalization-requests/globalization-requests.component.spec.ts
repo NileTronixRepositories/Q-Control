@@ -1,4 +1,4 @@
-import { HttpErrorResponse } from '@angular/common/http';
+﻿import { HttpErrorResponse } from '@angular/common/http';
 import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
@@ -101,9 +101,9 @@ describe('GlobalizationRequestsComponent responsive presentation', () => {
     const approvedBadge = fixture.nativeElement.querySelector('[data-status="Approved"]');
     const rejectedBadge = fixture.nativeElement.querySelector('[data-status="Rejected"]');
 
-    expect(pendingBadge.className).toContain('amber');
-    expect(approvedBadge.className).toContain('emerald');
-    expect(rejectedBadge.className).toContain('rose');
+    expect(pendingBadge.className).toContain('bg-warning-subtle');
+    expect(approvedBadge.className).toContain('bg-success-subtle');
+    expect(rejectedBadge.className).toContain('bg-danger-subtle');
     expect(fixture.nativeElement.querySelectorAll('[data-action="approve"]').length).toBe(2);
     expect(fixture.nativeElement.querySelectorAll('[data-action="reject"]').length).toBe(2);
   });
@@ -252,10 +252,10 @@ function createItem(
     requestType: 'BranchServiceTree',
     status,
     branchId: 5,
-    branchArabicName: 'الفرع الرئيسي',
+    branchArabicName: 'Ø§Ù„ÙØ±Ø¹ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠ',
     branchEnglishName: 'Main Branch',
     rootServiceId: 100 + requestId,
-    rootServiceArabicName: `خدمة ${requestId}`,
+    rootServiceArabicName: `Ø®Ø¯Ù…Ø© ${requestId}`,
     rootServiceEnglishName: `Service ${requestId}`,
     parentServiceId: null,
     parentServiceArabicName: null,
@@ -276,7 +276,7 @@ function createDetails() {
     requestType: 'BranchServiceTree' as const,
     status: 'Pending' as const,
     branchId: 5,
-    branchArabicName: 'الفرع الرئيسي',
+    branchArabicName: 'Ø§Ù„ÙØ±Ø¹ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠ',
     branchEnglishName: 'Main Branch',
     rootServiceId: 101,
     requestedByApplicationUserId: 'user-1',
@@ -289,7 +289,7 @@ function createDetails() {
       {
         serviceId: 101,
         parentServiceId: null,
-        arabicName: 'خدمة 1',
+        arabicName: 'Ø®Ø¯Ù…Ø© 1',
         englishName: 'Service 1',
         scope: 'BranchScoped' as const,
         ownerBranchId: 5,

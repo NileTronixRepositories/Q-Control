@@ -1,4 +1,4 @@
-import { computed, signal } from '@angular/core';
+﻿import { computed, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { of } from 'rxjs';
@@ -90,7 +90,7 @@ describe('WaitingAreasComponent', () => {
 
   it('reloads waiting areas for the selected branch', () => {
     const branchFilter = fixture.nativeElement.querySelectorAll(
-      '.admin-filter-toolbar select',
+      '.waiting-areas-page .list-panel > .row:first-child select',
     )[0] as HTMLSelectElement;
 
     branchFilter.value = '1';
@@ -115,7 +115,7 @@ function createBranchPage(): PagedBranchResponse<BranchListItem> {
     data: [
       {
         branchId: 1,
-        arabicName: 'الفرع الرئيسي',
+        arabicName: 'Ø§Ù„ÙØ±Ø¹ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠ',
         englishName: 'Main Branch',
         ipAddress: '10.0.0.1',
         governorate: 'Cairo',
@@ -144,7 +144,7 @@ function createWaitingAreaPage(): Pagination<WaitingAreaListItem> {
       {
         id: 10,
         branchId: 1,
-        branchArabicName: 'الفرع الرئيسي',
+        branchArabicName: 'Ø§Ù„ÙØ±Ø¹ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠ',
         branchEnglishName: 'Main Branch',
         number: 3,
         descriptiveName: 'Main Hall',
@@ -158,3 +158,5 @@ function createWaitingAreaPage(): Pagination<WaitingAreaListItem> {
     ],
   };
 }
+
+

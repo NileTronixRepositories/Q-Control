@@ -1,4 +1,4 @@
-<section
+﻿<section
   class="technical-admin-responsive-page branch-branding-page technical-page container-fluid"
   [attr.dir]="direction()"
   [attr.lang]="language()"
@@ -50,7 +50,7 @@
   }
 
   @if (selectedBranchId()) {
-    <section class="branding-grid">
+    <section class="branding-grid d-grid gap-4">
       <article class="content-panel branding-panel">
         <div
           class="panel-header d-flex align-items-start justify-content-between gap-3 flex-column flex-md-row"
@@ -60,10 +60,10 @@
             <p>{{ selectedBranchLabel() }}</p>
           </div>
 
-          <div class="branch-selector">
-            <!-- <label for="branchBrandingBranch">{{ copy().branchLabel }}</label> -->
+          <div class="branch-selector d-flex flex-column flex-lg-row align-items-stretch align-items-lg-center gap-3">
             <select
               id="branchBrandingBranch"
+              class="form-select branch-selector-control"
               [value]="selectedBranchId() ?? ''"
               [disabled]="branchesLoading()"
               (change)="selectBranch($event)"
@@ -86,8 +86,8 @@
         </div>
 
         @if (brandingLoading()) {
-    <app-niletronix-loading-state [title]="copy().loading" variant="inline" size="sm" />
-  }
+          <app-niletronix-loading-state [title]="copy().loading" variant="inline" size="sm" />
+        }
 
         @if (hasUnconfiguredBranding()) {
           <p class="empty-state compact-empty">{{ copy().noBranding }}</p>
@@ -288,8 +288,8 @@
         }
 
         @if (advertisementsLoading()) {
-    <app-niletronix-loading-state [title]="copy().loading" variant="inline" size="sm" />
-  }
+          <app-niletronix-loading-state [title]="copy().loading" variant="inline" size="sm" />
+        }
 
         @if (canUpdate()) {
           @if (selectedAdvertisementPreviews().length > 0) {
@@ -521,3 +521,7 @@
     <p class="empty-state">{{ copy().selectBranchPlaceholder }}</p>
   }
 </section>
+
+
+
+
