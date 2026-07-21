@@ -79,19 +79,21 @@
     @if (!hasRouteScope()) {
       <section class="schedule-section schedule-selector-section">
         <header
-          class="schedule-section-header d-flex align-items-center justify-content-between flex-wrap gap-2"
+          class="schedule-section-header d-flex align-items-start justify-content-between gap-3"
         >
-          <span class="schedule-section-icon">
-            <i class="bi bi-building" aria-hidden="true"></i>
-          </span>
-          <div>
-            <h2>{{ translations().branch }}</h2>
-            <span>{{ translations().selectBranchFirst }}</span>
+          <div class="schedule-selector-title d-flex align-items-start gap-2">
+            <span class="schedule-section-icon">
+              <i class="bi bi-building" aria-hidden="true"></i>
+            </span>
+            <div class="d-grid gap-1">
+              <h2 class="schedule-section-title">{{ translations().branch }}</h2>
+              <span>{{ translations().selectBranchFirst }}</span>
+            </div>
           </div>
         </header>
-        <div class="row g-2">
+        <div class="row g-3 align-items-end">
           @if (!isBranchAdmin()) {
-            <div class="col-12 col-md-6 col-xl-3">
+            <div class="col-12 col-lg-4">
               <label class="schedule-field d-grid gap-2 m-0">
                 <span>{{ translations().branch }}</span>
                 <select
@@ -112,7 +114,7 @@
           }
           @if (selectedBranchId() && scheduleTree().length > 0) {
             @for (level of serviceSelectLevels(); track level.index) {
-              <div class="col-12 col-md-6 col-xl-3">
+              <div class="col-12 col-md-6 col-lg-4">
                 <label class="schedule-field d-grid gap-2 m-0">
                   <span>{{ translations().service }}</span>
                   <select
@@ -516,18 +518,16 @@
         </footer>
       </form>
     } @else {
-      <section class="schedule-empty-placeholder-card">
-        <div class="empty-placeholder-content">
-          <div class="empty-icon-pulse">
-            <i class="bi bi-calendar-week" aria-hidden="true"></i>
-          </div>
+      <section class="schedule-empty-placeholder-card d-flex align-items-start gap-2 p-3">
+        <span class="schedule-empty-icon">
+          <i class="bi bi-calendar-week" aria-hidden="true"></i>
+        </span>
+        <div class="empty-placeholder-content d-grid gap-1">
           <h2>{{ translations().weeklySchedule }}</h2>
           <p>
             {{
               selectedBranchId()
-                ? language() === 'ar'
-                  ? 'الرجاء اختيار الخدمة لعرض تفاصيل الجدول.'
-                  : 'Please select a service to view the schedule details.'
+                ? translations().selectServiceFirst
                 : translations().selectBranchFirst
             }}
           </p>

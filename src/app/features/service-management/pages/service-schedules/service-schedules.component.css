@@ -38,6 +38,60 @@
   padding: 14px;
 }
 
+.schedule-selector-title {
+  min-width: 0;
+}
+
+.schedule-selector-title .schedule-section-title,
+.schedule-selector-title span:not(.schedule-section-icon) {
+  margin: 0;
+}
+
+.schedule-selector-title .schedule-section-title {
+  font-size: 1rem;
+  font-weight: 820;
+  line-height: 1.25;
+}
+
+.schedule-selector-title span:not(.schedule-section-icon) {
+  color: var(--schedule-muted);
+  font-size: 0.78rem;
+  font-weight: 650;
+  line-height: 1.45;
+}
+
+.schedule-selector-section .form-select {
+  border-radius: 8px;
+  min-height: 36px;
+}
+
+.schedule-empty-placeholder-card {
+  min-height: 0;
+}
+
+.empty-placeholder-content {
+  min-width: 0;
+}
+
+.empty-placeholder-content h2,
+.empty-placeholder-content p {
+  margin: 0;
+}
+
+.empty-placeholder-content h2 {
+  color: var(--schedule-text);
+  font-size: 1rem;
+  font-weight: 820;
+  line-height: 1.25;
+}
+
+.empty-placeholder-content p {
+  color: var(--schedule-muted);
+  font-size: 0.78rem;
+  font-weight: 650;
+  line-height: 1.45;
+}
+
 .schedule-section-icon,
 .schedule-empty-icon,
 .summary-icon {

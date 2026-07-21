@@ -1,5 +1,5 @@
-<section class="service-media" [attr.aria-busy]="state().loading">
-<header class="service-media-header">
+<section class="service-media d-grid gap-2 p-2" [attr.aria-busy]="state().loading">
+<header class="service-media-header d-flex align-items-center justify-content-between gap-2 pb-2">
 <div>
 <p>{{ translations().serviceMedia }}</p>
 <h3>{{ serviceName() }}</h3>
@@ -10,9 +10,9 @@
 @if (validationError(); as error) { <p class="service-media-alert" role="alert">
 <i class="bi bi-exclamation-triangle" aria-hidden="true"></i> {{ error }}
 </p> }
-<div class="service-media-grid">
-<article class="service-media-card service-media-card--single">
-<header>
+<div class="service-media-grid row g-2">
+<article class="service-media-card service-media-card--single col-12 col-xl-6 d-grid gap-2 p-2">
+<header class="d-flex align-items-start gap-2">
 <span class="service-media-icon"><i class="bi bi-image" aria-hidden="true"></i></span>
 <div>
 <h4>{{ translations().serviceLogo }}</h4>
@@ -23,7 +23,7 @@
 @if (resolvedUrl(state().logo); as url) { <img [src]="url" [alt]="imageAlt(state().logo!)" /> }
 @else { <span><i class="bi bi-image" aria-hidden="true"></i></span> }
 </div>
-<footer>
+<footer class="d-flex align-items-center flex-wrap gap-2">
 @if (canManage()) { <label class="service-media-btn service-media-btn--secondary">
 <i class="bi bi-upload" aria-hidden="true"></i> {{ state().logo ? translations().replaceLogo : translations().uploadLogo }}
 <input type="file" accept="image/png,image/jpeg,image/webp" [disabled]="state().uploadingLogo" (change)="onSingleImageSelected('Logo', $event)" />
@@ -33,8 +33,8 @@
 </button> } }
 </footer>
 </article>
-<article class="service-media-card service-media-card--single">
-<header>
+<article class="service-media-card service-media-card--single col-12 col-xl-6 d-grid gap-2 p-2">
+<header class="d-flex align-items-start gap-2">
 <span class="service-media-icon"><i class="bi bi-app-indicator" aria-hidden="true"></i></span>
 <div>
 <h4>{{ translations().serviceIcon }}</h4>
@@ -45,7 +45,7 @@
 @if (resolvedUrl(state().icon); as url) { <img [src]="url" [alt]="imageAlt(state().icon!)" /> }
 @else { <span><i class="bi bi-app" aria-hidden="true"></i></span> }
 </div>
-<footer>
+<footer class="d-flex align-items-center flex-wrap gap-2">
 @if (canManage()) { <label class="service-media-btn service-media-btn--secondary">
 <i class="bi bi-upload" aria-hidden="true"></i> {{ state().icon ? translations().replaceIcon : translations().uploadIcon }}
 <input type="file" accept="image/png,image/jpeg,image/webp" [disabled]="state().uploadingIcon" (change)="onSingleImageSelected('Icon', $event)" />
@@ -55,8 +55,8 @@
 </button> } }
 </footer>
 </article>
-<article class="service-media-card service-media-card--ads">
-<header>
+<article class="service-media-card service-media-card--ads col-12 d-grid gap-2 p-2">
+<header class="d-flex align-items-start gap-2">
 <span class="service-media-icon"><i class="bi bi-images" aria-hidden="true"></i></span>
 <div>
 <h4>{{ translations().advertisementImages }}</h4>
@@ -78,7 +78,7 @@
 <i class="bi bi-images" aria-hidden="true"></i>
 <span>{{ translations().noAdvertisementImages }}</span>
 </div> }
-@if (canManage()) { <div class="service-media-uploader">
+@if (canManage()) { <div class="service-media-uploader d-flex align-items-center flex-wrap gap-2">
 <label class="service-media-btn service-media-btn--secondary">
 <i class="bi bi-plus-lg" aria-hidden="true"></i> {{ translations().uploadAdvertisements }}
 <input type="file" accept="image/png,image/jpeg,image/webp" multiple [disabled]="state().uploadingAds" (change)="onAdsSelected($event)" />
@@ -106,20 +106,20 @@
 </section>
 @if (confirmState(); as confirm) { <div class="service-media-dialog-backdrop" (click)="closeDeleteConfirm()"></div>
 <aside class="service-media-dialog" role="dialog" [attr.aria-label]="confirm.title">
-<header>
+<header class="d-flex align-items-center justify-content-between gap-2">
 <h3>{{ confirm.title }}</h3>
 <button type="button" [attr.aria-label]="translations().close" (click)="closeDeleteConfirm()">
 <i class="bi bi-x-lg" aria-hidden="true"></i>
 </button>
 </header>
-<div class="service-media-dialog-body">
+<div class="service-media-dialog-body d-flex align-items-center gap-2">
 @if (resolvedUrl(confirm.image); as url) { <img [src]="url" [alt]="imageAlt(confirm.image)" /> }
 <div>
 <strong>{{ imageTypeLabel(confirm.image.imageType) }}</strong>
 <p>{{ confirm.body }}</p>
 </div>
 </div>
-<footer>
+<footer class="d-flex align-items-center justify-content-between gap-2">
 <button type="button" class="service-media-btn service-media-btn--secondary" (click)="closeDeleteConfirm()"> {{ translations().cancel }}
 </button>
 <button type="button" class="service-media-btn service-media-btn--danger-fill" (click)="confirmDelete()"> {{ translations().deleteImage }}

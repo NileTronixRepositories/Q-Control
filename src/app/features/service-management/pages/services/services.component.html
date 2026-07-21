@@ -68,8 +68,8 @@
             }
             @if (store.panelMode() === 'view') {
               @if (store.selectedDetails(); as details) {
-                <section class="svc-details-view">
-                  <div class="svc-logo-summary d-flex align-items-center gap-2">
+                <section class="svc-details-view d-grid gap-2">
+                  <div class="svc-logo-summary d-flex align-items-center gap-2 p-2">
                     @if (logoUrl(details.logoUrl); as url) {
                       <img class="svc-logo" [src]="url" [alt]="serviceName(details)" />
                     } @else {
@@ -77,7 +77,7 @@
                         <i class="bi bi-grid" aria-hidden="true"></i>
                       </span>
                     }
-                    <div>
+                    <div class="svc-logo-copy">
                       <h3>{{ serviceName(details) }}</h3>
                       <p>{{ translations().parent }}: {{ parentName(details) }}</p>
                     </div>
@@ -88,7 +88,7 @@
                       {{ translations().operationallyDisabled }}
                     </p>
                   }
-                  <dl class="svc-details-grid row g-2">
+                  <dl class="svc-details-grid row g-2 mb-0">
                     <div class="col-12 col-sm-6 col-xl-3">
                       <dt>{{ translations().arabicName }}</dt>
                       <dd>{{ details.arabicName }}</dd>
@@ -162,7 +162,7 @@
                     (serviceChange)="handleMediaServiceChange($event)"
                     (mediaChanged)="handleMediaChanged()"
                   />
-                  <footer class="svc-actions d-flex align-items-center flex-wrap gap-2">
+                  <footer class="svc-actions d-flex align-items-center flex-wrap gap-2 pt-1">
                     @if (canUpdateServiceDefinition(details)) {
                       <button
                         type="button"
@@ -695,18 +695,28 @@
             [loading]="store.assignedBranchTreeLoading() || store.branchAssigning()"
             [includeInactive]="includeInactiveTree()"
             [includeDeleted]="includeDeletedTree()"
-            [canCreate]="false"
+            [canCreate]="canCreateBranchScoped()"
             [canViewDetails]="false"
             [canUpdate]="canUpdate()"
-            [canDelete]="false"
-            [canRestore]="false"
+            [canDelete]="canDelete()"
+            [canRestore]="canRestore()"
+            [canPermanentDelete]="canDeletePermanent()"
+            [canCreateChildFor]="canCreateBranchScopedChild"
+            [canDeleteNode]="canSoftDeleteService"
+            [canRestoreNode]="canRestoreService"
+            [canPermanentDeleteNode]="canPermanentDeleteService"
             [dropTarget]="canUseBranchAssignment() && !store.branchAssigning()"
             (refresh)="refresh()"
             (includeInactiveChange)="updateTreeToggle('inactive', $event)"
             (includeDeletedChange)="updateTreeToggle('deleted', $event)"
             (toggleNode)="toggleAssignedBranchNode($event)"
             (selectNode)="selectAssignedBranchNode($event)"
+            (createRoot)="openCreateRoot()"
+            (createChild)="openCreateChild($event)"
             (editNode)="openEditFromTree($event)"
+            (deleteNode)="requestTreeDelete($event)"
+            (restoreNode)="requestTreeRestore($event)"
+            (permanentDeleteNode)="requestTreePermanentDelete($event)"
             (leafDropped)="dropBranchAssignment($event)"
           />
         </div>

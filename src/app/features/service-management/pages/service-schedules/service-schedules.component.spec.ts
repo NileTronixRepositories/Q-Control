@@ -347,10 +347,39 @@ describe('ServiceSchedulesComponent', () => {
   it('renders branch selection from the generic schedules route without loading a schedule', () => {
     recreateGenericRoute([parentService]);
 
+    const placeholder = fixture.nativeElement.querySelector('.schedule-empty-placeholder-card') as HTMLElement | null;
+
     expect(scheduleApi.getSchedule).not.toHaveBeenCalled();
     expect(fixture.nativeElement.textContent).toContain('Select a branch');
+    expect(placeholder?.classList.contains('d-flex')).toBe(true);
+    expect(placeholder?.classList.contains('align-items-start')).toBe(true);
+    expect(placeholder?.classList.contains('p-3')).toBe(true);
+    expect(placeholder?.querySelector('.schedule-empty-icon')).not.toBeNull();
   });
 
+  it('uses the compact Bootstrap selector layout on the generic schedules route', () => {
+    recreateGenericRoute([parentService]);
+
+    const selector = fixture.nativeElement.querySelector('.schedule-selector-section') as HTMLElement | null;
+    const header = selector?.querySelector('.schedule-section-header') as HTMLElement | null;
+    const titleGroup = selector?.querySelector('.schedule-selector-title') as HTMLElement | null;
+    const branchColumn = selector?.querySelector('.schedule-field')?.closest('.col-12') as HTMLElement | null;
+
+    expect(selector).not.toBeNull();
+    expect(header?.classList.contains('align-items-start')).toBe(true);
+    expect(header?.classList.contains('gap-3')).toBe(true);
+    expect(header?.classList.contains('flex-wrap')).toBe(false);
+    expect(titleGroup).not.toBeNull();
+    expect(branchColumn?.classList.contains('col-lg-4')).toBe(true);
+
+    selectDropdown(0, '10');
+    fixture.detectChanges();
+
+    const serviceColumn = Array.from(selector?.querySelectorAll('.schedule-field') ?? [])
+      .map((field) => field.closest('.col-12') as HTMLElement | null)
+      .find((column) => column?.classList.contains('col-md-6'));
+    expect(serviceColumn?.classList.contains('col-lg-4')).toBe(true);
+  });
   it('renders the first service dropdown after selecting a branch', () => {
     recreateGenericRoute([parentService]);
 
@@ -361,6 +390,8 @@ describe('ServiceSchedulesComponent', () => {
       includeDeleted: false,
     });
     expect(fixture.nativeElement.textContent).toContain('Certificates');
+    expect(fixture.nativeElement.textContent).toContain('Please select a service to view the schedule details.');
+    expect(fixture.nativeElement.textContent).not.toContain('Ø§Ù');
     expect(scheduleApi.getSchedule).not.toHaveBeenCalled();
   });
 

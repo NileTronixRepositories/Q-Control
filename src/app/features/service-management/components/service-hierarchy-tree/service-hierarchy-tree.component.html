@@ -5,7 +5,12 @@
 <p class="svc-tree-eyebrow py-2">{{ translations().hierarchy }}</p>
 <h2>{{ translations().serviceHierarchy }}</h2>
 </div>
-@if (canCreate()) { }
+@if (canCreate()) {
+<button type="button" class="svc-tree-primary-btn d-inline-flex align-items-center justify-content-center gap-2" [title]="translations().addRootService" [attr.aria-label]="translations().addRootService" (click)="createRoot.emit()">
+<i class="bi bi-plus-lg" aria-hidden="true"></i>
+<span>{{ translations().addRootService }}</span>
+</button>
+}
 </header>
 <div class="svc-tree-toolbar">
 <div class="svc-tree-filters">

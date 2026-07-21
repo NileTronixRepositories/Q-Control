@@ -35,11 +35,14 @@ describe('ServicesComponent', () => {
     readonly canRestore: ReturnType<typeof signal<boolean>>;
     readonly canDeletePermanent: ReturnType<typeof signal<boolean>>;
     readonly canAssignBranchServices: ReturnType<typeof signal<boolean>>;
+    readonly canCreateBranchServiceTree: ReturnType<typeof signal<boolean>>;
     readonly canViewStartOptions: ReturnType<typeof signal<boolean>>;
   };
   let branchServicesApi: {
     readonly getBranchServicesTree: ReturnType<typeof vi.fn>;
     readonly assignServices: ReturnType<typeof vi.fn>;
+    readonly createBranchServiceTree: ReturnType<typeof vi.fn>;
+    readonly createBranchServiceSubtree: ReturnType<typeof vi.fn>;
   };
   let api: {
     readonly getServiceTree: ReturnType<typeof vi.fn>;
@@ -54,6 +57,8 @@ describe('ServicesComponent', () => {
     readonly uploadServiceIcon: ReturnType<typeof vi.fn>;
     readonly uploadServiceAds: ReturnType<typeof vi.fn>;
     readonly deleteServiceImage: ReturnType<typeof vi.fn>;
+    readonly deleteService: ReturnType<typeof vi.fn>;
+    readonly restoreService: ReturnType<typeof vi.fn>;
     readonly permanentlyDeleteService: ReturnType<typeof vi.fn>;
   };
 
@@ -71,6 +76,8 @@ describe('ServicesComponent', () => {
       uploadServiceIcon: vi.fn(),
       uploadServiceAds: vi.fn(),
       deleteServiceImage: vi.fn(),
+      deleteService: vi.fn(() => of({ serviceId: 101, rowVersion: 'rv-deleted', message: 'Deleted', isDeleted: true })),
+      restoreService: vi.fn(() => of({ serviceId: 101, rowVersion: 'rv-restored', message: 'Restored', isDeleted: false, effectiveIsActive: true })),
       permanentlyDeleteService: vi.fn(() => of({ serviceId: 101, message: 'Deleted permanently' })),
     };
     authSessionState = signal<{ userType: 'TechnicalAdmin' | 'BranchAdmin'; activeBranchId: number | null }>({
@@ -86,11 +93,14 @@ describe('ServicesComponent', () => {
       canRestore: signal(true),
       canDeletePermanent: signal(true),
       canAssignBranchServices: signal(false),
+      canCreateBranchServiceTree: signal(false),
       canViewStartOptions: signal(false),
     };
     branchServicesApi = {
       getBranchServicesTree: vi.fn(() => of([])),
       assignServices: vi.fn(() => of({ createdAssignmentsCount: 1, message: 'Assigned' })),
+      createBranchServiceTree: vi.fn(() => of(createBranchCreateResponse(201))),
+      createBranchServiceSubtree: vi.fn(() => of(createBranchCreateResponse(202, 122))),
     };
     await TestBed.configureTestingModule({
       imports: [ServicesComponent],
@@ -125,6 +135,7 @@ describe('ServicesComponent', () => {
             canRestore: permissionState.canRestore.asReadonly(),
             canDeletePermanent: permissionState.canDeletePermanent.asReadonly(),
             canAssignBranchServices: permissionState.canAssignBranchServices.asReadonly(),
+            canCreateBranchServiceTree: permissionState.canCreateBranchServiceTree.asReadonly(),
             canViewStartOptions: permissionState.canViewStartOptions.asReadonly(),
           },
         },
@@ -284,6 +295,109 @@ describe('ServicesComponent', () => {
   });
 
 
+  it('shows CRUD actions only on the assigned branch services tree', () => {
+    recreateAsBranchAdmin([
+      createBranchScopedNode({ id: 122, canEditDefinition: true, isDeleted: false }),
+    ]);
+    fixture.detectChanges();
+
+    const columns = fixture.nativeElement.querySelectorAll('.svc-branch-assignment-column') as NodeListOf<HTMLElement>;
+    const sourceColumn = columns[0];
+    const assignedColumn = columns[1];
+
+    expect(sourceColumn.querySelector('[title="Edit"]')).toBeNull();
+    expect(sourceColumn.querySelector('[title="Delete"]')).toBeNull();
+    expect(sourceColumn.querySelector('[title="Add Child Service"]')).toBeNull();
+    expect(assignedColumn.querySelector('[title="Add Root Service"]')).not.toBeNull();
+    expect(assignedColumn.querySelector('[title="Add Child Service"]')).not.toBeNull();
+    expect(assignedColumn.querySelector('[title="Edit"]')).not.toBeNull();
+    expect(assignedColumn.querySelector('[title="Delete"]')).not.toBeNull();
+  });
+
+  it('creates a root BranchScoped service from the assigned tree using the branch tree endpoint', () => {
+    recreateAsBranchAdmin([]);
+    fixture.detectChanges();
+
+    fixture.componentInstance.openCreateRoot();
+    fillRequiredServiceFields();
+    fixture.componentInstance.saveService();
+
+    expect(branchServicesApi.createBranchServiceTree).toHaveBeenCalledWith(
+      5,
+      expect.objectContaining({
+        root: expect.objectContaining({
+          arabicName: 'Arabic Service',
+          englishName: 'Service',
+          children: [],
+        }),
+      }),
+    );
+    expect(api.createService).not.toHaveBeenCalled();
+  });
+
+  it('creates a child BranchScoped service from an assigned parent using the branch subtree endpoint', () => {
+    const parent = createBranchScopedNode({ id: 122, canEditDefinition: true, isDeleted: false });
+    recreateAsBranchAdmin([parent]);
+    fixture.detectChanges();
+
+    fixture.componentInstance.openCreateChild(parent);
+    fillRequiredServiceFields();
+    fixture.componentInstance.saveService();
+
+    expect(branchServicesApi.createBranchServiceSubtree).toHaveBeenCalledWith(
+      5,
+      122,
+      expect.objectContaining({ root: expect.objectContaining({ englishName: 'Service' }) }),
+    );
+    expect(api.createService).not.toHaveBeenCalled();
+  });
+
+  it('loads rowVersion before deleting, restoring, and permanently deleting assigned BranchScoped services', () => {
+    const activeNode = createBranchScopedNode({ id: 122, isDeleted: false });
+    const deletedNode = createBranchScopedNode({ id: 123, isDeleted: true });
+    recreateAsBranchAdmin([activeNode, deletedNode]);
+
+    api.getServiceDetails.mockReturnValueOnce(of(createServiceDetails({
+      id: 122,
+      scope: 'BranchScoped',
+      ownerBranchId: 5,
+      isOwnedByCurrentBranch: true,
+      canEditDefinition: true,
+      isDeleted: false,
+      rowVersion: 'delete-rv',
+    })));
+    fixture.componentInstance.requestTreeDelete(activeNode);
+    fixture.componentInstance.confirmAction();
+
+    api.getServiceDetails.mockReturnValueOnce(of(createServiceDetails({
+      id: 123,
+      scope: 'BranchScoped',
+      ownerBranchId: 5,
+      isOwnedByCurrentBranch: true,
+      canEditDefinition: true,
+      isDeleted: true,
+      rowVersion: 'restore-rv',
+    })));
+    fixture.componentInstance.requestTreeRestore(deletedNode);
+    fixture.componentInstance.confirmAction();
+
+    api.getServiceDetails.mockReturnValueOnce(of(createServiceDetails({
+      id: 123,
+      scope: 'BranchScoped',
+      ownerBranchId: 5,
+      isOwnedByCurrentBranch: true,
+      canEditDefinition: true,
+      isDeleted: true,
+      rowVersion: 'permanent-rv',
+    })));
+    fixture.componentInstance.requestTreePermanentDelete(deletedNode);
+    fixture.componentInstance.confirmAction();
+
+    expect(api.deleteService).toHaveBeenCalledWith(122, 'delete-rv');
+    expect(api.restoreService).toHaveBeenCalledWith(123, 'restore-rv');
+    expect(api.permanentlyDeleteService).toHaveBeenCalledWith(123, 'permanent-rv');
+    expect(branchServicesApi.getBranchServicesTree).toHaveBeenCalled();
+  });
   it('allows Branch Admin to edit an editable assigned BranchScoped service from the assignment tree', () => {
     recreateAsBranchAdmin([
       createBranchScopedNode({ id: 122, canEditDefinition: true, isDeleted: false }),
@@ -369,6 +483,35 @@ describe('ServicesComponent', () => {
     expect(request).not.toHaveProperty('canEditDefinition');
   });
 
+  it('submits null ticket fields when ticket issuing is disabled during update', () => {
+    api.getServiceDetails.mockReturnValueOnce(of(createServiceDetails({ id: 122, rowVersion: 'branch-rv' })));
+    fixture.componentInstance.openEdit(122);
+    fixture.componentInstance.serviceForm.patchValue({
+      arabicName: 'Arabic Service',
+      englishName: 'Service',
+      isTicketIssuable: 'false',
+      rangePrefix: 'OLD',
+      rangeStartNumber: 10,
+      rangeEndNumber: 99,
+      waitingDuration: 15,
+      noOfTicketCopies: 2,
+    });
+
+    fixture.componentInstance.saveService();
+
+    expect(api.updateService).toHaveBeenCalledWith(
+      122,
+      expect.objectContaining({
+        rowVersion: 'branch-rv',
+        isTicketIssuable: false,
+        rangePrefix: null,
+        rangeStartNumber: null,
+        rangeEndNumber: null,
+        waitingDuration: null,
+        noOfTicketCopies: null,
+      }),
+    );
+  });
   it('keeps edit form open and marks Arabic name on duplicate-name conflict', () => {
     api.getServiceDetails.mockReturnValueOnce(of(createServiceDetails({ id: 122, rowVersion: 'branch-rv' })));
     api.updateService.mockReturnValueOnce(
@@ -403,12 +546,19 @@ describe('ServicesComponent', () => {
 
     expect(api.getServiceDetails).toHaveBeenLastCalledWith(122);
   });
-  it('renders the service media manager after service details load', () => {
+  it('renders the compact details grid and service media manager after service details load', () => {
     fixture.componentInstance.openView(101);
     fixture.detectChanges();
 
+    const detailsView = fixture.nativeElement.querySelector('.svc-details-view') as HTMLElement | null;
+    const detailsGrid = fixture.nativeElement.querySelector('.svc-details-grid') as HTMLElement | null;
+    const detailCells = Array.from(detailsGrid?.children ?? []) as HTMLElement[];
+
     expect(api.getServiceDetails).toHaveBeenCalledWith(101);
     expect(api.getServiceImages).toHaveBeenCalledWith(101, undefined);
+    expect(detailsView?.classList).toContain('d-grid');
+    expect(detailsGrid?.classList).toContain('mb-0');
+    expect(detailCells.every((cell) => cell.classList.contains('col-xl-3'))).toBe(true);
     expect(fixture.nativeElement.querySelector('app-service-media-manager')).not.toBeNull();
   });
 
@@ -419,6 +569,10 @@ describe('ServicesComponent', () => {
     permissionState.canCreate.set(false);
     permissionState.canAssignBranchServices.set(true);
     permissionState.canUpdate.set(true);
+    permissionState.canDelete.set(true);
+    permissionState.canRestore.set(true);
+    permissionState.canDeletePermanent.set(true);
+    permissionState.canCreateBranchServiceTree.set(true);
     branchServicesApi.getBranchServicesTree.mockReturnValue(of(nodes));
     fixture = TestBed.createComponent(ServicesComponent);
   }
@@ -429,12 +583,12 @@ describe('ServicesComponent', () => {
       parentServiceId: null,
       scope: 'BranchScoped' as const,
       ownerBranchId: 5,
-      ownerBranchArabicName: 'فرع حالي',
+      ownerBranchArabicName: 'Ã™ÂÃ˜Â±Ã˜Â¹ Ã˜Â­Ã˜Â§Ã™â€žÃ™Å ',
       ownerBranchEnglishName: 'Current Branch',
       isOwnedByCurrentBranch: true,
       isAssignedToCurrentBranch: true,
       canEditDefinition: true,
-      arabicName: 'خدمة فرع',
+      arabicName: 'Ã˜Â®Ã˜Â¯Ã™â€¦Ã˜Â© Ã™ÂÃ˜Â±Ã˜Â¹',
       englishName: 'Branch Service',
       serviceCode: null,
       isServiceCodeRequired: false,
@@ -449,6 +603,7 @@ describe('ServicesComponent', () => {
       ...overrides,
     };
   }
+
   function fillRequiredServiceFields(): void {
     fixture.componentInstance.serviceForm.patchValue({
       arabicName: 'Arabic Service',
@@ -457,46 +612,70 @@ describe('ServicesComponent', () => {
       rangePrefix: 'S',
     });
   }
-function createServiceDetails(overrides = {}) {
-  return {
-    id: 101,
-    parentServiceId: null,
-    scope: 'Global' as const,
-    ownerBranchId: null,
-    ownerBranchArabicName: null,
-    ownerBranchEnglishName: null,
-    isOwnedByCurrentBranch: false,
-    isAssignedToCurrentBranch: null,
-    canEditDefinition: true,
-    arabicName: 'Arabic Service',
-    englishName: 'Service',
-    parentServiceNameAr: null,
-    parentServiceNameEn: null,
-    logoUrl: null,
-    serviceCode: null,
-    isServiceCodeRequired: false,
-    isActive: true,
-    effectiveIsActive: true,
-    isTicketIssuable: true,
-    hasChildren: false,
-    canIssueTicket: true,
-    isDeleted: false,
-    orderNo: 0,
-    priority: 0,
-    weight: 0,
-    rowVersion: 'rv',
-    arabicUserMessage: null,
-    englishUserMessage: null,
-    isClientInputRequired: false,
-    hasReservation: false,
-    rangePrefix: 'S',
-    rangeStartNumber: 1,
-    rangeEndNumber: 999,
-    waitingDuration: 0,
-    noOfTicketCopies: 1,
-    ...overrides,
-  };
+  function createBranchCreateResponse(id: number, parentServiceId: number | null = null) {
+    return {
+      branchId: 5,
+      scope: 'BranchScoped' as const,
+      ownerBranchId: 5,
+      createdServicesCount: 1,
+      createdAssignmentsCount: 1,
+      parentServiceId,
+      globalizationRequest: null,
+      message: 'Created',
+      root: {
+        id,
+        parentServiceId,
+        arabicName: 'Arabic Service',
+        englishName: 'Service',
+        scope: 'BranchScoped' as const,
+        ownerBranchId: 5,
+        serviceCode: null,
+        isServiceCodeRequired: false,
+        isTicketIssuable: true,
+        children: [],
+      },
+    };
+  }
+
+  function createServiceDetails(overrides = {}) {
+    return {
+      id: 101,
+      parentServiceId: null,
+      scope: 'Global' as const,
+      ownerBranchId: null,
+      ownerBranchArabicName: null,
+      ownerBranchEnglishName: null,
+      isOwnedByCurrentBranch: false,
+      isAssignedToCurrentBranch: null,
+      canEditDefinition: true,
+      arabicName: 'Arabic Service',
+      englishName: 'Service',
+      parentServiceNameAr: null,
+      parentServiceNameEn: null,
+      logoUrl: null,
+      serviceCode: null,
+      isServiceCodeRequired: false,
+      isActive: true,
+      effectiveIsActive: true,
+      isTicketIssuable: true,
+      hasChildren: false,
+      canIssueTicket: true,
+      isDeleted: false,
+      orderNo: 0,
+      priority: 0,
+      weight: 0,
+      rowVersion: 'rv',
+      arabicUserMessage: null,
+      englishUserMessage: null,
+      isClientInputRequired: false,
+      hasReservation: false,
+      rangePrefix: 'S',
+      rangeStartNumber: 1,
+      rangeEndNumber: 999,
+      waitingDuration: 0,
+      noOfTicketCopies: 1,
+      ...overrides,
+    };
   }
 });
-
 

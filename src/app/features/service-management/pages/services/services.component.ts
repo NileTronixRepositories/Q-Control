@@ -17,7 +17,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { Router } from '@angular/router';
-import { finalize } from 'rxjs';
+import { finalize, Observable } from 'rxjs';
 
 import { NiletronixLoadingStateComponent } from '../../../../shared/components/niletronix-loading-state/niletronix-loading-state.component';
 import { TechnicalAdminPageHeroComponent } from '../../../../shared/components/technical-admin-page-hero/technical-admin-page-hero.component';
@@ -28,6 +28,12 @@ import { formatTechnicalAdminApiError } from '../../../technical-admin/utils/api
 import { ServiceHierarchyTreeComponent } from '../../components/service-hierarchy-tree/service-hierarchy-tree.component';
 import { ServiceMediaManagerComponent } from '../../components/service-media-manager/service-media-manager.component';
 import { SERVICE_MANAGEMENT_TRANSLATIONS } from '../../i18n/service-management.translations';
+import {
+  CreateBranchServiceSubtreeResponse,
+  CreateBranchServiceTreeNodeRequest,
+  CreateBranchServiceTreeRequest,
+  CreateBranchServiceTreeResponse,
+} from '../../models/branch-services.model';
 import {
   CreateServiceRequest,
   ServiceBooleanFilter,
@@ -72,7 +78,6 @@ type FormControlName =
   | 'rangeStartNumber'
   | 'rangeEndNumber';
 
-
 @Component({
   selector: 'app-service-management-services',
   standalone: true,
@@ -99,14 +104,18 @@ export class ServicesComponent implements OnInit, OnDestroy {
   private readonly permissionService = inject(ServiceManagementPermissionService);
 
   public readonly store = inject(ServiceManagementStore);
-  public readonly canUpdateServiceDefinition = (service: ServiceListItem | ServiceDetails | ServiceTreeNode): boolean =>
-    canUpdateServiceRule(service, this.serviceActionPermissions());
-  public readonly canSoftDeleteService = (service: ServiceListItem | ServiceDetails | ServiceTreeNode): boolean =>
-    canSoftDeleteServiceRule(service, this.serviceActionPermissions());
-  public readonly canRestoreService = (service: ServiceListItem | ServiceDetails | ServiceTreeNode): boolean =>
-    canRestoreServiceRule(service, this.serviceActionPermissions());
-  public readonly canPermanentDeleteService = (service: ServiceListItem | ServiceDetails | ServiceTreeNode): boolean =>
-    canPermanentDeleteServiceRule(service, this.serviceActionPermissions());
+  public readonly canUpdateServiceDefinition = (
+    service: ServiceListItem | ServiceDetails | ServiceTreeNode,
+  ): boolean => canUpdateServiceRule(service, this.serviceActionPermissions());
+  public readonly canSoftDeleteService = (
+    service: ServiceListItem | ServiceDetails | ServiceTreeNode,
+  ): boolean => canSoftDeleteServiceRule(service, this.serviceActionPermissions());
+  public readonly canRestoreService = (
+    service: ServiceListItem | ServiceDetails | ServiceTreeNode,
+  ): boolean => canRestoreServiceRule(service, this.serviceActionPermissions());
+  public readonly canPermanentDeleteService = (
+    service: ServiceListItem | ServiceDetails | ServiceTreeNode,
+  ): boolean => canPermanentDeleteServiceRule(service, this.serviceActionPermissions());
   public readonly canAssignBranchService = (node: ServiceTreeNode): boolean =>
     canAssignServiceLeafRule(node, this.serviceActionPermissions());
   public readonly translations = computed(
@@ -122,18 +131,31 @@ export class ServicesComponent implements OnInit, OnDestroy {
   public readonly canRestore = this.permissionService.canRestore;
   public readonly canDeletePermanent = this.permissionService.canDeletePermanent;
   public readonly canAssignBranchServices = this.permissionService.canAssignBranchServices;
+  public readonly canCreateBranchServiceTree = this.permissionService.canCreateBranchServiceTree;
   public readonly isBranchAdmin = computed(
     () => this.authSessionService.currentSession()?.userType === 'BranchAdmin',
   );
-  public readonly activeBranchId = computed(() => this.authSessionService.currentSession()?.activeBranchId ?? null);
+  public readonly activeBranchId = computed(
+    () => this.authSessionService.currentSession()?.activeBranchId ?? null,
+  );
   public readonly canUseBranchAssignment = computed(
     () => this.isBranchAdmin() && this.canAssignBranchServices() && this.activeBranchId() !== null,
   );
-  public readonly canUseCatalog = computed(() => this.canViewAll() || this.canUseBranchAssignment());
+  public readonly canUseCatalog = computed(
+    () => this.canViewAll() || this.canUseBranchAssignment(),
+  );
   public readonly isTechnicalAdmin = computed(
     () => this.authSessionService.currentSession()?.userType === 'TechnicalAdmin',
   );
   public readonly canCreateGlobal = computed(() => this.isTechnicalAdmin() && this.canCreate());
+  public readonly canCreateBranchScoped = computed(
+    () => this.canUseBranchAssignment() && this.canCreateBranchServiceTree(),
+  );
+  public readonly canCreateBranchScopedChild = (node: ServiceTreeNode): boolean =>
+    this.canCreateBranchScoped() &&
+    !node.isDeleted &&
+    (node.scope === 'Global' ||
+      (node.scope === 'BranchScoped' && node.isOwnedByCurrentBranch && node.canEditDefinition));
 
   public readonly includeInactiveTree = signal(false);
   public readonly includeDeletedTree = signal(false);
@@ -167,7 +189,13 @@ export class ServicesComponent implements OnInit, OnDestroy {
       arabicUserMessage: ['', [Validators.maxLength(500)]],
       englishUserMessage: ['', [Validators.maxLength(500)]],
       isServiceCodeRequired: [false],
-      serviceCode: ['', [Validators.maxLength(100), (control: AbstractControl<string>) => this.serviceCodeValidator(control)]],
+      serviceCode: [
+        '',
+        [
+          Validators.maxLength(100),
+          (control: AbstractControl<string>) => this.serviceCodeValidator(control),
+        ],
+      ],
       isTicketIssuable: ['' as TicketIssuableValue, [Validators.required]],
       isClientInputRequired: [false],
       hasReservation: [false],
@@ -199,6 +227,7 @@ export class ServicesComponent implements OnInit, OnDestroy {
   private panelRequestId = 0;
   private serviceCodeConflict = false;
   private nameConflictControl: ServiceNameControlName | null = null;
+  private branchCreateParentNode: ServiceTreeNode | null = null;
 
   ngOnInit(): void {
     this.store.activeTab.set('tree');
@@ -320,10 +349,22 @@ export class ServicesComponent implements OnInit, OnDestroy {
   }
 
   public openCreateRoot(): void {
+    if (this.canCreateBranchScoped() && !this.canCreateGlobal()) {
+      this.openCreateForParent(null, this.translations().treeRoot, null);
+      return;
+    }
+
     this.openCreateForParent(null, this.translations().treeRoot);
   }
 
   public openCreateChild(parent: ServiceTreeNode): void {
+    if (this.canCreateBranchScopedChild(parent) && !this.canCreateGlobal()) {
+      this.store.expandAssignedBranchNodes([parent.id]);
+      this.openCreateForParent(parent.id, this.serviceName(parent), parent);
+      this.store.selectTreeNode(parent.id);
+      return;
+    }
+
     this.store.expandTreeNode(parent.id);
     this.openCreateForParent(parent.id, this.serviceName(parent));
     this.store.selectTreeNode(parent.id);
@@ -383,7 +424,10 @@ export class ServicesComponent implements OnInit, OnDestroy {
 
   public dropBranchAssignment(serviceId: number): void {
     const draggedNode = this.store.draggedBranchAssignmentNode();
-    const node = draggedNode?.id === serviceId ? draggedNode : this.findTreeNode(this.store.serviceTree(), serviceId);
+    const node =
+      draggedNode?.id === serviceId
+        ? draggedNode
+        : this.findTreeNode(this.store.serviceTree(), serviceId);
 
     if (!node || !this.isAssignableBranchService(node)) {
       this.showMessage('error', this.translations().branchAssignmentInvalidLeaf);
@@ -407,6 +451,7 @@ export class ServicesComponent implements OnInit, OnDestroy {
     this.reloadConflictServiceId.set(null);
     this.serviceCodeConflict = false;
     this.nameConflictControl = null;
+    this.branchCreateParentNode = null;
     this.serviceForm.markAsPristine();
     this.serviceForm.enable({ emitEvent: false });
   }
@@ -422,7 +467,14 @@ export class ServicesComponent implements OnInit, OnDestroy {
     }
 
     if (this.store.panelMode() === 'create') {
-      this.createService();
+      if (
+        this.branchCreateParentNode !== null ||
+        (this.canCreateBranchScoped() && !this.canCreateGlobal())
+      ) {
+        this.createBranchScopedService();
+      } else {
+        this.createService();
+      }
       return;
     }
 
@@ -511,7 +563,10 @@ export class ServicesComponent implements OnInit, OnDestroy {
     this.permanentlyDeleteService(state);
   }
 
-  public handleMediaMessage(message: { readonly tone: 'success' | 'error' | 'info'; readonly text: string }): void {
+  public handleMediaMessage(message: {
+    readonly tone: 'success' | 'error' | 'info';
+    readonly text: string;
+  }): void {
     this.showMessage(message.tone, message.text);
   }
 
@@ -595,7 +650,6 @@ export class ServicesComponent implements OnInit, OnDestroy {
   public logoUrl(value: string | null): string | null {
     return this.apiService.resolveMediaUrl(value);
   }
-
 
   public panelTitle(): string {
     if (this.store.panelMode() === 'create') {
@@ -778,28 +832,43 @@ export class ServicesComponent implements OnInit, OnDestroy {
   public ownerBranchLabel(
     item: ServiceListItem | ServiceDetails | ServiceTreeNode | ServiceParentOption,
   ): string {
-    const value = this.language() === 'ar' ? item.ownerBranchArabicName : item.ownerBranchEnglishName;
+    const value =
+      this.language() === 'ar' ? item.ownerBranchArabicName : item.ownerBranchEnglishName;
     return this.formatText(value);
   }
 
   public scopeLabel(scope: ServiceScope): string {
-    return scope === 'Global' ? this.translations().globalScope : this.translations().branchScopedScope;
+    return scope === 'Global'
+      ? this.translations().globalScope
+      : this.translations().branchScopedScope;
   }
-  private openCreateForParent(parentServiceId: number | null, parentName: string): void {
-    if (!this.canCreateGlobal()) {
+  private openCreateForParent(
+    parentServiceId: number | null,
+    parentName: string,
+    branchParentNode?: ServiceTreeNode | null,
+  ): void {
+    const isBranchScopedCreate = branchParentNode !== undefined;
+
+    if (
+      isBranchScopedCreate ? !this.canOpenBranchCreate(branchParentNode) : !this.canCreateGlobal()
+    ) {
       this.showMessage('error', this.translations().noPermissionHint);
       return;
     }
 
     this.panelRequestId += 1;
     this.store.selectedDetails.set(null);
+    this.branchCreateParentNode = branchParentNode ?? null;
     this.store.setCreateParentContext(parentServiceId, parentName);
     this.store.openPanel('create');
     this.formError.set(null);
     this.reloadConflictServiceId.set(null);
     this.serviceCodeConflict = false;
     this.nameConflictControl = null;
-    this.loadParentOptions();
+    if (!isBranchScopedCreate) {
+      this.loadParentOptions();
+    }
+
     this.serviceForm.enable({ emitEvent: false });
     this.serviceForm.reset({
       parentServiceId: parentServiceId ?? 0,
@@ -833,11 +902,11 @@ export class ServicesComponent implements OnInit, OnDestroy {
     this.store.listLoading.set(true);
 
     this.apiService.getServices(this.store.listQuery()).subscribe({
-        next: (response) => {
+      next: (response) => {
         this.store.servicePage.set(response);
       },
-        error: (error: HttpErrorResponse) => this.handleApiError(error),
-        complete: () => this.store.listLoading.set(false),
+      error: (error: HttpErrorResponse) => this.handleApiError(error),
+      complete: () => this.store.listLoading.set(false),
     });
   }
 
@@ -933,9 +1002,9 @@ export class ServicesComponent implements OnInit, OnDestroy {
     this.store.parentsLoading.set(true);
 
     this.apiService.getAvailableParents({ excludeServiceId }).subscribe({
-        next: (response) => this.store.parentOptions.set(response),
-        error: (error: HttpErrorResponse) => this.handleApiError(error),
-        complete: () => this.store.parentsLoading.set(false),
+      next: (response) => this.store.parentOptions.set(response),
+      error: (error: HttpErrorResponse) => this.handleApiError(error),
+      complete: () => this.store.parentsLoading.set(false),
     });
   }
 
@@ -1047,6 +1116,45 @@ export class ServicesComponent implements OnInit, OnDestroy {
       });
   }
 
+  private createBranchScopedService(): void {
+    const branchId = this.activeBranchId();
+    const parent = this.branchCreateParentNode;
+
+    if (!branchId || !this.canOpenBranchCreate(parent)) {
+      this.showMessage('error', this.translations().noPermissionHint);
+      return;
+    }
+
+    const request$: Observable<
+      CreateBranchServiceTreeResponse | CreateBranchServiceSubtreeResponse
+    > = parent
+      ? this.branchServicesApiService.createBranchServiceSubtree(
+          branchId,
+          parent.id,
+          this.mapBranchCreateRequest(),
+        )
+      : this.branchServicesApiService.createBranchServiceTree(
+          branchId,
+          this.mapBranchCreateRequest(),
+        );
+
+    this.store.saving.set(true);
+    request$.pipe(finalize(() => this.store.saving.set(false))).subscribe({
+      next: (response) => {
+        if (parent) {
+          this.store.expandAssignedBranchNodes([parent.id]);
+        }
+
+        this.store.selectTreeNode(response.root.id);
+        this.showMessage('success', response.message || this.translations().fallbackSuccess);
+        this.closePanel();
+        this.loadTree();
+        this.loadAssignedBranchTree(response.root.id);
+        this.loadDetails(response.root.id, 'view');
+      },
+      error: (error: HttpErrorResponse) => this.handleApiError(error),
+    });
+  }
   private updateService(): void {
     const details = this.store.selectedDetails();
 
@@ -1150,6 +1258,10 @@ export class ServicesComponent implements OnInit, OnDestroy {
     };
   }
 
+  private canOpenBranchCreate(parent: ServiceTreeNode | null): boolean {
+    return parent ? this.canCreateBranchScopedChild(parent) : this.canCreateBranchScoped();
+  }
+
   private populateForm(details: ServiceDetails): void {
     this.serviceCodeConflict = false;
     this.nameConflictControl = null;
@@ -1208,8 +1320,39 @@ export class ServicesComponent implements OnInit, OnDestroy {
     };
   }
 
+  private mapBranchCreateRequest(): CreateBranchServiceTreeRequest {
+    return {
+      root: this.mapBranchCreateNodeRequest(),
+    };
+  }
+
+  private mapBranchCreateNodeRequest(): CreateBranchServiceTreeNodeRequest {
+    const value = this.serviceForm.getRawValue();
+    const isTicketIssuable = value.isTicketIssuable === 'true';
+
+    return {
+      arabicName: value.arabicName.trim(),
+      englishName: value.englishName.trim(),
+      arabicUserMessage: this.toOptionalString(value.arabicUserMessage),
+      englishUserMessage: this.toOptionalString(value.englishUserMessage),
+      serviceCode: value.isServiceCodeRequired ? this.toOptionalString(value.serviceCode) : null,
+      isServiceCodeRequired: value.isServiceCodeRequired,
+      isTicketIssuable,
+      isClientInputRequired: value.isClientInputRequired,
+      hasReservation: value.hasReservation,
+      orderNo: Number(value.orderNo),
+      priority: Number(value.priority),
+      rangePrefix: isTicketIssuable ? this.toOptionalString(value.rangePrefix) : null,
+      rangeStartNumber: isTicketIssuable ? Number(value.rangeStartNumber) : null,
+      rangeEndNumber: isTicketIssuable ? Number(value.rangeEndNumber) : null,
+      waitingDuration: isTicketIssuable ? Number(value.waitingDuration) : null,
+      noOfTicketCopies: isTicketIssuable ? Number(value.noOfTicketCopies) : null,
+      children: [],
+    };
+  }
   private mapMutationRequest(): CreateServiceRequest {
     const value = this.serviceForm.getRawValue();
+    const isTicketIssuable = value.isTicketIssuable === 'true';
 
     return {
       parentServiceId: value.parentServiceId > 0 ? Number(value.parentServiceId) : null,
@@ -1219,17 +1362,17 @@ export class ServicesComponent implements OnInit, OnDestroy {
       englishUserMessage: this.toOptionalString(value.englishUserMessage),
       serviceCode: value.isServiceCodeRequired ? this.toOptionalString(value.serviceCode) : null,
       isServiceCodeRequired: value.isServiceCodeRequired,
-      isTicketIssuable: value.isTicketIssuable === 'true',
+      isTicketIssuable,
       isClientInputRequired: value.isClientInputRequired,
       hasReservation: value.hasReservation,
       orderNo: Number(value.orderNo),
       priority: Number(value.priority),
       weight: Number(value.weight),
-      rangePrefix: value.rangePrefix.trim(),
-      rangeStartNumber: Number(value.rangeStartNumber),
-      rangeEndNumber: Number(value.rangeEndNumber),
-      waitingDuration: Number(value.waitingDuration),
-      noOfTicketCopies: Number(value.noOfTicketCopies),
+      rangePrefix: isTicketIssuable ? this.toOptionalString(value.rangePrefix) : null,
+      rangeStartNumber: isTicketIssuable ? Number(value.rangeStartNumber) : null,
+      rangeEndNumber: isTicketIssuable ? Number(value.rangeEndNumber) : null,
+      waitingDuration: isTicketIssuable ? Number(value.waitingDuration) : null,
+      noOfTicketCopies: isTicketIssuable ? Number(value.noOfTicketCopies) : null,
     };
   }
 
@@ -1281,7 +1424,10 @@ export class ServicesComponent implements OnInit, OnDestroy {
     );
   }
 
-  private findTreeNode(nodes: readonly ServiceTreeNode[], serviceId: number): ServiceTreeNode | null {
+  private findTreeNode(
+    nodes: readonly ServiceTreeNode[],
+    serviceId: number,
+  ): ServiceTreeNode | null {
     for (const node of nodes) {
       if (node.id === serviceId) {
         return node;
@@ -1364,7 +1510,8 @@ export class ServicesComponent implements OnInit, OnDestroy {
     }
 
     if (this.isConcurrencyError(error)) {
-      const serviceId = this.store.panelMode() === 'edit' ? this.store.selectedDetails()?.id ?? null : null;
+      const serviceId =
+        this.store.panelMode() === 'edit' ? (this.store.selectedDetails()?.id ?? null) : null;
       this.reloadConflictServiceId.set(serviceId);
       this.formError.set(this.translations().concurrencyError);
       this.showMessage('error', this.translations().concurrencyError);
@@ -1378,11 +1525,16 @@ export class ServicesComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.showMessage('error', formatTechnicalAdminApiError(error, this.translations().fallbackError));
+    this.showMessage(
+      'error',
+      formatTechnicalAdminApiError(error, this.translations().fallbackError),
+    );
   }
 
   private isConcurrencyError(error: HttpErrorResponse): boolean {
-    return this.containsErrorCode(error, 'concurrency') || this.containsErrorCode(error, 'rowversion');
+    return (
+      this.containsErrorCode(error, 'concurrency') || this.containsErrorCode(error, 'rowversion')
+    );
   }
 
   private containsErrorCode(error: HttpErrorResponse, expected: string): boolean {
@@ -1402,7 +1554,6 @@ export class ServicesComponent implements OnInit, OnDestroy {
     this.serviceCodeConflict = false;
     this.serviceCodeControl.updateValueAndValidity({ emitEvent: false });
   }
-
 
   private markNameConflict(controlName: ServiceNameControlName, message: string): void {
     this.nameConflictControl = controlName;

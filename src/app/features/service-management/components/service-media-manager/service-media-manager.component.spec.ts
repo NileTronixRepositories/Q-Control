@@ -49,10 +49,20 @@ describe('ServiceMediaManagerComponent', () => {
 
   afterEach(() => vi.unstubAllGlobals());
 
-  it('loads and renders service images for the selected service', () => {
+  it('loads and renders service images in the compact media layout', () => {
+    const grid = fixture.nativeElement.querySelector('.service-media-grid') as HTMLElement | null;
+    const singleCards = fixture.nativeElement.querySelectorAll('.service-media-card--single');
+    const adsCard = fixture.nativeElement.querySelector('.service-media-card--ads') as HTMLElement | null;
+
     expect(api.getServiceImages).toHaveBeenCalledWith(101, undefined);
     expect(fixture.nativeElement.textContent).toContain('Service Media');
     expect(fixture.nativeElement.querySelectorAll('img').length).toBe(2);
+    expect(grid?.classList).toContain('row');
+    expect(singleCards.length).toBe(2);
+    expect(Array.from(singleCards).every((card) => (card as HTMLElement).classList.contains('col-xl-6'))).toBe(true);
+    expect(adsCard?.classList).toContain('col-12');
+    expect(fixture.nativeElement.querySelector('.service-media-empty')).not.toBeNull();
+    expect(fixture.nativeElement.querySelectorAll('input[type="file"]').length).toBe(3);
   });
 
   it('rejects unsupported advertisement files before upload', () => {

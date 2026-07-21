@@ -175,11 +175,11 @@ export interface ServiceMutationRequest extends ServiceCodeFields {
   readonly orderNo: number;
   readonly priority: number;
   readonly weight: number;
-  readonly rangePrefix: string;
-  readonly rangeStartNumber: number;
-  readonly rangeEndNumber: number;
-  readonly waitingDuration: number;
-  readonly noOfTicketCopies: number;
+  readonly rangePrefix: string | null;
+  readonly rangeStartNumber: number | null;
+  readonly rangeEndNumber: number | null;
+  readonly waitingDuration: number | null;
+  readonly noOfTicketCopies: number | null;
 }
 
 export type CreateServiceRequest = ServiceMutationRequest;

@@ -12,6 +12,7 @@ export interface ServiceScheduleTranslations {
   readonly noScheduleTitle: string;
   readonly noScheduleBody: string;
   readonly selectBranchFirst: string;
+  readonly selectServiceFirst: string;
   readonly invalidScheduleScope: string;
   readonly backToBranchServices: string;
   readonly branch: string;
@@ -80,6 +81,7 @@ export const SERVICE_SCHEDULE_TRANSLATIONS: Record<AppLanguage, ServiceScheduleT
     noScheduleTitle: 'لا يوجد جدول محفوظ',
     noScheduleBody: 'لم يتم إعداد جدول لهذه الخدمة في هذا الفرع.',
     selectBranchFirst: 'اختر فرعا لعرض الخدمات.',
+    selectServiceFirst: 'الرجاء اختيار الخدمة لعرض تفاصيل الجدول.',
     invalidScheduleScope: 'لا يمكن إدارة جدول هذه الخدمة داخل الفرع المحدد.',
     backToBranchServices: 'العودة إلى خدمات الفرع',
     branch: 'الفرع',
@@ -154,6 +156,7 @@ export const SERVICE_SCHEDULE_TRANSLATIONS: Record<AppLanguage, ServiceScheduleT
     noScheduleTitle: 'No schedule configured',
     noScheduleBody: 'This branch service does not have a saved schedule yet.',
     selectBranchFirst: 'Select a branch to view services.',
+    selectServiceFirst: 'Please select a service to view the schedule details.',
     invalidScheduleScope: 'This service schedule cannot be managed for the selected branch.',
     backToBranchServices: 'Back to Branch Services',
     branch: 'Branch',
