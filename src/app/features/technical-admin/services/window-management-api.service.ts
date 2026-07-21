@@ -104,6 +104,10 @@ export class WindowManagementApiService {
       .set('pageNumber', query.pageNumber ?? 1)
       .set('pageSize', Math.min(query.pageSize ?? 10, 100));
 
+    if (query.branchId) {
+      params = params.set('branchId', query.branchId);
+    }
+
     if (query.waitingAreaId) {
       params = params.set('waitingAreaId', query.waitingAreaId);
     }

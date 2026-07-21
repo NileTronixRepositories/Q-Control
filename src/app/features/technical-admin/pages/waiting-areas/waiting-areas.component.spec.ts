@@ -1,21 +1,24 @@
-﻿import { computed, signal } from '@angular/core';
+import { computed, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { of } from 'rxjs';
 
 import { AppDirection, AppLanguage } from '../../../../shared/models/app-language.model';
 import { AppLanguageStore } from '../../../../shared/store/app-language.store';
+import { AuthenticatedSession } from '../../../auth/models/login-credentials.model';
 import { AuthSessionService } from '../../../auth/services/auth-session.service';
 import { BranchListItem, PagedBranchResponse } from '../../models/branch-management.model';
 import { Pagination, WaitingAreaListItem } from '../../models/waiting-area.model';
 import { BranchManagementApiService } from '../../services/branch-management-api.service';
 import { WaitingAreaApiService } from '../../services/waiting-area-api.service';
+import { TechnicalAdminBranchContextStore } from '../../store/technical-admin-branch-context.store';
 import { TechnicalAdminI18nStore } from '../../store/technical-admin-i18n.store';
 import { WaitingAreasComponent } from './waiting-areas.component';
 
 describe('WaitingAreasComponent', () => {
   let fixture: ComponentFixture<WaitingAreasComponent>;
   const language = signal<AppLanguage>('en');
+  const session = signal<AuthenticatedSession | null>(null);
   const getBranches = vi.fn<BranchManagementApiService['getBranches']>(() =>
     of(createBranchPage()),
   );
@@ -26,6 +29,7 @@ describe('WaitingAreasComponent', () => {
   beforeEach(async () => {
     vi.clearAllMocks();
     language.set('en');
+    session.set(null);
 
     await TestBed.configureTestingModule({
       imports: [WaitingAreasComponent],
@@ -48,11 +52,12 @@ describe('WaitingAreasComponent', () => {
         {
           provide: AuthSessionService,
           useValue: {
+            currentSession: session.asReadonly(),
             shouldClearSessionForHttpStatus: () => false,
             clearSession: vi.fn(),
           } satisfies Pick<
             AuthSessionService,
-            'shouldClearSessionForHttpStatus' | 'clearSession'
+            'currentSession' | 'shouldClearSessionForHttpStatus' | 'clearSession'
           >,
         },
         { provide: BranchManagementApiService, useValue: { getBranches } },
@@ -90,7 +95,7 @@ describe('WaitingAreasComponent', () => {
 
   it('reloads waiting areas for the selected branch', () => {
     const branchFilter = fixture.nativeElement.querySelectorAll(
-      '.waiting-areas-page .list-panel > .row:first-child select',
+      '[data-testid="waiting-areas-branch-filter"]',
     )[0] as HTMLSelectElement;
 
     branchFilter.value = '1';
@@ -101,6 +106,31 @@ describe('WaitingAreasComponent', () => {
     expect(getWaitingAreas.mock.calls[1][0]).toEqual(
       expect.objectContaining({ branchId: 1, pageNumber: 1 }),
     );
+  });
+
+  it('locks the list and create ownership to the technical-admin branch context', () => {
+    const contextStore = TestBed.inject(TechnicalAdminBranchContextStore);
+    session.set({ userType: 'TechnicalAdmin' } as AuthenticatedSession);
+    contextStore.selectBranch({
+      branchId: 1,
+      arabicName: 'الفرع الرئيسي',
+      englishName: 'Main Branch',
+      isActive: true,
+      effectiveIsActive: true,
+    });
+    getWaitingAreas.mockClear();
+    fixture.destroy();
+    fixture = TestBed.createComponent(WaitingAreasComponent);
+    fixture.detectChanges();
+
+    const branchFilter = fixture.nativeElement.querySelector(
+      '[data-testid="waiting-areas-branch-filter"]',
+    ) as HTMLSelectElement;
+
+    expect(getWaitingAreas).toHaveBeenCalledWith(
+      expect.objectContaining({ branchId: 1 }),
+    );
+    expect(branchFilter.disabled).toBe(true);
   });
 });
 
@@ -115,7 +145,7 @@ function createBranchPage(): PagedBranchResponse<BranchListItem> {
     data: [
       {
         branchId: 1,
-        arabicName: 'Ø§Ù„ÙØ±Ø¹ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠ',
+        arabicName: 'الفرع الرئيسي',
         englishName: 'Main Branch',
         ipAddress: '10.0.0.1',
         governorate: 'Cairo',
@@ -144,7 +174,7 @@ function createWaitingAreaPage(): Pagination<WaitingAreaListItem> {
       {
         id: 10,
         branchId: 1,
-        branchArabicName: 'Ø§Ù„ÙØ±Ø¹ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠ',
+        branchArabicName: 'الفرع الرئيسي',
         branchEnglishName: 'Main Branch',
         number: 3,
         descriptiveName: 'Main Hall',
@@ -158,5 +188,6 @@ function createWaitingAreaPage(): Pagination<WaitingAreaListItem> {
     ],
   };
 }
+
 
 

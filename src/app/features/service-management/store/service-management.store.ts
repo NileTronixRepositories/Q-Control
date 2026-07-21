@@ -95,6 +95,8 @@ export class ServiceManagementStore {
   readonly parentOptions = signal<readonly ServiceParentOption[]>([]);
   readonly selectedDetails = signal<ServiceDetails | null>(null);
   readonly selectedTreeServiceId = signal<number | null>(null);
+  readonly serviceTreeSearchText = signal('');
+  readonly assignedBranchTreeSearchText = signal('');
   readonly createParentServiceId = signal<number | null>(null);
   readonly createParentName = signal<string | null>(null);
   readonly panelMode = signal<ServicePanelMode>('closed');
@@ -157,6 +159,14 @@ export class ServiceManagementStore {
     this.createParentName.set(null);
   }
 
+  expandTreeNodes(nodeIds: readonly number[]): void {
+    this.expandedTreeNodeIds.update((current) => {
+      const next = new Set(current);
+      nodeIds.forEach((nodeId) => next.add(nodeId));
+      return next;
+    });
+  }
+
   expandTreeNode(nodeId: number): void {
     this.expandedTreeNodeIds.update((current) => {
       if (current.has(nodeId)) {
@@ -216,6 +226,8 @@ export class ServiceManagementStore {
     this.parentOptions.set([]);
     this.selectedDetails.set(null);
     this.selectedTreeServiceId.set(null);
+    this.serviceTreeSearchText.set('');
+    this.assignedBranchTreeSearchText.set('');
     this.clearCreateParentContext();
     this.panelMode.set('closed');
     this.confirmState.set(null);

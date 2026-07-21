@@ -1,25 +1,82 @@
-@if (open()) { <div class="branch-services-backdrop" (click)="close()"></div>
-<aside class="branch-services-dialog" role="dialog" [attr.aria-label]="translations().assignTitle">
-<header class="branch-services-dialog-header d-flex align-items-center justify-content-between gap-2">
-<div>
-<p>{{ translations().addServices }}</p>
-<h2>{{ translations().assignTitle }}</h2>
-<span>{{ translations().assignDescription }}</span>
-</div>
-<button type="button" class="branch-services-icon-btn d-inline-flex align-items-center justify-content-center flex-shrink-0" [attr.aria-label]="translations().close" (click)="close()">
-<i class="bi bi-x-lg" aria-hidden="true"></i>
-</button>
-</header>
-<div class="branch-services-dialog-body branch-services-dialog-tree">
-<app-service-hierarchy-tree [nodes]="nodes()" [expandedNodeIds]="expandedNodeIds()" [selectedServiceId]="null" [translations]="serviceTranslations()" [language]="language()" [direction]="direction()" [loading]="loading()" [includeInactive]="false" [includeDeleted]="false" [canCreate]="false" [canViewDetails]="false" [canUpdate]="false" [canDelete]="false" [canRestore]="false" [selectableLeaves]="true" [selectedLeafIds]="selectedLeafIds()" [canSelectLeafNode]="canSelectNode()" (refresh)="refresh.emit()" (toggleNode)="toggleNode.emit($event)" (leafSelectionChange)="updateSelection($event)" />
-</div>
-<footer class="branch-services-dialog-actions d-flex align-items-center justify-content-end flex-wrap gap-2">
-<span>{{ translations().selectedCount }}: {{ selectedCount() }}</span>
-<button type="button" class="branch-services-secondary-btn d-inline-flex align-items-center justify-content-center gap-2" [disabled]="assigning()" (click)="close()"> {{ translations().cancel }}
-</button>
-<button type="button" class="branch-services-primary-btn d-inline-flex align-items-center justify-content-center gap-2" [disabled]="assigning() || selectedCount() === 0" (click)="submit()">
-<i class="bi bi-check2" aria-hidden="true"></i> {{ translations().assign }}
-</button>
-</footer>
+@if (open()) {
+<div class="q-dialog-backdrop" (click)="close()"></div>
+<aside class="q-dialog q-dialog--lg assign-dialog" role="dialog" [attr.aria-label]="translations().assignTitle">
+
+  <!-- ── Header ── -->
+  <header class="q-dialog-header">
+    <div class="d-flex align-items-flex-start gap-3">
+      <span class="q-dialog-icon">
+        <i class="bi bi-node-plus-fill" aria-hidden="true"></i>
+      </span>
+      <div>
+        <p class="q-dialog-eyebrow">{{ translations().addServices }}</p>
+        <h2 class="q-dialog-title">{{ translations().assignTitle }}</h2>
+        <p class="q-dialog-subtitle">{{ translations().assignDescription }}</p>
+      </div>
+    </div>
+    <button
+      type="button"
+      class="q-dialog-close"
+      [attr.aria-label]="translations().close"
+      (click)="close()"
+    >
+      <i class="bi bi-x-lg" aria-hidden="true"></i>
+    </button>
+  </header>
+
+  <!-- ── Body ── -->
+  <div class="q-dialog-body assign-dialog-tree">
+    <app-service-hierarchy-tree
+      [nodes]="nodes()"
+      [expandedNodeIds]="expandedNodeIds()"
+      [selectedServiceId]="null"
+      [translations]="serviceTranslations()"
+      [language]="language()"
+      [direction]="direction()"
+      [loading]="loading()"
+      [showSearch]="true"
+      [searchText]="searchText()"
+      [searchLabel]="searchLabel()"
+      [searchPlaceholder]="searchPlaceholder()"
+      [searchHelp]="searchHelp()"
+      [includeInactive]="false"
+      [includeDeleted]="false"
+      [canCreate]="false"
+      [canViewDetails]="false"
+      [canUpdate]="false"
+      [canDelete]="false"
+      [canRestore]="false"
+      [selectableLeaves]="true"
+      [selectedLeafIds]="selectedLeafIds()"
+      [canSelectLeafNode]="canSelectNode()"
+      (refresh)="refresh.emit()"
+      (searchTextChange)="searchTextChange.emit($event)"
+      (toggleNode)="toggleNode.emit($event)"
+      (leafSelectionChange)="updateSelection($event)"
+    />
+  </div>
+
+  <!-- ── Footer ── -->
+  <footer class="q-dialog-footer">
+    <span class="q-dialog-footer-meta">{{ translations().selectedCount }}: {{ selectedCount() }}</span>
+    <button
+      type="button"
+      class="q-btn q-btn--secondary"
+      [disabled]="assigning()"
+      (click)="close()"
+    >
+      {{ translations().cancel }}
+    </button>
+    <button
+      type="button"
+      class="q-btn q-btn--primary"
+      [disabled]="assigning() || selectedCount() === 0"
+      (click)="submit()"
+    >
+      <i class="bi bi-check2" aria-hidden="true"></i>
+      {{ translations().assign }}
+    </button>
+  </footer>
+
 </aside>
 }

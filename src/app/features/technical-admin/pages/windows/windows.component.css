@@ -1,20 +1,7 @@
-:host {
+﻿:host {
   display: block;
-}
-
-.window-management-page {
-  --q-table-min-width: 960px;
 }
 
 .window-editor-panel {
   --q-popup-width: min(760px, calc(100dvw - 96px));
-}
-
-.window-editor-form {
-  --bs-gutter-x: 14px;
-  --bs-gutter-y: 12px;
-}
-
-.window-check-field {
-  min-height: var(--q-admin-control-height, 44px);
 }

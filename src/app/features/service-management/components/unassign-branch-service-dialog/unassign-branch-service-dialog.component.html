@@ -1,38 +1,78 @@
-<div class="modal d-block bg-dark bg-opacity-50" role="presentation" tabindex="-1" (click)="closeFromBackdrop($event)"
+<div
+  class="q-dialog-backdrop"
+  role="presentation"
+  tabindex="-1"
+  (click)="closeFromBackdrop($event)"
 >
-<section class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="dialog" aria-modal="true" [attr.aria-labelledby]="'unassign-branch-service-title'" [attr.aria-describedby]="'unassign-branch-service-description'" >
-<div class="modal-content overflow-hidden border-0 shadow-lg">
-<header class="modal-header align-items-start gap-2">
-<div class="d-flex align-items-start gap-3">
-<span class="rounded-circle d-inline-flex flex-shrink-0 align-items-center justify-content-center bg-danger-subtle text-danger service-lifecycle-icon">
-<i class="bi bi-node-minus fs-5" aria-hidden="true"></i>
-</span>
-<div class="d-block">
-<h2 id="unassign-branch-service-title" class="modal-title fs-5 fw-bold text-break"> {{ translations().unassignConfirmTitle }}
-</h2>
-<p class="mb-0 mt-1 fw-semibold text-primary text-break">{{ state().serviceName }}</p>
-</div>
-</div>
-<button type="button" class="btn-close flex-shrink-0" [disabled]="unassigning()" [attr.aria-label]="translations().close" (click)="requestClose()" ></button>
-</header>
-<div class="modal-body d-grid gap-2">
-<p id="unassign-branch-service-description" class="mb-0 lh-lg text-secondary"> {{ translations().unassignConfirmBody }}
-</p>
-<div class="alert alert-warning d-flex gap-3 mb-0" role="alert">
-<i class="bi bi-info-circle flex-shrink-0" aria-hidden="true"></i>
-<p class="mb-0">{{ translations().unassignPreserveDefinition }}</p>
-</div>
-</div>
-<footer class="modal-footer gap-2">
-<button type="button" class="btn btn-outline-secondary" autofocus [disabled]="unassigning()" (click)="requestClose()" > {{ translations().cancel }}
-</button>
-<button type="button" class="btn btn-danger d-inline-flex align-items-center justify-content-center gap-2" [disabled]="unassigning()" (click)="requestConfirm()" >
-@if (unassigning()) { <i class="bi bi-arrow-repeat" aria-hidden="true"></i>
-<span>{{ translations().unassigning }}</span> }
-@else { <i class="bi bi-node-minus" aria-hidden="true"></i>
-<span>{{ translations().unassign }}</span> }
-</button>
-</footer>
-</div>
-</section>
+  <section
+    class="q-dialog q-dialog--sm"
+    role="dialog"
+    aria-modal="true"
+    [attr.aria-labelledby]="'unassign-branch-service-title'"
+    [attr.aria-describedby]="'unassign-branch-service-description'"
+  >
+
+    <!-- ── Header ── -->
+    <header class="q-dialog-header">
+      <div class="d-flex align-items-center gap-3">
+        <span class="q-confirm-icon q-confirm-icon--danger">
+          <i class="bi bi-node-minus" aria-hidden="true"></i>
+        </span>
+        <div>
+          <h2 id="unassign-branch-service-title" class="q-dialog-title mb-0">
+            {{ translations().unassignConfirmTitle }}
+          </h2>
+          <p class="q-confirm-service-name">{{ state().serviceName }}</p>
+        </div>
+      </div>
+      <button
+        type="button"
+        class="q-dialog-close"
+        [disabled]="unassigning()"
+        [attr.aria-label]="translations().close"
+        (click)="requestClose()"
+      >
+        <i class="bi bi-x-lg" aria-hidden="true"></i>
+      </button>
+    </header>
+
+    <!-- ── Body ── -->
+    <div class="q-dialog-body d-grid gap-3">
+      <p id="unassign-branch-service-description" class="q-confirm-body">
+        {{ translations().unassignConfirmBody }}
+      </p>
+      <div class="q-alert q-alert--warning" role="alert">
+        <i class="bi bi-info-circle flex-shrink-0" aria-hidden="true"></i>
+        <p class="mb-0">{{ translations().unassignPreserveDefinition }}</p>
+      </div>
+    </div>
+
+    <!-- ── Footer ── -->
+    <footer class="q-dialog-footer">
+      <button
+        type="button"
+        class="q-btn q-btn--secondary"
+        autofocus
+        [disabled]="unassigning()"
+        (click)="requestClose()"
+      >
+        {{ translations().cancel }}
+      </button>
+      <button
+        type="button"
+        class="q-btn q-btn--danger"
+        [disabled]="unassigning()"
+        (click)="requestConfirm()"
+      >
+        @if (unassigning()) {
+          <i class="bi bi-arrow-repeat" aria-hidden="true"></i>
+          <span>{{ translations().unassigning }}</span>
+        } @else {
+          <i class="bi bi-node-minus" aria-hidden="true"></i>
+          <span>{{ translations().unassign }}</span>
+        }
+      </button>
+    </footer>
+
+  </section>
 </div>

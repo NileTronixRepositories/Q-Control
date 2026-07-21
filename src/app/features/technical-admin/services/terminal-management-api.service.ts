@@ -96,6 +96,10 @@ export class TerminalManagementApiService {
       .set('pageNumber', query.pageNumber ?? 1)
       .set('pageSize', Math.min(query.pageSize ?? 10, 100));
 
+    if (query.branchId) {
+      params = params.set('branchId', query.branchId);
+    }
+
     if (query.windowId) {
       params = params.set('windowId', query.windowId);
     }

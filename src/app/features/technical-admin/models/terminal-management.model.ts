@@ -1,6 +1,7 @@
 import { LifecycleMutationResponse, OperationalEntityState, OperationalStatusFilter, PermanentDeleteResponse } from './operational-lifecycle.model';
 
 export interface GetTerminalsParams {
+  readonly branchId?: number;
   readonly windowId?: number;
   readonly search?: string;
   readonly pageNumber?: number;

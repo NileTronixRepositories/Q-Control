@@ -1,29 +1,39 @@
 @if (items().length > 0) {
   <nav
-    class="app-breadcrumb"
+    class="app-breadcrumb w-100"
     [attr.aria-label]="ariaLabel()"
     [attr.dir]="direction()"
     [attr.lang]="language()"
   >
-    <ol class="app-breadcrumb-list">
+    <ol class="app-breadcrumb-list d-flex align-items-center m-0 p-0">
       @for (item of items(); track item.route ?? item.label; let index = $index) {
-        <li class="app-breadcrumb-item" [class.is-current]="isLast(index)">
+        <li
+          class="app-breadcrumb-item d-inline-flex align-items-center"
+          [class.is-current]="isLast(index)"
+        >
           @if (isLast(index)) {
-            <span class="app-breadcrumb-current" aria-current="page">
+            <span
+              class="app-breadcrumb-current d-inline-flex align-items-center"
+              aria-current="page"
+            >
               @if (item.icon) {
                 <i class="bi {{ item.icon }}" aria-hidden="true"></i>
               }
               <span>{{ item.label }}</span>
             </span>
           } @else if (item.route) {
-            <a class="app-breadcrumb-link" [routerLink]="item.route">
+            <a
+              class="app-breadcrumb-link d-inline-flex align-items-center text-decoration-none"
+              [routerLink]="item.route"
+              [queryParams]="item.queryParams"
+            >
               @if (item.icon) {
                 <i class="bi {{ item.icon }}" aria-hidden="true"></i>
               }
               <span>{{ item.label }}</span>
             </a>
           } @else {
-            <span class="app-breadcrumb-label">
+            <span class="app-breadcrumb-label d-inline-flex align-items-center">
               @if (item.icon) {
                 <i class="bi {{ item.icon }}" aria-hidden="true"></i>
               }

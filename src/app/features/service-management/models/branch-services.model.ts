@@ -4,6 +4,7 @@ import { ServiceGlobalizationRequestSummary } from './service-globalization.mode
 export interface BranchServicesTreeQuery {
   readonly includeInactive: boolean;
   readonly includeDeleted: boolean;
+  readonly searchText?: string;
 }
 
 export interface AssignBranchServicesRequest {
@@ -120,3 +121,4 @@ export interface BranchServiceLifecycleConfirmState {
 }
 
 export type BranchServiceTreeNode = ServiceTreeNode;
+

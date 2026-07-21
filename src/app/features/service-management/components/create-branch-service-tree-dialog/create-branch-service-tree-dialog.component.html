@@ -1,117 +1,247 @@
-@if (open()) { <div class="branch-tree-backdrop" (click)="close()"></div>
-<aside class="branch-tree-dialog" role="dialog" [attr.aria-label]="dialogTitle()">
-<header class="branch-tree-header d-flex align-items-center justify-content-between gap-2">
-<div>
-<p>{{ dialogActionLabel() }}</p>
-<h2>{{ dialogTitle() }}</h2>
-<span>{{ dialogDescription() }}</span>
-@if (mode() === 'subtree' && parentLabel()) { <small class="branch-tree-parent-label" >{{ translations().createSubtreeUnder }}: {{ parentLabel() }}</small > }
-</div>
-<button type="button" class="branch-tree-icon-btn d-inline-flex align-items-center justify-content-center flex-shrink-0" [attr.aria-label]="translations().close" (click)="close()" >
-<i class="bi bi-x-lg" aria-hidden="true"></i>
-</button>
-</header>
-<div class="branch-tree-body">
-@if (validationError(); as error) { <p class="branch-tree-error">
-<i class="bi bi-exclamation-triangle" aria-hidden="true"></i> {{ error }}
-</p> }
-<ng-container *ngTemplateOutlet=" nodeTemplate; context: { $implicit: root, level: 0, parent: null, index: 0 }" />
-</div>
-<footer class="branch-tree-actions d-flex align-items-center justify-content-end flex-wrap gap-2">
-<button type="button" class="branch-tree-secondary-btn d-inline-flex align-items-center justify-content-center gap-2" [disabled]="saving()" (click)="close()" > {{ translations().cancel }}
-</button>
-<button type="button" class="branch-tree-primary-btn d-inline-flex align-items-center justify-content-center gap-2" [disabled]="saving()" (click)="submit()" >
-<i class="bi bi-check2" aria-hidden="true"></i> {{ translations().save }}
-</button>
-</footer>
-</aside>
+@if (open()) {
+  <div class="q-dialog-backdrop" (click)="close()" aria-hidden="true"></div>
+  <aside
+    class="q-dialog q-dialog--xl branch-tree-dialog"
+    role="dialog"
+    [attr.aria-label]="dialogTitle()"
+  >
+    <header class="q-dialog-header">
+      <div class="d-flex align-items-center gap-3">
+        <span class="q-dialog-icon">
+          <i class="bi bi-diagram-3-fill" aria-hidden="true"></i>
+        </span>
+        <div>
+          <p class="q-dialog-subtitle mb-0 text-primary fw-bold" style="font-size: 0.75rem;">{{ dialogActionLabel() }}</p>
+          <h2 class="q-dialog-title mb-0">{{ dialogTitle() }}</h2>
+          <span class="text-secondary small">{{ dialogDescription() }}</span>
+          @if (mode() === 'subtree' && parentLabel()) {
+            <small class="branch-tree-parent-label mt-1 d-block"
+              >{{ translations().createSubtreeUnder }}: {{ parentLabel() }}</small
+            >
+          }
+        </div>
+      </div>
+      <button
+        type="button"
+        class="q-dialog-close"
+        [attr.aria-label]="translations().close"
+        (click)="close()"
+      >
+        <i class="bi bi-x-lg" aria-hidden="true"></i>
+      </button>
+    </header>
+
+    <div class="q-dialog-body branch-tree-scroll-body">
+      @if (validationError(); as error) {
+        <div class="q-alert q-alert--danger mb-3" role="alert">
+          <i class="bi bi-exclamation-triangle flex-shrink-0" aria-hidden="true"></i>
+          <p class="mb-0">{{ error }}</p>
+        </div>
+      }
+      <ng-container
+        *ngTemplateOutlet="
+          nodeTemplate;
+          context: { $implicit: root, level: 0, parent: null, index: 0 }
+        "
+      />
+    </div>
+
+    <footer class="q-dialog-footer">
+      <button
+        type="button"
+        class="q-btn q-btn--secondary"
+        [disabled]="saving()"
+        (click)="close()"
+      >
+        {{ translations().cancel }}
+      </button>
+      <button
+        type="button"
+        class="q-btn q-btn--primary"
+        [disabled]="saving()"
+        (click)="submit()"
+      >
+        @if (saving()) {
+          <i class="bi bi-arrow-repeat animate-spin" aria-hidden="true"></i>
+        } @else {
+          <i class="bi bi-check2-circle" aria-hidden="true"></i>
+        }
+        <span>{{ translations().save }}</span>
+      </button>
+    </footer>
+  </aside>
 }
+
 <ng-template #nodeTemplate let-group let-level="level" let-parent="parent" let-index="index">
-<section class="branch-tree-node" [style.--node-level]="level" [formGroup]="group">
-<header class="branch-tree-node-header d-flex align-items-center justify-content-between flex-wrap gap-2">
-<strong>{{ level === 0 ? dialogTitle() : translations().addChild }}</strong>
-<div class="branch-tree-node-actions d-flex align-items-center flex-wrap gap-2">
-@if (!leafOnly()) { <button type="button" class="branch-tree-secondary-btn d-inline-flex align-items-center justify-content-center gap-2" (click)="addChild(group)">
-<i class="bi bi-plus-lg" aria-hidden="true"></i> {{ translations().addChild }}
-</button> }
-@if (parent) { <button type="button" class="branch-tree-danger-btn d-inline-flex align-items-center justify-content-center gap-2" (click)="removeChild(parent, index)">
-<i class="bi bi-trash3" aria-hidden="true"></i> {{ translations().removeNode }}
-</button> }
-</div>
-</header>
-<div class="branch-tree-grid row g-2">
-<label class="branch-tree-field d-grid gap-1 m-0 col-12 col-md">
-<span>{{ translations().arabicName }}</span>
-<input class="form-control" type="text" maxlength="100" formControlName="arabicName" />
-</label>
-<label class="branch-tree-field d-grid gap-1 m-0 col-12 col-md">
-<span>{{ translations().englishName }}</span>
-<input class="form-control" type="text" maxlength="100" formControlName="englishName" />
-</label>
-<label class="branch-tree-check d-flex align-items-center gap-2 m-0 col-12 col-md">
-<input type="checkbox" formControlName="isServiceCodeRequired" (change)="onNodeServiceCodeRequiredChange(group, $event)" />
-<span>{{ translations().serviceCodeRequired }}</span>
-</label>
-@if (group.controls.isServiceCodeRequired.value) { <label class="branch-tree-field d-grid gap-1 m-0 col-12 col-md">
-<span>{{ translations().serviceCode }}</span>
-<input type="text" maxlength="100" formControlName="serviceCode" (input)="onNodeServiceCodeInput(group)" />
-@if (group.controls.serviceCode.touched && group.controls.serviceCode.invalid) { <small>{{ nodeServiceCodeError(group) }}</small> }
-</label> }
-<label class="branch-tree-field d-grid gap-1 m-0 col-12 col-md">
-<span>{{ translations().arabicUserMessage }}</span>
-<textarea class="form-control" rows="2" maxlength="500" formControlName="arabicUserMessage"></textarea>
-</label>
-<label class="branch-tree-field d-grid gap-1 m-0 col-12 col-md">
-<span>{{ translations().englishUserMessage }}</span>
-<textarea class="form-control" rows="2" maxlength="500" formControlName="englishUserMessage"></textarea>
-</label>
-</div>
-<div class="branch-tree-grid row g-2">
-<label class="branch-tree-field d-grid gap-1 m-0 col-12 col-md">
-<span>{{ translations().orderNo }}</span>
-<input class="form-control" type="number" min="0" formControlName="orderNo" />
-</label>
-<label class="branch-tree-field d-grid gap-1 m-0 col-12 col-md">
-<span>{{ translations().priority }}</span>
-<input class="form-control" type="number" min="0" formControlName="priority" />
-</label>
-<label class="branch-tree-check d-flex align-items-center gap-2 m-0 col-12 col-md">
-<input class="form-check-input" type="checkbox" formControlName="isTicketIssuable" />
-<span>{{ translations().ticketIssuable }}</span>
-</label>
-<label class="branch-tree-check d-flex align-items-center gap-2 m-0 col-12 col-md">
-<input class="form-check-input" type="checkbox" formControlName="isClientInputRequired" />
-<span>{{ translations().clientInputRequired }}</span>
-</label>
-<label class="branch-tree-check d-flex align-items-center gap-2 m-0 col-12 col-md">
-<input class="form-check-input" type="checkbox" formControlName="hasReservation" />
-<span>{{ translations().hasReservation }}</span>
-</label>
-</div>
-<div class="branch-tree-grid row g-2">
-<label class="branch-tree-field d-grid gap-1 m-0 col-12 col-md">
-<span>{{ translations().rangePrefix }}</span>
-<input class="form-control" type="text" maxlength="10" formControlName="rangePrefix" />
-</label>
-<label class="branch-tree-field d-grid gap-1 m-0 col-12 col-md">
-<span>{{ translations().rangeStartNumber }}</span>
-<input class="form-control" type="number" min="0" formControlName="rangeStartNumber" />
-</label>
-<label class="branch-tree-field d-grid gap-1 m-0 col-12 col-md">
-<span>{{ translations().rangeEndNumber }}</span>
-<input class="form-control" type="number" min="0" formControlName="rangeEndNumber" />
-</label>
-<label class="branch-tree-field d-grid gap-1 m-0 col-12 col-md">
-<span>{{ translations().waitingDuration }}</span>
-<input class="form-control" type="number" min="0" formControlName="waitingDuration" />
-</label>
-<label class="branch-tree-field d-grid gap-1 m-0 col-12 col-md">
-<span>{{ translations().noOfTicketCopies }}</span>
-<input class="form-control" type="number" min="1" formControlName="noOfTicketCopies" />
-</label>
-</div>
-@if (childrenControls(group).controls.length > 0) { <div class="branch-tree-children">
-@for (child of childrenControls(group).controls; track child; let childIndex = $index) { <ng-container *ngTemplateOutlet=" nodeTemplate; context: { $implicit: child, level: level + 1, parent: group, index: childIndex }" /> }
-</div> }
-</section>
+  <section class="branch-tree-node rounded-3 border border-secondary-subtle bg-light-subtle p-3 mb-3" [style.--node-level]="level" [formGroup]="group">
+    <header class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+      <strong class="text-primary">{{ level === 0 ? dialogTitle() : translations().addChild }}</strong>
+      <div class="d-flex align-items-center flex-wrap gap-2">
+        @if (!leafOnly()) {
+          <button
+            type="button"
+            class="q-btn q-btn--secondary btn-sm py-1 px-2"
+            style="min-height: 32px;"
+            (click)="addChild(group)"
+          >
+            <i class="bi bi-plus-lg" aria-hidden="true"></i> {{ translations().addChild }}
+          </button>
+        }
+        @if (parent) {
+          <button
+            type="button"
+            class="q-btn q-btn--danger-ghost btn-sm py-1 px-2"
+            style="min-height: 32px;"
+            (click)="removeChild(parent, index)"
+          >
+            <i class="bi bi-trash3" aria-hidden="true"></i> {{ translations().removeNode }}
+          </button>
+        }
+      </div>
+    </header>
+
+    <div class="row g-3 mb-4">
+      <div class="col-12 col-md-6">
+        <label class="q-field h-100">
+          <span class="q-field-label">{{ translations().arabicName }}</span>
+          <input class="form-control" type="text" maxlength="100" formControlName="arabicName" />
+        </label>
+      </div>
+      <div class="col-12 col-md-6">
+        <label class="q-field h-100">
+          <span class="q-field-label">{{ translations().englishName }}</span>
+          <input class="form-control" type="text" maxlength="100" formControlName="englishName" />
+        </label>
+      </div>
+    </div>
+
+    <div class="q-option-grid mb-4">
+      <label class="q-option-card" [class.active]="group.controls.isTicketIssuable.value">
+        <input type="checkbox" formControlName="isTicketIssuable" />
+        <div class="q-option-icon"><i class="bi bi-ticket-perforated"></i></div>
+        <div class="q-option-label">
+          <span class="q-option-title">{{ translations().ticketIssuable }}</span>
+        </div>
+        <i class="bi bi-check-circle-fill q-option-indicator"></i>
+      </label>
+
+      <label class="q-option-card" [class.active]="group.controls.isClientInputRequired.value">
+        <input type="checkbox" formControlName="isClientInputRequired" />
+        <div class="q-option-icon"><i class="bi bi-person-lines-fill"></i></div>
+        <div class="q-option-label">
+          <span class="q-option-title">{{ translations().clientInputRequired }}</span>
+        </div>
+        <i class="bi bi-check-circle-fill q-option-indicator"></i>
+      </label>
+
+      <label class="q-option-card" [class.active]="group.controls.hasReservation.value">
+        <input type="checkbox" formControlName="hasReservation" />
+        <div class="q-option-icon"><i class="bi bi-calendar-check"></i></div>
+        <div class="q-option-label">
+          <span class="q-option-title">{{ translations().hasReservation }}</span>
+        </div>
+        <i class="bi bi-check-circle-fill q-option-indicator"></i>
+      </label>
+    </div>
+
+    <div class="row g-3 mb-4 align-items-end">
+      <div class="col-12 col-md-4">
+        <label class="q-option-card" [class.active]="group.controls.isServiceCodeRequired.value">
+          <input type="checkbox" formControlName="isServiceCodeRequired" (change)="onNodeServiceCodeRequiredChange(group, $event)" />
+          <div class="q-option-icon"><i class="bi bi-upc-scan"></i></div>
+          <div class="q-option-label">
+            <span class="q-option-title">{{ translations().serviceCodeRequired }}</span>
+          </div>
+          <i class="bi bi-check-circle-fill q-option-indicator"></i>
+        </label>
+      </div>
+      @if (group.controls.isServiceCodeRequired.value) {
+        <div class="col-12 col-md-8">
+          <label class="q-field">
+            <span class="q-field-label">{{ translations().serviceCode }}</span>
+            <input class="form-control" [class.is-invalid]="group.controls.serviceCode.touched && group.controls.serviceCode.invalid" type="text" maxlength="100" formControlName="serviceCode" (input)="onNodeServiceCodeInput(group)" />
+            @if (group.controls.serviceCode.touched && group.controls.serviceCode.invalid) {
+              <span class="q-field-error">{{ nodeServiceCodeError(group) }}</span>
+            }
+          </label>
+        </div>
+      }
+    </div>
+
+    <div class="row g-3 mb-4">
+      <div class="col-12 col-md-6">
+        <label class="q-field h-100">
+          <span class="q-field-label">{{ translations().arabicUserMessage }}</span>
+          <textarea class="form-control" rows="2" maxlength="500" formControlName="arabicUserMessage"></textarea>
+        </label>
+      </div>
+      <div class="col-12 col-md-6">
+        <label class="q-field h-100">
+          <span class="q-field-label">{{ translations().englishUserMessage }}</span>
+          <textarea class="form-control" rows="2" maxlength="500" formControlName="englishUserMessage"></textarea>
+        </label>
+      </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+      <div class="col-6 col-md-3">
+        <label class="q-field">
+          <span class="q-field-label">{{ translations().orderNo }}</span>
+          <input class="form-control" type="number" min="0" formControlName="orderNo" />
+        </label>
+      </div>
+      <div class="col-6 col-md-3">
+        <label class="q-field">
+          <span class="q-field-label">{{ translations().priority }}</span>
+          <input class="form-control" type="number" min="0" formControlName="priority" />
+        </label>
+      </div>
+      <div class="col-6 col-md-3">
+        <label class="q-field">
+          <span class="q-field-label">{{ translations().waitingDuration }}</span>
+          <input class="form-control" type="number" min="0" formControlName="waitingDuration" />
+        </label>
+      </div>
+      <div class="col-6 col-md-3">
+        <label class="q-field">
+          <span class="q-field-label">{{ translations().noOfTicketCopies }}</span>
+          <input class="form-control" type="number" min="1" formControlName="noOfTicketCopies" />
+        </label>
+      </div>
+    </div>
+
+    <div class="row g-3 mb-3">
+      <div class="col-12 col-md-4">
+        <label class="q-field">
+          <span class="q-field-label">{{ translations().rangePrefix }}</span>
+          <input class="form-control" type="text" maxlength="10" formControlName="rangePrefix" />
+        </label>
+      </div>
+      <div class="col-6 col-md-4">
+        <label class="q-field">
+          <span class="q-field-label">{{ translations().rangeStartNumber }}</span>
+          <input class="form-control" type="number" min="0" formControlName="rangeStartNumber" />
+        </label>
+      </div>
+      <div class="col-6 col-md-4">
+        <label class="q-field">
+          <span class="q-field-label">{{ translations().rangeEndNumber }}</span>
+          <input class="form-control" type="number" min="0" formControlName="rangeEndNumber" />
+        </label>
+      </div>
+    </div>
+
+    @if (childrenControls(group).controls.length > 0) {
+      <div class="branch-tree-children ps-3 ms-2 border-start border-primary border-opacity-25 mt-4">
+        @for (child of childrenControls(group).controls; track child; let childIndex = $index) {
+          <ng-container
+            *ngTemplateOutlet="
+              nodeTemplate;
+              context: { $implicit: child, level: level + 1, parent: group, index: childIndex }
+            "
+          />
+        }
+      </div>
+    }
+  </section>
 </ng-template>

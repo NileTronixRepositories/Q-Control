@@ -156,6 +156,7 @@ export interface ServiceTreeQuery {
   readonly scope?: ServiceScope | null;
   readonly ownerBranchId?: number | null;
   readonly isAssignedToCurrentBranch?: ServiceBooleanFilter;
+  readonly searchText?: string;
 }
 
 export interface ServiceParentQuery {

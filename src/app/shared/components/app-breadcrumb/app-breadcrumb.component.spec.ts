@@ -20,7 +20,12 @@ import { AppBreadcrumbComponent } from './app-breadcrumb.component';
 class TestHostComponent {
   items: readonly AppBreadcrumbItem[] = [
     { label: 'Dashboard', route: '/admin/branch-editor', icon: 'bi-speedometer2' },
-    { label: 'Services', route: '/admin/services/catalog', icon: 'bi-ui-checks-grid' },
+    {
+      label: 'Services',
+      route: '/admin/services/catalog',
+      queryParams: { branchId: 7 },
+      icon: 'bi-ui-checks-grid',
+    },
     { label: 'Service Schedules', icon: 'bi-calendar-week' },
   ];
   direction: 'ltr' | 'rtl' = 'ltr';
@@ -47,6 +52,7 @@ describe('AppBreadcrumbComponent', () => {
     expect(links).toHaveLength(2);
     expect(links[0].textContent).toContain('Dashboard');
     expect(links[1].textContent).toContain('Services');
+    expect(links[1].getAttribute('href')).toContain('branchId=7');
     expect(current.textContent).toContain('Service Schedules');
   });
 

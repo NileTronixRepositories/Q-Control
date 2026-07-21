@@ -1,4 +1,4 @@
-﻿<section class="technical-admin-responsive-page terminal-management-page container-fluid" [attr.dir]="direction()" [attr.lang]="language()">
+<section class="technical-admin-responsive-page terminal-management-page container-fluid" [attr.dir]="direction()" [attr.lang]="language()">
   <app-technical-admin-page-hero
     [eyebrow]="translations().title"
     [title]="translations().title"
@@ -76,8 +76,8 @@
       }
     </div>
     @if (activeTab() === 'active') {
-      <section class="list-panel">
-        <div class="row g-3 align-items-end">
+      <section class="list-panel d-grid gap-3 p-3">
+        <div class="terminal-filter-row row g-2 align-items-end">
           <div class="col-12 col-lg-5">
             <label class="filter-field">
               <span>{{ translations().searchPlaceholder }}</span>
@@ -128,10 +128,10 @@
               </select>
             </label>
           </div>
-          <div class="col-12 col-md-4 col-lg-2">
+          <div class="col-12 col-md-4 col-lg-2 d-grid">
             <button
               type="button"
-              class="secondary-action"
+              class="secondary-action d-inline-flex align-items-center justify-content-center gap-2 w-100"
               [disabled]="activeLoading()"
               (click)="refreshActive()"
             >
@@ -267,16 +267,18 @@
           </div>
         }
         @else if (!activeLoading()) {
-          <div class="empty-state">
-            <i class="bi bi-hourglass-split"></i>
+          <div class="terminal-list-empty d-flex flex-column align-items-center justify-content-center gap-2 p-3 text-center">
+            <span class="terminal-list-empty-icon d-inline-flex align-items-center justify-content-center" aria-hidden="true">
+              <i class="bi bi-pc-display-horizontal"></i>
+            </span>
 
-            <h2>
+            <h2 class="mb-0">
               {{ translations().noItems }}
             </h2>
           </div>
         }
         <footer
-          class="pagination-bar d-flex align-items-center justify-content-between gap-3 mt-3 flex-column flex-md-row"
+          class="pagination-bar d-flex align-items-center justify-content-between gap-2 pt-3 flex-column flex-md-row"
         >
           <span>
             {{ translations().totalItems }}:
@@ -286,7 +288,7 @@
           <div class="pagination-actions d-flex align-items-center gap-2 flex-wrap justify-content-center">
             <button
               type="button"
-              class="secondary-action compact-action"
+              class="secondary-action compact-action d-inline-flex align-items-center justify-content-center"
               [disabled]="!activeTerminalsPage().hasPreviousPage"
               (click)="previousActivePage()"
             >
@@ -301,7 +303,7 @@
 
             <button
               type="button"
-              class="secondary-action compact-action"
+              class="secondary-action compact-action d-inline-flex align-items-center justify-content-center"
               [disabled]="!activeTerminalsPage().hasNextPage"
               (click)="nextActivePage()"
             >
@@ -312,8 +314,8 @@
       </section>
     }
     @if (activeTab() === 'deleted') {
-      <section class="list-panel">
-        <div class="row g-3 align-items-end">
+      <section class="list-panel d-grid gap-3 p-3">
+        <div class="terminal-filter-row row g-2 align-items-end">
           <div class="col-12 col-lg-5">
             <label class="filter-field">
               <span>{{ translations().searchPlaceholder }}</span>
@@ -367,10 +369,10 @@
             </label>
           </div>
 
-          <div class="col-12 col-md-4 col-lg-2">
+          <div class="col-12 col-md-4 col-lg-2 d-grid">
             <button
               type="button"
-              class="secondary-action"
+              class="secondary-action d-inline-flex align-items-center justify-content-center gap-2 w-100"
               [disabled]="deletedLoading()"
               (click)="refreshDeleted()"
             >
@@ -493,17 +495,19 @@
             }
           </div>
         } @else if (!deletedLoading()) {
-          <div class="empty-state">
-            <i class="bi bi-hourglass-split"></i>
+          <div class="terminal-list-empty d-flex flex-column align-items-center justify-content-center gap-2 p-3 text-center">
+            <span class="terminal-list-empty-icon d-inline-flex align-items-center justify-content-center" aria-hidden="true">
+              <i class="bi bi-pc-display-horizontal"></i>
+            </span>
 
-            <h2>
+            <h2 class="mb-0">
               {{ translations().noItems }}
             </h2>
           </div>
         }
 
         <footer
-          class="pagination-bar d-flex align-items-center justify-content-between gap-3 mt-3 flex-column flex-md-row"
+          class="pagination-bar d-flex align-items-center justify-content-between gap-2 pt-3 flex-column flex-md-row"
         >
           <span>
             {{ translations().totalItems }}:
@@ -513,7 +517,7 @@
           <div class="pagination-actions d-flex align-items-center gap-2 flex-wrap justify-content-center">
             <button
               type="button"
-              class="secondary-action compact-action"
+              class="secondary-action compact-action d-inline-flex align-items-center justify-content-center"
               [disabled]="!deletedTerminalsPage().hasPreviousPage || deletedLoading()"
               (click)="previousDeletedPage()"
             >
@@ -528,7 +532,7 @@
 
             <button
               type="button"
-              class="secondary-action compact-action"
+              class="secondary-action compact-action d-inline-flex align-items-center justify-content-center"
               [disabled]="!deletedTerminalsPage().hasNextPage || deletedLoading()"
               (click)="nextDeletedPage()"
             >

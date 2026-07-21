@@ -48,6 +48,40 @@
   position: relative;
 }
 
+.branch-selectable-row[role='link'],
+.branch-selectable-card[role='link'] {
+  cursor: pointer;
+}
+
+.branch-selectable-row[role='link'] {
+  transition: background-color 160ms ease, box-shadow 160ms ease;
+}
+
+.branch-selectable-row[role='link']:hover,
+.branch-selectable-row[role='link']:focus-visible,
+.branch-selectable-row.branch-context-selected {
+  background: var(--q-primary-subtle, #ecfeff);
+  box-shadow: inset 3px 0 0 var(--q-primary, #0891b2);
+  outline: 0;
+}
+
+:host-context([dir='rtl']) .branch-selectable-row[role='link']:hover,
+:host-context([dir='rtl']) .branch-selectable-row[role='link']:focus-visible,
+:host-context([dir='rtl']) .branch-selectable-row.branch-context-selected {
+  box-shadow: inset -3px 0 0 var(--q-primary, #0891b2);
+}
+
+.branch-selectable-card[role='link'] {
+  border-radius: 16px;
+  transition: box-shadow 160ms ease;
+}
+
+.branch-selectable-card[role='link']:focus-visible,
+.branch-selectable-card.branch-context-selected {
+  box-shadow: 0 0 0 3px rgb(var(--q-primary-rgb) / 0.2);
+  outline: 0;
+}
+
 .pagination-bar .total-items {
   color: var(--q-text-muted);
   font-size: 0.85rem;

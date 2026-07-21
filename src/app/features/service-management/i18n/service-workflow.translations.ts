@@ -23,6 +23,8 @@ export interface ServiceWorkflowTranslations {
   readonly defaultCannotDeactivate: string;
   readonly ineligibleOwnerService: string;
   readonly searchCandidates: string;
+  readonly candidateSearchPlaceholder: string;
+  readonly candidateSearchHelp: string;
   readonly allParents: string;
   readonly createWorkflow: string;
   readonly editWorkflow: string;
@@ -137,6 +139,8 @@ export const SERVICE_WORKFLOW_TRANSLATIONS: Record<AppLanguage, ServiceWorkflowT
     defaultCannotDeactivate: 'لا يمكن تعطيل المسار الافتراضي. عيّن مسارًا نشطًا آخر كافتراضي أولًا.',
     ineligibleOwnerService: 'هذه الخدمة غير مؤهلة لإدارة المسارات.',
     searchCandidates: 'البحث في الخدمات المتاحة',
+    candidateSearchPlaceholder: '\u0627\u0628\u062d\u062b \u0628\u0627\u0633\u0645 \u0627\u0644\u062e\u062f\u0645\u0629 \u0623\u0648 \u0643\u0648\u062f \u0627\u0644\u062e\u062f\u0645\u0629',
+    candidateSearchHelp: '\u0627\u0644\u0628\u062d\u062b \u064a\u062f\u0639\u0645 \u0627\u0633\u0645 \u0627\u0644\u062e\u062f\u0645\u0629 \u0648\u0643\u0648\u062f \u0627\u0644\u062e\u062f\u0645\u0629.',
     allParents: 'كل الخدمات الرئيسية',
     createWorkflow: 'إضافة مسار',
     editWorkflow: 'تعديل المسار',
@@ -248,6 +252,8 @@ export const SERVICE_WORKFLOW_TRANSLATIONS: Record<AppLanguage, ServiceWorkflowT
     defaultCannotDeactivate: 'The default workflow cannot be deactivated. Set another active workflow as default first.',
     ineligibleOwnerService: 'This service is not eligible for workflow management.',
     searchCandidates: 'Search available services',
+    candidateSearchPlaceholder: 'Search by service name or service code',
+    candidateSearchHelp: 'Search by service name or service code.',
     allParents: 'All parent services',
     createWorkflow: 'Create Workflow',
     editWorkflow: 'Edit Workflow',

@@ -124,6 +124,10 @@ export class ServiceWorkflowsComponent implements OnInit, OnDestroy {
   );
   private searchDebounceId: ReturnType<typeof setTimeout> | null = null;
   private candidateSearchDebounceId: ReturnType<typeof setTimeout> | null = null;
+  private branchTreeSearchDebounceId: ReturnType<typeof setTimeout> | null = null;
+  private branchTreeRequestId = 0;
+  private candidateRequestId = 0;
+  private branchTreeExpansionSnapshot: ReadonlySet<number> | null = null;
   private toastTimeoutId: ReturnType<typeof setTimeout> | null = null;
   private stepUid = 0;
 
@@ -152,6 +156,7 @@ export class ServiceWorkflowsComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     if (this.searchDebounceId) clearTimeout(this.searchDebounceId);
     if (this.candidateSearchDebounceId) clearTimeout(this.candidateSearchDebounceId);
+    if (this.branchTreeSearchDebounceId) clearTimeout(this.branchTreeSearchDebounceId);
     if (this.toastTimeoutId) clearTimeout(this.toastTimeoutId);
   }
 
@@ -174,16 +179,41 @@ export class ServiceWorkflowsComponent implements OnInit, OnDestroy {
 
   private loadBranchTree(branchId: number): void {
     this.scopeError.set(null);
+    const requestId = ++this.branchTreeRequestId;
+    const searchText = this.store.branchTreeSearchText();
     this.store.branchTreeLoading.set(true);
     this.branchServicesApiService
-      .getBranchServicesTree(branchId, { includeInactive: false, includeDeleted: false })
-      .pipe(finalize(() => this.store.branchTreeLoading.set(false)))
+      .getBranchServicesTree(branchId, {
+        includeInactive: false,
+        includeDeleted: false,
+        searchText,
+      })
+      .pipe(
+        finalize(() => {
+          if (requestId === this.branchTreeRequestId) {
+            this.store.branchTreeLoading.set(false);
+          }
+        }),
+      )
       .subscribe({
         next: (tree) => {
+          if (requestId !== this.branchTreeRequestId) {
+            return;
+          }
+
           this.store.branchTree.set(tree);
+
+          if (searchText.trim()) {
+            this.store.expandBranchNodes(this.collectTreeNodeIds(tree));
+          }
+
           if (this.routeLeafServiceId) this.activateRouteScope(branchId, this.routeLeafServiceId);
         },
-        error: (error: HttpErrorResponse) => this.handleApiError(error),
+        error: (error: HttpErrorResponse) => {
+          if (requestId === this.branchTreeRequestId) {
+            this.handleApiError(error);
+          }
+        },
       });
   }
 
@@ -245,6 +275,28 @@ export class ServiceWorkflowsComponent implements OnInit, OnDestroy {
     node.isTicketIssuable &&
     node.canIssueTicket;
 
+  updateBranchTreeSearch(value: string): void {
+    const searchText = this.normalizeSearchText(value);
+    const hadSearch = this.store.branchTreeSearchText().trim().length > 0;
+
+    if (searchText && !hadSearch) {
+      this.branchTreeExpansionSnapshot = new Set(this.store.expandedBranchNodeIds());
+    }
+
+    if (!searchText && hadSearch) {
+      this.store.expandedBranchNodeIds.set(this.branchTreeExpansionSnapshot ?? new Set());
+      this.branchTreeExpansionSnapshot = null;
+    }
+
+    this.store.branchTreeSearchText.set(searchText);
+
+    if (this.branchTreeSearchDebounceId) clearTimeout(this.branchTreeSearchDebounceId);
+    const branchId = this.store.selectedBranchId();
+    if (branchId) {
+      this.branchTreeSearchDebounceId = setTimeout(() => this.loadBranchTree(branchId), 400);
+    }
+  }
+
   updateSearch(event: Event): void {
     this.store.updateQuery({ searchText: this.readInputValue(event), pageNumber: 1 });
     if (this.searchDebounceId) clearTimeout(this.searchDebounceId);
@@ -276,9 +328,12 @@ export class ServiceWorkflowsComponent implements OnInit, OnDestroy {
   }
 
   updateCandidateSearch(event: Event): void {
-    this.store.updateCandidateQuery({ searchText: this.readInputValue(event), pageNumber: 1 });
+    this.store.updateCandidateQuery({
+      searchText: this.normalizeSearchText(this.readInputValue(event)),
+      pageNumber: 1,
+    });
     if (this.candidateSearchDebounceId) clearTimeout(this.candidateSearchDebounceId);
-    this.candidateSearchDebounceId = setTimeout(() => this.loadCandidates(), 300);
+    this.candidateSearchDebounceId = setTimeout(() => this.loadCandidates(), 400);
   }
 
   updateCandidateParent(event: Event): void {
@@ -531,14 +586,29 @@ export class ServiceWorkflowsComponent implements OnInit, OnDestroy {
 
   private loadCandidates(): void {
     const scope = this.store.scope();
-    if (!scope || !this.canViewCandidates() || this.store.candidatesLoading()) return;
+    if (!scope || !this.canViewCandidates()) return;
+    const requestId = ++this.candidateRequestId;
     this.store.candidatesLoading.set(true);
     this.apiService
       .getCandidateServices(scope.branchId, this.store.candidateQuery())
-      .pipe(finalize(() => this.store.candidatesLoading.set(false)))
+      .pipe(
+        finalize(() => {
+          if (requestId === this.candidateRequestId) {
+            this.store.candidatesLoading.set(false);
+          }
+        }),
+      )
       .subscribe({
-        next: (response) => this.store.candidates.set(response),
-        error: (error: HttpErrorResponse) => this.handleApiError(error),
+        next: (response) => {
+          if (requestId === this.candidateRequestId) {
+            this.store.candidates.set(response);
+          }
+        },
+        error: (error: HttpErrorResponse) => {
+          if (requestId === this.candidateRequestId) {
+            this.handleApiError(error);
+          }
+        },
       });
   }
 
@@ -823,6 +893,7 @@ export class ServiceWorkflowsComponent implements OnInit, OnDestroy {
       parentEnglishName: step.parentEnglishName,
       arabicName: step.arabicName ?? this.translations().notAvailable,
       englishName: step.englishName ?? this.translations().notAvailable,
+      serviceCode: null,
       isActive: step.isActive,
       isDeleted: step.isDeleted,
       effectiveIsActive: step.effectiveIsActive,
@@ -974,6 +1045,18 @@ export class ServiceWorkflowsComponent implements OnInit, OnDestroy {
     return null;
   }
 
+  serviceCodeLabel(item: WorkflowCandidateService): string | null {
+    const code = item.serviceCode?.trim();
+    return code ? code : null;
+  }
+
+  private normalizeSearchText(value: string): string {
+    return value.trim().slice(0, 200);
+  }
+
+  private collectTreeNodeIds(nodes: readonly ServiceTreeNode[]): readonly number[] {
+    return nodes.flatMap((node) => [node.id, ...this.collectTreeNodeIds(node.children)]);
+  }
   private readPositiveInt(value: string | null): number | null {
     const parsed = Number(value);
     return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
@@ -987,3 +1070,4 @@ export class ServiceWorkflowsComponent implements OnInit, OnDestroy {
     return value?.trim() || this.translations().notAvailable;
   }
 }
+

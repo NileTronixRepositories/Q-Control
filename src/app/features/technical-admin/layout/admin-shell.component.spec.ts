@@ -10,6 +10,7 @@ import {
 } from '../../auth/models/login-credentials.model';
 import { AuthSessionService } from '../../auth/services/auth-session.service';
 import { ServiceManagementPermissionService } from '../../service-management/services/service-management-permission.service';
+import { TechnicalAdminBranchContextStore, TechnicalAdminBranchContext } from '../store/technical-admin-branch-context.store';
 import { TechnicalAdminI18nStore } from '../store/technical-admin-i18n.store';
 import { AdminShellComponent } from './admin-shell.component';
 
@@ -21,18 +22,36 @@ describe('AdminShellComponent', () => {
   const toggleLanguage = vi.fn();
   const clearSession = vi.fn();
   const canViewSchedules = signal(true);
+  const selectedBranchId = signal<number | null>(null);
+  const selectedBranch = signal<TechnicalAdminBranchContext | null>(null);
+  const clearBranchContext = vi.fn(() => {
+    selectedBranchId.set(null);
+    selectedBranch.set(null);
+  });
+  const activateBranchContext = vi.fn((branchId: number) => selectedBranchId.set(branchId));
 
   beforeEach(async () => {
     vi.clearAllMocks();
     language.set('en');
     session.set(createSession('TechnicalAdmin'));
     canViewSchedules.set(true);
+    selectedBranchId.set(null);
+    selectedBranch.set(null);
 
     await TestBed.configureTestingModule({
       imports: [AdminShellComponent],
       providers: [
         provideRouter([]),
         TechnicalAdminI18nStore,
+        {
+          provide: TechnicalAdminBranchContextStore,
+          useValue: {
+            selectedBranchId: selectedBranchId.asReadonly(),
+            selectedBranch: selectedBranch.asReadonly(),
+            activate: activateBranchContext,
+            clear: clearBranchContext,
+          },
+        },
         {
           provide: AppLanguageStore,
           useValue: {
@@ -71,6 +90,7 @@ describe('AdminShellComponent', () => {
     }).compileComponents();
 
     router = TestBed.inject(Router);
+    vi.spyOn(router, 'navigate').mockResolvedValue(true);
     vi.spyOn(router, 'navigateByUrl').mockResolvedValue(true);
     fixture = TestBed.createComponent(AdminShellComponent);
     fixture.detectChanges();
@@ -83,13 +103,91 @@ describe('AdminShellComponent', () => {
 
     expect(text).toContain('Branch Editor');
     expect(text).toContain('Branding & Advertisements');
-    expect(text).toContain('Waiting Areas');
-    expect(text).toContain('Service Locations');
-    expect(text).toContain('Terminals');
-    expect(text).toContain('Displays');
+    expect(text).not.toContain('Waiting Areas');
+    expect(text).not.toContain('Service Locations');
+    expect(text).not.toContain('Terminals');
+    expect(text).not.toContain('Displays');
     expect(text).toContain('Service Schedules');
   });
 
+  it('moves branch operations into the selected-branch sidebar for a technical admin', () => {
+    selectedBranchId.set(1);
+    selectedBranch.set({
+      branchId: 1,
+      arabicName: 'فرع القاهرة',
+      englishName: 'Cairo Branch',
+      isActive: true,
+      effectiveIsActive: true,
+    });
+    fixture.detectChanges();
+
+    const mainSidebar = fixture.nativeElement.querySelector('.sidebar') as HTMLElement;
+    const contextSidebar = fixture.nativeElement.querySelector('.context-sidebar') as HTMLElement;
+
+    expect(mainSidebar.textContent).not.toContain('Waiting Areas');
+    expect(contextSidebar.textContent).toContain('Cairo Branch');
+    expect(contextSidebar.textContent).toContain('Waiting Areas');
+    expect(contextSidebar.textContent).toContain('Service Locations');
+    expect(contextSidebar.textContent).toContain('Terminals');
+    expect(contextSidebar.textContent).toContain('Displays');
+    expect(contextSidebar.querySelector('a')?.getAttribute('href')).toContain('branchId=1');
+  });
+
+  it('collapses the branch sidebar without clearing context and exits only from the back action', async () => {
+    selectedBranchId.set(1);
+    selectedBranch.set({
+      branchId: 1,
+      arabicName: 'Cairo Branch',
+      englishName: 'Cairo Branch',
+      isActive: true,
+      effectiveIsActive: true,
+    });
+    fixture.detectChanges();
+    clearBranchContext.mockClear();
+    vi.mocked(router.navigate).mockClear();
+
+    const closeButton = fixture.nativeElement.querySelector('.context-sidebar-close') as HTMLButtonElement;
+    closeButton.click();
+    fixture.detectChanges();
+    await Promise.resolve();
+
+    expect(selectedBranchId()).toBe(1);
+    expect(clearBranchContext).not.toHaveBeenCalled();
+    expect(router.navigate).not.toHaveBeenCalled();
+    expect(fixture.nativeElement.querySelector('.context-reopen-edge')).not.toBeNull();
+
+    const reopenButton = fixture.nativeElement.querySelector('.context-reopen-edge') as HTMLButtonElement;
+    reopenButton.click();
+    fixture.detectChanges();
+
+    const backButton = fixture.nativeElement.querySelector('.context-back-button') as HTMLButtonElement;
+    backButton.click();
+
+    expect(clearBranchContext).toHaveBeenCalledOnce();
+    expect(router.navigate).toHaveBeenCalledWith(['/admin/branch-editor']);
+  });
+  it('keeps branch operations in the main sidebar for a permitted branch admin', () => {
+    session.set(
+      createSession(
+        'BranchAdmin',
+        createPermissionToken([
+          'WaitingAreas.ViewAll',
+          'Windows.ViewAll',
+          'Terminals.ViewAll',
+          'Displays.ViewAll',
+        ]),
+      ),
+    );
+    fixture.detectChanges();
+
+    const mainSidebar = fixture.nativeElement.querySelector('.sidebar') as HTMLElement;
+
+    expect(mainSidebar.textContent).toContain('Waiting Areas');
+    expect(mainSidebar.textContent).toContain('Service Locations');
+    expect(mainSidebar.textContent).toContain('Terminals');
+    expect(mainSidebar.textContent).toContain('Displays');
+    expect(fixture.nativeElement.querySelector('.context-sidebar')).toBeNull();
+  });
   it('shows service schedules navigation for a technical admin even before the JWT includes the new permission', () => {
     canViewSchedules.set(false);
     fixture.detectChanges();
@@ -190,6 +288,10 @@ describe('AdminShellComponent', () => {
   });
 });
 
+function createPermissionToken(permissions: readonly string[]): string {
+  const payload = btoa(JSON.stringify({ permissions }));
+  return `header.${payload}.signature`;
+}
 function createSession(
   userType: AuthenticatedUserType,
   token = 'technical-admin-token',

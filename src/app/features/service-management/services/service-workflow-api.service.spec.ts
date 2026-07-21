@@ -129,23 +129,34 @@ describe('ServiceWorkflowApiService branch scope', () => {
     });
   });
 
-  it('loads branch candidates without inactive or deleted flags', () => {
+  it('loads branch candidates with trimmed search, no inactive flags, and service codes', () => {
     service
       .getCandidateServices(10, {
-        searchText: 'certificate',
+        searchText: '  certificate  ',
         parentServiceId: 5,
         pageNumber: 1,
         pageSize: 25,
       })
-      .subscribe();
+      .subscribe((page) => {
+        expect(page.data).toEqual([
+          expect.objectContaining({ serviceId: 30, serviceCode: 'CERT-001' }),
+          expect.objectContaining({ serviceId: 31, serviceCode: null }),
+        ]);
+      });
 
     const request = httpController.expectOne(
       (candidate) => candidate.url.endsWith('/api/branches/10/services/workflow-candidates'),
     );
+    expect(request.request.params.get('searchText')).toBe('certificate');
     expect(request.request.params.get('parentServiceId')).toBe('5');
     expect(request.request.params.has('includeInactive')).toBe(false);
     expect(request.request.params.has('includeDeleted')).toBe(false);
-    request.flush({ data: [] });
+    request.flush({
+      data: [
+        { serviceId: 30, arabicName: 'خدمة', englishName: 'Certificate', serviceCode: 'CERT-001' },
+        { serviceId: 31, arabicName: 'خدمة', englishName: 'No Code' },
+      ],
+    });
   });
 
   it('sends the latest rowVersion through If-Match for every state action', () => {
@@ -225,3 +236,4 @@ describe('ServiceWorkflowApiService branch scope', () => {
     });
   });
 });
+

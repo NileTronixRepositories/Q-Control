@@ -11,6 +11,7 @@ import { AuthenticatedUserType } from '../../auth/models/login-credentials.model
 import { AuthSessionService } from '../../auth/services/auth-session.service';
 import { ServiceManagementPermissionService } from '../../service-management/services/service-management-permission.service';
 import { resolveJwtPermissions } from '../../auth/utils/auth-permissions.util';
+import { TechnicalAdminBranchContextStore } from '../store/technical-admin-branch-context.store';
 import { TechnicalAdminI18nStore } from '../store/technical-admin-i18n.store';
 
 @Component({
@@ -28,9 +29,13 @@ export class AdminShellComponent {
   private readonly router = inject(Router);
   private readonly authSessionService = inject(AuthSessionService);
   private readonly servicePermissionService = inject(ServiceManagementPermissionService);
+  private readonly branchContextStore = inject(TechnicalAdminBranchContextStore);
   private readonly currentUrl = signal(this.normalizeUrl(this.router.url));
 
   protected readonly i18nStore = inject(TechnicalAdminI18nStore);
+  protected readonly isTechnicalAdmin = computed(
+    () => this.authSessionService.currentSession()?.userType === 'TechnicalAdmin',
+  );
   protected readonly translations = this.i18nStore.translations;
   protected readonly currentUserDisplayName = computed(() => {
     const session = this.authSessionService.currentSession();
@@ -55,15 +60,138 @@ export class AdminShellComponent {
       filter((event): event is NavigationEnd => event instanceof NavigationEnd),
       takeUntilDestroyed(),
     )
-    .subscribe((event) => this.currentUrl.set(this.normalizeUrl(event.urlAfterRedirects)));
+    .subscribe((event) => this.syncRouterState(event.urlAfterRedirects));
+
+  constructor() {
+    this.syncRouterState(this.router.url);
+  }
+  private readonly branchOperationalNavigationItems = computed<readonly AppNavigationItem[]>(() => {
+    const translations = this.translations();
+    const items: AppNavigationItem[] = [];
+
+    if (this.canShow(['WaitingAreas.ViewAll'])) {
+      items.push({
+        label: translations.waitingAreasLabel,
+        route: '/admin/waiting-areas',
+        icon: 'bi-hourglass-split',
+      });
+    }
+
+    if (this.canShow(['Windows.ViewAll'])) {
+      items.push({
+        label: translations.windowsManagementLabel,
+        route: '/admin/windows',
+        icon: 'bi-window',
+      });
+    }
+
+    if (this.canShow(['Terminals.ViewAll'])) {
+      items.push({
+        label: translations.terminalsManagementLabel,
+        route: '/admin/terminals',
+        icon: 'bi-terminal',
+      });
+    }
+
+    if (this.canShow(['Displays.ViewAll'])) {
+      items.push({
+        label: translations.displaysManagementLabel,
+        route: '/admin/displays',
+        icon: 'bi-display',
+      });
+    }
+
+    return items;
+  });
+  protected readonly contextNavigationItems = computed<readonly AppNavigationItem[]>(() => {
+    const branchId = this.branchContextStore.selectedBranchId();
+
+    if (!this.isTechnicalAdmin() || branchId === null) {
+      return [];
+    }
+
+    return this.branchOperationalNavigationItems().map((item) => ({
+      ...item,
+      queryParams: { branchId },
+    }));
+  });
+  protected readonly contextNavigationTitle = computed(() => {
+    const branch = this.branchContextStore.selectedBranch();
+    const branchId = this.branchContextStore.selectedBranchId();
+
+    if (!branch) {
+      return branchId === null ? '' : `BR-${branchId}`;
+    }
+
+    const localizedName = this.i18nStore.language() === 'ar' ? branch.arabicName : branch.englishName;
+    return localizedName.trim() || `BR-${branch.branchId}`;
+  });
+  protected readonly contextNavigationMeta = computed(() => {
+    const branchId = this.branchContextStore.selectedBranchId();
+    return branchId === null ? '' : `BR-${branchId}`;
+  });
+  protected readonly contextNavigationStatusLabel = computed(() => {
+    const branch = this.branchContextStore.selectedBranch();
+
+    if (!branch) {
+      return '';
+    }
+
+    return branch.isActive
+      ? this.translations().activeBranchLabel
+      : this.translations().inactiveBranchLabel;
+  });
+  protected readonly contextNavigationStatusTone = computed<'active' | 'inactive'>(() =>
+    this.branchContextStore.selectedBranch()?.isActive ? 'active' : 'inactive',
+  );
   protected readonly breadcrumbs = computed<readonly AppBreadcrumbItem[]>(() => {
     const translations = this.translations();
-    const navigationPath = this.findNavigationPath(this.navigationItems(), this.currentUrl());
+    const currentUrl = this.currentUrl();
+    const branchId = this.branchContextStore.selectedBranchId();
     const root: AppBreadcrumbItem = {
       label: translations.topbarEyebrow,
       route: '/admin/branch-editor',
       icon: 'bi-speedometer2',
     };
+
+    if (this.isTechnicalAdmin() && branchId !== null) {
+      const branchItem: AppBreadcrumbItem = {
+        label: this.contextNavigationTitle(),
+        route: '/admin/branch-editor',
+        queryParams: { branchId },
+        icon: 'bi-building',
+      };
+      const contextItem = this.contextNavigationItems().find(
+        (item) => item.route && this.normalizeUrl(item.route) === currentUrl,
+      );
+
+      if (contextItem) {
+        return [
+          root,
+          {
+            label: translations.branchManagementLabel,
+            route: '/admin/branch-editor',
+            icon: 'bi-diagram-3',
+          },
+          branchItem,
+          { label: contextItem.label, icon: contextItem.icon },
+        ];
+      }
+
+      if (currentUrl === '/admin/branch-editor') {
+        return [
+          root,
+          {
+            label: translations.branchManagementLabel,
+            route: '/admin/branch-editor',
+            icon: 'bi-diagram-3',
+          },
+          branchItem,
+        ];
+      }
+    }
+
+    const navigationPath = this.findNavigationPath(this.navigationItems(), currentUrl);
 
     if (navigationPath.length === 0) {
       return [root];
@@ -76,6 +204,7 @@ export class AdminShellComponent {
         route:
           index === navigationPath.length - 1 ? undefined : item.route ?? this.firstChildRoute(item),
         icon: item.icon,
+        queryParams: item.queryParams,
       })),
     ];
   });
@@ -177,38 +306,9 @@ export class AdminShellComponent {
       });
     }
 
-    if (this.canShow(['WaitingAreas.ViewAll'])) {
-      branchChildren.push({
-        label: translations.waitingAreasLabel,
-        route: '/admin/waiting-areas',
-        icon: 'bi-hourglass-split',
-      });
+    if (!this.isTechnicalAdmin()) {
+      branchChildren.push(...this.branchOperationalNavigationItems());
     }
-
-    if (this.canShow(['Windows.ViewAll'])) {
-      branchChildren.push({
-        label: translations.windowsManagementLabel,
-        route: '/admin/windows',
-        icon: 'bi-window',
-      });
-    }
-
-    if (this.canShow(['Terminals.ViewAll'])) {
-      branchChildren.push({
-        label: translations.terminalsManagementLabel,
-        route: '/admin/terminals',
-        icon: 'bi-terminal',
-      });
-    }
-
-    if (this.canShow(['Displays.ViewAll'])) {
-      branchChildren.push({
-        label: translations.displaysManagementLabel,
-        route: '/admin/displays',
-        icon: 'bi-display',
-      });
-    }
-
     return branchChildren.length
       ? [
           {
@@ -221,6 +321,28 @@ export class AdminShellComponent {
       : [];
   });
 
+  protected closeBranchContext(): void {
+    this.branchContextStore.clear();
+    void this.router.navigate(['/admin/branch-editor']);
+  }
+
+  private syncRouterState(url: string): void {
+    this.currentUrl.set(this.normalizeUrl(url));
+
+    if (!this.isTechnicalAdmin()) {
+      this.branchContextStore.clear();
+      return;
+    }
+
+    const branchId = Number(this.router.parseUrl(url).queryParams['branchId']);
+
+    if (Number.isInteger(branchId) && branchId > 0) {
+      this.branchContextStore.activate(branchId);
+      return;
+    }
+
+    this.branchContextStore.clear();
+  }
   private canShow(requiredPermissions: readonly string[]): boolean {
     const session = this.authSessionService.currentSession();
 

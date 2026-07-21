@@ -1,4 +1,4 @@
-﻿<app-shell
+<app-shell
   [navigationItems]="navigationItems()"
   [direction]="i18nStore.direction()"
   [language]="i18nStore.language()"
@@ -16,8 +16,19 @@
   [currentUserDisplayName]="currentUserDisplayName()"
   [currentUserRoleLabel]="currentUserRoleLabel()"
   [currentUserLabel]="translations().currentUserLabel"
+  [contextNavigationItems]="contextNavigationItems()"
+  [contextNavigationLabel]="translations().branchNavigationLabel"
+  [contextNavigationEyebrow]="translations().selectedBranchLabel"
+  [contextNavigationTitle]="contextNavigationTitle()"
+  [contextNavigationMeta]="contextNavigationMeta()"
+  [contextNavigationStatusLabel]="contextNavigationStatusLabel()"
+  [contextNavigationStatusTone]="contextNavigationStatusTone()"
+  [openContextNavigationLabel]="translations().openBranchNavigationLabel"
+  [closeContextNavigationLabel]="translations().closeBranchNavigationLabel"
+  [backToContextRootLabel]="translations().backToBranchesLabel"
   mobileNavigationMode="overlay"
   (languageToggle)="toggleLanguage()"
+  (contextNavigationClose)="closeBranchContext()"
   (logout)="logout()"
 >
   <router-outlet />

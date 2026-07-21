@@ -2,10 +2,6 @@
   display: block;
 }
 
-.display-management-page {
-  --q-table-min-width: 820px;
-}
-
 .display-editor-panel {
   --q-popup-width: min(680px, calc(100dvw - 96px));
 }

@@ -329,6 +329,10 @@ export class ServiceManagementApiService {
       params = params.set('isAssignedToCurrentBranch', query.isAssignedToCurrentBranch);
     }
 
+    if (query.searchText?.trim()) {
+      params = params.set('searchText', query.searchText.trim());
+    }
+
     return params;
   }
   private resolveMediaOrigin(apiBaseUrl: string): string {

@@ -4,6 +4,8 @@
   [class.sidebar-collapsed]="!sidebarExpanded()"
   [class.is-mobile]="isMobile()"
   [class.mobile-navigation-overlay]="mobileNavigationMode() === 'overlay'"
+  [class.context-navigation-open]="contextSidebarOpen()"
+  [class.context-navigation-available]="hasContextNavigation()"
   [class.app-shell-rtl]="direction() === 'rtl'"
   [class.app-shell-ltr]="direction() === 'ltr'"
   [attr.dir]="direction()"
@@ -22,6 +24,25 @@
       >
         <i class="bi bi-list" aria-hidden="true"></i>
       </button>
+      @if (hasContextNavigation() && !contextSidebarOpen()) {
+        <button
+          #contextReopenButton
+          type="button"
+          class="context-reopen-button d-inline-flex align-items-center justify-content-center"
+          [attr.aria-label]="openContextNavigationLabel()"
+          [attr.aria-expanded]="contextSidebarOpen()"
+          [title]="contextNavigationTitle()"
+          aria-controls="branch-context-sidebar"
+          (click)="openContextNavigation()"
+        >
+          <i
+            class="bi context-reopen-arrow"
+            [class.bi-chevron-left]="direction() === 'rtl'"
+            [class.bi-chevron-right]="direction() === 'ltr'"
+            aria-hidden="true"
+          ></i>
+        </button>
+      }
       <div class="mobile-topbar-identity d-flex align-items-center flex-grow-1">
         <img src="/images/nile.png" [alt]="topbarLogoAlt()" />
         <strong>{{ topbarTitle() }}</strong>
@@ -53,7 +74,7 @@
         <div class="logo-container d-flex flex-grow-1 align-items-center">
           <img src="/images/nile.png" alt="" class="sidebar-logo d-block" />
         </div>
-        <app-theme-switcher></app-theme-switcher>
+
       }
       <button
         #sidebarToggleButton
@@ -158,6 +179,7 @@
                       <a
                         class="sidebar-link sidebar-nested-link position-relative d-flex align-items-center overflow-hidden text-decoration-none"
                         [routerLink]="nestedChild.route"
+                        [queryParams]="nestedChild.queryParams"
                         routerLinkActive="sidebar-link-active"
                         [title]="nestedChild.label"
                         [attr.dir]="direction()"
@@ -188,6 +210,7 @@
                   <a
                     class="sidebar-link position-relative d-flex align-items-center overflow-hidden text-decoration-none"
                     [routerLink]="child.route"
+                    [queryParams]="child.queryParams"
                     routerLinkActive="sidebar-link-active"
                     [title]="child.label"
                     [attr.dir]="direction()"
@@ -257,6 +280,113 @@
     </div>
   </aside>
 
+  @if (hasContextNavigation()) {
+    @if (usesContextOverlay() && contextSidebarOpen()) {
+      <button
+        type="button"
+        class="context-sidebar-backdrop"
+        [attr.aria-label]="closeContextNavigationLabel()"
+        (click)="closeContextNavigation()"
+      ></button>
+    }
+
+    <aside
+      id="branch-context-sidebar"
+      class="context-sidebar d-flex flex-column overflow-hidden"
+      [attr.dir]="direction()"
+      [attr.lang]="language()"
+      [attr.aria-hidden]="!contextSidebarOpen()"
+      [attr.inert]="!contextSidebarOpen() ? '' : null"
+    >
+      <header class="context-sidebar-header d-grid gap-2 p-3">
+        <div class="d-flex align-items-start justify-content-between gap-2">
+          <span class="context-sidebar-icon d-inline-flex flex-shrink-0 align-items-center justify-content-center" aria-hidden="true">
+            <i class="bi bi-building"></i>
+          </span>
+          <button
+            #contextCloseButton
+            type="button"
+            class="context-sidebar-close d-inline-flex flex-shrink-0 align-items-center justify-content-center"
+            [attr.aria-label]="closeContextNavigationLabel()"
+            (click)="closeContextNavigation()"
+          >
+            <i class="bi bi-x-lg" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="context-sidebar-copy d-grid gap-1">
+          <span>{{ contextNavigationEyebrow() }}</span>
+          <strong class="text-truncate">{{ contextNavigationTitle() }}</strong>
+          @if (contextNavigationMeta()) {
+            <small class="text-truncate">{{ contextNavigationMeta() }}</small>
+          }
+        </div>
+        @if (contextNavigationStatusLabel()) {
+          <span
+            class="context-status align-self-start"
+            [class.context-status-active]="contextNavigationStatusTone() === 'active'"
+            [class.context-status-inactive]="contextNavigationStatusTone() === 'inactive'"
+          >
+            {{ contextNavigationStatusLabel() }}
+          </span>
+        }
+      </header>
+
+      <nav
+        class="context-sidebar-nav d-grid align-content-start gap-2 p-3 overflow-y-auto"
+        [attr.aria-label]="contextNavigationLabel()"
+      >
+        @for (item of contextNavigationItems(); track item.route ?? item.label) {
+          <a
+            class="context-sidebar-link position-relative d-flex align-items-center gap-2 text-decoration-none"
+            [routerLink]="item.route"
+            [queryParams]="item.queryParams"
+            routerLinkActive="context-sidebar-link-active"
+            [title]="item.label"
+            (click)="contextNavigationSelected()"
+          >
+            @if (item.icon) {
+              <span class="context-link-icon d-inline-flex flex-shrink-0 align-items-center justify-content-center">
+                <i class="bi {{ item.icon }}" aria-hidden="true"></i>
+              </span>
+            }
+            <span class="context-link-text flex-grow-1 text-truncate fw-semibold">{{ item.label }}</span>
+            <i class="bi bi-chevron-right context-link-chevron" aria-hidden="true"></i>
+          </a>
+        }
+      </nav>
+
+      <footer class="context-sidebar-footer p-3 mt-auto">
+        <button
+          type="button"
+          class="context-back-button d-flex w-100 align-items-center justify-content-center gap-2"
+          (click)="closeContextRequested()"
+        >
+          <i class="bi bi-arrow-return-left" aria-hidden="true"></i>
+          <span>{{ backToContextRootLabel() }}</span>
+        </button>
+      </footer>
+    </aside>
+
+    @if (!contextSidebarOpen() && !isMobile()) {
+      <button
+        #contextReopenButton
+        type="button"
+        class="context-reopen-button context-reopen-edge d-inline-flex align-items-center justify-content-center"
+        [attr.aria-label]="openContextNavigationLabel()"
+        [attr.aria-expanded]="false"
+        [title]="openContextNavigationLabel()"
+        aria-controls="branch-context-sidebar"
+        (click)="openContextNavigation()"
+      >
+        <i
+          class="bi context-reopen-arrow"
+          [class.bi-chevron-left]="direction() === 'rtl'"
+          [class.bi-chevron-right]="direction() === 'ltr'"
+          aria-hidden="true"
+        ></i>
+      </button>
+    }
+  }
   <section
     class="workspace d-flex min-vh-100 flex-column flex-grow-1"
     [attr.dir]="direction()"
@@ -264,10 +394,10 @@
   >
     @if (hasWorkspaceHeader()) {
       <div
-        class="workspace-header d-flex flex-column align-items-stretch align-items-center justify-content-end"
+        class="workspace-header d-flex align-items-center justify-content-between gap-3"
       >
         @if (breadcrumbs().length > 0) {
-          <div class="workspace-breadcrumb">
+          <div class="workspace-breadcrumb flex-grow-1 overflow-hidden">
             <app-breadcrumb
               [items]="breadcrumbs()"
               [direction]="direction()"
@@ -277,9 +407,9 @@
           </div>
         }
 
-        @if (hasCurrentUser()) {
+        @if (showsWorkspaceUser()) {
           <div
-            class="workspace-user d-inline-flex flex-shrink-0 align-items-center"
+            class="workspace-user d-inline-flex flex-shrink-0 align-items-center gap-2"
             [attr.aria-label]="currentUserLabel()"
           >
             <span

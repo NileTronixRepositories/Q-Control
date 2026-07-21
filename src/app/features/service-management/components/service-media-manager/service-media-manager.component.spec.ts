@@ -58,8 +58,11 @@ describe('ServiceMediaManagerComponent', () => {
     expect(fixture.nativeElement.textContent).toContain('Service Media');
     expect(fixture.nativeElement.querySelectorAll('img').length).toBe(2);
     expect(grid?.classList).toContain('row');
+    expect(grid?.classList).toContain('g-2');
+    expect(grid?.classList).toContain('m-0');
     expect(singleCards.length).toBe(2);
-    expect(Array.from(singleCards).every((card) => (card as HTMLElement).classList.contains('col-xl-6'))).toBe(true);
+    expect(Array.from(singleCards).every((card) => (card as HTMLElement).classList.contains('col-xl-12'))).toBe(true);
+    expect(Array.from(singleCards).some((card) => (card as HTMLElement).classList.contains('col-xl-6'))).toBe(false);
     expect(adsCard?.classList).toContain('col-12');
     expect(fixture.nativeElement.querySelector('.service-media-empty')).not.toBeNull();
     expect(fixture.nativeElement.querySelectorAll('input[type="file"]').length).toBe(3);

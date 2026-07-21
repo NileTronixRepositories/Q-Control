@@ -1,177 +1,90 @@
-/* Forms and controls */
-body .theme-form.row,
-body .row {
-  --bs-gutter-x: var(--nt-form-gap-x) !important;
-  --bs-gutter-y: var(--nt-form-gap-y) !important;
+﻿/* Admin form refinements. Bootstrap owns layout utilities; this file owns theme tokens and field affordances. */
+body[data-admin-theme] :where(.theme-form.row, form.row) {
+  --bs-gutter-x: var(--nt-form-gap-x);
+  --bs-gutter-y: var(--nt-form-gap-y);
 }
 
-body
-  :where(
-    .form-label,
-    .form-row label,
-    .form-group label,
-    .field-row label,
-    .number-field label,
-    .form-field span,
-    .form-field label,
-    .filter-field span,
-    label,
-    dt
-  ) {
-  color: #1b2a44 !important;
-  font-size: 0.86rem !important;
-  font-weight: 800 !important;
+body[data-admin-theme]
+  :where(.form-label, .form-field span, .filter-field span, .field-row label, .number-field label) {
+  color: var(--q-text-secondary, #1b2a44);
+  font-size: var(--q-font-size-small, 0.82rem);
+  font-weight: 800;
+  line-height: var(--q-line-height-label, 1.4);
 }
 
-body input:not([type='checkbox']):not([type='radio']):not([type='color']),
-body select,
-body textarea,
-body .form-control,
-body .form-select,
-body .input-wrapper,
-body .color-control,
-body .number-control {
-  min-height: var(--nt-control-height) !important;
-  color: var(--q-text-secondary, var(--nt-text)) !important;
-  background: #ffffff !important;
-  border: 1px solid #d9e3ee !important;
-  border-radius: 9px !important;
-  box-shadow: none !important;
-  font-size: 0.9rem !important;
-  font-weight: 500 !important;
+body[data-admin-theme]
+  :where(input:not([type='checkbox']):not([type='radio']):not([type='color']), select, textarea, .form-control, .form-select) {
+  min-height: var(--nt-control-height);
+  color: var(--q-text-primary, var(--nt-text));
+  background-color: #ffffff;
+  border-color: var(--q-border-strong, #d9e3ee);
+  border-radius: 9px;
+  box-shadow: none;
+  font-size: 0.9rem;
+  font-weight: 500;
 }
 
-body input:not([type='checkbox']):not([type='radio']):not([type='color']),
-body select,
-body textarea,
-body .form-control,
-body .form-select {
-  padding-inline: var(--nt-control-padding-x) !important;
+body[data-admin-theme]
+  :where(input:not([type='checkbox']):not([type='radio']):not([type='color']):focus, select:focus, textarea:focus, .form-control:focus, .form-select:focus) {
+  background-color: #ffffff;
+  border-color: rgba(var(--q-primary-rgb, 15 125 168) / 0.52);
+  box-shadow: var(--nt-focus);
+  outline: 0;
 }
 
-body .input-wrapper {
-  display: flex !important;
-  align-items: center !important;
-  gap: 14px !important;
-  padding-inline: 14px !important;
+body[data-admin-theme] :where(.input-wrapper, .color-control) {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
 }
 
-body .input-wrapper i {
-  color: var(--nt-primary) !important;
+body[data-admin-theme] :where(.input-wrapper i, .form-field-icon) {
+  color: var(--q-primary, var(--nt-primary));
 }
 
-body input:not([type='checkbox']):not([type='radio']):not([type='color']):focus,
-body select:focus,
-body textarea:focus,
-body .form-control:focus,
-body .form-select:focus,
-body .input-wrapper:focus-within,
-body .color-control:focus-within,
-body .number-control:focus-within {
-  background: #ffffff !important;
-  border-color: rgba(15, 125, 168, 0.52) !important;
-  box-shadow: var(--nt-focus) !important;
-  outline: 0 !important;
+body[data-admin-theme] :where(.color-control) {
+  min-height: var(--nt-control-height);
+  padding-inline: var(--nt-control-padding-x);
+  background: #ffffff;
+  border: 1px solid var(--q-border-subtle, var(--nt-border));
+  border-radius: 9px;
 }
 
-body .color-control {
-  display: flex !important;
-  align-items: center !important;
-  gap: 12px !important;
-  padding: 0 var(--nt-control-padding-x) !important;
+body[data-admin-theme] :where(.color-preview) {
+  order: -1;
+  width: var(--nt-color-swatch-size);
+  height: var(--nt-color-swatch-size);
+  flex: 0 0 var(--nt-color-swatch-size);
+  border: 1px solid rgba(var(--q-primary-rgb, 15 125 168) / 0.08);
+  border-radius: 6px;
+  box-shadow: 0 7px 16px rgba(27, 36, 48, 0.1);
 }
 
-body .color-control input {
-  flex: 1 1 auto !important;
-  min-height: var(--nt-control-height) !important;
-  padding: 0 !important;
-  color: var(--q-text-secondary, var(--nt-text)) !important;
-  background: transparent !important;
-  border: 0 !important;
-  box-shadow: none !important;
-  font-size: 0.9rem !important;
-  font-weight: 500 !important;
+body[data-admin-theme] :where(.form-check-input, .check-row input[type='checkbox']) {
+  border-color: var(--nt-border-strong);
+  box-shadow: none;
 }
 
-body .color-preview {
-  order: -1 !important;
-  width: var(--nt-color-swatch-size) !important;
-  height: var(--nt-color-swatch-size) !important;
-  flex: 0 0 var(--nt-color-swatch-size) !important;
-  border: 1px solid rgba(15, 125, 168, 0.08) !important;
-  border-radius: 6px !important;
-  box-shadow: 0 7px 16px rgba(27, 36, 48, 0.1) !important;
+body[data-admin-theme] :where(.form-check-input:checked, .check-row input[type='checkbox']:checked) {
+  background-color: var(--q-primary, var(--nt-primary));
+  border-color: var(--q-primary, var(--nt-primary));
 }
 
-body .form-check-input,
-body .check-row input[type='checkbox'] {
-  border-color: var(--nt-border-strong) !important;
-  box-shadow: none !important;
+body[data-admin-theme] :where(.check-row) {
+  min-height: var(--nt-control-height);
+  color: var(--q-text-primary, var(--nt-text));
+  background: #fbfdff;
+  border: 1px solid var(--q-border-subtle, var(--nt-border));
+  border-radius: var(--q-radius-md, 12px);
 }
 
-body .form-check-input:checked,
-body .check-row input[type='checkbox']:checked {
-  background-color: var(--nt-primary) !important;
-  border-color: var(--nt-primary) !important;
+body[data-admin-theme] :where(.check-row:hover) {
+  border-color: rgba(var(--q-primary-rgb, 15 125 168) / 0.26);
+  box-shadow: var(--nt-shadow-soft);
 }
 
-body .check-row {
-  background: #fbfdff !important;
-  border-color: var(--nt-border) !important;
-  border-radius: 12px !important;
-}
-
-body .check-row:hover {
-  border-color: rgba(15, 125, 168, 0.26) !important;
-  box-shadow: var(--nt-shadow-soft) !important;
-}
-
-body .upload-control,
-body .upload-dropzone {
-  min-height: var(--nt-upload-height) !important;
-  gap: 10px !important;
-  color: var(--nt-primary) !important;
-  background: #f8fbfd !important;
-  border: 1px dashed rgba(15, 125, 168, 0.62) !important;
-  border-radius: 9px !important;
-  box-shadow: none !important;
-  font-size: 0.88rem !important;
-  font-weight: 850 !important;
-}
-
-body .upload-control:hover,
-body .upload-dropzone:hover,
-body .upload-dropzone.dragover {
-  color: var(--nt-primary-dark) !important;
-  background: var(--nt-primary-soft) !important;
-  border-color: var(--nt-primary) !important;
-  box-shadow: var(--nt-focus) !important;
-}
-
-body .upload-control i,
-body .upload-placeholder i,
-body .upload-success i {
-  color: var(--nt-primary) !important;
-}
-
-body .logo-tabs {
-  background: #f8fafc !important;
-  border: 1px solid var(--nt-border) !important;
-  border-radius: 12px !important;
-}
-
-body .logo-tab {
-  color: var(--nt-text-soft) !important;
-  border-radius: 10px !important;
-}
-
-body .logo-tab.active {
-  color: var(--nt-primary) !important;
-  background: #ffffff !important;
-  box-shadow: var(--nt-shadow-soft) !important;
-}
-body :where(.form-field small) {
-  color: var(--q-danger) !important;
-  font-size: var(--q-font-size-small) !important;
-  font-weight: 600 !important;
+body[data-admin-theme] :where(.form-field small, .invalid-feedback) {
+  color: var(--q-danger);
+  font-size: var(--q-font-size-small);
+  font-weight: 700;
 }

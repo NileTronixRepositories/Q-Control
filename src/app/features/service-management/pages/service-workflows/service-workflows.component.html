@@ -92,6 +92,11 @@
             [language]="language()"
             [direction]="direction()"
             [loading]="store.branchTreeLoading()"
+            [showSearch]="true"
+            [searchText]="store.branchTreeSearchText()"
+            [searchLabel]="serviceTranslations().treeSearchLabel"
+            [searchPlaceholder]="serviceTranslations().treeSearchPlaceholder"
+            [searchHelp]="serviceTranslations().treeSearchHelp"
             [includeInactive]="false"
             [includeDeleted]="false"
             [canCreate]="false"
@@ -102,6 +107,7 @@
             [canManageWorkflows]="true"
             [canManageWorkflowNode]="canManageWorkflowFor"
             [manageWorkflowsLabel]="translations().manageWorkflows"
+            (searchTextChange)="updateBranchTreeSearch($event)"
             (toggleNode)="toggleBranchNode($event)"
             (selectNode)="selectBranchNode($event)"
             (manageWorkflows)="openNodeWorkflows($event)"
@@ -294,7 +300,7 @@
                 }
               </div>
               <div
-                class="workflow-path-strip"
+                class="workflow-path-strip d-flex align-items-center gap-2 overflow-auto"
                 [attr.aria-label]="translations().currentWorkflowPath"
               >
                 @for (step of sortedSteps(workflow); track $index; let last = $last) {
@@ -387,7 +393,7 @@
                 size="sm"
               />
             } @else if (store.panelMode() === 'view' && store.selectedDetails(); as details) {
-              <section class="workflow-detail-view">
+              <section class="workflow-detail-view d-grid gap-3">
                 <div class="workflow-detail-card">
                   <div class="workflow-title-row">
                     <h3>{{ workflowName(details) }}</h3>
@@ -399,7 +405,7 @@
                   </div>
                   <p>{{ translations().workflowOwner }}: {{ store.scope()?.ownerServiceName }}</p>
                 </div>
-                <div class="workflow-path-strip workflow-path-strip--detail">
+                <div class="workflow-path-strip workflow-path-strip--detail d-flex align-items-center gap-2 overflow-auto">
                   @for (step of sortedSteps(details); track $index; let last = $last) {
                     <span class="workflow-path-chip workflow-path-chip--large">{{
                       serviceName(step)
@@ -498,7 +504,7 @@
                     <h3>{{ translations().currentWorkflowPath }}</h3>
                     <p>{{ translations().duplicateAllowed }}</p>
                   </header>
-                  <div class="workflow-builder-list">
+                  <div class="workflow-builder-list d-grid gap-2">
                     @for (step of builderSteps(); track step.uid; let index = $index) {
                       <article
                         class="workflow-builder-row"
@@ -566,9 +572,14 @@
                       <input
                         class="form-control"
                         type="search"
+                        maxlength="200"
+                        [placeholder]="translations().candidateSearchPlaceholder"
                         [value]="store.candidateQuery().searchText"
                         (input)="updateCandidateSearch($event)"
                       />
+                      <small class="workflow-filter-help text-muted fw-semibold small">{{
+                        translations().candidateSearchHelp
+                      }}</small>
                     </label>
                     <label class="filter-field d-grid gap-2 m-0">
                       <span>{{ translations().parent }}</span>
@@ -605,6 +616,9 @@
                         ></span>
                         <span class="workflow-candidate-copy">
                           <strong>{{ serviceName(candidate) }}</strong>
+                          @if (serviceCodeLabel(candidate); as serviceCode) {
+                            <span class="workflow-candidate-code badge rounded-pill text-bg-light border text-primary-emphasis text-truncate">{{ serviceCode }}</span>
+                          }
                           <small>{{ parentName(candidate) }}</small>
                         </span>
                       </button>
@@ -700,3 +714,4 @@
     </section>
   }
 </section>
+

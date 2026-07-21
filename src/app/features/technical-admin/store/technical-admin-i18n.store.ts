@@ -20,6 +20,13 @@ interface TechnicalAdminTranslations {
   readonly generalLabel: string;
   readonly serviceRequestLabel: string;
   readonly branchManagementLabel: string;
+  readonly selectedBranchLabel: string;
+  readonly branchNavigationLabel: string;
+  readonly openBranchNavigationLabel: string;
+  readonly closeBranchNavigationLabel: string;
+  readonly backToBranchesLabel: string;
+  readonly activeBranchLabel: string;
+  readonly inactiveBranchLabel: string;
   readonly branchEditorLabel: string;
   readonly branchBrandingLabel: string;
   readonly waitingAreasLabel: string;
@@ -133,6 +140,13 @@ const TECHNICAL_ADMIN_TRANSLATIONS: Record<AppLanguage, TechnicalAdminTranslatio
     generalLabel: '\u0639\u0627\u0645',
     serviceRequestLabel: '\u0637\u0644\u0628 \u0627\u0644\u062e\u062f\u0645\u0629',
     branchManagementLabel: '\u0625\u062f\u0627\u0631\u0629 \u0627\u0644\u0641\u0631\u0648\u0639',
+    selectedBranchLabel: '\u0627\u0644\u0641\u0631\u0639 \u0627\u0644\u0645\u062e\u062a\u0627\u0631',
+    branchNavigationLabel: '\u062a\u0646\u0642\u0644 \u0627\u0644\u0641\u0631\u0639',
+    openBranchNavigationLabel: '\u0641\u062a\u062d \u0642\u0627\u0626\u0645\u0629 \u0627\u0644\u0641\u0631\u0639',
+    closeBranchNavigationLabel: '\u0625\u063a\u0644\u0627\u0642 \u0642\u0627\u0626\u0645\u0629 \u0627\u0644\u0641\u0631\u0639',
+    backToBranchesLabel: '\u0627\u0644\u0639\u0648\u062f\u0629 \u0625\u0644\u0649 \u0627\u0644\u0641\u0631\u0648\u0639',
+    activeBranchLabel: '\u0646\u0634\u0637',
+    inactiveBranchLabel: '\u063a\u064a\u0631 \u0646\u0634\u0637',
     branchEditorLabel: '\u0645\u062d\u0631\u0631 \u0627\u0644\u0641\u0631\u0648\u0639',
     branchBrandingLabel: '\u0627\u0644\u0647\u0648\u064a\u0629 \u0648\u0627\u0644\u0625\u0639\u0644\u0627\u0646\u0627\u062a',
     waitingAreasLabel: '\u0645\u0646\u0627\u0637\u0642 \u0627\u0644\u0627\u0646\u062a\u0638\u0627\u0631',
@@ -244,6 +258,13 @@ const TECHNICAL_ADMIN_TRANSLATIONS: Record<AppLanguage, TechnicalAdminTranslatio
     generalLabel: 'General',
     serviceRequestLabel: 'Service Request',
     branchManagementLabel: 'Branch Management',
+    selectedBranchLabel: 'Selected branch',
+    branchNavigationLabel: 'Branch navigation',
+    openBranchNavigationLabel: 'Open branch navigation',
+    closeBranchNavigationLabel: 'Close branch navigation',
+    backToBranchesLabel: 'Back to branches',
+    activeBranchLabel: 'Active',
+    inactiveBranchLabel: 'Inactive',
     branchEditorLabel: 'Branch Editor',
     branchBrandingLabel: 'Branding & Advertisements',
     waitingAreasLabel: 'Waiting Areas',

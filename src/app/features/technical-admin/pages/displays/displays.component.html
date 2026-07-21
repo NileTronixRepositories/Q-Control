@@ -1,4 +1,4 @@
-﻿<section
+<section
   class="technical-admin-responsive-page display-management-page container-fluid"
   [attr.dir]="direction()"
   [attr.lang]="language()"
@@ -7,7 +7,7 @@
     [eyebrow]="translations().title"
     [title]="translations().title"
     [description]="translations().description"
-    icon="bi bi-display-fill"
+    icon="bi bi-display"
   >
     @if (activeTab() === 'active' && canCreate() && canViewActive()) {
       <button hero-actions type="button" class="primary-action" (click)="openCreate()">
@@ -54,7 +54,7 @@
       </p>
     </section>
   } @else {
-    <div class="tabs">
+    <div class="tabs d-flex flex-wrap gap-2">
       @if (canViewActive()) {
         <button
           type="button"
@@ -62,7 +62,7 @@
           [class.secondary-action]="activeTab() !== 'active'"
           (click)="switchTab('active')"
         >
-          <i class="bi bi-display me-1.5"></i>
+          <i class="bi bi-display"></i>
           {{ translations().activeTab }}
         </button>
       }
@@ -74,14 +74,14 @@
           [class.secondary-action]="activeTab() !== 'deleted'"
           (click)="switchTab('deleted')"
         >
-          <i class="bi bi-archive me-1.5"></i>
+          <i class="bi bi-trash3"></i>
           {{ translations().deletedTab }}
         </button>
       }
     </div>
     @if (activeTab() === 'active') {
-      <section class="list-panel">
-        <div class="row g-3 align-items-end">
+      <section class="list-panel d-grid gap-3 p-3">
+        <div class="row g-2 align-items-end">
           <div class="col-12 col-lg-5">
             <label class="filter-field">
               <span>{{ translations().searchPlaceholder }}</span>
@@ -104,7 +104,9 @@
 
               <select
                 class="form-select"
+                data-testid="displays-active-branch-filter"
                 [value]="activeBranchId() ?? ''"
+                [disabled]="isBranchContextLocked()"
                 (change)="updateActiveBranchFilter($event)"
               >
                 <option value="">
@@ -135,14 +137,14 @@
               </select>
             </label>
           </div>
-          <div class="col-12 col-md-4 col-lg-2">
+          <div class="col-12 col-md-4 col-lg-2 d-grid">
             <button
               type="button"
-              class="secondary-action"
+              class="secondary-action w-100"
               [disabled]="activeLoading()"
               (click)="refreshActive()"
             >
-              <i class="bi bi-arrow-clockwise"></i>
+              <i class="bi bi-arrow-repeat"></i>
 
               {{ translations().refresh }}
             </button>
@@ -153,15 +155,15 @@
         }
         @if (activeDisplaysPage().data.length > 0) {
           <div data-testid="displays-active-desktop" class="table-responsive table-wrap d-none d-md-block">
-            <table class="table align-middle custom-table">
+            <table class="admin-data-table table table-sm table-hover align-middle mb-0 custom-table">
               <thead>
                 <tr>
-                  <th>{{ translations().displayNumber }}</th>
-                  <th>{{ translations().typeLabel }}</th>
-                  <th>{{ translations().ipAddress }}</th>
-                  <th>{{ translations().serialNumber }}</th>
-                  <th>{{ translations().branch }}</th>
-                  <th class="text-center">
+                  <th scope="col">{{ translations().displayNumber }}</th>
+                  <th scope="col">{{ translations().typeLabel }}</th>
+                  <th scope="col">{{ translations().ipAddress }}</th>
+                  <th scope="col">{{ translations().serialNumber }}</th>
+                  <th scope="col">{{ translations().branch }}</th>
+                  <th scope="col" class="admin-actions-column text-center">
                     {{ translations().actions }}
                   </th>
                 </tr>
@@ -170,31 +172,47 @@
               <tbody>
                 @for (item of activeDisplaysPage().data; track item.id) {
                   <tr>
-                    <td>
+                    <td class="admin-number-cell">
                       <strong>{{ item.number }}</strong>
                     </td>
 
                     <td>{{ formatText(item.type) }}</td>
 
-                    <td>{{ formatText(item.ipAddress) }}</td>
+                    <td class="admin-technical-cell" dir="ltr">
+                      {{ formatText(item.ipAddress) }}
+                    </td>
 
-                    <td>{{ formatText(item.serialNo) }}</td>
+                    <td class="admin-technical-cell" dir="ltr">
+                      {{ formatText(item.serialNo) }}
+                    </td>
 
                     <td>
                       {{ branchLabel(item.branchArabicName, item.branchEnglishName) }}
                     </td>
 
-                    <td>
+                    <td class="admin-actions-column">
                       <div class="row-actions d-flex align-items-center justify-content-center gap-2 flex-wrap">
                         @if (canViewDetails()) {
-                          <button type="button" class="icon-action" (click)="openView(item.id)">
+                          <button
+                            type="button"
+                            class="icon-action"
+                            [attr.aria-label]="translations().view"
+                            [title]="translations().view"
+                            (click)="openView(item.id)"
+                          >
                             <i class="bi bi-eye"></i>
                           </button>
                         }
 
                         @if (canUpdate()) {
-                          <button type="button" class="icon-action" (click)="openEdit(item.id)">
-                            <i class="bi bi-pencil-square"></i>
+                          <button
+                            type="button"
+                            class="icon-action"
+                            [attr.aria-label]="translations().edit"
+                            [title]="translations().edit"
+                            (click)="openEdit(item.id)"
+                          >
+                            <i class="bi bi-pencil"></i>
                           </button>
                         }
 
@@ -202,9 +220,11 @@
                           <button
                             type="button"
                             class="icon-action danger-action"
+                            [attr.aria-label]="translations().delete"
+                            [title]="translations().delete"
                             (click)="requestSoftDelete(item)"
                           >
-                            <i class="bi bi-pause-circle"></i>
+                            <i class="bi bi-power"></i>
                           </button>
                         }
                       </div>
@@ -214,12 +234,12 @@
               </tbody>
             </table>
           </div>
-          <div data-testid="displays-active-mobile" class="d-grid gap-3 d-md-none">
+          <div data-testid="displays-active-mobile" class="d-grid gap-2 d-md-none">
             @for (item of activeDisplaysPage().data; track item.id) {
               <app-technical-admin-mobile-record-card
                 [eyebrow]="translations().displayNumber"
                 [title]="formatText(item.type)"
-                icon="bi bi-display-fill"
+                icon="bi bi-display"
                 [recordId]="item.number"
               >
                 <div record-fields>
@@ -267,7 +287,7 @@
                     [title]="translations().edit"
                     (click)="openEdit(item.id)"
                   >
-                    <i class="bi bi-pencil-square"></i>
+                    <i class="bi bi-pencil"></i>
                   </button>
                 }
                 @if (canDeactivate()) {
@@ -279,7 +299,7 @@
                     [title]="translations().delete"
                     (click)="requestSoftDelete(item)"
                   >
-                    <i class="bi bi-pause-circle"></i>
+                    <i class="bi bi-power"></i>
                   </button>
                 }
               </app-technical-admin-mobile-record-card>
@@ -287,16 +307,18 @@
           </div>
         }
         @else if (!activeLoading()) {
-          <div class="empty-state">
-            <i class="bi bi-inbox"></i>
-
-            <h2>
-              {{ translations().noItems }}
-            </h2>
+          <div class="admin-list-empty d-flex align-items-center gap-3 p-3" role="status">
+            <span
+              class="admin-list-empty-icon d-inline-flex align-items-center justify-content-center flex-shrink-0"
+              aria-hidden="true"
+            >
+              <i class="bi bi-display"></i>
+            </span>
+            <h2 class="mb-0">{{ translations().noItems }}</h2>
           </div>
         }
-        <footer class="pagination-bar d-flex align-items-center justify-content-between gap-3 mt-3 flex-column flex-md-row">
-          <span>
+        <footer class="pagination-bar d-flex align-items-center justify-content-between gap-2 pt-3 flex-column flex-md-row">
+          <span class="admin-pagination-total">
             {{ translations().totalItems }}:
             {{ activeDisplaysPage().totalItems }}
           </span>
@@ -330,8 +352,8 @@
       </section>
     }
     @if (activeTab() === 'deleted') {
-      <section class="list-panel">
-        <div class="row g-3 align-items-end">
+      <section class="list-panel d-grid gap-3 p-3">
+        <div class="row g-2 align-items-end">
           <div class="col-12 col-lg-5">
             <label class="filter-field">
               <span>{{ translations().searchPlaceholder }}</span>
@@ -355,7 +377,9 @@
 
               <select
                 class="form-select"
+                data-testid="displays-deleted-branch-filter"
                 [value]="deletedBranchId() ?? ''"
+                [disabled]="isBranchContextLocked()"
                 (change)="updateDeletedBranchFilter($event)"
               >
                 <option value="">
@@ -388,14 +412,14 @@
             </label>
           </div>
 
-          <div class="col-12 col-md-4 col-lg-2">
+          <div class="col-12 col-md-4 col-lg-2 d-grid">
             <button
               type="button"
-              class="secondary-action"
+              class="secondary-action w-100"
               [disabled]="deletedLoading()"
               (click)="refreshDeleted()"
             >
-              <i class="bi bi-arrow-clockwise"></i>
+              <i class="bi bi-arrow-repeat"></i>
 
               {{ translations().refresh }}
             </button>
@@ -408,15 +432,15 @@
 
         @if (deletedDisplaysPage().data.length > 0) {
           <div data-testid="displays-deleted-desktop" class="table-responsive table-wrap d-none d-md-block">
-            <table class="table align-middle custom-table">
+            <table class="admin-data-table table table-sm table-hover align-middle mb-0 custom-table">
               <thead>
                 <tr>
-                  <th>{{ translations().displayNumber }}</th>
-                  <th>{{ translations().typeLabel }}</th>
-                  <th>{{ translations().ipAddress }}</th>
-                  <th>{{ translations().serialNumber }}</th>
-                  <th>{{ translations().branch }}</th>
-                  <th class="text-center">
+                  <th scope="col">{{ translations().displayNumber }}</th>
+                  <th scope="col">{{ translations().typeLabel }}</th>
+                  <th scope="col">{{ translations().ipAddress }}</th>
+                  <th scope="col">{{ translations().serialNumber }}</th>
+                  <th scope="col">{{ translations().branch }}</th>
+                  <th scope="col" class="admin-actions-column text-center">
                     {{ translations().actions }}
                   </th>
                 </tr>
@@ -425,21 +449,25 @@
               <tbody>
                 @for (item of deletedDisplaysPage().data; track item.id) {
                   <tr>
-                    <td>
+                    <td class="admin-number-cell">
                       <strong>{{ item.number }}</strong>
                     </td>
 
                     <td>{{ formatText(item.type) }}</td>
 
-                    <td>{{ formatText(item.ipAddress) }}</td>
+                    <td class="admin-technical-cell" dir="ltr">
+                      {{ formatText(item.ipAddress) }}
+                    </td>
 
-                    <td>{{ formatText(item.serialNo) }}</td>
+                    <td class="admin-technical-cell" dir="ltr">
+                      {{ formatText(item.serialNo) }}
+                    </td>
 
                     <td>
                       {{ branchLabel(item.branchArabicName, item.branchEnglishName) }}
                     </td>
 
-                    <td>
+                    <td class="admin-actions-column">
                       <div class="row-actions d-flex align-items-center justify-content-center gap-2 flex-wrap">
                         @if (canReactivate()) {
                           <button
@@ -461,7 +489,7 @@
                             [title]="translations().permanentDelete"
                             (click)="requestPermanentDelete(item)"
                           >
-                            <i class="bi bi-trash-fill"></i>
+                            <i class="bi bi-trash3"></i>
                           </button>
                         }
                       </div>
@@ -471,12 +499,12 @@
               </tbody>
             </table>
           </div>
-          <div data-testid="displays-deleted-mobile" class="d-grid gap-3 d-md-none">
+          <div data-testid="displays-deleted-mobile" class="d-grid gap-2 d-md-none">
             @for (item of deletedDisplaysPage().data; track item.id) {
               <app-technical-admin-mobile-record-card
                 [eyebrow]="translations().displayNumber"
                 [title]="formatText(item.type)"
-                icon="bi bi-display-fill"
+                icon="bi bi-display"
                 [recordId]="item.number"
               >
                 <span record-badges class="status-pill status-inactive">{{
@@ -527,24 +555,26 @@
                     [title]="translations().permanentDelete"
                     (click)="requestPermanentDelete(item)"
                   >
-                    <i class="bi bi-trash-fill"></i>
+                    <i class="bi bi-trash3"></i>
                   </button>
                 }
               </app-technical-admin-mobile-record-card>
             }
           </div>
         } @else if (!deletedLoading()) {
-          <div class="empty-state">
-            <i class="bi bi-archive"></i>
-
-            <h2>
-              {{ translations().noItems }}
-            </h2>
+          <div class="admin-list-empty d-flex align-items-center gap-3 p-3" role="status">
+            <span
+              class="admin-list-empty-icon d-inline-flex align-items-center justify-content-center flex-shrink-0"
+              aria-hidden="true"
+            >
+              <i class="bi bi-trash3"></i>
+            </span>
+            <h2 class="mb-0">{{ translations().noItems }}</h2>
           </div>
         }
 
-        <footer class="pagination-bar d-flex align-items-center justify-content-between gap-3 mt-3 flex-column flex-md-row">
-          <span>
+        <footer class="pagination-bar d-flex align-items-center justify-content-between gap-2 pt-3 flex-column flex-md-row">
+          <span class="admin-pagination-total">
             {{ translations().totalItems }}:
             {{ deletedDisplaysPage().totalItems }}
           </span>
@@ -656,7 +686,7 @@
                   {{ translations().branchFilter }}
                 </span>
 
-                <select class="form-select" formControlName="branchId">
+                <select class="form-select" formControlName="branchId" [disabled]="isBranchContextLocked() || panelMode() === 'edit'">
                   <option [value]="0">
                     {{ translations().selectBranch }}
                   </option>

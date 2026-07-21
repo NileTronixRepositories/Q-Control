@@ -19,6 +19,7 @@ import {
 } from '../../models/waiting-area.model';
 import { BranchManagementApiService } from '../../services/branch-management-api.service';
 import { WaitingAreaApiService } from '../../services/waiting-area-api.service';
+import { TechnicalAdminBranchContextStore } from '../../store/technical-admin-branch-context.store';
 import { TechnicalAdminI18nStore } from '../../store/technical-admin-i18n.store';
 import { formatTechnicalAdminApiError } from '../../utils/api-error-message.util';
 
@@ -207,6 +208,7 @@ export class WaitingAreasComponent implements OnInit, OnDestroy {
   private readonly authSessionService = inject(AuthSessionService);
   private readonly branchManagementApiService = inject(BranchManagementApiService);
   private readonly waitingAreaApiService = inject(WaitingAreaApiService);
+  private readonly branchContextStore = inject(TechnicalAdminBranchContextStore);
   private readonly i18nStore = inject(TechnicalAdminI18nStore);
   protected readonly language = this.i18nStore.language;
   protected readonly direction = this.i18nStore.direction;
@@ -219,6 +221,11 @@ export class WaitingAreasComponent implements OnInit, OnDestroy {
   protected readonly waitingAreaPage = signal<Pagination<WaitingAreaListItem>>(EMPTY_PAGE);
   protected readonly search = signal('');
   protected readonly selectedBranchId = signal<number | null>(null);
+  protected readonly isBranchContextLocked = computed(
+    () =>
+      this.authSessionService.currentSession()?.userType === 'TechnicalAdmin' &&
+      this.branchContextStore.selectedBranchId() !== null,
+  );
   protected readonly statusFilter = signal<boolean | null>(null);
   protected readonly pageSize = signal(10);
   protected readonly loading = signal(false);
@@ -245,6 +252,7 @@ export class WaitingAreasComponent implements OnInit, OnDestroy {
   protected readonly controlDeviceControl = this.waitingAreaForm.controls.controlDevice;
 
   ngOnInit(): void {
+    this.selectedBranchId.set(this.branchContextStore.selectedBranchId());
     this.loadBranches();
     this.loadWaitingAreas();
   }
@@ -287,6 +295,10 @@ export class WaitingAreasComponent implements OnInit, OnDestroy {
   }
 
   protected updateBranchFilter(event: Event): void {
+    if (this.isBranchContextLocked()) {
+      return;
+    }
+
     const value = this.readInputValue(event);
     this.selectedBranchId.set(value ? Number(value) : null);
     this.loadWaitingAreas(1);
@@ -339,6 +351,10 @@ export class WaitingAreasComponent implements OnInit, OnDestroy {
       audioDevice: '',
       controlDevice: ''
     });
+
+    if (this.isBranchContextLocked()) {
+      this.branchIdControl.disable({ emitEvent: false });
+    }
   }
 
   protected openView(waitingAreaId: number): void {
@@ -463,7 +479,20 @@ export class WaitingAreasComponent implements OnInit, OnDestroy {
         isActive: true
       })
       .subscribe({
-        next: (page) => this.branchOptions.set(page.data.map((branch) => this.mapBranchOption(branch))),
+        next: (page) => {
+          const options = page.data.map((branch) => this.mapBranchOption(branch));
+          const contextBranch = this.branchContextStore.selectedBranch();
+
+          if (contextBranch && !options.some((branch) => branch.id === contextBranch.branchId)) {
+            options.unshift({
+              id: contextBranch.branchId,
+              arabicName: contextBranch.arabicName,
+              englishName: contextBranch.englishName,
+            });
+          }
+
+          this.branchOptions.set(options);
+        },
         error: (error: HttpErrorResponse) => this.handleApiError(error, false)
       });
   }
@@ -657,3 +686,4 @@ export class WaitingAreasComponent implements OnInit, OnDestroy {
     return (event.target as HTMLInputElement | HTMLSelectElement).value;
   }
 }
+

@@ -1,18 +1,23 @@
 @if (open()) {
-  <div class="editor-backdrop app-popup-overlay" (click)="closeDialog()" aria-hidden="true"></div>
+  <div class="q-dialog-backdrop" (click)="closeDialog()" aria-hidden="true"></div>
   <aside
-    class="editor-panel app-popup-panel app-popup-wide branch-admin-dialog modal-content"
+    class="q-dialog q-dialog--lg branch-admin-dialog"
     role="dialog"
     aria-modal="true"
     [attr.aria-label]="copy().createBranchAdminTitle"
     [attr.dir]="direction()"
     [attr.lang]="language()"
   >
-    <header class="editor-panel-header modal-header">
-      <h2>{{ copy().createBranchAdminTitle }}</h2>
+    <header class="q-dialog-header">
+      <div class="d-flex align-items-center gap-3">
+        <span class="q-dialog-icon">
+          <i class="bi bi-person-plus-fill" aria-hidden="true"></i>
+        </span>
+        <h2 class="q-dialog-title mb-0">{{ copy().createBranchAdminTitle }}</h2>
+      </div>
       <button
         type="button"
-        class="icon-action"
+        class="q-dialog-close"
         [attr.aria-label]="copy().close"
         (click)="closeDialog()"
       >
@@ -20,156 +25,159 @@
       </button>
     </header>
 
-    @if (formMessage()) {
-      <p class="api-note branch-admin-error" role="status">
-        <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
-        {{ formMessage() }}
-      </p>
-    }
-
-    <form
-      class="branch-form branch-admin-form row g-3 align-items-start"
-      [formGroup]="branchAdminForm"
-      [attr.aria-busy]="store.isSubmitting()"
-      (ngSubmit)="submitBranchAdmin()"
-      novalidate
-    >
-      @if (branchLabel()) {
-        <div class="form-section-title branch-section-title col-12 d-flex align-items-center gap-2">
-          {{ branchLabel() }}
+    <div class="q-dialog-body">
+      @if (formMessage()) {
+        <div class="q-alert q-alert--danger mb-4" role="status">
+          <i class="bi bi-exclamation-triangle flex-shrink-0" aria-hidden="true"></i>
+          <p class="mb-0">{{ formMessage() }}</p>
         </div>
       }
 
-      <p class="api-note alert alert-info col-12 d-flex align-items-center gap-2 mb-0" role="note">
-        <i class="bi bi-info-circle" aria-hidden="true"></i>
-        {{ copy().branchAdminHandoffNote }}
-      </p>
-
-      <label class="form-field branch-field col-12 col-md-6 col-xl-4">
-        <span>{{ copy().branchAdminUserName }}</span>
-        <input
-          class="form-control"
-          [class.is-invalid]="hasControlError('userName')"
-          type="text"
-          maxlength="100"
-          formControlName="userName"
-          autocomplete="username"
-        />
-        @if (controlErrorMessage('userName')) {
-          <small class="invalid-feedback branch-feedback">{{ controlErrorMessage('userName') }}</small>
-        }
-      </label>
-
-      <label class="form-field branch-field col-12 col-md-6 col-xl-4">
-        <span>{{ copy().branchAdminEmail }}</span>
-        <input
-          class="form-control"
-          [class.is-invalid]="hasControlError('email')"
-          type="email"
-          maxlength="200"
-          formControlName="email"
-          autocomplete="email"
-        />
-        @if (controlErrorMessage('email')) {
-          <small class="invalid-feedback branch-feedback">{{ controlErrorMessage('email') }}</small>
-        }
-      </label>
-
-      <label class="form-field branch-field col-12 col-md-6 col-xl-4">
-        <span>{{ copy().branchAdminPhone }}</span>
-        <input
-          class="form-control"
-          [class.is-invalid]="hasControlError('phoneNumber')"
-          type="tel"
-          maxlength="30"
-          formControlName="phoneNumber"
-          autocomplete="tel"
-        />
-        @if (controlErrorMessage('phoneNumber')) {
-          <small class="invalid-feedback branch-feedback">{{
-            controlErrorMessage('phoneNumber')
-          }}</small>
-        }
-      </label>
-
-      <label class="form-field branch-field col-12 col-md-6">
-        <span>{{ copy().branchAdminNameAr }}</span>
-        <input
-          class="form-control"
-          [class.is-invalid]="hasControlError('nameAr')"
-          type="text"
-          maxlength="200"
-          formControlName="nameAr"
-        />
-        @if (controlErrorMessage('nameAr')) {
-          <small class="invalid-feedback branch-feedback">{{ controlErrorMessage('nameAr') }}</small>
-        }
-      </label>
-
-      <label class="form-field branch-field col-12 col-md-6">
-        <span>{{ copy().branchAdminNameEn }}</span>
-        <input
-          class="form-control"
-          [class.is-invalid]="hasControlError('nameEn')"
-          type="text"
-          maxlength="200"
-          formControlName="nameEn"
-        />
-        @if (controlErrorMessage('nameEn')) {
-          <small class="invalid-feedback branch-feedback">{{
-            controlErrorMessage('nameEn')
-          }}</small>
-        }
-      </label>
-
-      <label class="form-field branch-field col-12 col-md-6">
-        <span>{{ copy().branchAdminTemporaryPassword }}</span>
-        <input
-          class="form-control"
-          [class.is-invalid]="hasControlError('temporaryPassword')"
-          type="password"
-          maxlength="120"
-          formControlName="temporaryPassword"
-          autocomplete="new-password"
-        />
-        @if (controlErrorMessage('temporaryPassword')) {
-          <small class="invalid-feedback branch-feedback">{{ controlErrorMessage('temporaryPassword') }}</small>
-        }
-      </label>
-
-      <label class="form-field branch-field col-12 col-md-6">
-        <span>{{ copy().branchAdminConfirmTemporaryPassword }}</span>
-        <input
-          class="form-control"
-          [class.is-invalid]="hasControlError('confirmTemporaryPassword')"
-          type="password"
-          maxlength="120"
-          formControlName="confirmTemporaryPassword"
-          autocomplete="new-password"
-        />
-        @if (controlErrorMessage('confirmTemporaryPassword')) {
-          <small class="invalid-feedback branch-feedback">{{ controlErrorMessage('confirmTemporaryPassword') }}</small>
-        }
-      </label>
-
-      <div
-        class="editor-actions branch-form-actions modal-footer col-12 d-flex flex-wrap justify-content-end gap-2"
+      <form
+        class="q-node-grid"
+        [formGroup]="branchAdminForm"
+        [attr.aria-busy]="store.isSubmitting()"
+        (ngSubmit)="submitBranchAdmin()"
+        novalidate
+        id="branchAdminForm"
       >
-        <button
-          type="button"
-          class="btn btn-outline-primary secondary-action"
-          (click)="closeDialog()"
-        >
-          {{ copy().cancel }}
-        </button>
-        <button
-          type="submit"
-          class="btn btn-primary primary-action"
-          [disabled]="store.isSubmitting()"
-        >
-          {{ copy().save }}
-        </button>
-      </div>
-    </form>
+        @if (branchLabel()) {
+          <div class="q-dialog-subtitle fw-bold text-primary mb-2" style="grid-column: 1 / -1;">
+            {{ branchLabel() }}
+          </div>
+        }
+
+        <div class="q-alert q-alert--info mb-3" style="grid-column: 1 / -1;" role="note">
+          <i class="bi bi-info-circle flex-shrink-0" aria-hidden="true"></i>
+          <p class="mb-0">{{ copy().branchAdminHandoffNote }}</p>
+        </div>
+
+        <label class="q-field">
+          <span class="q-field-label">{{ copy().branchAdminUserName }}</span>
+          <input
+            class="form-control"
+            [class.is-invalid]="hasControlError('userName')"
+            type="text"
+            maxlength="100"
+            formControlName="userName"
+            autocomplete="username"
+          />
+          @if (controlErrorMessage('userName')) {
+            <span class="q-field-error">{{ controlErrorMessage('userName') }}</span>
+          }
+        </label>
+
+        <label class="q-field">
+          <span class="q-field-label">{{ copy().branchAdminEmail }}</span>
+          <input
+            class="form-control"
+            [class.is-invalid]="hasControlError('email')"
+            type="email"
+            maxlength="200"
+            formControlName="email"
+            autocomplete="email"
+          />
+          @if (controlErrorMessage('email')) {
+            <span class="q-field-error">{{ controlErrorMessage('email') }}</span>
+          }
+        </label>
+
+        <label class="q-field">
+          <span class="q-field-label">{{ copy().branchAdminPhone }}</span>
+          <input
+            class="form-control"
+            [class.is-invalid]="hasControlError('phoneNumber')"
+            type="tel"
+            maxlength="30"
+            formControlName="phoneNumber"
+            autocomplete="tel"
+          />
+          @if (controlErrorMessage('phoneNumber')) {
+            <span class="q-field-error">{{ controlErrorMessage('phoneNumber') }}</span>
+          }
+        </label>
+
+        <label class="q-field">
+          <span class="q-field-label">{{ copy().branchAdminNameAr }}</span>
+          <input
+            class="form-control"
+            [class.is-invalid]="hasControlError('nameAr')"
+            type="text"
+            maxlength="200"
+            formControlName="nameAr"
+          />
+          @if (controlErrorMessage('nameAr')) {
+            <span class="q-field-error">{{ controlErrorMessage('nameAr') }}</span>
+          }
+        </label>
+
+        <label class="q-field">
+          <span class="q-field-label">{{ copy().branchAdminNameEn }}</span>
+          <input
+            class="form-control"
+            [class.is-invalid]="hasControlError('nameEn')"
+            type="text"
+            maxlength="200"
+            formControlName="nameEn"
+          />
+          @if (controlErrorMessage('nameEn')) {
+            <span class="q-field-error">{{ controlErrorMessage('nameEn') }}</span>
+          }
+        </label>
+
+        <label class="q-field">
+          <span class="q-field-label">{{ copy().branchAdminTemporaryPassword }}</span>
+          <input
+            class="form-control"
+            [class.is-invalid]="hasControlError('temporaryPassword')"
+            type="password"
+            maxlength="120"
+            formControlName="temporaryPassword"
+            autocomplete="new-password"
+          />
+          @if (controlErrorMessage('temporaryPassword')) {
+            <span class="q-field-error">{{ controlErrorMessage('temporaryPassword') }}</span>
+          }
+        </label>
+
+        <label class="q-field">
+          <span class="q-field-label">{{ copy().branchAdminConfirmTemporaryPassword }}</span>
+          <input
+            class="form-control"
+            [class.is-invalid]="hasControlError('confirmTemporaryPassword')"
+            type="password"
+            maxlength="120"
+            formControlName="confirmTemporaryPassword"
+            autocomplete="new-password"
+          />
+          @if (controlErrorMessage('confirmTemporaryPassword')) {
+            <span class="q-field-error">{{ controlErrorMessage('confirmTemporaryPassword') }}</span>
+          }
+        </label>
+      </form>
+    </div>
+
+    <footer class="q-dialog-footer">
+      <button
+        type="button"
+        class="q-btn q-btn--secondary"
+        (click)="closeDialog()"
+      >
+        {{ copy().cancel }}
+      </button>
+      <button
+        type="submit"
+        form="branchAdminForm"
+        class="q-btn q-btn--primary"
+        [disabled]="store.isSubmitting()"
+      >
+        @if (store.isSubmitting()) {
+          <i class="bi bi-arrow-repeat animate-spin" aria-hidden="true"></i>
+        } @else {
+          <i class="bi bi-check2-circle" aria-hidden="true"></i>
+        }
+        <span>{{ copy().save }}</span>
+      </button>
+    </footer>
   </aside>
 }

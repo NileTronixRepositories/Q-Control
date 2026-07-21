@@ -1,101 +1,84 @@
-﻿/* Q-SYSTEM admin toolbar contract for technical admin list pages. */
-body
+﻿/* Shared technical-admin list contract. Bootstrap owns grid, flex, spacing, and responsive behavior. */
+body[data-admin-theme]
   :where(
     .waiting-areas-page,
     .window-management-page,
     .display-management-page,
     .terminal-management-page
   ) {
-  --q-admin-control-height: 44px;
+  --q-admin-control-height: 40px;
   --q-admin-control-radius: 10px;
+  --q-admin-filter-icon-offset: 14px;
+  --q-admin-filter-icon-padding: 42px;
+  --q-icon-action-size: 34px;
+  --q-icon-action-radius: 8px;
 }
 
-body
+body[data-admin-theme]
   :where(
     .waiting-areas-page,
     .window-management-page,
     .display-management-page,
     .terminal-management-page
   )
-  .list-panel
-  > .row:first-child {
-  margin-bottom: 18px;
-}
-
-body .window-management-page .toolbar {
-  margin-bottom: 14px;
-}
-
-body
-  :where(
-    .waiting-areas-page,
-    .window-management-page,
-    .display-management-page,
-    .terminal-management-page
-  )
-  :is(.filter-field, .admin-filter-field) {
+  :where(.filter-field) {
   position: relative;
   display: flex;
   min-width: 0;
   flex-direction: column;
-  justify-content: flex-end;
-  gap: 7px;
+  gap: 0.45rem;
   margin: 0;
 }
 
-body
+body[data-admin-theme]
   :where(
     .waiting-areas-page,
     .window-management-page,
     .display-management-page,
     .terminal-management-page
   )
-  :is(.filter-field, .admin-filter-field)
-  > span {
+  :where(.filter-field > span) {
   display: flex;
-  min-height: 16px;
+  min-height: 1rem;
   align-items: center;
   overflow: hidden;
   color: var(--q-text-secondary);
   font-size: var(--q-font-size-small);
-  font-weight: 850;
-  line-height: 1.2;
+  font-weight: 800;
+  line-height: 1.25;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-body
+body[data-admin-theme]
   :where(
     .waiting-areas-page,
     .window-management-page,
     .display-management-page,
     .terminal-management-page
   )
-  :is(.filter-field, .admin-filter-field)
-  :is(.form-control, .form-select, input, select) {
-  min-width: 0;
+  :where(.filter-field .form-control, .filter-field .form-select) {
   min-height: var(--q-admin-control-height);
   border-radius: var(--q-admin-control-radius);
 }
 
-body
+body[data-admin-theme]
   :where(
     .waiting-areas-page,
     .window-management-page,
     .display-management-page,
     .terminal-management-page
   )
-  :is(.filter-field, .admin-filter-field):has(:is(.filter-icon, .window-filter-icon, .search-icon))
-  :is(.form-control, .form-select, input, select) {
-  padding-inline-start: 40px;
+  :where(.filter-field:has(.filter-icon) .form-control, .filter-field:has(.filter-icon) .form-select) {
+  padding-inline-start: var(--q-admin-filter-icon-padding);
 }
 
-body
-  :where(.waiting-areas-page, .window-management-page)
-  :is(.filter-icon, .window-filter-icon),
-body :where(.display-management-page, .terminal-management-page) .search-icon {
+body[data-admin-theme]
+  :where(.waiting-areas-page, .window-management-page, .display-management-page, .terminal-management-page)
+  :where(.filter-icon, .search-icon) {
   position: absolute;
-  inset-inline-start: 14px;
+  inset-block-end: 14px;
+  inset-inline-start: var(--q-admin-filter-icon-offset);
   z-index: 2;
   color: var(--q-primary);
   font-size: 0.9rem;
@@ -103,136 +86,107 @@ body :where(.display-management-page, .terminal-management-page) .search-icon {
   pointer-events: none;
 }
 
-body :where(.waiting-areas-page, .window-management-page) :is(.filter-icon, .window-filter-icon) {
-  inset-block-end: 14px;
-}
-
-body :where(.display-management-page, .terminal-management-page) .search-input-wrapper {
-  position: relative;
-  width: 100%;
-}
-
-body :where(.display-management-page, .terminal-management-page) .search-input-wrapper .search-icon {
-  inset-block-start: 50%;
-  transform: translateY(-50%);
-}
-
-body
+body[data-admin-theme]
   .app-shell-rtl
   :where(.waiting-areas-page, .window-management-page, .display-management-page, .terminal-management-page)
-  :is(.filter-field, .admin-filter-field):has(:is(.filter-icon, .window-filter-icon, .search-icon))
-  :is(.form-control, .form-select, input, select) {
-  padding-inline: 6px 40px;
+  :where(.filter-field:has(.filter-icon) .form-control, .filter-field:has(.filter-icon) .form-select) {
+  padding-inline: 0.75rem var(--q-admin-filter-icon-padding);
 }
 
-body
+body[data-admin-theme]
   .app-shell-rtl
-  :where(.waiting-areas-page, .window-management-page)
-  :is(.filter-icon, .window-filter-icon),
-body .app-shell-rtl :where(.display-management-page, .terminal-management-page) .search-icon {
-  inset-inline: auto 14px;
+  :where(.waiting-areas-page, .window-management-page, .display-management-page, .terminal-management-page)
+  :where(.filter-icon, .search-icon) {
+  inset-inline: auto var(--q-admin-filter-icon-offset);
 }
 
-body .window-management-page .tabs {
-  display: inline-flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px;
-}
-
-body .window-management-page .tabs :where(.primary-action, .secondary-action) {
-  min-width: 132px;
-}
-
-body :where(.waiting-areas-page, .window-management-page) :where(.primary-action, .secondary-action, .compact-action) {
+body[data-admin-theme]
+  :where(.waiting-areas-page, .window-management-page, .display-management-page, .terminal-management-page)
+  :where(.primary-action, .secondary-action, .compact-action) {
   min-height: var(--q-admin-control-height);
-  padding: 0 18px;
   border-radius: var(--q-admin-control-radius);
 }
 
-body
-  :where(.display-management-page, .terminal-management-page, .waiting-areas-page, .window-management-page)
-  .list-panel
-  > .row:first-child
-  > div:last-child,
-body .window-management-page .toolbar > button:last-child {
-  display: flex;
-  align-self: end;
-}
-
-body
-  :where(.display-management-page, .terminal-management-page, .waiting-areas-page)
-  .list-panel
-  > .row:first-child
-  > div:last-child
-  > :where(button, .btn),
-body .window-management-page .toolbar > button:last-child {
-  width: 100%;
-  min-height: var(--q-admin-control-height);
-}
-
-body
-  :where(.display-management-page, .terminal-management-page, .waiting-areas-page, .window-management-page)
-  .pagination-bar {
-  margin-top: 18px;
-  padding-top: 12px;
-}
-
-body :where(.window-management-page) .pagination-bar {
-  gap: 14px;
-  margin-top: 14px;
-}
-
-body
-  :where(.display-management-page, .terminal-management-page, .waiting-areas-page, .window-management-page)
+body[data-admin-theme]
+  :where(.waiting-areas-page, .window-management-page, .display-management-page, .terminal-management-page)
   :where(.compact-action) {
-  min-width: 110px;
+  min-width: 88px;
+  min-height: 34px;
+  padding: 0.4rem 0.75rem;
 }
 
-body
-  :where(.display-management-page, .terminal-management-page, .waiting-areas-page, .window-management-page)
+body[data-admin-theme]
+  :where(.waiting-areas-page, .window-management-page, .display-management-page, .terminal-management-page)
   :where(.page-indicator) {
   display: inline-flex;
-  min-width: 52px;
+  min-width: 56px;
+  min-height: 34px;
   align-items: center;
   justify-content: center;
+  color: var(--q-text-secondary);
+  background: var(--q-surface-muted);
+  border: 1px solid var(--q-border-subtle);
+  border-radius: var(--q-radius-sm);
+  font-weight: 800;
   line-height: 1;
 }
 
-body :where(.waiting-areas-page, .window-management-page) :where(.status-pill) {
+body[data-admin-theme]
+  :where(.waiting-areas-page, .window-management-page, .display-management-page, .terminal-management-page)
+  :where(.status-pill) {
   display: inline-flex;
-  min-width: 52px;
+  min-width: 58px;
+  min-height: 28px;
   align-items: center;
   justify-content: center;
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+  font-size: var(--q-font-size-small);
+  font-weight: 850;
   line-height: 1;
 }
 
-body :where(.waiting-areas-page, .window-management-page) :where(.icon-action) {
-  width: 36px;
-  min-width: 36px;
-  height: 36px;
-  min-height: 36px;
-  border-radius: 10px;
+body[data-admin-theme]
+  :where(.waiting-areas-page, .window-management-page, .display-management-page, .terminal-management-page)
+  :where(.icon-action) {
+  width: var(--q-icon-action-size);
+  min-width: var(--q-icon-action-size);
+  height: var(--q-icon-action-size);
+  min-height: var(--q-icon-action-size);
+  border-radius: var(--q-icon-action-radius);
 }
 
-body :where(.waiting-areas-page, .window-management-page) :where(th, td) {
+body[data-admin-theme]
+  :where(.waiting-areas-page, .window-management-page, .display-management-page, .terminal-management-page)
+  :where(th, td) {
   vertical-align: middle;
 }
 
+body[data-admin-theme]
+  :where(.waiting-areas-page, .window-management-page, .display-management-page, .terminal-management-page)
+  :where(.pagination-bar) {
+  min-height: 40px;
+}
+
+body[data-admin-theme]
+  :where(.waiting-areas-page, .window-management-page, .display-management-page, .terminal-management-page)
+  :where(.admin-pagination-total) {
+  color: var(--q-text-secondary);
+  font-size: 0.78rem;
+  font-weight: 750;
+}
+
 @media (max-width: 767.98px) {
-  body
-    :where(.display-management-page, .terminal-management-page, .waiting-areas-page)
-    .list-panel
-    > .row:first-child
-    > div:last-child,
-  body .window-management-page .toolbar > button:last-child,
-  body
-    :where(.display-management-page, .terminal-management-page, .waiting-areas-page, .window-management-page)
-    :where(.tabs .primary-action, .tabs .secondary-action, .compact-action, .pagination-bar, .pager-actions, .pagination-bar > div) {
+  body[data-admin-theme]
+    :where(.waiting-areas-page, .window-management-page, .display-management-page, .terminal-management-page)
+    :where(.compact-action, .pagination-bar, .pagination-bar > div) {
     width: 100%;
   }
 
-  body :where(.window-management-page) :where(.pagination-bar, .pager-actions) {
-    align-items: stretch;
+  body[data-admin-theme]
+    :where(.waiting-areas-page, .window-management-page, .display-management-page, .terminal-management-page)
+    :where(.pagination-bar > div .btn) {
+    flex: 1 1 0;
+    min-width: 0;
   }
 }

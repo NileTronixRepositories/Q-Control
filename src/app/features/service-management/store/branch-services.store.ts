@@ -33,6 +33,8 @@ export class BranchServicesStore {
   readonly expandedBranchNodeIds = signal<ReadonlySet<number>>(new Set());
   readonly expandedCentralNodeIds = signal<ReadonlySet<number>>(new Set());
   readonly selectedBranchNodeId = signal<number | null>(null);
+  readonly branchTreeSearchText = signal('');
+  readonly centralTreeSearchText = signal('');
   readonly includeInactive = signal(false);
   readonly includeDeleted = signal(false);
   readonly message = signal<BranchServicesUiMessage | null>(null);
@@ -88,6 +90,7 @@ export class BranchServicesStore {
     this.selectedBranchNodeId.set(null);
     this.branchTree.set([]);
     this.expandedBranchNodeIds.set(new Set());
+    this.branchTreeSearchText.set('');
     this.unassignConfirmState.set(null);
     this.lifecycleConfirmState.set(null);
     this.globalizationRequestsDialogOpen.set(false);
@@ -99,8 +102,16 @@ export class BranchServicesStore {
     this.expandedBranchNodeIds.update((current) => this.toggleSetItem(current, nodeId));
   }
 
+  expandBranchNodes(nodeIds: readonly number[]): void {
+    this.expandedBranchNodeIds.update((current) => this.addSetItems(current, nodeIds));
+  }
+
   toggleCentralNode(nodeId: number): void {
     this.expandedCentralNodeIds.update((current) => this.toggleSetItem(current, nodeId));
+  }
+
+  expandCentralNodes(nodeIds: readonly number[]): void {
+    this.expandedCentralNodeIds.update((current) => this.addSetItems(current, nodeIds));
   }
 
   selectBranchNode(nodeId: number | null): void {
@@ -176,6 +187,12 @@ export class BranchServicesStore {
     this.createTreeDialogOpen.set(false);
     this.createTreeMode.set('root');
     this.createSubtreeParent.set(null);
+  }
+
+  private addSetItems(current: ReadonlySet<number>, nodeIds: readonly number[]): ReadonlySet<number> {
+    const next = new Set(current);
+    nodeIds.forEach((nodeId) => next.add(nodeId));
+    return next;
   }
 
   private toggleSetItem(current: ReadonlySet<number>, nodeId: number): ReadonlySet<number> {

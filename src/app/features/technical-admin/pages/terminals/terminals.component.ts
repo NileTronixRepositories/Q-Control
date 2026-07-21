@@ -25,6 +25,7 @@ import { AuthSessionService } from '../../../auth/services/auth-session.service'
 import { WindowManagementApiService } from '../../services/window-management-api.service';
 import { TerminalManagementApiService } from '../../services/terminal-management-api.service';
 import { TerminalPermissionService } from '../../services/terminal-permission.service';
+import { TechnicalAdminBranchContextStore } from '../../store/technical-admin-branch-context.store';
 import { TechnicalAdminI18nStore } from '../../store/technical-admin-i18n.store';
 import { formatTechnicalAdminApiError } from '../../utils/api-error-message.util';
 import {
@@ -286,6 +287,7 @@ export class TerminalsComponent implements OnInit, OnDestroy {
   private readonly permissionService = inject(TerminalPermissionService);
   private readonly windowManagementApiService = inject(WindowManagementApiService);
   private readonly terminalManagementApiService = inject(TerminalManagementApiService);
+  private readonly branchContextStore = inject(TechnicalAdminBranchContextStore);
 
   private activeSearchDebounceId: ReturnType<typeof setTimeout> | null = null;
   private deletedSearchDebounceId: ReturnType<typeof setTimeout> | null = null;
@@ -313,6 +315,7 @@ export class TerminalsComponent implements OnInit, OnDestroy {
   protected readonly deletedSearch = signal('');
   protected readonly activeWindowId = signal<number | null>(null);
   protected readonly deletedWindowId = signal<number | null>(null);
+  protected readonly branchContextId = this.branchContextStore.selectedBranchId;
   protected readonly activePageSize = signal(10);
   protected readonly deletedPageSize = signal(10);
   protected readonly activeLoading = signal(false);
@@ -759,6 +762,7 @@ export class TerminalsComponent implements OnInit, OnDestroy {
 
   private loadWindows(): void {
     const query: GetWindowsParams = {
+      branchId: this.branchContextId() ?? undefined,
       pageNumber: 1,
       pageSize: 100,
       search: '',
@@ -1048,6 +1052,7 @@ export class TerminalsComponent implements OnInit, OnDestroy {
     isActive: boolean,
   ): GetTerminalsParams {
     return {
+      branchId: this.branchContextId() ?? undefined,
       windowId: windowId ?? undefined,
       search: search.trim(),
       pageNumber,

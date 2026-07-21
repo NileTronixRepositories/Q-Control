@@ -18,6 +18,7 @@ import {
 import { TerminalManagementApiService } from '../../services/terminal-management-api.service';
 import { TerminalPermissionService } from '../../services/terminal-permission.service';
 import { WindowManagementApiService } from '../../services/window-management-api.service';
+import { TechnicalAdminBranchContextStore } from '../../store/technical-admin-branch-context.store';
 import { TechnicalAdminI18nStore } from '../../store/technical-admin-i18n.store';
 import { TerminalsComponent } from './terminals.component';
 
@@ -140,6 +141,28 @@ describe('TerminalsComponent', () => {
     expect(
       fixture.nativeElement.querySelector('app-technical-admin-page-hero .primary-action'),
     ).toBeNull();
+  });
+
+  it('scopes terminals and window options to the selected branch context', () => {
+    TestBed.inject(TechnicalAdminBranchContextStore).selectBranch({
+      branchId: 7,
+      arabicName: 'فرع القاهرة',
+      englishName: 'Cairo Branch',
+      isActive: true,
+      effectiveIsActive: true,
+    });
+    getWindows.mockClear();
+    getTerminals.mockClear();
+    fixture.destroy();
+    fixture = TestBed.createComponent(TerminalsComponent);
+    fixture.detectChanges();
+
+    expect(getWindows).toHaveBeenCalledWith(
+      expect.objectContaining({ branchId: 7, isActive: true }),
+    );
+    expect(getTerminals).toHaveBeenCalledWith(
+      expect.objectContaining({ branchId: 7, isActive: true }),
+    );
   });
 });
 

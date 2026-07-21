@@ -15,6 +15,7 @@ import {
 import { WaitingAreaApiService } from '../../services/waiting-area-api.service';
 import { WindowManagementApiService } from '../../services/window-management-api.service';
 import { WindowPermissionService } from '../../services/window-permission.service';
+import { TechnicalAdminBranchContextStore } from '../../store/technical-admin-branch-context.store';
 import { TechnicalAdminI18nStore } from '../../store/technical-admin-i18n.store';
 import { WindowsComponent } from './windows.component';
 
@@ -114,7 +115,7 @@ describe('WindowsComponent', () => {
 
   it('loads deleted windows when the deleted tab opens', () => {
     const deletedTab = fixture.nativeElement.querySelector(
-      '.tabs button:last-child',
+      '[data-testid="windows-deleted-tab"]',
     ) as HTMLButtonElement;
 
     deletedTab.click();
@@ -137,6 +138,28 @@ describe('WindowsComponent', () => {
     expect(
       fixture.nativeElement.querySelector('app-technical-admin-page-hero .primary-action'),
     ).toBeNull();
+  });
+
+  it('scopes windows and waiting-area options to the selected branch context', () => {
+    TestBed.inject(TechnicalAdminBranchContextStore).selectBranch({
+      branchId: 7,
+      arabicName: 'فرع القاهرة',
+      englishName: 'Cairo Branch',
+      isActive: true,
+      effectiveIsActive: true,
+    });
+    getWaitingAreas.mockClear();
+    getWindows.mockClear();
+    fixture.destroy();
+    fixture = TestBed.createComponent(WindowsComponent);
+    fixture.detectChanges();
+
+    expect(getWaitingAreas).toHaveBeenCalledWith(
+      expect.objectContaining({ branchId: 7, isActive: true }),
+    );
+    expect(getWindows).toHaveBeenCalledWith(
+      expect.objectContaining({ branchId: 7, isActive: true }),
+    );
   });
 });
 
@@ -190,3 +213,4 @@ function createWaitingAreaPage(): Pagination<WaitingAreaListItem> {
     ],
   };
 }
+

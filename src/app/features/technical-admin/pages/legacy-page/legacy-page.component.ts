@@ -21,6 +21,7 @@ import {
 } from '../../models/branch-management.model';
 import { BranchManagementApiService } from '../../services/branch-management-api.service';
 import { BranchPermissionService } from '../../services/branch-permission.service';
+import { TechnicalAdminBranchContextStore } from '../../store/technical-admin-branch-context.store';
 import { TechnicalAdminI18nStore } from '../../store/technical-admin-i18n.store';
 import { formatTechnicalAdminApiError } from '../../utils/api-error-message.util';
 
@@ -221,6 +222,7 @@ export class LegacyPageComponent implements OnInit, OnDestroy {
   private readonly authSessionService = inject(AuthSessionService);
   private readonly branchManagementApiService = inject(BranchManagementApiService);
   private readonly branchPermissionService = inject(BranchPermissionService);
+  private readonly branchContextStore = inject(TechnicalAdminBranchContextStore);
   private readonly i18nStore = inject(TechnicalAdminI18nStore);
   protected readonly language = this.i18nStore.language;
   protected readonly direction = this.i18nStore.direction;
@@ -247,6 +249,10 @@ export class LegacyPageComponent implements OnInit, OnDestroy {
   protected readonly branchTableMeta = signal<BranchTableMeta>(EMPTY_BRANCH_TABLE_META);
   protected readonly branches = signal<readonly BranchEditorRow[]>([]);
   protected readonly canCreateBranchAdmin = this.branchPermissionService.canCreateBranchAdmin;
+  protected readonly selectedContextBranchId = this.branchContextStore.selectedBranchId;
+  protected readonly canSelectBranchContext = computed(
+    () => this.authSessionService.currentSession()?.userType === 'TechnicalAdmin',
+  );
 
 
   protected readonly branchForm = this.formBuilder.group({
@@ -370,6 +376,24 @@ export class LegacyPageComponent implements OnInit, OnDestroy {
     });
   }
 
+  protected selectBranchContext(branch: BranchEditorRow): void {
+    if (!this.canSelectBranchContext()) {
+      return;
+    }
+
+    this.branchContextStore.selectBranch({
+      branchId: branch.id,
+      arabicName: branch.arabicName,
+      englishName: branch.englishName,
+      isActive: branch.isActive,
+      effectiveIsActive: branch.effectiveIsActive,
+    });
+    void this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { branchId: branch.id },
+      queryParamsHandling: 'merge',
+    });
+  }
   protected openViewBranch(branchId: number): void {
     this.openBranchDetails(branchId, 'view');
   }

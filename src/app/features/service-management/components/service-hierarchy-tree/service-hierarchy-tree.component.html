@@ -13,6 +13,29 @@
 }
 </header>
 <div class="svc-tree-toolbar">
+@if (showSearch()) {
+<label class="svc-tree-search">
+<span>{{ searchLabel() }}</span>
+<span class="svc-tree-search-control">
+<i class="bi bi-search" aria-hidden="true"></i>
+<input
+class="svc-tree-search-input"
+type="search"
+maxlength="200"
+[value]="searchText()"
+[placeholder]="searchPlaceholder()"
+(input)="onSearchTextInput($event)"
+/>
+@if (normalizedSearchText()) {
+<button type="button" class="svc-tree-search-clear" [attr.aria-label]="translations().clearSearch" (click)="clearSearchText()">
+<i class="bi bi-x-lg" aria-hidden="true"></i>
+</button>
+}
+</span>
+@if (searchHelp()) { <small>{{ searchHelp() }}</small> }
+</label>
+}
+<div class="svc-tree-toolbar-actions">
 <div class="svc-tree-filters">
 <label class="svc-tree-filter">
 <input type="checkbox" class="svc-tree-filter-input" [checked]="includeInactive()" (change)="onIncludeInactiveChange($event)" />
@@ -27,6 +50,7 @@
 <i class="bi bi-arrow-clockwise" aria-hidden="true"></i>
 <span>{{ translations().refresh }}</span>
 </button>
+</div>
 </div>
 <div class="svc-tree-body">
 @if (loading() && flatNodes().length === 0) { <div class="d-grid py-4 gap-3 overflow-hidden rounded-3 border border-info-subtle p-3" role="status" aria-live="polite" aria-atomic="true" data-testid="svc-tree-initial-loading" >
@@ -110,7 +134,7 @@
 <div class="svc-tree-empty-icon">
 <i class="bi bi-diagram-3" aria-hidden="true"></i>
 </div>
-<h3>{{ translations().noTreeItems }}</h3>
+<h3>{{ normalizedSearchText() ? translations().noSearchResults : translations().noTreeItems }}</h3>
 @if (canCreate()) { <button type="button" class="svc-tree-primary-btn" (click)="createRoot.emit()">
 <i class="bi bi-plus-lg" aria-hidden="true"></i>
 <span>{{ translations().addRootService }}</span>

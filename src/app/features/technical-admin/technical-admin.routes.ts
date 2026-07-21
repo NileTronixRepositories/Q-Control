@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 
 import { adminPermissionGuard } from './guards/admin-permission.guard';
+import { technicalAdminBranchContextGuard } from './guards/technical-admin-branch-context.guard';
 
 export const TECHNICAL_ADMIN_ROUTES: Routes = [
   {
@@ -68,7 +69,7 @@ export const TECHNICAL_ADMIN_ROUTES: Routes = [
       },
       {
         path: 'waiting-areas',
-        canActivate: [adminPermissionGuard],
+        canActivate: [adminPermissionGuard, technicalAdminBranchContextGuard],
         data: {
           allowTechnicalAdminWithoutPermission: true,
           requiredAnyPermissions: ['WaitingAreas.ViewAll'],
@@ -80,7 +81,7 @@ export const TECHNICAL_ADMIN_ROUTES: Routes = [
       },
       {
         path: 'windows',
-        canActivate: [adminPermissionGuard],
+        canActivate: [adminPermissionGuard, technicalAdminBranchContextGuard],
         data: {
           requiredAnyPermissions: ['Windows.ViewAll'],
         },
@@ -91,7 +92,7 @@ export const TECHNICAL_ADMIN_ROUTES: Routes = [
       },
       {
         path: 'displays',
-        canActivate: [adminPermissionGuard],
+        canActivate: [adminPermissionGuard, technicalAdminBranchContextGuard],
         data: {
           requiredAnyPermissions: [
             'Displays.ViewAll',
@@ -108,7 +109,7 @@ export const TECHNICAL_ADMIN_ROUTES: Routes = [
       },
       {
         path: 'terminals',
-        canActivate: [adminPermissionGuard],
+        canActivate: [adminPermissionGuard, technicalAdminBranchContextGuard],
         data: {
           requiredAnyPermissions: ['Terminals.ViewAll'],
         },

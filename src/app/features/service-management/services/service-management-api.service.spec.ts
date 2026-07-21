@@ -37,6 +37,44 @@ describe('ServiceManagementApiService lifecycle requests', () => {
 
   afterEach(() => httpTestingController.verify());
 
+  it('trims service tree searchText and preserves existing filters', () => {
+    service
+      .getServiceTree({
+        includeInactive: true,
+        includeDeleted: false,
+        scope: 'BranchScoped',
+        ownerBranchId: 7,
+        isAssignedToCurrentBranch: true,
+        searchText: '  certificate  ',
+      })
+      .subscribe();
+
+    const endpoint = new URL('api/services/tree', environment.apiBaseUrl).toString();
+    const request = httpTestingController.expectOne((candidate) => candidate.url === endpoint);
+
+    expect(request.request.method).toBe('GET');
+    expect(request.request.params.get('includeInactive')).toBe('true');
+    expect(request.request.params.get('includeDeleted')).toBe('false');
+    expect(request.request.params.get('scope')).toBe('BranchScoped');
+    expect(request.request.params.get('ownerBranchId')).toBe('7');
+    expect(request.request.params.get('isAssignedToCurrentBranch')).toBe('true');
+    expect(request.request.params.get('searchText')).toBe('certificate');
+    request.flush([]);
+  });
+
+  it('omits empty service tree searchText', () => {
+    service
+      .getServiceTree({ includeInactive: false, includeDeleted: true, searchText: '   ' })
+      .subscribe();
+
+    const endpoint = new URL('api/services/tree', environment.apiBaseUrl).toString();
+    const request = httpTestingController.expectOne((candidate) => candidate.url === endpoint);
+
+    expect(request.request.params.has('searchText')).toBe(false);
+    expect(request.request.params.get('includeInactive')).toBe('false');
+    expect(request.request.params.get('includeDeleted')).toBe('true');
+    request.flush([]);
+  });
   it('updates a service through the shared service endpoint with language and auth headers', () => {
     const body = {
       parentServiceId: null,
@@ -209,3 +247,4 @@ function createImageResponse(id: number, imageType: 'Logo' | 'Icon' | 'Ads') {
     message: null,
   };
 }
+

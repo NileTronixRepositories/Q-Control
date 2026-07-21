@@ -25,6 +25,7 @@ import { AuthSessionService } from '../../../auth/services/auth-session.service'
 import { BranchManagementApiService } from '../../services/branch-management-api.service';
 import { DisplayManagementApiService } from '../../services/display-management-api.service';
 import { DisplayPermissionService } from '../../services/display-permission.service';
+import { TechnicalAdminBranchContextStore } from '../../store/technical-admin-branch-context.store';
 import { TechnicalAdminI18nStore } from '../../store/technical-admin-i18n.store';
 import { formatTechnicalAdminApiError } from '../../utils/api-error-message.util';
 import {
@@ -303,6 +304,7 @@ export class DisplaysComponent implements OnInit, OnDestroy {
   private readonly permissionService = inject(DisplayPermissionService);
   private readonly branchManagementApiService = inject(BranchManagementApiService);
   private readonly displayManagementApiService = inject(DisplayManagementApiService);
+  private readonly branchContextStore = inject(TechnicalAdminBranchContextStore);
 
   private activeSearchDebounceId: ReturnType<typeof setTimeout> | null = null;
   private deletedSearchDebounceId: ReturnType<typeof setTimeout> | null = null;
@@ -337,6 +339,11 @@ export class DisplaysComponent implements OnInit, OnDestroy {
   protected readonly deletedSearch = signal('');
   protected readonly activeBranchId = signal<number | null>(null);
   protected readonly deletedBranchId = signal<number | null>(null);
+  protected readonly isBranchContextLocked = computed(
+    () =>
+      this.authSessionService.currentSession()?.userType === 'TechnicalAdmin' &&
+      this.branchContextStore.selectedBranchId() !== null,
+  );
   protected readonly activePageSize = signal(10);
   protected readonly deletedPageSize = signal(10);
   protected readonly activeLoading = signal(false);
@@ -374,6 +381,9 @@ export class DisplaysComponent implements OnInit, OnDestroy {
   protected readonly typeControl = this.displayForm.controls.type;
 
   ngOnInit(): void {
+    const branchId = this.branchContextStore.selectedBranchId();
+    this.activeBranchId.set(branchId);
+    this.deletedBranchId.set(branchId);
     this.loadBranches();
     this.initializeTab();
   }
@@ -439,11 +449,19 @@ export class DisplaysComponent implements OnInit, OnDestroy {
   }
 
   protected updateActiveBranchFilter(event: Event): void {
+    if (this.isBranchContextLocked()) {
+      return;
+    }
+
     this.activeBranchId.set(this.toOptionalNumber(this.readInputValue(event)));
     this.loadActiveDisplays(1);
   }
 
   protected updateDeletedBranchFilter(event: Event): void {
+    if (this.isBranchContextLocked()) {
+      return;
+    }
+
     this.deletedBranchId.set(this.toOptionalNumber(this.readInputValue(event)));
     this.loadDeletedDisplays(1);
   }
@@ -512,6 +530,10 @@ export class DisplaysComponent implements OnInit, OnDestroy {
       serialNo: '',
       type: '',
     });
+
+    if (this.isBranchContextLocked()) {
+      this.branchIdControl.disable({ emitEvent: false });
+    }
   }
 
   protected openView(displayId: number): void {
@@ -781,13 +803,22 @@ export class DisplaysComponent implements OnInit, OnDestroy {
 
     this.branchManagementApiService.getBranches(query).subscribe({
       next: (response) => {
-        this.branches.set(
-          response.data.map((branch: BranchListItem) => ({
-            id: branch.branchId,
-            arabicName: branch.arabicName,
-            englishName: branch.englishName,
-          })),
-        );
+        const options = response.data.map((branch: BranchListItem) => ({
+          id: branch.branchId,
+          arabicName: branch.arabicName,
+          englishName: branch.englishName,
+        }));
+        const contextBranch = this.branchContextStore.selectedBranch();
+
+        if (contextBranch && !options.some((branch) => branch.id === contextBranch.branchId)) {
+          options.unshift({
+            id: contextBranch.branchId,
+            arabicName: contextBranch.arabicName,
+            englishName: contextBranch.englishName,
+          });
+        }
+
+        this.branches.set(options);
       },
       error: (error: HttpErrorResponse) => this.handleApiError(error),
     });

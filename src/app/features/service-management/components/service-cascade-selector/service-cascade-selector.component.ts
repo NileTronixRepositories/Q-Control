@@ -278,6 +278,7 @@ export class ServiceCascadeSelectorComponent implements OnInit {
       serviceId: option.serviceId,
       arabicName: option.arabicName,
       englishName: option.englishName,
+      serviceCode: null,
       parentServiceId: option.parentServiceId,
       parentArabicName: parent?.arabicName ?? null,
       parentEnglishName: parent?.englishName ?? null,
@@ -297,3 +298,4 @@ export class ServiceCascadeSelectorComponent implements OnInit {
     return value && value.trim().length > 0 ? value : this.translations().notAvailable;
   }
 }
+

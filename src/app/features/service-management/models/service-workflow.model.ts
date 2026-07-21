@@ -105,6 +105,7 @@ export interface WorkflowCandidateService {
   readonly parentEnglishName: string | null;
   readonly arabicName: string;
   readonly englishName: string;
+  readonly serviceCode: string | null;
   readonly isActive: boolean;
   readonly isDeleted: boolean;
   readonly effectiveIsActive: boolean;
@@ -155,3 +156,4 @@ export interface WorkflowBuilderStep {
   readonly uid: string;
   readonly service: WorkflowCandidateService;
 }
+

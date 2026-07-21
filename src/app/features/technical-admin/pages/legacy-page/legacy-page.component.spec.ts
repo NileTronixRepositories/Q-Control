@@ -6,6 +6,7 @@ import { of } from 'rxjs';
 import { AppDirection, AppLanguage } from '../../../../shared/models/app-language.model';
 import { AppLanguageStore } from '../../../../shared/store/app-language.store';
 import { BranchAdminsApiService } from '../../../branch-admins/services/branch-admins-api.service';
+import { AuthenticatedSession } from '../../../auth/models/login-credentials.model';
 import { AuthSessionService } from '../../../auth/services/auth-session.service';
 import { BranchListItem, PagedBranchResponse } from '../../models/branch-management.model';
 import { BranchManagementApiService } from '../../services/branch-management-api.service';
@@ -17,6 +18,7 @@ describe('LegacyPageComponent branch management', () => {
   let fixture: ComponentFixture<LegacyPageComponent>;
   const language = signal<AppLanguage>('en');
   const canCreateBranchAdmin = signal(false);
+  const navigate = vi.fn<Router['navigate']>().mockResolvedValue(true);
   const getBranches = vi.fn<BranchManagementApiService['getBranches']>(() =>
     of(createBranchPage()),
   );
@@ -25,6 +27,7 @@ describe('LegacyPageComponent branch management', () => {
     vi.clearAllMocks();
     language.set('en');
     canCreateBranchAdmin.set(false);
+    navigate.mockClear();
 
     await TestBed.configureTestingModule({
       imports: [LegacyPageComponent],
@@ -41,7 +44,7 @@ describe('LegacyPageComponent branch management', () => {
         {
           provide: Router,
           useValue: {
-            navigate: vi.fn<Router['navigate']>().mockResolvedValue(true),
+            navigate,
             navigateByUrl: vi.fn<Router['navigateByUrl']>().mockResolvedValue(true),
           } satisfies Pick<Router, 'navigate' | 'navigateByUrl'>,
         },
@@ -91,6 +94,38 @@ describe('LegacyPageComponent branch management', () => {
     expect(fixture.nativeElement.textContent).toContain('Main Branch');
   });
 
+  it('selects a branch from the row with pointer and keyboard interactions', () => {
+    const row = fixture.nativeElement.querySelector(
+      '[data-testid="branches-desktop"] tbody tr',
+    ) as HTMLTableRowElement;
+
+    row.click();
+    row.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+
+    expect(row.getAttribute('role')).toBe('link');
+    expect(row.tabIndex).toBe(0);
+    expect(navigate).toHaveBeenCalledWith([], {
+      relativeTo: expect.anything(),
+      queryParams: { branchId: 1 },
+      queryParamsHandling: 'merge',
+    });
+  });
+
+  it('does not select the branch when a row action is clicked', () => {
+    const component = fixture.componentInstance as unknown as {
+      openViewBranch: (branchId: number) => void;
+    };
+    const openViewBranch = vi.spyOn(component, 'openViewBranch').mockImplementation(() => undefined);
+    const viewButton = fixture.nativeElement.querySelector(
+      '[data-testid="branches-desktop"] [aria-label="View"]',
+    ) as HTMLButtonElement;
+
+    navigate.mockClear();
+    viewButton.click();
+
+    expect(openViewBranch).toHaveBeenCalledWith(1);
+    expect(navigate).not.toHaveBeenCalled();
+  });
   it('reloads the list with the selected status filter', () => {
     const statusFilter = fixture.nativeElement.querySelector(
       'select[aria-label="Status"]',
@@ -160,9 +195,10 @@ function createLanguageStore(
 
 function createAuthSessionMock(): Pick<
   AuthSessionService,
-  'shouldClearSessionForHttpStatus' | 'clearSession'
+  'currentSession' | 'shouldClearSessionForHttpStatus' | 'clearSession'
 > {
   return {
+    currentSession: signal({ userType: 'TechnicalAdmin' } as AuthenticatedSession).asReadonly(),
     shouldClearSessionForHttpStatus: () => false,
     clearSession: vi.fn(),
   };

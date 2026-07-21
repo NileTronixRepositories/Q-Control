@@ -3,10 +3,6 @@
   min-width: 0;
 }
 
-:host * {
-  box-sizing: border-box;
-}
-
 .workflow-page {
 
   --b: var(--q-border-subtle, var(--nt-border));
@@ -35,26 +31,6 @@
   --cgx: 10%;
 }
 
-.workflow-scope-stack,
-.workflow-content-stack {
-  display: grid;
-  gap: var(--nt-section-gap, 12px);
-  min-width: 0;
-}
-
-.workflow-list,
-.workflow-builder-list {
-  display: grid;
-  gap: 12px;
-  min-width: 0;
-}
-
-.workflow-detail-view {
-  display: grid;
-  gap: 8px;
-  min-width: 0;
-}
-
 .workflow-branch-panel,
 .workflow-tree-shell,
 .workflow-owner-card,
@@ -65,7 +41,6 @@
   background: var(--panel);
   border: 1px solid var(--pb);
   border-radius: var(--pr);
-  box-shadow: var(--shadow);
 }
 
 .workflow-branch-panel,
@@ -85,16 +60,8 @@
 }
 
 .workflow-owner-card {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
   padding: 14px 16px;
-  background: linear-gradient(90deg, rgb(var(--p) / 0.07), transparent 52%), var(--panel);
-}
-
-.workflow-owner-copy {
-  min-width: 0;
+  background: var(--panel);
 }
 
 .workflow-owner-copy p,
@@ -133,10 +100,6 @@
 }
 
 .workflow-list-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
   min-height: 50px;
   padding: 10px 12px;
   border-bottom: 1px solid var(--pb);
@@ -155,19 +118,6 @@
   background: var(--bg);
   border: 1px solid var(--b);
   border-radius: var(--r);
-  transition:
-    box-shadow 160ms ease,
-    border-color 160ms ease;
-}
-
-.workflow-card:hover {
-  border-color: rgb(var(--p) / 0.28);
-  box-shadow: 0 12px 30px rgb(var(--p) / 0.08);
-}
-
-.workflow-card-main,
-.workflow-title-row {
-  min-width: 0;
 }
 
 .workflow-title-row {
@@ -195,25 +145,6 @@
   line-height: 1;
 }
 
-.workflow-badge--active {
-  color: var(--q-success, #138a5b);
-  background: var(--q-success-soft, #eefbf5);
-  border: 1px solid rgba(19, 138, 91, 0.18);
-}
-
-.workflow-badge--inactive {
-  color: var(--tm);
-  background: var(--m);
-  border: 1px solid var(--b);
-}
-
-.workflow-badge--default,
-.workflow-action-accent {
-  color: var(--ph);
-  background: var(--ps);
-  border: 1px solid rgb(var(--p) / 0.22);
-}
-
 .workflow-path-strip {
   grid-column: 1 / -1;
   display: flex;
@@ -223,8 +154,7 @@
   min-width: 0;
   overflow-x: auto;
   padding: 10px 12px;
-  background: linear-gradient(135deg, var(--m), rgb(var(--p) / 0.04));
-  box-shadow: none;
+  background: var(--panel);
   scrollbar-width: thin;
 }
 
@@ -236,25 +166,11 @@
   white-space: nowrap;
   padding: 5px 10px;
   color: var(--t);
-  background:
-    radial-gradient(circle at var(--cgx) 50%, rgb(var(--p) / 0.13), transparent 56px),
-    linear-gradient(135deg, var(--bg), var(--ps));
+  background: var(--bg);
   border: 1px solid rgb(var(--p) / 0.2);
   border-radius: 999px;
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.8);
   font-size: var(--q-font-size-small, 0.82rem);
   font-weight: 850;
-}
-
-.workflow-path-chip--large {
-  padding: 6px 12px;
-  font-size: var(--q-font-size-base, 0.88rem);
-}
-
-.workflow-path-arrow {
-  color: rgb(var(--p) / 0.5);
-  font-size: 0.78rem;
-  flex: 0 0 auto;
 }
 
 .workflow-backdrop {
@@ -273,7 +189,6 @@
   padding: 0;
   overflow: hidden;
   border-radius: 12px;
-  box-shadow: 0 28px 70px rgb(15 23 42 / 0.18);
 }
 
 .workflow-panel-body {
@@ -287,21 +202,12 @@
   background: var(--m);
 }
 
-.workflow-detail-view {
-  display: grid;
-  gap: 12px;
-}
-
 .workflow-form {
   display: flex;
 
   height: auto;
   flex-direction: column;
   gap: 12px;
-}
-
-.workflow-builder {
-  flex: 0 0 auto;
 }
 
 .workflow-candidates {
@@ -329,7 +235,6 @@
 .workflow-drop-active {
   background: var(--ps);
   border-color: rgb(var(--p) / 0.42);
-  box-shadow: var(--nt-focus);
 }
 
 .workflow-builder-row {
@@ -343,19 +248,10 @@
   border: 1px solid var(--b);
   border-radius: var(--r);
   cursor: move;
-  transition:
-    border-color 140ms ease,
-    box-shadow 140ms ease;
-}
-
-.workflow-builder-row:hover {
-  border-color: rgb(var(--p) / 0.26);
-  box-shadow: 0 8px 18px rgb(var(--p) / 0.06);
 }
 
 .workflow-builder-row--replace {
   border-color: rgb(var(--p) / 0.46);
-  box-shadow: inset 4px 0 0 var(--q-primary, var(--nt-primary));
 }
 
 .workflow-step-index,
@@ -432,25 +328,10 @@
   gap: 8px;
   min-width: 0;
   padding: 10px 12px;
-  background:
-    radial-gradient(circle at var(--cgx) 50%, rgb(var(--p) / 0.15), transparent 70px),
-    linear-gradient(135deg, var(--bg), var(--ps));
+  background: var(--bg);
   border: 1px solid rgb(var(--p) / 0.18);
   border-radius: 10px;
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.82);
   cursor: grab;
-  transition:
-    border-color 140ms ease,
-    box-shadow 140ms ease,
-    transform 120ms ease;
-}
-
-.workflow-candidate-card:hover {
-  border-color: rgb(var(--p) / 0.34);
-  box-shadow:
-    0 14px 30px rgb(15 25 40 / 0.07),
-    inset 0 1px 0 rgb(255 255 255 / 0.9);
-  transform: translateY(-1px);
 }
 
 .workflow-candidate-icon {
@@ -484,12 +365,8 @@
   margin-inline: -14px;
   margin-bottom: -14px;
   padding: 10px 12px;
-  background: linear-gradient(0deg, #ffffff 60%, rgb(248 250 252 / 0));
+  background: var(--panel);
   border-top: 1px solid var(--b);
-}
-
-.workflow-replace-note {
-  margin-bottom: 8px;
 }
 
 .workflow-confirm-panel {
@@ -508,17 +385,6 @@
 
 .workflow-confirm-header {
   border-bottom: 1px solid var(--b);
-}
-
-.workflow-confirm-name {
-  display: block;
-  padding: 8px 12px;
-  margin-top: 4px;
-  background: var(--m);
-  border-radius: var(--r);
-  overflow-wrap: anywhere;
-  font-weight: 700;
-  color: var(--t);
 }
 
 .workflow-confirm-actions {
@@ -543,32 +409,6 @@
   justify-content: center;
   gap: 8px;
   text-align: center;
-}
-
-.workflow-state-card i {
-  font-size: 1.8rem;
-  color: var(--tm);
-  opacity: 0.6;
-}
-
-.workflow-state-card h2 {
-  margin: 0;
-  font-size: 1rem;
-  font-weight: 750;
-  color: var(--tm);
-}
-
-.workflow-tree-shell {
-  min-height: 220px;
-}
-
-.workflow-state-card--warning {
-  border-color: rgba(183, 121, 31, 0.24);
-  background: #fffcf5;
-}
-
-.workflow-detail-card {
-  background: var(--panel);
 }
 
 .workflow-detail-actions {

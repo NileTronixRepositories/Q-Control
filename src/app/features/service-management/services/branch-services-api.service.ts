@@ -29,13 +29,19 @@ export class BranchServicesApiService {
     branchId: number,
     query: BranchServicesTreeQuery,
   ): Observable<readonly BranchServiceTreeNode[]> {
+    let params = new HttpParams()
+      .set('includeInactive', query.includeInactive)
+      .set('includeDeleted', query.includeDeleted);
+
+    if (query.searchText?.trim()) {
+      params = params.set('searchText', query.searchText.trim());
+    }
+
     return this.httpClient.get<readonly BranchServiceTreeNode[]>(
       `${this.createBranchUrl(branchId)}/services/tree`,
       {
         headers: this.createJsonHeaders(),
-        params: new HttpParams()
-          .set('includeInactive', query.includeInactive)
-          .set('includeDeleted', query.includeDeleted),
+        params,
       },
     );
   }

@@ -183,6 +183,12 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
   );
 
   private toastTimeoutId: ReturnType<typeof setTimeout> | null = null;
+  private branchTreeSearchDebounceId: ReturnType<typeof setTimeout> | null = null;
+  private centralTreeSearchDebounceId: ReturnType<typeof setTimeout> | null = null;
+  private branchTreeRequestId = 0;
+  private centralTreeRequestId = 0;
+  private branchTreeExpansionSnapshot: ReadonlySet<number> | null = null;
+  private centralTreeExpansionSnapshot: ReadonlySet<number> | null = null;
   private pendingCountRequestId = 0;
   private pendingCountBranchId: number | null = null;
   private lastPendingRequestsCount: number | null = null;
@@ -272,6 +278,14 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
     if (this.toastTimeoutId) {
       clearTimeout(this.toastTimeoutId);
     }
+
+    if (this.branchTreeSearchDebounceId !== null) {
+      clearTimeout(this.branchTreeSearchDebounceId);
+    }
+
+    if (this.centralTreeSearchDebounceId !== null) {
+      clearTimeout(this.centralTreeSearchDebounceId);
+    }
   }
 
   protected clearMessage(): void {
@@ -312,6 +326,49 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
     this.store.openGlobalizationRequestsDialog();
   }
 
+  protected updateBranchTreeSearch(value: string): void {
+    const searchText = this.normalizeSearchText(value);
+    const hadSearch = this.store.branchTreeSearchText().trim().length > 0;
+
+    if (searchText && !hadSearch) {
+      this.branchTreeExpansionSnapshot = new Set(this.store.expandedBranchNodeIds());
+    }
+
+    if (!searchText && hadSearch) {
+      this.store.expandedBranchNodeIds.set(this.branchTreeExpansionSnapshot ?? new Set());
+      this.branchTreeExpansionSnapshot = null;
+    }
+
+    this.store.branchTreeSearchText.set(searchText);
+
+    if (this.branchTreeSearchDebounceId !== null) {
+      clearTimeout(this.branchTreeSearchDebounceId);
+    }
+
+    this.branchTreeSearchDebounceId = setTimeout(() => this.loadBranchTree(), 400);
+  }
+
+  protected updateCentralTreeSearch(value: string): void {
+    const searchText = this.normalizeSearchText(value);
+    const hadSearch = this.store.centralTreeSearchText().trim().length > 0;
+
+    if (searchText && !hadSearch) {
+      this.centralTreeExpansionSnapshot = new Set(this.store.expandedCentralNodeIds());
+    }
+
+    if (!searchText && hadSearch) {
+      this.store.expandedCentralNodeIds.set(this.centralTreeExpansionSnapshot ?? new Set());
+      this.centralTreeExpansionSnapshot = null;
+    }
+
+    this.store.centralTreeSearchText.set(searchText);
+
+    if (this.centralTreeSearchDebounceId !== null) {
+      clearTimeout(this.centralTreeSearchDebounceId);
+    }
+
+    this.centralTreeSearchDebounceId = setTimeout(() => this.loadServiceCentralTree(), 400);
+  }
   protected updateTreeToggle(kind: 'inactive' | 'deleted', checked: boolean): void {
     if (kind === 'inactive') {
       this.store.includeInactive.set(checked);
@@ -771,6 +828,13 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
     return canPermanentDeleteService(service, this.branchActionPermissions());
   }
 
+  private normalizeSearchText(value: string): string {
+    return value.trim().slice(0, 200);
+  }
+
+  private collectTreeNodeIds(nodes: readonly ServiceTreeNode[]): readonly number[] {
+    return nodes.flatMap((node) => [node.id, ...this.collectTreeNodeIds(node.children)]);
+  }
   private findTreeNode(nodes: readonly ServiceTreeNode[], serviceId: number): ServiceTreeNode | null {
     for (const node of nodes) {
       if (node.id === serviceId) {
@@ -837,16 +901,39 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
       return;
     }
 
+    const requestId = ++this.branchTreeRequestId;
+    const searchText = this.store.branchTreeSearchText();
     this.store.branchTreeLoading.set(true);
     this.branchServicesApiService
       .getBranchServicesTree(branchId, {
         includeInactive: this.store.includeInactive(),
         includeDeleted: this.store.includeDeleted(),
+        searchText,
       })
-      .pipe(finalize(() => this.store.branchTreeLoading.set(false)))
+      .pipe(
+        finalize(() => {
+          if (requestId === this.branchTreeRequestId) {
+            this.store.branchTreeLoading.set(false);
+          }
+        }),
+      )
       .subscribe({
-        next: (response) => this.store.branchTree.set(response),
-        error: (error: HttpErrorResponse) => this.handleApiError(error),
+        next: (response) => {
+          if (requestId !== this.branchTreeRequestId) {
+            return;
+          }
+
+          this.store.branchTree.set(response);
+
+          if (searchText.trim()) {
+            this.store.expandBranchNodes(this.collectTreeNodeIds(response));
+          }
+        },
+        error: (error: HttpErrorResponse) => {
+          if (requestId === this.branchTreeRequestId) {
+            this.handleApiError(error);
+          }
+        },
       });
   }
 
@@ -923,10 +1010,8 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
   }
 
   protected loadServiceCentralTree(): void {
-    if (this.store.centralTreeLoading()) {
-      return;
-    }
-
+    const requestId = ++this.centralTreeRequestId;
+    const searchText = this.store.centralTreeSearchText();
     this.store.centralTreeLoading.set(true);
     this.serviceManagementApiService
       .getServiceTree({
@@ -934,11 +1019,32 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
         includeDeleted: false,
         scope: 'Global',
         isAssignedToCurrentBranch: false,
+        searchText,
       })
-      .pipe(finalize(() => this.store.centralTreeLoading.set(false)))
+      .pipe(
+        finalize(() => {
+          if (requestId === this.centralTreeRequestId) {
+            this.store.centralTreeLoading.set(false);
+          }
+        }),
+      )
       .subscribe({
-        next: (response) => this.store.serviceCentralTree.set(response),
-        error: (error: HttpErrorResponse) => this.handleApiError(error),
+        next: (response) => {
+          if (requestId !== this.centralTreeRequestId) {
+            return;
+          }
+
+          this.store.serviceCentralTree.set(response);
+
+          if (searchText.trim()) {
+            this.store.expandCentralNodes(this.collectTreeNodeIds(response));
+          }
+        },
+        error: (error: HttpErrorResponse) => {
+          if (requestId === this.centralTreeRequestId) {
+            this.handleApiError(error);
+          }
+        },
       });
   }
 
@@ -1040,6 +1146,14 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
   private showMessage(tone: 'success' | 'error' | 'info', text: string): void {
     if (this.toastTimeoutId) {
       clearTimeout(this.toastTimeoutId);
+    }
+
+    if (this.branchTreeSearchDebounceId !== null) {
+      clearTimeout(this.branchTreeSearchDebounceId);
+    }
+
+    if (this.centralTreeSearchDebounceId !== null) {
+      clearTimeout(this.centralTreeSearchDebounceId);
     }
 
     this.store.message.set({ tone, text });

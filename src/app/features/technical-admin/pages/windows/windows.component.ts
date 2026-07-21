@@ -25,6 +25,7 @@ import { AuthSessionService } from '../../../auth/services/auth-session.service'
 import { WaitingAreaApiService } from '../../services/waiting-area-api.service';
 import { WindowManagementApiService } from '../../services/window-management-api.service';
 import { WindowPermissionService } from '../../services/window-permission.service';
+import { TechnicalAdminBranchContextStore } from '../../store/technical-admin-branch-context.store';
 import { TechnicalAdminI18nStore } from '../../store/technical-admin-i18n.store';
 import { formatTechnicalAdminApiError } from '../../utils/api-error-message.util';
 import {
@@ -132,58 +133,58 @@ const WINDOW_TRANSLATIONS: Record<AppLanguage, WindowTranslations> = {
     deletedTab: 'أماكن الخدمات غير النشطة',
     addWindow: 'إضافة مكان خدمة',
     searchPlaceholder: 'ابحث برقم مكان الخدمة أو الاسم أو عنوان IP',
-    waitingAreaFilter: '\u0645\u0646\u0637\u0642\u0629 \u0627\u0644\u0627\u0646\u062a\u0638\u0627\u0631',
-    allWaitingAreas: '\u0643\u0644 \u0645\u0646\u0627\u0637\u0642 \u0627\u0644\u0627\u0646\u062a\u0638\u0627\u0631',
-    pageSize: '\u062d\u062c\u0645 \u0627\u0644\u0635\u0641\u062d\u0629',
-    loading: '\u062c\u0627\u0631\u064a \u0627\u0644\u062a\u062d\u0645\u064a\u0644...',
+    waitingAreaFilter: 'منطقة الانتظار',
+    allWaitingAreas: 'كل مناطق الانتظار',
+    pageSize: 'حجم الصفحة',
+    loading: 'جاري التحميل...',
     noItems: 'لا توجد أماكن خدمات.',
-    totalItems: '\u0625\u062c\u0645\u0627\u0644\u064a \u0627\u0644\u0639\u0646\u0627\u0635\u0631',
-    previous: '\u0627\u0644\u0633\u0627\u0628\u0642',
-    next: '\u0627\u0644\u062a\u0627\u0644\u064a',
+    totalItems: 'إجمالي العناصر',
+    previous: 'السابق',
+    next: 'التالي',
     windowNumber: 'رقم مكان الخدمة',
-    descriptiveName: '\u0627\u0644\u0627\u0633\u0645 \u0627\u0644\u0648\u0635\u0641\u064a',
-    waitingArea: '\u0645\u0646\u0637\u0642\u0629 \u0627\u0644\u0627\u0646\u062a\u0638\u0627\u0631',
-    ipAddress: '\u0639\u0646\u0648\u0627\u0646 IP',
-    waitingAreaNumberLabel: '\u0631\u0642\u0645 \u0645\u0646\u0637\u0642\u0629 \u0627\u0644\u0627\u0646\u062a\u0638\u0627\u0631',
-    ticketBooking: '\u062d\u062c\u0632 \u0627\u0644\u062a\u0630\u0627\u0643\u0631',
-    directCall: '\u0627\u0644\u0627\u062a\u0635\u0627\u0644 \u0627\u0644\u0645\u0628\u0627\u0634\u0631',
-    deletedOn: '\u0627\u0644\u062d\u0627\u0644\u0629',
-    actions: '\u0627\u0644\u0625\u062c\u0631\u0627\u0621\u0627\u062a',
-    view: '\u0639\u0631\u0636',
-    edit: '\u062a\u0639\u062f\u064a\u0644',
-    deactivate: '\u0625\u064a\u0642\u0627\u0641',
-    reactivate: '\u0625\u0639\u0627\u062f\u0629 \u062a\u0646\u0634\u064a\u0637',
-    permanentDelete: '\u062d\u0630\u0641 \u062f\u0627\u0626\u0645',
-    enabled: '\u0645\u0641\u0639\u0644',
-    disabled: '\u0645\u0639\u0637\u0644',
-    yes: '\u0646\u0639\u0645',
-    no: '\u0644\u0627',
-    details: '\u062a\u0641\u0627\u0635\u064a\u0644',
+    descriptiveName: 'الاسم الوصفي',
+    waitingArea: 'منطقة الانتظار',
+    ipAddress: 'عنوان IP',
+    waitingAreaNumberLabel: 'رقم منطقة الانتظار',
+    ticketBooking: 'حجز التذاكر',
+    directCall: 'الاتصال المباشر',
+    deletedOn: 'الحالة',
+    actions: 'الإجراءات',
+    view: 'عرض',
+    edit: 'تعديل',
+    deactivate: 'إيقاف',
+    reactivate: 'إعادة تنشيط',
+    permanentDelete: 'حذف دائم',
+    enabled: 'مفعل',
+    disabled: 'معطل',
+    yes: 'نعم',
+    no: 'لا',
+    details: 'تفاصيل',
     windowDetails: 'تفاصيل مكان الخدمة',
     createTitle: 'إنشاء مكان خدمة',
     editTitle: 'تعديل مكان خدمة',
-    close: '\u0625\u063a\u0644\u0627\u0642',
-    cancel: '\u0625\u0644\u063a\u0627\u0621',
-    save: '\u062d\u0641\u0638',
-    requiredField: '\u0647\u0630\u0627 \u0627\u0644\u062d\u0642\u0644 \u0645\u0637\u0644\u0648\u0628.',
-    maxLength20: '\u0627\u0644\u062d\u062f \u0627\u0644\u0623\u0642\u0635\u0649 20 \u062d\u0631\u0641\u064b\u0627.',
-    maxLength100: '\u0627\u0644\u062d\u062f \u0627\u0644\u0623\u0642\u0635\u0649 100 \u062d\u0631\u0641.',
-    invalidIp: '\u0639\u0646\u0648\u0627\u0646 IP \u063a\u064a\u0631 \u0635\u062d\u064a\u062d.',
-    selectWaitingArea: '\u062d\u062f\u062f \u0645\u0646\u0637\u0642\u0629 \u0627\u0644\u0627\u0646\u062a\u0638\u0627\u0631',
-    refresh: '\u062a\u062d\u062f\u064a\u062b',
+    close: 'إغلاق',
+    cancel: 'إلغاء',
+    save: 'حفظ',
+    requiredField: 'هذا الحقل مطلوب.',
+    maxLength20: 'الحد الأقصى 20 حرفًا.',
+    maxLength100: 'الحد الأقصى 100 حرف.',
+    invalidIp: 'عنوان IP غير صحيح.',
+    selectWaitingArea: 'حدد منطقة الانتظار',
+    refresh: 'تحديث',
     deleteConfirm: 'تأكيد إيقاف مكان الخدمة',
-    permanentDeleteConfirm: 'تأكيد حذف مكان الخدمة نهائيا',
+    permanentDeleteConfirm: 'تأكيد حذف مكان الخدمة نهائيًا',
     deleteConfirmBody: 'هل تريد إيقاف مكان الخدمة هذا؟',
-    permanentDeleteConfirmBody: 'سيتم حذف مكان الخدمة نهائيا ولا يمكن التراجع عن ذلك.',
+    permanentDeleteConfirmBody: 'سيتم حذف مكان الخدمة نهائيًا ولا يمكن التراجع عن ذلك.',
     permanentDeleteAdditionalBody:
-      'قد تفشل العملية إذا كان مكان الخدمة مرتبطا بجهاز طرفي أو مكان خدمة عرض.',
-    fallbackSuccess: '\u062a\u0645\u062a \u0627\u0644\u0639\u0645\u0644\u064a\u0629 \u0628\u0646\u062c\u0627\u062d.',
-    fallbackError: '\u062d\u062f\u062b \u062e\u0637\u0623 \u063a\u064a\u0631 \u0645\u062a\u0648\u0642\u0639.',
-    accessDenied: '\u0627\u0644\u0635\u0644\u0627\u062d\u064a\u0629 \u0627\u0644\u0645\u0637\u0644\u0648\u0628\u0629 \u063a\u064a\u0631 \u0643\u0627\u0641\u064a\u0629.',
-    noPermissionHint: '\u0644\u064a\u0633\u062a \u0644\u062f\u064a\u0643 \u0635\u0644\u0627\u062d\u064a\u0629 \u0644\u062a\u0646\u0641\u064a\u0630 \u0647\u0630\u0627 \u0627\u0644\u0625\u062c\u0631\u0627\u0621.',
-    createdOn: '\u062a\u0627\u0631\u064a\u062e \u0627\u0644\u0625\u0646\u0634\u0627\u0621',
-    modifiedOn: '\u062a\u0627\u0631\u064a\u062e \u0622\u062e\u0631 \u062a\u0639\u062f\u064a\u0644',
-    traceIdLabel: '\u0645\u0639\u0631\u0641 \u0627\u0644\u062a\u062a\u0628\u0639',
+      'قد تفشل العملية إذا كان مكان الخدمة مرتبطًا بجهاز طرفي أو شاشة عرض.',
+    fallbackSuccess: 'تمت العملية بنجاح.',
+    fallbackError: 'حدث خطأ غير متوقع.',
+    accessDenied: 'الصلاحية المطلوبة غير كافية.',
+    noPermissionHint: 'ليست لديك صلاحية لتنفيذ هذا الإجراء.',
+    createdOn: 'تاريخ الإنشاء',
+    modifiedOn: 'تاريخ آخر تعديل',
+    traceIdLabel: 'معرف التتبع',
     notAvailable: '-',
   },
   en: {
@@ -286,6 +287,7 @@ export class WindowsComponent implements OnInit, OnDestroy {
   private readonly permissionService = inject(WindowPermissionService);
   private readonly waitingAreaApiService = inject(WaitingAreaApiService);
   private readonly windowsApiService = inject(WindowManagementApiService);
+  private readonly branchContextStore = inject(TechnicalAdminBranchContextStore);
 
   private activeSearchDebounceId: ReturnType<typeof setTimeout> | null = null;
   private deletedSearchDebounceId: ReturnType<typeof setTimeout> | null = null;
@@ -316,6 +318,7 @@ export class WindowsComponent implements OnInit, OnDestroy {
   protected readonly deletedSearch = signal('');
   protected readonly activeWaitingAreaId = signal<number | null>(null);
   protected readonly deletedWaitingAreaId = signal<number | null>(null);
+  protected readonly branchContextId = this.branchContextStore.selectedBranchId;
   protected readonly activePageSize = signal(10);
   protected readonly deletedPageSize = signal(10);
   protected readonly activeLoading = signal(false);
@@ -722,7 +725,7 @@ export class WindowsComponent implements OnInit, OnDestroy {
   private loadWaitingAreas(): void {
     this.waitingAreaApiService
       .getWaitingAreas({
-        branchId: null,
+        branchId: this.branchContextId(),
         search: '',
         pageNumber: 1,
         pageSize: 100,
@@ -956,6 +959,7 @@ export class WindowsComponent implements OnInit, OnDestroy {
     isActive: boolean,
   ): GetWindowsParams {
     return {
+      branchId: this.branchContextId() ?? undefined,
       waitingAreaId: waitingAreaId ?? undefined,
       search: search.trim(),
       pageNumber,
@@ -1104,3 +1108,4 @@ export class WindowsComponent implements OnInit, OnDestroy {
       : value.split(':').length <= 8;
   }
 }
+

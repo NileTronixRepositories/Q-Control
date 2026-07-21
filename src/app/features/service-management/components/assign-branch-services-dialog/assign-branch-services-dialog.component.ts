@@ -19,6 +19,10 @@ export class AssignBranchServicesDialogComponent {
   readonly nodes = input.required<readonly ServiceTreeNode[]>();
   readonly expandedNodeIds = input.required<ReadonlySet<number>>();
   readonly loading = input.required<boolean>();
+  readonly searchText = input('');
+  readonly searchLabel = input('');
+  readonly searchPlaceholder = input('');
+  readonly searchHelp = input('');
   readonly assigning = input.required<boolean>();
   readonly translations = input.required<BranchServicesTranslations>();
   readonly serviceTranslations = input.required<ServiceManagementTranslations>();
@@ -28,6 +32,7 @@ export class AssignBranchServicesDialogComponent {
 
   readonly closed = output<void>();
   readonly refresh = output<void>();
+  readonly searchTextChange = output<string>();
   readonly toggleNode = output<ServiceTreeNode>();
   readonly assigned = output<readonly number[]>();
 

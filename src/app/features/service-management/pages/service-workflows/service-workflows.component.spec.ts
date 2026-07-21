@@ -254,6 +254,7 @@ describe('ServiceWorkflowsComponent', () => {
       parentEnglishName: 'Services',
       arabicName: 'إصدار شهادة',
       englishName: 'Issue Certificate',
+      serviceCode: null,
       isActive: true,
       isDeleted: false,
       effectiveIsActive: true,
@@ -289,6 +290,39 @@ describe('ServiceWorkflowsComponent', () => {
     ]);
   });
 
+
+  it('resets candidate pagination and trims search changes', () => {
+    fixture.componentInstance.store.updateCandidateQuery({ pageNumber: 3, searchText: 'old' });
+    const event = new Event('input');
+    Object.defineProperty(event, 'target', { value: { value: '  certificate  ' } });
+
+    fixture.componentInstance.updateCandidateSearch(event);
+
+    expect(fixture.componentInstance.store.candidateQuery()).toEqual(
+      expect.objectContaining({ searchText: 'certificate', pageNumber: 1 }),
+    );
+  });
+
+  it('shows candidate service code badges only when a code exists', () => {
+    fixture.componentInstance.store.candidates.set({
+      ...emptyPage,
+      pageSize: 25,
+      totalItems: 2,
+      data: [
+        createCandidate({ serviceId: 30, englishName: 'Certificate', serviceCode: ' CERT-001 ' }),
+        createCandidate({ serviceId: 31, englishName: 'No Code', serviceCode: null }),
+      ],
+    });
+    fixture.componentInstance.openCreate();
+    fixture.detectChanges();
+
+    const badges = fixture.nativeElement.querySelectorAll(
+      '.workflow-candidate-code',
+    ) as NodeListOf<HTMLElement>;
+
+    expect(badges.length).toBe(1);
+    expect(badges[0].textContent?.trim()).toBe('CERT-001');
+  });
   it('reorders existing workflow steps with drag and drop', () => {
     const first = createCandidate({ serviceId: 31, englishName: 'First' });
     const second = createCandidate({ serviceId: 32, englishName: 'Second' });
@@ -396,6 +430,7 @@ function createCandidate(
     parentEnglishName: 'Services',
     arabicName: 'Service',
     englishName: 'Service',
+    serviceCode: null,
     isActive: true,
     isDeleted: false,
     effectiveIsActive: true,
@@ -420,3 +455,4 @@ function createWorkflowDragEvent(): DragEvent {
     relatedTarget: null,
   } as unknown as DragEvent;
 }
+

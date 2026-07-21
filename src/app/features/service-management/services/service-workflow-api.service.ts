@@ -348,6 +348,7 @@ export class ServiceWorkflowApiService {
         this.readString(record, ['parentEnglishName', 'parentServiceEnglishName']) ?? null,
       arabicName: this.readString(record, ['arabicName', 'nameAr']) ?? '',
       englishName: this.readString(record, ['englishName', 'nameEn']) ?? '',
+      serviceCode: this.readString(record, ['serviceCode']) ?? null,
       isActive: this.readBoolean(record, ['isActive']) ?? true,
       isDeleted: this.readBoolean(record, ['isDeleted']) ?? false,
       effectiveIsActive: this.readBoolean(record, ['effectiveIsActive']) ?? true,
@@ -462,3 +463,4 @@ export class ServiceWorkflowApiService {
     return value !== null && typeof value === 'object' && !Array.isArray(value);
   }
 }
+

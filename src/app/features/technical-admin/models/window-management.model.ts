@@ -1,6 +1,7 @@
 import { LifecycleMutationResponse, OperationalEntityState, OperationalStatusFilter, PermanentDeleteResponse } from './operational-lifecycle.model';
 
 export interface GetWindowsParams {
+  readonly branchId?: number;
   readonly waitingAreaId?: number;
   readonly search?: string;
   readonly pageNumber?: number;

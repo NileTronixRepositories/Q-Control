@@ -82,6 +82,11 @@ export class ServiceHierarchyTreeComponent {
   readonly language = input.required<AppLanguage>();
   readonly direction = input<AppDirection>('ltr');
   readonly loading = input.required<boolean>();
+  readonly showSearch = input(false);
+  readonly searchText = input('');
+  readonly searchLabel = input('');
+  readonly searchPlaceholder = input('');
+  readonly searchHelp = input('');
   readonly includeInactive = input.required<boolean>();
   readonly includeDeleted = input.required<boolean>();
   readonly canCreate = input.required<boolean>();
@@ -116,6 +121,7 @@ export class ServiceHierarchyTreeComponent {
   readonly manageMediaLabel = input('');
 
   readonly refresh = output<void>();
+  readonly searchTextChange = output<string>();
   readonly includeInactiveChange = output<boolean>();
   readonly includeDeletedChange = output<boolean>();
   readonly toggleNode = output<ServiceTreeNode>();
@@ -137,10 +143,21 @@ export class ServiceHierarchyTreeComponent {
   readonly manageMedia = output<ServiceTreeNode>();
 
   public readonly isDropActive = signal(false);
+  protected readonly normalizedSearchText = computed(() => this.searchText().trim());
 
   public readonly flatNodes = computed(() =>
     this.flattenNodes(this.nodes(), this.expandedNodeIds(), this.selectedServiceId()),
   );
+
+  public onSearchTextInput(event: Event): void {
+    this.searchTextChange.emit((event.target as HTMLInputElement).value.slice(0, 200));
+  }
+
+  public clearSearchText(): void {
+    if (this.normalizedSearchText()) {
+      this.searchTextChange.emit('');
+    }
+  }
 
   public onIncludeInactiveChange(event: Event): void {
     this.includeInactiveChange.emit((event.target as HTMLInputElement).checked);

@@ -15,6 +15,11 @@ export interface ServiceManagementTranslations {
   readonly editorEmptyBody: string;
   readonly createUnder: string;
   readonly searchPlaceholder: string;
+  readonly treeSearchLabel: string;
+  readonly treeSearchPlaceholder: string;
+  readonly treeSearchHelp: string;
+  readonly clearSearch: string;
+  readonly noSearchResults: string;
   readonly activeFilter: string;
   readonly deletedFilter: string;
   readonly ticketFilter: string;
@@ -185,6 +190,11 @@ export const SERVICE_MANAGEMENT_TRANSLATIONS: Record<AppLanguage, ServiceManagem
     editorEmptyBody: 'استخدم الشجرة لإضافة خدمة رئيسية، أو اضغط + بجانب أي خدمة لإضافة خدمة فرعية.',
     createUnder: 'إنشاء تحت',
     searchPlaceholder: 'ابحث بالاسم العربي أو الإنجليزي',
+    treeSearchLabel: '\u0627\u0644\u0628\u062d\u062b \u0628\u0627\u0633\u0645 \u0627\u0644\u062e\u062f\u0645\u0629 \u0623\u0648 \u0643\u0648\u062f \u0627\u0644\u062e\u062f\u0645\u0629',
+    treeSearchPlaceholder: '\u0627\u0628\u062d\u062b \u0639\u0646 \u062e\u062f\u0645\u0629...',
+    treeSearchHelp: '\u0627\u0628\u062d\u062b \u0628\u0627\u0633\u0645 \u0627\u0644\u062e\u062f\u0645\u0629 \u0623\u0648 \u0643\u0648\u062f \u0627\u0644\u062e\u062f\u0645\u0629.',
+    clearSearch: '\u0645\u0633\u062d \u0627\u0644\u0628\u062d\u062b',
+    noSearchResults: '\u0644\u0627 \u062a\u0648\u062c\u062f \u062e\u062f\u0645\u0627\u062a \u0645\u0637\u0627\u0628\u0642\u0629 \u0644\u0639\u0645\u0644\u064a\u0629 \u0627\u0644\u0628\u062d\u062b.',
     activeFilter: 'الحالة',
     deletedFilter: 'المحذوفة',
     ticketFilter: 'إصدار التذاكر',
@@ -354,6 +364,11 @@ export const SERVICE_MANAGEMENT_TRANSLATIONS: Record<AppLanguage, ServiceManagem
       'Use the tree to add a root service, or press + next to any service to add a child service.',
     createUnder: 'Creating under',
     searchPlaceholder: 'Search Arabic or English name',
+    treeSearchLabel: 'Search by service name or service code',
+    treeSearchPlaceholder: 'Search services...',
+    treeSearchHelp: 'Search by service name or service code.',
+    clearSearch: 'Clear search',
+    noSearchResults: 'No services match your search.',
     activeFilter: 'Status',
     deletedFilter: 'Deleted',
     ticketFilter: 'Ticket issuance',

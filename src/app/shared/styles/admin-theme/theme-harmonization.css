@@ -4,11 +4,11 @@
  * Merged from: theme-harmonization.css + final-separation.css + readability-pass.css + theme-state-colors.css
  *
  * Sections:
- *  1. Theme Tokens         — per-theme CSS custom properties
- *  2. Readability Tokens   — text/hover color tokens per theme
- *  3. Page Backgrounds     — per-theme workspace backgrounds
- *  4. Page Hero & Panels   — per-theme panel/hero tokens
- *  5. Per-Theme Overrides  — tabs, tables, uploads per theme
+ *  1. Theme Tokens         — fixed-theme CSS custom properties
+ *  2. Readability Tokens   — text/hover color tokens
+ *  3. Page Backgrounds     — workspace backgrounds
+ *  4. Page Hero & Panels   — panel/hero tokens
+ *  5. Theme Overrides      — tabs, tables, uploads
  *  6. Global Component     — shared harmonization rules (Bootstrap overrides)
  *  7. State Colors         — success/danger/info toast & status
  *  8. Readability Rules    — concrete text color rules using readability tokens
@@ -20,30 +20,6 @@
    1. THEME TOKENS
    ============================================================ */
 
-body[data-admin-theme='beach-sunset'] {
-  --q-primary-rgb: 27 73 101;
-  --q-primary-hover-rgb: 18 54 77;
-  --q-accent-rgb: 95 168 211;
-  --q-surface-card-rgb: 255 255 255;
-  --q-component-page-bg: linear-gradient(135deg, #f8fdff 0%, #edf9fb 48%, #dff3ff 100%);
-  --q-component-panel-bg: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.98) 0%,
-    rgba(248, 253, 255, 0.95) 100%
-  );
-  --q-component-hero-bg: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0.98) 0%,
-    rgba(202, 233, 255, 0.7) 62%,
-    rgba(190, 233, 232, 0.62) 100%
-  );
-  --q-component-strip-bg: rgba(202, 233, 255, 0.45);
-  --q-component-tab-active-bg: linear-gradient(135deg, #1b4965, #347f9b);
-  --q-component-table-head-bg: rgba(202, 233, 255, 0.54);
-  --q-component-table-row-alt-bg: rgba(190, 233, 232, 0.18);
-  --q-component-table-row-hover-bg: rgba(98, 182, 203, 0.18);
-  --q-component-soft-shadow: 0 12px 28px rgba(27, 73, 101, 0.075);
-}
 
 body[data-admin-theme='niletronix-admin'] {
   --q-primary-rgb: 11 138 168;
@@ -66,26 +42,6 @@ body[data-admin-theme='niletronix-admin'] {
   --q-component-soft-shadow: 0 10px 24px rgba(20, 42, 58, 0.065);
 }
 
-body[data-admin-theme='niletronix-brand'] {
-  --q-primary-rgb: 13 120 166;
-  --q-primary-hover-rgb: 7 95 134;
-  --q-accent-rgb: 227 30 36;
-  --q-surface-card-rgb: 255 255 255;
-  --q-component-page-bg: linear-gradient(135deg, #f4f6f8 0%, #ffffff 58%, #eef6fa 100%);
-  --q-component-panel-bg: linear-gradient(180deg, #ffffff 0%, #f8fbfc 100%);
-  --q-component-hero-bg: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0.98) 0%,
-    rgba(244, 246, 248, 0.95) 60%,
-    rgba(227, 30, 36, 0.07) 100%
-  );
-  --q-component-strip-bg: rgba(79, 165, 201, 0.13);
-  --q-component-tab-active-bg: linear-gradient(135deg, #0d78a6, #075f86);
-  --q-component-table-head-bg: #e7f1f5;
-  --q-component-table-row-alt-bg: rgba(79, 165, 201, 0.08);
-  --q-component-table-row-hover-bg: rgba(13, 120, 166, 0.09);
-  --q-component-soft-shadow: 0 10px 26px rgba(26, 29, 33, 0.07);
-}
 
 /* ============================================================
    2. READABILITY TOKENS (from readability-pass.css)
@@ -101,26 +57,6 @@ body[data-admin-theme='niletronix-admin'] {
   --q-hover-soft-border: rgba(11, 138, 168, 0.24);
 }
 
-body[data-admin-theme='beach-sunset'] {
-  --q-readable-heading: #102f43;
-  --q-readable-body: #183f52;
-  --q-readable-label: #1b4965;
-  --q-readable-muted: #6d8290;
-  --q-readable-placeholder: #8799a3;
-  --q-hover-soft-bg: rgba(95, 168, 211, 0.14);
-  --q-hover-soft-border: rgba(27, 73, 101, 0.26);
-}
-
-body[data-admin-theme='niletronix-brand'] {
-  --q-readable-heading: #101418;
-  --q-readable-body: #202a33;
-  --q-readable-label: #0a526f;
-  --q-readable-muted: #727d87;
-  --q-readable-placeholder: #89939d;
-  --q-hover-soft-bg: rgba(13, 120, 166, 0.09);
-  --q-hover-soft-border: rgba(13, 120, 166, 0.28);
-}
-
 /* ============================================================
    3. PAGE BACKGROUNDS (from final-separation.css)
    ============================================================ */
@@ -131,22 +67,6 @@ body[data-admin-theme='niletronix-admin']
     radial-gradient(circle at 12% 8%, rgba(11, 138, 168, 0.08), transparent 24rem),
     radial-gradient(circle at 92% 0%, rgba(242, 39, 69, 0.06), transparent 22rem),
     linear-gradient(135deg, #f6fafc 0%, #ffffff 54%, #f7fbfc 100%);
-}
-
-body[data-admin-theme='beach-sunset']
-  .workspace, body[data-admin-theme='beach-sunset'] .workspace-content, body[data-admin-theme='beach-sunset'] .main-content, body[data-admin-theme='beach-sunset'] .main-contact {
-  background:
-    radial-gradient(circle at 14% 8%, rgba(190, 233, 232, 0.82), transparent 27rem),
-    radial-gradient(circle at 86% 0%, rgba(202, 233, 255, 0.86), transparent 26rem),
-    linear-gradient(135deg, #f8fdff 0%, #e7f9fb 44%, #d9effb 100%);
-}
-
-body[data-admin-theme='niletronix-brand']
-  .workspace, body[data-admin-theme='niletronix-brand'] .workspace-content, body[data-admin-theme='niletronix-brand'] .main-content, body[data-admin-theme='niletronix-brand'] .main-contact {
-  background:
-    radial-gradient(circle at 12% 8%, rgba(13, 120, 166, 0.11), transparent 25rem),
-    radial-gradient(circle at 92% 4%, rgba(227, 30, 36, 0.08), transparent 23rem),
-    linear-gradient(135deg, #eef2f4 0%, #ffffff 48%, #f4f6f8 76%, #eef5f8 100%);
 }
 
 /* ============================================================
@@ -168,52 +88,8 @@ body[data-admin-theme='niletronix-admin'] {
   --q-panel-shadow: 0 14px 34px rgba(20, 42, 58, 0.065);
 }
 
-body[data-admin-theme='beach-sunset'] {
-  --q-page-hero-bg:
-    linear-gradient(
-      90deg,
-      rgba(255, 255, 255, 0.94) 0%,
-      rgba(202, 233, 255, 0.82) 58%,
-      rgba(190, 233, 232, 0.86) 100%
-    ),
-    #f8fdff;
-  --q-page-hero-border: rgba(95, 168, 211, 0.28);
-  --q-page-hero-accent-bg: linear-gradient(
-    135deg,
-    transparent 0 18%,
-    rgba(95, 168, 211, 0.16) 18% 34%,
-    transparent 34% 50%,
-    rgba(190, 233, 232, 0.24) 50% 68%,
-    transparent 68% 100%
-  );
-  --q-page-hero-dot-color: rgba(95, 168, 211, 0.2);
-  --q-panel-bg: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.96) 0%,
-    rgba(248, 253, 255, 0.9) 100%
-  );
-  --q-panel-border: rgba(95, 168, 211, 0.24);
-  --q-panel-shadow: 0 16px 36px rgba(27, 73, 101, 0.085);
-  --q-summary-accent-bg: linear-gradient(180deg, var(--q-beach-navy), rgba(95, 168, 211, 0.34));
-}
-
-body[data-admin-theme='niletronix-brand'] {
-  --q-page-hero-bg:
-    linear-gradient(
-      90deg,
-      rgba(255, 255, 255, 0.98) 0%,
-      rgba(244, 246, 248, 0.92) 56%,
-      rgba(227, 30, 36, 0.11) 100%
-    ),
-    #ffffff;
-  --q-page-hero-border: rgba(13, 120, 166, 0.22);
-  --q-panel-bg: linear-gradient(180deg, #ffffff 0%, #f8fafb 100%);
-  --q-panel-border: rgba(13, 120, 166, 0.2);
-  --q-panel-shadow: 0 16px 38px rgba(26, 29, 33, 0.08);
-}
-
 /* ============================================================
-   5. PER-THEME OVERRIDES (from final-separation.css)
+   5. THEME OVERRIDES (from final-separation.css)
    ============================================================ */
 
 /* Tabs */
@@ -222,30 +98,10 @@ body[data-admin-theme='niletronix-admin'] .tabs {
   border-color: rgba(11, 138, 168, 0.18);
 }
 
-body[data-admin-theme='beach-sunset'] .tabs {
-  background: rgba(202, 233, 255, 0.68);
-  border-color: rgba(95, 168, 211, 0.28);
-}
-
-body[data-admin-theme='niletronix-brand'] .tabs {
-  background: rgba(26, 29, 33, 0.07);
-  border-color: rgba(13, 120, 166, 0.24);
-}
-
 /* Table headers */
 body[data-admin-theme='niletronix-admin'] th, body[data-admin-theme='niletronix-admin'] .custom-table thead th, body[data-admin-theme='niletronix-admin'] .table thead th {
   color: #22314a;
   background: #eaf4f7;
-}
-
-body[data-admin-theme='beach-sunset'] th, body[data-admin-theme='beach-sunset'] .custom-table thead th, body[data-admin-theme='beach-sunset'] .table thead th {
-  color: #1b4965;
-  background: #cae9ff;
-}
-
-body[data-admin-theme='niletronix-brand'] th, body[data-admin-theme='niletronix-brand'] .custom-table thead th, body[data-admin-theme='niletronix-brand'] .table thead th {
-  color: #f4f6f8;
-  background: linear-gradient(135deg, #1a1d21, #0d78a6);
 }
 
 /* Table alternating rows */
@@ -253,18 +109,6 @@ body[data-admin-theme='niletronix-admin'] tbody tr:nth-child(even) td,
 body[data-admin-theme='niletronix-admin'] .custom-table tbody tr:nth-child(even) td,
 body[data-admin-theme='niletronix-admin'] .table tbody tr:nth-child(even) td {
   background: rgba(224, 246, 248, 0.32);
-}
-
-body[data-admin-theme='beach-sunset'] tbody tr:nth-child(even) td,
-body[data-admin-theme='beach-sunset'] .custom-table tbody tr:nth-child(even) td,
-body[data-admin-theme='beach-sunset'] .table tbody tr:nth-child(even) td {
-  background: rgba(190, 233, 232, 0.24);
-}
-
-body[data-admin-theme='niletronix-brand'] tbody tr:nth-child(even) td,
-body[data-admin-theme='niletronix-brand'] .custom-table tbody tr:nth-child(even) td,
-body[data-admin-theme='niletronix-brand'] .table tbody tr:nth-child(even) td {
-  background: rgba(79, 165, 201, 0.09);
 }
 
 /* ============================================================
@@ -708,9 +552,6 @@ body[data-admin-theme] :is(.message-error, .toast-error) {
   color: #b42318;
 }
 
-body[data-admin-theme='niletronix-brand'] :is(th, .custom-table thead th, .table thead th) {
-  color: #ffffff;
-}
 
 /* ============================================================
    9. LOADING SPINNER (state-note / api-note.loading-note)

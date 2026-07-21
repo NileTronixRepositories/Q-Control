@@ -42,6 +42,42 @@ describe('BranchServicesApiService', () => {
 
   afterEach(() => httpTestingController.verify());
 
+  it('trims branch service tree searchText and preserves include flags', () => {
+    service
+      .getBranchServicesTree(5, {
+        includeInactive: true,
+        includeDeleted: false,
+        searchText: '  LAB-001  ',
+      })
+      .subscribe();
+
+    const endpoint = new URL('api/branches/5/services/tree', environment.apiBaseUrl).toString();
+    const request = httpTestingController.expectOne((candidate) => candidate.url === endpoint);
+
+    expect(request.request.method).toBe('GET');
+    expect(request.request.params.get('includeInactive')).toBe('true');
+    expect(request.request.params.get('includeDeleted')).toBe('false');
+    expect(request.request.params.get('searchText')).toBe('LAB-001');
+    request.flush([]);
+  });
+
+  it('omits empty branch service tree searchText', () => {
+    service
+      .getBranchServicesTree(5, {
+        includeInactive: false,
+        includeDeleted: true,
+        searchText: '   ',
+      })
+      .subscribe();
+
+    const endpoint = new URL('api/branches/5/services/tree', environment.apiBaseUrl).toString();
+    const request = httpTestingController.expectOne((candidate) => candidate.url === endpoint);
+
+    expect(request.request.params.has('searchText')).toBe(false);
+    expect(request.request.params.get('includeInactive')).toBe('false');
+    expect(request.request.params.get('includeDeleted')).toBe('true');
+    request.flush([]);
+  });
   it('sends DELETE without a body and maps the unassignment response', () => {
     const expectedResponse: UnassignBranchLeafServiceResponse = {
       branchId: 5,
@@ -138,3 +174,4 @@ describe('BranchServicesApiService', () => {
     request.flush(response);
   });
 });
+

@@ -223,6 +223,12 @@ export class ServicesComponent implements OnInit, OnDestroy {
   public readonly rangeEndNumberControl = this.serviceForm.controls.rangeEndNumber;
 
   private searchDebounceId: ReturnType<typeof setTimeout> | null = null;
+  private treeSearchDebounceId: ReturnType<typeof setTimeout> | null = null;
+  private assignedBranchTreeSearchDebounceId: ReturnType<typeof setTimeout> | null = null;
+  private treeRequestId = 0;
+  private assignedBranchTreeRequestId = 0;
+  private serviceTreeExpansionSnapshot: ReadonlySet<number> | null = null;
+  private assignedBranchTreeExpansionSnapshot: ReadonlySet<number> | null = null;
   private toastTimeoutId: ReturnType<typeof setTimeout> | null = null;
   private panelRequestId = 0;
   private serviceCodeConflict = false;
@@ -246,6 +252,14 @@ export class ServicesComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     if (this.searchDebounceId) {
       clearTimeout(this.searchDebounceId);
+    }
+
+    if (this.treeSearchDebounceId) {
+      clearTimeout(this.treeSearchDebounceId);
+    }
+
+    if (this.assignedBranchTreeSearchDebounceId) {
+      clearTimeout(this.assignedBranchTreeSearchDebounceId);
     }
 
     if (this.toastTimeoutId) {
@@ -289,6 +303,51 @@ export class ServicesComponent implements OnInit, OnDestroy {
     this.searchDebounceId = setTimeout(() => this.loadServices(), 350);
   }
 
+  public updateServiceTreeSearch(value: string): void {
+    const searchText = this.normalizeSearchText(value);
+    const hadSearch = this.store.serviceTreeSearchText().trim().length > 0;
+
+    if (searchText && !hadSearch) {
+      this.serviceTreeExpansionSnapshot = new Set(this.store.expandedTreeNodeIds());
+    }
+
+    if (!searchText && hadSearch) {
+      this.store.expandedTreeNodeIds.set(this.serviceTreeExpansionSnapshot ?? new Set());
+      this.serviceTreeExpansionSnapshot = null;
+    }
+
+    this.store.serviceTreeSearchText.set(searchText);
+
+    if (this.treeSearchDebounceId) {
+      clearTimeout(this.treeSearchDebounceId);
+    }
+
+    this.treeSearchDebounceId = setTimeout(() => this.loadTree(), 400);
+  }
+
+  public updateAssignedBranchTreeSearch(value: string): void {
+    const searchText = this.normalizeSearchText(value);
+    const hadSearch = this.store.assignedBranchTreeSearchText().trim().length > 0;
+
+    if (searchText && !hadSearch) {
+      this.assignedBranchTreeExpansionSnapshot = new Set(this.store.expandedAssignedBranchNodeIds());
+    }
+
+    if (!searchText && hadSearch) {
+      this.store.expandedAssignedBranchNodeIds.set(
+        this.assignedBranchTreeExpansionSnapshot ?? new Set(),
+      );
+      this.assignedBranchTreeExpansionSnapshot = null;
+    }
+
+    this.store.assignedBranchTreeSearchText.set(searchText);
+
+    if (this.assignedBranchTreeSearchDebounceId) {
+      clearTimeout(this.assignedBranchTreeSearchDebounceId);
+    }
+
+    this.assignedBranchTreeSearchDebounceId = setTimeout(() => this.loadAssignedBranchTree(), 400);
+  }
   public updateBooleanFilter(
     key: 'isActive' | 'isDeleted' | 'isTicketIssuable',
     event: Event,
@@ -911,10 +970,12 @@ export class ServicesComponent implements OnInit, OnDestroy {
   }
 
   private loadTree(): void {
-    if (!this.canUseCatalog() || this.store.treeLoading()) {
+    if (!this.canUseCatalog()) {
       return;
     }
 
+    const requestId = ++this.treeRequestId;
+    const searchText = this.store.serviceTreeSearchText();
     this.store.treeLoading.set(true);
 
     this.apiService
@@ -924,44 +985,85 @@ export class ServicesComponent implements OnInit, OnDestroy {
         scope: this.store.listQuery().scope,
         ownerBranchId: this.store.listQuery().ownerBranchId,
         isAssignedToCurrentBranch: this.store.listQuery().isAssignedToCurrentBranch,
+        searchText,
       })
+      .pipe(
+        finalize(() => {
+          if (requestId === this.treeRequestId) {
+            this.store.treeLoading.set(false);
+          }
+        }),
+      )
       .subscribe({
         next: (response) => {
+          if (requestId !== this.treeRequestId) {
+            return;
+          }
+
           this.store.serviceTree.set(response);
+
+          if (searchText.trim()) {
+            this.store.expandTreeNodes(this.collectTreeNodeIds(response));
+          }
+
           const selectedId = this.store.selectedTreeServiceId();
 
           if (selectedId && !this.treeContains(response, selectedId)) {
             this.store.selectTreeNode(null);
           }
         },
-        error: (error: HttpErrorResponse) => this.handleApiError(error),
-        complete: () => this.store.treeLoading.set(false),
+        error: (error: HttpErrorResponse) => {
+          if (requestId === this.treeRequestId) {
+            this.handleApiError(error);
+          }
+        },
       });
   }
 
   private loadAssignedBranchTree(expandServiceId?: number): void {
     const branchId = this.activeBranchId();
 
-    if (!branchId || !this.canUseBranchAssignment() || this.store.assignedBranchTreeLoading()) {
+    if (!branchId || !this.canUseBranchAssignment()) {
       return;
     }
 
+    const requestId = ++this.assignedBranchTreeRequestId;
+    const searchText = this.store.assignedBranchTreeSearchText();
     this.store.assignedBranchTreeLoading.set(true);
     this.branchServicesApiService
       .getBranchServicesTree(branchId, {
         includeInactive: this.includeInactiveTree(),
         includeDeleted: this.includeDeletedTree(),
+        searchText,
       })
-      .pipe(finalize(() => this.store.assignedBranchTreeLoading.set(false)))
+      .pipe(
+        finalize(() => {
+          if (requestId === this.assignedBranchTreeRequestId) {
+            this.store.assignedBranchTreeLoading.set(false);
+          }
+        }),
+      )
       .subscribe({
         next: (response) => {
+          if (requestId !== this.assignedBranchTreeRequestId) {
+            return;
+          }
+
           this.store.assignedBranchServiceTree.set(response);
+
+          if (searchText.trim()) {
+            this.store.expandAssignedBranchNodes(this.collectTreeNodeIds(response));
+          }
 
           if (expandServiceId) {
             this.expandAssignedPathFor(expandServiceId);
           }
         },
-        error: (error: HttpErrorResponse) => this.handleApiError(error),
+        error: (error: HttpErrorResponse) => {
+          if (requestId === this.assignedBranchTreeRequestId) {
+            this.handleApiError(error);
+          }
+        },
       });
   }
 
@@ -1417,6 +1519,15 @@ export class ServicesComponent implements OnInit, OnDestroy {
 
     return Math.min(value, 100);
   }
+
+  private normalizeSearchText(value: string): string {
+    return value.trim().slice(0, 200);
+  }
+
+  private collectTreeNodeIds(nodes: readonly ServiceTreeNode[]): readonly number[] {
+    return nodes.flatMap((node) => [node.id, ...this.collectTreeNodeIds(node.children)]);
+  }
+
 
   private treeContains(nodes: readonly ServiceTreeNode[], serviceId: number): boolean {
     return nodes.some(

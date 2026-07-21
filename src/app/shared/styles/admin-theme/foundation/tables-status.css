@@ -1,101 +1,102 @@
-/* Tables and status */
-body .table-wrap,
-body .table-responsive {
-  background: #ffffff !important;
-  border: 1px solid var(--nt-border) !important;
-  border-radius: 12px !important;
-  box-shadow: var(--nt-shadow-soft) !important;
-}
-
-body table,
-body .table,
-body .custom-table {
-  color: var(--nt-text) !important;
-  background: transparent !important;
-}
-
-body th,
-body .custom-table thead th {
-  color: #536175 !important;
-  background: #f8fbfd !important;
-  border-bottom: 1px solid var(--nt-border) !important;
-  font-size: 0.72rem !important;
-  font-weight: 900 !important;
-  letter-spacing: 0 !important;
-}
-
-body td,
-body .custom-table tbody td {
-  color: var(--nt-text) !important;
-  border-color: #eef2f6 !important;
-  font-size: 0.86rem !important;
-}
-
-body tbody tr:hover td,
-body .custom-table tbody tr:hover td {
-  background: rgba(15, 125, 168, 0.035) !important;
-}
-
-body .status-pill.status-active,
-body .status-pill.status-online {
-  color: var(--nt-success) !important;
-  background: #ecfdf5 !important;
-  border: 1px solid rgba(19, 138, 91, 0.14) !important;
-}
-
-body .status-pill.status-maintenance,
-body .status-pill.status-delayed {
-  color: var(--nt-warning) !important;
-  background: #fff8eb !important;
-  border: 1px solid rgba(183, 121, 31, 0.16) !important;
-}
-
-body .status-pill.status-inactive,
-body .status-pill.status-offline {
-  color: var(--nt-danger) !important;
-  background: var(--nt-accent-soft) !important;
-  border: 1px solid rgba(243, 24, 45, 0.16) !important;
-}
-
-/* Merged from tables-responsive.css */
-/* Bootstrap responsive table sizing. */
+﻿/* Tables and status indicators. Bootstrap owns table semantics; this file owns admin theming. */
 body[data-admin-theme] :where(.list-panel, .content-panel, .settings-panel) {
-  min-width: 0 !important;
+  min-width: 0;
 }
 
 body[data-admin-theme] :where(.table-wrap, .table-responsive) {
-  max-width: 100% !important;
-  overflow-x: auto !important;
-  overflow-y: hidden !important;
-  -webkit-overflow-scrolling: touch !important;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  background: #ffffff;
+  border: 1px solid var(--nt-border);
+  border-radius: 12px;
+  box-shadow: var(--nt-shadow-soft);
+  -webkit-overflow-scrolling: touch;
   scrollbar-gutter: stable both-edges;
 }
 
-body[data-admin-theme] :where(.table-wrap table, .table-responsive table, .custom-table) {
-  width: 100% !important;
-  min-width: var(--q-admin-table-min-width, 760px) !important;
-  table-layout: auto !important;
+body[data-admin-theme] :where(table, .table, .custom-table) {
+  width: 100%;
+  min-width: var(--q-admin-table-min-width, 760px);
+  color: var(--nt-text);
+  background: transparent;
+  table-layout: auto;
 }
 
-body[data-admin-theme] :where(.table-wrap th, .table-responsive th, .custom-table th),
-body[data-admin-theme] :where(.table-wrap td, .table-responsive td, .custom-table td) {
-  white-space: nowrap !important;
+body[data-admin-theme] :where(.table > :not(caption) > * > *, .custom-table > :not(caption) > * > *) {
+  padding: var(--q-admin-table-cell-padding, 0.8rem 0.9rem);
+  color: var(--q-text-primary, var(--nt-text));
+  border-color: var(--q-border-subtle, #eef2f6);
+  white-space: nowrap;
+}
+
+body[data-admin-theme] :where(th, .custom-table thead th, .table thead th) {
+  color: #536175;
+  background: #f8fbfd;
+  border-bottom: 1px solid var(--nt-border);
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0;
+}
+
+body[data-admin-theme] :where(td, .custom-table tbody td, .table tbody td) {
+  font-size: 0.88rem;
+}
+
+body[data-admin-theme] :where(tbody tr:hover td, .custom-table tbody tr:hover td, .table tbody tr:hover td) {
+  background: rgba(var(--q-primary-rgb, 15 125 168) / 0.04);
+}
+
+body[data-admin-theme] :where(.status-pill.status-active, .status-pill.status-online) {
+  color: var(--nt-success);
+  background: #ecfdf5;
+  border: 1px solid rgba(19, 138, 91, 0.14);
+}
+
+body[data-admin-theme] :where(.status-pill.status-maintenance, .status-pill.status-delayed) {
+  color: var(--nt-warning);
+  background: #fff8eb;
+  border: 1px solid rgba(183, 121, 31, 0.16);
+}
+
+body[data-admin-theme] :where(.status-pill.status-inactive, .status-pill.status-offline) {
+  color: var(--nt-danger);
+  background: var(--nt-accent-soft);
+  border: 1px solid rgba(243, 24, 45, 0.16);
 }
 
 body[data-admin-theme] :where(.display-management-page) {
   --q-admin-table-min-width: 760px;
+  --q-admin-actions-column-width: 148px;
+  --q-admin-table-cell-padding: 0.6rem 0.75rem;
 }
 
 body[data-admin-theme] :where(.terminal-management-page) {
   --q-admin-table-min-width: 1040px;
+  --q-admin-actions-column-width: 148px;
+  --q-admin-table-cell-padding: 0.6rem 0.75rem;
 }
 
 body[data-admin-theme] :where(.waiting-areas-page) {
   --q-admin-table-min-width: 1080px;
+  --q-admin-actions-column-width: 184px;
+  --q-admin-table-cell-padding: 0.6rem 0.75rem;
 }
 
 body[data-admin-theme] :where(.window-management-page) {
   --q-admin-table-min-width: 980px;
+  --q-admin-actions-column-width: 148px;
+  --q-admin-table-cell-padding: 0.6rem 0.75rem;
+}
+
+body[data-admin-theme] :where(.admin-number-cell, .admin-technical-cell) {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+body[data-admin-theme] :where(.admin-actions-column) {
+  width: var(--q-admin-actions-column-width, 148px);
+  min-width: var(--q-admin-actions-column-width, 148px);
 }
 
 body[data-admin-theme] :where(.branch-page) {
@@ -104,12 +105,11 @@ body[data-admin-theme] :where(.branch-page) {
 
 @media (max-width: 575.98px) {
   body[data-admin-theme] :where(.table-wrap, .table-responsive) {
-    margin-inline: -2px !important;
-    border-radius: var(--q-radius-md) !important;
+    margin-inline: -2px;
+    border-radius: var(--q-radius-md);
   }
 
-  body[data-admin-theme] :where(.table-wrap th, .table-responsive th, .custom-table th),
-  body[data-admin-theme] :where(.table-wrap td, .table-responsive td, .custom-table td) {
-    padding-inline: 10px !important;
+  body[data-admin-theme] :where(.table > :not(caption) > * > *, .custom-table > :not(caption) > * > *) {
+    padding-inline: 0.75rem;
   }
 }

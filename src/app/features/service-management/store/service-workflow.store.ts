@@ -57,6 +57,7 @@ export class ServiceWorkflowStore {
   readonly branchTree = signal<readonly ServiceTreeNode[]>([]);
   readonly expandedBranchNodeIds = signal<ReadonlySet<number>>(new Set());
   readonly selectedBranchNodeId = signal<number | null>(null);
+  readonly branchTreeSearchText = signal('');
 
   readonly query = signal<ServiceWorkflowListQuery>(DEFAULT_WORKFLOW_QUERY);
   readonly candidateQuery = signal<WorkflowCandidateQuery>(DEFAULT_CANDIDATE_QUERY);
@@ -84,6 +85,7 @@ export class ServiceWorkflowStore {
     this.selectedBranchId.set(branchId);
     this.branchTree.set([]);
     this.expandedBranchNodeIds.set(new Set());
+    this.branchTreeSearchText.set('');
     this.selectedBranchNodeId.set(null);
     this.clearScope();
   }
@@ -114,6 +116,14 @@ export class ServiceWorkflowStore {
     this.expandedBranchNodeIds.update((current) => {
       const next = new Set(current);
       next.has(nodeId) ? next.delete(nodeId) : next.add(nodeId);
+      return next;
+    });
+  }
+
+  expandBranchNodes(nodeIds: readonly number[]): void {
+    this.expandedBranchNodeIds.update((current) => {
+      const next = new Set(current);
+      nodeIds.forEach((nodeId) => next.add(nodeId));
       return next;
     });
   }

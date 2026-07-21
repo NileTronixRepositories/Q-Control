@@ -220,6 +220,45 @@ describe('ServiceHierarchyTreeComponent', () => {
     button.click();
     expect(emitted).toEqual([leaf]);
   });
+
+  it('emits trimmed-length search changes and exposes the search controls', () => {
+    const emitted: string[] = [];
+    component.searchTextChange.subscribe((value) => emitted.push(value));
+    fixture.componentRef.setInput('showSearch', true);
+    fixture.componentRef.setInput('searchLabel', 'Find services');
+    fixture.componentRef.setInput('searchPlaceholder', 'Search services');
+    fixture.componentRef.setInput('searchHelp', 'Search by name or code.');
+    fixture.detectChanges();
+
+    const input = fixture.nativeElement.querySelector('.svc-tree-search-input') as HTMLInputElement;
+    input.value = 'x'.repeat(205);
+    input.dispatchEvent(new Event('input'));
+
+    expect(input.getAttribute('maxlength')).toBe('200');
+    expect(emitted).toEqual(['x'.repeat(200)]);
+    expect(fixture.nativeElement.textContent).toContain('Find services');
+    expect(fixture.nativeElement.textContent).toContain('Search by name or code.');
+  });
+
+  it('clears search text and shows the search-aware empty state', () => {
+    const emitted: string[] = [];
+    component.searchTextChange.subscribe((value) => emitted.push(value));
+    fixture.componentRef.setInput('showSearch', true);
+    fixture.componentRef.setInput('nodes', []);
+    fixture.componentRef.setInput('searchText', ' certificate ');
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.textContent).toContain(
+      SERVICE_MANAGEMENT_TRANSLATIONS.en.noSearchResults,
+    );
+
+    const clearButton = fixture.nativeElement.querySelector(
+      '.svc-tree-search-clear',
+    ) as HTMLButtonElement;
+    clearButton.click();
+
+    expect(emitted).toEqual(['']);
+  });
 });
 
 function createNode(
@@ -252,3 +291,4 @@ function createNode(
     ...overrides,
   };
 }
+

@@ -2,31 +2,32 @@
   display: contents;
 }
 
-.branch-globalization-backdrop {
-  z-index: 0;
-  background: rgba(15, 23, 42, 0.28);
-  backdrop-filter: blur(1.5px);
+.globalization-dialog {
+  max-width: min(1024px, calc(100vw - 48px));
+  max-height: min(800px, calc(100vh - 64px));
 }
 
-.branch-globalization-dialog {
-  z-index: 1;
-  max-width: min(920px, calc(100vw - 48px));
+.globalization-sub-dialog {
+  width: 100%;
+  max-width: min(520px, calc(100vw - 32px));
+  margin-inline: auto;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  display: flex;
+  flex-direction: column;
 }
 
-.branch-globalization-content {
-  max-height: min(760px, calc(100vh - 64px));
-  opacity: 1;
+.globalization-body {
+  min-height: 300px; /* give the table some room */
 }
 
-.branch-globalization-body {
-  min-height: 0;
-}
-
-.branch-globalization-icon {
-  inline-size: 48px;
-  block-size: 48px;
-  place-items: center;
-  background: linear-gradient(135deg, #0088b7, #00a6c8);
+.branch-globalization-search-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
 }
 
 .branch-globalization-icon-sm {
@@ -41,32 +42,14 @@
   place-items: center;
 }
 
-.branch-globalization-input-icon {
-  inset-inline-end: 0.875rem;
-  transform: translateY(-50%);
-  pointer-events: none;
-}
-
-.branch-globalization-input-icon + .form-control {
-  padding-inline-end: 2.5rem;
-}
-
 .branch-globalization-table-head {
   background: linear-gradient(135deg, #0f7496, #0891b2);
 }
 
-.branch-globalization-decision {
-  max-width: min(520px, calc(100vw - 32px));
-  margin-inline: auto;
-}
-
 @media (max-width: 767.98px) {
-  .branch-globalization-dialog {
+  .globalization-dialog {
     max-width: calc(100vw - 16px);
-    margin: 8px auto;
-  }
-
-  .branch-globalization-content {
     max-height: calc(100vh - 16px);
+    margin: 8px auto;
   }
 }

@@ -1,4 +1,4 @@
-﻿import { ChangeDetectionStrategy, Component, computed, HostListener, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, HostListener, input, output } from '@angular/core';
 
 import { BranchServicesTranslations } from '../../i18n/branch-services.translations';
 import { ServiceManagementTranslations } from '../../i18n/service-management.translations';
@@ -52,8 +52,8 @@ export class BranchServiceLifecycleDialogComponent {
   );
   readonly confirmButtonClass = computed(() =>
     this.isDelete() || this.isPermanentDelete()
-      ? 'btn btn-danger d-inline-flex align-items-center justify-content-center gap-2'
-      : 'btn btn-success d-inline-flex align-items-center justify-content-center gap-2',
+      ? 'q-btn q-btn--danger d-inline-flex align-items-center justify-content-center gap-2'
+      : 'q-btn q-btn--success d-inline-flex align-items-center justify-content-center gap-2',
   );
 
   @HostListener('document:keydown.escape')

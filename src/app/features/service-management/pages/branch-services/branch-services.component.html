@@ -1,5 +1,5 @@
 <section
-  class="technical-admin-responsive-page branch-services-page container-fluid d-grid gap-3 p-3 p-lg-4 w-100"
+  class="technical-admin-responsive-page branch-services-page container-fluid d-flex flex-column gap-3 p-3 p-lg-4"
   [attr.dir]="direction()"
   [attr.lang]="language()"
 >
@@ -31,7 +31,7 @@
           }
           @if (pendingRequestsBadge(); as badge) {
             <span
-              class="pending-requests-badge position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+              class="pending-requests-badge branch-requests-badge badge rounded-pill bg-danger"
               >{{ badge }}</span
             >
           }
@@ -145,6 +145,11 @@
         [language]="language()"
         [direction]="direction()"
         [loading]="store.branchTreeLoading()"
+        [showSearch]="true"
+        [searchText]="store.branchTreeSearchText()"
+        [searchLabel]="serviceTranslations().treeSearchLabel"
+        [searchPlaceholder]="serviceTranslations().treeSearchPlaceholder"
+        [searchHelp]="serviceTranslations().treeSearchHelp"
         [includeInactive]="store.includeInactive()"
         [includeDeleted]="store.includeDeleted()"
         [canCreate]="canOpenCreateTree()"
@@ -172,6 +177,7 @@
         [unassignLabel]="translations().unassign"
         [actionsDisabled]="branchActionsDisabled()"
         (refresh)="refresh()"
+        (searchTextChange)="updateBranchTreeSearch($event)"
         (includeInactiveChange)="updateTreeToggle('inactive', $event)"
         (includeDeletedChange)="updateTreeToggle('deleted', $event)"
         (toggleNode)="toggleBranchNode($event)"
@@ -200,6 +206,10 @@
     [nodes]="store.serviceCentralTree()"
     [expandedNodeIds]="store.expandedCentralNodeIds()"
     [loading]="store.centralTreeLoading()"
+    [searchText]="store.centralTreeSearchText()"
+    [searchLabel]="serviceTranslations().treeSearchLabel"
+    [searchPlaceholder]="serviceTranslations().treeSearchPlaceholder"
+    [searchHelp]="serviceTranslations().treeSearchHelp"
     [assigning]="store.assigning()"
     [translations]="translations()"
     [serviceTranslations]="serviceTranslations()"
@@ -208,6 +218,7 @@
     [canSelectNode]="canAssignBranchService"
     (closed)="store.closeAssignDialog()"
     (refresh)="loadServiceCentralTree()"
+    (searchTextChange)="updateCentralTreeSearch($event)"
     (toggleNode)="toggleCentralNode($event)"
     (assigned)="assignServices($event)"
   />
