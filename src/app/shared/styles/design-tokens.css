@@ -1,9 +1,12 @@
 /*
   Q-SYSTEM CSS Design Tokens (Shared Theme Customization)
+  Consolidated design tokens with better organization and reduced duplication
 */
 
 :root {
-  /* Brand Colors */
+  /* ============================================
+     BRAND COLORS
+     ============================================ */
   --q-primary: #0b8aa8;
   --q-primary-hover: #056579;
   --q-primary-soft: #e0f6f8;
@@ -16,7 +19,16 @@
   --q-danger: #d21f35;
   --q-danger-soft: #fff0f2;
 
-  /* Sizing and Density Tokens */
+  /* Deep Ocean Color Palette */
+  --q-ocean-950: #0a1128;
+  --q-ocean-900: #001f54;
+  --q-ocean-800: #034078;
+  --q-ocean-500: #1282a2;
+  --q-ocean-50: #fefcfb;
+
+  /* ============================================
+     SIZING & DENSITY TOKENS
+     ============================================ */
   --q-radius-sm: 8px;
   --q-radius-md: 12px;
   --q-radius-lg: 16px;
@@ -36,12 +48,17 @@
   --q-panel-padding-y: 14px;
   --q-panel-padding-x: 16px;
 
-  /* Shadows */
+  /* ============================================
+     SHADOWS
+     ============================================ */
   --q-shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.03);
   --q-shadow-card: 0 10px 24px rgba(15, 23, 42, 0.06);
   --q-shadow-premium: 0 20px 40px -15px rgba(15, 23, 42, 0.08);
+  --q-shadow-md: 0 4px 12px rgba(15, 23, 42, 0.06);
 
-  /* Shared Button Tokens */
+  /* ============================================
+     BUTTON TOKENS
+     ============================================ */
   --q-button-bg: linear-gradient(135deg, #0b7fa3 0%, #086b8d 100%);
   --q-button-hover-bg: linear-gradient(135deg, #086f92 0%, #075d7b 100%);
   --q-button-disabled-bg: linear-gradient(135deg, #7aa6b7 0%, #688d9b 100%);
@@ -58,7 +75,9 @@
   --q-icon-button-hover-bg: rgba(8, 107, 141, 0.08);
   --q-icon-button-border: rgba(8, 107, 141, 0.2);
 
-  /* Typography */
+  /* ============================================
+     TYPOGRAPHY
+     ============================================ */
   --q-font-family: 'Cairo', Arial, sans-serif;
 
   /* Typography Rhythm */
@@ -76,7 +95,9 @@
   --q-font-size-label: 0.8rem;
   --q-font-size-small: 0.72rem;
 
-  /* Neutral Surfaces & Text */
+  /* ============================================
+     NEUTRAL SURFACES & TEXT
+     ============================================ */
   --q-bg-base: #eaf1f5;
   --q-surface-card: #fbfdff;
   --q-surface-muted: #edf6f8;
@@ -85,14 +106,25 @@
   --q-surface-warm: #fff7ed;
   --q-text-primary: #0f172a;
   --q-text-secondary: #243647;
-  --q-text-muted: #7a8796;
+  --q-text-muted: #5a6b7a; /* Improved contrast for WCAG AA compliance */
 
-  /* Utility */
+  /* ============================================
+     ACCESSIBILITY TOKENS
+     ============================================ */
+  --q-focus-ring: 0 0 0 3px rgba(11, 138, 168, 0.25);
+  --q-focus-ring-offset: 2px;
+  --q-focus-visible-ring: 0 0 0 3px rgba(11, 138, 168, 0.4);
+  --q-focus-visible-offset: 2px;
+
+  /* ============================================
+     UTILITY TOKENS
+     ============================================ */
   --q-transition-base: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   --q-padding-md: 12px;
-  --q-shadow-md: 0 4px 12px rgba(15, 23, 42, 0.06);
 
-  /* Overriding Niletronix default theme variables for global compliance */
+  /* ============================================
+     NILETRONIX THEME ALIASES (for backward compatibility)
+     ============================================ */
   --nt-bg: var(--q-bg-base);
   --nt-primary: var(--q-primary);
   --nt-primary-dark: var(--q-primary-hover);
@@ -133,7 +165,9 @@
   --nt-hero-padding-y: var(--q-panel-padding-y);
   --nt-hero-padding-x: var(--q-panel-padding-x);
 
-  /* Legacy variable mappings (from various themes) */
+  /* ============================================
+     LEGACY VARIABLE MAPPINGS (for backward compatibility)
+     ============================================ */
   --bg-base: var(--q-bg-base);
   --surface-card: var(--q-surface-card);
   --surface-muted: var(--q-surface-muted);
@@ -153,27 +187,20 @@
   --accent-soft: var(--q-accent-soft);
   --shadow-card: var(--q-shadow-soft);
   --shadow-raised: var(--q-shadow-card);
-  --focus-ring: 0 0 0 4px rgba(11, 138, 168, 0.14);
+  --focus-ring: var(--q-focus-ring);
 }
 
-/* Legacy deep-ocean color tokens (merged from deep-ocean.css). */
-:root {
-  --q-ocean-950: #0a1128;
-  --q-ocean-900: #001f54;
-  --q-ocean-800: #034078;
-  --q-ocean-500: #1282a2;
-  --q-ocean-50: #fefcfb;
-}
-
-/* Scrollbar theming (merged from deep-ocean.css). */
+/* ============================================
+   SCROLLBAR THEMING
+   ============================================ */
 ::-webkit-scrollbar-track {
-  background: #eef5f8 !important;
+  background: #eef5f8;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #9eb8ca !important;
+  background: #9eb8ca;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--q-ocean-500) !important;
+  background: var(--q-ocean-500);
 }

@@ -1,0 +1,196 @@
+.button-group {
+  display: flex;
+  gap: 8px;
+
+  & .primary-action {
+    background: var(--q-button-bg);
+    color: var(--q-button-text);
+
+    &:hover {
+      background: var(--q-button-hover-bg);
+    }
+
+    &:focus-visible {
+      box-shadow: var(--q-focus-visible-ring);
+    }
+
+    &:disabled {
+      opacity: 0.72;
+      cursor: not-allowed;
+    }
+  }
+
+  & .secondary-action {
+    background: var(--q-secondary-button-bg);
+    color: var(--q-secondary-button-text);
+
+    &:hover {
+      background: var(--q-secondary-button-hover-bg);
+    }
+  }
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  & .form-label {
+    color: var(--q-text-secondary);
+    font-size: var(--q-font-size-label);
+    font-weight: 700;
+  }
+
+  & .form-control {
+    min-height: var(--q-control-height);
+    padding: 4px 10px;
+    border: 1px solid var(--q-border-strong);
+    border-radius: var(--q-radius-sm);
+
+    &:focus-visible {
+      border-color: var(--q-primary);
+      box-shadow: var(--q-focus-visible-ring);
+    }
+
+    &::placeholder {
+      color: var(--q-text-muted);
+    }
+  }
+
+  & .field-help {
+    color: var(--q-text-muted);
+    font-size: var(--q-font-size-small);
+  }
+}
+
+/* Example: Card component with nesting */
+.card {
+  background: var(--q-surface-card);
+  border: 1px solid var(--q-border-subtle);
+  border-radius: var(--q-radius-md);
+  box-shadow: var(--q-shadow-soft);
+
+  & .card-header {
+    padding: var(--q-panel-padding-y) var(--q-panel-padding-x);
+    border-bottom: 1px solid var(--q-border-subtle);
+
+    & h2 {
+      margin: 0;
+      color: var(--q-text-primary);
+      font-size: var(--q-font-size-heading);
+    }
+  }
+
+  & .card-body {
+    padding: var(--q-panel-padding-y) var(--q-panel-padding-x);
+  }
+
+  & .card-footer {
+    padding: var(--q-panel-padding-y) var(--q-panel-padding-x);
+    border-top: 1px solid var(--q-border-subtle);
+
+    & .panel-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+  }
+}
+
+/* Example: Table component with nesting */
+.table-container {
+  max-width: 100%;
+  overflow-x: auto;
+  background: #ffffff;
+  border: 1px solid var(--q-border-subtle);
+  border-radius: var(--q-radius-md);
+
+  & table {
+    width: 100%;
+    border-collapse: collapse;
+
+    & thead th {
+      color: var(--q-text-secondary);
+      background: var(--q-surface-muted);
+      font-size: var(--q-font-size-small);
+      font-weight: 700;
+      padding: 8px 10px;
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--q-border-subtle);
+    }
+
+    & tbody td {
+      color: var(--q-text-primary);
+      padding: 8px 10px;
+      border-bottom: 1px solid rgba(226, 232, 240, 0.6);
+    }
+
+    & tbody tr:hover td {
+      background: rgba(15, 125, 168, 0.02);
+    }
+  }
+}
+
+/* Example: Dialog component with nesting */
+.dialog-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(27, 36, 48, 0.36);
+  backdrop-filter: blur(4px);
+  z-index: 2147483647;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  & .dialog {
+    background: #ffffff;
+    border-radius: var(--q-radius-lg);
+    box-shadow: var(--q-shadow-raised);
+    max-width: min(90vw, 600px);
+    width: 100%;
+
+    & .dialog-header {
+      padding: var(--q-panel-padding-y) var(--q-panel-padding-x);
+      border-bottom: 1px solid var(--q-border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      & h2 {
+        margin: 0;
+        color: var(--q-text-primary);
+        font-size: var(--q-font-size-heading);
+      }
+
+      & .dialog-close {
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: transparent;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        color: var(--q-text-muted);
+
+        &:hover {
+          background: var(--q-surface-muted);
+          color: var(--q-text-primary);
+        }
+      }
+    }
+
+    & .dialog-body {
+      padding: var(--q-panel-padding-y) var(--q-panel-padding-x);
+    }
+
+    & .dialog-footer {
+      padding: var(--q-panel-padding-y) var(--q-panel-padding-x);
+      border-top: 1px solid var(--q-border-subtle);
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+  }
+}

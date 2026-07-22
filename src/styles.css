@@ -1,14 +1,26 @@
+/* Bootstrap CSS - Note: To optimize bundle size, consider switching to SCSS partial imports
+   This requires setting up SCSS build process. For now, using compiled CSS. */
 @import 'bootstrap/dist/css/bootstrap.min.css';
+
+/* CSS Layers for better specificity control */
 @layer theme, base, components, utilities;
 @import 'tailwindcss/theme.css' layer(theme);
 @import 'tailwindcss/utilities.css' layer(utilities);
+
+/* Design Tokens and Shared Styles */
 @import './app/shared/styles/design-tokens.css';
 @import './app/shared/styles/animations.css';
 @import './app/shared/styles/components-shared.css';
+
+/* Feature-specific Styles */
 @import './app/features/auth/pages/login/login-brand-animation.css';
+
+/* Global Foundation and Utilities */
 @import './app/shared/styles/global/foundation.css';
 @import './app/shared/styles/global/responsive.css';
 @import './app/shared/styles/global/enterprise-normalization.css';
 @import './app/shared/styles/global/ui-refresh.css';
 @import './app/shared/styles/global/typography-rhythm.css';
+
+/* Dialog System */
 @import './app/shared/styles/dialog-system.css';
