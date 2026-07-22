@@ -172,6 +172,41 @@ describe('ServiceHierarchyTreeComponent', () => {
     ).toBeNull();
   });
 
+  it('applies the current language and direction to the component root', () => {
+    const panel = fixture.nativeElement.querySelector('.svc-tree-panel') as HTMLElement;
+
+    expect(panel.getAttribute('dir')).toBe('ltr');
+    expect(panel.getAttribute('lang')).toBe('en');
+
+    fixture.componentRef.setInput('direction', 'rtl');
+    fixture.componentRef.setInput('language', 'ar');
+    fixture.detectChanges();
+
+    expect(panel.getAttribute('dir')).toBe('rtl');
+    expect(panel.getAttribute('lang')).toBe('ar');
+  });
+
+  it('mirrors the collapsed branch icon between LTR and RTL', () => {
+    fixture.componentRef.setInput('expandedNodeIds', new Set<number>());
+    fixture.detectChanges();
+
+    let icon = fixture.nativeElement.querySelector(
+      '.svc-tree-toggle--enabled i',
+    ) as HTMLElement;
+
+    expect(icon.classList).toContain('bi-chevron-right');
+
+    fixture.componentRef.setInput('direction', 'rtl');
+    fixture.detectChanges();
+
+    icon = fixture.nativeElement.querySelector(
+      '.svc-tree-toggle--enabled i',
+    ) as HTMLElement;
+
+    expect(icon.classList).toContain('bi-chevron-left');
+    expect(icon.classList).not.toContain('bi-chevron-right');
+  });
+
   it('uses logical indentation so skeleton levels follow both LTR and RTL direction', () => {
     fixture.componentRef.setInput('nodes', []);
     fixture.componentRef.setInput('loading', true);
@@ -231,6 +266,14 @@ describe('ServiceHierarchyTreeComponent', () => {
     fixture.detectChanges();
 
     const input = fixture.nativeElement.querySelector('.svc-tree-search-input') as HTMLInputElement;
+    const label = fixture.nativeElement.querySelector('.svc-tree-search-label') as HTMLLabelElement;
+    const help = fixture.nativeElement.querySelector('.svc-tree-search small') as HTMLElement;
+
+    expect(input.id).toMatch(/^svc-tree-search-/);
+    expect(label.htmlFor).toBe(input.id);
+    expect(input.getAttribute('aria-describedby')).toBe(help.id);
+    expect(fixture.nativeElement.querySelectorAll('.svc-tree-search-clear').length).toBe(0);
+
     input.value = 'x'.repeat(205);
     input.dispatchEvent(new Event('input'));
 
@@ -240,6 +283,77 @@ describe('ServiceHierarchyTreeComponent', () => {
     expect(fixture.nativeElement.textContent).toContain('Search by name or code.');
   });
 
+  it('renders accessible switches and emits their updated filter values', () => {
+    const inactiveValues: boolean[] = [];
+    const deletedValues: boolean[] = [];
+    component.includeInactiveChange.subscribe((value) => inactiveValues.push(value));
+    component.includeDeletedChange.subscribe((value) => deletedValues.push(value));
+
+    fixture.componentRef.setInput('includeInactive', true);
+    fixture.componentRef.setInput('includeDeleted', false);
+    fixture.detectChanges();
+
+    const switches = fixture.nativeElement.querySelectorAll(
+      '.svc-tree-filter-input[role="switch"]',
+    ) as NodeListOf<HTMLInputElement>;
+    const filterLabels = fixture.nativeElement.querySelectorAll(
+      '.svc-tree-filter',
+    ) as NodeListOf<HTMLElement>;
+
+    expect(switches.length).toBe(2);
+    expect(switches[0].checked).toBe(true);
+    expect(switches[1].checked).toBe(false);
+    expect(filterLabels[0].classList).toContain('svc-tree-filter--active');
+    expect(filterLabels[1].classList).not.toContain('svc-tree-filter--active');
+
+    switches[0].checked = false;
+    switches[0].dispatchEvent(new Event('change'));
+    switches[1].checked = true;
+    switches[1].dispatchEvent(new Event('change'));
+
+    expect(inactiveValues).toEqual([false]);
+    expect(deletedValues).toEqual([true]);
+  });
+
+  it('highlights each result card only while a non-empty search has loaded results', () => {
+    const resultCards = (): NodeListOf<HTMLElement> =>
+      fixture.nativeElement.querySelectorAll('.svc-tree-node');
+
+    fixture.componentRef.setInput('showSearch', true);
+    fixture.componentRef.setInput('searchText', ' service ');
+    fixture.detectChanges();
+
+    const body = fixture.nativeElement.querySelector('.svc-tree-body') as HTMLElement;
+
+    expect(body.classList).toContain('svc-tree-body--filtered');
+    expect(resultCards().length).toBe(2);
+    expect(
+      Array.from(resultCards()).every((card) =>
+        card.classList.contains('svc-tree-node--filtered'),
+      ),
+    ).toBe(true);
+
+    fixture.componentRef.setInput('searchText', '   ');
+    fixture.detectChanges();
+
+    expect(body.classList).not.toContain('svc-tree-body--filtered');
+    expect(
+      Array.from(resultCards()).every(
+        (card) => !card.classList.contains('svc-tree-node--filtered'),
+      ),
+    ).toBe(true);
+
+    fixture.componentRef.setInput('searchText', 'service');
+    fixture.componentRef.setInput('loading', true);
+    fixture.detectChanges();
+
+    expect(body.classList).not.toContain('svc-tree-body--filtered');
+    expect(
+      Array.from(resultCards()).every(
+        (card) => !card.classList.contains('svc-tree-node--filtered'),
+      ),
+    ).toBe(true);
+  });
   it('clears search text and shows the search-aware empty state', () => {
     const emitted: string[] = [];
     component.searchTextChange.subscribe((value) => emitted.push(value));
@@ -251,7 +365,10 @@ describe('ServiceHierarchyTreeComponent', () => {
     expect(fixture.nativeElement.textContent).toContain(
       SERVICE_MANAGEMENT_TRANSLATIONS.en.noSearchResults,
     );
+    expect(fixture.nativeElement.querySelector('.svc-tree-list')).toBeNull();
+    expect(fixture.nativeElement.querySelector('.svc-tree-body--filtered')).toBeNull();
 
+    expect(fixture.nativeElement.querySelectorAll('.svc-tree-search-clear').length).toBe(1);
     const clearButton = fixture.nativeElement.querySelector(
       '.svc-tree-search-clear',
     ) as HTMLButtonElement;

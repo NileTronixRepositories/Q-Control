@@ -37,29 +37,29 @@ select,
 textarea,
 .form-control,
 .form-select {
-  min-height: var(--q-control-height) !important;
-  height: var(--q-control-height) !important;
-  padding: 4px 10px !important;
-  color: var(--q-text-secondary) !important;
-  background-color: var(--q-surface-card) !important;
-  border: 1px solid var(--q-border-strong) !important;
-  border-radius: var(--q-radius-sm) !important;
-  font-size: var(--q-font-size-base) !important;
-  font-family: inherit !important;
-  font-weight: 500 !important;
-  outline: none !important;
-  box-shadow: none !important;
+  min-height: var(--q-control-height);
+  height: var(--q-control-height);
+  padding: 4px 10px;
+  color: var(--q-text-secondary);
+  background-color: var(--q-surface-card);
+  border: 1px solid var(--q-border-strong);
+  border-radius: var(--q-radius-sm);
+  font-size: var(--q-font-size-base);
+  font-family: inherit;
+  font-weight: 500;
+  outline: none;
+  box-shadow: none;
   transition:
     border-color 0.15s ease-in-out,
-    box-shadow 0.15s ease-in-out !important;
+    box-shadow 0.15s ease-in-out;
 }
 
 input::placeholder,
 textarea::placeholder,
 .form-control::placeholder {
-  color: var(--q-text-muted) !important;
-  font-weight: 400 !important;
-  opacity: 1 !important;
+  color: var(--q-text-muted);
+  font-weight: 400;
+  opacity: 1;
 }
 
 select option,
@@ -77,11 +77,11 @@ select:focus-visible,
 textarea:focus-visible,
 .form-control:focus-visible,
 .form-select:focus-visible {
-  color: var(--q-text-secondary) !important;
-  background-color: var(--q-surface-card) !important;
-  border-color: var(--q-primary) !important;
-  box-shadow: var(--q-focus-visible-ring) !important;
-  outline: none !important;
+  color: var(--q-text-secondary);
+  background-color: var(--q-surface-card);
+  border-color: var(--q-primary);
+  box-shadow: var(--q-focus-visible-ring);
+  outline: none;
 }
 
 input:focus,
@@ -89,11 +89,11 @@ select:focus,
 textarea:focus,
 .form-control:focus,
 .form-select:focus {
-  color: var(--q-text-secondary) !important;
-  background-color: var(--q-surface-card) !important;
-  border-color: var(--q-primary) !important;
-  box-shadow: var(--q-focus-ring) !important;
-  outline: none !important;
+  color: var(--q-text-secondary);
+  background-color: var(--q-surface-card);
+  border-color: var(--q-primary);
+  box-shadow: var(--q-focus-ring);
+  outline: none;
 }
 
 /* Icon-Input Wrappers */
@@ -491,4 +491,57 @@ td,
 tbody tr:hover td,
 .custom-table tbody tr:hover td {
   background: rgba(15, 125, 168, 0.02);
+}
+
+/* ==========================================================================
+   Global Form Validation Styles (Danger/Required)
+   ========================================================================== */
+
+/* Invalid Inputs Border & Icon */
+.form-control.ng-invalid.ng-touched,
+.form-select.ng-invalid.ng-touched,
+.svc-input.ng-invalid.ng-touched {
+  border-color: var(--q-danger, #e11d48) !important;
+  box-shadow: 0 0 0 1px rgba(225, 29, 72, 0.2) !important;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23e11d48'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23e11d48' stroke='none'/%3e%3c/svg%3e") !important;
+  background-repeat: no-repeat !important;
+  background-position: left calc(0.375em + 0.1875rem) center !important; /* left for RTL, right for LTR depending on dir, but let's default to left */
+  background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem) !important;
+  padding-inline-end: 2.25rem !important;
+}
+
+[dir="ltr"] .form-control.ng-invalid.ng-touched,
+[dir="ltr"] .form-select.ng-invalid.ng-touched,
+[dir="ltr"] .svc-input.ng-invalid.ng-touched {
+  background-position: right calc(0.375em + 0.1875rem) center !important;
+}
+
+/* Invalid Messages */
+.form-control.ng-invalid.ng-touched ~ small,
+.form-select.ng-invalid.ng-touched ~ small,
+.ng-invalid.ng-touched + small,
+.field-error,
+.svc-field-error,
+.svc-field small:not(.field-help) {
+  color: var(--q-danger, #e11d48) !important;
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin-top: 4px;
+  line-height: 1.3;
+}
+
+.form-control.ng-invalid.ng-touched ~ small::before,
+.form-select.ng-invalid.ng-touched ~ small::before,
+.ng-invalid.ng-touched + small::before,
+.field-error::before,
+.svc-field-error::before,
+.svc-field small:not(.field-help)::before {
+  content: "\F33B"; /* bi-exclamation-triangle-fill */
+  font-family: bootstrap-icons !important;
+  font-weight: normal;
+  font-size: 12px;
+  color: var(--q-danger, #e11d48);
 }

@@ -1,0 +1,385 @@
+/* ═══════════════════════════════════════════════════════════════
+   Service Editor Drawer
+   ─ Covers create & edit modes only.
+   ─ view/closed remain in the page layout (no changes).
+   ─ Opens from the inline-end edge → matches text direction:
+       RTL (Arabic)  → slides in from the right
+       LTR (English) → slides in from the left
+   ════════════════════════════════════════════════════════════════ */
+
+/* ── Backdrop ────────────────────────────────────────────────── */
+.svc-drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  background: rgba(15, 23, 42, 0.32);
+  animation: svc-backdrop-in 0.18s ease forwards;
+}
+
+@keyframes svc-backdrop-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ── Drawer shell ────────────────────────────────────────────── */
+.svc-editor-drawer {
+  position: fixed;
+  inset-block: 0;
+  inset-inline-end: 0;
+  inset-inline-start: auto;
+  z-index: 1101;
+
+  display: flex;
+  flex-direction: column;
+   width: min(650px, calc(100vw - 48px));
+  max-height: 100dvh;
+  max-height: 100vh;  
+
+  background: #fff;
+  border-inline-start: 1px solid #dbeafe;
+  box-shadow: -8px 0 40px rgba(15, 23, 42, 0.14);
+  outline: none;  
+
+  animation: svc-drawer-in-end 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Slide-in animation based on logical inline-start/end */
+@keyframes svc-drawer-in-end {
+  from {
+    transform: translateX(var(--drawer-slide-dir, 100%));
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Set the slide direction based on document dir */
+:host-context([dir="rtl"]) {
+  --drawer-slide-dir: 100%;
+}
+:host-context([dir="ltr"]) {
+  --drawer-slide-dir: -100%;
+}
+
+ .svc-editor-drawer:focus-visible {
+  outline: 2px solid #0284c7;
+  outline-offset: -2px;
+}
+ 
+
+/* ── Reduced motion ──────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .svc-drawer-backdrop,
+  .svc-editor-drawer {
+    animation: none;
+  }
+}
+
+/* ── Drawer header ───────────────────────────────────────────── */
+.svc-drawer-header {
+  padding: 10px 14px;
+  background: #f8fbff;
+  border-block-end: 1px solid #dbeafe;
+  min-height: 52px;
+}
+
+.svc-drawer-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+  color: #0284c7;
+  background: #e0f2fe;
+  border: 1px solid #bae6fd;
+  border-radius: 8px;
+  font-size: 15px;
+}
+
+.svc-drawer-title {
+  margin: 0;
+  color: #0f172a;
+  font-size: 15px;
+  font-weight: 900;
+  line-height: 1.25;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Editor tabs inside drawer ───────────────────────────────── */
+.svc-drawer-tabs {
+  display: flex;
+  gap: 0;
+  padding: 0 14px;
+  background: #f8fbff;
+  border-block-end: 1px solid #dbeafe;
+}
+
+.svc-editor-tabs {
+  display: flex;
+}
+
+.svc-editor-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  color: #64748b;
+  background: transparent;
+  border: 0;
+  border-block-end: 2px solid transparent;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+  transition:
+    color 0.14s ease,
+    border-color 0.14s ease;
+  white-space: nowrap;
+}
+
+.svc-editor-tab:hover {
+  color: #0284c7;
+}
+
+.svc-editor-tab.active {
+  color: #0284c7;
+  border-block-end-color: #0284c7;
+}
+
+.svc-editor-tab:focus-visible {
+  outline: 2px solid #0284c7;
+  outline-offset: -2px;
+  border-radius: 4px 4px 0 0;
+}
+
+/* ── Drawer body (scrollable) ────────────────────────────────── */
+.svc-drawer-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* Padding for the form section inside the drawer */
+.svc-editor-drawer .svc-editor-form-panel {
+  padding: 14px;
+}
+
+/* Override base .svc-form grid to single stack inside drawer */
+.svc-editor-drawer .svc-form {
+  grid-template-columns: 1fr;
+}
+
+/* Two-column rows from sm upward inside drawer */
+.svc-editor-drawer .svc-form-2col {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+/* ── Drawer footer ───────────────────────────────────────────── */
+.svc-drawer-footer {
+  padding: 10px 14px;
+  background: #f8fbff;
+  border-block-start: 1px solid #dbeafe;
+}
+
+/* ── Responsive ──────────────────────────────────────────────── */
+
+/* Tablet: near-full width */
+@media (max-width: 991.98px) {
+  .svc-editor-drawer {
+    width: calc(100vw - 24px);
+  }
+}
+
+/* Mobile: full screen */
+@media (max-width: 575.98px) {
+  .svc-editor-drawer {
+    width: 100vw;
+    border-inline-start: none;
+    border-radius: 0;
+  }
+}
+
+.svc-editor-tab-panel {
+  min-width: 0;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Premium Refactor Overrides (Modern & Clean UI inside Drawer)
+   ════════════════════════════════════════════════════════════════ */
+
+/* ── Modern Header ───────────────────────────────────────────── */
+.svc-drawer-header {
+  background: #fff;
+  border-block-end: 1px solid #e2e8f0;
+  padding: 16px 24px;
+}
+
+.svc-drawer-icon {
+  width: 42px;
+  height: 42px;
+  font-size: 18px;
+  background: #f0f9ff;
+  border: 1px solid #e0f2fe;
+  color: #0ea5e9;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(14, 165, 233, 0.1);
+}
+
+.svc-drawer-title {
+  font-size: 17px;
+  letter-spacing: -0.2px;
+}
+
+.svc-eyebrow {
+  font-size: 11px;
+  color: #64748b;
+  margin-bottom: 2px;
+}
+
+/* ── Enhanced Tabs ───────────────────────────────────────────── */
+.svc-drawer-tabs {
+  background: #f8fafc;
+  padding: 0 24px;
+  border-block-end: 1px solid #e2e8f0;
+}
+
+.svc-editor-tab {
+  padding: 14px 18px;
+  font-size: 12px;
+  color: #64748b;
+  border-block-end: 2px solid transparent;
+  margin-block-end: -1px; /* overlap border */
+}
+
+.svc-editor-tab.active {
+  color: #0ea5e9;
+  border-block-end-color: #0ea5e9;
+}
+
+.svc-editor-tab i {
+  font-size: 15px;
+}
+
+/* ── Form Container & Sections ───────────────────────────────── */
+.svc-editor-drawer .svc-editor-form-panel {
+  padding: 12px 24px 32px;
+}
+
+/* Remove the heavy boxed borders for sections inside drawer */
+.svc-editor-drawer .svc-form-section {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 20px 0;
+  border-block-end: 1px solid #f1f5f9;
+}
+
+.svc-editor-drawer .svc-form-section:last-child {
+  border-block-end: none;
+  padding-bottom: 0;
+}
+
+/* Subtle section titles with accent marker */
+.svc-editor-drawer .svc-form-title {
+  color: #0f172a;
+  font-size: 15px;
+  font-weight: 800;
+  margin-bottom: 20px !important;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.svc-editor-drawer .svc-form-title::before {
+  content: "";
+  display: block;
+  width: 4px;
+  height: 16px;
+  background: #0ea5e9;
+  border-radius: 4px;
+}
+
+/* ── Refined Inputs & Fields ─────────────────────────────────── */
+.svc-editor-drawer .svc-field {
+  position: relative;
+  padding-bottom: 18px; /* Reserve space for absolute error message to prevent layout shift */
+}
+
+.svc-editor-drawer .svc-field > span:first-child {
+  font-size: 12px;
+  color: #475569;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+/* Position error messages absolutely so they don't push adjacent inputs */
+.svc-editor-drawer .svc-field > small:not(.field-help),
+.svc-editor-drawer .svc-field > .svc-field-error {
+  position: absolute;
+  bottom: 0;
+  inset-inline-start: 0;
+  margin-top: 0;
+}
+
+.svc-editor-drawer .svc-input {
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 13px;
+  color: #1e293b;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.02);
+}
+
+.svc-editor-drawer .svc-input:focus {
+  background: #fff;
+  border-color: #0ea5e9;
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.15);
+  outline: none;
+}
+
+.svc-editor-drawer .svc-input:hover:not(:focus):not(:disabled) {
+  border-color: #94a3b8;
+}
+
+.svc-editor-drawer .svc-input:disabled {
+  background: #f8fafc;
+  color: #94a3b8;
+}
+
+/* ── Grouped Controls (Ticket settings, code row) ────────────── */
+.svc-editor-drawer .svc-ticket-grid,
+.svc-editor-drawer .svc-code-row {
+  background: #f8fafc;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  gap: 16px;
+}
+
+.svc-editor-drawer .svc-parent-lock {
+  border: 1px dashed #cbd5e1;
+  background: #f8fafc;
+  padding: 16px;
+}
+
+/* ── Modern Footer ───────────────────────────────────────────── */
+.svc-drawer-footer {
+  background: #fff;
+  border-block-start: 1px solid #e2e8f0;
+  padding: 16px 24px;
+}
+
+.svc-drawer-footer button {
+  padding: 8px 16px;
+  font-size: 13px;
+  min-height: 36px;
+}

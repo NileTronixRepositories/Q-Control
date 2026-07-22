@@ -64,7 +64,7 @@ html {
   .primary-action,
   .secondary-action
 ) {
-  font-size: 0.82rem !important;
+  font-size: 0.82rem;
 }
 
 :where(

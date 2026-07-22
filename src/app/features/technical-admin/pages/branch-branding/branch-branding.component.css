@@ -2,18 +2,124 @@
   display: block;
 }
 
-.branding-layout {
+.branch-branding-page {
+  --bb-border: var(--q-border-subtle, #d7e2ea);
+  --bb-muted: var(--q-surface-muted, #f5f8fa);
+  --bb-text: var(--q-text, #172033);
+  --bb-subtle: var(--q-text-muted, #64748b);
+  --bb-primary: var(--q-primary, #087fa7);
+  min-width: 0;
+}
+
+:is(
+  .branding-context,
+  .branding-context-copy,
+  .branding-context-actions,
+  .branding-section-header,
+  .branding-section-heading,
+  .branding-theme-heading,
+  .branding-ad-heading,
+  .branding-logo-hint,
+  .branding-order-strip,
+  .branding-pending-header,
+  .branding-ad-footer,
+  .branding-order-summary,
+  .branding-ad-actions
+) {
+  display: flex;
+  align-items: center;
+}
+
+.branding-context {
+  position: relative;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+  padding: 14px 16px;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid var(--bb-border);
+  border-radius: 8px;
+}
+
+.branding-context::before {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  width: 4px;
+  background: var(--bb-primary);
+  content: '';
+}
+
+.branding-context-copy,
+.branding-section-heading,
+.branding-ad-heading {
+  min-width: 0;
+  gap: 12px;
+}
+
+.branding-context-copy > div {
   display: grid;
-  grid-template-columns: minmax(260px, 320px) minmax(0, 1fr);
-  gap: 24px;
+  min-width: 0;
+}
+
+.branding-context-copy span:last-child,
+.branding-section-heading p {
+  overflow: hidden;
+  margin: 0;
+  color: var(--bb-subtle);
+  font-size: 0.78rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+:is(.branding-context-icon, .branding-section-icon, .branding-theme-heading > span, .branding-ad-icon) {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  color: var(--bb-primary);
+  background: #e8f5f8;
+  border: 1px solid #c8e8ef;
+  border-radius: 8px;
+}
+
+.branding-context-actions {
+  flex: 0 1 520px;
+  justify-content: flex-end;
+  gap: 10px;
 }
 
 .branch-selector-control {
-  min-width: min(100%, 260px);
+  width: min(100%, 330px);
+  min-height: 44px;
 }
 
-@media (max-width: 991.98px) {
-  .branding-layout {
-    grid-template-columns: 1fr;
-  }
+.branding-refresh-action {
+  min-height: 44px;
+  white-space: nowrap;
+}
+
+.branding-workspace {
+  gap: 20px;
+}
+
+:is(.branding-identity-panel, .branding-advertisements-panel) {
+  overflow: hidden;
+  padding: 0;
+  border-radius: 8px;
+}
+
+.branding-section-header {
+  justify-content: space-between;
+  gap: 14px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--bb-border);
+}
+
+.branding-section-heading h2 {
+  margin: 0;
+  color: var(--bb-text);
+  font-size: 1rem;
 }

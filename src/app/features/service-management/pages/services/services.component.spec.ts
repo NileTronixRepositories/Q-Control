@@ -194,12 +194,13 @@ describe('ServicesComponent', () => {
       Array.from(section.classList).some((className) => className.startsWith('col-')),
     );
     const lowerColumns = Array.from(fixture.nativeElement.querySelectorAll('form.svc-form > .row > .col-12')) as HTMLElement[];
-    const basicGrid = fixture.nativeElement.querySelector('form.svc-form .row-cols-lg-2') as HTMLElement | null;
+    const basicGrid = fixture.nativeElement.querySelector('form.svc-form .row-cols-sm-2') as HTMLElement | null;
     const arabicName = fixture.nativeElement.querySelector('[formControlName="arabicName"]') as HTMLElement | null;
     const englishName = fixture.nativeElement.querySelector('[formControlName="englishName"]') as HTMLElement | null;
     const arabicMessage = fixture.nativeElement.querySelector('[formControlName="arabicUserMessage"]') as HTMLElement | null;
     const englishMessage = fixture.nativeElement.querySelector('[formControlName="englishUserMessage"]') as HTMLElement | null;
     const orderingGrid = fixture.nativeElement.querySelector('[formControlName="orderNo"]')?.closest('.row') as HTMLElement | null;
+    const orderingColumns = Array.from(orderingGrid?.children ?? []) as HTMLElement[];
     const serviceCodeToggle = fixture.nativeElement.querySelector('[formControlName="isServiceCodeRequired"]') as HTMLInputElement | null;
     const serviceCodeToggleField = serviceCodeToggle?.closest('label') as HTMLElement | null;
     const numberControls = ['orderNo', 'priority', 'weight'].map((controlName) =>
@@ -218,10 +219,11 @@ describe('ServicesComponent', () => {
     expect(englishName?.closest('label')?.classList.contains('col')).toBe(true);
     expect(arabicMessage?.closest('label')?.classList.contains('col')).toBe(true);
     expect(englishMessage?.closest('label')?.classList.contains('col')).toBe(true);
-    expect(orderingGrid?.classList.contains('row-cols-sm-3')).toBe(true);
+    expect(orderingColumns).toHaveLength(3);
+    expect(orderingColumns.every((column) => column.classList.contains('col-4'))).toBe(true);
     expect(serviceCodeToggle).not.toBeNull();
     expect(serviceCodeToggleField?.classList.contains('svc-code-toggle-field')).toBe(true);
-    expect(serviceCodeToggleField?.classList.contains('col-md-auto')).toBe(true);
+    expect(serviceCodeToggleField?.classList.contains('col-sm-auto')).toBe(true);
     expect(numberControls.every((control) => control?.classList.contains('svc-number-input'))).toBe(true);
     expect(fixture.nativeElement.querySelector('[formControlName="serviceCode"]')).toBeNull();
 
@@ -631,24 +633,71 @@ describe('ServicesComponent', () => {
 
     expect(api.getServiceDetails).toHaveBeenLastCalledWith(122);
   });
-  it('renders the compact details grid and service media manager after service details load', () => {
+  it('renders grouped service details and the media manager after details load', () => {
     fixture.componentInstance.openView(101);
     fixture.detectChanges();
 
     const detailsView = fixture.nativeElement.querySelector('.svc-details-view') as HTMLElement | null;
-    const detailsGrid = fixture.nativeElement.querySelector('.svc-details-grid') as HTMLElement | null;
-    const detailCells = Array.from(detailsGrid?.children ?? []) as HTMLElement[];
-    const fallbackLogo = fixture.nativeElement.querySelector('.svc-logo-empty') as HTMLElement | null;
+    const sections = Array.from(
+      fixture.nativeElement.querySelectorAll('.svc-details-section'),
+    ) as HTMLElement[];
+    const detailItems = fixture.nativeElement.querySelectorAll('.svc-detail-item');
+    const fallbackLogo = fixture.nativeElement.querySelector(
+      '.svc-details-logo-empty',
+    ) as HTMLElement | null;
 
     expect(api.getServiceDetails).toHaveBeenCalledWith(101);
     expect(api.getServiceImages).toHaveBeenCalledWith(101, undefined);
-    expect(detailsView?.classList).toContain('d-grid');
-    expect(detailsGrid?.classList).toContain('mb-0');
-    expect(detailCells.every((cell) => cell.classList.contains('col-xl-3'))).toBe(true);
-    expect(fallbackLogo?.classList).toContain('d-inline-flex');
-    expect(fallbackLogo?.classList).toContain('align-items-center');
-    expect(fallbackLogo?.classList).toContain('justify-content-center');
+    expect(detailsView).not.toBeNull();
+    expect(fixture.nativeElement.querySelector('.svc-details-summary')).not.toBeNull();
+    expect(fixture.nativeElement.querySelectorAll('.svc-summary-badge').length).toBe(3);
+    expect(sections.map((section) => section.dataset['section'])).toEqual([
+      'basic',
+      'ownership',
+      'behavior',
+      'numbers',
+    ]);
+    expect(detailItems.length).toBe(16);
+    expect(fallbackLogo).not.toBeNull();
     expect(fixture.nativeElement.querySelector('app-service-media-manager')).not.toBeNull();
+  });
+
+  it('renders the service logo when available and keeps media read-only without update access', () => {
+    permissionState.canUpdate.set(false);
+    api.getServiceDetails.mockReturnValueOnce(
+      of(createServiceDetails({ logoUrl: '/Media/Services/101/Logo/logo.webp' })),
+    );
+
+    fixture.componentInstance.openView(101);
+    fixture.detectChanges();
+
+    const logo = fixture.nativeElement.querySelector('img.svc-details-logo') as HTMLImageElement | null;
+    const media = fixture.nativeElement.querySelector('.service-media') as HTMLElement | null;
+
+    expect(logo?.getAttribute('src')).toBe('/Media/Services/101/Logo/logo.webp');
+    expect(fixture.nativeElement.querySelector('.svc-details-logo-empty')).toBeNull();
+    expect(media?.classList).toContain('is-read-only');
+    expect(media?.querySelectorAll('input[type="file"]').length).toBe(0);
+  });
+
+  it('presents deleted and operationally disabled services with danger states', () => {
+    api.getServiceDetails.mockReturnValueOnce(
+      of(
+        createServiceDetails({
+          isActive: false,
+          effectiveIsActive: false,
+          isDeleted: true,
+          canEditDefinition: false,
+        }),
+      ),
+    );
+
+    fixture.componentInstance.openView(101);
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('.svc-summary-badge.status-deleted')).not.toBeNull();
+    expect(fixture.nativeElement.querySelectorAll('.svc-detail-state.is-negative').length).toBe(2);
+    expect(fixture.nativeElement.querySelector('.svc-note-danger')).not.toBeNull();
   });
 
   function recreateAsBranchAdmin(nodes: readonly ReturnType<typeof createBranchScopedNode>[]): void {

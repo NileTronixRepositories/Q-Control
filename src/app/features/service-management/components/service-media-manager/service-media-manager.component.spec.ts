@@ -49,23 +49,34 @@ describe('ServiceMediaManagerComponent', () => {
 
   afterEach(() => vi.unstubAllGlobals());
 
-  it('loads and renders service images in the compact media layout', () => {
+  it('loads and renders service images in the responsive media layout', () => {
     const grid = fixture.nativeElement.querySelector('.service-media-grid') as HTMLElement | null;
     const singleCards = fixture.nativeElement.querySelectorAll('.service-media-card--single');
+    const logoCard = fixture.nativeElement.querySelector('.service-media-card--logo');
+    const iconCard = fixture.nativeElement.querySelector('.service-media-card--icon');
     const adsCard = fixture.nativeElement.querySelector('.service-media-card--ads') as HTMLElement | null;
 
     expect(api.getServiceImages).toHaveBeenCalledWith(101, undefined);
     expect(fixture.nativeElement.textContent).toContain('Service Media');
     expect(fixture.nativeElement.querySelectorAll('img').length).toBe(2);
-    expect(grid?.classList).toContain('row');
-    expect(grid?.classList).toContain('g-2');
-    expect(grid?.classList).toContain('m-0');
+    expect(grid).not.toBeNull();
     expect(singleCards.length).toBe(2);
-    expect(Array.from(singleCards).every((card) => (card as HTMLElement).classList.contains('col-xl-12'))).toBe(true);
-    expect(Array.from(singleCards).some((card) => (card as HTMLElement).classList.contains('col-xl-6'))).toBe(false);
-    expect(adsCard?.classList).toContain('col-12');
+    expect(logoCard).not.toBeNull();
+    expect(iconCard).not.toBeNull();
+    expect(adsCard).not.toBeNull();
     expect(fixture.nativeElement.querySelector('.service-media-empty')).not.toBeNull();
     expect(fixture.nativeElement.querySelectorAll('input[type="file"]').length).toBe(3);
+  });
+
+  it('renders a compact read-only state without upload controls', () => {
+    fixture.componentRef.setInput('canManage', false);
+    fixture.detectChanges();
+
+    const media = fixture.nativeElement.querySelector('.service-media') as HTMLElement | null;
+
+    expect(media?.classList).toContain('is-read-only');
+    expect(fixture.nativeElement.querySelectorAll('input[type="file"]').length).toBe(0);
+    expect(fixture.nativeElement.querySelectorAll('.service-media-btn').length).toBe(0);
   });
 
   it('rejects unsupported advertisement files before upload', () => {

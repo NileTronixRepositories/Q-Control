@@ -1,4 +1,9 @@
-﻿body .login-shell {
+﻿/* ============================================
+   MODERN LOGIN PAGE STYLES - Professional & Catchy
+   Simplified animations, better performance, clean code
+   ============================================ */
+
+body .login-shell {
   --login-primary: var(--q-primary, var(--primary-color, #0b8aa8));
   --login-primary-strong: var(--q-primary-hover, var(--primary-hover, #056579));
   --login-primary-soft: var(--q-primary-soft, var(--primary-soft, #e0f6f8));
@@ -19,17 +24,9 @@
   overflow: hidden;
   color: var(--login-text);
   background:
-    radial-gradient(
-      circle at 10% 20%,
-      color-mix(in srgb, var(--login-primary) 14%, transparent),
-      transparent 34%
-    ),
-    radial-gradient(
-      circle at 92% 86%,
-      color-mix(in srgb, var(--login-accent) 8%, transparent),
-      transparent 30%
-    ),
-    linear-gradient(135deg, #eef8fa 0%, #f8fafc 48%, #ffffff 100%) !important;
+    radial-gradient(circle at 10% 20%, rgba(11, 138, 168, 0.08), transparent 40%),
+    radial-gradient(circle at 92% 86%, rgba(242, 39, 69, 0.05), transparent 35%),
+    linear-gradient(135deg, #eef8fa 0%, #f8fafc 48%, #ffffff 100%);
 }
 
 body .login-shell .login-stage {
@@ -65,26 +62,7 @@ body .login-shell .login-welcome-panel {
   padding: clamp(2.25rem, 4vw, 3.5rem) clamp(8rem, 10vw, 10rem) clamp(2.4rem, 4vw, 3.5rem)
     clamp(2.25rem, 4vw, 3.5rem);
   color: #ffffff;
-  background:
-    radial-gradient(circle at 20% 24%, rgba(255, 255, 255, 0.12), transparent 24%),
-    linear-gradient(
-      145deg,
-      color-mix(in srgb, var(--login-primary) 78%, #082d45),
-      var(--login-primary-strong)
-    );
-}
-
-body .login-shell .login-welcome-panel::before {
-  position: absolute;
-  inset: -30% -16%;
-  z-index: -2;
-  content: '';
-  background:
-    linear-gradient(115deg, transparent 0 34%, rgba(255, 255, 255, 0.16) 44%, transparent 56% 100%),
-    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.045) 0 1px, transparent 1px 42px);
-  opacity: 0.62;
-  transform: translateX(-18%) rotate(0.001deg);
-  animation: loginBlueSweep 8s ease-in-out infinite;
+  background: linear-gradient(145deg, var(--login-primary), var(--login-primary-strong));
 }
 
 body .login-shell .login-welcome-panel::after {
@@ -264,46 +242,17 @@ body .login-shell .login-form-panel {
   background: #ffffff;
 }
 
-body .login-shell .login-form-panel::before,
-body .login-shell .login-form-panel::after {
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  content: '';
-  pointer-events: none;
-}
-
-body .login-shell .login-form-panel::before {
-  background:
-    radial-gradient(circle at 28% 22%, color-mix(in srgb, var(--login-primary) 7%, transparent), transparent 30%),
-    radial-gradient(circle at 78% 70%, color-mix(in srgb, var(--login-primary) 5%, transparent), transparent 32%),
-    linear-gradient(135deg, rgba(255, 255, 255, 0), color-mix(in srgb, var(--login-primary-soft) 22%, transparent));
-  opacity: 0.82;
-  transform: translate3d(-1.5%, -1.5%, 0) scale(1.04);
-  animation: loginWhiteGlow 13s ease-in-out infinite;
-}
-
-body .login-shell .login-form-panel::after {
-  background-image:
-    linear-gradient(90deg, color-mix(in srgb, var(--login-primary) 5%, transparent) 1px, transparent 1px),
-    linear-gradient(color-mix(in srgb, var(--login-primary) 4%, transparent) 1px, transparent 1px);
-  background-size: 44px 44px;
-  opacity: 0.16;
-  mask-image: radial-gradient(circle at 55% 48%, #000 0 34%, transparent 72%);
-  animation: loginWhiteGrid 24s linear infinite;
-}
-
 body .login-shell .login-card {
   direction: ltr;
   position: relative;
   z-index: 1;
   width: min(100%, 34rem);
-  padding: 0 !important;
-  background: transparent !important;
-  border: 0 !important;
-  border-radius: 0 !important;
-  box-shadow: none !important;
-  backdrop-filter: none !important;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  backdrop-filter: none;
 }
 
 body .login-shell .login-card-header {
@@ -333,166 +282,6 @@ body .login-shell .login-form {
   gap: 1rem;
 }
 
-body .login-shell .field-group {
-  display: grid;
-  gap: 0.42rem;
-  min-width: 0;
-  animation: loginFieldIn 0.45s ease both;
-}
-
-body .login-shell .field-group:nth-child(2) {
-  animation-delay: 0.06s;
-}
-
-body .login-shell .form-label {
-  margin: 0;
-  color: var(--login-text-soft);
-  font-size: 0.82rem;
-  font-weight: 900;
-  line-height: var(--q-line-height-label, 1.4);
-}
-
-body .login-shell .required-field::after {
-  content: '*';
-  margin-inline-start: 0.25rem;
-  color: var(--login-danger);
-}
-
-body .login-shell .input-shell {
-  display: grid;
-  width: 100%;
-  min-height: 52px;
-  grid-template-columns: 3.15rem minmax(0, 1fr);
-  align-items: center;
-  overflow: hidden;
-  background: rgba(255, 255, 255, 0.72);
-  border: 1px solid color-mix(in srgb, var(--login-primary) 16%, var(--login-border));
-  border-radius: 10px;
-  box-shadow: 0 8px 22px rgba(15, 42, 58, 0.035);
-  transition:
-    background-color 0.18s ease,
-    border-color 0.18s ease,
-    box-shadow 0.18s ease,
-    transform 0.18s ease;
-}
-
-body .login-shell .input-shell:focus-within {
-  background: rgba(255, 255, 255, 0.96);
-  border-color: color-mix(in srgb, var(--login-primary) 58%, var(--login-border));
-  box-shadow:
-    0 0 0 3px color-mix(in srgb, var(--login-primary) 10%, transparent),
-    0 12px 28px rgba(15, 42, 58, 0.07);
-  transform: translateY(-1px);
-}
-
-body .login-shell .input-shell:has(.form-control:not(:placeholder-shown)) {
-  background: rgba(255, 255, 255, 0.9);
-  border-color: color-mix(in srgb, var(--login-primary) 26%, var(--login-border));
-}
-
-body .login-shell .input-shell > .bi {
-  display: inline-flex;
-  width: 2.2rem;
-  height: 2.2rem;
-  align-items: center;
-  justify-content: center;
-  justify-self: center;
-  color: color-mix(in srgb, var(--login-primary-strong) 82%, var(--login-muted));
-  background: color-mix(in srgb, var(--login-primary-soft) 62%, #ffffff);
-  border: 1px solid color-mix(in srgb, var(--login-primary) 12%, transparent);
-  border-radius: 8px;
-  font-size: 0.96rem;
-  transition:
-    color 0.18s ease,
-    background-color 0.18s ease,
-    border-color 0.18s ease,
-    transform 0.18s ease;
-}
-
-body .login-shell .input-shell:focus-within > .bi {
-  color: #ffffff;
-  background: var(--login-primary);
-  border-color: var(--login-primary);
-  transform: scale(0.96);
-}
-
-body .login-shell .input-shell .form-control {
-  width: 100%;
-  min-width: 0;
-  min-height: 50px !important;
-  padding: 0.86rem 0.9rem !important;
-  color: var(--login-text) !important;
-  caret-color: var(--login-primary);
-  background: transparent !important;
-  border: 0 !important;
-  border-radius: 0 !important;
-  outline: 0 !important;
-  box-shadow: none !important;
-  font-size: 0.9rem !important;
-  font-weight: 800;
-}
-
-body .login-shell .input-shell .form-control:focus {
-  background: transparent !important;
-  border: 0 !important;
-  outline: 0 !important;
-  box-shadow: none !important;
-}
-
-body .login-shell .input-shell .form-control::placeholder {
-  color: color-mix(in srgb, var(--login-muted) 64%, white);
-}
-
-body .login-shell .input-shell .form-control:-webkit-autofill,
-body .login-shell .input-shell .form-control:-webkit-autofill:hover,
-body .login-shell .input-shell .form-control:-webkit-autofill:focus {
-  -webkit-text-fill-color: var(--login-text);
-  box-shadow: 0 0 0 1000px transparent inset !important;
-  transition: background-color 9999s ease-out;
-}
-
-body .login-shell .password-shell {
-  grid-template-columns: 3.15rem minmax(0, 1fr) 3rem;
-}
-
-body .login-shell .password-toggle {
-  display: inline-flex;
-  width: 2.15rem;
-  height: 2.15rem;
-  align-items: center;
-  justify-content: center;
-  justify-self: center;
-  color: color-mix(in srgb, var(--login-muted) 78%, var(--login-primary-strong));
-  background: transparent;
-  border: 0;
-  border-radius: 8px;
-  transition:
-    color 0.18s ease,
-    background-color 0.18s ease,
-    transform 0.18s ease;
-}
-
-body .login-shell .password-toggle:hover,
-body .login-shell .password-toggle:focus-visible {
-  color: var(--login-primary-strong);
-  background: color-mix(in srgb, var(--login-primary-soft) 70%, #ffffff);
-  outline: 0;
-  transform: scale(0.96);
-}
-
-body .login-shell .input-invalid,
-body .login-shell .input-invalid:focus-within {
-  border-color: var(--login-danger);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--login-danger) 13%, transparent);
-}
-
-body .login-shell .invalid-feedback {
-  margin: 0;
-  color: var(--login-danger);
-  font-size: 0.76rem;
-  font-weight: 800;
-}
-
 body .login-shell .login-options {
   display: grid;
   grid-template-columns: minmax(0, 1fr) max-content;
@@ -515,12 +304,12 @@ body .login-shell .form-check-input {
   flex: 0 0 auto;
   float: none;
   margin: 0;
-  border-color: color-mix(in srgb, var(--login-primary) 34%, var(--login-border));
+  border-color: rgba(11, 138, 168, 0.34);
   box-shadow: none;
 }
 
 body .login-shell .form-check-input:focus {
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--login-primary) 18%, transparent);
+  box-shadow: 0 0 0 3px rgba(11, 138, 168, 0.18);
 }
 
 body .login-shell .form-check-input:checked {
@@ -570,7 +359,7 @@ body .login-shell .submit-button {
   background: linear-gradient(135deg, var(--login-primary), var(--login-primary-strong));
   border: 1px solid var(--login-primary-strong);
   border-radius: 8px;
-  box-shadow: 0 14px 26px color-mix(in srgb, var(--login-primary) 24%, transparent);
+  box-shadow: 0 14px 26px rgba(11, 138, 168, 0.24);
   font-size: 0.94rem;
   font-weight: 900;
   transition: 0.18s ease;
@@ -591,7 +380,7 @@ body .login-shell .submit-button::before {
 
 body .login-shell .submit-button:hover:not(:disabled),
 body .login-shell .submit-button:focus-visible:not(:disabled) {
-  box-shadow: 0 18px 34px color-mix(in srgb, var(--login-primary) 30%, transparent);
+  box-shadow: 0 18px 34px rgba(11, 138, 168, 0.3);
   outline: 0;
   transform: translateY(-1px);
 }
@@ -636,10 +425,10 @@ body .login-shell .login-toast {
   min-height: 64px;
   padding: 12px;
   pointer-events: auto;
-  background: rgba(255, 255, 255, 0.98) !important;
-  border: 1px solid var(--login-border) !important;
-  border-radius: 10px !important;
-  box-shadow: 0 20px 42px rgba(15, 42, 58, 0.16) !important;
+  background: rgba(255, 255, 255, 0.98);
+  border: 1px solid var(--login-border);
+  border-radius: 10px;
+  box-shadow: 0 20px 42px rgba(15, 42, 58, 0.16);
   animation: loginToastIn 0.22s ease;
 }
 
@@ -712,11 +501,6 @@ body .login-shell[dir='rtl'] .login-welcome-panel::after {
   border-radius: 999px 0 0 999px;
 }
 
-body .login-shell[dir='rtl'] .input-shell .form-control {
-  padding-inline: 0.9rem !important;
-}
-
-
 body .login-shell[dir='ltr'] .login-card-shell,
 body .login-shell[dir='rtl'] .login-card-shell {
   direction: ltr;
@@ -725,85 +509,22 @@ body .login-shell[dir='rtl'] .login-card-shell {
 
 body .login-shell[dir='ltr'] .login-card,
 body .login-shell[dir='ltr'] .login-form,
-body .login-shell[dir='ltr'] .field-group,
 body .login-shell[dir='ltr'] .login-card-header {
-  direction: ltr;
-  text-align: left;
-}
-
-body .login-shell[dir='ltr'] .input-shell {
-  direction: ltr;
-  grid-template-columns: 3.15rem minmax(0, 1fr);
-}
-
-body .login-shell[dir='ltr'] .password-shell {
-  grid-template-columns: 3.15rem minmax(0, 1fr) 3rem;
-}
-
-body .login-shell[dir='ltr'] .input-shell .form-control {
   direction: ltr;
   text-align: left;
 }
 
 body .login-shell[dir='rtl'] .login-card,
 body .login-shell[dir='rtl'] .login-form,
-body .login-shell[dir='rtl'] .field-group,
 body .login-shell[dir='rtl'] .login-card-header {
   direction: rtl;
   text-align: right;
-}
-
-body .login-shell[dir='rtl'] .input-shell {
-  direction: ltr;
-  grid-template-columns: minmax(0, 1fr) 3.15rem;
-}
-
-body .login-shell[dir='rtl'] .password-shell {
-  grid-template-columns: 3rem minmax(0, 1fr) 3.15rem;
-}
-
-body .login-shell[dir='rtl'] .input-shell > .bi {
-  grid-column: 2;
-  grid-row: 1;
-}
-
-body .login-shell[dir='rtl'] .input-shell .form-control {
-  direction: rtl;
-  grid-column: 1;
-  grid-row: 1;
-  padding-inline: 0.9rem !important;
-  text-align: right;
-}
-
-body .login-shell[dir='rtl'] .password-shell > .bi {
-  grid-column: 3;
-}
-
-body .login-shell[dir='rtl'] .password-shell .form-control {
-  grid-column: 2;
-}
-
-body .login-shell[dir='rtl'] .password-toggle {
-  grid-column: 1;
-  grid-row: 1;
 }
 
 @keyframes loginCardIn {
   from {
     opacity: 0;
     transform: translateY(18px) scale(0.985);
-  }
-
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-
-@keyframes loginFieldIn {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
   }
 
   to {
@@ -833,38 +554,6 @@ body .login-shell[dir='rtl'] .password-toggle {
 @keyframes loginButtonShine {
   to {
     transform: translateX(120%);
-  }
-}
-
-@keyframes loginWhiteGlow {
-  0%,
-  100% {
-    transform: translate3d(-1.5%, -1.5%, 0) scale(1.04);
-    opacity: 0.72;
-  }
-
-  50% {
-    transform: translate3d(1.5%, 1%, 0) scale(1.08);
-    opacity: 0.9;
-  }
-}
-
-@keyframes loginWhiteGrid {
-  to {
-    background-position: 44px 44px;
-  }
-}
-
-@keyframes loginBlueSweep {
-  0%,
-  100% {
-    transform: translateX(-20%) rotate(0.001deg);
-    opacity: 0.44;
-  }
-
-  50% {
-    transform: translateX(18%) rotate(0.001deg);
-    opacity: 0.72;
   }
 }
 
@@ -1005,4 +694,3 @@ body .login-shell[dir='rtl'] .password-toggle {
     transition-duration: 1ms !important;
   }
 }
-

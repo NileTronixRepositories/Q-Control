@@ -1,42 +1,47 @@
 :host {
   display: block;
+  min-width: 0;
 }
 
 .service-media {
-  background: #fff;
-  border: 1px solid #d7e8ff;
-  border-radius: 10px;
-  box-shadow: 0 8px 18px #0f172a0d;
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+  padding-block: 16px;
+  border-block: 1px solid #e2e8f0;
 }
 
 .service-media-header {
-  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 0;
 }
 
 .service-media-header > div,
-.service-media-card header > div {
+.service-media-card-header > div {
   min-width: 0;
 }
 
 .service-media-header p {
-  color: #0369a1;
+  margin: 0 0 2px;
+  color: #0284c7;
   font-size: 9px;
   font-weight: 900;
-  margin: 0 0 2px;
-  text-transform: uppercase;
 }
 
 .service-media-header h3,
 .service-media-card h4,
 .service-media-dialog h3 {
+  margin: 0;
   color: #0f172a;
   font-weight: 900;
-  margin: 0;
 }
 
 .service-media-header h3 {
-  font-size: 13px;
-  line-height: 1.25;
+  font-size: 14px;
+  line-height: 1.3;
   overflow-wrap: anywhere;
 }
 
@@ -47,188 +52,233 @@
 .service-media-selected figcaption span {
   color: #64748b;
   font-size: 10px;
-  font-weight: 600;
+  font-weight: 650;
+}
+
+.service-media-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  min-width: 0;
 }
 
 .service-media-card {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  min-width: 0;
+  padding: 12px;
   background: #f8fbff;
   border: 1px solid #dbeafe;
-  border-radius: 10px;
+  border-radius: 8px;
+}
+
+.service-media-card--ads {
+  grid-column: 1 / -1;
+}
+
+.service-media-card-header,
+.service-media-actions,
+.service-media-uploader {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.service-media-card-header {
+  align-items: flex-start;
 }
 
 .service-media-icon {
-  align-items: center;
-  background: #ecfeff;
-  border: 1px solid #a5f3fc;
-  border-radius: 8px;
-  color: #0284c7;
   display: inline-flex;
-  flex: 0 0 30px;
-  height: 30px;
+  align-items: center;
   justify-content: center;
-  width: 30px;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  color: #0369a1;
+  background: #ecfeff;
+  border: 1px solid #bae6fd;
+  border-radius: 8px;
+  font-size: 15px;
 }
 
 .service-media-card h4 {
   font-size: 12px;
-  line-height: 1.25;
+  line-height: 1.3;
 }
 
 .service-media-card p {
   margin: 2px 0 0;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
 }
 
 .service-media-preview,
 .service-media-empty {
-  align-items: center;
-  background: #fff;
-  border: 1px dashed #bae6fd;
-  border-radius: 8px;
   display: flex;
+  align-items: center;
   justify-content: center;
-  min-height: 96px;
   overflow: hidden;
+  color: #0284c7;
+  background: #fff;
+  border: 1px dashed #7dd3fc;
+  border-radius: 8px;
 }
 
-.service-media-preview--icon {
-  min-height: 82px;
+.service-media-preview {
+  aspect-ratio: 16 / 6;
+  min-height: 96px;
 }
 
 .service-media-preview img,
 .service-media-dialog-body img {
+  width: 100%;
   height: 100%;
-  max-height: 132px;
   max-width: 100%;
   object-fit: contain;
-  width: 100%;
+}
+
+.service-media-preview img {
+  padding: 8px;
+}
+
+.service-media-preview--icon img {
+  width: min(34%, 104px);
 }
 
 .service-media-preview span,
 .service-media-empty i {
-  color: #0284c7;
-  font-size: 20px;
+  font-size: 22px;
+}
+
+.service-media-actions {
+  margin-block-start: auto;
 }
 
 .service-media-btn {
-  align-items: center;
-  border: 1px solid transparent;
-  border-radius: 8px;
+  position: relative;
   display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 34px;
+  padding-inline: 10px;
+  color: #0369a1;
+  background: #fff;
+  border: 1px solid #bae6fd;
+  border-radius: 8px;
   font-size: 10px;
   font-weight: 850;
-  gap: 5px;
-  justify-content: center;
-  min-height: 28px;
-  padding: 0 9px;
-  position: relative;
+  line-height: 1.2;
   white-space: nowrap;
 }
 
 .service-media-btn input {
-  height: 1px;
-  opacity: 0;
-  overflow: hidden;
   position: absolute;
   width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
 }
 
 .service-media-btn--primary {
+  color: #fff;
   background: #0284c7;
   border-color: #0284c7;
-  color: #fff;
 }
 
 .service-media-btn--secondary {
-  background: #fff;
-  border-color: #bae6fd;
-  color: #0369a1;
   cursor: pointer;
 }
 
 .service-media-btn--danger {
-  background: #fff;
-  border-color: #fecdd3;
   color: #e11d48;
+  border-color: #fecdd3;
 }
 
 .service-media-btn--danger-fill {
+  color: #fff;
   background: #e11d48;
   border-color: #e11d48;
-  color: #fff;
 }
 
 .service-media-alert {
+  display: flex;
   align-items: center;
+  gap: 6px;
+  margin: 0;
+  padding: 7px 9px;
+  color: #be123c;
   background: #fff1f2;
   border: 1px solid #fecaca;
   border-radius: 8px;
-  color: #be123c;
-  display: flex;
   font-size: 10px;
   font-weight: 800;
-  gap: 6px;
-  margin: 0;
-  padding: 6px 8px;
 }
 
 .service-media-gallery,
 .service-media-selected-grid {
   display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   gap: 8px;
-  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
 }
 
 .service-media-ad,
 .service-media-selected figure {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+  margin: 0;
+  padding: 6px;
+  overflow: hidden;
   background: #fff;
   border: 1px solid #e2e8f0;
   border-radius: 8px;
-  display: grid;
-  gap: 6px;
-  margin: 0;
-  overflow: hidden;
-  padding: 6px;
 }
 
 .service-media-ad img,
 .service-media-selected img {
-  aspect-ratio: 16 / 9;
-  background: #f8fafc;
-  border-radius: 6px;
-  object-fit: cover;
   width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  background: #f1f5f9;
+  border-radius: 6px;
 }
 
 .service-media-ad figcaption,
 .service-media-selected figcaption {
-  align-items: center;
   display: flex;
-  gap: 6px;
+  align-items: center;
   justify-content: space-between;
+  gap: 6px;
+  min-width: 0;
 }
 
 .service-media-ad figcaption span {
+  padding: 3px 7px;
+  color: #0369a1;
   background: #eff6ff;
   border-radius: 999px;
-  color: #0369a1;
   font-size: 10px;
   font-weight: 900;
-  padding: 3px 6px;
 }
 
 .service-media-ad button,
 .service-media-selected button,
 .service-media-dialog header button {
+  display: inline-flex;
   align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  flex: 0 0 30px;
+  padding: 0;
+  color: #e11d48;
   background: #fff;
   border: 1px solid #fecdd3;
   border-radius: 8px;
-  color: #e11d48;
-  display: inline-flex;
-  height: 26px;
-  justify-content: center;
-  padding: 0;
-  width: 26px;
 }
 
 .service-media-ad.is-deleting {
@@ -237,69 +287,77 @@
 
 .service-media-empty {
   flex-direction: column;
-  gap: 5px;
+  gap: 6px;
   min-height: 88px;
+  padding: 14px;
+  text-align: center;
 }
 
 .service-media-selected {
   display: grid;
   gap: 7px;
+  padding-block-start: 10px;
+  border-block-start: 1px solid #e2e8f0;
 }
 
 .service-media-selected figcaption span {
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
+.service-media.is-read-only .service-media-empty {
+  min-height: 72px;
+}
+
 .service-media-dialog-backdrop {
-  background: #0f172a66;
-  inset: 0;
   position: fixed;
+  inset: 0;
   z-index: 1000;
+  background: #0f172a66;
 }
 
 .service-media-dialog {
+  position: fixed;
+  inset: 50% auto auto 50%;
+  z-index: 1001;
+  width: min(420px, calc(100vw - 24px));
   background: #fff;
   border: 1px solid #d7e8ff;
   border-radius: 10px;
   box-shadow: 0 24px 70px #0f172a33;
-  left: 50%;
-  max-width: calc(100vw - 24px);
-  position: fixed;
-  top: 50%;
   transform: translate(-50%, -50%);
-  width: 420px;
-  z-index: 1001;
 }
 
 .service-media-dialog header,
 .service-media-dialog footer,
 .service-media-dialog-body {
-  padding: 10px;
+  padding: 12px;
 }
 
 .service-media-dialog header {
-  border-bottom: 1px solid #e2e8f0;
+  border-block-end: 1px solid #e2e8f0;
 }
 
 .service-media-dialog footer {
-  border-top: 1px solid #e2e8f0;
+  border-block-start: 1px solid #e2e8f0;
 }
 
 .service-media-dialog-body img {
+  width: 108px;
+  height: 82px;
+  flex: 0 0 108px;
   background: #f8fafc;
   border: 1px solid #e2e8f0;
   border-radius: 8px;
-  flex: 0 0 108px;
-  height: 82px;
-  width: 108px;
 }
 
 .service-media-dialog-body p {
+  margin: 4px 0 0;
   color: #475569;
   font-size: 11px;
-  margin: 4px 0 0;
+  line-height: 1.5;
 }
 
 :where(button, input):disabled {
@@ -307,28 +365,32 @@
   opacity: .55;
 }
 
-
-:host-context(.svc-editor-side) .service-media {
-  box-shadow: none;
+:where(button, .service-media-btn):focus-visible {
+  outline: 2px solid #0284c7;
+  outline-offset: 2px;
 }
 
-:host-context(.svc-editor-side) .service-media-preview,
-:host-context(.svc-editor-side) .service-media-empty {
-  min-height: 72px;
+:host-context(.svc-editor-side) .service-media-grid {
+  grid-template-columns: minmax(0, 1fr);
 }
 
-:host-context(.svc-editor-side) .service-media-preview--icon {
-  min-height: 64px;
+:host-context(.svc-editor-side) .service-media-card--ads {
+  grid-column: auto;
+}
+
+:host-context(.svc-editor-side) .service-media-preview {
+  min-height: 78px;
+  aspect-ratio: 16 / 5;
 }
 
 :host-context(.svc-editor-side) .service-media-gallery,
 :host-context(.svc-editor-side) .service-media-selected-grid {
-  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(116px, 1fr));
 }
 
 @media (max-width: 767.98px) {
   .service-media-header,
-  .service-media-card footer,
+  .service-media-actions,
   .service-media-uploader,
   .service-media-dialog-body,
   .service-media-dialog footer {
@@ -336,7 +398,35 @@
     flex-direction: column;
   }
 
+  .service-media-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .service-media-card--ads {
+    grid-column: auto;
+  }
+
+  .service-media-preview {
+    min-height: 84px;
+    aspect-ratio: 16 / 7;
+  }
+
   .service-media-btn {
     width: 100%;
+    min-height: 44px;
+  }
+
+  .service-media-ad button,
+  .service-media-selected button,
+  .service-media-dialog header button {
+    width: 44px;
+    height: 44px;
+    flex-basis: 44px;
+  }
+
+  .service-media-dialog-body img {
+    width: 100%;
+    height: 140px;
+    flex-basis: auto;
   }
 }

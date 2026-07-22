@@ -1,4 +1,4 @@
-<section class="svc-tree-panel" [attr.aria-busy]="loading()" [class.svc-tree-panel--drop-target]="dropTarget()" [class.svc-tree-panel--drop-active]="isDropActive()" (dragover)="onDropTargetDragOver($event)" (dragleave)="onDropTargetDragLeave($event)" (drop)="onDropTargetDrop($event)"
+<section class="svc-tree-panel" [attr.dir]="direction()" [attr.lang]="language()" [attr.aria-busy]="loading()" [class.svc-tree-panel--drop-target]="dropTarget()" [class.svc-tree-panel--drop-active]="isDropActive()" (dragover)="onDropTargetDragOver($event)" (dragleave)="onDropTargetDragLeave($event)" (drop)="onDropTargetDrop($event)"
 >
 <header class="svc-tree-header">
 <div class="svc-tree-title">
@@ -14,45 +14,75 @@
 </header>
 <div class="svc-tree-toolbar">
 @if (showSearch()) {
-<label class="svc-tree-search">
-<span>{{ searchLabel() }}</span>
-<span class="svc-tree-search-control">
-<i class="bi bi-search" aria-hidden="true"></i>
+<div class="svc-tree-search" role="search">
+<label class="svc-tree-search-label" [for]="searchInputId">{{ searchLabel() }}</label>
+<div class="input-group svc-tree-search-control">
+<span class="input-group-text border-0 rounded-0 svc-tree-search-icon" aria-hidden="true">
+<i class="bi bi-search"></i>
+</span>
 <input
-class="svc-tree-search-input"
+[id]="searchInputId"
+class="form-control h-auto py-2 border-0 rounded-0 svc-tree-search-input"
 type="search"
 maxlength="200"
+autocomplete="off"
+spellcheck="false"
 [value]="searchText()"
 [placeholder]="searchPlaceholder()"
+[attr.aria-describedby]="searchHelp() ? searchHelpId : null"
 (input)="onSearchTextInput($event)"
 />
 @if (normalizedSearchText()) {
-<button type="button" class="svc-tree-search-clear" [attr.aria-label]="translations().clearSearch" (click)="clearSearchText()">
+<button
+type="button"
+class="btn border-0 rounded-0 svc-tree-search-clear"
+[title]="translations().clearSearch"
+[attr.aria-label]="translations().clearSearch"
+(click)="clearSearchText()"
+>
 <i class="bi bi-x-lg" aria-hidden="true"></i>
 </button>
 }
-</span>
-@if (searchHelp()) { <small>{{ searchHelp() }}</small> }
-</label>
+</div>
+@if (searchHelp()) { <small [id]="searchHelpId">{{ searchHelp() }}</small> }
+</div>
 }
 <div class="svc-tree-toolbar-actions">
 <div class="svc-tree-filters">
-<label class="svc-tree-filter">
-<input type="checkbox" class="svc-tree-filter-input" [checked]="includeInactive()" (change)="onIncludeInactiveChange($event)" />
+<label class="form-check form-switch svc-tree-filter" [class.svc-tree-filter--active]="includeInactive()">
+<input
+type="checkbox"
+role="switch"
+class="form-check-input svc-tree-filter-input"
+[checked]="includeInactive()"
+(change)="onIncludeInactiveChange($event)"
+/>
 <span class="svc-tree-filter-label">{{ translations().includeInactive }}</span>
 </label>
-<label class="svc-tree-filter">
-<input type="checkbox" class="svc-tree-filter-input" [checked]="includeDeleted()" (change)="onIncludeDeletedChange($event)" />
+<label class="form-check form-switch svc-tree-filter" [class.svc-tree-filter--active]="includeDeleted()">
+<input
+type="checkbox"
+role="switch"
+class="form-check-input svc-tree-filter-input"
+[checked]="includeDeleted()"
+(change)="onIncludeDeletedChange($event)"
+/>
 <span class="svc-tree-filter-label">{{ translations().includeDeleted }}</span>
 </label>
 </div>
-<button type="button" class="svc-tree-refresh-btn" [disabled]="loading()" (click)="refresh.emit()" >
+<button
+type="button"
+class="svc-tree-refresh-btn"
+[title]="translations().refresh"
+[disabled]="loading()"
+(click)="refresh.emit()"
+>
 <i class="bi bi-arrow-clockwise" aria-hidden="true"></i>
 <span>{{ translations().refresh }}</span>
 </button>
 </div>
 </div>
-<div class="svc-tree-body">
+<div class="svc-tree-body" [class.svc-tree-body--filtered]="normalizedSearchText() && flatNodes().length > 0 && !loading()">
 @if (loading() && flatNodes().length === 0) { <div class="d-grid py-4 gap-3 overflow-hidden rounded-3 border border-info-subtle p-3" role="status" aria-live="polite" aria-atomic="true" data-testid="svc-tree-initial-loading" >
 <app-niletronix-loading-state [title]="translations().loading" icon="bi bi-diagram-3-fill" variant="inline" size="sm" />
 <div class="d-grid gap-2" aria-hidden="true">
@@ -75,7 +105,7 @@ maxlength="200"
 <app-niletronix-loading-state [title]="translations().loading" variant="inline" size="sm" />
 </div> }
 @if (flatNodes().length > 0) { <div class="svc-tree-list" role="tree" [attr.aria-label]="translations().serviceHierarchy">
-@for (entry of flatNodes(); track entry.node.id) { <article [class]="entry.rowClassList" [class.svc-tree-node--draggable]="entry.canDragLeaf" [class.svc-tree-node--selectable]="selectableLeaves()" [style.--tree-offset]="entry.offset + 'px'" [attr.data-level]="entry.level" role="treeitem" [attr.aria-level]="entry.level" [attr.aria-expanded]="entry.hasChildren ? entry.isExpanded : null" [attr.draggable]="entry.canDragLeaf ? 'true' : null" (dragstart)="onLeafDragStart(entry.node, $event)" (dragend)="onLeafDragEnd()" (click)="selectNode.emit(entry.node)" >
+@for (entry of flatNodes(); track entry.node.id) { <article [class]="entry.rowClassList" [class.svc-tree-node--filtered]="normalizedSearchText() && !loading()" [class.svc-tree-node--draggable]="entry.canDragLeaf" [class.svc-tree-node--selectable]="selectableLeaves()" [style.--tree-offset]="entry.offset + 'px'" [attr.data-level]="entry.level" role="treeitem" [attr.aria-level]="entry.level" [attr.aria-expanded]="entry.hasChildren ? entry.isExpanded : null" [attr.draggable]="entry.canDragLeaf ? 'true' : null" (dragstart)="onLeafDragStart(entry.node, $event)" (dragend)="onLeafDragEnd()" (click)="selectNode.emit(entry.node)" >
 <button type="button" [class]="entry.toggleClassList" [disabled]="!entry.hasChildren" [attr.aria-label]="entry.toggleLabel" (click)="requestToggle(entry.node, $event)" >
 <i [class]="entry.toggleIconClass" aria-hidden="true"></i>
 </button>

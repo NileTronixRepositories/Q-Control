@@ -112,11 +112,29 @@ describe('BranchBrandingComponent', () => {
     expect(fixture.nativeElement.textContent).toContain('2');
   });
 
+  it('renders the enterprise branding workspace with accessible media controls', () => {
+    const element = fixture.nativeElement as HTMLElement;
+    const branchSelect = element.querySelector<HTMLSelectElement>('#branchBrandingBranch');
+    const advertisementCards = element.querySelectorAll('.branding-ad-card');
+    const iconButtons = element.querySelectorAll<HTMLButtonElement>('.branding-icon-action');
+
+    expect(branchSelect?.value).toBe('1');
+    expect(element.querySelector('.branding-live-preview')).not.toBeNull();
+    expect(element.querySelector('.branding-logo-empty .bi-file-earmark-image')).not.toBeNull();
+    expect(element.querySelector('.bi-vector-pen')).not.toBeNull();
+    expect(element.querySelector('.bi-badge-ad')).not.toBeNull();
+    expect(advertisementCards).toHaveLength(2);
+    expect(Array.from(iconButtons).every((button) => !!button.getAttribute('aria-label'))).toBe(
+      true,
+    );
+    expect(Array.from(iconButtons).every((button) => !!button.getAttribute('title'))).toBe(true);
+  });
+
   it('submits a valid changed theme with the current row version', () => {
     const mainColorInput = fixture.nativeElement.querySelector(
       'input[type="text"][placeholder="#A7060F"]',
     ) as HTMLInputElement;
-    const form = fixture.nativeElement.querySelector('.theme-form') as HTMLFormElement;
+    const form = fixture.nativeElement.querySelector('.branding-theme-form') as HTMLFormElement;
 
     mainColorInput.value = '#112233';
     mainColorInput.dispatchEvent(new Event('input'));
@@ -137,7 +155,9 @@ describe('BranchBrandingComponent', () => {
     canUpdate.set(false);
     fixture.detectChanges();
 
-    expect(fixture.nativeElement.querySelector('.theme-form button[type="submit"]')).toBeNull();
+    expect(
+      fixture.nativeElement.querySelector('.branding-theme-form button[type="submit"]'),
+    ).toBeNull();
     expect(
       (
         fixture.nativeElement.querySelector(

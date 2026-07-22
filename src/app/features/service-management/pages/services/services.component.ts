@@ -1,10 +1,13 @@
-import { NgTemplateOutlet } from '@angular/common';
+import { DOCUMENT, NgTemplateOutlet } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import {
   ChangeDetectionStrategy,
   Component,
+  ElementRef,
+  HostListener,
   OnDestroy,
   OnInit,
+  ViewChild,
   computed,
   inject,
   signal,
@@ -66,6 +69,25 @@ type TicketIssuableValue = '' | 'true' | 'false';
 type ServiceScopeFilterValue = 'all' | ServiceScope;
 type TreeMutationAction = ServiceConfirmAction;
 type ServiceNameControlName = 'arabicName' | 'englishName';
+type ServiceDetailValueKind = 'text' | 'boolean' | 'status';
+type ServiceDetailValueTone = 'positive' | 'negative' | 'neutral';
+type ServiceEditorTab = 'form' | 'media';
+
+interface ServiceDetailItem {
+  readonly key: string;
+  readonly label: string;
+  readonly value: string | number;
+  readonly kind: ServiceDetailValueKind;
+  readonly tone: ServiceDetailValueTone;
+}
+
+interface ServiceDetailSection {
+  readonly key: string;
+  readonly title: string;
+  readonly icon: string;
+  readonly items: readonly ServiceDetailItem[];
+}
+
 type FormControlName =
   | 'arabicName'
   | 'englishName'
@@ -91,11 +113,22 @@ type FormControlName =
   ],
   providers: [ServiceManagementStore],
   templateUrl: './services.component.html',
-  styleUrls: ['./services.component.css', './services-form-switches.component.css'],
+  styleUrls: [
+    './services.component.css',
+    './services-details.component.css',
+    './services-form-switches.component.css',
+    './services-editor-drawer.component.css',
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ServicesComponent implements OnInit, OnDestroy {
+  @ViewChild('serviceEditDrawer')
+  private readonly serviceEditDrawer?: ElementRef<HTMLElement>;
+
+  private drawerOpenTrigger: HTMLElement | null = null;
+
   private readonly formBuilder = inject(NonNullableFormBuilder);
+  private readonly document = inject(DOCUMENT);
   private readonly router = inject(Router);
   private readonly authSessionService = inject(AuthSessionService);
   private readonly i18nStore = inject(TechnicalAdminI18nStore);
@@ -161,9 +194,107 @@ export class ServicesComponent implements OnInit, OnDestroy {
   public readonly includeDeletedTree = signal(false);
   public readonly formError = signal<string | null>(null);
   public readonly reloadConflictServiceId = signal<number | null>(null);
+  public readonly activeEditorTab = signal<ServiceEditorTab>('form');
+  public readonly isWriteDrawerOpen = computed(
+    () => this.store.panelMode() === 'create' || this.store.panelMode() === 'edit',
+  );
   public readonly createParentLabel = computed(
     () => this.store.createParentName() ?? this.translations().treeRoot,
   );
+  public readonly detailSections = computed<readonly ServiceDetailSection[]>(() => {
+    const details = this.store.selectedDetails();
+
+    if (!details) {
+      return [];
+    }
+
+    const translations = this.translations();
+
+    return [
+      {
+        key: 'basic',
+        title: translations.basicInfo,
+        icon: 'bi-info-circle',
+        items: [
+          this.detailText('arabicName', translations.arabicName, details.arabicName),
+          this.detailText('englishName', translations.englishName, details.englishName),
+          this.detailBoolean(
+            'serviceCodeRequired',
+            translations.serviceCodeRequired,
+            details.isServiceCodeRequired,
+          ),
+          this.detailText(
+            'serviceCode',
+            translations.serviceCode,
+            this.formatText(details.serviceCode),
+          ),
+        ],
+      },
+      {
+        key: 'ownership',
+        title: translations.ownershipInfo,
+        icon: 'bi-building',
+        items: [
+          this.detailText('scope', translations.scope, this.scopeLabel(details.scope)),
+          this.detailText('ownerBranch', translations.ownerBranch, this.ownerBranchLabel(details)),
+        ],
+      },
+      {
+        key: 'behavior',
+        title: translations.ticketBehavior,
+        icon: 'bi-ticket-perforated',
+        items: [
+          this.detailStatus(
+            'status',
+            translations.status,
+            this.statusLabel(details),
+            details.isActive && !details.isDeleted,
+          ),
+          this.detailStatus(
+            'effectiveActive',
+            translations.effectiveActive,
+            this.effectiveStatusLabel(details),
+            details.effectiveIsActive,
+          ),
+          this.detailBoolean(
+            'ticketIssuable',
+            translations.ticketIssuable,
+            details.isTicketIssuable,
+          ),
+          this.detailBoolean('canIssueTicket', translations.canIssueTicket, details.canIssueTicket),
+          this.detailBoolean(
+            'clientInputRequired',
+            translations.clientInputRequired,
+            details.isClientInputRequired,
+          ),
+          this.detailBoolean('hasReservation', translations.hasReservation, details.hasReservation),
+        ],
+      },
+      {
+        key: 'numbers',
+        title: translations.ticketNumbers,
+        icon: 'bi-123',
+        items: [
+          this.detailText(
+            'rangePrefix',
+            translations.rangePrefix,
+            this.formatText(details.rangePrefix),
+          ),
+          this.detailText(
+            'rangeStartNumber',
+            translations.rangeStartNumber,
+            details.rangeStartNumber,
+          ),
+          this.detailText('rangeEndNumber', translations.rangeEndNumber, details.rangeEndNumber),
+          this.detailText(
+            'noOfTicketCopies',
+            translations.noOfTicketCopies,
+            details.noOfTicketCopies,
+          ),
+        ],
+      },
+    ];
+  });
 
   public readonly serviceForm = this.formBuilder.group(
     {
@@ -330,7 +461,9 @@ export class ServicesComponent implements OnInit, OnDestroy {
     const hadSearch = this.store.assignedBranchTreeSearchText().trim().length > 0;
 
     if (searchText && !hadSearch) {
-      this.assignedBranchTreeExpansionSnapshot = new Set(this.store.expandedAssignedBranchNodeIds());
+      this.assignedBranchTreeExpansionSnapshot = new Set(
+        this.store.expandedAssignedBranchNodeIds(),
+      );
     }
 
     if (!searchText && hadSearch) {
@@ -408,6 +541,8 @@ export class ServicesComponent implements OnInit, OnDestroy {
   }
 
   public openCreateRoot(): void {
+    this.captureDrawerTrigger();
+
     if (this.canCreateBranchScoped() && !this.canCreateGlobal()) {
       this.openCreateForParent(null, this.translations().treeRoot, null);
       return;
@@ -417,6 +552,8 @@ export class ServicesComponent implements OnInit, OnDestroy {
   }
 
   public openCreateChild(parent: ServiceTreeNode): void {
+    this.captureDrawerTrigger();
+
     if (this.canCreateBranchScopedChild(parent) && !this.canCreateGlobal()) {
       this.store.expandAssignedBranchNodes([parent.id]);
       this.openCreateForParent(parent.id, this.serviceName(parent), parent);
@@ -443,6 +580,8 @@ export class ServicesComponent implements OnInit, OnDestroy {
   }
 
   public openEdit(serviceId: number): void {
+    this.captureDrawerTrigger();
+
     if (!this.canUpdate()) {
       this.showMessage('error', this.translations().noPermissionHint);
       return;
@@ -511,8 +650,39 @@ export class ServicesComponent implements OnInit, OnDestroy {
     this.serviceCodeConflict = false;
     this.nameConflictControl = null;
     this.branchCreateParentNode = null;
+    this.activeEditorTab.set('form');
     this.serviceForm.markAsPristine();
     this.serviceForm.enable({ emitEvent: false });
+    this.restoreDrawerTriggerFocus();
+  }
+
+  public focusDrawerAfterRender(): void {
+    window.setTimeout(() => this.serviceEditDrawer?.nativeElement.focus(), 0);
+  }
+
+  public openEditorTab(tab: ServiceEditorTab): void {
+    if (tab === 'media' && this.store.panelMode() !== 'edit') {
+      return;
+    }
+
+    this.activeEditorTab.set(tab);
+  }
+
+  @HostListener('document:keydown', ['$event'])
+  public handleDocumentKeydown(event: KeyboardEvent): void {
+    if (!this.isWriteDrawerOpen()) {
+      return;
+    }
+
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      this.closePanel();
+      return;
+    }
+
+    if (event.key === 'Tab') {
+      this.trapDrawerFocus(event);
+    }
   }
 
   public saveService(): void {
@@ -660,18 +830,6 @@ export class ServicesComponent implements OnInit, OnDestroy {
     }
   }
 
-  public statusClass(item: ServiceListItem | ServiceDetails | ServiceTreeNode): string {
-    if (item.isDeleted) {
-      return 'status-deleted';
-    }
-
-    if (!item.isActive) {
-      return 'status-inactive';
-    }
-
-    return 'status-active';
-  }
-
   public statusLabel(item: ServiceListItem | ServiceDetails | ServiceTreeNode): string {
     if (item.isDeleted) {
       return this.translations().deleted;
@@ -696,10 +854,6 @@ export class ServicesComponent implements OnInit, OnDestroy {
     const value =
       this.i18nStore.language() === 'ar' ? item.parentServiceNameAr : item.parentServiceNameEn;
     return this.formatText(value);
-  }
-
-  public displayBoolean(value: boolean): string {
-    return value ? this.translations().yes : this.translations().no;
   }
 
   public formatText(value: string | null | undefined): string {
@@ -901,6 +1055,99 @@ export class ServicesComponent implements OnInit, OnDestroy {
       ? this.translations().globalScope
       : this.translations().branchScopedScope;
   }
+
+  private detailText(key: string, label: string, value: string | number): ServiceDetailItem {
+    return { key, label, value, kind: 'text', tone: 'neutral' };
+  }
+
+  private detailBoolean(key: string, label: string, value: boolean): ServiceDetailItem {
+    return {
+      key,
+      label,
+      value: value ? this.translations().yes : this.translations().no,
+      kind: 'boolean',
+      tone: value ? 'positive' : 'neutral',
+    };
+  }
+
+  private detailStatus(
+    key: string,
+    label: string,
+    value: string,
+    isPositive: boolean,
+  ): ServiceDetailItem {
+    return {
+      key,
+      label,
+      value,
+      kind: 'status',
+      tone: isPositive ? 'positive' : 'negative',
+    };
+  }
+
+  private captureDrawerTrigger(): void {
+    const activeElement = this.document.activeElement;
+
+    this.drawerOpenTrigger =
+      activeElement instanceof HTMLElement && typeof activeElement.focus === 'function'
+        ? activeElement
+        : null;
+  }
+
+  private restoreDrawerTriggerFocus(): void {
+    const trigger = this.drawerOpenTrigger;
+    this.drawerOpenTrigger = null;
+
+    if (!trigger || !this.document.contains(trigger)) {
+      return;
+    }
+
+    this.document.defaultView?.setTimeout(() => trigger.focus(), 0);
+  }
+
+  private trapDrawerFocus(event: KeyboardEvent): void {
+    const drawer = this.serviceEditDrawer?.nativeElement;
+
+    if (!drawer) {
+      return;
+    }
+
+    const focusableElements = Array.from(
+      drawer.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex=-1])',
+      ),
+    ).filter(
+      (element) => !element.hasAttribute('disabled') && !element.getAttribute('aria-hidden'),
+    );
+
+    if (focusableElements.length === 0) {
+      event.preventDefault();
+      drawer.focus();
+      return;
+    }
+
+    const firstElement = focusableElements[0];
+    const lastElement = focusableElements[focusableElements.length - 1];
+    const activeElement = this.document.activeElement;
+
+    if (event.shiftKey && activeElement === firstElement) {
+      event.preventDefault();
+      lastElement.focus();
+      return;
+    }
+
+    if (!event.shiftKey && activeElement === lastElement) {
+      event.preventDefault();
+      firstElement.focus();
+      return;
+    }
+
+    if (!drawer.contains(activeElement)) {
+      event.preventDefault();
+      firstElement.focus();
+    }
+  }
+
   private openCreateForParent(
     parentServiceId: number | null,
     parentName: string,
@@ -920,6 +1167,7 @@ export class ServicesComponent implements OnInit, OnDestroy {
     this.branchCreateParentNode = branchParentNode ?? null;
     this.store.setCreateParentContext(parentServiceId, parentName);
     this.store.openPanel('create');
+    this.activeEditorTab.set('form');
     this.formError.set(null);
     this.reloadConflictServiceId.set(null);
     this.serviceCodeConflict = false;
@@ -950,6 +1198,7 @@ export class ServicesComponent implements OnInit, OnDestroy {
       noOfTicketCopies: 1,
     });
     this.serviceForm.controls.parentServiceId.disable({ emitEvent: false });
+    this.focusDrawerAfterRender();
   }
 
   private loadServices(pageNumber = this.store.listQuery().pageNumber): void {
@@ -1114,6 +1363,7 @@ export class ServicesComponent implements OnInit, OnDestroy {
     const requestId = ++this.panelRequestId;
 
     this.store.openPanel(mode);
+    this.activeEditorTab.set('form');
     this.store.selectedDetails.set(null);
     this.store.selectTreeNode(serviceId);
     this.store.clearCreateParentContext();
@@ -1141,6 +1391,7 @@ export class ServicesComponent implements OnInit, OnDestroy {
 
             this.loadParentOptions(response.id);
             this.populateForm(response);
+            this.focusDrawerAfterRender();
           }
         },
         error: (error: HttpErrorResponse) => {
@@ -1527,7 +1778,6 @@ export class ServicesComponent implements OnInit, OnDestroy {
   private collectTreeNodeIds(nodes: readonly ServiceTreeNode[]): readonly number[] {
     return nodes.flatMap((node) => [node.id, ...this.collectTreeNodeIds(node.children)]);
   }
-
 
   private treeContains(nodes: readonly ServiceTreeNode[], serviceId: number): boolean {
     return nodes.some(

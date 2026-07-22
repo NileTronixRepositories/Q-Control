@@ -97,12 +97,12 @@
                 <input
                   id="username"
                   type="text"
-                  class="form-control"
-                  [class.is-invalid]="hasUsernameError()"
+                  class="login-input"
                   formControlName="username"
                   autocomplete="username"
                   required
                   [placeholder]="translations().usernamePlaceholder"
+                  [attr.aria-invalid]="hasUsernameError() || null"
                   [attr.aria-describedby]="hasUsernameError() ? 'username-error' : null"
                 />
               </div>
@@ -123,12 +123,12 @@
                 <input
                   id="password"
                   [type]="passwordVisible() ? 'text' : 'password'"
-                  class="form-control"
-                  [class.is-invalid]="hasPasswordError()"
+                  class="login-input"
                   formControlName="password"
                   autocomplete="current-password"
                   required
                   [placeholder]="translations().passwordPlaceholder"
+                  [attr.aria-invalid]="hasPasswordError() || null"
                   [attr.aria-describedby]="hasPasswordError() ? 'password-error' : null"
                 />
                 <button

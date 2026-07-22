@@ -67,6 +67,11 @@ const INFO_STATUS_CLASSES = 'svc-tree-chip--info';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ServiceHierarchyTreeComponent {
+  private static nextSearchControlId = 0;
+
+  protected readonly searchInputId =
+    `svc-tree-search-${++ServiceHierarchyTreeComponent.nextSearchControlId}`;
+  protected readonly searchHelpId = `${this.searchInputId}-help`;
   protected readonly loadingSkeletonRows: readonly ServiceHierarchyLoadingRow[] = [
     { indent: 0, nameWidth: 42, chipWidths: [18, 14, 12] },
     { indent: 22, nameWidth: 34, chipWidths: [14, 19] },

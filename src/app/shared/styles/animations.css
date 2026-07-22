@@ -90,7 +90,7 @@ textarea:focus,
 .form-select:focus {
   transition:
     border-color 0.15s ease-in-out,
-    box-shadow 0.15s ease-in-out !important;
+    box-shadow 0.15s ease-in-out;
 }
 
 /* Modern SaaS Hover Animations */

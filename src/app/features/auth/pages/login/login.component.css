@@ -1,3 +1,161 @@
 :host {
   display: block;
 }
+
+.field-group {
+  display: grid;
+  min-width: 0;
+  gap: 0.5rem;
+  animation: loginFieldIn 0.45s ease both;
+}
+
+.field-group:nth-child(2) {
+  animation-delay: 0.06s;
+}
+
+.form-label {
+  margin: 0;
+  color: var(--login-text-soft);
+  font-size: 0.82rem;
+  font-weight: 800;
+  line-height: var(--q-line-height-label, 1.4);
+}
+
+.required-field::after {
+  margin-inline-start: 0.25rem;
+  color: var(--login-danger);
+  content: '*';
+}
+
+.input-shell {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  min-height: 3rem;
+  align-items: stretch;
+  overflow: hidden;
+  background: #ffffff;
+  border: 1px solid var(--login-border);
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(15, 42, 58, 0.04);
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.input-shell:focus-within {
+  border-color: var(--login-primary);
+  box-shadow: 0 0 0 3px rgba(11, 138, 168, 0.12);
+}
+
+.input-shell > .bi {
+  display: inline-flex;
+  width: 2.875rem;
+  flex: 0 0 2.875rem;
+  align-items: center;
+  justify-content: center;
+  color: var(--login-primary-strong);
+  background: #f1f8fa;
+  border-inline-end: 1px solid var(--login-border);
+  font-size: 0.95rem;
+  transition:
+    color 160ms ease,
+    background-color 160ms ease;
+}
+
+.input-shell:focus-within > .bi {
+  color: #ffffff;
+  background: var(--login-primary);
+}
+
+.input-shell .login-input {
+  width: 100%;
+  min-width: 0;
+  min-height: 2.875rem;
+  flex: 1 1 auto;
+  padding: 0.75rem 0.875rem;
+  color: var(--login-text);
+  caret-color: var(--login-primary);
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  outline: 0;
+  box-shadow: none;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1.5;
+  text-align: start;
+}
+
+.input-shell .login-input:focus {
+  outline: 0;
+}
+
+.input-shell .login-input::placeholder {
+  color: var(--login-muted);
+  font-weight: 500;
+  opacity: 0.72;
+}
+
+.input-shell .login-input:-webkit-autofill,
+.input-shell .login-input:-webkit-autofill:hover,
+.input-shell .login-input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--login-text);
+  box-shadow: 0 0 0 1000px #ffffff inset;
+}
+
+.password-toggle {
+  display: inline-flex;
+  width: 2.875rem;
+  flex: 0 0 2.875rem;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  color: var(--login-muted);
+  background: transparent;
+  border: 0;
+  border-inline-start: 1px solid var(--login-border);
+  border-radius: 0;
+  cursor: pointer;
+  transition:
+    color 160ms ease,
+    background-color 160ms ease;
+}
+
+.password-toggle:hover {
+  color: var(--login-primary-strong);
+  background: #f1f8fa;
+}
+
+.password-toggle:focus-visible {
+  color: var(--login-primary-strong);
+  background: var(--login-primary-soft);
+  outline: 2px solid var(--login-primary);
+  outline-offset: -4px;
+}
+
+.input-invalid,
+.input-invalid:focus-within {
+  border-color: var(--login-danger);
+  box-shadow: 0 0 0 3px rgba(210, 31, 53, 0.12);
+}
+
+.invalid-feedback {
+  margin: 0;
+  color: var(--login-danger);
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+@keyframes loginFieldIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}

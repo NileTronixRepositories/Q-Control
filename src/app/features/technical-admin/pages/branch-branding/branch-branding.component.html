@@ -7,7 +7,7 @@
     [eyebrow]="copy().pageEyebrow"
     [title]="copy().pageTitle"
     [description]="copy().pageDescription"
-    icon="bi bi-palette-fill"
+    icon="bi bi-vector-pen"
   />
 
   @if (message(); as currentMessage) {
@@ -38,6 +38,46 @@
     </div>
   }
 
+  <section class="branding-context" [attr.aria-label]="copy().branchLabel">
+    <div class="branding-context-copy">
+      <span class="branding-context-icon" aria-hidden="true">
+        <i class="bi bi-buildings"></i>
+      </span>
+      <div>
+        <strong>{{ copy().branchLabel }}</strong>
+        <span>{{ selectedBranchLabel() || copy().selectBranchPlaceholder }}</span>
+      </div>
+    </div>
+
+    <div class="branding-context-actions">
+      <label class="visually-hidden" for="branchBrandingBranch">{{ copy().branchLabel }}</label>
+      <select
+        id="branchBrandingBranch"
+        class="form-select branch-selector-control"
+        [value]="selectedBranchId() ?? ''"
+        [disabled]="branchesLoading()"
+        (change)="selectBranch($event)"
+      >
+        <option value="" [selected]="!selectedBranchId()">{{ copy().selectBranchPlaceholder }}</option>
+        @for (branch of branches(); track branch.id) {
+          <option [value]="branch.id" [selected]="branch.id === selectedBranchId()">
+            {{ branch.label }}
+          </option>
+        }
+      </select>
+      <button
+        type="button"
+        class="secondary-action branding-refresh-action"
+        [disabled]="!selectedBranchId() || brandingLoading()"
+        [attr.title]="copy().refreshLabel"
+        (click)="refreshSelectedBranch()"
+      >
+        <i class="bi bi-arrow-repeat" aria-hidden="true"></i>
+        {{ copy().refreshLabel }}
+      </button>
+    </div>
+  </section>
+
   @if (!canUpdate()) {
     <p class="permission-note" role="status">
       <i class="bi bi-shield-lock" aria-hidden="true"></i>
@@ -50,38 +90,17 @@
   }
 
   @if (selectedBranchId()) {
-    <section class="branding-grid d-grid gap-4">
-      <article class="content-panel branding-panel">
-        <div
-          class="panel-header d-flex align-items-start justify-content-between gap-3 flex-column flex-md-row"
-        >
-          <div>
-            <h2>{{ copy().brandingSection }}</h2>
-            <p>{{ selectedBranchLabel() }}</p>
-          </div>
-
-          <div class="branch-selector d-flex flex-column flex-lg-row align-items-stretch align-items-lg-center gap-3">
-            <select
-              id="branchBrandingBranch"
-              class="form-select branch-selector-control"
-              [value]="selectedBranchId() ?? ''"
-              [disabled]="branchesLoading()"
-              (change)="selectBranch($event)"
-            >
-              <option value="">{{ copy().selectBranchPlaceholder }}</option>
-              @for (branch of branches(); track branch.id) {
-                <option [value]="branch.id">{{ branch.label }}</option>
-              }
-            </select>
-            <button
-              type="button"
-              class="secondary-action"
-              [disabled]="brandingLoading()"
-              (click)="refreshSelectedBranch()"
-            >
-              <i class="bi bi-arrow-clockwise" aria-hidden="true"></i>
-              {{ copy().refreshLabel }}
-            </button>
+    <section class="branding-workspace d-grid gap-4">
+      <article class="content-panel branding-identity-panel">
+        <div class="panel-header branding-section-header">
+          <div class="branding-section-heading">
+            <span class="branding-section-icon" aria-hidden="true">
+              <i class="bi bi-paint-bucket"></i>
+            </span>
+            <div>
+              <h2>{{ copy().brandingSection }}</h2>
+              <p>{{ selectedBranchLabel() }}</p>
+            </div>
           </div>
         </div>
 
@@ -93,31 +112,44 @@
           <p class="empty-state compact-empty">{{ copy().noBranding }}</p>
         }
 
-        <div class="branding-layout fade-in">
-          <section class="logo-block" [attr.aria-label]="copy().logoLabel">
-            <div class="logo-preview">
+        <div class="branding-editor fade-in">
+          <section class="branding-logo-panel" [attr.aria-label]="copy().logoLabel">
+            <div
+              class="branding-logo-preview branding-live-preview"
+              [style.--branding-main]="themePickerValue('mainColor')"
+              [style.--branding-secondary]="themePickerValue('secondaryColor')"
+              [style.--branding-background]="themePickerValue('backgroundColor')"
+            >
               @if (logoPreviewUrl(); as logoUrl) {
                 <img [src]="logoUrl" [alt]="copy().logoLabel" (error)="markLogoPreviewFailed()" />
               } @else {
-                <div class="logo-empty">
-                  <i class="bi bi-image" aria-hidden="true"></i>
+                <div class="branding-logo-empty">
+                  <i class="bi bi-file-earmark-image" aria-hidden="true"></i>
                   <span>{{ copy().logoEmpty }}</span>
                 </div>
               }
             </div>
+            <div class="branding-preview-swatches" aria-hidden="true">
+              <span [style.background]="themePickerValue('mainColor')"></span>
+              <span [style.background]="themePickerValue('secondaryColor')"></span>
+              <span [style.background]="themePickerValue('backgroundColor')"></span>
+            </div>
 
-            <p class="field-hint">{{ copy().logoHint }}</p>
+            <p class="field-hint branding-field-hint">
+              <i class="bi bi-info-circle" aria-hidden="true"></i>
+              {{ copy().logoHint }}
+            </p>
 
             @if (canUpdate()) {
-              <div class="upload-row">
-                <label class="secondary-action upload-button" for="branchLogoInput">
-                  <i class="bi bi-upload" aria-hidden="true"></i>
+              <div class="branding-logo-actions">
+                <label class="secondary-action branding-file-button" for="branchLogoInput">
+                  <i class="bi bi-file-earmark-plus" aria-hidden="true"></i>
                   {{ copy().chooseLogo }}
                 </label>
                 <input
                   #logoInput
                   id="branchLogoInput"
-                  class="visually-hidden-input"
+                  class="branding-file-input"
                   type="file"
                   accept="image/png,image/jpeg,image/webp,.png,.jpg,.jpeg,.webp"
                   (change)="selectLogoFile($event)"
@@ -128,13 +160,15 @@
                   [disabled]="!selectedLogoFile() || logoUploading()"
                   (click)="uploadLogo()"
                 >
-                  <i class="bi bi-cloud-arrow-up" aria-hidden="true"></i>
+                  <i class="bi bi-cloud-plus" aria-hidden="true"></i>
                   {{ copy().uploadLogo }}
                 </button>
               </div>
 
               @if (selectedLogoFile(); as logoFile) {
-                <p class="selected-files">{{ copy().selectedFile }}: {{ logoFile.name }}</p>
+                <p class="branding-selected-file mb-0 small text-truncate fw-semibold">
+                  {{ copy().selectedFile }}: {{ logoFile.name }}
+                </p>
               }
 
               @if (logoValidationMessage()) {
@@ -143,15 +177,18 @@
             }
           </section>
 
-          <form class="theme-form" [formGroup]="themeForm" (ngSubmit)="saveTheme()" novalidate>
-            <h3 class="theme-form-title">{{ copy().themeColors }}</h3>
+          <form class="branding-theme-form" [formGroup]="themeForm" (ngSubmit)="saveTheme()" novalidate>
+            <div class="branding-theme-heading gap-2 mb-3">
+              <span aria-hidden="true"><i class="bi bi-droplet-half"></i></span>
+              <h3 class="branding-theme-title m-0 fs-6 fw-bold">{{ copy().themeColors }}</h3>
+            </div>
 
-            <div class="colors-grid">
-              <label class="color-field">
+            <div class="branding-color-grid">
+              <label class="branding-color-field">
                 <span>{{ copy().mainColor }}</span>
                 <div
-                  class="color-control"
-                  [class.invalid-control]="isThemeControlInvalid('mainColor')"
+                  class="branding-color-control"
+                  [class.branding-control-invalid]="isThemeControlInvalid('mainColor')"
                 >
                   <input
                     type="color"
@@ -174,11 +211,11 @@
                 }
               </label>
 
-              <label class="color-field">
+              <label class="branding-color-field">
                 <span>{{ copy().secondaryColor }}</span>
                 <div
-                  class="color-control"
-                  [class.invalid-control]="isThemeControlInvalid('secondaryColor')"
+                  class="branding-color-control"
+                  [class.branding-control-invalid]="isThemeControlInvalid('secondaryColor')"
                 >
                   <input
                     type="color"
@@ -201,11 +238,11 @@
                 }
               </label>
 
-              <label class="color-field">
+              <label class="branding-color-field">
                 <span>{{ copy().backgroundColor }}</span>
                 <div
-                  class="color-control"
-                  [class.invalid-control]="isThemeControlInvalid('backgroundColor')"
+                  class="branding-color-control"
+                  [class.branding-control-invalid]="isThemeControlInvalid('backgroundColor')"
                 >
                   <input
                     type="color"
@@ -230,9 +267,9 @@
             </div>
 
             @if (canUpdate()) {
-              <div class="theme-form-actions">
+              <div class="branding-theme-actions">
                 <button type="submit" class="primary-action" [disabled]="!canSaveTheme()">
-                  <i class="bi bi-check-lg" aria-hidden="true"></i>
+                  <i class="bi bi-floppy" aria-hidden="true"></i>
                   {{ copy().saveTheme }}
                 </button>
               </div>
@@ -241,13 +278,13 @@
         </div>
       </article>
 
-      <article class="content-panel advertisements-panel">
+      <article class="content-panel branding-advertisements-panel">
         <div class="panel-header advertisements-header">
-          <div class="advertisements-heading">
-            <span class="advertisements-icon" aria-hidden="true">
-              <i class="bi bi-images"></i>
+          <div class="branding-ad-heading">
+            <span class="branding-ad-icon" aria-hidden="true">
+              <i class="bi bi-badge-ad"></i>
             </span>
-            <div class="advertisements-title-block">
+            <div class="branding-ad-title">
               <h2>{{ copy().advertisementsSection }}</h2>
               <p>
                 <span>{{ copy().advertisementsCounter }}: {{ advertisementCount() }} / 20</span>
@@ -258,28 +295,28 @@
           @if (canUpdate()) {
             <button
               type="button"
-              class="primary-action save-order-action"
-              [class.save-order-action-dirty]="orderDirty()"
+              class="primary-action branding-save-order"
+              [class.branding-save-order-dirty]="orderDirty()"
               [disabled]="!orderDirty() || orderSaving()"
               (click)="saveAdvertisementOrder()"
             >
-              <i class="bi bi-check2-all" aria-hidden="true"></i>
+              <i class="bi bi-list-check" aria-hidden="true"></i>
               {{ copy().saveOrder }}
             </button>
           }
         </div>
 
         @if (canUpdate() && advertisements().length > 0) {
-          <section class="advertisement-order-strip" [class.order-strip-dirty]="orderDirty()">
-            <div class="order-strip-copy">
-              <i class="bi bi-grip-horizontal" aria-hidden="true"></i>
+          <section class="branding-order-strip" [class.branding-order-strip-dirty]="orderDirty()">
+            <div class="branding-order-copy">
+              <i class="bi bi-list-ol" aria-hidden="true"></i>
               <div>
                 <strong>{{ copy().orderLabel }}</strong>
                 <span>{{ copy().orderLabel }} / {{ copy().saveOrder }}</span>
               </div>
             </div>
             @if (orderDirty()) {
-              <span class="order-dirty-chip">
+              <span class="branding-order-dirty">
                 <i class="bi bi-exclamation-circle" aria-hidden="true"></i>
                 {{ copy().saveOrder }}
               </span>
@@ -293,9 +330,9 @@
 
         @if (canUpdate()) {
           @if (selectedAdvertisementPreviews().length > 0) {
-            <section class="pending-preview-panel" [attr.aria-label]="copy().selectedImages">
-              <div class="pending-preview-header">
-                <div class="pending-preview-title">
+            <section class="branding-pending-panel" [attr.aria-label]="copy().selectedImages">
+              <div class="branding-pending-header">
+                <div class="branding-pending-title">
                   <strong>{{ copy().selectedImages }}</strong>
                   <span
                     >{{ selectedAdvertisementPreviews().length }} /
@@ -312,9 +349,9 @@
                   {{ copy().cancelAdvertisements }}
                 </button>
               </div>
-              <div class="pending-preview-grid">
+              <div class="branding-pending-grid">
                 @for (preview of selectedAdvertisementPreviews(); track preview.url) {
-                  <figure class="pending-preview-card">
+                  <figure class="branding-pending-card">
                     <img [src]="preview.url" [alt]="preview.name" />
                     <figcaption>{{ preview.name }}</figcaption>
                   </figure>
@@ -332,14 +369,14 @@
           <p class="empty-state">{{ copy().noAdvertisements }}</p>
         }
 
-        <div class="advertisement-grid fade-in">
+        <div class="branding-ad-grid fade-in">
           @if (canUpdate()) {
             <div
-              class="advertisement-upload-card"
-              [class.disabled-upload]="advertisementLimitReached() || advertisementsUploading()"
+              class="branding-upload-card"
+              [class.branding-upload-disabled]="advertisementLimitReached() || advertisementsUploading()"
             >
-              <label class="upload-dropzone" for="branchAdvertisementsInput">
-                <i class="bi bi-images" aria-hidden="true"></i>
+              <label class="branding-upload-dropzone" for="branchAdvertisementsInput">
+                <i class="bi bi-cloud-plus" aria-hidden="true"></i>
                 <span>
                   @if (advertisementLimitReached()) {
                     {{ copy().maximumReached }}
@@ -351,7 +388,7 @@
               <input
                 #advertisementsInput
                 id="branchAdvertisementsInput"
-                class="visually-hidden-input"
+                class="branding-file-input"
                 type="file"
                 accept="image/png,image/jpeg,image/webp,.png,.jpg,.jpeg,.webp"
                 multiple
@@ -359,7 +396,7 @@
                 (change)="selectAdvertisementFiles($event)"
               />
               @if (selectedAdvertisementFiles().length > 0) {
-                <div class="advertisement-selection-actions">
+                <div class="branding-upload-actions">
                   <button
                     type="button"
                     class="primary-action compact-action upload-submit-btn"
@@ -385,13 +422,13 @@
 
           @for (advertisement of advertisements(); track advertisement.id; let index = $index) {
             <article
-              class="advertisement-card"
-              [class.inactive-advertisement]="!advertisement.isActive"
-              [class.advertisement-card-dragging]="draggingAdvertisementId() === advertisement.id"
-              [class.advertisement-card-drop-before]="
+              class="branding-ad-card"
+              [class.branding-ad-inactive]="!advertisement.isActive"
+              [class.branding-ad-dragging]="draggingAdvertisementId() === advertisement.id"
+              [class.branding-ad-drop-before]="
                 dragOverAdvertisementId() === advertisement.id && dragOverPlacement() === 'before'
               "
-              [class.advertisement-card-drop-after]="
+              [class.branding-ad-drop-after]="
                 dragOverAdvertisementId() === advertisement.id && dragOverPlacement() === 'after'
               "
               [attr.draggable]="canUpdate() && !orderSaving() ? 'true' : null"
@@ -401,21 +438,21 @@
               (dragleave)="onAdvertisementDragLeave(advertisement.id)"
               (dragend)="onAdvertisementDragEnd()"
             >
-              <div class="advertisement-preview-shell">
+              <div class="branding-ad-preview">
                 <span
-                  class="drag-handle"
-                  [class.disabled-drag]="!canUpdate() || orderSaving()"
+                  class="branding-drag-handle"
+                  [class.branding-drag-disabled]="!canUpdate() || orderSaving()"
                   [attr.title]="copy().orderLabel"
                 >
-                  <i class="bi bi-grip-horizontal" aria-hidden="true"></i>
+                  <i class="bi bi-grip-vertical" aria-hidden="true"></i>
                 </span>
-                <span class="order-badge"
+                <span class="branding-order-badge"
                   >{{ copy().orderLabel }} {{ advertisement.displayOrder }}</span
                 >
                 <strong
-                  class="status-badge"
-                  [class.status-active]="advertisement.isActive"
-                  [class.status-inactive]="!advertisement.isActive"
+                  class="branding-status-badge"
+                  [class.branding-status-active]="advertisement.isActive"
+                  [class.branding-status-inactive]="!advertisement.isActive"
                 >
                   {{ advertisement.isActive ? copy().active : copy().inactive }}
                 </strong>
@@ -428,29 +465,29 @@
                       (error)="markAdvertisementImageFailed(advertisement.id)"
                     />
                   } @else {
-                    <div class="advertisement-preview-empty">
-                      <i class="bi bi-image" aria-hidden="true"></i>
+                    <div class="branding-ad-empty">
+                      <i class="bi bi-file-earmark-image" aria-hidden="true"></i>
                       <span>{{ copy().advertisementsSection }}</span>
                     </div>
                   }
                 } @else {
-                  <div class="advertisement-preview-empty">
-                    <i class="bi bi-image" aria-hidden="true"></i>
+                  <div class="branding-ad-empty">
+                    <i class="bi bi-file-earmark-image" aria-hidden="true"></i>
                     <span>{{ copy().advertisementsSection }}</span>
                   </div>
                 }
               </div>
 
-              <div class="advertisement-footer">
-                <div class="order-position-indicator">
+              <div class="branding-ad-footer">
+                <div class="branding-position">
                   <span>{{ index + 1 }}</span>
                   <small>/ {{ advertisements().length }}</small>
                 </div>
-                <div class="order-summary">
+                <div class="branding-order-summary">
                   <span>{{ copy().orderLabel }}</span>
                   @if (canUpdate()) {
                     <input
-                      class="order-input"
+                      class="branding-order-input"
                       [attr.aria-label]="copy().orderLabel"
                       type="number"
                       min="1"
@@ -465,46 +502,50 @@
                 </div>
 
                 @if (canUpdate()) {
-                  <div class="advertisement-actions">
+                  <div class="branding-ad-actions">
                     <button
                       type="button"
-                      class="icon-action"
+                      class="branding-icon-action"
                       [disabled]="index === 0 || orderSaving()"
                       [attr.aria-label]="copy().moveUp"
+                      [attr.title]="copy().moveUp"
                       (click)="moveAdvertisement(index, -1)"
                     >
-                      <i class="bi bi-arrow-left" aria-hidden="true"></i>
+                      <i class="bi bi-arrow-up" aria-hidden="true"></i>
                     </button>
                     <button
                       type="button"
-                      class="icon-action"
+                      class="branding-icon-action"
                       [disabled]="index === advertisements().length - 1 || orderSaving()"
                       [attr.aria-label]="copy().moveDown"
+                      [attr.title]="copy().moveDown"
                       (click)="moveAdvertisement(index, 1)"
                     >
-                      <i class="bi bi-arrow-right" aria-hidden="true"></i>
+                      <i class="bi bi-arrow-down" aria-hidden="true"></i>
                     </button>
                     <button
                       type="button"
-                      class="icon-action"
+                      class="branding-icon-action"
                       [disabled]="mutatingAdvertisementId() === advertisement.id"
                       [attr.aria-label]="
                         advertisement.isActive ? copy().deactivate : copy().activate
                       "
+                      [attr.title]="advertisement.isActive ? copy().deactivate : copy().activate"
                       (click)="toggleAdvertisementState(advertisement)"
                     >
                       <i
                         class="bi"
-                        [class.bi-pause-circle]="advertisement.isActive"
-                        [class.bi-play-circle]="!advertisement.isActive"
+                        [class.bi-toggle-on]="advertisement.isActive"
+                        [class.bi-toggle-off]="!advertisement.isActive"
                         aria-hidden="true"
                       ></i>
                     </button>
                     <button
                       type="button"
-                      class="icon-action danger-action"
+                      class="branding-icon-action branding-danger-action"
                       [disabled]="deletingAdvertisementId() === advertisement.id"
                       [attr.aria-label]="copy().delete"
+                      [attr.title]="copy().delete"
                       (click)="deleteAdvertisement(advertisement)"
                     >
                       <i class="bi bi-trash3" aria-hidden="true"></i>

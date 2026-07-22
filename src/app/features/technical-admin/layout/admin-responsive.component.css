@@ -1,7 +1,6 @@
 .app-shell.mobile-navigation-overlay :where(
   .technical-admin-responsive-page,
   .branch-page,
-  .branch-branding-page,
   .waiting-areas-page,
   .window-management-page,
   .display-management-page,
@@ -15,7 +14,7 @@
 }
 
 @media (min-width: 768px) and (max-width: 1199.98px) {
-  .app-shell.mobile-navigation-overlay :where(.branding-layout, .svc-workspace, .svc-form-row-support, .svc-form-row-metrics) {
+  .app-shell.mobile-navigation-overlay :where(.svc-workspace, .svc-form-row-support, .svc-form-row-metrics) {
     grid-template-columns: minmax(0, 1fr) !important;
   }
 }
@@ -131,7 +130,6 @@
   .app-shell.mobile-navigation-overlay :where(
     .technical-admin-responsive-page,
     .branch-page,
-    .branch-branding-page,
     .waiting-areas-page,
     .window-management-page,
     .display-management-page,
@@ -149,9 +147,6 @@
   .app-shell.mobile-navigation-overlay :where(
     .details-list,
     .editor-form,
-    .colors-grid,
-    .pending-preview-grid,
-    .advertisement-grid,
     .svc-workspace,
     .svc-branch-assignment-workspace,
     .svc-details-grid,
@@ -176,8 +171,6 @@
     .pager-actions,
     .branch-services-toolbar,
     .branch-services-actions,
-    .upload-row,
-    .theme-form-actions,
     .form-actions,
     .dialog-actions
   ) {
@@ -198,7 +191,7 @@
     min-height: 44px !important;
   }
 
-  .app-shell.mobile-navigation-overlay :where(.list-panel, .content-panel, .settings-panel, .theme-form) {
+  .app-shell.mobile-navigation-overlay :where(.list-panel, .content-panel, .settings-panel) {
     min-width: 0;
     padding: 14px !important;
   }

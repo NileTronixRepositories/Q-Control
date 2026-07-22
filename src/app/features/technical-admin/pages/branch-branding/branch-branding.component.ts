@@ -218,7 +218,11 @@ const PAGE_TRANSLATIONS: Record<AppLanguage, BranchBrandingPageTranslations> = {
   selector: 'app-branch-branding',
   imports: [ReactiveFormsModule, TechnicalAdminPageHeroComponent, NiletronixLoadingStateComponent],
   templateUrl: './branch-branding.component.html',
-  styleUrl: './branch-branding.component.css',
+  styleUrls: [
+    './branch-branding.component.css',
+    './branch-branding-identity.component.css',
+    './branch-branding-advertisements.component.css',
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BranchBrandingComponent implements OnInit, OnDestroy {
