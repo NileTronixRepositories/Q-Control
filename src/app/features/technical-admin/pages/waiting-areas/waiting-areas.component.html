@@ -1,4 +1,8 @@
-<section class="technical-admin-responsive-page waiting-areas-page container-fluid" [attr.dir]="direction()" [attr.lang]="language()">
+<section
+  class="technical-admin-responsive-page waiting-areas-page container-fluid"
+  [attr.dir]="direction()"
+  [attr.lang]="language()"
+>
   <app-technical-admin-page-hero
     [eyebrow]="translations().branch"
     [title]="translations().title"
@@ -27,7 +31,12 @@
           aria-hidden="true"
         ></i>
         <p class="mb-0">{{ currentMessage.text }}</p>
-        <button type="button" class="toast-close" [attr.aria-label]="translations().close" (click)="clearMessage()">
+        <button
+          type="button"
+          class="toast-close"
+          [attr.aria-label]="translations().close"
+          (click)="clearMessage()"
+        >
           <i class="bi bi-x-lg" aria-hidden="true"></i>
         </button>
       </div>
@@ -73,8 +82,12 @@
         <div class="col-12 col-md-6 col-xl-2">
           <label class="filter-field">
             <span>{{ translations().status }}</span>
-            <i class="bi bi-check2-circle filter-icon" aria-hidden="true"></i>
-            <select class="form-select" [value]="statusFilter() === null ? '' : statusFilter()" (change)="updateStatusFilter($event)">
+            <i class="bi bi-check2-circle filter-icon pe-2" aria-hidden="true"></i>
+            <select
+              class="form-select"
+              [value]="statusFilter() === null ? '' : statusFilter()"
+              (change)="updateStatusFilter($event)"
+            >
               <option value="">{{ translations().allStatuses }}</option>
               <option value="true">{{ translations().active }}</option>
               <option value="false">{{ translations().inactive }}</option>
@@ -96,7 +109,12 @@
         </div>
 
         <div class="col-12 col-sm-6 col-md-4 col-xl-2 d-grid">
-          <button type="button" class="btn secondary-action w-100" [disabled]="loading()" (click)="refresh()">
+          <button
+            type="button"
+            class="btn secondary-action w-100"
+            [disabled]="loading()"
+            (click)="refresh()"
+          >
             <i class="bi bi-arrow-repeat" aria-hidden="true"></i>
             <span>{{ translations().refresh }}</span>
           </button>
@@ -108,7 +126,10 @@
       }
 
       @if (waitingAreaPage().data.length > 0) {
-        <div data-testid="waiting-areas-desktop" class="table-responsive table-wrap d-none d-md-block">
+        <div
+          data-testid="waiting-areas-desktop"
+          class="table-responsive table-wrap d-none d-md-block"
+        >
           <table class="admin-data-table table table-sm table-hover align-middle custom-table mb-0">
             <thead>
               <tr>
@@ -119,43 +140,86 @@
                 <th scope="col">{{ translations().controlDevice }}</th>
                 <th scope="col">{{ translations().windowsCount }}</th>
                 <th scope="col">{{ translations().status }}</th>
-                <th scope="col" class="admin-actions-column text-center">{{ translations().actions }}</th>
+                <th scope="col" class="admin-actions-column text-center">
+                  {{ translations().actions }}
+                </th>
               </tr>
             </thead>
             <tbody>
               @for (item of waitingAreaPage().data; track item.id) {
                 <tr>
-                  <td class="admin-number-cell"><strong>{{ item.number }}</strong></td>
+                  <td class="admin-number-cell">
+                    <strong>{{ item.number }}</strong>
+                  </td>
                   <td>{{ textOrFallback(item.descriptiveName) }}</td>
                   <td>{{ branchName(item) }}</td>
                   <td>{{ textOrFallback(item.audioDevice) }}</td>
                   <td>{{ textOrFallback(item.controlDevice) }}</td>
                   <td class="admin-number-cell">{{ item.windowsCount }}</td>
                   <td class="admin-actions-column">
-                    <span class="status-pill" [class.status-active]="item.isActive" [class.status-inactive]="!item.isActive">
+                    <span
+                      class="status-pill"
+                      [class.status-active]="item.isActive"
+                      [class.status-inactive]="!item.isActive"
+                    >
                       {{ statusLabel(item) }}
                     </span>
                     @if (showOperationalWarning(item)) {
-                      <small class="d-block text-warning fw-bold mt-2">{{ translations().operationalUnavailable }}</small>
+                      <small class="d-block text-warning fw-bold mt-2">{{
+                        translations().operationalUnavailable
+                      }}</small>
                     }
                   </td>
                   <td>
                     <div class="d-flex flex-wrap align-items-center justify-content-center gap-2">
-                      <button type="button" class="icon-action" [attr.aria-label]="translations().view" [title]="translations().view" (click)="openView(item.id)">
+                      <button
+                        type="button"
+                        class="icon-action"
+                        [attr.aria-label]="translations().view"
+                        [title]="translations().view"
+                        (click)="openView(item.id)"
+                      >
                         <i class="bi bi-eye" aria-hidden="true"></i>
                       </button>
-                      <button type="button" class="icon-action" [attr.aria-label]="translations().edit" [title]="translations().edit" (click)="openEdit(item.id)">
+                      <button
+                        type="button"
+                        class="icon-action"
+                        [attr.aria-label]="translations().edit"
+                        [title]="translations().edit"
+                        (click)="openEdit(item.id)"
+                      >
                         <i class="bi bi-pencil" aria-hidden="true"></i>
                       </button>
                       @if (item.isActive) {
-                        <button type="button" class="icon-action warning-action" [attr.aria-label]="translations().deactivate" [title]="translations().deactivate" [disabled]="deletingId() === item.id" (click)="deactivateWaitingArea(item)">
+                        <button
+                          type="button"
+                          class="icon-action warning-action"
+                          [attr.aria-label]="translations().deactivate"
+                          [title]="translations().deactivate"
+                          [disabled]="deletingId() === item.id"
+                          (click)="deactivateWaitingArea(item)"
+                        >
                           <i class="bi bi-power" aria-hidden="true"></i>
                         </button>
                       } @else {
-                        <button type="button" class="icon-action success-action" [attr.aria-label]="translations().reactivate" [title]="translations().reactivate" [disabled]="deletingId() === item.id" (click)="reactivateWaitingArea(item)">
+                        <button
+                          type="button"
+                          class="icon-action success-action"
+                          [attr.aria-label]="translations().reactivate"
+                          [title]="translations().reactivate"
+                          [disabled]="deletingId() === item.id"
+                          (click)="reactivateWaitingArea(item)"
+                        >
                           <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
                         </button>
-                        <button type="button" class="icon-action danger-action" [attr.aria-label]="translations().permanentDelete" [title]="translations().permanentDelete" [disabled]="deletingId() === item.id" (click)="permanentlyDeleteWaitingArea(item)">
+                        <button
+                          type="button"
+                          class="icon-action danger-action"
+                          [attr.aria-label]="translations().permanentDelete"
+                          [title]="translations().permanentDelete"
+                          [disabled]="deletingId() === item.id"
+                          (click)="permanentlyDeleteWaitingArea(item)"
+                        >
                           <i class="bi bi-trash3" aria-hidden="true"></i>
                         </button>
                       }
@@ -175,7 +239,12 @@
               icon="bi bi-hourglass-split"
               [recordId]="item.number"
             >
-              <span record-badges class="status-pill" [class.status-active]="item.isActive" [class.status-inactive]="!item.isActive">
+              <span
+                record-badges
+                class="status-pill"
+                [class.status-active]="item.isActive"
+                [class.status-inactive]="!item.isActive"
+              >
                 {{ statusLabel(item) }}
               </span>
               <div record-fields>
@@ -183,33 +252,77 @@
                 <dd class="mb-0 mt-1 text-break fw-bold">{{ branchName(item) }}</dd>
               </div>
               <div record-fields>
-                <dt class="small fw-bold text-muted text-uppercase">{{ translations().windowsCount }}</dt>
+                <dt class="small fw-bold text-muted text-uppercase">
+                  {{ translations().windowsCount }}
+                </dt>
                 <dd class="mb-0 mt-1 fw-bold">{{ item.windowsCount }}</dd>
               </div>
               <div record-fields>
-                <dt class="small fw-bold text-muted text-uppercase">{{ translations().audioDevice }}</dt>
+                <dt class="small fw-bold text-muted text-uppercase">
+                  {{ translations().audioDevice }}
+                </dt>
                 <dd class="mb-0 mt-1 text-break fw-bold">{{ textOrFallback(item.audioDevice) }}</dd>
               </div>
               <div record-fields>
-                <dt class="small fw-bold text-muted text-uppercase">{{ translations().controlDevice }}</dt>
-                <dd class="mb-0 mt-1 text-break fw-bold">{{ textOrFallback(item.controlDevice) }}</dd>
+                <dt class="small fw-bold text-muted text-uppercase">
+                  {{ translations().controlDevice }}
+                </dt>
+                <dd class="mb-0 mt-1 text-break fw-bold">
+                  {{ textOrFallback(item.controlDevice) }}
+                </dd>
               </div>
-              <button record-actions type="button" class="icon-action" [attr.aria-label]="translations().view" [title]="translations().view" (click)="openView(item.id)">
+              <button
+                record-actions
+                type="button"
+                class="icon-action"
+                [attr.aria-label]="translations().view"
+                [title]="translations().view"
+                (click)="openView(item.id)"
+              >
                 <i class="bi bi-eye" aria-hidden="true"></i>
               </button>
-              <button record-actions type="button" class="icon-action" [attr.aria-label]="translations().edit" [title]="translations().edit" (click)="openEdit(item.id)">
+              <button
+                record-actions
+                type="button"
+                class="icon-action"
+                [attr.aria-label]="translations().edit"
+                [title]="translations().edit"
+                (click)="openEdit(item.id)"
+              >
                 <i class="bi bi-pencil" aria-hidden="true"></i>
               </button>
               @if (item.isActive) {
-                <button record-actions type="button" class="icon-action warning-action" [attr.aria-label]="translations().deactivate" [title]="translations().deactivate" [disabled]="deletingId() === item.id" (click)="deactivateWaitingArea(item)">
+                <button
+                  record-actions
+                  type="button"
+                  class="icon-action warning-action"
+                  [attr.aria-label]="translations().deactivate"
+                  [title]="translations().deactivate"
+                  [disabled]="deletingId() === item.id"
+                  (click)="deactivateWaitingArea(item)"
+                >
                   <i class="bi bi-power" aria-hidden="true"></i>
                 </button>
               } @else {
                 <ng-container record-actions>
-                  <button type="button" class="icon-action success-action" [attr.aria-label]="translations().reactivate" [title]="translations().reactivate" [disabled]="deletingId() === item.id" (click)="reactivateWaitingArea(item)">
+                  <button
+                    type="button"
+                    class="icon-action success-action"
+                    [attr.aria-label]="translations().reactivate"
+                    [title]="translations().reactivate"
+                    [disabled]="deletingId() === item.id"
+                    (click)="reactivateWaitingArea(item)"
+                  >
                     <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
                   </button>
-                  <button type="button" class="icon-action danger-action" [attr.aria-label]="translations().permanentDelete" [title]="translations().permanentDelete" [disabled]="deletingId() === item.id" (click)="permanentlyDeleteWaitingArea(item)">
+                  <button
+                    type="button"
+                    class="icon-action danger-action"
+                    [attr.aria-label]="translations().permanentDelete"
+                    [title]="translations().permanentDelete"
+                    [disabled]="deletingId() === item.id"
+                    (click)="permanentlyDeleteWaitingArea(item)"
+                  >
                     <i class="bi bi-trash3" aria-hidden="true"></i>
                   </button>
                 </ng-container>
@@ -219,7 +332,10 @@
         </div>
       } @else if (!loading()) {
         <div class="admin-list-empty d-flex align-items-center gap-3 p-3" role="status">
-          <span class="admin-list-empty-icon d-inline-flex align-items-center justify-content-center flex-shrink-0" aria-hidden="true">
+          <span
+            class="admin-list-empty-icon d-inline-flex align-items-center justify-content-center flex-shrink-0"
+            aria-hidden="true"
+          >
             <i class="bi bi-hourglass-split"></i>
           </span>
           <div class="d-grid gap-1">
@@ -229,15 +345,33 @@
         </div>
       }
 
-      <footer class="pagination-bar d-flex flex-column flex-md-row align-items-center justify-content-between gap-2 pt-3">
-        <span class="admin-pagination-total">{{ translations().totalItems }}: {{ waitingAreaPage().totalItems }}</span>
-        <div class="pagination-actions d-flex flex-wrap align-items-center justify-content-center gap-2">
-          <button type="button" class="btn secondary-action compact-action" [disabled]="!waitingAreaPage().hasPreviousPage || loading()" (click)="previousPage()">
+      <footer
+        class="pagination-bar d-flex flex-column flex-md-row align-items-center justify-content-between gap-2 pt-3"
+      >
+        <span class="admin-pagination-total"
+          >{{ translations().totalItems }}: {{ waitingAreaPage().totalItems }}</span
+        >
+        <div
+          class="pagination-actions d-flex flex-wrap align-items-center justify-content-center gap-2"
+        >
+          <button
+            type="button"
+            class="btn secondary-action compact-action"
+            [disabled]="!waitingAreaPage().hasPreviousPage || loading()"
+            (click)="previousPage()"
+          >
             <i class="bi bi-chevron-left" aria-hidden="true"></i>
             <span>{{ translations().previous }}</span>
           </button>
-          <span class="page-indicator">{{ waitingAreaPage().currentPage }} / {{ waitingAreaPage().totalPages || 1 }}</span>
-          <button type="button" class="btn secondary-action compact-action" [disabled]="!waitingAreaPage().hasNextPage || loading()" (click)="nextPage()">
+          <span class="page-indicator"
+            >{{ waitingAreaPage().currentPage }} / {{ waitingAreaPage().totalPages || 1 }}</span
+          >
+          <button
+            type="button"
+            class="btn secondary-action compact-action"
+            [disabled]="!waitingAreaPage().hasNextPage || loading()"
+            (click)="nextPage()"
+          >
             <span>{{ translations().next }}</span>
             <i class="bi bi-chevron-right" aria-hidden="true"></i>
           </button>
@@ -247,16 +381,29 @@
 
     @if (panelMode() !== 'closed') {
       <div class="editor-backdrop app-popup-overlay" (click)="closePanel()"></div>
-      <aside class="editor-panel app-popup-panel waiting-area-editor-panel" role="dialog" [attr.aria-label]="formTitle()">
+      <aside
+        class="editor-panel app-popup-panel waiting-area-editor-panel"
+        role="dialog"
+        [attr.aria-label]="formTitle()"
+      >
         <header class="panel-header">
           <h2>{{ formTitle() }}</h2>
-          <button type="button" class="icon-action" [attr.aria-label]="translations().close" (click)="closePanel()">
+          <button
+            type="button"
+            class="icon-action"
+            [attr.aria-label]="translations().close"
+            (click)="closePanel()"
+          >
             <i class="bi bi-x-lg" aria-hidden="true"></i>
           </button>
         </header>
 
         @if (panelLoading()) {
-          <app-niletronix-loading-state [title]="translations().loading" variant="inline" size="sm" />
+          <app-niletronix-loading-state
+            [title]="translations().loading"
+            variant="inline"
+            size="sm"
+          />
         }
 
         @if (panelMode() === 'view' && selectedDetails(); as details) {
@@ -285,12 +432,22 @@
         }
 
         @if (panelMode() === 'create' || panelMode() === 'edit') {
-          <form class="waiting-area-form row g-3" [formGroup]="waitingAreaForm" (ngSubmit)="save()" novalidate>
+          <form
+            class="waiting-area-form row g-3"
+            [formGroup]="waitingAreaForm"
+            (ngSubmit)="save()"
+            novalidate
+          >
             <div class="col-12">
               <label class="form-field has-field-icon w-100">
                 <span>{{ translations().branch }}</span>
                 <i class="bi bi-diagram-3 form-field-icon" aria-hidden="true"></i>
-                <select class="form-select" formControlName="branchId" [class.is-invalid]="hasFieldError('branchId')" [disabled]="panelMode() === 'edit' || isBranchContextLocked()">
+                <select
+                  class="form-select"
+                  formControlName="branchId"
+                  [class.is-invalid]="hasFieldError('branchId')"
+                  [disabled]="panelMode() === 'edit' || isBranchContextLocked()"
+                >
                   <option [ngValue]="0">{{ translations().selectBranch }}</option>
                   @for (branch of branchOptions(); track branch.id) {
                     <option [ngValue]="branch.id">{{ optionName(branch) }}</option>
@@ -305,7 +462,12 @@
               <label class="form-field has-field-icon w-100">
                 <span>{{ translations().number }}</span>
                 <i class="bi bi-hash form-field-icon" aria-hidden="true"></i>
-                <input class="form-control" type="number" formControlName="number" [class.is-invalid]="hasFieldError('number') || !isFormNumberValid()" />
+                <input
+                  class="form-control"
+                  type="number"
+                  formControlName="number"
+                  [class.is-invalid]="hasFieldError('number') || !isFormNumberValid()"
+                />
                 @if (hasFieldError('number') || !isFormNumberValid()) {
                   <small>{{ translations().positiveNumber }}</small>
                 }
@@ -315,7 +477,13 @@
               <label class="form-field has-field-icon w-100">
                 <span>{{ translations().descriptiveName }}</span>
                 <i class="bi bi-card-text form-field-icon" aria-hidden="true"></i>
-                <input class="form-control" type="text" maxlength="100" formControlName="descriptiveName" [class.is-invalid]="hasFieldError('descriptiveName')" />
+                <input
+                  class="form-control"
+                  type="text"
+                  maxlength="100"
+                  formControlName="descriptiveName"
+                  [class.is-invalid]="hasFieldError('descriptiveName')"
+                />
                 @if (hasFieldError('descriptiveName')) {
                   <small>{{ translations().maxLength }}</small>
                 }
@@ -325,7 +493,13 @@
               <label class="form-field has-field-icon w-100">
                 <span>{{ translations().audioDevice }}</span>
                 <i class="bi bi-volume-up form-field-icon" aria-hidden="true"></i>
-                <input class="form-control" type="text" maxlength="100" formControlName="audioDevice" [class.is-invalid]="hasFieldError('audioDevice')" />
+                <input
+                  class="form-control"
+                  type="text"
+                  maxlength="100"
+                  formControlName="audioDevice"
+                  [class.is-invalid]="hasFieldError('audioDevice')"
+                />
                 @if (hasFieldError('audioDevice')) {
                   <small>{{ translations().maxLength }}</small>
                 }
@@ -335,13 +509,21 @@
               <label class="form-field has-field-icon w-100">
                 <span>{{ translations().controlDevice }}</span>
                 <i class="bi bi-cpu form-field-icon" aria-hidden="true"></i>
-                <input class="form-control" type="text" maxlength="100" formControlName="controlDevice" [class.is-invalid]="hasFieldError('controlDevice')" />
+                <input
+                  class="form-control"
+                  type="text"
+                  maxlength="100"
+                  formControlName="controlDevice"
+                  [class.is-invalid]="hasFieldError('controlDevice')"
+                />
                 @if (hasFieldError('controlDevice')) {
                   <small>{{ translations().maxLength }}</small>
                 }
               </label>
             </div>
-            <div class="panel-actions col-12 d-flex flex-column flex-sm-row justify-content-end gap-2">
+            <div
+              class="panel-actions col-12 d-flex flex-column flex-sm-row justify-content-end gap-2"
+            >
               <button type="button" class="btn secondary-action" (click)="closePanel()">
                 <i class="bi bi-x-lg" aria-hidden="true"></i>
                 <span>{{ translations().cancel }}</span>
@@ -357,4 +539,3 @@
     }
   </section>
 </section>
-

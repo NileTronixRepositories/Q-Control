@@ -19,7 +19,7 @@ body[data-admin-theme] .filter-field {
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
   margin: 0;
 }
 
@@ -48,15 +48,36 @@ body[data-admin-theme] .filter-field:has(.filter-icon) .form-select {
   padding-inline-start: var(--admin-icon-padding);
 }
 
+body[data-admin-theme] .filter-field .form-control,
+body[data-admin-theme] .filter-field .form-select {
+  padding-inline-end: 0.85rem;
+  padding-inline-start: 0.85rem;
+  background-color: var(--q-surface);
+  border-color: var(--q-border-subtle);
+  color: var(--q-text-primary);
+  font-size: var(--q-font-size-base);
+  line-height: var(--q-line-height-body, 1.55);
+  box-shadow: none;
+  transition: all 0.2s ease;
+}
+
 body[data-admin-theme] .filter-icon,
 body[data-admin-theme] .search-icon {
   position: absolute;
-  inset-block-end: 14px;
+  inset-block-end: 7px;
   inset-inline-start: var(--admin-icon-offset);
   z-index: 2;
   color: var(--q-primary);
   font-size: 0.9rem;
   pointer-events: none;
+  transition: all 0.2s ease;
+  opacity: 0.6;
+  transform: translate3d(0, 0, 0);
+  -webkit-transform: translate3d(0, 0, 0);
+}
+
+body[data-admin-theme] .search-icon {
+  inset-inline-start: 14px;
 }
 
 /* RTL Support for Filter Fields */

@@ -127,9 +127,7 @@ describe('WaitingAreasComponent', () => {
       '[data-testid="waiting-areas-branch-filter"]',
     ) as HTMLSelectElement;
 
-    expect(getWaitingAreas).toHaveBeenCalledWith(
-      expect.objectContaining({ branchId: 1 }),
-    );
+    expect(getWaitingAreas).toHaveBeenCalledWith(expect.objectContaining({ branchId: 1 }));
     expect(branchFilter.disabled).toBe(true);
   });
 });
@@ -188,6 +186,3 @@ function createWaitingAreaPage(): Pagination<WaitingAreaListItem> {
     ],
   };
 }
-
-
-

@@ -20,7 +20,6 @@
    1. THEME TOKENS
    ============================================================ */
 
-
 body[data-admin-theme='niletronix-admin'] {
   --q-primary-rgb: 11 138 168;
   --q-primary-hover-rgb: 5 101 121;
@@ -42,7 +41,6 @@ body[data-admin-theme='niletronix-admin'] {
   --q-component-soft-shadow: 0 10px 24px rgba(20, 42, 58, 0.065);
 }
 
-
 /* ============================================================
    2. READABILITY TOKENS (from readability-pass.css)
    ============================================================ */
@@ -61,8 +59,10 @@ body[data-admin-theme='niletronix-admin'] {
    3. PAGE BACKGROUNDS (from final-separation.css)
    ============================================================ */
 
-body[data-admin-theme='niletronix-admin']
-  .workspace, body[data-admin-theme='niletronix-admin'] .workspace-content, body[data-admin-theme='niletronix-admin'] .main-content, body[data-admin-theme='niletronix-admin'] .main-contact {
+body[data-admin-theme='niletronix-admin'] .workspace,
+body[data-admin-theme='niletronix-admin'] .workspace-content,
+body[data-admin-theme='niletronix-admin'] .main-content,
+body[data-admin-theme='niletronix-admin'] .main-contact {
   background:
     radial-gradient(circle at 12% 8%, rgba(11, 138, 168, 0.08), transparent 24rem),
     radial-gradient(circle at 92% 0%, rgba(242, 39, 69, 0.06), transparent 22rem),
@@ -99,7 +99,9 @@ body[data-admin-theme='niletronix-admin'] .tabs {
 }
 
 /* Table headers */
-body[data-admin-theme='niletronix-admin'] th, body[data-admin-theme='niletronix-admin'] .custom-table thead th, body[data-admin-theme='niletronix-admin'] .table thead th {
+body[data-admin-theme='niletronix-admin'] th,
+body[data-admin-theme='niletronix-admin'] .custom-table thead th,
+body[data-admin-theme='niletronix-admin'] .table thead th {
   color: #22314a;
   background: #eaf4f7;
 }
@@ -280,7 +282,8 @@ body[data-admin-theme='niletronix-admin'] .table tbody tr:nth-child(even) td {
   background: var(--q-primary-soft);
 }
 
-:is(body[data-admin-theme]) :is(.save-status, .save-chip, .status-pill, .status-badge, .order-badge) {
+:is(body[data-admin-theme])
+  :is(.save-status, .save-chip, .status-pill, .status-badge, .order-badge) {
   color: var(--q-primary-hover);
   background: var(--q-primary-soft);
   border: 1px solid var(--q-primary-border);
@@ -458,8 +461,7 @@ body[data-admin-theme]
   font-weight: 500;
 }
 
-body[data-admin-theme]
-  :is(input::placeholder, textarea::placeholder, .form-control::placeholder) {
+body[data-admin-theme] :is(input::placeholder, textarea::placeholder, .form-control::placeholder) {
   color: var(--q-readable-placeholder);
   font-weight: 400;
   opacity: 1;
@@ -552,7 +554,6 @@ body[data-admin-theme] :is(.message-error, .toast-error) {
   color: #b42318;
 }
 
-
 /* ============================================================
    9. LOADING SPINNER (state-note / api-note.loading-note)
    ============================================================ */
@@ -643,15 +644,20 @@ body[data-admin-theme] :is(.message-error, .toast-error) {
   opacity: 1;
 }
 
-:is(body[data-admin-theme]) :is(.list-panel, .content-panel):has(> :is(.state-note, .api-note.loading-note)) {
+:is(body[data-admin-theme])
+  :is(.list-panel, .content-panel):has(> :is(.state-note, .api-note.loading-note)) {
   min-height: clamp(360px, calc(100dvh - 300px), 620px);
 }
 
-:is(body[data-admin-theme]) :is(.list-panel, .content-panel) > :is(.state-note, .api-note.loading-note) {
+:is(body[data-admin-theme])
+  :is(.list-panel, .content-panel)
+  > :is(.state-note, .api-note.loading-note) {
   margin: clamp(88px, 18vh, 180px) auto;
 }
 
-:is(body[data-admin-theme]) :is(.app-popup-panel, .editor-panel) > :is(.state-note, .api-note.loading-note) {
+:is(body[data-admin-theme])
+  :is(.app-popup-panel, .editor-panel)
+  > :is(.state-note, .api-note.loading-note) {
   width: 88px;
   height: 88px;
   min-width: 88px;
@@ -659,7 +665,10 @@ body[data-admin-theme] :is(.message-error, .toast-error) {
   margin: 8px auto 18px;
 }
 
-:is(body[data-admin-theme]) :is(.app-popup-panel, .editor-panel) > :is(.state-note, .api-note.loading-note) > :is(i, .bi)::before {
+:is(body[data-admin-theme])
+  :is(.app-popup-panel, .editor-panel)
+  > :is(.state-note, .api-note.loading-note)
+  > :is(i, .bi)::before {
   inset-block-start: 15px;
   transform-origin: 50% 30px;
 }
@@ -689,7 +698,8 @@ body[data-admin-theme] :is(.message-error, .toast-error) {
 }
 
 @keyframes qOrbBreath {
-  0%, 100% {
+  0%,
+  100% {
     transform: translate(-50%, -50%) scale(1);
     box-shadow:
       0 0 18px rgba(6, 182, 212, 0.5),
