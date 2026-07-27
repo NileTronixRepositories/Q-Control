@@ -15,6 +15,92 @@
         {{ translations().addDisplay }}
       </button>
     }
+
+    <div hero-filters class="w-100">
+      @if (activeTab() === 'active') {
+        <div class="row g-3 align-items-end">
+          <div class="col-12 col-lg-5">
+            <label class="filter-field">
+              <span>{{ translations().searchPlaceholder }}</span>
+              <div class="search-input-wrapper">
+                <i class="bi bi-search search-icon"></i>
+                <input class="has-search-icon form-control" type="search" [value]="activeSearch()" [placeholder]="translations().searchPlaceholder" (input)="updateActiveSearch($event)" />
+              </div>
+            </label>
+          </div>
+          <div class="col-12 col-md-4 col-lg-3">
+            <label class="filter-field">
+              <span>{{ translations().branchFilter }}</span>
+              <select class="form-select" data-testid="displays-active-branch-filter" [value]="activeBranchId() ?? ''" [disabled]="isBranchContextLocked()" (change)="updateActiveBranchFilter($event)">
+                <option value="">{{ translations().allBranches }}</option>
+                @for (branch of branches(); track branch.id) {
+                  <option [value]="branch.id">{{ branchOptionLabel(branch) }}</option>
+                }
+              </select>
+            </label>
+          </div>
+          <div class="col-12 col-md-4 col-lg-2">
+            <label class="filter-field">
+              <span>{{ translations().pageSize }}</span>
+              <select class="form-select" [value]="activePageSize()" (change)="updateActivePageSize($event)">
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+              </select>
+            </label>
+          </div>
+          <div class="col-12 col-md-4 col-lg-2 d-grid">
+            <button type="button" class="secondary-action w-100" [disabled]="activeLoading()" (click)="refreshActive()">
+              <i class="bi bi-arrow-repeat"></i>
+              {{ translations().refresh }}
+            </button>
+          </div>
+        </div>
+      }
+
+      @if (activeTab() === 'deleted') {
+        <div class="row g-2 align-items-end">
+          <div class="col-12 col-lg-5">
+            <label class="filter-field">
+              <span>{{ translations().searchPlaceholder }}</span>
+              <div class="search-input-wrapper">
+                <i class="bi bi-search search-icon"></i>
+                <input class="has-search-icon form-control" type="search" [value]="deletedSearch()" [placeholder]="translations().searchPlaceholder" (input)="updateDeletedSearch($event)" />
+              </div>
+            </label>
+          </div>
+          <div class="col-12 col-md-4 col-lg-3">
+            <label class="filter-field">
+              <span>{{ translations().branchFilter }}</span>
+              <select class="form-select" data-testid="displays-deleted-branch-filter" [value]="deletedBranchId() ?? ''" [disabled]="isBranchContextLocked()" (change)="updateDeletedBranchFilter($event)">
+                <option value="">{{ translations().allBranches }}</option>
+                @for (branch of branches(); track branch.id) {
+                  <option [value]="branch.id">{{ branchOptionLabel(branch) }}</option>
+                }
+              </select>
+            </label>
+          </div>
+          <div class="col-12 col-md-4 col-lg-2">
+            <label class="filter-field">
+              <span>{{ translations().pageSize }}</span>
+              <select class="form-select" [value]="deletedPageSize()" (change)="updateDeletedPageSize($event)">
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+              </select>
+            </label>
+          </div>
+          <div class="col-12 col-md-4 col-lg-2 d-grid">
+            <button type="button" class="secondary-action w-100" [disabled]="deletedLoading()" (click)="refreshDeleted()">
+              <i class="bi bi-arrow-repeat"></i>
+              {{ translations().refresh }}
+            </button>
+          </div>
+        </div>
+      }
+    </div>
   </app-technical-admin-page-hero>
   @if (message(); as currentMessage) {
     <div class="toast-stack" role="status" aria-live="polite" aria-atomic="true">
@@ -81,75 +167,6 @@
     </div>
     @if (activeTab() === 'active') {
       <section class="list-panel d-grid gap-3 p-3">
-        <div class="row g-2 align-items-end">
-          <div class="col-12 col-lg-5">
-            <label class="filter-field">
-              <span>{{ translations().searchPlaceholder }}</span>
-
-              <div class="search-input-wrapper">
-                <i class="bi bi-search search-icon"></i>
-                <input
-                  class="has-search-icon form-control"
-                  type="search"
-                  [value]="activeSearch()"
-                  [placeholder]="translations().searchPlaceholder"
-                  (input)="updateActiveSearch($event)"
-                />
-              </div>
-            </label>
-          </div>
-          <div class="col-12 col-md-4 col-lg-3">
-            <label class="filter-field">
-              <span>{{ translations().branchFilter }}</span>
-
-              <select
-                class="form-select"
-                data-testid="displays-active-branch-filter"
-                [value]="activeBranchId() ?? ''"
-                [disabled]="isBranchContextLocked()"
-                (change)="updateActiveBranchFilter($event)"
-              >
-                <option value="">
-                  {{ translations().allBranches }}
-                </option>
-
-                @for (branch of branches(); track branch.id) {
-                  <option [value]="branch.id">
-                    {{ branchOptionLabel(branch) }}
-                  </option>
-                }
-              </select>
-            </label>
-          </div>
-          <div class="col-12 col-md-4 col-lg-2">
-            <label class="filter-field">
-              <span>{{ translations().pageSize }}</span>
-
-              <select
-                class="form-select"
-                [value]="activePageSize()"
-                (change)="updateActivePageSize($event)"
-              >
-                <option value="10">10</option>
-                <option value="25">25</option>
-                <option value="50">50</option>
-                <option value="100">100</option>
-              </select>
-            </label>
-          </div>
-          <div class="col-12 col-md-4 col-lg-2 d-grid">
-            <button
-              type="button"
-              class="secondary-action w-100"
-              [disabled]="activeLoading()"
-              (click)="refreshActive()"
-            >
-              <i class="bi bi-arrow-repeat"></i>
-
-              {{ translations().refresh }}
-            </button>
-          </div>
-        </div>
         @if (activeLoading()) {
           <app-niletronix-loading-state [title]="translations().loading" variant="inline" size="sm" />
         }
@@ -353,79 +370,6 @@
     }
     @if (activeTab() === 'deleted') {
       <section class="list-panel d-grid gap-3 p-3">
-        <div class="row g-2 align-items-end">
-          <div class="col-12 col-lg-5">
-            <label class="filter-field">
-              <span>{{ translations().searchPlaceholder }}</span>
-
-              <div class="search-input-wrapper">
-                <i class="bi bi-search search-icon"></i>
-                <input
-                  class="has-search-icon form-control"
-                  type="search"
-                  [value]="deletedSearch()"
-                  [placeholder]="translations().searchPlaceholder"
-                  (input)="updateDeletedSearch($event)"
-                />
-              </div>
-            </label>
-          </div>
-
-          <div class="col-12 col-md-4 col-lg-3">
-            <label class="filter-field">
-              <span>{{ translations().branchFilter }}</span>
-
-              <select
-                class="form-select"
-                data-testid="displays-deleted-branch-filter"
-                [value]="deletedBranchId() ?? ''"
-                [disabled]="isBranchContextLocked()"
-                (change)="updateDeletedBranchFilter($event)"
-              >
-                <option value="">
-                  {{ translations().allBranches }}
-                </option>
-
-                @for (branch of branches(); track branch.id) {
-                  <option [value]="branch.id">
-                    {{ branchOptionLabel(branch) }}
-                  </option>
-                }
-              </select>
-            </label>
-          </div>
-
-          <div class="col-12 col-md-4 col-lg-2">
-            <label class="filter-field">
-              <span>{{ translations().pageSize }}</span>
-
-              <select
-                class="form-select"
-                [value]="deletedPageSize()"
-                (change)="updateDeletedPageSize($event)"
-              >
-                <option value="10">10</option>
-                <option value="25">25</option>
-                <option value="50">50</option>
-                <option value="100">100</option>
-              </select>
-            </label>
-          </div>
-
-          <div class="col-12 col-md-4 col-lg-2 d-grid">
-            <button
-              type="button"
-              class="secondary-action w-100"
-              [disabled]="deletedLoading()"
-              (click)="refreshDeleted()"
-            >
-              <i class="bi bi-arrow-repeat"></i>
-
-              {{ translations().refresh }}
-            </button>
-          </div>
-        </div>
-
         @if (deletedLoading()) {
           <app-niletronix-loading-state [title]="translations().loading" variant="inline" size="sm" />
         }
@@ -615,107 +559,128 @@
         role="dialog"
         translate="no"
       >
-        <header class="display-editor-panel-header">
-          <h2>
-            {{ panelTitle() }}
-          </h2>
-
-          <button type="button" class="icon-action" (click)="closePanel()">
-            <i class="bi bi-x-lg"></i>
+        <header class="q-dialog-header">
+          <div class="d-flex align-items-center gap-3">
+            <span class="q-dialog-icon">
+              <i class="bi bi-display" aria-hidden="true"></i>
+            </span>
+            <div>
+              <h2 class="q-dialog-title mb-0">{{ panelTitle() }}</h2>
+            </div>
+          </div>
+          <button type="button" class="q-dialog-close" (click)="closePanel()">
+            <i class="bi bi-x-lg" aria-hidden="true"></i>
           </button>
         </header>
-        @if (panelMode() === 'view' && selectedDetails()) {
-          <dl class="details-list">
-            <div>
-              <dt>{{ translations().displayNumber }}</dt>
-              <dd>{{ selectedDetails()!.number }}</dd>
-            </div>
 
-            <div>
-              <dt>{{ translations().typeLabel }}</dt>
-              <dd>{{ formatText(selectedDetails()!.type) }}</dd>
-            </div>
+        @if (panelMode() === 'view' && selectedDetails(); as details) {
+          <div class="q-detail-sections p-3">
+            <section class="q-detail-section">
+              <h3 class="q-detail-section-title">
+                <i class="bi bi-display" aria-hidden="true"></i>
+                تفاصيل الشاشة
+              </h3>
+              <div class="q-detail-grid">
+                <div class="q-detail-item">
+                  <span class="q-detail-label">
+                    <i class="bi bi-hash" aria-hidden="true"></i>
+                    {{ translations().displayNumber }}
+                  </span>
+                  <span class="q-detail-value">{{ details.number }}</span>
+                </div>
+                <div class="q-detail-item">
+                  <span class="q-detail-label">
+                    <i class="bi bi-tag" aria-hidden="true"></i>
+                    {{ translations().typeLabel }}
+                  </span>
+                  <span class="q-detail-value">{{ formatText(details.type) }}</span>
+                </div>
+                <div class="q-detail-item">
+                  <span class="q-detail-label">
+                    <i class="bi bi-hdd-network" aria-hidden="true"></i>
+                    {{ translations().ipAddress }}
+                  </span>
+                  <span class="q-detail-value" dir="ltr">{{ formatText(details.ipAddress) }}</span>
+                </div>
+                <div class="q-detail-item">
+                  <span class="q-detail-label">
+                    <i class="bi bi-upc-scan" aria-hidden="true"></i>
+                    {{ translations().serialNumber }}
+                  </span>
+                  <span class="q-detail-value" dir="ltr">{{ formatText(details.serialNo) }}</span>
+                </div>
+                <div class="q-detail-item q-detail-item-full">
+                  <span class="q-detail-label">
+                    <i class="bi bi-building" aria-hidden="true"></i>
+                    {{ translations().branch }}
+                  </span>
+                  <span class="q-detail-value">{{ branchLabel(details.branchArabicName, details.branchEnglishName) }}</span>
+                </div>
+              </div>
+            </section>
 
-            <div>
-              <dt>{{ translations().ipAddress }}</dt>
-              <dd>{{ formatText(selectedDetails()!.ipAddress) }}</dd>
-            </div>
-
-            <div>
-              <dt>{{ translations().serialNumber }}</dt>
-              <dd>{{ formatText(selectedDetails()!.serialNo) }}</dd>
-            </div>
-
-            <div>
-              <dt>{{ translations().branch }}</dt>
-              <dd>
-                {{
-                  branchLabel(
-                    selectedDetails()!.branchArabicName,
-                    selectedDetails()!.branchEnglishName
-                  )
-                }}
-              </dd>
-            </div>
-
-            <div>
-              <dt>{{ translations().createdOn }}</dt>
-              <dd>{{ formatDate(selectedDetails()!.createdOnUtc) }}</dd>
-            </div>
-
-            <div>
-              <dt>{{ translations().modifiedOn }}</dt>
-              <dd>{{ formatDate(selectedDetails()!.modifiedOnUtc) }}</dd>
-            </div>
-          </dl>
+            <section class="q-detail-section">
+              <h3 class="q-detail-section-title">
+                <i class="bi bi-clock-history" aria-hidden="true"></i>
+                التاريخ والوقت
+              </h3>
+              <div class="q-detail-grid">
+                <div class="q-detail-item">
+                  <span class="q-detail-label">
+                    <i class="bi bi-calendar-plus" aria-hidden="true"></i>
+                    {{ translations().createdOn }}
+                  </span>
+                  <span class="q-detail-value" dir="ltr">{{ formatDate(details.createdOnUtc) }}</span>
+                </div>
+                <div class="q-detail-item">
+                  <span class="q-detail-label">
+                    <i class="bi bi-calendar-check" aria-hidden="true"></i>
+                    {{ translations().modifiedOn }}
+                  </span>
+                  <span class="q-detail-value" dir="ltr">{{ formatDate(details.modifiedOnUtc) }}</span>
+                </div>
+              </div>
+            </section>
+          </div>
         }
 
         @if (panelMode() === 'view' && !selectedDetails()) {
           <app-niletronix-loading-state [title]="translations().loading" variant="inline" size="sm" />
         }
+
         @if (panelMode() === 'create' || panelMode() === 'edit') {
           <form
-            class="editor-form display-editor-form row g-3"
+            class="editor-form display-editor-form"
             [formGroup]="displayForm"
             (ngSubmit)="saveDisplay()"
             novalidate
           >
-            <div class="form-cell form-cell-full col-12">
+            <div class="form-cell form-cell-full">
               <label class="form-field">
-                <span>
-                  {{ translations().branchFilter }}
-                </span>
-
+                <span>{{ translations().branchFilter }}</span>
                 <select class="form-select" formControlName="branchId" [disabled]="isBranchContextLocked() || panelMode() === 'edit'">
                   <option [value]="0">
                     {{ translations().selectBranch }}
                   </option>
-
                   @for (branch of branches(); track branch.id) {
                     <option [value]="branch.id">
                       {{ branchOptionLabel(branch) }}
                     </option>
                   }
                 </select>
-
                 @if (hasDisplayFormError('branchId')) {
                   <small>{{ translations().requiredField }}</small>
                 }
               </label>
             </div>
-            <div class="form-cell col-12 col-md-6">
+
+            <div class="form-cell">
               <label class="form-field">
-                <span>
-                  {{ translations().displayNumber }}
-                </span>
-
+                <span>{{ translations().displayNumber }}</span>
                 <input class="form-control" type="text" maxlength="20" formControlName="number" />
-
                 @if (hasDisplayFormError('number')) {
                   <small>
-                    @if (
-                      numberControl.hasError('required') || numberControl.hasError('whitespace')
-                    ) {
+                    @if (numberControl.hasError('required') || numberControl.hasError('whitespace')) {
                       {{ translations().requiredField }}
                     } @else if (numberControl.hasError('maxlength')) {
                       {{ translations().maxLength20 }}
@@ -724,19 +689,11 @@
                 }
               </label>
             </div>
-            <div class="form-cell col-12 col-md-6">
+
+            <div class="form-cell">
               <label class="form-field">
-                <span>
-                  {{ translations().ipAddress }}
-                </span>
-
-                <input
-                  class="form-control"
-                  type="text"
-                  maxlength="45"
-                  formControlName="ipAddress"
-                />
-
+                <span>{{ translations().ipAddress }}</span>
+                <input class="form-control" type="text" maxlength="45" formControlName="ipAddress" />
                 @if (hasDisplayFormError('ipAddress')) {
                   <small>
                     @if (ipAddressControl.hasError('required')) {
@@ -750,24 +707,14 @@
                 }
               </label>
             </div>
-            <div class="form-cell col-12 col-md-6">
+
+            <div class="form-cell">
               <label class="form-field">
-                <span>
-                  {{ translations().serialNumber }}
-                </span>
-
-                <input
-                  class="form-control"
-                  type="text"
-                  maxlength="100"
-                  formControlName="serialNo"
-                />
-
+                <span>{{ translations().serialNumber }}</span>
+                <input class="form-control" type="text" maxlength="100" formControlName="serialNo" />
                 @if (hasDisplayFormError('serialNo')) {
                   <small>
-                    @if (
-                      serialNoControl.hasError('required') || serialNoControl.hasError('whitespace')
-                    ) {
+                    @if (serialNoControl.hasError('required') || serialNoControl.hasError('whitespace')) {
                       {{ translations().requiredField }}
                     } @else if (serialNoControl.hasError('maxlength')) {
                       {{ translations().maxLength100 }}
@@ -776,14 +723,11 @@
                 }
               </label>
             </div>
-            <div class="form-cell col-12 col-md-6">
+
+            <div class="form-cell">
               <label class="form-field">
-                <span>
-                  {{ translations().typeLabel }}
-                </span>
-
+                <span>{{ translations().typeLabel }}</span>
                 <input class="form-control" type="text" maxlength="100" formControlName="type" />
-
                 @if (hasDisplayFormError('type')) {
                   <small>
                     @if (typeControl.hasError('required') || typeControl.hasError('whitespace')) {
@@ -795,11 +739,11 @@
                 }
               </label>
             </div>
-            <div class="form-actions col-12 d-flex flex-wrap justify-content-end gap-2">
+
+            <div class="form-actions">
               <button type="button" class="secondary-action" (click)="closePanel()">
                 {{ translations().cancel }}
               </button>
-
               <button type="submit" class="primary-action" [disabled]="saving()">
                 {{ translations().save }}
               </button>
@@ -816,24 +760,31 @@
         role="dialog"
         translate="no"
       >
-        <header class="display-editor-panel-header">
-          <h2>
-            @if (confirmDialog()?.kind === 'deactivate') {
-              {{ translations().deleteConfirm }}
-            } @else if (confirmDialog()?.kind === 'reactivate') {
-              {{ translations().restoreConfirm }}
-            } @else {
-              {{ translations().permanentDeleteConfirm }}
-            }
-          </h2>
+        <header class="q-dialog-header">
+          <div class="d-flex align-items-center gap-3">
+            <span class="q-dialog-icon q-dialog-icon--danger">
+              <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
+            </span>
+            <div>
+              <h2 class="q-dialog-title mb-0">
+                @if (confirmDialog()?.kind === 'deactivate') {
+                  {{ translations().deleteConfirm }}
+                } @else if (confirmDialog()?.kind === 'reactivate') {
+                  {{ translations().restoreConfirm }}
+                } @else {
+                  {{ translations().permanentDeleteConfirm }}
+                }
+              </h2>
+            </div>
+          </div>
 
           <button
             type="button"
-            class="icon-action"
+            class="q-dialog-close"
             [disabled]="deleting()"
             (click)="closeConfirmDialog()"
           >
-            <i class="bi bi-x-lg"></i>
+            <i class="bi bi-x-lg" aria-hidden="true"></i>
           </button>
         </header>
 
@@ -884,6 +835,3 @@
     }
   }
 </section>
-
-
-

@@ -58,6 +58,8 @@ interface WindowTranslations {
   readonly addWindow: string;
   readonly searchPlaceholder: string;
   readonly waitingAreaFilter: string;
+  // Trigger HMR
+
   readonly allWaitingAreas: string;
   readonly pageSize: string;
   readonly loading: string;

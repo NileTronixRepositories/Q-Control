@@ -9,10 +9,62 @@
     [description]="translations().description"
     icon="bi bi-people-fill"
   >
-    <button hero-actions type="button" class="btn primary-action" (click)="openCreate()">
+    <button hero-actions type="button" class="primary-action" (click)="openCreate()">
       <i class="bi bi-plus-lg" aria-hidden="true"></i>
-      <span>{{ translations().addButton }}</span>
+      <span class="text-light">{{ translations().addButton }}</span>
     </button>
+    <div hero-filters class="w-100">
+      <div class="row g-3 align-items-end" data-testid="waiting-areas-filters">
+        <div class="col-12 col-xl-4">
+          <label class="filter-field">
+            <span>{{ translations().searchPlaceholder }}</span>
+            <i class="bi bi-search filter-icon" aria-hidden="true"></i>
+            <input class="form-control" type="search" [value]="search()" [placeholder]="translations().searchPlaceholder" (input)="updateSearch($event)" />
+          </label>
+        </div>
+        <div class="col-12 col-md-6 col-xl-3">
+          <label class="filter-field">
+            <span>{{ translations().branchFilter }}</span>
+            <!-- <i class="bi bi-building filter-icon" aria-hidden="true"></i> -->
+            <select data-testid="waiting-areas-branch-filter" class="form-select" [value]="selectedBranchId() ?? ''" [disabled]="isBranchContextLocked()" (change)="updateBranchFilter($event)">
+              <option value="">{{ translations().allBranches }}</option>
+              @for (branch of branchOptions(); track branch.id) {
+                <option [value]="branch.id">{{ optionName(branch) }}</option>
+              }
+            </select>
+          </label>
+        </div>
+        <div class="col-12 col-md-6 col-xl-2">
+          <label class="filter-field">
+            <span>{{ translations().status }}</span>
+            <!-- <i class="bi bi-check2-circle filter-icon pe-2" aria-hidden="true"></i> -->
+            <select class="form-select" [value]="statusFilter() === null ? '' : statusFilter()" (change)="updateStatusFilter($event)">
+              <option value="">{{ translations().allStatuses }}</option>
+              <option value="true">{{ translations().active }}</option>
+              <option value="false">{{ translations().inactive }}</option>
+            </select>
+          </label>
+        </div>
+        <div class="col-12 col-sm-6 col-md-4 col-xl-1">
+          <label class="filter-field">
+            <span>{{ translations().pageSize }}</span>
+            <!-- <i class="bi bi-list-ul filter-icon" aria-hidden="true"></i> -->
+            <select class="form-select" [value]="pageSize()" (change)="updatePageSize($event)">
+              <option value="10">10</option>
+              <option value="25">25</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+            </select>
+          </label>
+        </div>
+        <div class="col-12 col-sm-6 col-md-4 col-xl-2 d-grid">
+          <button type="button" class="btn secondary-action w-100" [disabled]="loading()" (click)="refresh()">
+            <i class="bi bi-arrow-repeat" aria-hidden="true"></i>
+            <span>{{ translations().refresh }}</span>
+          </button>
+        </div>
+      </div>
+    </div>
   </app-technical-admin-page-hero>
 
   @if (message(); as currentMessage) {
@@ -45,82 +97,6 @@
 
   <section class="content-grid">
     <div class="list-panel d-grid gap-3 p-3">
-      <div class="row g-2 align-items-end" data-testid="waiting-areas-filters">
-        <div class="col-12 col-xl-4">
-          <label class="filter-field">
-            <span>{{ translations().searchPlaceholder }}</span>
-            <i class="bi bi-search filter-icon" aria-hidden="true"></i>
-            <input
-              class="form-control"
-              type="search"
-              [value]="search()"
-              [placeholder]="translations().searchPlaceholder"
-              (input)="updateSearch($event)"
-            />
-          </label>
-        </div>
-
-        <div class="col-12 col-md-6 col-xl-3">
-          <label class="filter-field">
-            <span>{{ translations().branchFilter }}</span>
-            <i class="bi bi-building filter-icon" aria-hidden="true"></i>
-            <select
-              data-testid="waiting-areas-branch-filter"
-              class="form-select"
-              [value]="selectedBranchId() ?? ''"
-              [disabled]="isBranchContextLocked()"
-              (change)="updateBranchFilter($event)"
-            >
-              <option value="">{{ translations().allBranches }}</option>
-              @for (branch of branchOptions(); track branch.id) {
-                <option [value]="branch.id">{{ optionName(branch) }}</option>
-              }
-            </select>
-          </label>
-        </div>
-
-        <div class="col-12 col-md-6 col-xl-2">
-          <label class="filter-field">
-            <span>{{ translations().status }}</span>
-            <i class="bi bi-check2-circle filter-icon pe-2" aria-hidden="true"></i>
-            <select
-              class="form-select"
-              [value]="statusFilter() === null ? '' : statusFilter()"
-              (change)="updateStatusFilter($event)"
-            >
-              <option value="">{{ translations().allStatuses }}</option>
-              <option value="true">{{ translations().active }}</option>
-              <option value="false">{{ translations().inactive }}</option>
-            </select>
-          </label>
-        </div>
-
-        <div class="col-12 col-sm-6 col-md-4 col-xl-1">
-          <label class="filter-field">
-            <span>{{ translations().pageSize }}</span>
-            <i class="bi bi-list-ul filter-icon" aria-hidden="true"></i>
-            <select class="form-select" [value]="pageSize()" (change)="updatePageSize($event)">
-              <option value="10">10</option>
-              <option value="25">25</option>
-              <option value="50">50</option>
-              <option value="100">100</option>
-            </select>
-          </label>
-        </div>
-
-        <div class="col-12 col-sm-6 col-md-4 col-xl-2 d-grid">
-          <button
-            type="button"
-            class="btn secondary-action w-100"
-            [disabled]="loading()"
-            (click)="refresh()"
-          >
-            <i class="bi bi-arrow-repeat" aria-hidden="true"></i>
-            <span>{{ translations().refresh }}</span>
-          </button>
-        </div>
-      </div>
-
       @if (loading()) {
         <app-niletronix-loading-state [title]="translations().loading" variant="inline" size="sm" />
       }

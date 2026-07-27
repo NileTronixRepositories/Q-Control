@@ -108,37 +108,38 @@ body .app-shell .sidebar-nested-link.sidebar-link-active .child-dot {
   box-shadow: none;
 }
 
-/* Branch context sidebar - compact nav links */
+/* Branch context sidebar - premium nav links */
 body .app-shell .context-sidebar-link:hover,
 body .app-shell .context-sidebar-link:focus-visible {
   color: var(--q-primary);
-  background: linear-gradient(90deg, rgba(11, 138, 168, 0.08), transparent);
-  border-color: rgba(11, 138, 168, 0.12);
-  transition: all 0.2s ease;
+  background: rgba(var(--q-primary-rgb, 11 138 168) / 0.05);
+  transform: translateX(4px);
+  border-color: rgba(var(--q-primary-rgb, 11 138 168) / 0.08);
 }
 
 body .app-shell .context-sidebar-link:hover .context-link-icon {
   color: var(--q-primary);
-  background: rgba(11, 138, 168, 0.14);
+  background: rgba(var(--q-primary-rgb, 11 138 168) / 0.15);
+  transform: scale(1.08);
 }
 
 body .app-shell .context-sidebar-link-active {
   color: var(--q-primary);
-  background: linear-gradient(90deg, rgba(11, 138, 168, 0.1), transparent 75%);
-  border-color: rgba(11, 138, 168, 0.14);
-  box-shadow: none;
-  transition: all 0.2s ease;
+  background: linear-gradient(90deg, rgba(var(--q-primary-rgb, 11 138 168) / 0.12), rgba(var(--q-primary-rgb, 11 138 168) / 0.02));
+  border-color: rgba(var(--q-primary-rgb, 11 138 168) / 0.1);
+  box-shadow: 0 4px 12px rgba(var(--q-primary-rgb, 11 138 168) / 0.06);
 }
 
 body .app-shell .context-sidebar-link-active::before {
-  width: 2px;
   background: var(--q-primary);
-  box-shadow: none;
+  transform: scaleY(1);
 }
 
 body .app-shell .context-sidebar-link-active .context-link-icon {
-  color: var(--q-primary);
-  background: rgba(11, 138, 168, 0.14);
+  color: #ffffff;
+  background: var(--q-primary);
+  box-shadow: 0 4px 10px rgba(var(--q-primary-rgb, 11 138 168) / 0.35);
+  transform: scale(1);
 }
 
 body .app-shell .context-sidebar-link-active .context-link-text {
@@ -147,9 +148,9 @@ body .app-shell .context-sidebar-link-active .context-link-text {
 
 body .app-shell.app-shell-rtl .context-sidebar-link:hover,
 body .app-shell.app-shell-rtl .context-sidebar-link:focus-visible {
-  background: linear-gradient(270deg, rgba(11, 138, 168, 0.08), transparent);
+  transform: translateX(-4px);
 }
 
 body .app-shell.app-shell-rtl .context-sidebar-link-active {
-  background: linear-gradient(270deg, rgba(11, 138, 168, 0.1), transparent 75%);
+  background: linear-gradient(270deg, rgba(var(--q-primary-rgb, 11 138 168) / 0.12), rgba(var(--q-primary-rgb, 11 138 168) / 0.02));
 }

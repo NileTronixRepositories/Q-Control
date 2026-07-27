@@ -5,7 +5,7 @@
     <p>{{ copy().description }}</p>
     <div class="access-state-actions">
       @if (availableRoute() !== '/no-access') {
-        <a class="primary-action" [routerLink]="availableRoute()">{{ copy().home }}</a>
+        <a class="primary-action text-white" [routerLink]="availableRoute()">{{ copy().home }}</a>
       }
       <button type="button" class="secondary-action" (click)="logout()">{{ copy().logout }}</button>
     </div>

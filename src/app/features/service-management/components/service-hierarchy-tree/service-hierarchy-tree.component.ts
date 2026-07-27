@@ -353,6 +353,7 @@ export class ServiceHierarchyTreeComponent {
     this.permanentDeleteNode.emit(node);
   }
 
+
   private flattenNodes(
     nodes: readonly ServiceTreeNode[],
     expandedIds: ReadonlySet<number>,
@@ -366,7 +367,6 @@ export class ServiceHierarchyTreeComponent {
       if (node.children.length === 0 || !isExpanded) {
         return [current];
       }
-
       return [current, ...this.flattenNodes(node.children, expandedIds, selectedServiceId, depth + 1)];
     });
   }
@@ -380,6 +380,7 @@ export class ServiceHierarchyTreeComponent {
     const translations = this.translations();
     const hasChildren = node.children.length > 0;
     const collapsedIconClass = this.direction() === 'rtl' ? 'bi-chevron-left' : 'bi-chevron-right';
+    const isWorkflowLeaf = !hasChildren && this.canManageWorkflows() && this.canManageWorkflowNode()(node);
 
     return {
       node,
@@ -389,7 +390,7 @@ export class ServiceHierarchyTreeComponent {
       serviceCodeLabel: this.serviceCodeLabel(node),
       isExpanded,
       hasChildren,
-      rowClassList: `${ROW_BASE_CLASSES} ${isSelected ? ROW_SELECTED_CLASSES : ROW_DEFAULT_CLASSES}`,
+      rowClassList: `${ROW_BASE_CLASSES} ${isSelected ? ROW_SELECTED_CLASSES : ROW_DEFAULT_CLASSES} ${isWorkflowLeaf ? 'svc-tree-node--workflow-leaf' : ''}`,
       toggleClassList: `${TOGGLE_BASE_CLASSES} ${hasChildren ? TOGGLE_ENABLED_CLASSES : TOGGLE_DISABLED_CLASSES}`,
       toggleIconClass: `bi ${isExpanded ? 'bi-chevron-down' : collapsedIconClass}`,
       toggleLabel: isExpanded ? translations.collapse : translations.expand,

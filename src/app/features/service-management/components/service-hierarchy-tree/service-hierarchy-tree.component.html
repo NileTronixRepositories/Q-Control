@@ -15,7 +15,7 @@
 <div class="svc-tree-toolbar">
 @if (showSearch()) {
 <div class="svc-tree-search" role="search">
-<label class="svc-tree-search-label" [for]="searchInputId">{{ searchLabel() }}</label>
+<label class="svc-tree-search-label visually-hidden" [for]="searchInputId">{{ searchLabel() }}</label>
 <div class="input-group svc-tree-search-control">
 <span class="input-group-text border-0 rounded-0 svc-tree-search-icon" aria-hidden="true">
 <i class="bi bi-search"></i>
@@ -44,7 +44,7 @@ class="btn border-0 rounded-0 svc-tree-search-clear"
 </button>
 }
 </div>
-@if (searchHelp()) { <small [id]="searchHelpId">{{ searchHelp() }}</small> }
+@if (searchHelp()) { <small [id]="searchHelpId" class="visually-hidden">{{ searchHelp() }}</small> }
 </div>
 }
 <div class="svc-tree-toolbar-actions">

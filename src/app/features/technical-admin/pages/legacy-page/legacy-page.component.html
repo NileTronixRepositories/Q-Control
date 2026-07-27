@@ -507,71 +507,167 @@
             }
 
             @if (branchPanelMode() === 'view' && selectedBranchDetails(); as details) {
-              <div class="q-node-grid">
-                <div class="q-detail-item">
-                  <span class="q-detail-label">{{ translations().arabicNameLabel }}</span>
-                  <span class="q-detail-value">{{ detailValue(details.arabicName) }}</span>
-                </div>
-                <div class="q-detail-item">
-                  <span class="q-detail-label">{{ translations().englishNameLabel }}</span>
-                  <span class="q-detail-value">{{ detailValue(details.englishName) }}</span>
-                </div>
-                <div class="q-detail-item">
-                  <span class="q-detail-label">{{ translations().ipAddressLabel }}</span>
-                  <span class="q-detail-value" dir="ltr">{{ detailValue(details.ipAddress) }}</span>
-                </div>
-                <div class="q-detail-item">
-                  <span class="q-detail-label">{{ branchEditorTranslations().license }}</span>
-                  <span class="q-detail-value">{{ detailValue(details.license) }}</span>
-                </div>
-                <div class="q-detail-item">
-                  <span class="q-detail-label">{{ branchEditorTranslations().status }}</span>
-                  <span class="q-detail-value">{{ details.isActive ? branchEditorTranslations().active : branchEditorTranslations().inactive }}</span>
-                </div>
-                <div class="q-detail-item">
-                  <span class="q-detail-label">{{ branchEditorTranslations().operationalStatus }}</span>
-                  <span class="q-detail-value">{{ details.effectiveIsActive ? branchEditorTranslations().operationalAvailable : branchEditorTranslations().operationalUnavailable }}</span>
-                </div>
-                <div class="q-detail-item">
-                  <span class="q-detail-label">{{ translations().governorateLabel }}</span>
-                  <span class="q-detail-value">{{ detailValue(details.location?.governorate) }}</span>
-                </div>
-                <div class="q-detail-item">
-                  <span class="q-detail-label">{{ translations().cityLabel }}</span>
-                  <span class="q-detail-value">{{ detailValue(details.location?.city) }}</span>
-                </div>
-                <div class="q-detail-item">
-                  <span class="q-detail-label">{{ branchEditorTranslations().area }}</span>
-                  <span class="q-detail-value">{{ detailValue(details.location?.area) }}</span>
-                </div>
-                <div class="q-detail-item">
-                  <span class="q-detail-label">{{ branchEditorTranslations().address }}</span>
-                  <span class="q-detail-value">{{ detailValue(details.location?.address) }}</span>
-                </div>
-                <div class="q-detail-item">
-                  <span class="q-detail-label">{{ branchEditorTranslations().longitude }}</span>
-                  <span class="q-detail-value" dir="ltr">{{ detailValue(details.location?.longitude) }}</span>
-                </div>
-                <div class="q-detail-item">
-                  <span class="q-detail-label">{{ branchEditorTranslations().latitude }}</span>
-                  <span class="q-detail-value" dir="ltr">{{ detailValue(details.location?.latitude) }}</span>
-                </div>
-                <div class="q-detail-item">
-                  <span class="q-detail-label">{{ translations().createdByLabel }}</span>
-                  <span class="q-detail-value">{{ userName(details.createdBy) }}</span>
-                </div>
-                <div class="q-detail-item">
-                  <span class="q-detail-label">{{ branchEditorTranslations().createdOn }}</span>
-                  <span class="q-detail-value">{{ formatNullableDate(details.createdOnUtc) }}</span>
-                </div>
-                <div class="q-detail-item">
-                  <span class="q-detail-label">{{ branchEditorTranslations().lastModifiedBy }}</span>
-                  <span class="q-detail-value">{{ userName(details.lastModifiedBy) }}</span>
-                </div>
-                <div class="q-detail-item">
-                  <span class="q-detail-label">{{ branchEditorTranslations().modifiedOn }}</span>
-                  <span class="q-detail-value">{{ formatNullableDate(details.modifiedOnUtc) }}</span>
-                </div>
+              <div class="q-detail-sections">
+                <!-- Group 1: General & Status Info -->
+                <section class="q-detail-section">
+                  <h3 class="q-detail-section-title">
+                    <i class="bi bi-info-circle-fill" aria-hidden="true"></i>
+                    البيانات الأساسية والحالة
+                  </h3>
+                  <div class="q-detail-grid">
+                    <div class="q-detail-item">
+                      <span class="q-detail-label">
+                        <i class="bi bi-translate" aria-hidden="true"></i>
+                        {{ translations().arabicNameLabel }}
+                      </span>
+                      <span class="q-detail-value">{{ detailValue(details.arabicName) }}</span>
+                    </div>
+                    <div class="q-detail-item">
+                      <span class="q-detail-label">
+                        <i class="bi bi-type" aria-hidden="true"></i>
+                        {{ translations().englishNameLabel }}
+                      </span>
+                      <span class="q-detail-value">{{ detailValue(details.englishName) }}</span>
+                    </div>
+                    <div class="q-detail-item">
+                      <span class="q-detail-label">
+                        <i class="bi bi-hdd-network" aria-hidden="true"></i>
+                        {{ translations().ipAddressLabel }}
+                      </span>
+                      <span class="q-detail-value" dir="ltr">{{ detailValue(details.ipAddress) }}</span>
+                    </div>
+                    <div class="q-detail-item">
+                      <span class="q-detail-label">
+                        <i class="bi bi-key-fill" aria-hidden="true"></i>
+                        {{ branchEditorTranslations().license }}
+                      </span>
+                      <span class="q-detail-value">{{ detailValue(details.license) }}</span>
+                    </div>
+                    <div class="q-detail-item">
+                      <span class="q-detail-label">
+                        <i class="bi bi-toggle-on" aria-hidden="true"></i>
+                        {{ branchEditorTranslations().status }}
+                      </span>
+                      <span
+                        class="q-detail-pill"
+                        [class.q-detail-pill--active]="details.isActive"
+                        [class.q-detail-pill--inactive]="!details.isActive"
+                      >
+                        <i
+                          class="bi"
+                          [class.bi-check-circle-fill]="details.isActive"
+                          [class.bi-x-circle-fill]="!details.isActive"
+                          aria-hidden="true"
+                        ></i>
+                        {{ details.isActive ? branchEditorTranslations().active : branchEditorTranslations().inactive }}
+                      </span>
+                    </div>
+                    <div class="q-detail-item">
+                      <span class="q-detail-label">
+                        <i class="bi bi-activity" aria-hidden="true"></i>
+                        {{ branchEditorTranslations().operationalStatus }}
+                      </span>
+                      <span
+                        class="q-detail-pill"
+                        [class.q-detail-pill--active]="details.effectiveIsActive"
+                        [class.q-detail-pill--inactive]="!details.effectiveIsActive"
+                      >
+                        <i
+                          class="bi"
+                          [class.bi-check-circle-fill]="details.effectiveIsActive"
+                          [class.bi-x-circle-fill]="!details.effectiveIsActive"
+                          aria-hidden="true"
+                        ></i>
+                        {{ details.effectiveIsActive ? branchEditorTranslations().operationalAvailable : branchEditorTranslations().operationalUnavailable }}
+                      </span>
+                    </div>
+                  </div>
+                </section>
+
+                <!-- Group 2: Location Info -->
+                <section class="q-detail-section">
+                  <h3 class="q-detail-section-title">
+                    <i class="bi bi-geo-alt-fill" aria-hidden="true"></i>
+                    {{ branchEditorTranslations().location }}
+                  </h3>
+                  <div class="q-detail-grid">
+                    <div class="q-detail-item">
+                      <span class="q-detail-label">
+                        <i class="bi bi-map" aria-hidden="true"></i>
+                        {{ translations().governorateLabel }}
+                      </span>
+                      <span class="q-detail-value">{{ detailValue(details.location?.governorate) }}</span>
+                    </div>
+                    <div class="q-detail-item">
+                      <span class="q-detail-label">
+                        <i class="bi bi-building" aria-hidden="true"></i>
+                        {{ translations().cityLabel }}
+                      </span>
+                      <span class="q-detail-value">{{ detailValue(details.location?.city) }}</span>
+                    </div>
+                    <div class="q-detail-item">
+                      <span class="q-detail-label">
+                        <i class="bi bi-compass" aria-hidden="true"></i>
+                        {{ branchEditorTranslations().area }}
+                      </span>
+                      <span class="q-detail-value">{{ detailValue(details.location?.area) }}</span>
+                    </div>
+                    <div class="q-detail-item">
+                      <span class="q-detail-label">
+                        <i class="bi bi-signpost-2" aria-hidden="true"></i>
+                        {{ branchEditorTranslations().address }}
+                      </span>
+                      <span class="q-detail-value">{{ detailValue(details.location?.address) }}</span>
+                    </div>
+                    <div class="q-detail-item">
+                      <span class="q-detail-label">
+                        <i class="bi bi-geo" aria-hidden="true"></i>
+                        {{ branchEditorTranslations().longitude }} / {{ branchEditorTranslations().latitude }}
+                      </span>
+                      <span class="q-detail-value" dir="ltr">
+                        {{ detailValue(details.location?.longitude) }}, {{ detailValue(details.location?.latitude) }}
+                      </span>
+                    </div>
+                  </div>
+                </section>
+
+                <!-- Group 3: System Audit -->
+                <section class="q-detail-section">
+                  <h3 class="q-detail-section-title">
+                    <i class="bi bi-shield-check" aria-hidden="true"></i>
+                    سجل النظام والتعديلات
+                  </h3>
+                  <div class="q-detail-grid">
+                    <div class="q-detail-item">
+                      <span class="q-detail-label">
+                        <i class="bi bi-person-plus" aria-hidden="true"></i>
+                        {{ translations().createdByLabel }}
+                      </span>
+                      <span class="q-detail-value">{{ userName(details.createdBy) }}</span>
+                    </div>
+                    <div class="q-detail-item">
+                      <span class="q-detail-label">
+                        <i class="bi bi-calendar-check" aria-hidden="true"></i>
+                        {{ branchEditorTranslations().createdOn }}
+                      </span>
+                      <span class="q-detail-value">{{ formatNullableDate(details.createdOnUtc) }}</span>
+                    </div>
+                    <div class="q-detail-item">
+                      <span class="q-detail-label">
+                        <i class="bi bi-person-gear" aria-hidden="true"></i>
+                        {{ branchEditorTranslations().lastModifiedBy }}
+                      </span>
+                      <span class="q-detail-value">{{ userName(details.lastModifiedBy) }}</span>
+                    </div>
+                    <div class="q-detail-item">
+                      <span class="q-detail-label">
+                        <i class="bi bi-clock-history" aria-hidden="true"></i>
+                        {{ branchEditorTranslations().modifiedOn }}
+                      </span>
+                      <span class="q-detail-value">{{ formatNullableDate(details.modifiedOnUtc) }}</span>
+                    </div>
+                  </div>
+                </section>
               </div>
             }
 

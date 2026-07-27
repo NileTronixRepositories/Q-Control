@@ -1,4 +1,4 @@
-﻿<section class="technical-admin-responsive-page window-management-page container-fluid" [attr.dir]="direction()" [attr.lang]="language()">
+<section class="technical-admin-responsive-page window-management-page container-fluid" [attr.dir]="direction()" [attr.lang]="language()">
   <app-technical-admin-page-hero
     [eyebrow]="translations().title"
     [title]="translations().title"
@@ -6,11 +6,109 @@
     icon="bi bi-window-stack"
   >
     @if (activeTab() === 'active' && canCreate() && canViewActive()) {
-      <button hero-actions type="button" class="btn primary-action" (click)="openCreate()">
+      <button hero-actions type="button" class="primary-action" (click)="openCreate()">
         <i class="bi bi-plus-lg" aria-hidden="true"></i>
-        <span>{{ translations().addWindow }}</span>
+        <span class="text-white">{{ translations().addWindow }}</span>
       </button>
     }
+
+    <div hero-filters class="w-100">
+      @if (activeTab() === 'active') {
+        <div class="row g-3 align-items-end" data-testid="windows-active-filters">
+          <div class="col-12 col-xl-5">
+            <label class="filter-field">
+              <span>{{ translations().searchPlaceholder }}</span>
+              <i class="bi bi-search filter-icon" aria-hidden="true"></i>
+              <input
+                class="form-control"
+                type="search"
+                [value]="activeSearch()"
+                [placeholder]="translations().searchPlaceholder"
+                (input)="updateActiveSearch($event)"
+              />
+            </label>
+          </div>
+          <div class="col-12 col-md-6 col-xl-3">
+            <label class="filter-field">
+              <span>{{ translations().waitingAreaFilter }}</span>
+              <!-- <i class="bi bi-hourglass-split filter-icon" aria-hidden="true"></i> -->
+              <select class="form-select" [value]="activeWaitingAreaId() ?? ''" (change)="updateActiveWaitingAreaFilter($event)">
+                <option value="">{{ translations().allWaitingAreas }}</option>
+                @for (area of waitingAreas(); track area.id) {
+                  <option [value]="area.id">{{ waitingAreaLabel(area) }}</option>
+                }
+              </select>
+            </label>
+          </div>
+          <div class="col-12 col-sm-6 col-md-3 col-xl-2">
+            <label class="filter-field">
+              <span>{{ translations().pageSize }}</span>
+              <!-- <i class="bi bi-list-ol filter-icon" aria-hidden="true"></i> -->
+              <select class="form-select" [value]="activePageSize()" (change)="updateActivePageSize($event)">
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+              </select>
+            </label>
+          </div>
+          <div class="col-12 col-sm-6 col-md-3 col-xl-2 d-grid">
+            <button type="button" class="secondary-action w-100" [disabled]="activeLoading()" (click)="refreshActive()">
+              <i class="bi bi-arrow-repeat" aria-hidden="true"></i>
+              <span>{{ translations().refresh }}</span>
+            </button>
+          </div>
+        </div>
+      }
+
+      @if (activeTab() === 'deleted') {
+        <div class="row g-3 align-items-end" data-testid="windows-deleted-filters">
+          <div class="col-12 col-xl-5">
+            <label class="filter-field">
+              <span>{{ translations().searchPlaceholder }}</span>
+              <i class="bi bi-search filter-icon" aria-hidden="true"></i>
+              <input
+                class="form-control"
+                type="search"
+                [value]="deletedSearch()"
+                [placeholder]="translations().searchPlaceholder"
+                (input)="updateDeletedSearch($event)"
+              />
+            </label>
+          </div>
+          <div class="col-12 col-md-6 col-xl-3">
+            <label class="filter-field">
+              <span>{{ translations().waitingAreaFilter }}</span>
+              <!-- <i class="bi bi-hourglass-split filter-icon" aria-hidden="true"></i> -->
+              <select class="form-select" [value]="deletedWaitingAreaId() ?? ''" (change)="updateDeletedWaitingAreaFilter($event)">
+                <option value="">{{ translations().allWaitingAreas }}</option>
+                @for (area of waitingAreas(); track area.id) {
+                  <option [value]="area.id">{{ waitingAreaLabel(area) }}</option>
+                }
+              </select>
+            </label>
+          </div>
+          <div class="col-12 col-sm-6 col-md-3 col-xl-2">
+            <label class="filter-field">
+              <span>{{ translations().pageSize }}</span>
+              <!-- <i class="bi bi-list-ol filter-icon" aria-hidden="true"></i> -->
+              <select class="form-select" [value]="deletedPageSize()" (change)="updateDeletedPageSize($event)">
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+              </select>
+            </label>
+          </div>
+          <div class="col-12 col-sm-6 col-md-3 col-xl-2 d-grid">
+            <button type="button" class="secondary-action w-100" [disabled]="deletedLoading()" (click)="refreshDeleted()">
+              <i class="bi bi-arrow-repeat" aria-hidden="true"></i>
+              <span>{{ translations().refresh }}</span>
+            </button>
+          </div>
+        </div>
+      }
+    </div>
   </app-technical-admin-page-hero>
 
   @if (message(); as currentMessage) {
@@ -49,8 +147,8 @@
           <button
             data-testid="windows-active-tab"
             type="button"
-            class="btn secondary-action"
             [class.primary-action]="activeTab() === 'active'"
+            [class.secondary-action]="activeTab() !== 'active'"
             (click)="switchTab('active')"
           >
             <i class="bi bi-window-stack" aria-hidden="true"></i>
@@ -61,8 +159,8 @@
           <button
             data-testid="windows-deleted-tab"
             type="button"
-            class="btn secondary-action"
             [class.primary-action]="activeTab() === 'deleted'"
+            [class.secondary-action]="activeTab() !== 'deleted'"
             (click)="switchTab('deleted')"
           >
             <i class="bi bi-trash3" aria-hidden="true"></i>
@@ -73,52 +171,6 @@
 
       @if (activeTab() === 'active') {
         <div class="list-panel d-grid gap-3 p-3 mt-3">
-          <div class="row g-2 align-items-end" data-testid="windows-active-filters">
-            <div class="col-12 col-xl-5">
-              <label class="filter-field">
-                <span>{{ translations().searchPlaceholder }}</span>
-                <i class="bi bi-search filter-icon" aria-hidden="true"></i>
-                <input
-                  class="form-control"
-                  type="search"
-                  [value]="activeSearch()"
-                  [placeholder]="translations().searchPlaceholder"
-                  (input)="updateActiveSearch($event)"
-                />
-              </label>
-            </div>
-            <div class="col-12 col-md-6 col-xl-3">
-              <label class="filter-field">
-                <span>{{ translations().waitingAreaFilter }}</span>
-                <i class="bi bi-hourglass-split filter-icon" aria-hidden="true"></i>
-                <select class="form-select" [value]="activeWaitingAreaId() ?? ''" (change)="updateActiveWaitingAreaFilter($event)">
-                  <option value="">{{ translations().allWaitingAreas }}</option>
-                  @for (area of waitingAreas(); track area.id) {
-                    <option [value]="area.id">{{ waitingAreaLabel(area) }}</option>
-                  }
-                </select>
-              </label>
-            </div>
-            <div class="col-12 col-sm-6 col-md-3 col-xl-2">
-              <label class="filter-field">
-                <span>{{ translations().pageSize }}</span>
-                <i class="bi bi-list-ol filter-icon" aria-hidden="true"></i>
-                <select class="form-select" [value]="activePageSize()" (change)="updateActivePageSize($event)">
-                  <option value="10">10</option>
-                  <option value="25">25</option>
-                  <option value="50">50</option>
-                  <option value="100">100</option>
-                </select>
-              </label>
-            </div>
-            <div class="col-12 col-sm-6 col-md-3 col-xl-2 d-grid">
-              <button type="button" class="btn secondary-action w-100" [disabled]="activeLoading()" (click)="refreshActive()">
-                <i class="bi bi-arrow-repeat" aria-hidden="true"></i>
-                <span>{{ translations().refresh }}</span>
-              </button>
-            </div>
-          </div>
-
           @if (activeLoading()) {
             <app-niletronix-loading-state [title]="translations().loading" variant="inline" size="sm" />
           }
@@ -236,52 +288,6 @@
 
       @if (activeTab() === 'deleted') {
         <div class="list-panel d-grid gap-3 p-3 mt-3">
-          <div class="row g-2 align-items-end" data-testid="windows-deleted-filters">
-            <div class="col-12 col-xl-5">
-              <label class="filter-field">
-                <span>{{ translations().searchPlaceholder }}</span>
-                <i class="bi bi-search filter-icon" aria-hidden="true"></i>
-                <input
-                  class="form-control"
-                  type="search"
-                  [value]="deletedSearch()"
-                  [placeholder]="translations().searchPlaceholder"
-                  (input)="updateDeletedSearch($event)"
-                />
-              </label>
-            </div>
-            <div class="col-12 col-md-6 col-xl-3">
-              <label class="filter-field">
-                <span>{{ translations().waitingAreaFilter }}</span>
-                <i class="bi bi-hourglass-split filter-icon" aria-hidden="true"></i>
-                <select class="form-select" [value]="deletedWaitingAreaId() ?? ''" (change)="updateDeletedWaitingAreaFilter($event)">
-                  <option value="">{{ translations().allWaitingAreas }}</option>
-                  @for (area of waitingAreas(); track area.id) {
-                    <option [value]="area.id">{{ waitingAreaLabel(area) }}</option>
-                  }
-                </select>
-              </label>
-            </div>
-            <div class="col-12 col-sm-6 col-md-3 col-xl-2">
-              <label class="filter-field">
-                <span>{{ translations().pageSize }}</span>
-                <i class="bi bi-list-ol filter-icon" aria-hidden="true"></i>
-                <select class="form-select" [value]="deletedPageSize()" (change)="updateDeletedPageSize($event)">
-                  <option value="10">10</option>
-                  <option value="25">25</option>
-                  <option value="50">50</option>
-                  <option value="100">100</option>
-                </select>
-              </label>
-            </div>
-            <div class="col-12 col-sm-6 col-md-3 col-xl-2 d-grid">
-              <button type="button" class="btn secondary-action w-100" [disabled]="deletedLoading()" (click)="refreshDeleted()">
-                <i class="bi bi-arrow-repeat" aria-hidden="true"></i>
-                <span>{{ translations().refresh }}</span>
-              </button>
-            </div>
-          </div>
-
           @if (deletedLoading()) {
             <app-niletronix-loading-state [title]="translations().loading" variant="inline" size="sm" />
           }
@@ -391,56 +397,103 @@
       @if (panelMode() !== 'closed') {
         <div class="editor-backdrop app-popup-overlay" (click)="closePanel()"></div>
         <aside class="editor-panel app-popup-panel window-editor-panel" role="dialog" [attr.aria-label]="panelTitle()">
-          <header class="panel-header">
-            <h2>{{ panelTitle() }}</h2>
-            <button type="button" class="icon-action" [attr.aria-label]="translations().close" (click)="closePanel()">
+          <header class="q-dialog-header">
+            <div class="d-flex align-items-center gap-3">
+              <span class="q-dialog-icon">
+                <i class="bi bi-window-stack" aria-hidden="true"></i>
+              </span>
+              <div>
+                <h2 class="q-dialog-title mb-0">{{ panelTitle() }}</h2>
+              </div>
+            </div>
+            <button type="button" class="q-dialog-close" (click)="closePanel()">
               <i class="bi bi-x-lg" aria-hidden="true"></i>
             </button>
           </header>
 
-          @if (panelMode() === 'view' && selectedDetails()) {
-            <dl class="details-list">
-              <div>
-                <dt>{{ translations().windowNumber }}</dt>
-                <dd>{{ selectedDetails()!.number }}</dd>
-              </div>
-              <div>
-                <dt>{{ translations().descriptiveName }}</dt>
-                <dd>{{ formatText(selectedDetails()!.descriptiveName) }}</dd>
-              </div>
-              <div>
-                <dt>{{ translations().waitingArea }}</dt>
-                <dd>{{ selectedDetails()!.waitingAreaNumber }} - {{ formatText(selectedDetails()!.waitingAreaDescriptiveName) }}</dd>
-              </div>
-              <div>
-                <dt>{{ translations().ipAddress }}</dt>
-                <dd dir="ltr">{{ formatText(selectedDetails()!.ipAddress) }}</dd>
-              </div>
-              <div>
-                <dt>{{ translations().ticketBooking }}</dt>
-                <dd>{{ displayBoolean(selectedDetails()!.enableTicketBooking) }}</dd>
-              </div>
-              <div>
-                <dt>{{ translations().directCall }}</dt>
-                <dd>{{ displayBoolean(selectedDetails()!.enableDirectCall) }}</dd>
-              </div>
-              <div>
-                <dt>{{ translations().createdOn }}</dt>
-                <dd>{{ formatDate(selectedDetails()!.createdOnUtc) }}</dd>
-              </div>
-              <div>
-                <dt>{{ translations().modifiedOn }}</dt>
-                <dd>{{ formatDate(selectedDetails()!.modifiedOnUtc) }}</dd>
-              </div>
-            </dl>
+          @if (panelMode() === 'view' && selectedDetails(); as details) {
+            <div class="q-detail-sections p-3">
+              <section class="q-detail-section">
+                <h3 class="q-detail-section-title">
+                  <i class="bi bi-window-stack" aria-hidden="true"></i>
+                  تفاصيل مكان الخدمة
+                </h3>
+                <div class="q-detail-grid">
+                  <div class="q-detail-item">
+                    <span class="q-detail-label">
+                      <i class="bi bi-hash" aria-hidden="true"></i>
+                      {{ translations().windowNumber }}
+                    </span>
+                    <span class="q-detail-value">{{ details.number }}</span>
+                  </div>
+                  <div class="q-detail-item">
+                    <span class="q-detail-label">
+                      <i class="bi bi-card-text" aria-hidden="true"></i>
+                      {{ translations().descriptiveName }}
+                    </span>
+                    <span class="q-detail-value">{{ formatText(details.descriptiveName) }}</span>
+                  </div>
+                  <div class="q-detail-item">
+                    <span class="q-detail-label">
+                      <i class="bi bi-hourglass-split" aria-hidden="true"></i>
+                      {{ translations().waitingArea }}
+                    </span>
+                    <span class="q-detail-value">{{ details.waitingAreaNumber }} - {{ formatText(details.waitingAreaDescriptiveName) }}</span>
+                  </div>
+                  <div class="q-detail-item">
+                    <span class="q-detail-label">
+                      <i class="bi bi-hdd-network" aria-hidden="true"></i>
+                      {{ translations().ipAddress }}
+                    </span>
+                    <span class="q-detail-value" dir="ltr">{{ formatText(details.ipAddress) }}</span>
+                  </div>
+                  <div class="q-detail-item">
+                    <span class="q-detail-label">
+                      <i class="bi bi-ticket-perforated" aria-hidden="true"></i>
+                      {{ translations().ticketBooking }}
+                    </span>
+                    <span class="q-detail-value">{{ displayBoolean(details.enableTicketBooking) }}</span>
+                  </div>
+                  <div class="q-detail-item">
+                    <span class="q-detail-label">
+                      <i class="bi bi-telephone" aria-hidden="true"></i>
+                      {{ translations().directCall }}
+                    </span>
+                    <span class="q-detail-value">{{ displayBoolean(details.enableDirectCall) }}</span>
+                  </div>
+                </div>
+              </section>
+
+              <section class="q-detail-section">
+                <h3 class="q-detail-section-title">
+                  <i class="bi bi-clock-history" aria-hidden="true"></i>
+                  التاريخ والوقت
+                </h3>
+                <div class="q-detail-grid">
+                  <div class="q-detail-item">
+                    <span class="q-detail-label">
+                      <i class="bi bi-calendar-plus" aria-hidden="true"></i>
+                      {{ translations().createdOn }}
+                    </span>
+                    <span class="q-detail-value" dir="ltr">{{ formatDate(details.createdOnUtc) }}</span>
+                  </div>
+                  <div class="q-detail-item">
+                    <span class="q-detail-label">
+                      <i class="bi bi-calendar-check" aria-hidden="true"></i>
+                      {{ translations().modifiedOn }}
+                    </span>
+                    <span class="q-detail-value" dir="ltr">{{ formatDate(details.modifiedOnUtc) }}</span>
+                  </div>
+                </div>
+              </section>
+            </div>
           }
 
           @if (panelMode() === 'create' || panelMode() === 'edit') {
-            <form class="window-form row g-3" [formGroup]="windowForm" (ngSubmit)="saveWindow()" novalidate>
-              <div class="col-12">
-                <label class="form-field has-field-icon w-100">
+            <form class="editor-form window-form" [formGroup]="windowForm" (ngSubmit)="saveWindow()" novalidate>
+              <div class="form-cell form-cell-full">
+                <label class="form-field">
                   <span>{{ translations().waitingArea }}</span>
-                  <i class="bi bi-hourglass-split form-field-icon" aria-hidden="true"></i>
                   <select class="form-select" formControlName="waitingAreaId" [class.is-invalid]="hasWindowFormError('waitingAreaId')">
                     <option [value]="0">{{ translations().selectWaitingArea }}</option>
                     @for (area of waitingAreas(); track area.id) {
@@ -452,10 +505,10 @@
                   }
                 </label>
               </div>
-              <div class="col-12 col-md-6">
-                <label class="form-field has-field-icon w-100">
+
+              <div class="form-cell">
+                <label class="form-field">
                   <span>{{ translations().windowNumber }}</span>
-                  <i class="bi bi-hash form-field-icon" aria-hidden="true"></i>
                   <input class="form-control" type="text" maxlength="20" formControlName="number" [class.is-invalid]="hasWindowFormError('number')" />
                   @if (hasWindowFormError('number')) {
                     <small>
@@ -468,44 +521,51 @@
                   }
                 </label>
               </div>
-              <div class="col-12 col-md-6">
-                <label class="form-field has-field-icon w-100">
+
+              <div class="form-cell">
+                <label class="form-field">
                   <span>{{ translations().descriptiveName }}</span>
-                  <i class="bi bi-card-text form-field-icon" aria-hidden="true"></i>
                   <input class="form-control" type="text" maxlength="100" formControlName="descriptiveName" [class.is-invalid]="hasWindowFormError('descriptiveName')" />
                   @if (hasWindowFormError('descriptiveName')) {
                     <small>{{ translations().maxLength100 }}</small>
                   }
                 </label>
               </div>
-              <div class="col-12 col-md-6">
-                <label class="form-field has-field-icon w-100">
+
+              <div class="form-cell">
+                <label class="form-field">
                   <span>{{ translations().ipAddress }}</span>
-                  <i class="bi bi-hdd-network form-field-icon" aria-hidden="true"></i>
                   <input class="form-control" type="text" maxlength="45" formControlName="ipAddress" [class.is-invalid]="hasWindowFormError('ipAddress')" />
                   @if (hasWindowFormError('ipAddress')) {
                     <small>{{ translations().invalidIp }}</small>
                   }
                 </label>
               </div>
-              <div class="col-12 col-md-6">
-                <label class="check-row d-flex align-items-center gap-2 m-0 p-3">
-                  <input class="form-check-input flex-shrink-0 m-0" type="checkbox" formControlName="enableTicketBooking" />
-                  <span>{{ translations().ticketBooking }}</span>
-                </label>
+
+              <div class="form-cell form-cell-full">
+                <div class="d-grid gap-3" style="grid-template-columns: 1fr 1fr;">
+                  <label class="q-toggle-card" [class.active]="ticketCb.checked">
+                    <input #ticketCb type="checkbox" formControlName="enableTicketBooking" class="d-none" />
+                    <i class="bi bi-ticket-perforated"></i>
+                    <span>{{ translations().ticketBooking }}</span>
+                    <div class="active-indicator"><i class="bi bi-check-circle-fill"></i></div>
+                  </label>
+
+                  <label class="q-toggle-card" [class.active]="directCallCb.checked">
+                    <input #directCallCb type="checkbox" formControlName="enableDirectCall" class="d-none" />
+                    <i class="bi bi-telephone"></i>
+                    <span>{{ translations().directCall }}</span>
+                    <div class="active-indicator"><i class="bi bi-check-circle-fill"></i></div>
+                  </label>
+                </div>
               </div>
-              <div class="col-12 col-md-6">
-                <label class="check-row d-flex align-items-center gap-2 m-0 p-3">
-                  <input class="form-check-input flex-shrink-0 m-0" type="checkbox" formControlName="enableDirectCall" />
-                  <span>{{ translations().directCall }}</span>
-                </label>
-              </div>
-              <div class="panel-actions col-12 d-flex flex-column flex-sm-row justify-content-end gap-2">
-                <button type="button" class="btn secondary-action" (click)="closePanel()">
+
+              <div class="form-actions">
+                <button type="button" class="secondary-action" (click)="closePanel()">
                   <i class="bi bi-x-lg" aria-hidden="true"></i>
                   <span>{{ translations().cancel }}</span>
                 </button>
-                <button type="submit" class="btn primary-action" [disabled]="saving()">
+                <button type="submit" class="primary-action" [disabled]="saving()">
                   <i class="bi bi-check2" aria-hidden="true"></i>
                   <span>{{ translations().save }}</span>
                 </button>
@@ -518,15 +578,22 @@
       @if (confirmDialog()) {
         <div class="editor-backdrop app-popup-overlay" (click)="closeConfirmDialog()"></div>
         <aside class="editor-panel app-popup-panel window-confirm-panel" role="dialog" [attr.aria-label]="confirmDialog()?.title ?? ''">
-          <header class="panel-header">
-            <h2>
-              @if (confirmDialog()?.kind === 'deactivate') {
-                {{ translations().deleteConfirm }}
-              } @else {
-                {{ translations().permanentDeleteConfirm }}
-              }
-            </h2>
-            <button type="button" class="icon-action" [attr.aria-label]="translations().close" (click)="closeConfirmDialog()">
+          <header class="q-dialog-header">
+            <div class="d-flex align-items-center gap-3">
+              <span class="q-dialog-icon q-dialog-icon--danger">
+                <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
+              </span>
+              <div>
+                <h2 class="q-dialog-title mb-0">
+                  @if (confirmDialog()?.kind === 'deactivate') {
+                    {{ translations().deleteConfirm }}
+                  } @else {
+                    {{ translations().permanentDeleteConfirm }}
+                  }
+                </h2>
+              </div>
+            </div>
+            <button type="button" class="q-dialog-close" (click)="closeConfirmDialog()">
               <i class="bi bi-x-lg" aria-hidden="true"></i>
             </button>
           </header>

@@ -313,30 +313,35 @@
 
 /* ── Form Fields ──────────────────────────────────────────────── */
 .q-field {
-  display: grid;
-  gap: 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
   min-width: 0;
 }
 
 .q-field-label {
   color: #475569;
-  font-size: 10.5px;
+  font-size: 0.82rem;
   font-weight: 800;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.02em;
+  line-height: 1.4;
 }
 
 .q-field .form-control,
 .q-field input,
 .q-field select,
 .q-field textarea {
-  min-height: 34px;
-  padding: 6px 10px;
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 14px;
   color: #0f172a;
   background: #fff;
-  border: 1px solid #cbd5e1;
-  border-radius: 8px;
-  font-size: 12px;
+  border: 1px solid #d9e3ee;
+  border-radius: 9px;
+  font-size: 0.9rem;
   font-weight: 500;
+  box-sizing: border-box;
   transition: border-color 0.15s, box-shadow 0.15s;
 }
 
@@ -357,7 +362,7 @@
 
 .q-field-error {
   color: #dc2626;
-  font-size: 10px;
+  font-size: 0.75rem;
   font-weight: 700;
 }
 
@@ -632,6 +637,241 @@
 
 .q-option-card.active .q-option-indicator,
 .q-option-card:has(input:checked) .q-option-indicator {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* ── Structured Detail Cards & Detail Grid System ─────────────────── */
+.q-detail-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.q-detail-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.03);
+}
+
+.q-detail-section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding-bottom: 10px;
+  color: #0369a1;
+  font-size: 13px;
+  font-weight: 850;
+  border-bottom: 1px dashed #e2e8f0;
+}
+
+.q-detail-section-title i {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: #e0f2fe;
+  color: #0284c7;
+  font-size: 14px;
+}
+
+.q-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 12px;
+}
+
+.q-detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 14px;
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+  border-radius: 10px;
+  transition: all 0.15s ease;
+}
+
+.q-detail-item:hover {
+  background: #f0f9ff;
+  border-color: #e0f2fe;
+  transform: translateY(-1px);
+}
+
+.q-detail-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: 0.02em;
+}
+
+.q-detail-label i {
+  color: #0ea5e9;
+  font-size: 13px;
+}
+
+.q-detail-value {
+  color: #0f172a;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.q-detail-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: fit-content;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 800;
+}
+
+.q-detail-pill--active {
+  color: #047857;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+}
+
+.q-detail-pill--inactive {
+  color: #be123c;
+  background: #fff1f2;
+  border: 1px solid #fecdd3;
+}
+
+/* ── Universal Popup Form & Input Grid Fix ───────────────────────── */
+.editor-form,
+.terminal-editor-form,
+.window-editor-form,
+.display-editor-form {
+  width: 100% !important;
+}
+
+.editor-form .form-cell,
+.terminal-editor-form .form-cell,
+.window-editor-form .form-cell,
+.display-editor-form .form-cell {
+  display: flex !important;
+  flex-direction: column !important;
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+.editor-form .form-field,
+.terminal-editor-form .form-field,
+.window-editor-form .form-field,
+.display-editor-form .form-field,
+.app-popup-panel .form-field {
+  display: flex !important;
+  flex-direction: column !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  gap: 6px !important;
+  margin: 0 !important;
+}
+
+.editor-form .form-field > span,
+.terminal-editor-form .form-field > span,
+.window-editor-form .form-field > span,
+.display-editor-form .form-field > span,
+.app-popup-panel .form-field > span {
+  display: block !important;
+  width: 100% !important;
+  color: #475569 !important;
+  font-size: 11.5px !important;
+  font-weight: 800 !important;
+  margin-bottom: 2px !important;
+}
+
+.editor-form :where(.form-control, .form-select, input:not([type="checkbox"]):not([type="radio"]), select, textarea),
+.terminal-editor-form :where(.form-control, .form-select, input:not([type="checkbox"]):not([type="radio"]), select, textarea),
+.window-editor-form :where(.form-control, .form-select, input:not([type="checkbox"]):not([type="radio"]), select, textarea),
+.display-editor-form :where(.form-control, .form-select, input:not([type="checkbox"]):not([type="radio"]), select, textarea),
+.app-popup-panel :where(.form-control, .form-select, input:not([type="checkbox"]):not([type="radio"]), select, textarea) {
+  width: 100% !important;
+  min-height: 42px !important;
+  box-sizing: border-box !important;
+}
+
+/* ── Toggle Cards (Checkbox Alternative) ───────────────────────── */
+.q-toggle-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 10px 14px;
+  background: #f8fafc;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
+  overflow: hidden;
+  height: 100%;
+}
+
+.q-toggle-card:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.q-toggle-card > i {
+  font-size: 20px;
+  color: #64748b;
+  transition: all 0.2s ease;
+  line-height: 1;
+}
+
+.q-toggle-card > span {
+  font-size: 10px;
+  font-weight: 700;
+  color: #475569;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.q-toggle-card .active-indicator {
+  position: absolute;
+  top: 6px;
+  inset-inline-end: 12px;
+  color: #48b291;
+  font-size: 14px;
+  opacity: 0;
+  transform: scale(0.5);
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.q-toggle-card.active {
+  background: #ecfdf5;
+  border-color: #75f0a4;
+  box-shadow: 0 4px 12px rgba(74, 177, 210, 0.1);
+}
+
+.q-toggle-card.active > i {
+  color: #047857;
+  transform: translateY(-2px);
+}
+
+.q-toggle-card.active > span {
+  color: #047857;
+}
+
+.q-toggle-card.active .active-indicator {
   opacity: 1;
   transform: scale(1);
 }

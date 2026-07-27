@@ -4,6 +4,7 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
   selector: 'app-technical-admin-page-hero',
   standalone: true,
   templateUrl: './technical-admin-page-hero.component.html',
+  styleUrl: './technical-admin-page-hero.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TechnicalAdminPageHeroComponent {

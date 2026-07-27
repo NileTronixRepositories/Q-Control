@@ -48,100 +48,75 @@ const TIME_PATTERN = /^([01]\d|2[0-3]):[0-5]\d$/;
 const API_TIME_PATTERN = /^([01]\d|2[0-3]):[0-5]\d(?::[0-5]\d)?$/;
 const AM_PM_TIME_PATTERN = /^(0?[1-9]|1[0-2]):([0-5]\d)(?::[0-5]\d)?\s*([AP]M)$/i;
 
-type TimeSlotGroup = FormGroup<{
+type ScheduleRuleGroup = FormGroup<{
   startTime: FormControl<string>;
   endTime: FormControl<string>;
-}>;
-
-type ScheduleDayGroup = FormGroup<{
-  dayOfWeek: FormControl<DayOfWeek>;
-  isWorkingDay: FormControl<boolean>;
-  timeSlots: FormArray<TimeSlotGroup>;
+  day: FormControl<DayOfWeek | null>;
 }>;
 
 type ScheduleForm = FormGroup<{
-  days: FormArray<ScheduleDayGroup>;
+  rules: FormArray<ScheduleRuleGroup>;
   isSlotCodeRequired: FormControl<boolean>;
   slotCode: FormControl<string>;
 }>;
 
-function serviceScheduleDaysValidator(control: AbstractControl): ValidationErrors | null {
-  const daysControl = control.get('days');
+function serviceScheduleRulesValidator(control: AbstractControl): ValidationErrors | null {
+  const rulesControl = control.get('rules');
 
-  if (!(daysControl instanceof FormArray)) {
-    return null;
+  if (!(rulesControl instanceof FormArray) || rulesControl.length === 0) {
+    return { rulesRequired: true };
   }
 
-  let hasWorkingDay = false;
-  let hasMissingSlot = false;
   let hasInvalidTime = false;
   let hasInvalidRange = false;
-  let hasDuplicateSlot = false;
+  let hasNoDays = false;
   let hasOverlap = false;
 
-  for (const dayControl of daysControl.controls) {
-    if (!dayControl.get('isWorkingDay')?.value) {
-      continue;
+  // Track slots per day to check for overlaps
+  const slotsPerDay = new Map<DayOfWeek, Array<{ start: number; end: number }>>();
+  SERVICE_SCHEDULE_DAYS.forEach(day => slotsPerDay.set(day, []));
+
+  for (const ruleControl of rulesControl.controls) {
+    const startTime = String(ruleControl.get('startTime')?.value ?? '').trim();
+    const endTime = String(ruleControl.get('endTime')?.value ?? '').trim();
+    const day = ruleControl.get('day')?.value as DayOfWeek | null;
+
+    if (!day) {
+      hasNoDays = true;
     }
 
-    hasWorkingDay = true;
-    const slotsControl = dayControl.get('timeSlots');
-
-    if (!(slotsControl instanceof FormArray) || slotsControl.length === 0) {
-      hasMissingSlot = true;
-      continue;
-    }
-
-    const slots = slotsControl.controls.map((slotControl) => ({
-      startTime: String(slotControl.get('startTime')?.value ?? '').trim(),
-      endTime: String(slotControl.get('endTime')?.value ?? '').trim(),
-    }));
-
-    if (slots.some((slot) => !slot.startTime || !slot.endTime)) {
-      hasMissingSlot = true;
-    }
-
-    if (slots.some((slot) => !TIME_PATTERN.test(slot.startTime) || !TIME_PATTERN.test(slot.endTime))) {
+    if (!TIME_PATTERN.test(startTime) || !TIME_PATTERN.test(endTime)) {
       hasInvalidTime = true;
       continue;
     }
 
-    const sortedSlots = slots
-      .map((slot) => ({
-        ...slot,
-        startMinutes: timeToMinutes(slot.startTime),
-        endMinutes: timeToMinutes(slot.endTime),
-      }))
-      .sort((first, second) => first.startMinutes - second.startMinutes || first.endMinutes - second.endMinutes);
+    const startMinutes = timeToMinutes(startTime);
+    const endMinutes = timeToMinutes(endTime);
 
-    if (sortedSlots.some((slot) => slot.startMinutes >= slot.endMinutes)) {
+    if (startMinutes >= endMinutes) {
       hasInvalidRange = true;
+      continue;
     }
 
-    const seenSlots = new Set<string>();
-    for (const slot of sortedSlots) {
-      const key = `${slot.startTime}-${slot.endTime}`;
-      if (seenSlots.has(key)) {
-        hasDuplicateSlot = true;
-      }
-      seenSlots.add(key);
+    if (day) {
+      slotsPerDay.get(day)?.push({ start: startMinutes, end: endMinutes });
     }
+  }
 
-    for (let index = 1; index < sortedSlots.length; index += 1) {
-      const previous = sortedSlots[index - 1];
-      const current = sortedSlots[index];
-      if (current.startMinutes < previous.endMinutes && current.endMinutes > previous.startMinutes) {
+  // Check overlaps per day
+  for (const [day, slots] of slotsPerDay.entries()) {
+    slots.sort((a, b) => a.start - b.start || a.end - b.end);
+    for (let i = 1; i < slots.length; i++) {
+      if (slots[i].start < slots[i - 1].end && slots[i].end > slots[i - 1].start) {
         hasOverlap = true;
       }
     }
   }
 
   const errors: ValidationErrors = {};
-  if (!hasWorkingDay) errors['daysRequired'] = true;
-  if (hasMissingSlot) errors['timeSlotsRequired'] = true;
+  if (hasNoDays) errors['daysRequired'] = true;
   if (hasInvalidTime) errors['invalidTime'] = true;
   if (hasInvalidRange) errors['timeRange'] = true;
-  if (hasDuplicateSlot) errors['duplicateTimeSlot'] = true;
   if (hasOverlap) errors['overlappingTimeSlots'] = true;
 
   return Object.keys(errors).length > 0 ? errors : null;
@@ -380,14 +355,6 @@ export class ServiceSchedulesComponent implements OnInit, OnDestroy, ServiceSche
     this.loadSchedule();
   }
 
-  protected dayGroups(): readonly ScheduleDayGroup[] {
-    return this.scheduleForm.controls.days.controls;
-  }
-
-  protected timeSlotGroups(dayIndex: number): readonly TimeSlotGroup[] {
-    return this.dayGroup(dayIndex).controls.timeSlots.controls;
-  }
-
   protected openNativeTimePicker(input: HTMLInputElement): void {
     if (this.inlineControlsDisabled()) {
       return;
@@ -400,69 +367,6 @@ export class ServiceSchedulesComponent implements OnInit, OnDestroy, ServiceSche
     }
   }
 
-  protected dayIsWorking(dayIndex: number): boolean {
-    return this.dayGroup(dayIndex).controls.isWorkingDay.value;
-  }
-
-  protected toggleWorkingDay(dayIndex: number, checked: boolean): void {
-    if (!this.canEditInline()) {
-      return;
-    }
-
-    const dayGroup = this.dayGroup(dayIndex);
-    const slots = dayGroup.controls.timeSlots;
-
-    if (checked) {
-      dayGroup.controls.isWorkingDay.setValue(true);
-      if (slots.length === 0) {
-        slots.push(this.createTimeSlotGroup());
-      }
-    } else {
-      if (this.hasEnteredTimeSlots(slots) && !window.confirm(this.translations().disableDayConfirm)) {
-        return;
-      }
-
-      slots.clear();
-      dayGroup.controls.isWorkingDay.setValue(false);
-    }
-
-    dayGroup.markAsDirty();
-    dayGroup.markAsTouched();
-    this.scheduleForm.updateValueAndValidity();
-  }
-
-  protected addTimeSlot(dayIndex: number): void {
-    if (!this.canEditInline()) {
-      return;
-    }
-
-    const dayGroup = this.dayGroup(dayIndex);
-
-    dayGroup.controls.isWorkingDay.setValue(true);
-    dayGroup.controls.timeSlots.push(this.createTimeSlotGroup());
-    dayGroup.markAsDirty();
-    dayGroup.markAsTouched();
-    this.scheduleForm.updateValueAndValidity();
-  }
-
-  protected removeTimeSlot(dayIndex: number, slotIndex: number): void {
-    if (!this.canEditInline()) {
-      return;
-    }
-
-    const dayGroup = this.dayGroup(dayIndex);
-    const slots = dayGroup.controls.timeSlots;
-
-    slots.removeAt(slotIndex);
-
-    if (slots.length === 0) {
-      dayGroup.controls.isWorkingDay.setValue(false);
-    }
-
-    dayGroup.markAsDirty();
-    dayGroup.markAsTouched();
-    this.scheduleForm.updateValueAndValidity();
-  }
   protected submit(): void {
     const currentScope = this.scope();
     this.scheduleForm.markAllAsTouched();
@@ -526,29 +430,6 @@ export class ServiceSchedulesComponent implements OnInit, OnDestroy, ServiceSche
     return null;
   }
 
-  protected slotControlError(
-    dayIndex: number,
-    slotIndex: number,
-    controlName: 'startTime' | 'endTime',
-  ): string | null {
-    const control = this.timeSlotGroup(dayIndex, slotIndex).controls[controlName];
-
-    if (!control.touched || !control.invalid) {
-      return null;
-    }
-
-    if (control.hasError('required')) {
-      return controlName === 'startTime'
-        ? this.translations().startTimeRequired
-        : this.translations().endTimeRequired;
-    }
-
-    if (control.hasError('pattern')) {
-      return this.translations().invalidTime;
-    }
-
-    return null;
-  }
   protected formError(): string | null {
     if (!this.scheduleForm.touched) {
       return null;
@@ -738,44 +619,42 @@ export class ServiceSchedulesComponent implements OnInit, OnDestroy, ServiceSche
   private createScheduleForm(): ScheduleForm {
     return this.formBuilder.group(
       {
-        days: this.formBuilder.array(SERVICE_SCHEDULE_DAYS.map((day) => this.createDayGroup(day))),
+        rules: this.formBuilder.array<ScheduleRuleGroup>([]),
         isSlotCodeRequired: [false],
         slotCode: ['', [Validators.maxLength(100)]],
       },
-      { validators: serviceScheduleDaysValidator },
+      { validators: serviceScheduleRulesValidator },
     ) as ScheduleForm;
   }
 
-  private createDayGroup(
-    dayOfWeek: DayOfWeek,
-    timeSlots: readonly ServiceScheduleTimeSlot[] = [],
-  ): ScheduleDayGroup {
-    return this.formBuilder.group({
-      dayOfWeek: this.formBuilder.control(dayOfWeek),
-      isWorkingDay: this.formBuilder.control(timeSlots.length > 0),
-      timeSlots: this.formBuilder.array(
-        timeSlots.map((slot) =>
-          this.createTimeSlotGroup(this.toInputTime(slot.startTime), this.toInputTime(slot.endTime)),
-        ),
-      ),
-    }) as ScheduleDayGroup;
-  }
-
-  private createTimeSlotGroup(startTime = '', endTime = ''): TimeSlotGroup {
+  private createRuleGroup(
+    startTime = '',
+    endTime = '',
+    day: DayOfWeek | null = null,
+  ): ScheduleRuleGroup {
     return this.formBuilder.group({
       startTime: [startTime, [Validators.required, Validators.pattern(TIME_PATTERN)]],
       endTime: [endTime, [Validators.required, Validators.pattern(TIME_PATTERN)]],
-    }) as TimeSlotGroup;
+      day: [day],
+    }) as ScheduleRuleGroup;
   }
 
   private resetScheduleForm(schedule: ServiceSchedule | null = null): void {
-    const daysByName = new Map(schedule?.days.map((day) => [day.dayOfWeek, day]) ?? []);
-    const daysArray = this.scheduleForm.controls.days;
+    const rulesArray = this.scheduleForm.controls.rules;
+    rulesArray.clear();
 
-    daysArray.clear();
-    SERVICE_SCHEDULE_DAYS.forEach((day) => {
-      daysArray.push(this.createDayGroup(day, daysByName.get(day)?.timeSlots ?? []));
-    });
+    if (schedule && schedule.days.length > 0) {
+      for (const dayGroup of schedule.days) {
+        for (const slot of dayGroup.timeSlots) {
+          rulesArray.push(
+            this.createRuleGroup(this.toInputTime(slot.startTime), this.toInputTime(slot.endTime), dayGroup.dayOfWeek),
+          );
+        }
+      }
+    } else {
+      // Create a default empty rule
+      rulesArray.push(this.createRuleGroup());
+    }
 
     this.scheduleForm.controls.isSlotCodeRequired.setValue(schedule?.isSlotCodeRequired ?? false);
     this.scheduleForm.controls.slotCode.setValue(schedule?.slotCode ?? '');
@@ -784,32 +663,67 @@ export class ServiceSchedulesComponent implements OnInit, OnDestroy, ServiceSche
     this.scheduleForm.updateValueAndValidity();
   }
 
-  private dayGroup(dayIndex: number): ScheduleDayGroup {
-    return this.scheduleForm.controls.days.at(dayIndex);
+  protected rules(): readonly ScheduleRuleGroup[] {
+    return this.scheduleForm.controls.rules.controls;
   }
 
-  private timeSlotGroup(dayIndex: number, slotIndex: number): TimeSlotGroup {
-    return this.dayGroup(dayIndex).controls.timeSlots.at(slotIndex);
+  protected addRule(): void {
+    if (!this.canEditInline()) return;
+    this.scheduleForm.controls.rules.push(this.createRuleGroup());
+    this.scheduleForm.markAsDirty();
+    this.scheduleForm.updateValueAndValidity();
   }
 
-  private hasEnteredTimeSlots(slots: FormArray<TimeSlotGroup>): boolean {
-    return slots.controls.some((slot) =>
-      Boolean(slot.controls.startTime.value.trim() || slot.controls.endTime.value.trim()),
-    );
+  protected removeRule(index: number): void {
+    if (!this.canEditInline()) return;
+    this.scheduleForm.controls.rules.removeAt(index);
+    if (this.scheduleForm.controls.rules.length === 0) {
+      this.scheduleForm.controls.rules.push(this.createRuleGroup());
+    }
+    this.scheduleForm.markAsDirty();
+    this.scheduleForm.updateValueAndValidity();
+  }
+
+  protected ruleControlError(ruleIndex: number, controlName: 'startTime' | 'endTime'): string | null {
+    const control = this.rules()[ruleIndex].controls[controlName];
+
+    if (!control.touched || !control.invalid) {
+      return null;
+    }
+
+    if (control.hasError('required')) {
+      return controlName === 'startTime'
+        ? this.translations().startTimeRequired
+        : this.translations().endTimeRequired;
+    }
+
+    if (control.hasError('pattern')) {
+      return this.translations().invalidTime;
+    }
+
+    return null;
   }
   private mapRequest(): CreateServiceScheduleRequest {
     const value = this.scheduleForm.getRawValue();
     const slotCode = value.slotCode.trim();
-    const days = this.scheduleForm.controls.days.controls
-      .filter((dayGroup) => dayGroup.controls.isWorkingDay.value)
-      .map((dayGroup) => ({
-        dayOfWeek: dayGroup.controls.dayOfWeek.value,
-        timeSlots: dayGroup.controls.timeSlots.controls
-          .map((slotGroup) => ({
-            startTime: this.toApiTime(slotGroup.controls.startTime.value),
-            endTime: this.toApiTime(slotGroup.controls.endTime.value),
-          }))
-          .sort((first, second) => this.compareTimeSlots(first, second)),
+    
+    const daysMap = new Map<DayOfWeek, Array<{ startTime: string; endTime: string }>>();
+    SERVICE_SCHEDULE_DAYS.forEach(d => daysMap.set(d, []));
+
+    for (const rule of value.rules) {
+      if (!rule.day || !rule.startTime || !rule.endTime) continue;
+      
+      const apiStartTime = this.toApiTime(rule.startTime);
+      const apiEndTime = this.toApiTime(rule.endTime);
+      
+      daysMap.get(rule.day)?.push({ startTime: apiStartTime, endTime: apiEndTime });
+    }
+
+    const days = Array.from(daysMap.entries())
+      .filter(([_, slots]) => slots.length > 0)
+      .map(([dayOfWeek, timeSlots]) => ({
+        dayOfWeek,
+        timeSlots: timeSlots.sort((first, second) => this.compareTimeSlots(first, second)),
       }));
 
     return {

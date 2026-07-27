@@ -1,4 +1,4 @@
-﻿/* ============================================
+/* ============================================
    MODERN ADMIN TOOLBAR STYLES - Catchy & Simple
    ============================================ */
 
@@ -50,7 +50,6 @@ body[data-admin-theme] .filter-field:has(.filter-icon) .form-select {
 
 body[data-admin-theme] .filter-field .form-control,
 body[data-admin-theme] .filter-field .form-select {
-  padding-inline-end: 0.85rem;
   padding-inline-start: 0.85rem;
   background-color: var(--q-surface);
   border-color: var(--q-border-subtle);
@@ -59,6 +58,10 @@ body[data-admin-theme] .filter-field .form-select {
   line-height: var(--q-line-height-body, 1.55);
   box-shadow: none;
   transition: all 0.2s ease;
+}
+
+body[data-admin-theme] .filter-field .form-control {
+  padding-inline-end: 0.85rem;
 }
 
 body[data-admin-theme] .filter-icon,
@@ -78,17 +81,6 @@ body[data-admin-theme] .search-icon {
 
 body[data-admin-theme] .search-icon {
   inset-inline-start: 14px;
-}
-
-/* RTL Support for Filter Fields */
-body[data-admin-theme].app-shell-rtl .filter-field:has(.filter-icon) .form-control,
-body[data-admin-theme].app-shell-rtl .filter-field:has(.filter-icon) .form-select {
-  padding-inline: 0.75rem var(--admin-icon-padding);
-}
-
-body[data-admin-theme].app-shell-rtl .filter-icon,
-body[data-admin-theme].app-shell-rtl .search-icon {
-  inset-inline: auto var(--admin-icon-offset);
 }
 
 /* ============================================
