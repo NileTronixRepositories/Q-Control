@@ -298,11 +298,9 @@
       [attr.aria-hidden]="!contextSidebarOpen()"
       [attr.inert]="!contextSidebarOpen() ? '' : null"
     >
-      <header class="context-sidebar-header d-grid gap-2 p-3">
-        <div class="d-flex align-items-start justify-content-between gap-2">
-          <span class="context-sidebar-icon d-inline-flex flex-shrink-0 align-items-center justify-content-center" aria-hidden="true">
-            <i class="bi bi-building"></i>
-          </span>
+      <header class="context-sidebar-header">
+        <div class="context-sidebar-topbar d-flex align-items-center justify-content-between gap-2">
+          <span class="context-sidebar-eyebrow">{{ contextNavigationEyebrow() }}</span>
           <button
             #contextCloseButton
             type="button"
@@ -313,26 +311,32 @@
             <i class="bi bi-x-lg" aria-hidden="true"></i>
           </button>
         </div>
-        <div class="context-sidebar-copy d-grid gap-1">
-          <span>{{ contextNavigationEyebrow() }}</span>
-          <strong class="text-truncate">{{ contextNavigationTitle() }}</strong>
-          @if (contextNavigationMeta()) {
-            <small class="text-truncate">{{ contextNavigationMeta() }}</small>
+        <div class="context-sidebar-identity">
+          <strong class="context-sidebar-title text-truncate">{{ contextNavigationTitle() }}</strong>
+          @if (contextNavigationMeta() || contextNavigationStatusLabel()) {
+            <div class="context-sidebar-meta d-flex align-items-center flex-wrap gap-1">
+              @if (contextNavigationMeta()) {
+                <small class="context-sidebar-code text-truncate">{{ contextNavigationMeta() }}</small>
+              }
+              @if (contextNavigationMeta() && contextNavigationStatusLabel()) {
+                <span class="context-sidebar-meta-separator" aria-hidden="true">&middot;</span>
+              }
+              @if (contextNavigationStatusLabel()) {
+                <span
+                  class="context-status status-pill"
+                  [class.status-active]="contextNavigationStatusTone() === 'active'"
+                  [class.status-inactive]="contextNavigationStatusTone() === 'inactive'"
+                >
+                  {{ contextNavigationStatusLabel() }}
+                </span>
+              }
+            </div>
           }
         </div>
-        @if (contextNavigationStatusLabel()) {
-          <span
-            class="context-status align-self-start"
-            [class.context-status-active]="contextNavigationStatusTone() === 'active'"
-            [class.context-status-inactive]="contextNavigationStatusTone() === 'inactive'"
-          >
-            {{ contextNavigationStatusLabel() }}
-          </span>
-        }
       </header>
 
       <nav
-        class="context-sidebar-nav d-grid align-content-start gap-2 p-3 overflow-y-auto"
+        class="context-sidebar-nav d-grid align-content-start overflow-y-auto"
         [attr.aria-label]="contextNavigationLabel()"
       >
         @for (item of contextNavigationItems(); track item.route ?? item.label) {
@@ -349,16 +353,15 @@
                 <i class="bi {{ item.icon }}" aria-hidden="true"></i>
               </span>
             }
-            <span class="context-link-text flex-grow-1 text-truncate fw-semibold">{{ item.label }}</span>
-            <i class="bi bi-chevron-right context-link-chevron" aria-hidden="true"></i>
+            <span class="context-link-text flex-grow-1 text-truncate">{{ item.label }}</span>
           </a>
         }
       </nav>
 
-      <footer class="context-sidebar-footer p-3 mt-auto">
+      <footer class="context-sidebar-footer mt-auto">
         <button
           type="button"
-          class="context-back-button d-flex w-100 align-items-center justify-content-center gap-2"
+          class="context-back-button d-flex w-100 align-items-center justify-content-center"
           (click)="closeContextRequested()"
         >
           <i class="bi bi-arrow-return-left" aria-hidden="true"></i>

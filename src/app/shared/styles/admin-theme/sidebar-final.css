@@ -107,3 +107,49 @@ body .app-shell .sidebar-nested-link.sidebar-link-active .child-icon,
 body .app-shell .sidebar-nested-link.sidebar-link-active .child-dot {
   box-shadow: none;
 }
+
+/* Branch context sidebar - compact nav links */
+body .app-shell .context-sidebar-link:hover,
+body .app-shell .context-sidebar-link:focus-visible {
+  color: var(--q-primary);
+  background: linear-gradient(90deg, rgba(11, 138, 168, 0.08), transparent);
+  border-color: rgba(11, 138, 168, 0.12);
+  transition: all 0.2s ease;
+}
+
+body .app-shell .context-sidebar-link:hover .context-link-icon {
+  color: var(--q-primary);
+  background: rgba(11, 138, 168, 0.14);
+}
+
+body .app-shell .context-sidebar-link-active {
+  color: var(--q-primary);
+  background: linear-gradient(90deg, rgba(11, 138, 168, 0.1), transparent 75%);
+  border-color: rgba(11, 138, 168, 0.14);
+  box-shadow: none;
+  transition: all 0.2s ease;
+}
+
+body .app-shell .context-sidebar-link-active::before {
+  width: 2px;
+  background: var(--q-primary);
+  box-shadow: none;
+}
+
+body .app-shell .context-sidebar-link-active .context-link-icon {
+  color: var(--q-primary);
+  background: rgba(11, 138, 168, 0.14);
+}
+
+body .app-shell .context-sidebar-link-active .context-link-text {
+  color: var(--q-primary);
+}
+
+body .app-shell.app-shell-rtl .context-sidebar-link:hover,
+body .app-shell.app-shell-rtl .context-sidebar-link:focus-visible {
+  background: linear-gradient(270deg, rgba(11, 138, 168, 0.08), transparent);
+}
+
+body .app-shell.app-shell-rtl .context-sidebar-link-active {
+  background: linear-gradient(270deg, rgba(11, 138, 168, 0.1), transparent 75%);
+}
