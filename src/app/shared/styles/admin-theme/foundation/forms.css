@@ -1,4 +1,4 @@
-﻿/* Admin form refinements. Bootstrap owns layout utilities; this file owns theme tokens and field affordances. */
+/* Admin form refinements. Bootstrap owns layout utilities; this file owns theme tokens and field affordances. */
 body[data-admin-theme] :where(.theme-form.row, form.row) {
   --bs-gutter-x: var(--nt-form-gap-x);
   --bs-gutter-y: var(--nt-form-gap-y);
@@ -40,6 +40,24 @@ body[data-admin-theme] :where(.input-wrapper, .color-control) {
 
 body[data-admin-theme] :where(.input-wrapper i, .form-field-icon) {
   color: var(--q-primary, var(--nt-primary));
+}
+
+/* Global Search Input Style */
+body[data-admin-theme] .search-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+body[data-admin-theme] .search-input-wrapper > svg {
+  position: absolute;
+  inset-inline-start: 12px;
+  pointer-events: none;
+  color: var(--bs-secondary);
+}
+
+body[data-admin-theme] .search-input-wrapper > .form-control {
+  padding-inline-start: 36px !important;
 }
 
 body[data-admin-theme] :where(.color-control) {

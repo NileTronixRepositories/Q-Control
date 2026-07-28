@@ -1,0 +1,30 @@
+.drawer-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1040;
+  background-color: rgba(15, 23, 42, 0.5);
+}
+
+.drawer-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 100%;
+  max-width: 800px;
+  height: 100vh;
+  z-index: 1045;
+  background-color: #ffffff;
+  transition: transform 0.3s ease-in-out;
+}
+
+:host-context([dir='rtl']) .drawer-panel {
+  right: auto;
+  left: 0;
+}
+
+.drawer-header {
+  min-height: 64px;
+}

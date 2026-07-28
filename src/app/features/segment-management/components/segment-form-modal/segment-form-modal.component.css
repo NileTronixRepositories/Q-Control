@@ -1,0 +1,28 @@
+.modal-backdrop {
+  z-index: 1050;
+  background-color: var(--nt-overlay-bg, rgba(27, 36, 48, 0.36));
+  backdrop-filter: blur(2px);
+}
+
+.modal {
+  z-index: 1055;
+}
+
+.modal-content {
+  border-radius: var(--q-radius-lg, 16px);
+  overflow: hidden;
+  box-shadow: var(--nt-shadow-card);
+  border: 1px solid var(--nt-border);
+}
+
+.modal-header {
+  padding: 1rem 1.25rem;
+  background: var(--q-panel-header-bg, linear-gradient(180deg, #ffffff, #f8fbfd));
+  border-bottom: 1px solid var(--q-panel-border, var(--nt-border));
+}
+
+.modal-footer {
+  padding: 1rem 1.25rem;
+  background: var(--q-surface-muted, #f8fafc);
+  border-top: 1px solid var(--q-border-subtle, var(--nt-border));
+}

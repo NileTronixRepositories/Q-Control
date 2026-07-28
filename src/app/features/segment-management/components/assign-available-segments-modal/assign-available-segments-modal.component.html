@@ -1,0 +1,153 @@
+@if (open) {
+  <div class="modal-backdrop fade show"></div>
+  <div class="modal d-block" tabindex="-1" role="dialog" aria-modal="true" [attr.dir]="'auto'">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+      <div class="modal-content shadow-lg border-0">
+        <header class="modal-header editor-panel-header d-flex justify-content-between align-items-center">
+          <h5 class="modal-title fw-bold text-dark d-flex align-items-center gap-2 m-0 fs-6">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-primary">
+              <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/>
+            </svg>
+            {{ translations.assignSegments || 'ربط شرائح جديدة' }}
+          </h5>
+          <button
+            type="button"
+            class="btn-close m-0"
+            [attr.aria-label]="translations.close || 'إغلاق'"
+            [disabled]="assigning"
+            (click)="closeModal()"
+          ></button>
+        </header>
+
+        <div class="modal-body p-4 dialog-content">
+          <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+            <div class="search-input-wrapper flex-grow-1" style="max-width: 320px;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              </svg>
+              <input
+                type="search"
+                class="form-control rounded-3"
+                [placeholder]="translations.searchPlaceholder || 'بحث بالاسم العربي أو الإنجليزي...'"
+                [ngModel]="searchText()"
+                (ngModelChange)="onSearch($event)"
+              />
+            </div>
+
+            <div class="d-flex align-items-center gap-2 bg-body-tertiary p-2 rounded-3 border">
+              <span class="text-secondary small fw-semibold">{{ translations.remainingQuota || 'الحصة المتبقية' }}:</span>
+              <span class="badge bg-success fs-6">{{ remainingQuota }}</span>
+              <span class="text-muted small">|</span>
+              <span class="text-secondary small fw-semibold">{{ translations.selectedTotal || 'إجمالي المختار' }}:</span>
+              <span class="badge" [class.bg-primary]="totalSelectedQuota <= remainingQuota" [class.bg-danger]="totalSelectedQuota > remainingQuota">
+                {{ totalSelectedQuota }}
+              </span>
+            </div>
+          </div>
+
+          @if (validationError()) {
+            <div class="alert alert-danger d-flex align-items-center gap-2 rounded-3" role="alert">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+              <div class="small fw-semibold">{{ validationError() }}</div>
+            </div>
+          }
+
+          @if (loading) {
+            <div class="text-center py-5">
+              <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">{{ translations.loading || 'جاري التحميل...' }}</span>
+              </div>
+              <p class="mt-2 text-muted small fw-semibold">{{ translations.loading || 'جاري التحميل...' }}</p>
+            </div>
+          } @else if (availableItems.length === 0) {
+            <div class="text-center py-5 text-muted">
+              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="mb-2 text-secondary"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>
+              <p class="mb-0 fw-semibold">{{ translations.noAvailableSegments || 'لا توجد شرائح متاحة للربط حالياً.' }}</p>
+            </div>
+          } @else {
+            <p class="text-secondary small fw-semibold mb-2">{{ translations.selectSegmentsToAdd || 'اختر الشرائح وحدد حصة كل منها:' }}</p>
+
+            <div class="table-responsive border rounded-3 max-table-height">
+              <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th style="width: 40px;"></th>
+                    <th>{{ translations.arabicName || 'الاسم بالعربية' }}</th>
+                    <th>{{ translations.englishName || 'الاسم بالإنجليزية' }}</th>
+                    <th>{{ translations.scope || 'النطاق' }}</th>
+                    <th>{{ translations.priority || 'الأولوية' }}</th>
+                    <th style="width: 140px;">{{ translations.quota || 'الحصة' }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (state of itemsState(); track state.item.segmentId; let idx = $index) {
+                    <tr [class.table-active]="state.selected">
+                      <td>
+                        <input
+                          type="checkbox"
+                          class="form-check-input"
+                          [checked]="state.selected"
+                          (change)="toggleSelect(idx)"
+                        />
+                      </td>
+                      <td><strong class="text-dark">{{ state.item.arabicName }}</strong></td>
+                      <td>{{ state.item.englishName }}</td>
+                      <td>
+                        @if (state.item.scope === 'Global') {
+                          <span class="badge bg-primary-subtle text-primary border border-primary-subtle">{{ translations.scopeGlobal || 'عامة (Global)' }}</span>
+                        } @else {
+                          <span class="badge bg-info-subtle text-info-emphasis border border-info-subtle">{{ translations.scopeBranchScoped || 'خاصة بالفرع (Branch-Scoped)' }}</span>
+                        }
+                      </td>
+                      <td>
+                        <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle">
+                          {{ translations.priority || 'الأولوية' }}: {{ state.item.priority }}
+                        </span>
+                      </td>
+                      <td>
+                        <input
+                          type="number"
+                          min="0"
+                          step="1"
+                          class="form-control form-control-sm rounded-2"
+                          [disabled]="!state.selected || assigning"
+                          [ngModel]="state.quota"
+                          [ngModelOptions]="{standalone: true}"
+                          (ngModelChange)="onQuotaChange(idx, $event)"
+                        />
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        </div>
+
+        <footer class="modal-footer bg-light border-top d-flex gap-2 justify-content-end p-3">
+          <button
+            type="button"
+            class="btn btn-light text-secondary border px-4 py-2 fw-semibold rounded-pill"
+            [disabled]="assigning"
+            (click)="closeModal()"
+          >
+            {{ translations.cancel || 'إلغاء' }}
+          </button>
+          <button
+            type="button"
+            class="btn btn-primary px-4 py-2 fw-semibold rounded-pill d-inline-flex align-items-center gap-2"
+            [disabled]="assigning || selectedCount === 0 || !!validationError()"
+            (click)="onSubmit()"
+          >
+            @if (assigning) {
+              <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            } @else {
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+            }
+            {{ translations.assignSegments || 'ربط الشرائح' }} ({{ selectedCount }})
+          </button>
+        </footer>
+      </div>
+    </div>
+  </div>
+}

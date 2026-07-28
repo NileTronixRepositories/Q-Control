@@ -80,15 +80,20 @@
         </div>
 
         <div class="branch-api-filters row g-3 mb-3">
-          <label class="col-12 col-lg-6 col-xl-4 d-flex flex-column gap-2"
+          <label class="col-12 col-lg-6 col-xl-4 d-flex flex-column gap-2 w-100"
             ><span>{{ translations().searchLabel }}</span>
-            <input
-              class="form-control"
-              type="search"
-              [value]="branchSearchText()"
-              [attr.aria-label]="translations().searchLabel"
-              (change)="updateBranchSearch($event)"
-            />
+            <div class="search-input-wrapper">
+              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              </svg>
+              <input
+                class="form-control"
+                type="search"
+                [value]="branchSearchText()"
+                [attr.aria-label]="translations().searchLabel"
+                (change)="updateBranchSearch($event)"
+              />
+            </div>
           </label>
           <label class="col-12 col-md-4 col-lg-2 d-flex flex-column gap-2"
             ><span>{{ translations().sortLabel }}</span>

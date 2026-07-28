@@ -38,9 +38,9 @@
 </section>
 </div> }
 <form class="d-flex flex-wrap align-items-end gap-3 rounded-3 border border-info-subtle p-3 shadow-sm p-3" (submit)="submitSearch($event)" >
-<label class="d-grid flex-grow-1 gap-1">
+<label class="d-grid flex-grow-1 gap-1 w-100">
 <span class="d-flex align-items-center gap-1 fw-bold text-secondary" ><i class="bi bi-search text-primary" aria-hidden="true"></i >{{ translations().search }}</span >
-<span class="position-relative d-block" ><i class="bi bi-search position-absolute start-0 top-50 translate-middle-y text-muted" aria-hidden="true" ></i ><input class="form-control control-height w-100 rounded-3 border border-secondary-subtle bg-white ps-4" type="search" maxlength="200" [value]="store.searchText()" (input)="updateSearch($event)" /></span>
+<div class="search-input-wrapper"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input class="form-control control-height w-100 rounded-3 border border-secondary-subtle bg-white ps-4" type="search" maxlength="200" [value]="store.searchText()" (input)="updateSearch($event)" /></div>
 </label>
 <label class="d-grid flex-grow-1 gap-1">
 <span class="d-flex align-items-center gap-1 fw-bold text-secondary" ><i class="bi bi-activity text-primary" aria-hidden="true"></i >{{ translations().status }}</span >

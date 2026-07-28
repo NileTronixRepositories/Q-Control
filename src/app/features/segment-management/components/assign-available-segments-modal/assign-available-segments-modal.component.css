@@ -1,0 +1,18 @@
+.modal-backdrop {
+  z-index: 1050;
+  background-color: rgba(15, 23, 42, 0.6);
+}
+
+.modal {
+  z-index: 1055;
+}
+
+.modal-content {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.max-table-height {
+  max-height: 360px;
+  overflow-y: auto;
+}

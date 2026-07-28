@@ -169,14 +169,19 @@
         @if (filtersExpanded()) {
           <div class="workflow-filter-grid row g-3 p-3 border-bottom">
             <div class="col-12 col-lg-5">
-              <label class="filter-field d-grid gap-2 m-0">
+              <label class="filter-field d-grid gap-2 m-0 w-100">
                 <span>{{ translations().search }}</span>
-                <input
-                  class="form-control"
-                  type="search"
-                  [value]="store.query().searchText"
-                  (input)="updateSearch($event)"
-                />
+                <div class="search-input-wrapper">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                  </svg>
+                  <input
+                    class="form-control"
+                    type="search"
+                    [value]="store.query().searchText"
+                    (input)="updateSearch($event)"
+                  />
+                </div>
               </label>
             </div>
             <div class="col-12 col-md-6 col-lg-3">
@@ -647,16 +652,21 @@
                   <header class="workflow-candidate-filters p-3 bg-light rounded-3 border mb-3">
                     <div class="row g-3 align-items-start">
                       <div class="col-12 col-md-6">
-                        <label class="filter-field d-grid gap-2 m-0">
+                        <label class="filter-field d-grid gap-2 m-0 w-100">
                           <span class="fw-bold text-dark fs-7">{{ translations().searchCandidates }}</span>
-                          <input
-                            class="form-control filter-input-std"
-                            type="search"
-                            maxlength="200"
-                            [placeholder]="translations().candidateSearchPlaceholder"
-                            [value]="store.candidateQuery().searchText"
-                            (input)="updateCandidateSearch($event)"
-                          />
+                          <div class="search-input-wrapper">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                            </svg>
+                            <input
+                              class="form-control"
+                              type="search"
+                              maxlength="200"
+                              [placeholder]="translations().candidateSearchPlaceholder"
+                              [value]="store.candidateQuery().searchText"
+                              (input)="updateCandidateSearch($event)"
+                            />
+                          </div>
                         </label>
                       </div>
                       <div class="col-12 col-md-6">

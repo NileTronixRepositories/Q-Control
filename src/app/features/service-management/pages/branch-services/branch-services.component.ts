@@ -63,6 +63,16 @@ import {
   canUnassignService,
 } from '../../utils/service-action-rules.util';
 
+import { LeafServiceSegmentsDrawerComponent } from '../../../segment-management/components/leaf-service-segments-drawer/leaf-service-segments-drawer.component';
+import { SEGMENT_TRANSLATIONS_AR, SEGMENT_TRANSLATIONS_EN } from '../../../segment-management/i18n/segment.translations';
+import {
+  AssignSegmentItem,
+  AssignedBranchServiceSegmentsResponse,
+  AvailableSegmentItem,
+} from '../../../segment-management/models/segment.model';
+import { SegmentApiService } from '../../../segment-management/services/segment-api.service';
+import { SegmentPermissionService } from '../../../segment-management/services/segment-permission.service';
+
 const STATUS_POLL_INTERVAL_MS = 15_000;
 
 @Component({
@@ -78,6 +88,7 @@ const STATUS_POLL_INTERVAL_MS = 15_000;
     NiletronixLoadingStateComponent,
     TechnicalAdminPageHeroComponent,
     UnassignBranchServiceDialogComponent,
+    LeafServiceSegmentsDrawerComponent,
   ],
   providers: [BranchServicesStore],
   templateUrl: './branch-services.component.html',
@@ -95,6 +106,166 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
   private readonly permissionService = inject(ServiceManagementPermissionService);
   private readonly invalidationService = inject(ServiceDataInvalidationService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly segmentApiService = inject(SegmentApiService);
+  protected readonly segmentPermissionService = inject(SegmentPermissionService);
+
+  protected readonly segmentTranslations = computed(() =>
+    this.i18nStore.language() === 'ar' ? SEGMENT_TRANSLATIONS_AR : SEGMENT_TRANSLATIONS_EN,
+  );
+
+  segmentsDrawerOpen = signal(false);
+  selectedSegmentLeafNode = signal<ServiceTreeNode | null>(null);
+  assignedSegmentsResponse = signal<AssignedBranchServiceSegmentsResponse | null>(null);
+  availableSegmentsList = signal<AvailableSegmentItem[]>([]);
+  segmentsLoading = signal(false);
+  availableSegmentsLoading = signal(false);
+  segmentsAssigning = signal(false);
+  segmentsUpdatingQuota = signal(false);
+  segmentsUnassigning = signal(false);
+
+  canManageSegmentsFor = (node: ServiceTreeNode): boolean =>
+    !node.isDeleted &&
+    (node.canIssueTicket || node.children.length === 0 || !node.hasChildren) &&
+    this.segmentPermissionService.canViewBranchServiceSegments();
+
+  openServiceSegments(node: ServiceTreeNode): void {
+    const branchId = this.store.selectedBranchId();
+    if (!branchId) return;
+
+    this.selectedSegmentLeafNode.set(node);
+    this.segmentsDrawerOpen.set(true);
+    this.loadAssignedSegments(branchId, node.id);
+  }
+
+  closeServiceSegments(): void {
+    this.segmentsDrawerOpen.set(false);
+    this.selectedSegmentLeafNode.set(null);
+    this.assignedSegmentsResponse.set(null);
+  }
+
+  loadAssignedSegments(branchId: number, leafServiceId: number): void {
+    this.segmentsLoading.set(true);
+    this.segmentApiService.getAssignedSegments(branchId, leafServiceId).subscribe({
+      next: (res) => {
+        this.assignedSegmentsResponse.set(res);
+        this.segmentsLoading.set(false);
+      },
+      error: (err) => {
+        this.segmentsLoading.set(false);
+        this.store.message.set({
+          text: formatTechnicalAdminApiError(err, 'Failed to load service segments'),
+          tone: 'error',
+        });
+      },
+    });
+  }
+
+  loadAvailableSegments(): void {
+    const branchId = this.store.selectedBranchId();
+    const node = this.selectedSegmentLeafNode();
+    if (!branchId || !node) return;
+
+    this.availableSegmentsLoading.set(true);
+    this.segmentApiService.getAvailableSegments(branchId, node.id).subscribe({
+      next: (res) => {
+        this.availableSegmentsList.set(res.segments.data);
+        this.availableSegmentsLoading.set(false);
+      },
+      error: (err) => {
+        this.availableSegmentsLoading.set(false);
+        this.store.message.set({
+          text: formatTechnicalAdminApiError(err, 'Failed to load available segments'),
+          tone: 'error',
+        });
+      },
+    });
+  }
+
+  onAssignSegmentsSubmitted(items: AssignSegmentItem[]): void {
+    const branchId = this.store.selectedBranchId();
+    const node = this.selectedSegmentLeafNode();
+    if (!branchId || !node) return;
+
+    this.segmentsAssigning.set(true);
+    this.segmentApiService.assignSegments(branchId, node.id, { items }).subscribe({
+      next: (res) => {
+        this.assignedSegmentsResponse.set(res);
+        this.segmentsAssigning.set(false);
+        this.store.message.set({
+          text: res.message || 'Segments assigned successfully',
+          tone: 'success',
+        });
+      },
+      error: (err) => {
+        this.segmentsAssigning.set(false);
+        this.store.message.set({
+          text: formatTechnicalAdminApiError(err, 'Failed to assign segments'),
+          tone: 'error',
+        });
+      },
+    });
+  }
+
+  onUpdateSegmentQuota(event: { segmentId: number; quota: number; rowVersion: string }): void {
+    const branchId = this.store.selectedBranchId();
+    const node = this.selectedSegmentLeafNode();
+    if (!branchId || !node) return;
+
+    this.segmentsUpdatingQuota.set(true);
+    this.segmentApiService
+      .updateSegmentQuota(branchId, node.id, event.segmentId, {
+        quota: event.quota,
+        rowVersion: event.rowVersion,
+      })
+      .subscribe({
+        next: (res) => {
+          this.assignedSegmentsResponse.set(res);
+          this.segmentsUpdatingQuota.set(false);
+          this.store.message.set({
+            text: res.message || 'Segment quota updated successfully',
+            tone: 'success',
+          });
+        },
+        error: (err) => {
+          this.segmentsUpdatingQuota.set(false);
+          this.store.message.set({
+            text: formatTechnicalAdminApiError(err, 'Failed to update quota'),
+            tone: 'error',
+          });
+        },
+      });
+  }
+
+  onUnassignSegment(event: { segmentId: number; rowVersion: string }): void {
+    const branchId = this.store.selectedBranchId();
+    const node = this.selectedSegmentLeafNode();
+    if (!branchId || !node) return;
+
+    this.segmentsUnassigning.set(true);
+    this.segmentApiService
+      .unassignSegment(branchId, node.id, event.segmentId, event.rowVersion)
+      .subscribe({
+        next: (res) => {
+          this.segmentsUnassigning.set(false);
+          if (res) {
+            this.assignedSegmentsResponse.set(res);
+          } else {
+            this.loadAssignedSegments(branchId, node.id);
+          }
+          this.store.message.set({
+            text: 'Segment unassigned successfully',
+            tone: 'success',
+          });
+        },
+        error: (err) => {
+          this.segmentsUnassigning.set(false);
+          this.store.message.set({
+            text: formatTechnicalAdminApiError(err, 'Failed to unassign segment'),
+            tone: 'error',
+          });
+        },
+      });
+  }
 
   protected readonly store = inject(BranchServicesStore);
   protected readonly translations = computed(

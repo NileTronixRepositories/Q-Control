@@ -99,13 +99,16 @@ export class BranchManagementApiService {
 
   private createParams(query: BranchListQuery): HttpParams {
     let params = new HttpParams()
-      .set('searchText', query.searchText)
-      .set('orderSort', query.orderSort)
-      .set('pageNumber', query.pageNumber)
-      .set('pageSize', query.pageSize);
+      .set('OrderSort', query.orderSort)
+      .set('PageNumber', query.pageNumber)
+      .set('PageSize', query.pageSize);
 
-    if (query.isActive !== null) {
-      params = params.set('isActive', query.isActive);
+    if (query.searchText?.trim()) {
+      params = params.set('SearchText', query.searchText.trim());
+    }
+
+    if (query.isActive !== null && query.isActive !== undefined) {
+      params = params.set('IsActive', query.isActive);
     }
 
     return params;

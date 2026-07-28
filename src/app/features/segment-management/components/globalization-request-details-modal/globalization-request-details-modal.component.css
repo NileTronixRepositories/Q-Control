@@ -1,0 +1,63 @@
+.modal-backdrop {
+  z-index: 1050;
+  background-color: var(--nt-overlay-bg, rgba(27, 36, 48, 0.36));
+  backdrop-filter: blur(2px);
+}
+
+.modal {
+  z-index: 1055;
+}
+
+.modal-content {
+  border-radius: var(--q-radius-lg, 16px);
+  overflow: hidden;
+  box-shadow: var(--nt-shadow-card);
+  border: 1px solid var(--nt-border);
+}
+
+.modal-header {
+  padding: 1rem 1.25rem;
+  background: var(--q-panel-header-bg, linear-gradient(180deg, #ffffff, #f8fbfd));
+  border-bottom: 1px solid var(--q-panel-border, var(--nt-border));
+}
+
+.modal-footer {
+  padding: 1rem 1.25rem;
+  background: var(--q-surface-muted, #f8fafc);
+  border-top: 1px solid var(--q-border-subtle, var(--nt-border));
+}
+
+/* Badge styles */
+.seg-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.6rem;
+  font-size: 0.75rem;
+  font-weight: 750;
+  border-radius: 6px;
+  line-height: 1;
+}
+
+.seg-badge-system {
+  color: var(--q-warning);
+  background: var(--q-warning-soft);
+  border: 1px solid rgba(183, 121, 31, 0.2);
+}
+
+.seg-badge-priority {
+  color: var(--q-text-secondary);
+  background: #ffffff;
+  border: 1px solid var(--q-border-subtle);
+  box-shadow: var(--q-shadow-soft);
+}
+
+/* Hover Utilities for Danger Button */
+.hover-bg-danger:hover {
+  background-color: var(--bs-danger) !important;
+  border-color: var(--bs-danger) !important;
+}
+
+.hover-text-white:hover {
+  color: #fff !important;
+}

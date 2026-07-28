@@ -10,6 +10,7 @@ import { AppNavigationItem } from '../../../shared/models/navigation.model';
 import { AuthenticatedUserType } from '../../auth/models/login-credentials.model';
 import { AuthSessionService } from '../../auth/services/auth-session.service';
 import { ServiceManagementPermissionService } from '../../service-management/services/catalog/service-management-permission.service';
+import { SegmentPermissionService } from '../../segment-management/services/segment-permission.service';
 import { resolveJwtPermissions } from '../../auth/utils/auth-permissions.util';
 import { TechnicalAdminBranchContextStore } from '../store/technical-admin-branch-context.store';
 import { TechnicalAdminI18nStore } from '../store/technical-admin-i18n.store';
@@ -29,6 +30,7 @@ export class AdminShellComponent {
   private readonly router = inject(Router);
   private readonly authSessionService = inject(AuthSessionService);
   private readonly servicePermissionService = inject(ServiceManagementPermissionService);
+  private readonly segmentPermissionService = inject(SegmentPermissionService);
   private readonly branchContextStore = inject(TechnicalAdminBranchContextStore);
   private readonly currentUrl = signal(this.normalizeUrl(this.router.url));
 
@@ -271,6 +273,33 @@ export class AdminShellComponent {
       });
     }
 
+
+    const segmentNavChildren: AppNavigationItem[] = [];
+
+    if (this.segmentPermissionService.canViewAllSegments()) {
+      segmentNavChildren.push({
+        label: this.i18nStore.language() === 'ar' ? 'إدارة الشرائح' : 'Segment Management',
+        route: '/admin/segments',
+        icon: 'bi-tags-fill',
+      });
+    }
+
+    if (this.segmentPermissionService.canViewAllGlobalizationRequests()) {
+      segmentNavChildren.push({
+        label: this.i18nStore.language() === 'ar' ? 'طلبات تعميم الشرائح' : 'Globalization Requests',
+        route: '/admin/segment-globalization-requests',
+        icon: 'bi-patch-check-fill',
+      });
+    }
+
+    if (this.segmentPermissionService.canViewOwnGlobalizationRequests()) {
+      segmentNavChildren.push({
+        label: this.i18nStore.language() === 'ar' ? 'طلبات شرائح الفرع' : 'Branch Segment Requests',
+        route: '/admin/branch-segment-requests',
+        icon: 'bi-send-check-fill',
+      });
+    }
+
     const branchChildren: AppNavigationItem[] = [];
 
     if (
@@ -303,6 +332,18 @@ export class AdminShellComponent {
         icon: 'bi-ui-checks-grid',
         expanded: this.currentUrl().startsWith('/admin/services'),
         children: serviceNavChildren,
+      });
+    }
+
+    if (segmentNavChildren.length) {
+      branchChildren.push({
+        label: this.i18nStore.language() === 'ar' ? 'الشرائح' : 'Segments',
+        icon: 'bi-tags',
+        expanded:
+          this.currentUrl().startsWith('/admin/segments') ||
+          this.currentUrl().startsWith('/admin/segment-globalization-requests') ||
+          this.currentUrl().startsWith('/admin/branch-segment-requests'),
+        children: segmentNavChildren,
       });
     }
 
@@ -417,6 +458,10 @@ export class AdminShellComponent {
 
     if (/^\/admin\/services\/branches\/[^/]+\/services\/[^/]+\/workflows$/.test(normalizedUrl)) {
       return '/admin/services/workflows';
+    }
+
+     if (/^\/admin\/segments\/[^/]+/.test(normalizedUrl)) {
+      return '/admin/segments';
     }
 
     return normalizedUrl;

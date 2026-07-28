@@ -118,6 +118,45 @@ export const TECHNICAL_ADMIN_ROUTES: Routes = [
             (component) => component.TerminalsComponent,
           ),
       },
+      {
+        path: 'segments',
+        canActivate: [adminPermissionGuard],
+        data: {
+          allowTechnicalAdminWithoutPermission: true,
+          requiredAnyPermissions: [
+            'Segments.ViewAll',
+            'Segments.CreateBranchScoped',
+            'Segments.CreateGlobal',
+            'Segments.Update',
+          ],
+        },
+        loadChildren: () =>
+          import('../segment-management/segment-management.routes').then(
+            (routes) => routes.SEGMENT_MANAGEMENT_ROUTES,
+          ),
+      },
+      {
+        path: 'segment-globalization-requests',
+        canActivate: [adminPermissionGuard],
+        data: {
+          requiredAnyPermissions: ['SegmentGlobalizationRequests.ViewAll'],
+        },
+        loadComponent: () =>
+          import('../segment-management/pages/technical-globalization-requests/technical-globalization-requests.component').then(
+            (component) => component.TechnicalGlobalizationRequestsComponent,
+          ),
+      },
+      {
+        path: 'branch-segment-requests',
+        canActivate: [adminPermissionGuard],
+        data: {
+          requiredAnyPermissions: ['SegmentGlobalizationRequests.ViewOwn'],
+        },
+        loadComponent: () =>
+          import('../segment-management/pages/branch-segment-requests/branch-segment-requests.component').then(
+            (component) => component.BranchSegmentRequestsComponent,
+          ),
+      },
     ],
   },
 ];

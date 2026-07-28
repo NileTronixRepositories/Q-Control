@@ -1,0 +1,218 @@
+@if (open && request) {
+  <div class="modal-backdrop fade show"></div>
+  <div class="modal d-block" tabindex="-1" role="dialog" aria-modal="true" [attr.dir]="'auto'">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+      <div class="modal-content shadow-lg border-0">
+        <header class="modal-header editor-panel-header d-flex justify-content-between align-items-center">
+          <h5 class="modal-title fw-bold text-dark d-flex align-items-center gap-2 m-0 fs-6">
+            <!-- Modern Shield Check SVG -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              <polyline points="9 12 11 14 15 10"/>
+            </svg>
+            <span dir="ltr">#{{ request.id }}</span> — {{ request.segmentArabicName }} / <span dir="ltr">{{ request.segmentEnglishName }}</span>
+          </h5>
+          <button
+            type="button"
+            class="btn-close m-0"
+            [attr.aria-label]="translations.close"
+            [disabled]="processing"
+            (click)="closeModal()"
+          ></button>
+        </header>
+
+        <div class="modal-body p-4 dialog-content">
+          @if (errorMessage()) {
+            <div class="alert alert-danger d-flex align-items-center gap-2 border-danger-subtle bg-danger-subtle text-danger" role="alert">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+              <div class="small fw-semibold">{{ errorMessage() }}</div>
+            </div>
+          }
+
+          <dl class="details-list mb-4">
+            <div class="details-group">
+              <dt>{{ translations.status }}</dt>
+              <dd>
+                @if (request.status === 'Pending') {
+                  <span class="seg-badge seg-badge-system">{{ translations.pending }}</span>
+                } @else if (request.status === 'Approved') {
+                  <span class="seg-badge bg-success text-white">{{ translations.approved }}</span>
+                } @else {
+                  <span class="seg-badge bg-danger text-white">{{ translations.rejected }}</span>
+                }
+              </dd>
+            </div>
+
+            <div class="details-group">
+              <dt>{{ translations.ownerBranch }}</dt>
+              <dd>
+                <strong>{{ request.branchArabicName || request.branchEnglishName }}</strong>
+              </dd>
+            </div>
+
+            <div class="details-group">
+              <dt>{{ translations.priority }}</dt>
+              <dd dir="ltr">
+                <span class="seg-badge seg-badge-priority">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                  </svg>
+                  Priority {{ request.segmentPriority }}
+                </span>
+              </dd>
+            </div>
+
+            <div class="details-group details-group-full">
+              <dt>{{ translations.requestedBy }}</dt>
+              <dd>
+                <strong class="d-block">{{ request.requestedByName }}</strong>
+                <span class="text-muted small mt-1 d-block" dir="ltr">{{ request.requestedOnUtc | date:'medium' }}</span>
+              </dd>
+            </div>
+
+            <div class="details-group details-group-full">
+              <dt>{{ translations.reviewedBy }}</dt>
+              <dd>
+                @if (request.reviewedByName) {
+                  <strong class="d-block">{{ request.reviewedByName }}</strong>
+                  <span class="text-muted small mt-1 d-block" dir="ltr">{{ request.reviewedOnUtc | date:'medium' }}</span>
+                } @else {
+                  <span class="text-muted">—</span>
+                }
+              </dd>
+            </div>
+
+            @if (request.rejectionReason) {
+              <div class="details-group details-group-full bg-danger-subtle border-danger-subtle">
+                <dt class="text-danger">{{ translations.rejectionReason }}</dt>
+                <dd class="text-danger">
+                  <p class="mb-0">{{ request.rejectionReason }}</p>
+                </dd>
+              </div>
+            }
+          </dl>
+
+          @if (request.status === 'Pending' && (canApprove || canReject)) {
+            <hr class="my-4 border-secondary-subtle" />
+
+            @if (showApproveConfirm()) {
+              <div class="alert alert-warning border-warning d-flex flex-column gap-3">
+                <h6 class="fw-bold d-flex align-items-center gap-2 m-0 text-dark">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" class="text-warning"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm0-4h-2V7h2v8z"/></svg>
+                  {{ translations.confirmApproveTitle }}
+                </h6>
+                <p class="mb-0 small text-dark">{{ translations.confirmApproveMessage }}</p>
+                <div class="d-flex align-items-center gap-2 mt-1">
+                  <button
+                    type="button"
+                    class="primary-action bg-success border-success"
+                    style="min-height: 38px; font-size: 0.85rem;"
+                    [disabled]="processing"
+                    (click)="confirmApprove()"
+                  >
+                    @if (processing) {
+                      <span class="spinner-border spinner-border-sm" role="status"></span>
+                    }
+                    {{ translations.approve }}
+                  </button>
+                  <button
+                    type="button"
+                    class="secondary-action"
+                    style="min-height: 38px; font-size: 0.85rem;"
+                    [disabled]="processing"
+                    (click)="cancelApproveConfirm()"
+                  >
+                    {{ translations.cancel }}
+                  </button>
+                </div>
+              </div>
+            } @else if (showRejectReasonInput()) {
+              <div class="alert alert-danger border-danger d-flex flex-column gap-3">
+                <h6 class="fw-bold d-flex align-items-center gap-2 m-0 text-dark">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" class="text-danger"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+                  Reject Request
+                </h6>
+                <div>
+                  <label class="form-label small fw-semibold text-dark" for="rejectReason">
+                    {{ translations.rejectionReason }} (Optional, Max 500 characters)
+                  </label>
+                  <textarea
+                    id="rejectReason"
+                    class="form-control form-control-sm"
+                    rows="3"
+                    maxlength="500"
+                    [ngModel]="rejectionReasonText()"
+                    (ngModelChange)="rejectionReasonText.set($event)"
+                  ></textarea>
+                </div>
+                <div class="d-flex align-items-center gap-2 mt-1">
+                  <button
+                    type="button"
+                    class="primary-action bg-danger border-danger"
+                    style="min-height: 38px; font-size: 0.85rem;"
+                    [disabled]="processing"
+                    (click)="confirmReject()"
+                  >
+                    @if (processing) {
+                      <span class="spinner-border spinner-border-sm" role="status"></span>
+                    }
+                    {{ translations.reject }}
+                  </button>
+                  <button
+                    type="button"
+                    class="secondary-action"
+                    style="min-height: 38px; font-size: 0.85rem;"
+                    [disabled]="processing"
+                    (click)="cancelRejectInput()"
+                  >
+                    {{ translations.cancel }}
+                  </button>
+                </div>
+              </div>
+            } @else {
+              <div class="d-flex align-items-center justify-content-end gap-2">
+                @if (canApprove) {
+                  <button
+                    type="button"
+                    class="primary-action bg-success border-success"
+                    [disabled]="processing"
+                    (click)="onApproveClick()"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                    {{ translations.approve }}
+                  </button>
+                }
+                @if (canReject) {
+                  <button
+                    type="button"
+                    class="secondary-action text-danger border-danger-subtle bg-danger-subtle hover-bg-danger hover-text-white"
+                    [disabled]="processing"
+                    (click)="onRejectClick()"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line>
+                    </svg>
+                    {{ translations.reject }}
+                  </button>
+                }
+              </div>
+            }
+          }
+        </div>
+
+        <footer class="modal-footer form-actions bg-light border-top">
+          <button
+            type="button"
+            class="secondary-action"
+            [disabled]="processing"
+            (click)="closeModal()"
+          >
+            {{ translations.close }}
+          </button>
+        </footer>
+      </div>
+    </div>
+  </div>
+}

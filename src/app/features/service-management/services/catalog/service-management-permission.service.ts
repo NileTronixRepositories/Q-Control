@@ -134,7 +134,14 @@ export class ServiceManagementPermissionService {
   readonly canCreateSchedule = computed(() => this.hasPermission('ServiceSchedules.Create'));
   readonly canUpdateSchedule = computed(() => this.hasPermission('ServiceSchedules.Update'));
 
+  readonly isTechnicalAdmin = computed(
+    () => this.authSessionService.currentSession()?.userType === 'TechnicalAdmin',
+  );
+
   hasPermission(permission: ServiceAreaPermission): boolean {
+    if (this.isTechnicalAdmin()) {
+      return true;
+    }
     return this.permissions().has(permission);
   }
 

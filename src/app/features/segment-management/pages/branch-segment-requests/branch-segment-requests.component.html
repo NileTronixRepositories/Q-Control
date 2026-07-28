@@ -1,0 +1,204 @@
+<section
+  class="technical-admin-responsive-page branch-segment-requests-page container-fluid d-flex flex-column gap-3 p-3 p-lg-4"
+  [attr.dir]="direction()"
+  [attr.lang]="language()"
+>
+  <app-technical-admin-page-hero
+    [eyebrow]="language() === 'ar' ? 'طلبات الفرع' : 'Branch Requests'"
+    [title]="translations().branchRequestsTitle"
+    [description]="language() === 'ar' ? 'متابعة حالة طلبات تحويل الشرائح الخاصة بالفرع الحالي إلى شرائح عامة.' : 'Track globalization requests submitted by the active branch.'"
+    icon="bi bi-send-check-fill"
+  >
+    <div hero-filters class="w-100">
+      <div class="row g-3 align-items-end">
+        <div class="col-12 col-md-8 col-lg-5">
+          <label class="filter-field w-100">
+            <span>{{ translations().searchPlaceholder }}</span>
+            <div class="search-input-wrapper">
+              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              </svg>
+              <input
+                type="search"
+                class="form-control"
+                [placeholder]="translations().searchPlaceholder"
+                [ngModel]="searchText()"
+                (ngModelChange)="onSearch($event)"
+              />
+            </div>
+          </label>
+        </div>
+
+        <div class="col-12 col-md-4 col-lg-3">
+          <label class="filter-field">
+            <span>{{ translations().status }}</span>
+            <select class="form-select" (change)="onStatusFilter($event)">
+              <option value="">{{ language() === 'ar' ? 'جميع الحالات' : 'All Statuses' }}</option>
+              <option value="Pending">{{ translations().pending }}</option>
+              <option value="Approved">{{ translations().approved }}</option>
+              <option value="Rejected">{{ translations().rejected }}</option>
+            </select>
+          </label>
+        </div>
+      </div>
+    </div>
+  </app-technical-admin-page-hero>
+
+  @if (toastMessage(); as msg) {
+    <div class="toast-stack" role="status" aria-live="polite" aria-atomic="true">
+      <div
+        class="toast-item"
+        [class.toast-success]="msg.tone === 'success'"
+        [class.toast-error]="msg.tone === 'error'"
+        [class.toast-info]="msg.tone === 'info'"
+      >
+        <svg class="toast-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          @if (msg.tone === 'success') {
+            <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm-1 15l-5-5 1.41-1.41L11 14.17l7.59-7.59L20 8z"/>
+          } @else if (msg.tone === 'error') {
+            <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm1 15h-2v-2h2zm0-4h-2V7h2z"/>
+          } @else {
+            <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm1 15h-2v-6h2zm0-8h-2V7h2z"/>
+          }
+        </svg>
+        <p>{{ msg.text }}</p>
+        <button type="button" class="toast-close" (click)="clearToast()" [attr.aria-label]="'Close'">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- Table -->
+  <div class="table-responsive table-wrap">
+    <table class="custom-table table table-sm table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th scope="col">{{ translations().requestId }}</th>
+          <th scope="col">Segment</th>
+          <th scope="col">{{ translations().priority }}</th>
+          <th scope="col">{{ translations().status }}</th>
+          <th scope="col">{{ translations().requestedBy }}</th>
+          <th scope="col">{{ translations().requestedOn }}</th>
+          <th scope="col" class="admin-actions-column text-center">{{ translations().actions }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        @if (loading()) {
+          <tr>
+            <td colspan="7" class="text-center py-5">
+              <div class="admin-list-empty d-flex flex-column align-items-center justify-content-center gap-2 py-4 border-0 bg-transparent">
+                <div class="spinner-border" style="color: var(--q-primary); width: 1.75rem; height: 1.75rem;" role="status">
+                  <span class="visually-hidden">{{ translations().loading }}</span>
+                </div>
+                <p class="mb-0 small" style="color: var(--q-text-muted);">{{ translations().loading }}</p>
+              </div>
+            </td>
+          </tr>
+        } @else if (requests().length === 0) {
+          <tr>
+            <td colspan="7">
+              <div class="admin-list-empty d-flex flex-column align-items-center justify-content-center gap-2 p-5">
+                <div class="admin-list-empty-icon d-flex align-items-center justify-content-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/>
+                    <path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>
+                  </svg>
+                </div>
+                <h2>{{ language() === 'ar' ? 'لا توجد طلبات' : 'No requests' }}</h2>
+                <p>{{ language() === 'ar' ? 'لا توجد طلبات تطابق معايير البحث الحالية.' : 'No globalization requests found.' }}</p>
+              </div>
+            </td>
+          </tr>
+        } @else {
+          @for (req of requests(); track req.id) {
+            <tr>
+              <td class="admin-technical-cell" dir="ltr"><strong>#{{ req.id }}</strong></td>
+              <td>
+                <strong>{{ req.segmentArabicName }}</strong>
+                <span class="text-muted small d-block" dir="ltr">{{ req.segmentEnglishName }}</span>
+              </td>
+              <td class="admin-number-cell" dir="ltr">
+                <span class="seg-badge seg-badge-priority">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="currentColor">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                  </svg>
+                  {{ req.segmentPriority }}
+                </span>
+              </td>
+              <td>
+                @if (req.status === 'Pending') {
+                  <span class="seg-badge seg-badge-system">{{ translations().pending }}</span>
+                } @else if (req.status === 'Approved') {
+                  <span class="seg-badge bg-success text-white">{{ translations().approved }}</span>
+                } @else {
+                  <span class="seg-badge bg-danger text-white">{{ translations().rejected }}</span>
+                }
+              </td>
+              <td>{{ req.requestedByName }}</td>
+              <td class="admin-technical-cell" dir="ltr">{{ req.requestedOnUtc | date:'short' }}</td>
+              <td class="admin-actions-column text-center">
+                <button
+                  type="button"
+                  class="icon-action"
+                  [title]="translations().viewDetails || 'View Details'"
+                  (click)="openDetails(req)"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                  </svg>
+                </button>
+              </td>
+            </tr>
+          }
+        }
+      </tbody>
+    </table>
+
+    <!-- Pagination -->
+    @if (totalItems() > pageSize()) {
+      <div class="pagination-bar d-flex align-items-center justify-content-between px-3 py-2">
+        <span class="small">
+          @if (language() === 'ar') {
+            صفحة {{ currentPage() }} من {{ totalPages }} ({{ totalItems() }} عنصر)
+          } @else {
+            Page {{ currentPage() }} of {{ totalPages }} &middot; {{ totalItems() }} items
+          }
+        </span>
+        <nav [attr.aria-label]="language() === 'ar' ? 'تنقل الصفحات' : 'Pagination'">
+          <ul class="pagination pagination-sm m-0 gap-1">
+            <li class="page-item" [class.disabled]="currentPage() === 1">
+              <button type="button" class="page-link" (click)="onPageChange(currentPage() - 1)">
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                  <polyline [attr.points]="direction() === 'rtl' ? '9 18 15 12 9 6' : '15 18 9 12 15 6'"/>
+                </svg>
+              </button>
+            </li>
+            <li class="page-item active">
+              <span class="page-link">{{ currentPage() }}</span>
+            </li>
+            <li class="page-item" [class.disabled]="currentPage() === totalPages">
+              <button type="button" class="page-link" (click)="onPageChange(currentPage() + 1)">
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                  <polyline [attr.points]="direction() === 'rtl' ? '15 18 9 12 15 6' : '9 18 15 12 9 6'"/>
+                </svg>
+              </button>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    }
+  </div>
+
+  <app-globalization-request-details-modal
+    [open]="detailsModalOpen()"
+    [request]="selectedRequest()"
+    [translations]="translations()"
+    [canApprove]="false"
+    [canReject]="false"
+    (closed)="closeDetailsModal()"
+  />
+</section>

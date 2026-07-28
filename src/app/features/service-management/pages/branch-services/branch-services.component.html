@@ -194,6 +194,9 @@
         [canManageMedia]="canViewDetails()"
         [canManageMediaNode]="canManageMediaFor"
         [manageMediaLabel]="serviceTranslations().serviceMedia"
+        [canManageSegments]="segmentPermissionService.canViewBranchServiceSegments()"
+        [canManageSegmentsNode]="canManageSegmentsFor"
+        [manageSegmentsLabel]="segmentTranslations().serviceSegmentsTitle"
         [unassigning]="store.unassigning()"
         [unassignLabel]="translations().unassign"
         [actionsDisabled]="branchActionsDisabled()"
@@ -212,6 +215,7 @@
         (manageWorkflows)="openServiceWorkflows($event)"
         (manageSchedule)="openServiceSchedule($event)"
         (manageMedia)="openServiceMedia($event)"
+        (manageSegments)="openServiceSegments($event)"
       />
     }
   }
@@ -316,4 +320,26 @@
       <app-niletronix-loading-state [title]="serviceTranslations().loading" variant="panel" />
     </aside>
   }
+
+  <app-leaf-service-segments-drawer
+    [open]="segmentsDrawerOpen()"
+    [serviceTitle]="selectedSegmentLeafNode()?.arabicName || selectedSegmentLeafNode()?.englishName || ''"
+    [responseData]="assignedSegmentsResponse()"
+    [availableSegments]="availableSegmentsList()"
+    [loading]="segmentsLoading()"
+    [availableLoading]="availableSegmentsLoading()"
+    [assigning]="segmentsAssigning()"
+    [updatingQuota]="segmentsUpdatingQuota()"
+    [unassigning]="segmentsUnassigning()"
+    [translations]="segmentTranslations()"
+    [canAssign]="segmentPermissionService.canAssignBranchServiceSegments()"
+    [canUpdateQuota]="segmentPermissionService.canUpdateSegmentQuota()"
+    [canUnassign]="segmentPermissionService.canUnassignSegment()"
+    (closed)="closeServiceSegments()"
+    (refresh)="selectedSegmentLeafNode() && loadAssignedSegments(store.selectedBranchId()!, selectedSegmentLeafNode()!.id)"
+    (openAddAvailableModal)="loadAvailableSegments()"
+    (assignSubmitted)="onAssignSegmentsSubmitted($event)"
+    (quotaUpdated)="onUpdateSegmentQuota($event)"
+    (segmentUnassigned)="onUnassignSegment($event)"
+  />
 </section>

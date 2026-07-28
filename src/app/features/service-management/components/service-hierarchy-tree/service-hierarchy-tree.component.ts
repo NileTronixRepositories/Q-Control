@@ -38,6 +38,7 @@ interface ServiceHierarchyTreeEntry {
   readonly canManageWorkflow: boolean;
   readonly canManageSchedule: boolean;
   readonly canManageMedia: boolean;
+  readonly canManageSegments: boolean;
 }
 
 interface ServiceHierarchyLoadingRow {
@@ -124,6 +125,9 @@ export class ServiceHierarchyTreeComponent {
   readonly canManageMedia = input(false);
   readonly canManageMediaNode = input<(node: ServiceTreeNode) => boolean>(() => false);
   readonly manageMediaLabel = input('');
+  readonly canManageSegments = input(false);
+  readonly canManageSegmentsNode = input<(node: ServiceTreeNode) => boolean>(() => false);
+  readonly manageSegmentsLabel = input('');
 
   readonly refresh = output<void>();
   readonly searchTextChange = output<string>();
@@ -146,6 +150,7 @@ export class ServiceHierarchyTreeComponent {
   readonly manageWorkflows = output<ServiceTreeNode>();
   readonly manageSchedule = output<ServiceTreeNode>();
   readonly manageMedia = output<ServiceTreeNode>();
+  readonly manageSegments = output<ServiceTreeNode>();
 
   public readonly isDropActive = signal(false);
   protected readonly normalizedSearchText = computed(() => this.searchText().trim());
@@ -419,7 +424,16 @@ export class ServiceHierarchyTreeComponent {
       canManageSchedule:
         this.canManageSchedules() && this.canManageScheduleNode()(node),
       canManageMedia: this.canManageMedia() && this.canManageMediaNode()(node),
+      canManageSegments: this.canManageSegments() && this.canManageSegmentsNode()(node),
     };
+  }
+
+  public requestManageSegments(node: ServiceTreeNode, event: MouseEvent): void {
+    event.stopPropagation();
+    if (this.actionsDisabled() || node.isDeleted) {
+      return;
+    }
+    this.manageSegments.emit(node);
   }
 
   private isUnassignableLeaf(node: ServiceTreeNode): boolean {
