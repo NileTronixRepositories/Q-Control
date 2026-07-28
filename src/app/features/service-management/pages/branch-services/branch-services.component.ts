@@ -2,6 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   OnDestroy,
   OnInit,
   computed,
@@ -11,6 +12,7 @@ import {
   untracked,
 } from '@angular/core';
 import { Router } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize, Observable } from 'rxjs';
 
 import { NiletronixLoadingStateComponent } from '../../../../shared/components/niletronix-loading-state/niletronix-loading-state.component';
@@ -46,12 +48,12 @@ import {
   ServiceRestoreResponse,
   ServiceTreeNode,
 } from '../../models/service-management.model';
-import { BranchServicesApiService } from '../../services/branch-services-api.service';
-import { ServiceManagementApiService } from '../../services/service-management-api.service';
-import { ServiceManagementPermissionService } from '../../services/service-management-permission.service';
-import { ServiceGlobalizationApiService } from '../../services/service-globalization-api.service';
+import { BranchServicesApiService } from '../../services/branch/branch-services-api.service';
+import { ServiceManagementApiService } from '../../services/catalog/service-management-api.service';
+import { ServiceManagementPermissionService } from '../../services/catalog/service-management-permission.service';
+import { ServiceGlobalizationApiService } from '../../services/globalization/service-globalization-api.service';
 import { BranchServicesStore } from '../../store/branch-services.store';
-import { ServiceDataInvalidationService } from '../../services/service-data-invalidation.service';
+import { ServiceDataInvalidationService } from '../../services/catalog/service-data-invalidation.service';
 import {
   ServiceActionPermissions,
   canAssignServiceLeaf,
@@ -92,6 +94,7 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
   private readonly serviceGlobalizationApiService = inject(ServiceGlobalizationApiService);
   private readonly permissionService = inject(ServiceManagementPermissionService);
   private readonly invalidationService = inject(ServiceDataInvalidationService);
+  private readonly destroyRef = inject(DestroyRef);
 
   protected readonly store = inject(BranchServicesStore);
   protected readonly translations = computed(
@@ -439,7 +442,10 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
     this.mediaLoading.set(true);
     this.serviceManagementApiService
       .getServiceDetails(node.id)
-      .pipe(finalize(() => this.mediaLoading.set(false)))
+      .pipe(
+        finalize(() => this.mediaLoading.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
       .subscribe({
         next: (details) => {
           if (!details.canEditDefinition) {
@@ -553,7 +559,10 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
     this.store.lifecyclePreparing.set(true);
     this.serviceManagementApiService
       .getServiceDetails(node.id)
-      .pipe(finalize(() => this.store.lifecyclePreparing.set(false)))
+      .pipe(
+        finalize(() => this.store.lifecyclePreparing.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
       .subscribe({
         next: (details) => this.openLifecycleConfirm(details, action, branchId),
         error: (error: HttpErrorResponse) => this.handleLifecycleApiError(error),
@@ -588,7 +597,10 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
 
     this.store.lifecycleMutating.set(true);
     request$
-      .pipe(finalize(() => this.store.lifecycleMutating.set(false)))
+      .pipe(
+        finalize(() => this.store.lifecycleMutating.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
       .subscribe({
         next: (response) => {
           const restoredButDisabled =
@@ -637,7 +649,10 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
     this.store.unassigning.set(true);
     this.branchServicesApiService
       .unassignLeafService(state.branchId, state.leafServiceId)
-      .pipe(finalize(() => this.store.unassigning.set(false)))
+      .pipe(
+        finalize(() => this.store.unassigning.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
       .subscribe({
         next: (response) => {
           const message = this.translations()
@@ -683,7 +698,10 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
     this.store.assigning.set(true);
     this.branchServicesApiService
       .assignServices(branchId, { serviceIds })
-      .pipe(finalize(() => this.store.assigning.set(false)))
+      .pipe(
+        finalize(() => this.store.assigning.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
       .subscribe({
         next: (response) => {
           this.showMessage(
@@ -717,7 +735,10 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
 
     this.store.creatingTree.set(true);
     createRequest$
-      .pipe(finalize(() => this.store.creatingTree.set(false)))
+      .pipe(
+        finalize(() => this.store.creatingTree.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
       .subscribe({
         next: (response) => {
           this.showMessage('success', response.message || this.translations().fallbackSuccess);
@@ -887,7 +908,10 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
         pageSize: 100,
         isActive: true,
       })
-      .pipe(finalize(() => this.store.branchesLoading.set(false)))
+      .pipe(
+        finalize(() => this.store.branchesLoading.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
       .subscribe({
         next: (response) => this.branches.set(response.data),
         error: (error: HttpErrorResponse) => this.handleApiError(error),
@@ -916,6 +940,7 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
             this.store.branchTreeLoading.set(false);
           }
         }),
+        takeUntilDestroyed(this.destroyRef),
       )
       .subscribe({
         next: (response) => {
@@ -959,6 +984,7 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
             this.store.pendingGlobalizationRequestsLoading.set(false);
           }
         }),
+        takeUntilDestroyed(this.destroyRef),
       )
       .subscribe({
         next: (response) => {
@@ -1027,6 +1053,7 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
             this.store.centralTreeLoading.set(false);
           }
         }),
+        takeUntilDestroyed(this.destroyRef),
       )
       .subscribe({
         next: (response) => {

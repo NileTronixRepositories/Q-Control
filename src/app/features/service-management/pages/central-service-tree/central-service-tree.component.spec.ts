@@ -8,8 +8,8 @@ import { AuthSessionService } from '../../../auth/services/auth-session.service'
 import { TechnicalAdminI18nStore } from '../../../technical-admin/store/technical-admin-i18n.store';
 import { ServiceHierarchyTreeComponent } from '../../components/service-hierarchy-tree/service-hierarchy-tree.component';
 import { ServiceTreeNode } from '../../models/service-management.model';
-import { ServiceDataInvalidationService } from '../../services/service-data-invalidation.service';
-import { ServiceManagementApiService } from '../../services/service-management-api.service';
+import { ServiceDataInvalidationService } from '../../services/catalog/service-data-invalidation.service';
+import { ServiceManagementApiService } from '../../services/catalog/service-management-api.service';
 import { CentralServiceTreeComponent } from './central-service-tree.component';
 
 const rootNode: ServiceTreeNode = {

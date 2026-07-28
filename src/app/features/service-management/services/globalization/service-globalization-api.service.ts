@@ -2,9 +2,9 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { environment } from '../../../../environments/environment';
-import { AppLanguageStore } from '../../../shared/store/app-language.store';
-import { AuthSessionService } from '../../auth/services/auth-session.service';
+import { environment } from '../../../../../environments/environment';
+import { AppLanguageStore } from '../../../../shared/store/app-language.store';
+import { AuthSessionService } from '../../../auth/services/auth-session.service';
 import {
   ApproveServiceGlobalizationRequestResponse,
   PagedServiceGlobalizationRequestsResponse,
@@ -13,7 +13,7 @@ import {
   ServiceGlobalizationRequestDetails,
   ServiceGlobalizationRequestQuery,
   TechnicalServiceGlobalizationRequestQuery,
-} from '../models/service-globalization.model';
+} from '../../models/service-globalization.model';
 
 const REQUESTS_PATH = 'api/service-globalization-requests';
 const BRANCHES_PATH = 'api/branches';

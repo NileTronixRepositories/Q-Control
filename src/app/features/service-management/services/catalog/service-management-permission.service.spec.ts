@@ -1,7 +1,7 @@
 import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
-import { AuthSessionService } from '../../auth/services/auth-session.service';
+import { AuthSessionService } from '../../../auth/services/auth-session.service';
 import { ServiceManagementPermissionService } from './service-management-permission.service';
 
 describe('ServiceManagementPermissionService', () => {

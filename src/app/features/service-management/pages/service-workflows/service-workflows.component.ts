@@ -2,12 +2,14 @@ import { HttpErrorResponse } from '@angular/common/http';
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   OnDestroy,
   OnInit,
   computed,
   inject,
   signal,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   NonNullableFormBuilder,
   ReactiveFormsModule,
@@ -36,9 +38,9 @@ import {
   WorkflowCandidateService,
   WorkflowConfirmAction,
 } from '../../models/service-workflow.model';
-import { BranchServicesApiService } from '../../services/branch-services-api.service';
-import { ServiceManagementPermissionService } from '../../services/service-management-permission.service';
-import { ServiceWorkflowApiService } from '../../services/service-workflow-api.service';
+import { BranchServicesApiService } from '../../services/branch/branch-services-api.service';
+import { ServiceManagementPermissionService } from '../../services/catalog/service-management-permission.service';
+import { ServiceWorkflowApiService } from '../../services/workflow/service-workflow-api.service';
 import { ServiceWorkflowStore } from '../../store/service-workflow.store';
 
 type BooleanSelectValue = 'all' | 'true' | 'false';
@@ -75,6 +77,7 @@ export class ServiceWorkflowsComponent implements OnInit, OnDestroy {
   private readonly branchServicesApiService = inject(BranchServicesApiService);
   private readonly apiService = inject(ServiceWorkflowApiService);
   private readonly permissionService = inject(ServiceManagementPermissionService);
+  private readonly destroyRef = inject(DestroyRef);
 
   readonly store = inject(ServiceWorkflowStore);
   readonly translations = computed(() => SERVICE_WORKFLOW_TRANSLATIONS[this.i18nStore.language()]);
@@ -170,7 +173,10 @@ export class ServiceWorkflowsComponent implements OnInit, OnDestroy {
         pageSize: 100,
         isActive: true,
       })
-      .pipe(finalize(() => this.store.branchesLoading.set(false)))
+      .pipe(
+        finalize(() => this.store.branchesLoading.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
       .subscribe({
         next: (response) => this.store.branches.set(response.data),
         error: (error: HttpErrorResponse) => this.handleApiError(error),
@@ -194,6 +200,7 @@ export class ServiceWorkflowsComponent implements OnInit, OnDestroy {
             this.store.branchTreeLoading.set(false);
           }
         }),
+        takeUntilDestroyed(this.destroyRef),
       )
       .subscribe({
         next: (tree) => {
@@ -249,6 +256,12 @@ export class ServiceWorkflowsComponent implements OnInit, OnDestroy {
 
   selectBranchNode(node: ServiceTreeNode): void {
     this.store.selectedBranchNodeId.set(node.id);
+    const branchId = this.store.selectedBranchId();
+    if (branchId && this.canManageWorkflowFor(node)) {
+      this.activateScope(branchId, node);
+    } else if (node.children.length > 0) {
+      this.toggleBranchNode(node);
+    }
   }
 
   openNodeWorkflows(node: ServiceTreeNode): void {
@@ -258,10 +271,11 @@ export class ServiceWorkflowsComponent implements OnInit, OnDestroy {
       return;
     }
     this.activateScope(branchId, node);
-    this.openCreate();
   }
 
   backToScopeSelection(): void {
+    this.store.clearScope();
+    this.scopeError.set(null);
     void this.router.navigateByUrl('/admin/services/workflows');
   }
 
@@ -545,7 +559,12 @@ export class ServiceWorkflowsComponent implements OnInit, OnDestroy {
               state.rowVersion,
             );
 
-    request.pipe(finalize(() => this.store.mutating.set(false))).subscribe({
+    request
+      .pipe(
+        finalize(() => this.store.mutating.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
       next: (response) => {
         this.store.confirmState.set(null);
         this.applyMutationResponse(response, state.action);
@@ -577,7 +596,10 @@ export class ServiceWorkflowsComponent implements OnInit, OnDestroy {
     this.store.listLoading.set(true);
     this.apiService
       .getWorkflows(scope.branchId, scope.leafServiceId, this.store.query())
-      .pipe(finalize(() => this.store.listLoading.set(false)))
+      .pipe(
+        finalize(() => this.store.listLoading.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
       .subscribe({
         next: (response) => this.store.page.set(response),
         error: (error: HttpErrorResponse) => this.handleApiError(error),
@@ -597,6 +619,7 @@ export class ServiceWorkflowsComponent implements OnInit, OnDestroy {
             this.store.candidatesLoading.set(false);
           }
         }),
+        takeUntilDestroyed(this.destroyRef),
       )
       .subscribe({
         next: (response) => {
@@ -618,7 +641,10 @@ export class ServiceWorkflowsComponent implements OnInit, OnDestroy {
     this.store.startOptionsLoading.set(true);
     this.apiService
       .getWorkflowStartOptions(scope.branchId, scope.leafServiceId)
-      .pipe(finalize(() => this.store.startOptionsLoading.set(false)))
+      .pipe(
+        finalize(() => this.store.startOptionsLoading.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
       .subscribe({
         next: (response) => this.store.startOptions.set(response),
         error: (error: HttpErrorResponse) => this.handleApiError(error),
@@ -632,7 +658,10 @@ export class ServiceWorkflowsComponent implements OnInit, OnDestroy {
     this.store.detailsLoading.set(true);
     this.apiService
       .getWorkflowDetails(scope.branchId, scope.leafServiceId, workflowId)
-      .pipe(finalize(() => this.store.detailsLoading.set(false)))
+      .pipe(
+        finalize(() => this.store.detailsLoading.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
       .subscribe({
         next: (details) => {
           this.store.selectedDetails.set(details);
@@ -648,7 +677,10 @@ export class ServiceWorkflowsComponent implements OnInit, OnDestroy {
     this.store.saving.set(true);
     this.apiService
       .createWorkflow(scope.branchId, scope.leafServiceId, this.mapCreateRequest())
-      .pipe(finalize(() => this.store.saving.set(false)))
+      .pipe(
+        finalize(() => this.store.saving.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
       .subscribe({
         next: (response) => {
           this.showMessage('success', response.message || this.translations().fallbackSuccess);
@@ -674,7 +706,10 @@ export class ServiceWorkflowsComponent implements OnInit, OnDestroy {
         ...this.mapCreateRequest(),
         rowVersion: details.rowVersion,
       })
-      .pipe(finalize(() => this.store.saving.set(false)))
+      .pipe(
+        finalize(() => this.store.saving.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
       .subscribe({
         next: (response) => {
           this.store.selectedDetails.set(response);
@@ -689,7 +724,12 @@ export class ServiceWorkflowsComponent implements OnInit, OnDestroy {
   }
 
   workflowName(item: ServiceWorkflowListItem | ServiceWorkflowDetails): string {
-    return this.formatText(this.language() === 'ar' ? item.arabicName : item.englishName);
+    const primaryName = this.language() === 'ar' ? item.arabicName : item.englishName;
+    const secondaryName = this.language() === 'ar' ? item.englishName : item.arabicName;
+    const name = primaryName?.trim() || secondaryName?.trim();
+    if (name) return name;
+    const fallback = this.language() === 'ar' ? 'مسار رقم' : 'Workflow #';
+    return `${fallback} ${item.workflowId}`;
   }
 
   serviceName(item: ServiceTreeNode | WorkflowCandidateService | ServiceWorkflowStep): string {

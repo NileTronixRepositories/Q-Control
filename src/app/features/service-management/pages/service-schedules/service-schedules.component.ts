@@ -2,12 +2,14 @@ import { HttpErrorResponse } from '@angular/common/http';
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   OnDestroy,
   OnInit,
   computed,
   inject,
   signal,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   AbstractControl,
   FormArray,
@@ -40,9 +42,9 @@ import {
   ServiceScheduleTimeSlot,
   ServiceScheduleUiMessage,
 } from '../../models/service-schedule.model';
-import { BranchServicesApiService } from '../../services/branch-services-api.service';
-import { ServiceManagementPermissionService } from '../../services/service-management-permission.service';
-import { ServiceScheduleApiService } from '../../services/service-schedule-api.service';
+import { BranchServicesApiService } from '../../services/branch/branch-services-api.service';
+import { ServiceManagementPermissionService } from '../../services/catalog/service-management-permission.service';
+import { ServiceScheduleApiService } from '../../services/schedule/service-schedule-api.service';
 
 const TIME_PATTERN = /^([01]\d|2[0-3]):[0-5]\d$/;
 const API_TIME_PATTERN = /^([01]\d|2[0-3]):[0-5]\d(?::[0-5]\d)?$/;
@@ -151,6 +153,7 @@ export class ServiceSchedulesComponent implements OnInit, OnDestroy, ServiceSche
   private readonly branchServicesApiService = inject(BranchServicesApiService);
   private readonly apiService = inject(ServiceScheduleApiService);
   private readonly permissionService = inject(ServiceManagementPermissionService);
+  private readonly destroyRef = inject(DestroyRef);
 
   protected readonly translations = computed(
     () => SERVICE_SCHEDULE_TRANSLATIONS[this.i18nStore.language()],
@@ -388,7 +391,12 @@ export class ServiceSchedulesComponent implements OnInit, OnDestroy, ServiceSche
         });
 
     this.saving.set(true);
-    mutation$.pipe(finalize(() => this.saving.set(false))).subscribe({
+    mutation$
+      .pipe(
+        finalize(() => this.saving.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
       next: (response) => {
         this.schedule.set(response);
         this.syncSelectorState(response.branchId, response.serviceId);
@@ -483,7 +491,10 @@ export class ServiceSchedulesComponent implements OnInit, OnDestroy, ServiceSche
         pageSize: 100,
         isActive: true,
       })
-      .pipe(finalize(() => this.branchesLoading.set(false)))
+      .pipe(
+        finalize(() => this.branchesLoading.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
       .subscribe({
         next: (response) => this.branches.set(response.data),
         error: (error: HttpErrorResponse) => this.handleApiError(error),
@@ -495,7 +506,10 @@ export class ServiceSchedulesComponent implements OnInit, OnDestroy, ServiceSche
     this.treeLoading.set(true);
     this.branchServicesApiService
       .getBranchServicesTree(branchId, { includeInactive: false, includeDeleted: false })
-      .pipe(finalize(() => this.treeLoading.set(false)))
+      .pipe(
+        finalize(() => this.treeLoading.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
       .subscribe({
         next: (tree) => {
           this.branchTree.set(tree);
@@ -554,7 +568,10 @@ export class ServiceSchedulesComponent implements OnInit, OnDestroy, ServiceSche
     this.scheduleLoading.set(true);
     this.apiService
       .getSchedule(currentScope.branchId, currentScope.leafServiceId)
-      .pipe(finalize(() => this.scheduleLoading.set(false)))
+      .pipe(
+        finalize(() => this.scheduleLoading.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
       .subscribe({
         next: (response) => {
           this.schedule.set(response);

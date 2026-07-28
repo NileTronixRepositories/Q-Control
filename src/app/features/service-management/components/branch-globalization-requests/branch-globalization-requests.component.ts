@@ -1,4 +1,4 @@
-﻿import { HttpErrorResponse } from '@angular/common/http';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 import {
   ChangeDetectionStrategy,
@@ -30,9 +30,9 @@ import {
   ServiceGlobalizationRequestStatus,
   ServiceGlobalizationRequestType,
 } from '../../models/service-globalization.model';
-import { ServiceDataInvalidationService } from '../../services/service-data-invalidation.service';
-import { ServiceGlobalizationApiService } from '../../services/service-globalization-api.service';
-import { ServiceManagementPermissionService } from '../../services/service-management-permission.service';
+import { ServiceDataInvalidationService } from '../../services/catalog/service-data-invalidation.service';
+import { ServiceGlobalizationApiService } from '../../services/globalization/service-globalization-api.service';
+import { ServiceManagementPermissionService } from '../../services/catalog/service-management-permission.service';
 
 const STATUS_POLL_INTERVAL_MS = 15_000;
 

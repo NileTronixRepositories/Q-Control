@@ -4,7 +4,7 @@ import { vi } from 'vitest';
 
 import { SERVICE_MANAGEMENT_TRANSLATIONS } from '../../i18n/service-management.translations';
 import { ServiceDetails, ServiceImageResponse } from '../../models/service-management.model';
-import { ServiceManagementApiService } from '../../services/service-management-api.service';
+import { ServiceManagementApiService } from '../../services/catalog/service-management-api.service';
 import { ServiceMediaManagerComponent } from './service-media-manager.component';
 
 describe('ServiceMediaManagerComponent', () => {

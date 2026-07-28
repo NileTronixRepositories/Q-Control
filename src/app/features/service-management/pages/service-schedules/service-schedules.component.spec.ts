@@ -11,9 +11,9 @@ import { BranchManagementApiService } from '../../../technical-admin/services/br
 import { TechnicalAdminI18nStore } from '../../../technical-admin/store/technical-admin-i18n.store';
 import { ServiceTreeNode } from '../../models/service-management.model';
 import { ServiceSchedule } from '../../models/service-schedule.model';
-import { BranchServicesApiService } from '../../services/branch-services-api.service';
-import { ServiceManagementPermissionService } from '../../services/service-management-permission.service';
-import { ServiceScheduleApiService } from '../../services/service-schedule-api.service';
+import { BranchServicesApiService } from '../../services/branch/branch-services-api.service';
+import { ServiceManagementPermissionService } from '../../services/catalog/service-management-permission.service';
+import { ServiceScheduleApiService } from '../../services/schedule/service-schedule-api.service';
 import { ServiceSchedulesComponent } from './service-schedules.component';
 
 const eligibleLeaf: ServiceTreeNode = {
@@ -597,7 +597,7 @@ describe('ServiceSchedulesComponent', () => {
     const component = fixture.componentInstance as unknown as TestScheduleComponent;
 
     expect(component.dayGroups()).toHaveLength(7);
-    expect(component.dayGroups().every((day) => !day.controls.isWorkingDay.value)).toBe(true);
+    expect(component.dayGroups().every((day: any) => !day.controls.isWorkingDay.value)).toBe(true);
   });
 
   it('closes a day when its last time slot is removed', () => {
@@ -837,15 +837,15 @@ describe('ServiceSchedulesComponent', () => {
 });
 
 interface TestScheduleComponent {
-  readonly scheduleForm: ServiceSchedulesComponent['scheduleForm'];
+  readonly scheduleForm: any;
   readonly schedule: ServiceSchedulesComponent['schedule'];
   readonly selectedBranchId: ServiceSchedulesComponent['selectedBranchId'];
   readonly selectedServicePath: ServiceSchedulesComponent['selectedServicePath'];
   readonly reloadRequired: ServiceSchedulesComponent['reloadRequired'];
   resetInlineChanges(): void;
   submit(): void;
-  dayGroups(): ServiceSchedulesComponent['scheduleForm']['controls']['days']['controls'];
-  timeSlotGroups(dayIndex: number): ReturnType<TestScheduleComponent['dayGroups']>[number]['controls']['timeSlots']['controls'];
+  dayGroups(): any[];
+  timeSlotGroups(dayIndex: number): any[];
   toggleWorkingDay(dayIndex: number, checked: boolean): void;
   addTimeSlot(dayIndex: number): void;
   removeTimeSlot(dayIndex: number, slotIndex: number): void;

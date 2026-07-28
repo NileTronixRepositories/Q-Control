@@ -2,6 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   OnInit,
   computed,
   effect,
@@ -9,6 +10,7 @@ import {
   signal,
   untracked,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs';
 
 import { TechnicalAdminPageHeroComponent } from '../../../../shared/components/technical-admin-page-hero/technical-admin-page-hero.component';
@@ -20,8 +22,8 @@ import { ServiceHierarchyTreeComponent } from '../../components/service-hierarch
 import { SERVICE_GLOBALIZATION_TRANSLATIONS } from '../../i18n/service-globalization.translations';
 import { SERVICE_MANAGEMENT_TRANSLATIONS } from '../../i18n/service-management.translations';
 import { ServiceTreeNode } from '../../models/service-management.model';
-import { ServiceDataInvalidationService } from '../../services/service-data-invalidation.service';
-import { ServiceManagementApiService } from '../../services/service-management-api.service';
+import { ServiceDataInvalidationService } from '../../services/catalog/service-data-invalidation.service';
+import { ServiceManagementApiService } from '../../services/catalog/service-management-api.service';
 
 @Component({
   selector: 'app-central-service-tree',
@@ -35,6 +37,7 @@ export class CentralServiceTreeComponent implements OnInit {
   private readonly i18nStore = inject(TechnicalAdminI18nStore);
   private readonly authSessionService = inject(AuthSessionService);
   private readonly invalidationService = inject(ServiceDataInvalidationService);
+  private readonly destroyRef = inject(DestroyRef);
 
   protected readonly language = this.i18nStore.language;
   protected readonly direction = this.i18nStore.direction;
@@ -72,9 +75,12 @@ export class CentralServiceTreeComponent implements OnInit {
         includeInactive: this.includeInactive(),
         includeDeleted: this.includeDeleted(),
       })
-      .pipe(finalize(() => {
-        if (requestId === this.requestId) this.loading.set(false);
-      }))
+      .pipe(
+        finalize(() => {
+          if (requestId === this.requestId) this.loading.set(false);
+        }),
+        takeUntilDestroyed(this.destroyRef),
+      )
       .subscribe({
         next: (response) => {
           if (requestId === this.requestId) this.nodes.set(response);

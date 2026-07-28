@@ -3,10 +3,10 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
-import { environment } from '../../../../environments/environment';
-import { AppLanguageStore } from '../../../shared/store/app-language.store';
-import { AuthSessionService } from '../../auth/services/auth-session.service';
-import { ServiceSchedule } from '../models/service-schedule.model';
+import { environment } from '../../../../../environments/environment';
+import { AppLanguageStore } from '../../../../shared/store/app-language.store';
+import { AuthSessionService } from '../../../auth/services/auth-session.service';
+import { ServiceSchedule } from '../../models/service-schedule.model';
 import { ServiceScheduleApiService } from './service-schedule-api.service';
 
 describe('ServiceScheduleApiService', () => {

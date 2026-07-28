@@ -2,9 +2,9 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { environment } from '../../../../environments/environment';
-import { AppLanguageStore } from '../../../shared/store/app-language.store';
-import { AuthSessionService } from '../../auth/services/auth-session.service';
+import { environment } from '../../../../../environments/environment';
+import { AppLanguageStore } from '../../../../shared/store/app-language.store';
+import { AuthSessionService } from '../../../auth/services/auth-session.service';
 import {
   AssignBranchServicesRequest,
   AssignBranchServicesResponse,
@@ -14,7 +14,7 @@ import {
   CreateBranchServiceTreeRequest,
   CreateBranchServiceTreeResponse,
   UnassignBranchLeafServiceResponse,
-} from '../models/branch-services.model';
+} from '../../models/branch-services.model';
 
 const BRANCHES_PATH = 'api/branches';
 

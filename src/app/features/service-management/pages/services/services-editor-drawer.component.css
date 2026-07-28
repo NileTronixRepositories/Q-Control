@@ -1,10 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════
-   Service Editor Drawer
-   ─ Covers create & edit modes only.
-   ─ view/closed remain in the page layout (no changes).
-   ─ Opens from the inline-end edge → matches text direction:
-       RTL (Arabic)  → slides in from the right
-       LTR (English) → slides in from the left
+   Service Editor Drawer - Refactored Layout & UX Polish
    ════════════════════════════════════════════════════════════════ */
 
 /* ── Backdrop ────────────────────────────────────────────────── */
@@ -12,8 +7,9 @@
   position: fixed;
   inset: 0;
   z-index: 1100;
-  background: rgba(15, 23, 42, 0.32);
-  animation: svc-backdrop-in 0.18s ease forwards;
+  background: rgba(10, 17, 40, 0.45);
+  backdrop-filter: blur(4px);
+  animation: svc-backdrop-in 0.2s ease forwards;
 }
 
 @keyframes svc-backdrop-in {
@@ -21,7 +17,7 @@
   to   { opacity: 1; }
 }
 
-/* ── Drawer shell ────────────────────────────────────────────── */
+/* ── Drawer Shell ────────────────────────────────────────────── */
 .svc-editor-drawer {
   position: fixed;
   inset-block: 0;
@@ -31,19 +27,22 @@
 
   display: flex;
   flex-direction: column;
-   width: min(650px, calc(100vw - 48px));
+  width: min(780px, calc(100vw - 32px));
+  max-height: 100vh;
   max-height: 100dvh;
-  max-height: 100vh;  
 
-  background: #fff;
-  border-inline-start: 1px solid #dbeafe;
-  box-shadow: -8px 0 40px rgba(15, 23, 42, 0.14);
-  outline: none;  
+  background: #ffffff;
+  border-inline-start: 1px solid var(--q-border-subtle, #d8e5ec);
+  box-shadow: -12px 0 40px rgba(15, 23, 42, 0.16);
+  outline: none;
+
+  font-family: var(--q-font-family, 'Cairo', sans-serif);
+  font-size: var(--q-font-size-base, 13px);
+  color: var(--q-text-primary, #0f172a);
 
   animation: svc-drawer-in-end 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-/* Slide-in animation based on logical inline-start/end */
 @keyframes svc-drawer-in-end {
   from {
     transform: translateX(var(--drawer-slide-dir, 100%));
@@ -55,7 +54,6 @@
   }
 }
 
-/* Set the slide direction based on document dir */
 :host-context([dir="rtl"]) {
   --drawer-slide-dir: 100%;
 }
@@ -63,26 +61,12 @@
   --drawer-slide-dir: -100%;
 }
 
- .svc-editor-drawer:focus-visible {
-  outline: 2px solid #0284c7;
-  outline-offset: -2px;
-}
- 
-
-/* ── Reduced motion ──────────────────────────────────────────── */
-@media (prefers-reduced-motion: reduce) {
-  .svc-drawer-backdrop,
-  .svc-editor-drawer {
-    animation: none;
-  }
-}
-
-/* ── Drawer header ───────────────────────────────────────────── */
+/* ── Drawer Header ───────────────────────────────────────────── */
 .svc-drawer-header {
-  padding: 10px 14px;
-  background: #f8fbff;
-  border-block-end: 1px solid #dbeafe;
-  min-height: 52px;
+  padding: 16px 20px;
+  background: linear-gradient(90deg, #f0f9ff 0%, #ffffff 100%);
+  border-block-end: 1px solid rgba(11, 138, 168, 0.15);
+  min-height: 64px;
 }
 
 .svc-drawer-icon {
@@ -90,73 +74,68 @@
   align-items: center;
   justify-content: center;
   flex: 0 0 auto;
-  width: 34px;
-  height: 34px;
-  color: #0284c7;
-  background: #e0f2fe;
-  border: 1px solid #bae6fd;
-  border-radius: 8px;
-  font-size: 15px;
+  width: 40px;
+  height: 40px;
+  color: #ffffff;
+  background: linear-gradient(135deg, #0b8aa8 0%, #056579 100%);
+  border-radius: 10px;
+  font-size: 18px;
+  box-shadow: 0 4px 12px rgba(11, 138, 168, 0.25);
 }
 
 .svc-drawer-title {
   margin: 0;
-  color: #0f172a;
-  font-size: 15px;
-  font-weight: 900;
-  line-height: 1.25;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  color: var(--q-text-primary, #0f172a);
+  font-size: 17px;
+  font-weight: 800;
+  line-height: 1.3;
 }
 
-/* ── Editor tabs inside drawer ───────────────────────────────── */
+.svc-eyebrow {
+  margin: 0 0 2px;
+  color: var(--q-primary, #0b8aa8);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+/* ── Editor Tabs ─────────────────────────────────────────────── */
 .svc-drawer-tabs {
   display: flex;
-  gap: 0;
-  padding: 0 14px;
-  background: #f8fbff;
-  border-block-end: 1px solid #dbeafe;
-}
-
-.svc-editor-tabs {
-  display: flex;
+  gap: 4px;
+  padding: 0 20px;
+  background: #f8fafc;
+  border-block-end: 1px solid var(--q-border-subtle, #d8e5ec);
 }
 
 .svc-editor-tab {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 8px 14px;
-  color: #64748b;
+  gap: 8px;
+  padding: 12px 18px;
+  color: var(--q-text-muted, #5a6b7a);
   background: transparent;
   border: 0;
   border-block-end: 2px solid transparent;
-  font-size: 11px;
-  font-weight: 800;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
   cursor: pointer;
-  transition:
-    color 0.14s ease,
-    border-color 0.14s ease;
+  transition: all 0.2s ease;
   white-space: nowrap;
 }
 
 .svc-editor-tab:hover {
-  color: #0284c7;
+  color: var(--q-primary, #0b8aa8);
 }
 
 .svc-editor-tab.active {
-  color: #0284c7;
-  border-block-end-color: #0284c7;
+  color: var(--q-primary, #0b8aa8);
+  border-block-end-color: var(--q-primary, #0b8aa8);
 }
 
-.svc-editor-tab:focus-visible {
-  outline: 2px solid #0284c7;
-  outline-offset: -2px;
-  border-radius: 4px 4px 0 0;
-}
-
-/* ── Drawer body (scrollable) ────────────────────────────────── */
+/* ── Drawer Body & Form Grid ─────────────────────────────────── */
 .svc-drawer-body {
   flex: 1 1 auto;
   min-height: 0;
@@ -165,221 +144,175 @@
   overscroll-behavior: contain;
 }
 
-/* Padding for the form section inside the drawer */
 .svc-editor-drawer .svc-editor-form-panel {
-  padding: 14px;
+  padding: 20px;
 }
 
-/* Override base .svc-form grid to single stack inside drawer */
 .svc-editor-drawer .svc-form {
-  grid-template-columns: 1fr;
+  display: grid;
+  gap: 16px;
 }
 
-/* Two-column rows from sm upward inside drawer */
-.svc-editor-drawer .svc-form-2col {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+/* ── Section Cards inside Drawer ─────────────────────────────── */
+.svc-editor-drawer .svc-form-section {
+  background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+  border: 1px solid rgba(11, 138, 168, 0.15);
+  border-radius: var(--q-radius-md, 12px);
+  padding: 18px;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.03);
 }
 
-/* ── Drawer footer ───────────────────────────────────────────── */
+.svc-editor-drawer .svc-form-title {
+  color: var(--q-text-primary, #0f172a);
+  font-size: 14px;
+  font-weight: 800;
+  margin-bottom: 14px !important;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ── Form Fields & Inputs ────────────────────────────────────── */
+.svc-editor-drawer .svc-field {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+/* Prevent duplicate warning icons from global components-shared.css ::before rules */
+.svc-editor-drawer .svc-field small::before,
+.svc-editor-drawer .svc-field-error::before,
+.svc-editor-drawer small.text-danger::before {
+  content: none !important;
+  display: none !important;
+}
+
+.svc-editor-drawer .svc-field > span:first-child {
+  font-size: 12px;
+  color: var(--q-primary, #0b8aa8);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.svc-editor-drawer .svc-input {
+  border: 1px solid var(--q-border-strong, #cbd5e1);
+  border-radius: var(--q-radius-sm, 8px);
+  padding: 8px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--q-text-primary, #0f172a);
+  background: #ffffff;
+  min-height: 40px;
+  transition: all 0.2s ease;
+}
+
+.svc-editor-drawer .svc-input:focus {
+  border-color: var(--q-primary, #0b8aa8);
+  box-shadow: var(--q-focus-ring, 0 0 0 3px rgba(11, 138, 168, 0.25));
+  outline: none;
+}
+
+.svc-editor-drawer .svc-input:hover:not(:focus):not(:disabled) {
+  border-color: var(--q-primary, #0b8aa8);
+}
+
+ 
+.svc-editor-drawer .form-control.ng-invalid,
+.svc-editor-drawer .form-control.is-invalid,
+.svc-editor-drawer .form-select.ng-invalid,
+.svc-editor-drawer .form-select.is-invalid {
+  background-image: none !important;
+  padding-inline-end: 12px !important;
+}
+
+/* ── Service Code Card ───────────────────────────────────────── */
+.svc-code-card {
+  background: #f0f9ff !important;
+  border: 1px solid rgba(11, 138, 168, 0.2) !important;
+}
+
+.svc-code-input-box {
+  background: #ffffff;
+  border: 1px solid var(--q-border-strong, #cbd5e1);
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.svc-code-input-box:focus-within {
+  border-color: var(--q-primary, #0b8aa8) !important;
+  box-shadow: var(--q-focus-ring, 0 0 0 3px rgba(11, 138, 168, 0.25));
+}
+
+/* ── Ticket Behavior & Option Cards ──────────────────────────── */
+.svc-segment-card {
+  cursor: pointer;
+  position: relative;
+}
+
+.svc-segment-card input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.svc-segment-card .svc-segment-control {
+  background: #ffffff;
+  border: 1px solid var(--q-border-strong, #cbd5e1);
+  color: var(--q-text-muted, #5a6b7a);
+  font-size: 12px;
+  font-weight: 700;
+  transition: all 0.2s ease;
+  min-height: 42px;
+}
+
+.svc-segment-card input:checked + .svc-segment-control,
+.svc-segment-card.selected .svc-segment-control {
+  background: var(--q-primary-soft, #e0f6f8);
+  border-color: var(--q-primary, #0b8aa8);
+  color: var(--q-primary, #0b8aa8);
+  font-weight: 800;
+  box-shadow: 0 2px 8px rgba(11, 138, 168, 0.15);
+}
+
+.svc-switch-card {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.svc-switch-card:hover {
+  border-color: var(--q-primary, #0b8aa8) !important;
+  background: #f0f9ff !important;
+}
+
+.svc-switch-card input.form-check-input {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--q-primary, #0b8aa8);
+  cursor: pointer;
+}
+
+/* ── Drawer Footer ───────────────────────────────────────────── */
 .svc-drawer-footer {
-  padding: 10px 14px;
-  background: #f8fbff;
-  border-block-start: 1px solid #dbeafe;
+  padding: 14px 20px;
+  background: #ffffff;
+  border-block-start: 1px solid var(--q-border-subtle, #d8e5ec);
+  box-shadow: 0 -4px 14px rgba(15, 23, 42, 0.04);
+}
+
+.svc-drawer-footer button {
+  height: 38px;
+  padding: 0 20px;
+  font-size: 13px;
+  font-weight: 700;
+  border-radius: 8px;
 }
 
 /* ── Responsive ──────────────────────────────────────────────── */
-
-/* Tablet: near-full width */
-@media (max-width: 991.98px) {
-  .svc-editor-drawer {
-    width: calc(100vw - 24px);
-  }
-}
-
-/* Mobile: full screen */
-@media (max-width: 575.98px) {
+@media (max-width: 767.98px) {
   .svc-editor-drawer {
     width: 100vw;
     border-inline-start: none;
     border-radius: 0;
   }
-}
-
-.svc-editor-tab-panel {
-  min-width: 0;
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   Premium Refactor Overrides (Modern & Clean UI inside Drawer)
-   ════════════════════════════════════════════════════════════════ */
-
-/* ── Modern Header ───────────────────────────────────────────── */
-.svc-drawer-header {
-  background: #fff;
-  border-block-end: 1px solid #e2e8f0;
-  padding: 16px 24px;
-}
-
-.svc-drawer-icon {
-  width: 42px;
-  height: 42px;
-  font-size: 18px;
-  background: #f0f9ff;
-  border: 1px solid #e0f2fe;
-  color: #0ea5e9;
-  border-radius: 12px;
-  box-shadow: 0 2px 6px rgba(14, 165, 233, 0.1);
-}
-
-.svc-drawer-title {
-  font-size: 17px;
-  letter-spacing: -0.2px;
-}
-
-.svc-eyebrow {
-  font-size: 11px;
-  color: #64748b;
-  margin-bottom: 2px;
-}
-
-/* ── Enhanced Tabs ───────────────────────────────────────────── */
-.svc-drawer-tabs {
-  background: #f8fafc;
-  padding: 0 24px;
-  border-block-end: 1px solid #e2e8f0;
-}
-
-.svc-editor-tab {
-  padding: 14px 18px;
-  font-size: 12px;
-  color: #64748b;
-  border-block-end: 2px solid transparent;
-  margin-block-end: -1px; /* overlap border */
-}
-
-.svc-editor-tab.active {
-  color: #0ea5e9;
-  border-block-end-color: #0ea5e9;
-}
-
-.svc-editor-tab i {
-  font-size: 15px;
-}
-
-/* ── Form Container & Sections ───────────────────────────────── */
-.svc-editor-drawer .svc-editor-form-panel {
-  padding: 12px 24px 32px;
-}
-
-/* Remove the heavy boxed borders for sections inside drawer */
-.svc-editor-drawer .svc-form-section {
-  background: transparent;
-  border: none;
-  border-radius: 0;
-  box-shadow: none;
-  padding: 20px 0;
-  border-block-end: 1px solid #f1f5f9;
-}
-
-.svc-editor-drawer .svc-form-section:last-child {
-  border-block-end: none;
-  padding-bottom: 0;
-}
-
-/* Subtle section titles with accent marker */
-.svc-editor-drawer .svc-form-title {
-  color: #0f172a;
-  font-size: 15px;
-  font-weight: 800;
-  margin-bottom: 20px !important;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.svc-editor-drawer .svc-form-title::before {
-  content: "";
-  display: block;
-  width: 4px;
-  height: 16px;
-  background: #0ea5e9;
-  border-radius: 4px;
-}
-
-/* ── Refined Inputs & Fields ─────────────────────────────────── */
-.svc-editor-drawer .svc-field {
-  position: relative;
-  padding-bottom: 18px; /* Reserve space for absolute error message to prevent layout shift */
-}
-
-.svc-editor-drawer .svc-field > span:first-child {
-  font-size: 12px;
-  color: #475569;
-  font-weight: 700;
-  margin-bottom: 6px;
-}
-
-/* Position error messages absolutely so they don't push adjacent inputs */
-.svc-editor-drawer .svc-field > small:not(.field-help),
-.svc-editor-drawer .svc-field > .svc-field-error {
-  position: absolute;
-  bottom: 0;
-  inset-inline-start: 0;
-  margin-top: 0;
-}
-
-.svc-editor-drawer .svc-input {
-  border: 1px solid #cbd5e1;
-  border-radius: 8px;
-  padding: 10px 14px;
-  font-size: 13px;
-  color: #1e293b;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  background: #fff;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.02);
-}
-
-.svc-editor-drawer .svc-input:focus {
-  background: #fff;
-  border-color: #0ea5e9;
-  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.15);
-  outline: none;
-}
-
-.svc-editor-drawer .svc-input:hover:not(:focus):not(:disabled) {
-  border-color: #94a3b8;
-}
-
-.svc-editor-drawer .svc-input:disabled {
-  background: #f8fafc;
-  color: #94a3b8;
-}
-
-/* ── Grouped Controls (Ticket settings, code row) ────────────── */
-.svc-editor-drawer .svc-ticket-grid,
-.svc-editor-drawer .svc-code-row {
-  background: #f8fafc;
-  padding: 16px;
-  border-radius: 12px;
-  border: 1px solid #e2e8f0;
-  gap: 16px;
-}
-
-.svc-editor-drawer .svc-parent-lock {
-  border: 1px dashed #cbd5e1;
-  background: #f8fafc;
-  padding: 16px;
-}
-
-/* ── Modern Footer ───────────────────────────────────────────── */
-.svc-drawer-footer {
-  background: #fff;
-  border-block-start: 1px solid #e2e8f0;
-  padding: 16px 24px;
-}
-
-.svc-drawer-footer button {
-  padding: 8px 16px;
-  font-size: 13px;
-  min-height: 36px;
 }

@@ -7,8 +7,8 @@ import { vi } from 'vitest';
 import { AuthSessionService } from '../../../auth/services/auth-session.service';
 import { TechnicalAdminI18nStore } from '../../../technical-admin/store/technical-admin-i18n.store';
 import { ServiceSelectionOption } from '../../models/service-management.model';
-import { ServiceManagementApiService } from '../../services/service-management-api.service';
-import { ServiceManagementPermissionService } from '../../services/service-management-permission.service';
+import { ServiceManagementApiService } from '../../services/catalog/service-management-api.service';
+import { ServiceManagementPermissionService } from '../../services/catalog/service-management-permission.service';
 import { ServiceCascadeSelectorComponent } from './service-cascade-selector.component';
 
 const ticketService: ServiceSelectionOption = {

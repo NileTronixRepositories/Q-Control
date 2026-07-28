@@ -2,9 +2,9 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { environment } from '../../../../environments/environment';
-import { AppLanguageStore } from '../../../shared/store/app-language.store';
-import { AuthSessionService } from '../../auth/services/auth-session.service';
+import { environment } from '../../../../../environments/environment';
+import { AppLanguageStore } from '../../../../shared/store/app-language.store';
+import { AuthSessionService } from '../../../auth/services/auth-session.service';
 import {
   CreateServiceRequest,
   PagedServiceResponse,
@@ -24,7 +24,7 @@ import {
   ServiceTreeNode,
   ServiceTreeQuery,
   UpdateServiceRequest,
-} from '../models/service-management.model';
+} from '../../models/service-management.model';
 
 const SERVICES_PATH = 'api/services';
 
@@ -180,6 +180,7 @@ export class ServiceManagementApiService {
       { headers: this.createJsonHeaders(imageRowVersion) },
     );
   }
+
   deleteService(serviceId: number, rowVersion: string): Observable<ServiceDeleteResponse> {
     return this.httpClient.delete<ServiceDeleteResponse>(this.createItemUrl(serviceId), {
       headers: this.createJsonHeaders(rowVersion),
@@ -232,6 +233,7 @@ export class ServiceManagementApiService {
       { headers: this.createMultipartHeaders() },
     );
   }
+
   private createItemUrl(serviceId: number): string {
     return new URL(String(serviceId), `${this.servicesEndpoint}/`).toString();
   }
@@ -335,6 +337,7 @@ export class ServiceManagementApiService {
 
     return params;
   }
+
   private resolveMediaOrigin(apiBaseUrl: string): string {
     const apiUrl = new URL(apiBaseUrl);
     return `${apiUrl.protocol}//${apiUrl.host}`;

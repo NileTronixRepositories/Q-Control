@@ -25,12 +25,16 @@
 }
 
 .app-breadcrumb-item:not(:last-child)::after {
-  margin-inline: 7px;
-  color: var(--q-text-muted, #7a8796);
-  content: "/";
-  font-size: 0.72rem;
-  font-weight: 750;
-  opacity: 0.5;
+  margin-inline: 8px;
+  color: var(--q-primary, #0b8aa8);
+  content: "‹";
+  font-size: 0.95rem;
+  font-weight: 800;
+  opacity: 0.45;
+}
+
+.app-breadcrumb[dir='ltr'] .app-breadcrumb-item:not(:last-child)::after {
+  content: "›";
 }
 
 .app-breadcrumb-link,
@@ -38,22 +42,19 @@
 .app-breadcrumb-current {
   gap: 6px;
   min-width: 0;
-  min-height: 30px;
-  padding: 4px 8px;
+  min-height: 32px;
+  padding: 4px 12px;
   border: 1px solid transparent;
-  border-radius: var(--q-radius-sm, 8px);
+  border-radius: 50rem;
   font-size: 0.78rem;
+  font-weight: 600;
   line-height: 1.2;
   white-space: nowrap;
-  transition:
-    color 160ms ease,
-    background-color 160ms ease,
-    border-color 160ms ease,
-    box-shadow 160ms ease;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .app-breadcrumb-link {
-  color: var(--q-text-secondary, #243647);
+  color: #475569;
 }
 
 .app-breadcrumb-label {
@@ -62,21 +63,23 @@
 
 .app-breadcrumb-link:hover,
 .app-breadcrumb-link:focus-visible {
-  color: var(--q-secondary-button-text, #075d7b);
-  background: rgba(8, 107, 141, 0.07);
-  border-color: rgba(8, 107, 141, 0.14);
+  color: var(--q-primary, #0b8aa8);
+  background: #f0f9ff;
+  border-color: rgba(11, 138, 168, 0.2);
+  transform: translateY(-1px);
 }
 
 .app-breadcrumb-link:focus-visible {
   outline: 0;
-  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.16);
+  box-shadow: 0 0 0 3px rgba(11, 138, 168, 0.15);
 }
 
 .app-breadcrumb-current {
-  color: var(--q-primary-hover, #056579);
-  background: var(--q-primary-soft, #e0f6f8);
-  border-color: var(--q-primary-border, #bae6fd);
-  font-weight: 750;
+  color: var(--q-primary, #0b8aa8);
+  background: linear-gradient(135deg, #e0f6f8 0%, #f0f9ff 100%);
+  border: 1px solid rgba(11, 138, 168, 0.25);
+  font-weight: 800;
+  box-shadow: 0 2px 8px rgba(11, 138, 168, 0.1);
 }
 
 .app-breadcrumb-link span,
@@ -94,12 +97,12 @@
 .app-breadcrumb-label i,
 .app-breadcrumb-current i {
   flex: 0 0 auto;
-  font-size: 0.82rem;
+  font-size: 0.85rem;
   line-height: 1;
 }
 
 .app-breadcrumb-link i {
-  color: var(--q-primary, #086b8d);
+  color: var(--q-primary, #0b8aa8);
 }
 
 @media (max-width: 767.98px) {

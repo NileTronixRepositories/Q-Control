@@ -7,10 +7,10 @@ import { vi } from 'vitest';
 
 import { AuthSessionService } from '../../../auth/services/auth-session.service';
 import { TechnicalAdminI18nStore } from '../../../technical-admin/store/technical-admin-i18n.store';
-import { BranchServicesApiService } from '../../services/branch-services-api.service';
-import { ServiceManagementApiService } from '../../services/service-management-api.service';
-import { ServiceManagementPermissionService } from '../../services/service-management-permission.service';
-import { ServiceWorkflowApiService } from '../../services/service-workflow-api.service';
+import { BranchServicesApiService } from '../../services/branch/branch-services-api.service';
+import { ServiceManagementApiService } from '../../services/catalog/service-management-api.service';
+import { ServiceManagementPermissionService } from '../../services/catalog/service-management-permission.service';
+import { ServiceWorkflowApiService } from '../../services/workflow/service-workflow-api.service';
 import { ServicesComponent } from './services.component';
 
 const emptyPage = {

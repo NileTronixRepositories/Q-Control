@@ -2,10 +2,10 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 
-import { environment } from '../../../../environments/environment';
-import { AppLanguageStore } from '../../../shared/store/app-language.store';
-import { AuthSessionService } from '../../auth/services/auth-session.service';
-import { PagedServiceResponse } from '../models/service-management.model';
+import { environment } from '../../../../../environments/environment';
+import { AppLanguageStore } from '../../../../shared/store/app-language.store';
+import { AuthSessionService } from '../../../auth/services/auth-session.service';
+import { PagedServiceResponse } from '../../models/service-management.model';
 import {
   CreateServiceWorkflowRequest,
   ServiceWorkflowDetails,
@@ -19,7 +19,7 @@ import {
   WorkflowStartOptionItem,
   WorkflowStartMode,
   WorkflowStartOptions,
-} from '../models/service-workflow.model';
+} from '../../models/service-workflow.model';
 
 type UnknownRecord = Record<string, unknown>;
 const BRANCHES_PATH = 'api/branches';
@@ -463,4 +463,3 @@ export class ServiceWorkflowApiService {
     return value !== null && typeof value === 'object' && !Array.isArray(value);
   }
 }
-

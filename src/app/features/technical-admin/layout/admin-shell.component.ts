@@ -9,7 +9,7 @@ import { AppBreadcrumbItem } from '../../../shared/models/breadcrumb.model';
 import { AppNavigationItem } from '../../../shared/models/navigation.model';
 import { AuthenticatedUserType } from '../../auth/models/login-credentials.model';
 import { AuthSessionService } from '../../auth/services/auth-session.service';
-import { ServiceManagementPermissionService } from '../../service-management/services/service-management-permission.service';
+import { ServiceManagementPermissionService } from '../../service-management/services/catalog/service-management-permission.service';
 import { resolveJwtPermissions } from '../../auth/utils/auth-permissions.util';
 import { TechnicalAdminBranchContextStore } from '../store/technical-admin-branch-context.store';
 import { TechnicalAdminI18nStore } from '../store/technical-admin-i18n.store';

@@ -1,10 +1,10 @@
 import { computed, inject, Injectable } from '@angular/core';
 
-import { AuthSessionService } from '../../auth/services/auth-session.service';
-import { ServicePermission } from '../models/service-management.model';
-import { ServiceSchedulePermission } from '../models/service-schedule.model';
-import { ServiceWorkflowPermission } from '../models/service-workflow.model';
-import { ServiceGlobalizationPermission } from '../models/service-globalization.model';
+import { AuthSessionService } from '../../../auth/services/auth-session.service';
+import { ServicePermission } from '../../models/service-management.model';
+import { ServiceSchedulePermission } from '../../models/service-schedule.model';
+import { ServiceWorkflowPermission } from '../../models/service-workflow.model';
+import { ServiceGlobalizationPermission } from '../../models/service-globalization.model';
 
 export type ServiceAreaPermission =
   | ServicePermission

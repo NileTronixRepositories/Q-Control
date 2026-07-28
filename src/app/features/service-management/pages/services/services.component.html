@@ -47,13 +47,18 @@
         <!-- ── Empty / closed state ───────────────────────────── -->
         @if (store.panelMode() === 'closed') {
           <section class="svc-empty">
-            <i class="bi bi-diagram-3" aria-hidden="true"></i>
-            <h2>{{ translations().editorEmptyTitle }}</h2>
-            <p>{{ translations().editorEmptyBody }}</p>
+            <div class="empty-icon-wrapper mb-3">
+              <div class="empty-icon-pulse"></div>
+              <div class="empty-icon-box">
+                <i class="bi bi-diagram-3-fill" aria-hidden="true"></i>
+              </div>
+            </div>
+            <h2 class="empty-title">{{ translations().editorEmptyTitle }}</h2>
+            <p class="empty-subtitle">{{ translations().editorEmptyBody }}</p>
             @if (canCreateGlobal()) {
               <button
                 type="button"
-                class="svc-primary-btn d-inline-flex align-items-center justify-content-center gap-2"
+                class="svc-primary-btn d-inline-flex align-items-center justify-content-center gap-2 mt-2"
                 (click)="openCreateRoot()"
               >
                 <i class="bi bi-plus-lg" aria-hidden="true"></i>
@@ -412,15 +417,12 @@
       </section>
     } @else {
       <section class="svc-workspace row g-2 align-items-start" [attr.inert]="isWriteDrawerOpen() ? '' : null">
-        <!-- Inline panel: view and closed modes only.
-             create/edit are rendered in the Drawer <aside> below. -->
         @if (store.panelMode() === 'closed' || store.panelMode() === 'view') {
           <ng-container
             [ngTemplateOutlet]="serviceEditorPanel"
             [ngTemplateOutletContext]="{ editorClass: 'svc-editor col-12 col-xl-7' }"
           ></ng-container>
         }
-        <!-- Tree: always col-xl-5; Drawer does not affect its width -->
         <app-service-hierarchy-tree
           class="col-12 col-xl-5"
           [nodes]="store.serviceTree()"
@@ -474,19 +476,19 @@
     <aside
       #serviceEditDrawer
       class="svc-editor-drawer"
+      [attr.dir]="direction()"
       role="dialog"
       aria-modal="true"
       aria-labelledby="svc-drawer-title"
       tabindex="-1"
     >
-      <!-- ── Drawer Header ──────────────────────────────────────── -->
       <header class="svc-drawer-header d-flex align-items-center justify-content-between gap-2">
-        <div class="d-flex align-items-center gap-2 overflow-hidden">
+        <div class="d-flex align-items-center gap-3 overflow-hidden">
           <span class="svc-drawer-icon">
             <i
               class="bi"
-              [class.bi-plus-circle]="store.panelMode() === 'create'"
-              [class.bi-pencil-square]="store.panelMode() === 'edit'"
+              [class.bi-plus-lg]="store.panelMode() === 'create'"
+              [class.bi-pencil-fill]="store.panelMode() === 'edit'"
               aria-hidden="true"
             ></i>
           </span>
@@ -513,7 +515,6 @@
         </button>
       </header>
 
-      <!-- ── Tabs (edit mode only) ────────────────────────────────── -->
       @if (store.panelMode() === 'edit') {
         <nav class="svc-drawer-tabs" role="tablist" [attr.aria-label]="translations().editTitle">
           <button
@@ -545,10 +546,7 @@
         </nav>
       }
 
-      <!-- ── Drawer Body ─────────────────────────────────────────── -->
       <div class="svc-drawer-body">
-
-        <!-- Media tab panel -->
         @if (store.panelMode() === 'edit' && activeEditorTab() === 'media') {
           <section
             class="svc-editor-tab-panel"
@@ -557,19 +555,24 @@
             aria-labelledby="svc-drawer-media-tab"
           >
             @if (store.selectedDetails(); as details) {
-              <app-service-media-manager
-                [service]="details"
-                [translations]="translations()"
-                [canManage]="canUpdate() && details.canEditDefinition && !details.isDeleted"
-                (message)="handleMediaMessage($event)"
-                (serviceChange)="handleMediaServiceChange($event)"
-                (mediaChanged)="handleMediaChanged()"
-              />
+              @defer (on interaction; prefetch on idle) {
+                <app-service-media-manager
+                  [service]="details"
+                  [translations]="translations()"
+                  [canManage]="canUpdate() && details.canEditDefinition && !details.isDeleted"
+                  (message)="handleMediaMessage($event)"
+                  (serviceChange)="handleMediaServiceChange($event)"
+                  (mediaChanged)="handleMediaChanged()"
+                />
+              } @placeholder {
+                <app-niletronix-loading-state
+                  [title]="translations().loading"
+                  size="sm"
+                />
+              }
             }
           </section>
         } @else {
-
-          <!-- Form tab panel -->
           <section
             class="svc-editor-tab-panel svc-editor-form-panel"
             id="svc-drawer-form-panel"
@@ -584,7 +587,6 @@
               />
             }
 
-            <!-- Form error banner -->
             @if (formError(); as error) {
               <p class="svc-note svc-note-danger d-flex align-items-center flex-wrap gap-2">
                 <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
@@ -602,7 +604,6 @@
               </p>
             }
 
-            <!-- Ownership info read-only summary (edit mode only) -->
             @if (store.panelMode() === 'edit') {
               @if (store.selectedDetails(); as details) {
                 <section class="svc-form-section svc-readonly-summary">
@@ -621,74 +622,82 @@
               }
             }
 
-            <!-- Main form -->
             <form
               id="svc-drawer-form"
-              class="svc-form d-grid gap-2"
+              class="svc-form d-grid gap-3"
               [formGroup]="serviceForm"
               (ngSubmit)="saveService()"
               novalidate
             >
-
-              <!-- ── Basic Info ───────────────────────────────────── -->
-              <section class="svc-form-section d-grid gap-2">
-                <h3 class="svc-form-title mb-0">{{ translations().basicInfo }}</h3>
-                <div class="row g-2 m-0 row-cols-1 row-cols-sm-2">
-                  <label class="svc-field d-grid gap-1 m-0 col">
-                    <span>{{ translations().arabicName }}</span>
+              <section class="svc-form-section d-grid gap-3">
+                <h3 class="svc-form-title mb-0">
+                  <i class="bi bi-info-circle-fill text-primary" aria-hidden="true"></i>
+                  {{ translations().basicInfo }}
+                </h3>
+                <div class="row g-3 m-0">
+                  <label class="svc-field d-grid gap-1 m-0 col-12 col-md-6">
+                    <span>{{ translations().arabicName }} <span class="text-danger">*</span></span>
                     <input
                       class="svc-input form-control"
                       type="text"
+                      dir="rtl"
+                      lang="ar"
                       maxlength="100"
                       formControlName="arabicName"
                       (input)="onNameInput('arabicName')"
                     />
                     @if (hasControlError('arabicName')) {
-                      <small>{{ nameError('arabicName') }}</small>
+                      <small class="text-danger fw-bold mt-1 d-flex align-items-center gap-1"><i class="bi bi-exclamation-triangle-fill"></i>{{ nameError('arabicName') }}</small>
                     }
                   </label>
-                  <label class="svc-field d-grid gap-1 m-0 col">
-                    <span>{{ translations().englishName }}</span>
+                  <label class="svc-field d-grid gap-1 m-0 col-12 col-md-6">
+                    <span>{{ translations().englishName }} <span class="text-danger">*</span></span>
                     <input
                       class="svc-input form-control"
                       type="text"
+                      dir="ltr"
+                      lang="en"
                       maxlength="100"
                       formControlName="englishName"
                       (input)="onNameInput('englishName')"
                     />
                     @if (hasControlError('englishName')) {
-                      <small>{{ nameError('englishName') }}</small>
+                      <small class="text-danger fw-bold mt-1 d-flex align-items-center gap-1"><i class="bi bi-exclamation-triangle-fill"></i>{{ nameError('englishName') }}</small>
                     }
                   </label>
-                  <label class="svc-field d-grid gap-1 m-0 col">
+                  <label class="svc-field d-grid gap-1 m-0 col-12 col-md-6">
                     <span>{{ translations().arabicUserMessage }}</span>
                     <textarea
                       class="svc-input compact-textarea form-control"
+                      dir="rtl"
+                      lang="ar"
                       maxlength="500"
                       rows="2"
                       formControlName="arabicUserMessage"
                     ></textarea>
                     @if (hasControlError('arabicUserMessage')) {
-                      <small>{{ translations().maxLength500 }}</small>
+                      <small class="text-danger mt-1 d-flex align-items-center gap-1"><i class="bi bi-exclamation-triangle-fill"></i>{{ translations().maxLength500 }}</small>
                     }
                   </label>
-                  <label class="svc-field d-grid gap-1 m-0 col">
+                  <label class="svc-field d-grid gap-1 m-0 col-12 col-md-6">
                     <span>{{ translations().englishUserMessage }}</span>
                     <textarea
                       class="svc-input compact-textarea form-control"
+                      dir="ltr"
+                      lang="en"
                       maxlength="500"
                       rows="2"
                       formControlName="englishUserMessage"
                     ></textarea>
                     @if (hasControlError('englishUserMessage')) {
-                      <small>{{ translations().maxLength500 }}</small>
+                      <small class="text-danger mt-1 d-flex align-items-center gap-1"><i class="bi bi-exclamation-triangle-fill"></i>{{ translations().maxLength500 }}</small>
                     }
                   </label>
                 </div>
 
-                <!-- Service-code toggle -->
-                <div class="svc-code-row row g-2 align-items-end m-0">
-                  <label class="svc-switch-option svc-code-toggle-field m-0 col-12 col-sm-auto">
+                <!-- Service Code Row (Clean & Borderless) -->
+                <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 pt-3 mt-1 border-top">
+                  <label class="svc-switch-option m-0">
                     <input
                       type="checkbox"
                       formControlName="isServiceCodeRequired"
@@ -698,37 +707,41 @@
                       <span class="svc-switch-track" aria-hidden="true">
                         <span class="svc-switch-thumb"></span>
                       </span>
-                      <span>{{ translations().serviceCodeRequired }}</span>
+                      <span class="fw-bold text-dark fs-7">{{ translations().serviceCodeRequired }}</span>
                     </span>
                   </label>
                   @if (serviceForm.controls.isServiceCodeRequired.value) {
-                    <label class="svc-field d-grid gap-1 m-0 col-12 col-sm-6">
-                      <span>{{ translations().serviceCode }}</span>
+                    <div class="svc-field flex-grow-1 m-0" style="max-width: 300px;">
                       <input
                         class="svc-input form-control"
                         type="text"
+                        dir="ltr"
                         maxlength="100"
                         formControlName="serviceCode"
+                        [placeholder]="translations().serviceCode"
                         (input)="onServiceCodeInput()"
                       />
                       @if (hasControlError('serviceCode')) {
-                        <small>{{ serviceCodeError() }}</small>
+                        <small class="text-danger fw-bold mt-1 d-flex align-items-center gap-1">
+                          <i class="bi bi-exclamation-triangle-fill"></i>{{ serviceCodeError() }}
+                        </small>
                       }
-                    </label>
+                    </div>
                   }
                 </div>
               </section>
 
-              <!-- ── Hierarchy + Ticket Behavior ──────────────────── -->
-              <div class="row g-2 m-0">
-                <!-- Hierarchy -->
-                <div class="col-12 col-xl-4">
+              <div class="row g-3 m-0">
+                <div class="col-12 col-md-5">
                   <section class="svc-form-section h-100 d-grid gap-2">
-                    <h3 class="svc-form-title mb-0">{{ translations().hierarchy }}</h3>
+                    <h3 class="svc-form-title mb-0">
+                      <i class="bi bi-diagram-3-fill text-primary" aria-hidden="true"></i>
+                      {{ translations().hierarchy }}
+                    </h3>
                     @if (store.panelMode() === 'create') {
-                      <div class="svc-parent-lock">
-                        <span>{{ translations().createUnder }}</span>
-                        <strong>{{ createParentLabel() }}</strong>
+                      <div class="svc-parent-lock d-flex flex-column gap-1 p-3 rounded-3 border bg-light">
+                        <span class="text-muted fs-7">{{ translations().createUnder }}</span>
+                        <strong class="fs-6 text-primary">{{ createParentLabel() }}</strong>
                       </div>
                     } @else {
                       <label class="svc-field d-grid gap-1 m-0">
@@ -743,61 +756,56 @@
                     }
                   </section>
                 </div>
-                <!-- Ticket Behavior -->
-                <div class="col-12 col-xl-8">
+                <div class="col-12 col-md-7">
                   <section class="svc-form-section h-100 d-grid gap-2">
-                    <h3 class="svc-form-title mb-0">{{ translations().ticketBehavior }}</h3>
-                    <div class="svc-ticket-grid">
+                    <h3 class="svc-form-title mb-0">
+                      <i class="bi bi-ticket-perforated-fill text-primary" aria-hidden="true"></i>
+                      {{ translations().ticketBehavior }}
+                    </h3>
+                    <div class="svc-ticket-grid d-grid gap-2">
                       <div
-                        class="svc-segment-switch"
+                        class="svc-segment-switch row g-2 m-0"
                         role="radiogroup"
                         [attr.aria-label]="translations().ticketBehavior"
                       >
-                        <label class="svc-segment-option">
+                        <label class="svc-segment-card col-6 m-0" [class.selected]="serviceForm.controls.isTicketIssuable.value">
                           <input
                             type="radio"
-                            value="true"
+                            [value]="true"
                             formControlName="isTicketIssuable"
                             [disabled]="store.selectedDetails()?.hasChildren === true"
                           />
-                          <span class="svc-segment-control">
-                            <span class="svc-segment-indicator" aria-hidden="true"></span>
+                          <span class="svc-segment-control w-100 d-flex align-items-center justify-content-center gap-2 p-2 rounded-3 border">
+                            <i class="bi bi-ticket-perforated"></i>
                             <span>{{ translations().ticketIssuable }}</span>
                           </span>
                         </label>
-                        <label class="svc-segment-option">
-                          <input type="radio" value="false" formControlName="isTicketIssuable" />
-                          <span class="svc-segment-control">
-                            <span class="svc-segment-indicator" aria-hidden="true"></span>
+                        <label class="svc-segment-card col-6 m-0" [class.selected]="!serviceForm.controls.isTicketIssuable.value">
+                          <input type="radio" [value]="false" formControlName="isTicketIssuable" />
+                          <span class="svc-segment-control w-100 d-flex align-items-center justify-content-center gap-2 p-2 rounded-3 border">
+                            <i class="bi bi-folder"></i>
                             <span>{{ translations().categoryOnly }}</span>
                           </span>
                         </label>
                       </div>
-                      <div class="svc-toggle-grid">
-                        <label class="svc-switch-option">
-                          <input type="checkbox" formControlName="isClientInputRequired" />
-                          <span class="svc-switch-control">
-                            <span class="svc-switch-track" aria-hidden="true">
-                              <span class="svc-switch-thumb"></span>
-                            </span>
-                            <span>{{ translations().clientInputRequired }}</span>
-                          </span>
+
+                      <div class="svc-options-list d-grid gap-2 mt-1">
+                        <label class="svc-switch-card d-flex align-items-center justify-content-between p-2 px-3 rounded-3 border bg-white m-0">
+                          <span class="fw-bold text-dark fs-7 me-2">{{ translations().clientInputRequired }}</span>
+                          <input type="checkbox" formControlName="isClientInputRequired" class="form-check-input flex-shrink-0" />
                         </label>
-                        <label class="svc-switch-option">
-                          <input type="checkbox" formControlName="hasReservation" />
-                          <span class="svc-switch-control">
-                            <span class="svc-switch-track" aria-hidden="true">
-                              <span class="svc-switch-thumb"></span>
-                            </span>
-                            <span>{{ translations().hasReservation }}</span>
-                          </span>
+
+                        <label class="svc-switch-card d-flex align-items-center justify-content-between p-2 px-3 rounded-3 border bg-white m-0">
+                          <span class="fw-bold text-dark fs-7 me-2">{{ translations().hasReservation }}</span>
+                          <input type="checkbox" formControlName="hasReservation" class="form-check-input flex-shrink-0" />
                         </label>
                       </div>
+
                       @if (hasControlError('isTicketIssuable')) {
-                        <small class="svc-field-error wide">{{ translations().ticketRequired }}</small>
+                        <small class="svc-field-error wide text-danger fw-bold mt-1 d-flex align-items-center gap-1"><i class="bi bi-exclamation-triangle-fill"></i>{{ translations().ticketRequired }}</small>
                       }
                       @if (store.selectedDetails()?.hasChildren) {
-                        <small class="svc-field-help wide">{{ translations().childTicketDisabled }}</small>
+                        <small class="svc-field-help wide text-info mt-1 d-flex align-items-center gap-1"><i class="bi bi-info-circle-fill"></i>{{ translations().childTicketDisabled }}</small>
                       }
                     </div>
                   </section>
@@ -805,30 +813,30 @@
               </div>
 
               <!-- ── Ordering + Ticket Numbers ────────────────────── -->
-              <div class="row g-2 m-0">
+              <div class="row g-3 m-0">
                 <!-- Ordering -->
-                <div class="col-12 col-xl-4">
+                <div class="col-12 col-md-5">
                   <section class="svc-form-section h-100 d-grid gap-2">
                     <h3 class="svc-form-title mb-0">{{ translations().ordering }}</h3>
                     <div class="row g-2 m-0">
                       <label class="svc-field d-grid gap-1 m-0 col-4">
                         <span>{{ translations().orderNo }}</span>
                         <input
-                          class="svc-input svc-number-input form-control"
+                          class="svc-input svc-number-input form-control text-center"
                           type="number" min="0" formControlName="orderNo"
                         />
                       </label>
                       <label class="svc-field d-grid gap-1 m-0 col-4">
                         <span>{{ translations().priority }}</span>
                         <input
-                          class="svc-input svc-number-input form-control"
+                          class="svc-input svc-number-input form-control text-center"
                           type="number" min="0" formControlName="priority"
                         />
                       </label>
                       <label class="svc-field d-grid gap-1 m-0 col-4">
                         <span>{{ translations().weight }}</span>
                         <input
-                          class="svc-input svc-number-input form-control"
+                          class="svc-input svc-number-input form-control text-center"
                           type="number" min="0" formControlName="weight"
                         />
                       </label>
@@ -836,18 +844,18 @@
                   </section>
                 </div>
                 <!-- Ticket Numbers -->
-                <div class="col-12 col-xl-8">
+                <div class="col-12 col-md-7">
                   <section class="svc-form-section h-100 d-grid gap-2">
                     <h3 class="svc-form-title mb-0">{{ translations().ticketNumbers }}</h3>
                     <div class="row g-2 m-0">
                       <label class="svc-field d-grid gap-1 m-0 col-12 col-sm-6">
                         <span>{{ translations().rangePrefix }}</span>
                         <input
-                          class="svc-input form-control" type="text" maxlength="10"
+                          class="svc-input form-control" type="text" dir="ltr" maxlength="10"
                           formControlName="rangePrefix"
                         />
                         @if (hasControlError('rangePrefix')) {
-                          <small>{{
+                          <small class="text-danger fw-bold mt-1 d-flex align-items-center gap-1"><i class="bi bi-exclamation-triangle-fill"></i>{{
                             rangePrefixControl.hasError('maxlength')
                               ? translations().maxLength10
                               : translations().requiredField
@@ -861,39 +869,39 @@
                           formControlName="noOfTicketCopies"
                         />
                         @if (hasControlError('noOfTicketCopies')) {
-                          <small>{{ translations().copiesMin }}</small>
+                          <small class="text-danger fw-bold mt-1 d-flex align-items-center gap-1"><i class="bi bi-exclamation-triangle-fill"></i>{{ translations().copiesMin }}</small>
                         }
                       </label>
-                      <label class="svc-field d-grid gap-1 m-0 col-12 col-sm-6">
+                      <label class="svc-field d-grid gap-1 m-0 col-12 col-sm-4">
                         <span>{{ translations().waitingDuration }}</span>
                         <input
                           class="svc-input form-control" type="number" min="0"
                           formControlName="waitingDuration"
                         />
                       </label>
-                      <label class="svc-field d-grid gap-1 m-0 col-12 col-sm-6">
+                      <label class="svc-field d-grid gap-1 m-0 col-12 col-sm-4">
                         <span>{{ translations().rangeStartNumber }}</span>
                         <input
                           class="svc-input form-control" type="number" min="0"
                           formControlName="rangeStartNumber"
                         />
                         @if (hasControlError('rangeStartNumber')) {
-                          <small>{{ translations().minZero }}</small>
+                          <small class="text-danger fw-bold mt-1 d-flex align-items-center gap-1"><i class="bi bi-exclamation-triangle-fill"></i>{{ translations().minZero }}</small>
                         }
                       </label>
-                      <label class="svc-field d-grid gap-1 m-0 col-12 col-sm-6">
+                      <label class="svc-field d-grid gap-1 m-0 col-12 col-sm-4">
                         <span>{{ translations().rangeEndNumber }}</span>
                         <input
                           class="svc-input form-control" type="number" min="0"
                           formControlName="rangeEndNumber"
                         />
                         @if (hasControlError('rangeEndNumber')) {
-                          <small>{{ translations().minZero }}</small>
+                          <small class="text-danger fw-bold mt-1 d-flex align-items-center gap-1"><i class="bi bi-exclamation-triangle-fill"></i>{{ translations().minZero }}</small>
                         }
                       </label>
                     </div>
                     @if (hasRangeError()) {
-                      <small class="svc-field-error">{{ translations().rangeInvalid }}</small>
+                      <small class="svc-field-error text-danger fw-bold mt-1 d-flex align-items-center gap-1"><i class="bi bi-exclamation-triangle-fill"></i>{{ translations().rangeInvalid }}</small>
                     }
                   </section>
                 </div>

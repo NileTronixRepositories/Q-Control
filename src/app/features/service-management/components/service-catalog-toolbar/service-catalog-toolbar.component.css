@@ -1,0 +1,4 @@
+/* Presentational toolbar styles using design system tokens */
+.svc-toolbar {
+  transition: all 0.2s ease-in-out;
+}

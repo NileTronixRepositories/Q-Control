@@ -3,6 +3,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   ElementRef,
   HostListener,
   OnDestroy,
@@ -12,6 +13,7 @@ import {
   inject,
   signal,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   AbstractControl,
   NonNullableFormBuilder,
@@ -51,9 +53,10 @@ import {
   ServiceTreeNode,
   UpdateServiceRequest,
 } from '../../models/service-management.model';
-import { BranchServicesApiService } from '../../services/branch-services-api.service';
-import { ServiceManagementApiService } from '../../services/service-management-api.service';
-import { ServiceManagementPermissionService } from '../../services/service-management-permission.service';
+import { BranchServicesApiService } from '../../services/branch/branch-services-api.service';
+import { ServiceCatalogFacadeService } from '../../services/catalog/service-catalog-facade.service';
+import { ServiceManagementApiService } from '../../services/catalog/service-management-api.service';
+import { ServiceManagementPermissionService } from '../../services/catalog/service-management-permission.service';
 import { ServiceManagementStore } from '../../store/service-management.store';
 import {
   ServiceActionPermissions,
@@ -135,6 +138,7 @@ export class ServicesComponent implements OnInit, OnDestroy {
   private readonly apiService = inject(ServiceManagementApiService);
   private readonly branchServicesApiService = inject(BranchServicesApiService);
   private readonly permissionService = inject(ServiceManagementPermissionService);
+  private readonly destroyRef = inject(DestroyRef);
 
   public readonly store = inject(ServiceManagementStore);
   public readonly canUpdateServiceDefinition = (
@@ -1209,7 +1213,10 @@ export class ServicesComponent implements OnInit, OnDestroy {
     this.store.updateQuery({ pageNumber });
     this.store.listLoading.set(true);
 
-    this.apiService.getServices(this.store.listQuery()).subscribe({
+    this.apiService
+      .getServices(this.store.listQuery())
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
       next: (response) => {
         this.store.servicePage.set(response);
       },
@@ -1242,6 +1249,7 @@ export class ServicesComponent implements OnInit, OnDestroy {
             this.store.treeLoading.set(false);
           }
         }),
+        takeUntilDestroyed(this.destroyRef),
       )
       .subscribe({
         next: (response) => {
@@ -1291,6 +1299,7 @@ export class ServicesComponent implements OnInit, OnDestroy {
             this.store.assignedBranchTreeLoading.set(false);
           }
         }),
+        takeUntilDestroyed(this.destroyRef),
       )
       .subscribe({
         next: (response) => {
@@ -1328,7 +1337,10 @@ export class ServicesComponent implements OnInit, OnDestroy {
     this.store.branchAssigning.set(true);
     this.branchServicesApiService
       .assignServices(branchId, { serviceIds: [node.id] })
-      .pipe(finalize(() => this.store.branchAssigning.set(false)))
+      .pipe(
+        finalize(() => this.store.branchAssigning.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
       .subscribe({
         next: (response) => {
           this.showMessage(
@@ -1352,7 +1364,10 @@ export class ServicesComponent implements OnInit, OnDestroy {
 
     this.store.parentsLoading.set(true);
 
-    this.apiService.getAvailableParents({ excludeServiceId }).subscribe({
+    this.apiService
+      .getAvailableParents({ excludeServiceId })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
       next: (response) => this.store.parentOptions.set(response),
       error: (error: HttpErrorResponse) => this.handleApiError(error),
       complete: () => this.store.parentsLoading.set(false),
@@ -1372,7 +1387,10 @@ export class ServicesComponent implements OnInit, OnDestroy {
 
     this.apiService
       .getServiceDetails(serviceId)
-      .pipe(finalize(() => this.store.detailsLoading.set(false)))
+      .pipe(
+        finalize(() => this.store.detailsLoading.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
       .subscribe({
         next: (response) => {
           if (requestId !== this.panelRequestId || this.store.panelMode() !== mode) {
@@ -1412,7 +1430,10 @@ export class ServicesComponent implements OnInit, OnDestroy {
 
     this.apiService
       .getServiceDetails(serviceId)
-      .pipe(finalize(() => this.store.detailsLoading.set(false)))
+      .pipe(
+        finalize(() => this.store.detailsLoading.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
       .subscribe({
         next: (details) => {
           this.store.selectTreeNode(details.id);
@@ -1450,7 +1471,10 @@ export class ServicesComponent implements OnInit, OnDestroy {
 
     this.apiService
       .createService(this.mapCreateRequest())
-      .pipe(finalize(() => this.store.saving.set(false)))
+      .pipe(
+        finalize(() => this.store.saving.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
       .subscribe({
         next: (response) => {
           if (parentServiceId > 0) {
@@ -1492,7 +1516,12 @@ export class ServicesComponent implements OnInit, OnDestroy {
         );
 
     this.store.saving.set(true);
-    request$.pipe(finalize(() => this.store.saving.set(false))).subscribe({
+    request$
+      .pipe(
+        finalize(() => this.store.saving.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
       next: (response) => {
         if (parent) {
           this.store.expandAssignedBranchNodes([parent.id]);
@@ -1519,7 +1548,10 @@ export class ServicesComponent implements OnInit, OnDestroy {
 
     this.apiService
       .updateService(details.id, this.mapUpdateRequest(details.rowVersion))
-      .pipe(finalize(() => this.store.saving.set(false)))
+      .pipe(
+        finalize(() => this.store.saving.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
       .subscribe({
         next: (response) => {
           this.showMessage('success', response.message || this.translations().fallbackSuccess);
@@ -1537,7 +1569,10 @@ export class ServicesComponent implements OnInit, OnDestroy {
 
     this.apiService
       .deleteService(state.serviceId, state.rowVersion)
-      .pipe(finalize(() => this.store.mutating.set(false)))
+      .pipe(
+        finalize(() => this.store.mutating.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
       .subscribe({
         next: (response) => {
           this.showMessage('success', response.message || this.translations().fallbackSuccess);
@@ -1553,7 +1588,10 @@ export class ServicesComponent implements OnInit, OnDestroy {
 
     this.apiService
       .restoreService(state.serviceId, state.rowVersion)
-      .pipe(finalize(() => this.store.mutating.set(false)))
+      .pipe(
+        finalize(() => this.store.mutating.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
       .subscribe({
         next: (response) => {
           const message = response.effectiveIsActive
@@ -1572,7 +1610,10 @@ export class ServicesComponent implements OnInit, OnDestroy {
 
     this.apiService
       .permanentlyDeleteService(state.serviceId, state.rowVersion)
-      .pipe(finalize(() => this.store.mutating.set(false)))
+      .pipe(
+        finalize(() => this.store.mutating.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
       .subscribe({
         next: (response) => {
           this.showMessage('success', response.message || this.translations().fallbackSuccess);

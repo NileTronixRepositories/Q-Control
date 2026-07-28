@@ -4,9 +4,9 @@
   [attr.lang]="language()"
 >
   <app-technical-admin-page-hero
-    [eyebrow]="translations().title"
+    [eyebrow]="language() === 'ar' ? 'إدارة الخدمات والعمليات' : 'Services & Workflows Management'"
     [title]="translations().title"
-    [description]="translations().description"
+    [description]="language() === 'ar' ? 'عرض وتخصيص شجرة الخدمات المتاحة للفرع والموافقة على طلبات الاعتماد المركزية.' : 'View and customize the branch service tree and approve central requests.'"
     icon="bi bi-diagram-3-fill"
   >
     <div
@@ -16,24 +16,15 @@
       @if (canOpenGlobalizationRequests() && store.hasSelectedBranch()) {
         <button
           type="button"
-          class="branch-services-secondary-btn position-relative d-inline-flex align-items-center justify-content-center gap-2"
+          class="branch-requests-btn d-inline-flex align-items-center justify-content-center gap-2"
+          [class.has-pending]="!!pendingRequestsBadge()"
           [attr.aria-busy]="store.pendingGlobalizationRequestsLoading()"
           (click)="openGlobalizationRequests()"
         >
-          <i class="bi bi-bell" aria-hidden="true"></i>
-          {{ globalizationTranslations().branchRequestsTitle }}
-          @if (pendingRequestsBadge()) {
-            <span
-              data-testid="pending-requests-shadow"
-              class="position-absolute top-0 bottom-0 start-0 end-0 rounded-pill shadow-sm"
-              aria-hidden="true"
-            ></span>
-          }
+          <i class="bi bi-bell-fill bell-icon" aria-hidden="true"></i>
+          <span>{{ globalizationTranslations().branchRequestsTitle }}</span>
           @if (pendingRequestsBadge(); as badge) {
-            <span
-              class="pending-requests-badge branch-requests-badge badge rounded-pill bg-danger"
-              >{{ badge }}</span
-            >
+            <span class="pending-requests-badge badge rounded-pill">{{ badge }}</span>
           }
         </button>
       }
@@ -65,6 +56,13 @@
         [class.error]="currentMessage.tone === 'error'"
         [class.info]="currentMessage.tone === 'info'"
       >
+        <i
+          class="bi"
+          [class.bi-check-circle-fill]="currentMessage.tone === 'success'"
+          [class.bi-exclamation-octagon-fill]="currentMessage.tone === 'error'"
+          [class.bi-info-circle-fill]="currentMessage.tone === 'info'"
+          aria-hidden="true"
+        ></i>
         <p>{{ currentMessage.text }}</p>
         <button type="button" [attr.aria-label]="translations().close" (click)="clearMessage()">
           <i class="bi bi-x-lg" aria-hidden="true"></i>
@@ -74,32 +72,47 @@
   }
   @if (!canViewBranchServices()) {
     <section class="branch-services-empty branch-services-denied">
-      <i class="bi bi-shield-lock" aria-hidden="true"></i>
-      <h2>{{ translations().accessDenied }}</h2>
+      <div class="empty-icon-wrapper mb-2">
+        <div class="empty-icon-box danger-box">
+          <i class="bi bi-shield-lock-fill" aria-hidden="true"></i>
+        </div>
+      </div>
+      <h2 class="empty-title text-danger">{{ translations().accessDenied }}</h2>
+      <p class="empty-subtitle">{{ serviceTranslations().noPermissionHint }}</p>
     </section>
   } @else {
     <section
-      class="branch-services-toolbar d-flex align-items-center justify-content-between flex-wrap gap-2"
+      class="branch-services-toolbar d-flex align-items-end justify-content-between flex-wrap gap-3"
     >
       @if (isBranchAdmin()) {
-        <div class="branch-services-active-branch d-grid gap-1">
-          <span>{{ translations().activeBranch }}</span>
-          <strong>{{ store.selectedBranchLabel() }}</strong>
+        <div class="branch-services-active-branch d-flex align-items-center gap-3">
+          <div class="branch-badge-icon">
+            <i class="bi bi-building-check"></i>
+          </div>
+          <div class="d-flex flex-column">
+            <span class="toolbar-label">{{ translations().activeBranch }}</span>
+            <strong class="branch-name">{{ store.selectedBranchLabel() }}</strong>
+          </div>
         </div>
       } @else {
-        <label class="branch-services-field d-grid gap-1 m-0">
-          <span>{{ translations().branchSelector }}</span>
-          <select
-            class="form-select"
-            [disabled]="store.branchesLoading()"
-            (change)="onBranchChange($event)"
-          >
-            <option value="">{{ translations().selectBranch }}</option>
-            @for (branch of branches(); track branch.branchId) {
-              <option [value]="branch.branchId">{{ branchName(branch) }}</option>
-            }
-          </select>
-        </label>
+        <div class="branch-services-field d-flex flex-column gap-1 m-0">
+          <span class="toolbar-label">{{ translations().branchSelector }}</span>
+          <div class="d-flex align-items-center gap-2">
+            <div class="branch-badge-icon" [title]="translations().branchSelector">
+              <i class="bi bi-geo-alt-fill"></i>
+            </div>
+            <select
+              class="form-select branch-select-dropdown"
+              [disabled]="store.branchesLoading()"
+              (change)="onBranchChange($event)"
+            >
+              <option value="">{{ translations().selectBranch }}</option>
+              @for (branch of branches(); track branch.branchId) {
+                <option [value]="branch.branchId">{{ branchName(branch) }}</option>
+              }
+            </select>
+          </div>
+        </div>
       }
       <button
         type="button"
@@ -112,8 +125,16 @@
     </section>
     @if (!store.hasSelectedBranch()) {
       <section class="branch-services-empty">
-        <i class="bi bi-building" aria-hidden="true"></i>
-        <h2>{{ translations().noBranchSelected }}</h2>
+        <div class="empty-icon-wrapper mb-2">
+          <div class="empty-icon-pulse"></div>
+          <div class="empty-icon-box">
+            <i class="bi bi-building-gear" aria-hidden="true"></i>
+          </div>
+        </div>
+        <h2 class="empty-title">{{ translations().noBranchSelected }}</h2>
+        <p class="empty-subtitle">
+          {{ language() === 'ar' ? 'الرجاء اختيار فرع من القائمة أعلاه لعرض وتخصيص شجرة الخدمات والعمليات الخاصة به.' : 'Please select a branch from the list above to view and manage its services and workflows.' }}
+        </p>
       </section>
     } @else {
       @if (creationRequestSummary(); as request) {
@@ -272,14 +293,18 @@
           <i class="bi bi-x-lg" aria-hidden="true"></i>
         </button>
       </header>
-      <app-service-media-manager
-        [service]="details"
-        [translations]="serviceTranslations()"
-        [canManage]="canManageLoadedMedia(details)"
-        (message)="handleMediaMessage($event)"
-        (serviceChange)="handleMediaServiceChange($event)"
-        (mediaChanged)="handleMediaChanged()"
-      />
+      @defer (on interaction; prefetch on idle) {
+        <app-service-media-manager
+          [service]="details"
+          [translations]="serviceTranslations()"
+          [canManage]="canManageLoadedMedia(details)"
+          (message)="handleMediaMessage($event)"
+          (serviceChange)="handleMediaServiceChange($event)"
+          (mediaChanged)="handleMediaChanged()"
+        />
+      } @placeholder {
+        <app-niletronix-loading-state [title]="serviceTranslations().loading" variant="panel" />
+      }
     </aside>
   } @else if (mediaLoading()) {
     <div class="branch-services-media-backdrop"></div>

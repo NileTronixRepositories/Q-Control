@@ -19,8 +19,8 @@ import { formatTechnicalAdminApiError } from '../../../technical-admin/utils/api
 import { SERVICE_WORKFLOW_TRANSLATIONS } from '../../i18n/service-workflow.translations';
 import { ServiceSelectionOption } from '../../models/service-management.model';
 import { WorkflowCandidateService } from '../../models/service-workflow.model';
-import { ServiceManagementApiService } from '../../services/service-management-api.service';
-import { ServiceManagementPermissionService } from '../../services/service-management-permission.service';
+import { ServiceManagementApiService } from '../../services/catalog/service-management-api.service';
+import { ServiceManagementPermissionService } from '../../services/catalog/service-management-permission.service';
 
 export interface WorkflowSelectionLevel {
   readonly parentServiceId: number | null;

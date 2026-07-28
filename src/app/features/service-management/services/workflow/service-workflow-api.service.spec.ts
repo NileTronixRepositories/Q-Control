@@ -3,8 +3,8 @@ import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 
-import { AppLanguageStore } from '../../../shared/store/app-language.store';
-import { AuthSessionService } from '../../auth/services/auth-session.service';
+import { AppLanguageStore } from '../../../../shared/store/app-language.store';
+import { AuthSessionService } from '../../../auth/services/auth-session.service';
 import { ServiceWorkflowApiService } from './service-workflow-api.service';
 
 describe('ServiceWorkflowApiService branch scope', () => {
@@ -236,4 +236,3 @@ describe('ServiceWorkflowApiService branch scope', () => {
     });
   });
 });
-

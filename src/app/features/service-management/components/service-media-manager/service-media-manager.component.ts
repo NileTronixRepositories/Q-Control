@@ -22,7 +22,7 @@ import {
   ServiceImageType,
   ServiceUiMessage,
 } from '../../models/service-management.model';
-import { ServiceManagementApiService } from '../../services/service-management-api.service';
+import { ServiceManagementApiService } from '../../services/catalog/service-management-api.service';
 
 interface ServiceMediaState {
   readonly logo: ServiceImageResponse | null;

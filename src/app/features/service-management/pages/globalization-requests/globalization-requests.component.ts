@@ -1,5 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { finalize, Observable } from 'rxjs';
 
@@ -21,9 +22,9 @@ import {
   ServiceGlobalizationRequestStatus,
   ServiceGlobalizationRequestType,
 } from '../../models/service-globalization.model';
-import { ServiceDataInvalidationService } from '../../services/service-data-invalidation.service';
-import { ServiceGlobalizationApiService } from '../../services/service-globalization-api.service';
-import { ServiceManagementPermissionService } from '../../services/service-management-permission.service';
+import { ServiceDataInvalidationService } from '../../services/catalog/service-data-invalidation.service';
+import { ServiceGlobalizationApiService } from '../../services/globalization/service-globalization-api.service';
+import { ServiceManagementPermissionService } from '../../services/catalog/service-management-permission.service';
 import { ServiceGlobalizationStore } from '../../store/service-globalization.store';
 
 interface FlatRequestServiceNode {
@@ -47,6 +48,7 @@ export class GlobalizationRequestsComponent implements OnInit, OnDestroy {
   private readonly branchApiService = inject(BranchManagementApiService);
   private readonly permissionService = inject(ServiceManagementPermissionService);
   private readonly invalidationService = inject(ServiceDataInvalidationService);
+  private readonly destroyRef = inject(DestroyRef);
 
   protected readonly store = inject(ServiceGlobalizationStore);
   protected readonly language = this.i18nStore.language;
@@ -99,6 +101,7 @@ export class GlobalizationRequestsComponent implements OnInit, OnDestroy {
             this.store.loading.set(false);
           }
         }),
+        takeUntilDestroyed(this.destroyRef),
       )
       .subscribe({
         next: (response) => {
@@ -196,7 +199,12 @@ export class GlobalizationRequestsComponent implements OnInit, OnDestroy {
         : this.apiService.rejectRequest(state.requestId, state.rowVersion, {
             rejectionReason: this.rejectionReason().trim() || null,
           });
-    request$.pipe(finalize(() => this.store.mutating.set(false))).subscribe({
+    request$
+      .pipe(
+        finalize(() => this.store.mutating.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
       next: (response) => {
         this.store.decisionState.set(null);
         this.store.applyDecisionResponse(response);
@@ -322,6 +330,7 @@ export class GlobalizationRequestsComponent implements OnInit, OnDestroy {
             this.store.detailsLoading.set(false);
           }
         }),
+        takeUntilDestroyed(this.destroyRef),
       )
       .subscribe({
         next: (details) => {
@@ -341,7 +350,10 @@ export class GlobalizationRequestsComponent implements OnInit, OnDestroy {
     this.branchesLoading.set(true);
     this.branchApiService
       .getBranches({ searchText: '', orderSort: 'Newest', pageNumber: 1, pageSize: 100, isActive: null })
-      .pipe(finalize(() => this.branchesLoading.set(false)))
+      .pipe(
+        finalize(() => this.branchesLoading.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
       .subscribe({
         next: (response) => this.branches.set(response.data),
         error: () => this.branches.set([]),

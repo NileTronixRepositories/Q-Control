@@ -2,9 +2,9 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 
-import { environment } from '../../../../environments/environment';
-import { AppLanguageStore } from '../../../shared/store/app-language.store';
-import { AuthSessionService } from '../../auth/services/auth-session.service';
+import { environment } from '../../../../../environments/environment';
+import { AppLanguageStore } from '../../../../shared/store/app-language.store';
+import { AuthSessionService } from '../../../auth/services/auth-session.service';
 import {
   CreateServiceScheduleRequest,
   DayOfWeek,
@@ -13,7 +13,7 @@ import {
   ServiceScheduleDay,
   ServiceScheduleTimeSlot,
   UpdateServiceScheduleRequest,
-} from '../models/service-schedule.model';
+} from '../../models/service-schedule.model';
 
 type UnknownRecord = Record<string, unknown>;
 const BRANCHES_PATH = 'api/branches';

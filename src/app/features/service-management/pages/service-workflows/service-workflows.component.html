@@ -4,31 +4,31 @@
   [attr.lang]="language()"
 >
   <app-technical-admin-page-hero
-    [eyebrow]="translations().title"
+    [eyebrow]="language() === 'ar' ? 'إدارة مسارات العمليات' : 'Workflow Operations'"
     [title]="translations().title"
-    [description]="translations().description"
+    [description]="language() === 'ar' ? 'قم باختيار الفرع والخدمة لإنشاء وتتبع مسارات الخدمة وخطوات التنفيذ بكل سهولة.' : 'Select a branch and service to create and configure workflows effortlessly.'"
     icon="bi bi-signpost-split-fill"
   >
     @if (store.scope()) {
       <div hero-actions class="workflow-hero-actions d-flex align-items-center flex-wrap gap-2">
         @if (canCreate()) {
-          <button type="button" class="primary-action" (click)="openCreate()">
+          <button type="button" class="branch-services-primary-btn d-inline-flex align-items-center gap-2" (click)="openCreate()">
             <i class="bi bi-plus-lg" aria-hidden="true"></i> {{ translations().createWorkflow }}
           </button>
         }
-        <button type="button" class="secondary-action" (click)="backToScopeSelection()">
-          {{ translations().changeWorkflowScope }}
+        <button type="button" class="branch-services-secondary-btn d-inline-flex align-items-center gap-2" (click)="backToScopeSelection()">
+          <i class="bi bi-arrow-right-short" aria-hidden="true"></i> {{ translations().changeWorkflowScope }}
         </button>
       </div>
     } @else if (!isBranchAdmin()) {
-      <div hero-actions class="workflow-branch-field" style="max-width: 400px; background: white; padding: 8px 16px; border-radius: 50rem; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border: 1px solid var(--q-border-subtle, #e2e8f0); display: flex; align-items: center; gap: 12px;">
-        <span style="font-weight: 700; color: var(--q-text-primary, #334155); white-space: nowrap;">{{ translations().branch }}</span>
+      <div hero-actions class="workflow-branch-field-pill d-flex align-items-center gap-2 p-2 px-3 bg-white rounded-pill border shadow-sm" style="min-width: 320px;">
+        <i class="bi bi-geo-alt-fill text-primary fs-6"></i>
+        <span class="fw-bold text-dark fs-7 text-nowrap">{{ translations().branch }}:</span>
         <select
-          class="form-select"
+          class="form-select border-0 bg-transparent shadow-none fs-7 fw-semibold p-0 cursor-pointer flex-grow-1"
           [disabled]="store.branchesLoading()"
           [value]="store.selectedBranchId() ?? ''"
           (change)="selectBranch($event)"
-          style="border-radius: 50rem; min-width: 240px; border-color: var(--q-border-strong, #cbd5e1); flex-grow: 1;"
         >
           <option value="">{{ translations().selectBranch }}</option>
           @for (branch of store.branches(); track branch.branchId) {
@@ -82,7 +82,18 @@
   } @else if (!store.scope()) {
     <section class="workflow-scope-stack d-grid gap-3">
       @if (store.selectedBranchId()) {
-        <section class="workflow-tree-shell">
+        <section class="workflow-tree-shell bg-white p-3 rounded-3 border shadow-sm">
+          <div class="workflow-tree-header-banner p-3 bg-light rounded-3 border mb-3 d-flex align-items-center justify-content-between flex-wrap gap-3">
+            <div class="d-flex align-items-center gap-3">
+              <div class="workflow-banner-icon d-inline-flex align-items-center justify-content-center bg-white text-primary rounded-3 p-2 shadow-sm" style="width: 44px; height: 44px;">
+                <i class="bi bi-diagram-3-fill fs-5"></i>
+              </div>
+              <div>
+                <h3 class="fw-bold text-dark fs-6 mb-1">{{ language() === 'ar' ? 'اختر الخدمة لإدارة مسار العمليات' : 'Select a Service for Workflow Setup' }}</h3>
+                <p class="text-muted fs-7 mb-0">{{ language() === 'ar' ? 'انقر على زر "إدارة المسارات" بجانب أي خدمة لعرض أو إنشاء مسارات تنفيذ خاصة بها.' : 'Click "Manage Workflows" next to any service below to configure its execution steps.' }}</p>
+              </div>
+            </div>
+          </div>
           <app-service-hierarchy-tree
             [nodes]="store.branchTree()"
             [expandedNodeIds]="store.expandedBranchNodeIds()"
@@ -220,10 +231,11 @@
             />
           }
           @for (workflow of workflows(); track workflow.workflowId) {
-            <article class="workflow-card">
-              <div class="workflow-card-main">
-                <div class="workflow-title-row">
-                  <h3>{{ workflowName(workflow) }}</h3>
+            <article class="workflow-card p-3 bg-white rounded-3 border shadow-sm d-grid gap-3">
+              <!-- Top Row: Title, Badges & Actions -->
+              <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                <div class="d-flex align-items-center flex-wrap gap-2">
+                  <h3 class="fw-bold text-dark fs-6 m-0">{{ workflowName(workflow) }}</h3>
                   @if (workflow.isDefault) {
                     <span class="workflow-badge workflow-badge--default">{{
                       translations().defaultWorkflow
@@ -237,84 +249,91 @@
                     {{ workflow.isActive ? translations().active : translations().inactive }}
                   </span>
                 </div>
-                <div class="workflow-meta-row">
-                  <span>{{ translations().steps }}: {{ workflow.stepsCount }}</span>
-                  <span>{{ translations().created }}: {{ formatDate(workflow.createdOnUtc) }}</span>
-                  <span
-                    >{{ translations().modified }}: {{ formatDate(workflow.modifiedOnUtc) }}</span
-                  >
+
+                <!-- Action Buttons -->
+                <div class="workflow-card-actions d-flex align-items-center flex-wrap gap-2">
+                  @if (canViewDetails()) {
+                    <button
+                      type="button"
+                      class="branch-services-secondary-btn compact-btn"
+                      (click)="openView(workflow)"
+                    >
+                      <i class="bi bi-eye" aria-hidden="true"></i> {{ translations().view }}
+                    </button>
+                  }
+                  @if (canUpdate() && workflow.isActive) {
+                    <button
+                      type="button"
+                      class="branch-services-secondary-btn compact-btn"
+                      (click)="openEdit(workflow)"
+                    >
+                      <i class="bi bi-pencil" aria-hidden="true"></i> {{ translations().edit }}
+                    </button>
+                  }
+                  @if (canSetDefault() && workflow.isActive && !workflow.isDefault) {
+                    <button
+                      type="button"
+                      class="branch-services-secondary-btn compact-btn"
+                      (click)="requestSetDefault(workflow)"
+                    >
+                      <i class="bi bi-check2-circle" aria-hidden="true"></i> {{ translations().setDefault }}
+                    </button>
+                  }
+                  @if (canDeactivate() && workflow.isActive) {
+                    <button
+                      type="button"
+                      class="branch-services-secondary-btn compact-btn danger-action"
+                      [disabled]="workflow.isDefault"
+                      [title]="
+                        workflow.isDefault
+                          ? translations().defaultCannotDeactivate
+                          : translations().deactivate
+                      "
+                      (click)="requestDeactivate(workflow)"
+                    >
+                      <i class="bi bi-slash-circle" aria-hidden="true"></i> {{ translations().deactivate }}
+                    </button>
+                  }
+                  @if (canReactivate() && !workflow.isActive) {
+                    <button
+                      type="button"
+                      class="branch-services-secondary-btn compact-btn success-action"
+                      (click)="requestReactivate(workflow)"
+                    >
+                      <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i> {{ translations().reactivate }}
+                    </button>
+                  }
                 </div>
               </div>
-              <div class="workflow-card-actions d-flex align-items-center flex-wrap gap-2">
-                @if (canViewDetails()) {
-                  <button
-                    type="button"
-                    class="secondary-action compact-action"
-                    (click)="openView(workflow)"
-                  >
-                    {{ translations().view }}
-                  </button>
-                }
-                @if (canUpdate() && workflow.isActive) {
-                  <button
-                    type="button"
-                    class="secondary-action compact-action"
-                    (click)="openEdit(workflow)"
-                  >
-                    {{ translations().edit }}
-                  </button>
-                }
-                @if (canSetDefault() && workflow.isActive && !workflow.isDefault) {
-                  <button
-                    type="button"
-                    class="secondary-action compact-action workflow-action-accent"
-                    (click)="requestSetDefault(workflow)"
-                  >
-                    {{ translations().setDefault }}
-                  </button>
-                }
-                @if (canDeactivate() && workflow.isActive) {
-                  <button
-                    type="button"
-                    class="secondary-action compact-action danger-action"
-                    [disabled]="workflow.isDefault"
-                    [title]="
-                      workflow.isDefault
-                        ? translations().defaultCannotDeactivate
-                        : translations().deactivate
-                    "
-                    (click)="requestDeactivate(workflow)"
-                  >
-                    {{ translations().deactivate }}
-                  </button>
-                }
-                @if (canReactivate() && !workflow.isActive) {
-                  <button
-                    type="button"
-                    class="secondary-action compact-action success-action"
-                    (click)="requestReactivate(workflow)"
-                  >
-                    {{ translations().reactivate }}
-                  </button>
-                }
-              </div>
+
+              <!-- Main Highlight: Workflow Path Strip (Placed First) -->
               <div
-                class="workflow-path-strip d-flex align-items-center gap-2 overflow-auto"
+                class="workflow-path-strip d-flex align-items-center gap-2 overflow-auto p-2 px-3 bg-light rounded-3 border"
                 [attr.aria-label]="translations().currentWorkflowPath"
               >
                 @for (step of sortedSteps(workflow); track $index; let last = $last) {
-                  <span class="workflow-path-chip">{{ serviceName(step) }}</span>
+                  <div class="workflow-path-chip-wrapper d-flex align-items-center gap-2 flex-shrink-0">
+                    <span class="workflow-step-num badge rounded-circle bg-primary text-white">{{ $index + 1 }}</span>
+                    <span class="workflow-path-chip">{{ serviceName(step) }}</span>
+                  </div>
                   @if (!last) {
                     <i
                       [class]="
                         direction() === 'rtl'
-                          ? 'bi bi-arrow-left workflow-path-arrow'
-                          : 'bi bi-arrow-right workflow-path-arrow'
+                          ? 'bi bi-arrow-left workflow-path-arrow flex-shrink-0'
+                          : 'bi bi-arrow-right workflow-path-arrow flex-shrink-0'
                       "
                       aria-hidden="true"
                     ></i>
                   }
                 }
+              </div>
+
+              <!-- Bottom Row: Meta Info -->
+              <div class="workflow-meta-row d-flex align-items-center flex-wrap gap-3 text-muted fs-7 border-top pt-2 mt-1">
+                <span><i class="bi bi-diagram-2 text-primary me-1"></i>{{ translations().steps }}: <strong>{{ workflow.stepsCount }}</strong></span>
+                <span><i class="bi bi-calendar-event me-1"></i>{{ translations().created }}: {{ formatDate(workflow.createdOnUtc) }}</span>
+                <span><i class="bi bi-clock-history me-1"></i>{{ translations().modified }}: {{ formatDate(workflow.modifiedOnUtc) }}</span>
               </div>
             </article>
           } @empty {
@@ -392,71 +411,131 @@
                 size="sm"
               />
             } @else if (store.panelMode() === 'view' && store.selectedDetails(); as details) {
-              <section class="workflow-detail-view d-grid gap-3">
-                <div class="workflow-detail-card">
-                  <div class="workflow-title-row">
-                    <h3>{{ workflowName(details) }}</h3>
-                    @if (details.isDefault) {
-                      <span class="workflow-badge workflow-badge--default">{{
-                        translations().defaultWorkflow
-                      }}</span>
+              <section class="workflow-detail-view d-grid gap-3 p-1">
+                <!-- Header Info Card -->
+                <div class="workflow-detail-header-card p-3 rounded-3 border bg-white shadow-sm">
+                  <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
+                    <div class="d-flex align-items-center gap-2">
+                      <div class="workflow-header-avatar d-inline-flex align-items-center justify-content-center bg-light text-primary rounded-3 p-2 border">
+                        <i class="bi bi-signpost-split-fill fs-5"></i>
+                      </div>
+                      <div>
+                        <h3 class="fw-bold text-dark fs-5 m-0">{{ workflowName(details) }}</h3>
+                        <small class="text-muted fs-7">{{ translations().workflowOwner }}: <strong>{{ store.scope()?.ownerServiceName }}</strong></small>
+                      </div>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                      @if (details.isDefault) {
+                        <span class="workflow-badge workflow-badge--default">{{
+                          translations().defaultWorkflow
+                        }}</span>
+                      }
+                      <span
+                        class="workflow-badge"
+                        [class.workflow-badge--active]="details.isActive"
+                        [class.workflow-badge--inactive]="!details.isActive"
+                      >
+                        {{ details.isActive ? translations().active : translations().inactive }}
+                      </span>
+                    </div>
+                  </div>
+                  <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 text-muted fs-7 pt-2 border-top">
+                    <span>
+                      <i class="bi bi-diagram-3 text-primary me-1"></i>
+                      {{ translations().steps }}: <strong class="text-dark">{{ details.steps.length }}</strong>
+                    </span>
+                    <span>
+                      <i class="bi bi-hash text-muted me-1"></i>ID: <strong>#{{ details.workflowId }}</strong>
+                    </span>
+                  </div>
+                </div>
+
+                <!-- 2026 Vertical Stepper Flow -->
+                <div class="workflow-vertical-flow-container">
+                  <h4 class="vertical-flow-title">
+                    <i class="bi bi-diagram-3-fill text-primary fs-5"></i>
+                    {{ language() === 'ar' ? 'تسلسل خطوات المسار' : 'Workflow Step Sequence' }}
+                  </h4>
+
+                  <div class="workflow-vertical-stepper">
+                    @for (step of sortedSteps(details); track step.stepOrder; let last = $last) {
+                      <div class="stepper-item">
+                        <div class="stepper-node-col">
+                          <div class="stepper-circle">
+                            {{ $index + 1 }}
+                          </div>
+                          @if (!last) {
+                            <div class="stepper-line">
+                              <div class="stepper-arrow-chip">
+                                <i class="bi bi-arrow-down"></i>
+                              </div>
+                            </div>
+                          }
+                        </div>
+                        <div class="stepper-content-card">
+                          <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-1">
+                            <h5 class="stepper-service-title m-0">{{ serviceName(step) }}</h5>
+                            <span
+                              class="stepper-step-tag"
+                              [class.tag-start]="$index === 0"
+                              [class.tag-final]="last"
+                              [class.tag-middle]="$index > 0 && !last"
+                            >
+                              @if ($index === 0) {
+                                {{ language() === 'ar' ? 'الخطوة الأولى' : 'Start Step' }}
+                              } @else if (last) {
+                                {{ language() === 'ar' ? 'الجهة النهائية' : 'Final Step' }}
+                              } @else {
+                                {{ language() === 'ar' ? 'خطوة وسيطة' : 'Step ' + ($index + 1) }}
+                              }
+                            </span>
+                          </div>
+                          <span class="stepper-order-meta">
+                            <i class="bi bi-hash me-1"></i>{{ language() === 'ar' ? 'ترتيب الخطوة' : 'Step Order' }}: <strong>{{ step.stepOrder }}</strong>
+                          </span>
+                        </div>
+                      </div>
                     }
                   </div>
-                  <p>{{ translations().workflowOwner }}: {{ store.scope()?.ownerServiceName }}</p>
                 </div>
-                <div class="workflow-path-strip workflow-path-strip--detail d-flex align-items-center gap-2 overflow-auto">
-                  @for (step of sortedSteps(details); track $index; let last = $last) {
-                    <span class="workflow-path-chip workflow-path-chip--large">{{
-                      serviceName(step)
-                    }}</span>
-                    @if (!last) {
-                      <i
-                        [class]="
-                          direction() === 'rtl'
-                            ? 'bi bi-arrow-left workflow-path-arrow'
-                            : 'bi bi-arrow-right workflow-path-arrow'
-                        "
-                        aria-hidden="true"
-                      ></i>
-                    }
-                  }
-                </div>
-                <div class="workflow-detail-actions d-flex align-items-center flex-wrap gap-2">
+
+                <!-- Actions Footer -->
+                <div class="workflow-detail-actions d-flex align-items-center flex-wrap gap-2 pt-2 border-top">
                   @if (canUpdate() && details.isActive) {
                     <button
                       type="button"
-                      class="secondary-action compact-action"
+                      class="branch-services-secondary-btn compact-btn"
                       (click)="openEdit(details)"
                     >
-                      {{ translations().edit }}
+                      <i class="bi bi-pencil me-1"></i> {{ translations().edit }}
                     </button>
                   }
                   @if (canSetDefault() && details.isActive && !details.isDefault) {
                     <button
                       type="button"
-                      class="secondary-action compact-action workflow-action-accent"
+                      class="branch-services-secondary-btn compact-btn"
                       (click)="requestSetDefault(details)"
                     >
-                      {{ translations().setDefault }}
+                      <i class="bi bi-check2-circle me-1"></i> {{ translations().setDefault }}
                     </button>
                   }
                   @if (canDeactivate() && details.isActive) {
                     <button
                       type="button"
-                      class="secondary-action compact-action danger-action"
+                      class="branch-services-secondary-btn compact-btn danger-action"
                       [disabled]="details.isDefault"
                       (click)="requestDeactivate(details)"
                     >
-                      {{ translations().deactivate }}
+                      <i class="bi bi-slash-circle me-1"></i> {{ translations().deactivate }}
                     </button>
                   }
                   @if (canReactivate() && !details.isActive) {
                     <button
                       type="button"
-                      class="secondary-action compact-action success-action"
+                      class="branch-services-secondary-btn compact-btn success-action"
                       (click)="requestReactivate(details)"
                     >
-                      {{ translations().reactivate }}
+                      <i class="bi bi-arrow-counterclockwise me-1"></i> {{ translations().reactivate }}
                     </button>
                   }
                 </div>
@@ -565,34 +644,40 @@
                   </div>
                 </section>
                 <section class="workflow-form-section workflow-candidates">
-                  <header class="workflow-candidate-filters">
-                    <label class="filter-field d-grid gap-2 m-0">
-                      <span>{{ translations().searchCandidates }}</span>
-                      <input
-                        class="form-control"
-                        type="search"
-                        maxlength="200"
-                        [placeholder]="translations().candidateSearchPlaceholder"
-                        [value]="store.candidateQuery().searchText"
-                        (input)="updateCandidateSearch($event)"
-                      />
-                      <small class="workflow-filter-help text-muted fw-semibold small">{{
-                        translations().candidateSearchHelp
-                      }}</small>
-                    </label>
-                    <label class="filter-field d-grid gap-2 m-0">
-                      <span>{{ translations().parent }}</span>
-                      <select
-                        class="form-select"
-                        [value]="store.candidateQuery().parentServiceId ?? ''"
-                        (change)="updateCandidateParent($event)"
-                      >
-                        <option value="">{{ translations().allParents }}</option>
-                        @for (parent of parentOptions(); track parent.id) {
-                          <option [value]="parent.id">{{ parentOptionName(parent) }}</option>
-                        }
-                      </select>
-                    </label>
+                  <header class="workflow-candidate-filters p-3 bg-light rounded-3 border mb-3">
+                    <div class="row g-3 align-items-start">
+                      <div class="col-12 col-md-6">
+                        <label class="filter-field d-grid gap-2 m-0">
+                          <span class="fw-bold text-dark fs-7">{{ translations().searchCandidates }}</span>
+                          <input
+                            class="form-control filter-input-std"
+                            type="search"
+                            maxlength="200"
+                            [placeholder]="translations().candidateSearchPlaceholder"
+                            [value]="store.candidateQuery().searchText"
+                            (input)="updateCandidateSearch($event)"
+                          />
+                        </label>
+                      </div>
+                      <div class="col-12 col-md-6">
+                        <label class="filter-field d-grid gap-2 m-0">
+                          <span class="fw-bold text-dark fs-7">{{ translations().parent }}</span>
+                          <select
+                            class="form-select filter-input-std"
+                            [value]="store.candidateQuery().parentServiceId ?? ''"
+                            (change)="updateCandidateParent($event)"
+                          >
+                            <option value="">{{ translations().allParents }}</option>
+                            @for (parent of parentOptions(); track parent.id) {
+                              <option [value]="parent.id">{{ parentOptionName(parent) }}</option>
+                            }
+                          </select>
+                        </label>
+                      </div>
+                    </div>
+                    <small class="workflow-filter-help text-muted fw-semibold d-block mt-2 fs-7">{{
+                      translations().candidateSearchHelp
+                    }}</small>
                   </header>
                   @if (replacingStepUid()) {
                     <p class="message message-info workflow-replace-note">

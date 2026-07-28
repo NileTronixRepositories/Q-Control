@@ -10,9 +10,9 @@ import {
   PagedServiceGlobalizationRequestsResponse,
   ServiceGlobalizationRequestListItem,
 } from '../../models/service-globalization.model';
-import { ServiceDataInvalidationService } from '../../services/service-data-invalidation.service';
-import { ServiceGlobalizationApiService } from '../../services/service-globalization-api.service';
-import { ServiceManagementPermissionService } from '../../services/service-management-permission.service';
+import { ServiceDataInvalidationService } from '../../services/catalog/service-data-invalidation.service';
+import { ServiceGlobalizationApiService } from '../../services/globalization/service-globalization-api.service';
+import { ServiceManagementPermissionService } from '../../services/catalog/service-management-permission.service';
 import { BranchGlobalizationRequestsComponent } from './branch-globalization-requests.component';
 
 describe('BranchGlobalizationRequestsComponent request triggers', () => {

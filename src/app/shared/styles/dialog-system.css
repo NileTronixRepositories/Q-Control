@@ -859,7 +859,7 @@
 .q-toggle-card.active {
   background: #ecfdf5;
   border-color: #75f0a4;
-  box-shadow: 0 4px 12px rgba(74, 177, 210, 0.1);
+  box-shadow: 0 4px 12px rgba(34, 175, 98, 0.1);
 }
 
 .q-toggle-card.active > i {

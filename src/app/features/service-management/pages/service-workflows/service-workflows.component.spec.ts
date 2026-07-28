@@ -11,9 +11,9 @@ import { BranchManagementApiService } from '../../../technical-admin/services/br
 import { TechnicalAdminI18nStore } from '../../../technical-admin/store/technical-admin-i18n.store';
 import { ServiceTreeNode } from '../../models/service-management.model';
 import { ServiceWorkflowListItem, WorkflowCandidateService } from '../../models/service-workflow.model';
-import { BranchServicesApiService } from '../../services/branch-services-api.service';
-import { ServiceManagementPermissionService } from '../../services/service-management-permission.service';
-import { ServiceWorkflowApiService } from '../../services/service-workflow-api.service';
+import { BranchServicesApiService } from '../../services/branch/branch-services-api.service';
+import { ServiceManagementPermissionService } from '../../services/catalog/service-management-permission.service';
+import { ServiceWorkflowApiService } from '../../services/workflow/service-workflow-api.service';
 import { ServiceWorkflowsComponent } from './service-workflows.component';
 
 const emptyPage = {
