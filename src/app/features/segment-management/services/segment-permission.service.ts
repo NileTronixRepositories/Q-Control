@@ -70,8 +70,9 @@ export class SegmentPermissionService {
 
   readonly canViewOwnGlobalizationRequests = computed(
     () =>
-      this.isBranchAdmin() ||
-      this.hasPermission('SegmentGlobalizationRequests.ViewOwn'),
+      (this.isBranchAdmin() ||
+        this.hasPermission('SegmentGlobalizationRequests.ViewOwn')) &&
+      !!this.authSessionService.currentSession()?.activeBranchId,
   );
 
   readonly canViewGlobalizationRequestDetails = computed(

@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 
 import { TechnicalAdminPageHeroComponent } from '../../../../shared/components/technical-admin-page-hero/technical-admin-page-hero.component';
 import { AuthSessionService } from '../../../auth/services/auth-session.service';
@@ -50,6 +51,8 @@ export class BranchSegmentRequestsComponent implements OnInit {
     this.language() === 'ar' ? SEGMENT_TRANSLATIONS_AR : SEGMENT_TRANSLATIONS_EN,
   );
 
+  private readonly router = inject(Router);
+
   ngOnInit(): void {
     this.loadRequests();
   }
@@ -57,7 +60,7 @@ export class BranchSegmentRequestsComponent implements OnInit {
   loadRequests(): void {
     const branchId = this.authSessionService.currentSession()?.activeBranchId;
     if (!branchId) {
-      this.showToast('No active branch found in current session.', 'error');
+      this.router.navigate(['/admin/segment-globalization-requests']);
       return;
     }
 
