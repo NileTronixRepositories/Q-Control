@@ -4,7 +4,6 @@
 }
 
 .workflow-page {
-
   --b: var(--q-border-subtle, var(--nt-border));
   --bg: var(--q-surface-card, var(--nt-card));
   --m: var(--q-surface-muted, #f8fafc);
@@ -944,4 +943,3 @@
   display: block;
   margin-top: 4px;
 }
-

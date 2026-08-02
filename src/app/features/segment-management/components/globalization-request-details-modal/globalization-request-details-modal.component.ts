@@ -82,7 +82,7 @@ export class GlobalizationRequestDetailsModalComponent {
       return;
     }
     this.rejected.emit({
-      requestId: this.request.id,
+      requestId: reqId,
       rowVersion: this.request.rowVersion,
       rejectionReason: reason || undefined,
     });
