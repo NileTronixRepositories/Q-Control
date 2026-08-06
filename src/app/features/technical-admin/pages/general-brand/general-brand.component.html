@@ -1,0 +1,834 @@
+<div class="branch-branding-page" [attr.dir]="direction()" [attr.lang]="language()">
+  <app-technical-admin-page-hero
+    [eyebrow]="copy().pageEyebrow"
+    [title]="copy().pageTitle"
+    [description]="copy().pageDescription"
+    icon="bi bi-palette"
+  >
+    <div hero-actions class="d-flex align-items-center gap-2">
+      <button
+        type="button"
+        class="btn btn-outline-secondary d-inline-flex align-items-center gap-2"
+        [disabled]="loading()"
+        (click)="refresh()"
+      >
+        <i class="bi bi-arrow-clockwise" [class.spin]="loading()" aria-hidden="true"></i>
+        <span>{{ copy().refreshLabel }}</span>
+      </button>
+    </div>
+  </app-technical-admin-page-hero>
+
+  @if (message(); as msg) {
+    <div
+      class="alert alert-dismissible fade show my-3 d-flex align-items-center gap-2"
+      [class.alert-success]="msg.tone === 'success'"
+      [class.alert-danger]="msg.tone === 'error'"
+      [class.alert-info]="msg.tone === 'info'"
+      role="alert"
+    >
+      <i
+        class="bi"
+        [class.bi-check-circle-fill]="msg.tone === 'success'"
+        [class.bi-exclamation-triangle-fill]="msg.tone === 'error'"
+        [class.bi-info-circle-fill]="msg.tone === 'info'"
+        aria-hidden="true"
+      ></i>
+      <div class="flex-grow-1">{{ msg.text }}</div>
+      <button
+        type="button"
+        class="btn-close"
+        [attr.aria-label]="copy().close"
+        (click)="clearMessage()"
+      ></button>
+    </div>
+  }
+
+  @if (!canModify()) {
+    <div class="alert alert-warning my-3 d-flex align-items-center gap-2" role="alert">
+      <i class="bi bi-shield-lock-fill" aria-hidden="true"></i>
+      <span>{{ copy().readOnlyNotice }}</span>
+    </div>
+  }
+
+  @if (!isConfigured() && !loading()) {
+    <div class="alert alert-info my-3 d-flex align-items-center gap-2" role="alert">
+      <i class="bi bi-info-circle-fill" aria-hidden="true"></i>
+      <span>{{ copy().notConfiguredNotice }}</span>
+    </div>
+  }
+
+  @if (loading()) {
+    <app-niletronix-loading-state [title]="copy().loading" />
+  } @else {
+    <form [formGroup]="themeForm" (ngSubmit)="save()" class="branding-form mt-4">
+      <!-- SECTION 1: VISUAL IDENTITY COLORS -->
+      <section class="branding-card shadow-sm rounded-4 p-4 mb-4">
+        <h2 class="h5 font-weight-bold text-dark mb-3 border-bottom pb-2">
+          <i class="bi bi-palette-fill text-primary me-2 ms-2" aria-hidden="true"></i>
+          {{ copy().themeColors }}
+        </h2>
+
+        <div class="row g-3">
+          <!-- Main Color -->
+          <div class="col-12 col-md-4">
+            <label for="gbMainColor" class="form-label fw-semibold">
+              {{ copy().mainColor }} <span class="text-danger">*</span>
+            </label>
+            <div class="input-group">
+              <input
+                type="color"
+                class="form-control form-control-color"
+                id="gbMainColorPicker"
+                [value]="themePickerValue('mainColor')"
+                [disabled]="!canModify()"
+                (input)="updateThemePicker('mainColor', $event)"
+              />
+              <input
+                type="text"
+                class="form-control"
+                id="gbMainColor"
+                formControlName="mainColor"
+                placeholder="#0070C4"
+                maxlength="7"
+                [class.is-invalid]="isThemeControlInvalid('mainColor')"
+                (input)="updateThemeText('mainColor', $event)"
+              />
+            </div>
+            @if (isThemeControlInvalid('mainColor')) {
+              <div class="invalid-feedback d-block">{{ themeControlError('mainColor') }}</div>
+            }
+          </div>
+
+          <!-- Secondary Color -->
+          <div class="col-12 col-md-4">
+            <label for="gbSecondaryColor" class="form-label fw-semibold">
+              {{ copy().secondaryColor }} <span class="text-danger">*</span>
+            </label>
+            <div class="input-group">
+              <input
+                type="color"
+                class="form-control form-control-color"
+                id="gbSecondaryColorPicker"
+                [value]="themePickerValue('secondaryColor', '#FFFFFF')"
+                [disabled]="!canModify()"
+                (input)="updateThemePicker('secondaryColor', $event)"
+              />
+              <input
+                type="text"
+                class="form-control"
+                id="gbSecondaryColor"
+                formControlName="secondaryColor"
+                placeholder="#FFFFFF"
+                maxlength="7"
+                [class.is-invalid]="isThemeControlInvalid('secondaryColor')"
+                (input)="updateThemeText('secondaryColor', $event)"
+              />
+            </div>
+            @if (isThemeControlInvalid('secondaryColor')) {
+              <div class="invalid-feedback d-block">{{ themeControlError('secondaryColor') }}</div>
+            }
+          </div>
+
+          <!-- Background Color -->
+          <div class="col-12 col-md-4">
+            <label for="gbBackgroundColor" class="form-label fw-semibold">
+              {{ copy().backgroundColor }} <span class="text-danger">*</span>
+            </label>
+            <div class="input-group">
+              <input
+                type="color"
+                class="form-control form-control-color"
+                id="gbBackgroundColorPicker"
+                [value]="themePickerValue('backgroundColor', '#FFFFFF')"
+                [disabled]="!canModify()"
+                (input)="updateThemePicker('backgroundColor', $event)"
+              />
+              <input
+                type="text"
+                class="form-control"
+                id="gbBackgroundColor"
+                formControlName="backgroundColor"
+                placeholder="#FFFFFF"
+                maxlength="7"
+                [class.is-invalid]="isThemeControlInvalid('backgroundColor')"
+                (input)="updateThemeText('backgroundColor', $event)"
+              />
+            </div>
+            @if (isThemeControlInvalid('backgroundColor')) {
+              <div class="invalid-feedback d-block">{{ themeControlError('backgroundColor') }}</div>
+            }
+          </div>
+
+          <!-- Header Color -->
+          <div class="col-12 col-md-4">
+            <label for="gbHeaderColor" class="form-label fw-semibold">
+              {{ copy().headerColor }}
+            </label>
+            <div class="input-group">
+              <input
+                type="color"
+                class="form-control form-control-color"
+                id="gbHeaderColorPicker"
+                [value]="themePickerValue('headerColor', '#FFFFFF')"
+                [disabled]="!canModify()"
+                (input)="updateThemePicker('headerColor', $event)"
+              />
+              <input
+                type="text"
+                class="form-control"
+                id="gbHeaderColor"
+                formControlName="headerColor"
+                placeholder="#FFFFFF"
+                maxlength="7"
+                [class.is-invalid]="isThemeControlInvalid('headerColor')"
+                (input)="updateThemeText('headerColor', $event)"
+              />
+            </div>
+            @if (isThemeControlInvalid('headerColor')) {
+              <div class="invalid-feedback d-block">{{ themeControlError('headerColor') }}</div>
+            }
+          </div>
+
+          <!-- Footer Color -->
+          <div class="col-12 col-md-4">
+            <label for="gbFooterColor" class="form-label fw-semibold">
+              {{ copy().footerColor }}
+            </label>
+            <div class="input-group">
+              <input
+                type="color"
+                class="form-control form-control-color"
+                id="gbFooterColorPicker"
+                [value]="themePickerValue('footerColor', '#FFFFFF')"
+                [disabled]="!canModify()"
+                (input)="updateThemePicker('footerColor', $event)"
+              />
+              <input
+                type="text"
+                class="form-control"
+                id="gbFooterColor"
+                formControlName="footerColor"
+                placeholder="#FFFFFF"
+                maxlength="7"
+                [class.is-invalid]="isThemeControlInvalid('footerColor')"
+                (input)="updateThemeText('footerColor', $event)"
+              />
+            </div>
+            @if (isThemeControlInvalid('footerColor')) {
+              <div class="invalid-feedback d-block">{{ themeControlError('footerColor') }}</div>
+            }
+          </div>
+
+          <!-- Main Text Color -->
+          <div class="col-12 col-md-4">
+            <label for="gbMainTextColor" class="form-label fw-semibold">
+              {{ copy().mainTextColor }}
+            </label>
+            <div class="input-group">
+              <input
+                type="color"
+                class="form-control form-control-color"
+                id="gbMainTextColorPicker"
+                [value]="themePickerValue('mainTextColor', '#000000')"
+                [disabled]="!canModify()"
+                (input)="updateThemePicker('mainTextColor', $event)"
+              />
+              <input
+                type="text"
+                class="form-control"
+                id="gbMainTextColor"
+                formControlName="mainTextColor"
+                placeholder="#000000"
+                maxlength="7"
+                [class.is-invalid]="isThemeControlInvalid('mainTextColor')"
+                (input)="updateThemeText('mainTextColor', $event)"
+              />
+            </div>
+            @if (isThemeControlInvalid('mainTextColor')) {
+              <div class="invalid-feedback d-block">{{ themeControlError('mainTextColor') }}</div>
+            }
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 2: SCREEN BEHAVIOR -->
+      <section class="branding-card shadow-sm rounded-4 p-4 mb-4">
+        <h2 class="h5 font-weight-bold text-dark mb-3 border-bottom pb-2">
+          <i class="bi bi-sliders text-primary me-2 ms-2" aria-hidden="true"></i>
+          {{ copy().behaviorSection }}
+        </h2>
+
+        <div class="row g-3">
+          <div class="col-12 col-md-6">
+            <div class="form-check form-switch card p-3 shadow-xs h-100">
+              <input
+                class="form-check-input ms-0 me-2"
+                type="checkbox"
+                id="gbShowLanguagePage"
+                formControlName="showLanguagePage"
+              />
+              <label class="form-check-label fw-semibold" for="gbShowLanguagePage">
+                {{ copy().showLanguagePageLabel }}
+              </label>
+            </div>
+          </div>
+
+          <div class="col-12 col-md-6">
+            <div class="form-check form-switch card p-3 shadow-xs h-100">
+              <input
+                class="form-check-input ms-0 me-2"
+                type="checkbox"
+                id="gbDefaultLanguageIsArabic"
+                formControlName="defaultLanguageIsArabic"
+              />
+              <label class="form-check-label fw-semibold" for="gbDefaultLanguageIsArabic">
+                {{ copy().defaultLanguageIsArabicLabel }}
+              </label>
+            </div>
+          </div>
+
+          <div class="col-12 col-md-6">
+            <div class="form-check form-switch card p-3 shadow-xs h-100">
+              <input
+                class="form-check-input ms-0 me-2"
+                type="checkbox"
+                id="gbAlwaysRequireUserInput"
+                formControlName="alwaysRequireUserInput"
+              />
+              <label class="form-check-label fw-semibold" for="gbAlwaysRequireUserInput">
+                {{ copy().alwaysRequireUserInputLabel }}
+              </label>
+            </div>
+          </div>
+
+          <div class="col-12 col-md-6">
+            <div class="form-check form-switch card p-3 shadow-xs h-100">
+              <input
+                class="form-check-input ms-0 me-2"
+                type="checkbox"
+                id="gbShowServiceNavigationPath"
+                formControlName="showServiceNavigationPath"
+              />
+              <label class="form-check-label fw-semibold" for="gbShowServiceNavigationPath">
+                {{ copy().showServiceNavigationPathLabel }}
+              </label>
+            </div>
+          </div>
+
+          <div class="col-12 col-md-6">
+            <div class="form-check form-switch card p-3 shadow-xs h-100">
+              <input
+                class="form-check-input ms-0 me-2"
+                type="checkbox"
+                id="gbAllowOperatorSelection"
+                formControlName="allowOperatorSelection"
+              />
+              <label class="form-check-label fw-semibold" for="gbAllowOperatorSelection">
+                {{ copy().allowOperatorSelectionLabel }}
+              </label>
+            </div>
+          </div>
+
+          <div class="col-12 col-md-6">
+            <div class="form-check form-switch card p-3 shadow-xs h-100">
+              <input
+                class="form-check-input ms-0 me-2"
+                type="checkbox"
+                id="gbAllowRequestMoreServices"
+                formControlName="allowRequestMoreServices"
+              />
+              <label class="form-check-label fw-semibold" for="gbAllowRequestMoreServices">
+                {{ copy().allowRequestMoreServicesLabel }}
+              </label>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 3: LANGUAGE BUTTON -->
+      <section class="branding-card shadow-sm rounded-4 p-4 mb-4">
+        <h2 class="h5 font-weight-bold text-dark mb-3 border-bottom pb-2">
+          <i class="bi bi-translate text-primary me-2 ms-2" aria-hidden="true"></i>
+          {{ copy().languageButtonSection }}
+        </h2>
+
+        <div class="row g-3">
+          <div class="col-12 col-md-6">
+            <label for="gbLangBgColor" class="form-label fw-semibold">
+              {{ copy().buttonBackgroundColorLabel }}
+            </label>
+            <div class="input-group">
+              <input
+                type="color"
+                class="form-control form-control-color"
+                id="gbLangBgColorPicker"
+                [value]="themePickerValue('languageButtonBackgroundColor', '#0070C4')"
+                [disabled]="!canModify()"
+                (input)="updateThemePicker('languageButtonBackgroundColor', $event)"
+              />
+              <input
+                type="text"
+                class="form-control"
+                id="gbLangBgColor"
+                formControlName="languageButtonBackgroundColor"
+                placeholder="#0070C4"
+                maxlength="7"
+                [class.is-invalid]="isThemeControlInvalid('languageButtonBackgroundColor')"
+                (input)="updateThemeText('languageButtonBackgroundColor', $event)"
+              />
+            </div>
+          </div>
+
+          <div class="col-12 col-md-6">
+            <label for="gbLangTextColor" class="form-label fw-semibold">
+              {{ copy().buttonTextColorLabel }}
+            </label>
+            <div class="input-group">
+              <input
+                type="color"
+                class="form-control form-control-color"
+                id="gbLangTextColorPicker"
+                [value]="themePickerValue('languageButtonTextColor', '#FFFFFF')"
+                [disabled]="!canModify()"
+                (input)="updateThemePicker('languageButtonTextColor', $event)"
+              />
+              <input
+                type="text"
+                class="form-control"
+                id="gbLangTextColor"
+                formControlName="languageButtonTextColor"
+                placeholder="#FFFFFF"
+                maxlength="7"
+                [class.is-invalid]="isThemeControlInvalid('languageButtonTextColor')"
+                (input)="updateThemeText('languageButtonTextColor', $event)"
+              />
+            </div>
+          </div>
+
+          <div class="col-12 col-md-4">
+            <label for="gbLangWidth" class="form-label fw-semibold">
+              {{ copy().buttonWidthLabel }}
+            </label>
+            <input
+              type="number"
+              class="form-control"
+              id="gbLangWidth"
+              formControlName="languageButtonWidth"
+              placeholder="40"
+              min="0.01"
+              max="100"
+              [class.is-invalid]="isThemeControlInvalid('languageButtonWidth')"
+            />
+          </div>
+
+          <div class="col-12 col-md-4">
+            <label for="gbLangHeight" class="form-label fw-semibold">
+              {{ copy().buttonHeightLabel }}
+            </label>
+            <input
+              type="number"
+              class="form-control"
+              id="gbLangHeight"
+              formControlName="languageButtonHeight"
+              placeholder="22"
+              min="0.01"
+              max="100"
+              [class.is-invalid]="isThemeControlInvalid('languageButtonHeight')"
+            />
+          </div>
+
+          <div class="col-12 col-md-4">
+            <label for="gbLangText" class="form-label fw-semibold">
+              {{ copy().buttonTextLabel }}
+            </label>
+            <input
+              type="text"
+              class="form-control"
+              id="gbLangText"
+              formControlName="languageButtonText"
+              placeholder="اختيار اللغة"
+              maxlength="200"
+              [class.is-invalid]="isThemeControlInvalid('languageButtonText')"
+            />
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 4: SERVICE BUTTON -->
+      <section class="branding-card shadow-sm rounded-4 p-4 mb-4">
+        <h2 class="h5 font-weight-bold text-dark mb-3 border-bottom pb-2">
+          <i class="bi bi-grid-3x3-gap-fill text-primary me-2 ms-2" aria-hidden="true"></i>
+          {{ copy().serviceButtonSection }}
+        </h2>
+
+        <div class="row g-3">
+          <div class="col-12 col-md-6">
+            <label for="gbSrvBgColor" class="form-label fw-semibold">
+              {{ copy().buttonBackgroundColorLabel }}
+            </label>
+            <div class="input-group">
+              <input
+                type="color"
+                class="form-control form-control-color"
+                id="gbSrvBgColorPicker"
+                [value]="themePickerValue('serviceButtonBackgroundColor', '#0070C4')"
+                [disabled]="!canModify()"
+                (input)="updateThemePicker('serviceButtonBackgroundColor', $event)"
+              />
+              <input
+                type="text"
+                class="form-control"
+                id="gbSrvBgColor"
+                formControlName="serviceButtonBackgroundColor"
+                placeholder="#0070C4"
+                maxlength="7"
+                [class.is-invalid]="isThemeControlInvalid('serviceButtonBackgroundColor')"
+                (input)="updateThemeText('serviceButtonBackgroundColor', $event)"
+              />
+            </div>
+          </div>
+
+          <div class="col-12 col-md-6">
+            <label for="gbSrvTextColor" class="form-label fw-semibold">
+              {{ copy().buttonTextColorLabel }}
+            </label>
+            <div class="input-group">
+              <input
+                type="color"
+                class="form-control form-control-color"
+                id="gbSrvTextColorPicker"
+                [value]="themePickerValue('serviceButtonTextColor', '#FFFFFF')"
+                [disabled]="!canModify()"
+                (input)="updateThemePicker('serviceButtonTextColor', $event)"
+              />
+              <input
+                type="text"
+                class="form-control"
+                id="gbSrvTextColor"
+                formControlName="serviceButtonTextColor"
+                placeholder="#FFFFFF"
+                maxlength="7"
+                [class.is-invalid]="isThemeControlInvalid('serviceButtonTextColor')"
+                (input)="updateThemeText('serviceButtonTextColor', $event)"
+              />
+            </div>
+          </div>
+
+          <div class="col-12 col-md-3">
+            <label for="gbSrvWidth" class="form-label fw-semibold">
+              {{ copy().buttonWidthLabel }}
+            </label>
+            <input
+              type="number"
+              class="form-control"
+              id="gbSrvWidth"
+              formControlName="serviceButtonWidth"
+              placeholder="40"
+              min="0.01"
+              max="100"
+              [class.is-invalid]="isThemeControlInvalid('serviceButtonWidth')"
+            />
+          </div>
+
+          <div class="col-12 col-md-3">
+            <label for="gbSrvHeight" class="form-label fw-semibold">
+              {{ copy().buttonHeightLabel }}
+            </label>
+            <input
+              type="number"
+              class="form-control"
+              id="gbSrvHeight"
+              formControlName="serviceButtonHeight"
+              placeholder="20"
+              min="0.01"
+              max="100"
+              [class.is-invalid]="isThemeControlInvalid('serviceButtonHeight')"
+            />
+          </div>
+
+          <div class="col-12 col-md-3">
+            <label for="gbSrvSpace" class="form-label fw-semibold">
+              {{ copy().serviceButtonSpaceLabel }}
+            </label>
+            <input
+              type="number"
+              class="form-control"
+              id="gbSrvSpace"
+              formControlName="serviceButtonSpace"
+              placeholder="2"
+              min="0"
+              max="100"
+              [class.is-invalid]="isThemeControlInvalid('serviceButtonSpace')"
+            />
+          </div>
+
+          <div class="col-12 col-md-3">
+            <label for="gbSrvFontSize" class="form-label fw-semibold">
+              {{ copy().serviceButtonFontSizeLabel }}
+            </label>
+            <input
+              type="number"
+              step="0.1"
+              class="form-control"
+              id="gbSrvFontSize"
+              formControlName="serviceButtonFontSize"
+              placeholder="1.8"
+              min="0.01"
+              max="100"
+              [class.is-invalid]="isThemeControlInvalid('serviceButtonFontSize')"
+            />
+          </div>
+
+          <div class="col-12">
+            <label for="gbSrvText" class="form-label fw-semibold">
+              {{ copy().buttonTextLabel }}
+            </label>
+            <input
+              type="text"
+              class="form-control"
+              id="gbSrvText"
+              formControlName="serviceButtonText"
+              placeholder="اختيار الخدمة"
+              maxlength="200"
+              [class.is-invalid]="isThemeControlInvalid('serviceButtonText')"
+            />
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 5: KEYPAD BUTTON -->
+      <section class="branding-card shadow-sm rounded-4 p-4 mb-4">
+        <h2 class="h5 font-weight-bold text-dark mb-3 border-bottom pb-2">
+          <i class="bi bi-calculator-fill text-primary me-2 ms-2" aria-hidden="true"></i>
+          {{ copy().keypadButtonSection }}
+        </h2>
+
+        <div class="row g-3">
+          <div class="col-12 col-md-6">
+            <label for="gbKeypadBgColor" class="form-label fw-semibold">
+              {{ copy().buttonBackgroundColorLabel }}
+            </label>
+            <div class="input-group">
+              <input
+                type="color"
+                class="form-control form-control-color"
+                id="gbKeypadBgColorPicker"
+                [value]="themePickerValue('keypadButtonBackgroundColor', '#0070C4')"
+                [disabled]="!canModify()"
+                (input)="updateThemePicker('keypadButtonBackgroundColor', $event)"
+              />
+              <input
+                type="text"
+                class="form-control"
+                id="gbKeypadBgColor"
+                formControlName="keypadButtonBackgroundColor"
+                placeholder="#0070C4"
+                maxlength="7"
+                [class.is-invalid]="isThemeControlInvalid('keypadButtonBackgroundColor')"
+                (input)="updateThemeText('keypadButtonBackgroundColor', $event)"
+              />
+            </div>
+          </div>
+
+          <div class="col-12 col-md-6">
+            <label for="gbKeypadTextColor" class="form-label fw-semibold">
+              {{ copy().buttonTextColorLabel }}
+            </label>
+            <div class="input-group">
+              <input
+                type="color"
+                class="form-control form-control-color"
+                id="gbKeypadTextColorPicker"
+                [value]="themePickerValue('keypadButtonTextColor', '#FFFFFF')"
+                [disabled]="!canModify()"
+                (input)="updateThemePicker('keypadButtonTextColor', $event)"
+              />
+              <input
+                type="text"
+                class="form-control"
+                id="gbKeypadTextColor"
+                formControlName="keypadButtonTextColor"
+                placeholder="#FFFFFF"
+                maxlength="7"
+                [class.is-invalid]="isThemeControlInvalid('keypadButtonTextColor')"
+                (input)="updateThemeText('keypadButtonTextColor', $event)"
+              />
+            </div>
+          </div>
+
+          <div class="col-12 col-md-4">
+            <label for="gbKeypadWidth" class="form-label fw-semibold">
+              {{ copy().buttonWidthLabel }}
+            </label>
+            <input
+              type="number"
+              class="form-control"
+              id="gbKeypadWidth"
+              formControlName="keypadButtonWidth"
+              placeholder="45"
+              min="0.01"
+              max="100"
+              [class.is-invalid]="isThemeControlInvalid('keypadButtonWidth')"
+            />
+          </div>
+
+          <div class="col-12 col-md-4">
+            <label for="gbKeypadHeight" class="form-label fw-semibold">
+              {{ copy().buttonHeightLabel }}
+            </label>
+            <input
+              type="number"
+              class="form-control"
+              id="gbKeypadHeight"
+              formControlName="keypadButtonHeight"
+              placeholder="10"
+              min="0.01"
+              max="100"
+              [class.is-invalid]="isThemeControlInvalid('keypadButtonHeight')"
+            />
+          </div>
+
+          <div class="col-12 col-md-4">
+            <label for="gbKeypadText" class="form-label fw-semibold">
+              {{ copy().buttonTextLabel }}
+            </label>
+            <input
+              type="text"
+              class="form-control"
+              id="gbKeypadText"
+              formControlName="keypadButtonText"
+              placeholder="تأكيد"
+              maxlength="200"
+              [class.is-invalid]="isThemeControlInvalid('keypadButtonText')"
+            />
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 6: FOOTER BUTTON -->
+      <section class="branding-card shadow-sm rounded-4 p-4 mb-4">
+        <h2 class="h5 font-weight-bold text-dark mb-3 border-bottom pb-2">
+          <i class="bi bi-arrow-left-square-fill text-primary me-2 ms-2" aria-hidden="true"></i>
+          {{ copy().footerButtonSection }}
+        </h2>
+
+        <div class="row g-3">
+          <div class="col-12 col-md-6">
+            <label for="gbFooterBgColor" class="form-label fw-semibold">
+              {{ copy().buttonBackgroundColorLabel }}
+            </label>
+            <div class="input-group">
+              <input
+                type="color"
+                class="form-control form-control-color"
+                id="gbFooterBgColorPicker"
+                [value]="themePickerValue('footerButtonBackgroundColor', '#0070C4')"
+                [disabled]="!canModify()"
+                (input)="updateThemePicker('footerButtonBackgroundColor', $event)"
+              />
+              <input
+                type="text"
+                class="form-control"
+                id="gbFooterBgColor"
+                formControlName="footerButtonBackgroundColor"
+                placeholder="#0070C4"
+                maxlength="7"
+                [class.is-invalid]="isThemeControlInvalid('footerButtonBackgroundColor')"
+                (input)="updateThemeText('footerButtonBackgroundColor', $event)"
+              />
+            </div>
+          </div>
+
+          <div class="col-12 col-md-6">
+            <label for="gbFooterTextColor" class="form-label fw-semibold">
+              {{ copy().buttonTextColorLabel }}
+            </label>
+            <div class="input-group">
+              <input
+                type="color"
+                class="form-control form-control-color"
+                id="gbFooterTextColorPicker"
+                [value]="themePickerValue('footerButtonTextColor', '#FFFFFF')"
+                [disabled]="!canModify()"
+                (input)="updateThemePicker('footerButtonTextColor', $event)"
+              />
+              <input
+                type="text"
+                class="form-control"
+                id="gbFooterTextColor"
+                formControlName="footerButtonTextColor"
+                placeholder="#FFFFFF"
+                maxlength="7"
+                [class.is-invalid]="isThemeControlInvalid('footerButtonTextColor')"
+                (input)="updateThemeText('footerButtonTextColor', $event)"
+              />
+            </div>
+          </div>
+
+          <div class="col-12 col-md-4">
+            <label for="gbFooterWidth" class="form-label fw-semibold">
+              {{ copy().buttonWidthLabel }}
+            </label>
+            <input
+              type="number"
+              class="form-control"
+              id="gbFooterWidth"
+              formControlName="footerButtonWidth"
+              placeholder="10"
+              min="0.01"
+              max="100"
+              [class.is-invalid]="isThemeControlInvalid('footerButtonWidth')"
+            />
+          </div>
+
+          <div class="col-12 col-md-4">
+            <label for="gbFooterHeight" class="form-label fw-semibold">
+              {{ copy().buttonHeightLabel }}
+            </label>
+            <input
+              type="number"
+              class="form-control"
+              id="gbFooterHeight"
+              formControlName="footerButtonHeight"
+              placeholder="12"
+              min="0.01"
+              max="100"
+              [class.is-invalid]="isThemeControlInvalid('footerButtonHeight')"
+            />
+          </div>
+
+          <div class="col-12 col-md-4">
+            <label for="gbFooterText" class="form-label fw-semibold">
+              {{ copy().buttonTextLabel }}
+            </label>
+            <input
+              type="text"
+              class="form-control"
+              id="gbFooterText"
+              formControlName="footerButtonText"
+              placeholder="رجوع"
+              maxlength="200"
+              [class.is-invalid]="isThemeControlInvalid('footerButtonText')"
+            />
+          </div>
+        </div>
+      </section>
+
+      <!-- SAVE BUTTON BAR -->
+      <div class="d-flex justify-content-end gap-3 mt-4 mb-5">
+        <button
+          type="submit"
+          class="btn btn-primary btn-lg px-4 d-inline-flex align-items-center gap-2"
+          [disabled]="!canSave()"
+        >
+          @if (saving()) {
+            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+          } @else {
+            <i class="bi bi-check2-circle fs-5" aria-hidden="true"></i>
+          }
+          <span>{{ isConfigured() ? copy().saveBrand : copy().createBrand }}</span>
+        </button>
+      </div>
+    </form>
+  }
+</div>

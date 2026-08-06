@@ -18,7 +18,8 @@ export class TicketGeneratorService {
 
   private createTicket(selection: ServiceRequestSelection): QueueTicket {
     const issuedAtIso = new Date().toISOString();
-    const ticketNumber = this.createTicketNumber(selection.serviceType.ticketPrefix);
+    const prefix = selection.subSpecialty?.ticketPrefix || selection.specialty?.ticketPrefix || selection.serviceType.ticketPrefix || 'Q';
+    const ticketNumber = this.createTicketNumber(prefix);
     const estimatedWaitingMinutes = this.calculateEstimatedWaiting(selection);
     const counterHint = this.resolveCounterHint(selection);
 
@@ -26,7 +27,7 @@ export class TicketGeneratorService {
       id: crypto.randomUUID(),
       ticketNumber,
       serviceTypeName: selection.serviceType.name,
-      departmentName: selection.specialty.name,
+      departmentName: selection.specialty?.name ?? null,
       subSpecialtyName: selection.subSpecialty?.name ?? null,
       issuedAtIso,
       estimatedWaitingMinutes,
@@ -34,7 +35,7 @@ export class TicketGeneratorService {
       qrPayload: JSON.stringify({
         ticketNumber,
         serviceType: selection.serviceType.code,
-        specialty: selection.specialty.code,
+        specialty: selection.specialty?.code ?? null,
         subSpecialty: selection.subSpecialty?.code ?? null,
         issuedAt: issuedAtIso,
       }),
@@ -43,13 +44,14 @@ export class TicketGeneratorService {
 
   private createTicketNumber(prefix: string): string {
     this.sequence = this.sequence >= TICKET_SEQUENCE_MAX ? 1 : this.sequence + 1;
-    return `${prefix}${this.sequence.toString().padStart(3, '0')}`;
+    const separator = /\d$/.test(prefix) ? '-' : '';
+    return `${prefix}${separator}${this.sequence.toString().padStart(3, '0')}`;
   }
 
   private calculateEstimatedWaiting(selection: ServiceRequestSelection): number {
     return (
       selection.serviceType.estimatedWaitingMinutes +
-      selection.specialty.estimatedWaitingMinutes +
+      (selection.specialty?.estimatedWaitingMinutes ?? 0) +
       (selection.subSpecialty?.estimatedWaitingMinutes ?? 0)
     );
   }

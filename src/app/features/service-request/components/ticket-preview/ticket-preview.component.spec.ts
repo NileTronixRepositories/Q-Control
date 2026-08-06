@@ -37,4 +37,15 @@ describe('TicketPreviewComponent', () => {
     expect(text).toContain('Counter 1');
     expect(text).not.toContain('null');
   });
+
+  it('renders correctly when departmentName is null for directly issuable root services', () => {
+    fixture.componentRef.setInput('ticket', { ...ticket, departmentName: null });
+    fixture.detectChanges();
+
+    const text = fixture.nativeElement.textContent as string;
+    expect(text).toContain('A-101');
+    expect(text).toContain('Regular');
+    expect(text).not.toContain('Cardiology');
+    expect(text).not.toContain('null');
+  });
 });

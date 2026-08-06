@@ -1,4 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
+import { Subscription } from 'rxjs';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -53,10 +54,34 @@ interface BranchBrandingPageTranslations {
   readonly mainColor: string;
   readonly secondaryColor: string;
   readonly backgroundColor: string;
+  readonly headerColor: string;
+  readonly footerColor: string;
+  readonly mainTextColor: string;
+  readonly generalColorsSection: string;
+  readonly behaviorSection: string;
+  readonly showLanguagePageLabel: string;
+  readonly defaultLanguageIsArabicLabel: string;
+  readonly alwaysRequireUserInputLabel: string;
+  readonly showServiceNavigationPathLabel: string;
+  readonly allowOperatorSelectionLabel: string;
+  readonly allowRequestMoreServicesLabel: string;
+  readonly languageButtonSection: string;
+  readonly serviceButtonSection: string;
+  readonly keypadButtonSection: string;
+  readonly footerButtonSection: string;
+  readonly buttonBackgroundColorLabel: string;
+  readonly buttonTextColorLabel: string;
+  readonly buttonWidthLabel: string;
+  readonly buttonHeightLabel: string;
+  readonly buttonTextLabel: string;
+  readonly serviceButtonSpaceLabel: string;
+  readonly serviceButtonFontSizeLabel: string;
   readonly saveTheme: string;
   readonly noBranding: string;
   readonly colorRequired: string;
   readonly colorInvalid: string;
+  readonly dimensionInvalid: string;
+  readonly textTooLong: string;
   readonly readOnlyNotice: string;
   readonly advertisementsCounter: string;
   readonly remainingSlots: string;
@@ -111,11 +136,11 @@ const PAGE_TRANSLATIONS: Record<AppLanguage, BranchBrandingPageTranslations> = {
   ar: {
     pageEyebrow: 'إدارة الفروع',
     pageTitle: 'الهوية البصرية والإعلانات',
-    pageDescription: 'تحكم في شعار الفرع وألوان الهوية البصرية وصور الإعلانات لكل فرع من لوحة المسؤول التقني.',
+    pageDescription: 'تحكم في شعار الفرع وإعدادات التصميم والسلوك وشاشة طلب الخدمة لكل فرع من لوحة المسؤول التقني.',
     branchLabel: 'الفرع',
     selectBranchPlaceholder: 'اختر فرعا',
     refreshLabel: 'تحديث',
-    brandingSection: 'هوية الفرع',
+    brandingSection: 'إعدادات الفرع والشاشة',
     advertisementsSection: 'إعلانات الفرع',
     logoLabel: 'شعار الفرع',
     logoEmpty: 'لا يوجد شعار مرفوع لهذا الفرع.',
@@ -127,10 +152,34 @@ const PAGE_TRANSLATIONS: Record<AppLanguage, BranchBrandingPageTranslations> = {
     mainColor: 'اللون الرئيسي',
     secondaryColor: 'اللون الثانوي',
     backgroundColor: 'لون الخلفية',
-    saveTheme: 'حفظ الهوية البصرية',
+    headerColor: 'لون الهيدر',
+    footerColor: 'لون الفوتر',
+    mainTextColor: 'لون النص الرئيسي',
+    generalColorsSection: 'الألوان العامة',
+    behaviorSection: 'سلوك شاشة طلب الخدمة',
+    showLanguagePageLabel: 'إظهار صفحة اختيار اللغة',
+    defaultLanguageIsArabicLabel: 'اللغة الافتراضية هي العربية',
+    alwaysRequireUserInputLabel: 'تطلب إدخال بيانات من المستخدم دائماً',
+    showServiceNavigationPathLabel: 'إظهار مسار التنقل بين الخدمات',
+    allowOperatorSelectionLabel: 'السماح باختيار الموظف / تقديم الخدمة',
+    allowRequestMoreServicesLabel: 'السماح بطلب المزيد من الخدمات',
+    languageButtonSection: 'إعدادات زر اللغة',
+    serviceButtonSection: 'إعدادات زر الخدمة',
+    keypadButtonSection: 'إعدادات لوحة الأرقام',
+    footerButtonSection: 'إعدادات زر الفوتر (رجوع)',
+    buttonBackgroundColorLabel: 'لون خلفية الزر',
+    buttonTextColorLabel: 'لون نص الزر',
+    buttonWidthLabel: 'عرض الزر (%)',
+    buttonHeightLabel: 'ارتفاع الزر (%)',
+    buttonTextLabel: 'نص الزر',
+    serviceButtonSpaceLabel: 'المسافة بين أزرار الخدمات (%)',
+    serviceButtonFontSizeLabel: 'حجم خط أزرار الخدمات (rem)',
+    saveTheme: 'حفظ الإعدادات',
     noBranding: 'لم يتم إعداد الهوية البصرية لهذا الفرع بعد.',
     colorRequired: 'هذا اللون مطلوب.',
     colorInvalid: 'استخدم صيغة #RRGGBB فقط.',
+    dimensionInvalid: 'يجب أن تكون القيمة بين 0 و 100.',
+    textTooLong: 'لا يمكن أن يتجاوز النص 200 حرف.',
     readOnlyNotice: 'يمكنك عرض البيانات فقط لأن صلاحية Branches.Update غير متاحة.',
     advertisementsCounter: 'الإعلانات',
     remainingSlots: 'المتاح',
@@ -151,23 +200,23 @@ const PAGE_TRANSLATIONS: Record<AppLanguage, BranchBrandingPageTranslations> = {
     orderLabel: 'الترتيب',
     confirmDelete: 'هل أنت متأكد من حذف هذا الإعلان نهائيا؟ لا يمكن التراجع عن هذا الإجراء.',
     loading: 'جاري التحميل...',
-    conflict: 'تم تعديل البيانات بواسطة مستخدم آخر. برجاء إعادة المحاولة بعد التحديث.',
+    conflict: 'تم تعديل البيانات بواسطة مستخدم آخر. تم إعادة جلب البيانات برجاء المراجعة والحفظ مجدداً.',
     invalidImage: 'نوع الصورة غير مدعوم. استخدم PNG أو JPG أو JPEG أو WEBP فقط.',
     tooManyImages: 'عدد الصور المحددة يتجاوز الحد المتاح لهذا الفرع.',
     genericError: 'حدث خطأ غير متوقع.',
-    themeSaved: 'تم حفظ الهوية البصرية بنجاح.',
+    themeSaved: 'تم حفظ إعدادات الهوية البصرية والتصميم بنجاح.',
     advertisementsUploaded: 'تم رفع الإعلانات بنجاح.',
     orderSaved: 'تم حفظ ترتيب الإعلانات بنجاح.',
     close: 'إغلاق',
   },
   en: {
     pageEyebrow: 'Branch Management',
-    pageTitle: 'Branding & Advertisements',
-    pageDescription: 'Control each branch logo, visual identity colors, and advertisement images from Technical Admin.',
+    pageTitle: 'Branding & Ticket Issuance Layout',
+    pageDescription: 'Control branch logo, full design layout, button dimensions, screen behavior, and advertisements.',
     branchLabel: 'Branch',
     selectBranchPlaceholder: 'Select a branch',
     refreshLabel: 'Refresh',
-    brandingSection: 'Branch Branding',
+    brandingSection: 'Branch Branding & Layout',
     advertisementsSection: 'Branch Advertisements',
     logoLabel: 'Branch logo',
     logoEmpty: 'No logo has been uploaded for this branch.',
@@ -179,10 +228,34 @@ const PAGE_TRANSLATIONS: Record<AppLanguage, BranchBrandingPageTranslations> = {
     mainColor: 'Main color',
     secondaryColor: 'Secondary color',
     backgroundColor: 'Background color',
-    saveTheme: 'Save visual identity',
+    headerColor: 'Header color',
+    footerColor: 'Footer color',
+    mainTextColor: 'Main text color',
+    generalColorsSection: 'General Colors',
+    behaviorSection: 'Screen Behavior',
+    showLanguagePageLabel: 'Show language selection page',
+    defaultLanguageIsArabicLabel: 'Default language is Arabic',
+    alwaysRequireUserInputLabel: 'Always require user input',
+    showServiceNavigationPathLabel: 'Show service navigation path',
+    allowOperatorSelectionLabel: 'Allow operator selection',
+    allowRequestMoreServicesLabel: 'Allow requesting more services',
+    languageButtonSection: 'Language Button Settings',
+    serviceButtonSection: 'Service Button Settings',
+    keypadButtonSection: 'Keypad Button Settings',
+    footerButtonSection: 'Footer Button Settings',
+    buttonBackgroundColorLabel: 'Button background color',
+    buttonTextColorLabel: 'Button text color',
+    buttonWidthLabel: 'Button width (%)',
+    buttonHeightLabel: 'Button height (%)',
+    buttonTextLabel: 'Button text',
+    serviceButtonSpaceLabel: 'Service button space (%)',
+    serviceButtonFontSizeLabel: 'Service button font size (rem)',
+    saveTheme: 'Save Branding & Layout',
     noBranding: 'No branding has been configured for this branch.',
     colorRequired: 'This color is required.',
     colorInvalid: 'Use #RRGGBB format only.',
+    dimensionInvalid: 'Must be a value between 0 and 100.',
+    textTooLong: 'Text cannot exceed 200 characters.',
     readOnlyNotice: 'You can view this data only because Branches.Update is not available.',
     advertisementsCounter: 'Advertisements',
     remainingSlots: 'Remaining',
@@ -203,11 +276,11 @@ const PAGE_TRANSLATIONS: Record<AppLanguage, BranchBrandingPageTranslations> = {
     orderLabel: 'Order',
     confirmDelete: 'Are you sure you want to permanently delete this advertisement? This action cannot be undone.',
     loading: 'Loading...',
-    conflict: 'The data was modified by another user. Please reload and try again.',
+    conflict: 'The data was modified by another user. Latest server data has been loaded for your review.',
     invalidImage: 'Unsupported image type. Use PNG, JPG, JPEG, or WEBP only.',
     tooManyImages: 'Selected images exceed the available slots for this branch.',
     genericError: 'Unexpected error occurred.',
-    themeSaved: 'Visual identity saved successfully.',
+    themeSaved: 'Visual identity and layout settings saved successfully.',
     advertisementsUploaded: 'Advertisements uploaded successfully.',
     orderSaved: 'Advertisement order saved successfully.',
     close: 'Close',
@@ -271,9 +344,51 @@ export class BranchBrandingComponent implements OnInit, OnDestroy {
   protected readonly dragOverPlacement = signal<DropPlacement>('before');
 
   protected readonly themeForm = this.formBuilder.group({
+    // SECTION A — General Colors
     mainColor: ['', [Validators.required, Validators.pattern(HEX_COLOR_PATTERN)]],
     secondaryColor: ['', [Validators.required, Validators.pattern(HEX_COLOR_PATTERN)]],
     backgroundColor: ['', [Validators.required, Validators.pattern(HEX_COLOR_PATTERN)]],
+    headerColor: ['', [Validators.pattern(HEX_COLOR_PATTERN)]],
+    footerColor: ['', [Validators.pattern(HEX_COLOR_PATTERN)]],
+    mainTextColor: ['', [Validators.pattern(HEX_COLOR_PATTERN)]],
+
+    // SECTION B — Screen Behavior
+    showLanguagePage: [false],
+    defaultLanguageIsArabic: [false],
+    alwaysRequireUserInput: [false],
+    showServiceNavigationPath: [false],
+    allowOperatorSelection: [false],
+    allowRequestMoreServices: [false],
+
+    // SECTION C — Language Button
+    languageButtonBackgroundColor: ['', [Validators.pattern(HEX_COLOR_PATTERN)]],
+    languageButtonTextColor: ['', [Validators.pattern(HEX_COLOR_PATTERN)]],
+    languageButtonWidth: [null as number | null, [Validators.min(0.01), Validators.max(100)]],
+    languageButtonHeight: [null as number | null, [Validators.min(0.01), Validators.max(100)]],
+    languageButtonText: ['', [Validators.maxLength(200)]],
+
+    // SECTION D — Service Button
+    serviceButtonBackgroundColor: ['', [Validators.pattern(HEX_COLOR_PATTERN)]],
+    serviceButtonTextColor: ['', [Validators.pattern(HEX_COLOR_PATTERN)]],
+    serviceButtonWidth: [null as number | null, [Validators.min(0.01), Validators.max(100)]],
+    serviceButtonHeight: [null as number | null, [Validators.min(0.01), Validators.max(100)]],
+    serviceButtonSpace: [null as number | null, [Validators.min(0), Validators.max(100)]],
+    serviceButtonFontSize: [null as number | null, [Validators.min(0.01), Validators.max(100)]],
+    serviceButtonText: ['', [Validators.maxLength(200)]],
+
+    // SECTION E — Keypad Button
+    keypadButtonBackgroundColor: ['', [Validators.pattern(HEX_COLOR_PATTERN)]],
+    keypadButtonTextColor: ['', [Validators.pattern(HEX_COLOR_PATTERN)]],
+    keypadButtonWidth: [null as number | null, [Validators.min(0.01), Validators.max(100)]],
+    keypadButtonHeight: [null as number | null, [Validators.min(0.01), Validators.max(100)]],
+    keypadButtonText: ['', [Validators.maxLength(200)]],
+
+    // SECTION F — Footer Button
+    footerButtonBackgroundColor: ['', [Validators.pattern(HEX_COLOR_PATTERN)]],
+    footerButtonTextColor: ['', [Validators.pattern(HEX_COLOR_PATTERN)]],
+    footerButtonWidth: [null as number | null, [Validators.min(0.01), Validators.max(100)]],
+    footerButtonHeight: [null as number | null, [Validators.min(0.01), Validators.max(100)]],
+    footerButtonText: ['', [Validators.maxLength(200)]],
   });
 
   protected readonly selectedBranchLabel = computed(() => {
@@ -325,13 +440,7 @@ export class BranchBrandingComponent implements OnInit, OnDestroy {
 
   protected readonly themeDirty = computed(() => {
     this.themeRevision();
-    const branding = this.branding();
-
-    return (
-      this.themeControlValue('mainColor') !== (branding?.mainColor ?? '') ||
-      this.themeControlValue('secondaryColor') !== (branding?.secondaryColor ?? '') ||
-      this.themeControlValue('backgroundColor') !== (branding?.backgroundColor ?? '')
-    );
+    return this.themeForm.dirty;
   });
 
   protected readonly canSaveTheme = computed(() => {
@@ -346,11 +455,21 @@ export class BranchBrandingComponent implements OnInit, OnDestroy {
     );
   });
 
+  private formChangesSubscription: Subscription | null = null;
+
   ngOnInit(): void {
+    this.formChangesSubscription = this.themeForm.valueChanges.subscribe(() => {
+      this.themeRevision.update((value) => value + 1);
+    });
     this.loadBranches();
   }
 
   ngOnDestroy(): void {
+    if (this.formChangesSubscription) {
+      this.formChangesSubscription.unsubscribe();
+      this.formChangesSubscription = null;
+    }
+
     if (this.messageTimeoutId) {
       clearTimeout(this.messageTimeoutId);
     }
@@ -377,36 +496,51 @@ export class BranchBrandingComponent implements OnInit, OnDestroy {
     this.loadSelectedBranchData();
   }
 
-  protected updateThemeText(controlName: ThemeColorControl, event: Event): void {
-    this.updateThemeControl(controlName, (event.target as HTMLInputElement).value.toUpperCase());
+  protected updateThemeText(controlName: keyof typeof this.themeForm.controls, event: Event): void {
+    const value = (event.target as HTMLInputElement).value.toUpperCase();
+    this.updateThemeControl(controlName, value);
   }
 
-  protected updateThemePicker(controlName: ThemeColorControl, event: Event): void {
-    this.updateThemeControl(controlName, (event.target as HTMLInputElement).value.toUpperCase());
+  protected updateThemePicker(controlName: keyof typeof this.themeForm.controls, event: Event): void {
+    const value = (event.target as HTMLInputElement).value.toUpperCase();
+    this.updateThemeControl(controlName, value);
   }
 
-  protected themeControlValue(controlName: ThemeColorControl): string {
-    return this.themeForm.controls[controlName].value;
+  protected themeControlValue(controlName: keyof typeof this.themeForm.controls): string {
+    return String(this.themeForm.controls[controlName].value ?? '');
   }
 
-  protected themePickerValue(controlName: ThemeColorControl): string {
+  protected themePickerValue(controlName: keyof typeof this.themeForm.controls, fallback = '#000000'): string {
     const value = this.themeControlValue(controlName);
-    return HEX_COLOR_PATTERN.test(value) ? value.toUpperCase() : '#000000';
+    return HEX_COLOR_PATTERN.test(value) ? value.toUpperCase() : fallback;
   }
 
-  protected isThemeControlInvalid(controlName: ThemeColorControl): boolean {
+  protected isThemeControlInvalid(controlName: keyof typeof this.themeForm.controls): boolean {
     const control = this.themeForm.controls[controlName];
     return control.touched && control.invalid;
   }
 
-  protected themeControlError(controlName: ThemeColorControl): string {
+  protected themeControlError(controlName: keyof typeof this.themeForm.controls): string {
     const control = this.themeForm.controls[controlName];
 
     if (!this.isThemeControlInvalid(controlName)) {
       return '';
     }
 
-    return control.hasError('required') ? this.copy().colorRequired : this.copy().colorInvalid;
+    if (control.hasError('required')) {
+      return this.copy().colorRequired;
+    }
+    if (control.hasError('pattern')) {
+      return this.copy().colorInvalid;
+    }
+    if (control.hasError('min') || control.hasError('max')) {
+      return this.copy().dimensionInvalid;
+    }
+    if (control.hasError('maxlength')) {
+      return this.copy().textTooLong;
+    }
+
+    return '';
   }
 
   protected saveTheme(): void {
@@ -422,22 +556,81 @@ export class BranchBrandingComponent implements OnInit, OnDestroy {
       return;
     }
 
+    const branding = this.branding();
+    const isConfigured = branding?.isConfigured ?? false;
+
     const request: UpdateBranchThemeRequest = {
       mainColor: this.themeControlValue('mainColor').toUpperCase(),
       secondaryColor: this.themeControlValue('secondaryColor').toUpperCase(),
       backgroundColor: this.themeControlValue('backgroundColor').toUpperCase(),
-      rowVersion: this.branding()?.rowVersion ?? null,
+      headerColor: this.normalizeOptionalColor('headerColor'),
+      footerColor: this.normalizeOptionalColor('footerColor'),
+      mainTextColor: this.normalizeOptionalColor('mainTextColor'),
+
+      showLanguagePage: Boolean(this.themeForm.controls.showLanguagePage.value),
+      defaultLanguageIsArabic: Boolean(this.themeForm.controls.defaultLanguageIsArabic.value),
+      alwaysRequireUserInput: Boolean(this.themeForm.controls.alwaysRequireUserInput.value),
+      showServiceNavigationPath: Boolean(this.themeForm.controls.showServiceNavigationPath.value),
+      allowOperatorSelection: Boolean(this.themeForm.controls.allowOperatorSelection.value),
+      allowRequestMoreServices: Boolean(this.themeForm.controls.allowRequestMoreServices.value),
+
+      languageButtonBackgroundColor: this.normalizeOptionalColor('languageButtonBackgroundColor'),
+      languageButtonTextColor: this.normalizeOptionalColor('languageButtonTextColor'),
+      languageButtonWidth: this.normalizeOptionalNumber('languageButtonWidth'),
+      languageButtonHeight: this.normalizeOptionalNumber('languageButtonHeight'),
+      languageButtonText: this.normalizeOptionalText('languageButtonText'),
+
+      serviceButtonBackgroundColor: this.normalizeOptionalColor('serviceButtonBackgroundColor'),
+      serviceButtonTextColor: this.normalizeOptionalColor('serviceButtonTextColor'),
+      serviceButtonWidth: this.normalizeOptionalNumber('serviceButtonWidth'),
+      serviceButtonHeight: this.normalizeOptionalNumber('serviceButtonHeight'),
+      serviceButtonSpace: this.normalizeOptionalNumber('serviceButtonSpace'),
+      serviceButtonFontSize: this.normalizeOptionalNumber('serviceButtonFontSize'),
+      serviceButtonText: this.normalizeOptionalText('serviceButtonText'),
+
+      keypadButtonBackgroundColor: this.normalizeOptionalColor('keypadButtonBackgroundColor'),
+      keypadButtonTextColor: this.normalizeOptionalColor('keypadButtonTextColor'),
+      keypadButtonWidth: this.normalizeOptionalNumber('keypadButtonWidth'),
+      keypadButtonHeight: this.normalizeOptionalNumber('keypadButtonHeight'),
+      keypadButtonText: this.normalizeOptionalText('keypadButtonText'),
+
+      footerButtonBackgroundColor: this.normalizeOptionalColor('footerButtonBackgroundColor'),
+      footerButtonTextColor: this.normalizeOptionalColor('footerButtonTextColor'),
+      footerButtonWidth: this.normalizeOptionalNumber('footerButtonWidth'),
+      footerButtonHeight: this.normalizeOptionalNumber('footerButtonHeight'),
+      footerButtonText: this.normalizeOptionalText('footerButtonText'),
+
+      rowVersion: isConfigured ? (branding?.rowVersion ?? null) : null,
     };
 
     this.themeSaving.set(true);
     this.branchBrandingApiService.updateBranchTheme(branchId, request).subscribe({
-      next: (branding) => {
-        this.applyBranding(branding);
-        this.showMessage('success', branding.message ?? this.copy().themeSaved);
+      next: (updatedBranding) => {
+        this.applyBranding(updatedBranding);
+        this.showMessage('success', updatedBranding.message ?? this.copy().themeSaved);
       },
       error: (error: HttpErrorResponse) => this.handleApiError(error, () => this.loadBranding()),
       complete: () => this.themeSaving.set(false),
     });
+  }
+
+  private normalizeOptionalColor(controlName: keyof typeof this.themeForm.controls): string | null {
+    const val = String(this.themeForm.controls[controlName].value ?? '').trim();
+    return HEX_COLOR_PATTERN.test(val) ? val.toUpperCase() : null;
+  }
+
+  private normalizeOptionalNumber(controlName: keyof typeof this.themeForm.controls): number | null {
+    const val = this.themeForm.controls[controlName].value;
+    if (val === null || val === undefined || val === '') {
+      return null;
+    }
+    const num = Number(val);
+    return Number.isFinite(num) ? num : null;
+  }
+
+  private normalizeOptionalText(controlName: keyof typeof this.themeForm.controls): string | null {
+    const val = String(this.themeForm.controls[controlName].value ?? '').trim();
+    return val.length > 0 ? val : null;
   }
 
   protected selectLogoFile(event: Event): void {
@@ -890,6 +1083,42 @@ export class BranchBrandingComponent implements OnInit, OnDestroy {
       mainColor: branding.mainColor ?? '',
       secondaryColor: branding.secondaryColor ?? '',
       backgroundColor: branding.backgroundColor ?? '',
+      headerColor: branding.headerColor ?? '',
+      footerColor: branding.footerColor ?? '',
+      mainTextColor: branding.mainTextColor ?? '',
+
+      showLanguagePage: branding.showLanguagePage ?? false,
+      defaultLanguageIsArabic: branding.defaultLanguageIsArabic ?? false,
+      alwaysRequireUserInput: branding.alwaysRequireUserInput ?? false,
+      showServiceNavigationPath: branding.showServiceNavigationPath ?? false,
+      allowOperatorSelection: branding.allowOperatorSelection ?? false,
+      allowRequestMoreServices: branding.allowRequestMoreServices ?? false,
+
+      languageButtonBackgroundColor: branding.languageButtonBackgroundColor ?? '',
+      languageButtonTextColor: branding.languageButtonTextColor ?? '',
+      languageButtonWidth: branding.languageButtonWidth ?? null,
+      languageButtonHeight: branding.languageButtonHeight ?? null,
+      languageButtonText: branding.languageButtonText ?? '',
+
+      serviceButtonBackgroundColor: branding.serviceButtonBackgroundColor ?? '',
+      serviceButtonTextColor: branding.serviceButtonTextColor ?? '',
+      serviceButtonWidth: branding.serviceButtonWidth ?? null,
+      serviceButtonHeight: branding.serviceButtonHeight ?? null,
+      serviceButtonSpace: branding.serviceButtonSpace ?? null,
+      serviceButtonFontSize: branding.serviceButtonFontSize ?? null,
+      serviceButtonText: branding.serviceButtonText ?? '',
+
+      keypadButtonBackgroundColor: branding.keypadButtonBackgroundColor ?? '',
+      keypadButtonTextColor: branding.keypadButtonTextColor ?? '',
+      keypadButtonWidth: branding.keypadButtonWidth ?? null,
+      keypadButtonHeight: branding.keypadButtonHeight ?? null,
+      keypadButtonText: branding.keypadButtonText ?? '',
+
+      footerButtonBackgroundColor: branding.footerButtonBackgroundColor ?? '',
+      footerButtonTextColor: branding.footerButtonTextColor ?? '',
+      footerButtonWidth: branding.footerButtonWidth ?? null,
+      footerButtonHeight: branding.footerButtonHeight ?? null,
+      footerButtonText: branding.footerButtonText ?? '',
     });
     this.themeForm.markAsPristine();
     this.themeRevision.update((value) => value + 1);
@@ -927,9 +1156,9 @@ export class BranchBrandingComponent implements OnInit, OnDestroy {
     this.confirmedAdvertisements.set(remove(this.confirmedAdvertisements()));
   }
 
-  private updateThemeControl(controlName: ThemeColorControl, value: string): void {
+  private updateThemeControl(controlName: keyof typeof this.themeForm.controls, value: unknown): void {
     const control = this.themeForm.controls[controlName];
-    control.setValue(value);
+    control.setValue(value as never);
     control.markAsDirty();
     control.markAsTouched();
     this.themeRevision.update((current) => current + 1);

@@ -84,6 +84,16 @@ describe('ServiceRequestHomeComponent', () => {
             selectedSubSpecialty: signal<Specialty | null>(null).asReadonly(),
             ticket: ticket.asReadonly(),
             loadingTicket: loadingTicket.asReadonly(),
+            loadingServices: signal(false).asReadonly(),
+            errorLoadingServices: signal(false).asReadonly(),
+            logoUrl: signal<string | null>(null).asReadonly(),
+            branchBranding: signal<any>(null).asReadonly(),
+            theme: signal<any>(null).asReadonly(),
+            behavior: signal<any>(null).asReadonly(),
+            languageButton: signal<any>(null).asReadonly(),
+            serviceButton: signal<any>(null).asReadonly(),
+            keypadButton: signal<any>(null).asReadonly(),
+            footerButton: signal<any>(null).asReadonly(),
             availableSpecialties: signal<readonly Specialty[]>([specialty]).asReadonly(),
             availableSubSpecialties: signal<readonly Specialty[]>(
               specialty.subSpecialties,
@@ -115,6 +125,7 @@ describe('ServiceRequestHomeComponent', () => {
             goBack: vi.fn<ServiceRequestStore['goBack']>(),
             restart,
             resolveText: vi.fn<ServiceRequestStore['resolveText']>((text) => text.en),
+            loadServices: vi.fn<ServiceRequestStore['loadServices']>(),
           } satisfies Pick<
             ServiceRequestStore,
             | 'language'
@@ -127,6 +138,16 @@ describe('ServiceRequestHomeComponent', () => {
             | 'selectedSubSpecialty'
             | 'ticket'
             | 'loadingTicket'
+            | 'loadingServices'
+            | 'errorLoadingServices'
+            | 'logoUrl'
+            | 'branchBranding'
+            | 'theme'
+            | 'behavior'
+            | 'languageButton'
+            | 'serviceButton'
+            | 'keypadButton'
+            | 'footerButton'
             | 'availableSpecialties'
             | 'availableSubSpecialties'
             | 'currentStep'
@@ -139,6 +160,7 @@ describe('ServiceRequestHomeComponent', () => {
             | 'goBack'
             | 'restart'
             | 'resolveText'
+            | 'loadServices'
           >,
         },
       ],
@@ -161,14 +183,11 @@ describe('ServiceRequestHomeComponent', () => {
     expect(fixture.nativeElement.textContent).toContain('Cardiology');
   });
 
-  it('forwards language and restart actions to the store', () => {
-    (fixture.nativeElement.querySelector('app-service-request-language-selector button') as HTMLButtonElement).click();
-    expect(setLanguage).toHaveBeenCalledWith('ar');
-
+  it('forwards restart actions to the store', () => {
     selectServiceType(serviceType);
     fixture.detectChanges();
     const restartButton = fixture.nativeElement.querySelector(
-      '.service-request-actions__button--primary',
+      '.kiosk-circular-nav-btn--next',
     ) as HTMLButtonElement;
     restartButton.click();
 

@@ -7,9 +7,7 @@ export const TECHNICAL_ADMIN_ROUTES: Routes = [
   {
     path: '',
     loadComponent: () =>
-      import('./layout/admin-shell.component').then(
-        (component) => component.AdminShellComponent,
-      ),
+      import('./layout/admin-shell.component').then((component) => component.AdminShellComponent),
     children: [
       {
         path: '',
@@ -46,6 +44,37 @@ export const TECHNICAL_ADMIN_ROUTES: Routes = [
         loadComponent: () =>
           import('./pages/branch-branding/branch-branding.component').then(
             (component) => component.BranchBrandingComponent,
+          ),
+      },
+      {
+        path: 'branch-configuration',
+        canActivate: [adminPermissionGuard],
+        data: {
+          allowTechnicalAdminWithoutPermission: true,
+          requiredAnyPermissions: [
+            'BranchConfigurations.View',
+            'BranchConfigurations.Create',
+            'BranchConfigurations.Update',
+          ],
+        },
+        loadComponent: () =>
+          import('./pages/branch-configuration/branch-configuration.component').then(
+            (component) => component.BranchConfigurationComponent,
+          ),
+      },
+      {
+        path: 'general-brand',
+        canActivate: [adminPermissionGuard],
+        data: {
+          requiredAnyPermissions: [
+            'GeneralBrand.View',
+            'GeneralBrand.Create',
+            'GeneralBrand.Update',
+          ],
+        },
+        loadComponent: () =>
+          import('./pages/general-brand/general-brand.component').then(
+            (component) => component.GeneralBrandComponent,
           ),
       },
       {

@@ -136,7 +136,7 @@ export class BranchBrandingApiService {
     );
   }
 
-  resolveMediaUrl(mediaPath: string | null, _rowVersion?: string | null): string | null {
+  resolveMediaUrl(mediaPath: string | null, rowVersion?: string | null): string | null {
     if (!mediaPath) {
       return null;
     }
@@ -144,6 +144,12 @@ export class BranchBrandingApiService {
     const baseUrl = mediaPath.startsWith('http://') || mediaPath.startsWith('https://')
       ? new URL(mediaPath)
       : new URL(mediaPath.startsWith('/') ? mediaPath : `/${mediaPath}`, this.mediaOrigin);
+
+    if (rowVersion) {
+      baseUrl.searchParams.set('v', rowVersion);
+    } else {
+      baseUrl.searchParams.set('t', String(Date.now()));
+    }
 
     return baseUrl.toString();
   }

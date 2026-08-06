@@ -1,0 +1,60 @@
+<div class="kiosk-keypad-card">
+  <div class="kiosk-keypad-header mb-3 text-center">
+    <i class="bi bi-person-vcard kiosk-keypad-icon" aria-hidden="true"></i>
+    <h3 class="kiosk-keypad-title m-0">
+      {{ isRtl() ? 'يرجى إدخال رقم الهوية أو رقم الهاتف' : 'Please Enter National ID or Phone Number' }}
+    </h3>
+    <p class="kiosk-keypad-sub m-0 mt-1">
+      {{ isRtl() ? 'استخدم لوحة الأرقام لإدخال بياناتك قبل إصدار التذكرة' : 'Use the touchscreen keypad to enter your details before issuing ticket' }}
+    </p>
+  </div>
+
+  <!-- NUMERIC DISPLAY BOX -->
+  <div class="kiosk-keypad-display mb-4" dir="ltr">
+    <span class="keypad-display-value">
+      {{ inputValue() || (isRtl() ? 'أدخل الرقم هنا...' : 'Enter number here...') }}
+    </span>
+    @if (inputValue()) {
+      <button type="button" class="keypad-clear-btn" (click)="clear()" [title]="isRtl() ? 'مسح الكل' : 'Clear All'">
+        <i class="bi bi-x-circle-fill" aria-hidden="true"></i>
+      </button>
+    }
+  </div>
+
+  <!-- TOUCH KEYPAD GRID -->
+  <div class="kiosk-keypad-grid mb-4" dir="ltr">
+    <button type="button" class="keypad-num-btn" (click)="appendDigit('1')">1</button>
+    <button type="button" class="keypad-num-btn" (click)="appendDigit('2')">2</button>
+    <button type="button" class="keypad-num-btn" (click)="appendDigit('3')">3</button>
+
+    <button type="button" class="keypad-num-btn" (click)="appendDigit('4')">4</button>
+    <button type="button" class="keypad-num-btn" (click)="appendDigit('5')">5</button>
+    <button type="button" class="keypad-num-btn" (click)="appendDigit('6')">6</button>
+
+    <button type="button" class="keypad-num-btn" (click)="appendDigit('7')">7</button>
+    <button type="button" class="keypad-num-btn" (click)="appendDigit('8')">8</button>
+    <button type="button" class="keypad-num-btn" (click)="appendDigit('9')">9</button>
+
+    <button type="button" class="keypad-num-btn keypad-num-btn--action" (click)="clear()">C</button>
+    <button type="button" class="keypad-num-btn" (click)="appendDigit('0')">0</button>
+    <button type="button" class="keypad-num-btn keypad-num-btn--action" (click)="backspace()">
+      <i class="bi bi-backspace" aria-hidden="true"></i>
+    </button>
+  </div>
+
+  <!-- CONFIRM ACTION BUTTON (BOUND TO BRANDING KEYPAD BUTTON CONFIG) -->
+  <div class="kiosk-keypad-footer text-center">
+    <button
+      type="button"
+      class="kiosk-keypad-confirm-btn"
+      [style.background-color]="store.keypadButton()?.backgroundColor || null"
+      [style.color]="store.keypadButton()?.textColor || null"
+      [style.width]="store.keypadButton()?.width ? store.keypadButton()?.width + '%' : '100%'"
+      [style.height]="store.keypadButton()?.height ? store.keypadButton()?.height + '%' : null"
+      (click)="submit()"
+    >
+      <i class="bi bi-check-circle-fill me-2 ms-2" aria-hidden="true"></i>
+      <span>{{ confirmButtonText() }}</span>
+    </button>
+  </div>
+</div>

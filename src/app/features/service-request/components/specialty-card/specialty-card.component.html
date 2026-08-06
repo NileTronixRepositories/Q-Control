@@ -1,19 +1,31 @@
 <button type="button" [class]="cardClass()" (click)="selectCard()">
-  <span class="specialty-card__icon">
-    <i class="bi {{ card().icon }}" aria-hidden="true"></i>
-  </span>
+  <div class="specialty-card__header">
+    <span class="specialty-card__icon">
+      <i class="bi {{ card().icon }}" aria-hidden="true"></i>
+    </span>
 
-  <span class="specialty-card__body">
+    @if (card().meta) {
+      <span class="specialty-card__meta">
+        <i class="bi bi-clock" aria-hidden="true"></i>
+        <span>{{ card().meta }}</span>
+      </span>
+    }
+  </div>
+
+  <div class="specialty-card__body">
     <span class="specialty-card__title">
       {{ card().title }}
     </span>
 
-    <span class="specialty-card__description">
-      {{ card().description }}
-    </span>
-  </span>
+    @if (card().description) {
+      <span class="specialty-card__description">
+        {{ card().description }}
+      </span>
+    }
+  </div>
 
-  <span class="specialty-card__meta">
-    {{ card().meta }}
-  </span>
+  <div class="specialty-card__footer">
+    <span class="specialty-card__prompt">{{ promptText() }}</span>
+    <i class="bi {{ arrowIconClass() }} specialty-card__arrow" aria-hidden="true"></i>
+  </div>
 </button>

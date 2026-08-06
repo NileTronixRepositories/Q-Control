@@ -12,4 +12,5 @@ export interface ServiceType {
   readonly tone: ServiceRequestCardTone;
   readonly estimatedWaitingMinutes: number;
   readonly specialtyIds: readonly string[];
+  readonly isTicketIssuable?: boolean;
 }

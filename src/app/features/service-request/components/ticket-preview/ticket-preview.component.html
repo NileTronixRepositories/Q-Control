@@ -27,12 +27,14 @@
       </div>
     </div>
 
-    <div class="col-12 col-md-6">
-      <div class="ticket-preview__detail">
-        <span>{{ translations().departmentLabel }}</span>
-        <strong>{{ department() }}</strong>
+    @if (department(); as selectedDepartment) {
+      <div class="col-12 col-md-6">
+        <div class="ticket-preview__detail">
+          <span>{{ translations().departmentLabel }}</span>
+          <strong>{{ selectedDepartment }}</strong>
+        </div>
       </div>
-    </div>
+    }
 
     @if (subSpecialty(); as selectedSubSpecialty) {
       <div class="col-12 col-md-6">

@@ -10,4 +10,6 @@ export interface Specialty {
   readonly tone: ServiceRequestCardTone;
   readonly estimatedWaitingMinutes: number;
   readonly subSpecialties: readonly Specialty[];
+  readonly ticketPrefix?: string;
+  readonly isTicketIssuable?: boolean;
 }

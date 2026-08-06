@@ -103,6 +103,22 @@ export class AdminShellComponent {
       });
     }
 
+    if (this.canShow(['Branches.ViewDetails', 'Branches.Update'])) {
+      items.push({
+        label: translations.branchBrandingLabel,
+        route: '/admin/branch-branding',
+        icon: 'bi-brush',
+      });
+    }
+
+    if (this.canShow(['BranchConfigurations.View', 'BranchConfigurations.Create', 'BranchConfigurations.Update'])) {
+      items.push({
+        label: translations.branchConfigurationLabel,
+        route: '/admin/branch-configuration',
+        icon: 'bi-clock-history',
+      });
+    }
+
     return items;
   });
   protected readonly contextNavigationItems = computed<readonly AppNavigationItem[]>(() => {
@@ -318,11 +334,11 @@ export class AdminShellComponent {
       });
     }
 
-    if (this.canShow(['Branches.ViewDetails', 'Branches.Update'])) {
+    if (this.canShow(['GeneralBrand.View', 'GeneralBrand.Create', 'GeneralBrand.Update'])) {
       branchChildren.push({
-        label: translations.branchBrandingLabel,
-        route: '/admin/branch-branding',
-        icon: 'bi-brush',
+        label: translations.generalBrandLabel,
+        route: '/admin/general-brand',
+        icon: 'bi-palette',
       });
     }
 

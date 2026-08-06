@@ -34,7 +34,13 @@ export interface ServiceRequestTranslations {
   readonly ticketDescription: string;
   readonly loadingTitle: string;
   readonly loadingDescription: string;
+  readonly loadingServicesTitle: string;
+  readonly loadingServicesDescription: string;
+  readonly errorLoadingTitle: string;
+  readonly errorLoadingDescription: string;
+  readonly retryLabel: string;
   readonly backLabel: string;
+  readonly nextLabel: string;
   readonly restartLabel: string;
   readonly footerServicePrompt: string;
   readonly footerSpecialtyPrompt: string;
@@ -93,7 +99,13 @@ export const SERVICE_REQUEST_TRANSLATIONS: Record<AppLanguage, ServiceRequestTra
     ticketDescription: 'احتفظ برقم التذكرة وانتظر النداء على الشاشة.',
     loadingTitle: 'جاري إصدار التذكرة',
     loadingDescription: 'برجاء الانتظار لحظات قليلة.',
+    loadingServicesTitle: 'جاري تحميل قائمة الخدمات...',
+    loadingServicesDescription: 'يرجى الانتظار لحين تهيئة البيانات.',
+    errorLoadingTitle: 'تعذر الاتصال بالخادم',
+    errorLoadingDescription: 'حدث خطأ أثناء تحميل قائمة الخدمات من الخادم، يرجى المحاولة مرة أخرى.',
+    retryLabel: 'إعادة المحاولة',
     backLabel: 'السابق',
+    nextLabel: 'التالي',
     restartLabel: 'طلب جديد',
     footerServicePrompt: 'اختر نوع الخدمة من الشاشة',
     footerSpecialtyPrompt: 'اختر التخصص المطلوب',
@@ -129,7 +141,13 @@ export const SERVICE_REQUEST_TRANSLATIONS: Record<AppLanguage, ServiceRequestTra
     ticketDescription: 'Keep your ticket number and wait for the screen announcement.',
     loadingTitle: 'Generating your ticket',
     loadingDescription: 'Please wait for a moment.',
+    loadingServicesTitle: 'Loading services catalog...',
+    loadingServicesDescription: 'Please wait while kiosk data is initialized.',
+    errorLoadingTitle: 'Connection Error',
+    errorLoadingDescription: 'An error occurred while loading services from the server. Please try again.',
+    retryLabel: 'Retry',
     backLabel: 'Back',
+    nextLabel: 'Next',
     restartLabel: 'New request',
     footerServicePrompt: 'Choose a service from the screen',
     footerSpecialtyPrompt: 'Choose the required department',

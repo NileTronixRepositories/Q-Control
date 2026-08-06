@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnDestroy, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, computed, inject, signal, effect } from '@angular/core';
 import { Subscription } from 'rxjs';
 
 import { ServiceRequestStep } from '../../enums/service-request-step.enum';
@@ -10,7 +10,9 @@ import { KioskHeaderComponent } from '../../components/kiosk-header/kiosk-header
 import { ServiceCardComponent } from '../../components/service-card/service-card.component';
 import { SpecialtyCardComponent } from '../../components/specialty-card/specialty-card.component';
 import { TicketPreviewComponent } from '../../components/ticket-preview/ticket-preview.component';
+import { KeypadInputComponent } from '../../components/keypad-input/keypad-input.component';
 import { SelectionCardViewModel } from '../../shared/selection-card-view.model';
+import { AppLanguage } from '../../../../shared/models/app-language.model';
 
 @Component({
   selector: 'app-service-request-home',
@@ -19,6 +21,7 @@ import { SelectionCardViewModel } from '../../shared/selection-card-view.model';
     ServiceCardComponent,
     SpecialtyCardComponent,
     TicketPreviewComponent,
+    KeypadInputComponent,
     KioskFooterComponent,
   ],
   templateUrl: './service-request-home.component.html',
@@ -30,6 +33,35 @@ export class ServiceRequestHomeComponent implements OnDestroy {
   protected readonly step = ServiceRequestStep;
 
   private ticketSubscription: Subscription | null = null;
+  private autoRestartTimeoutId: ReturnType<typeof setTimeout> | null = null;
+
+  // Step 0 Language selection state & Keypad user input state & forward history tracking
+  protected readonly isLanguageStepActive = signal<boolean>(false);
+  protected readonly isUserInputStepActive = signal<boolean>(false);
+  protected readonly hasForwardSelection = signal<boolean>(false);
+  private initializedLanguageStep = false;
+
+  constructor() {
+    effect(() => {
+      const behavior = this.store.behavior();
+      if (behavior && !this.initializedLanguageStep) {
+        this.initializedLanguageStep = true;
+        if (behavior.showLanguagePage) {
+          this.isLanguageStepActive.set(true);
+        }
+      }
+    });
+  }
+
+  protected readonly isRtl = computed(() => this.store.direction() === 'rtl');
+
+  protected readonly prevButtonIcon = computed(() =>
+    this.isRtl() ? 'bi-chevron-right' : 'bi-chevron-left',
+  );
+
+  protected readonly nextButtonIcon = computed(() =>
+    this.isRtl() ? 'bi-chevron-left' : 'bi-chevron-right',
+  );
 
   protected readonly serviceCards = computed<readonly SelectionCardViewModel[]>(() =>
     this.store.serviceTypes().map((serviceType) => this.mapServiceTypeCard(serviceType)),
@@ -44,8 +76,24 @@ export class ServiceRequestHomeComponent implements OnDestroy {
   );
 
   protected readonly pageTitle = computed(() => {
+    if (this.store.errorLoadingServices()) {
+      return this.store.translations().errorLoadingTitle;
+    }
+
+    if (this.store.loadingServices()) {
+      return this.store.translations().loadingServicesTitle;
+    }
+
     if (this.store.loadingTicket()) {
       return this.store.translations().loadingTitle;
+    }
+
+    if (this.isLanguageStepActive()) {
+      return this.isRtl() ? 'اختر لغة التواصل' : 'Select Preferred Language';
+    }
+
+    if (this.isUserInputStepActive()) {
+      return this.isRtl() ? 'إدخال بيانات المستخدم' : 'Enter User Information';
     }
 
     const translations = this.store.translations();
@@ -58,13 +106,34 @@ export class ServiceRequestHomeComponent implements OnDestroy {
       case ServiceRequestStep.Ticket:
         return translations.ticketTitle;
       case ServiceRequestStep.ServiceType:
+      default:
         return translations.serviceTypeTitle;
     }
   });
 
   protected readonly pageDescription = computed(() => {
+    if (this.store.errorLoadingServices()) {
+      return this.store.translations().errorLoadingDescription;
+    }
+
+    if (this.store.loadingServices()) {
+      return this.store.translations().loadingServicesDescription;
+    }
+
     if (this.store.loadingTicket()) {
       return this.store.translations().loadingDescription;
+    }
+
+    if (this.isLanguageStepActive()) {
+      return this.isRtl()
+        ? 'يرجى لمس الشاشة لاختيار اللغة المطلوبة للمتابعة.'
+        : 'Please touch the screen to choose your language to continue.';
+    }
+
+    if (this.isUserInputStepActive()) {
+      return this.isRtl()
+        ? 'استخدم لوحة الأرقام لإدخال بياناتك كشرط إضافي قبل طباعة التذكرة.'
+        : 'Use touchscreen keypad to submit user data before printing ticket.';
     }
 
     const translations = this.store.translations();
@@ -77,6 +146,7 @@ export class ServiceRequestHomeComponent implements OnDestroy {
       case ServiceRequestStep.Ticket:
         return translations.ticketDescription;
       case ServiceRequestStep.ServiceType:
+      default:
         return translations.serviceTypeDescription;
     }
   });
@@ -84,8 +154,24 @@ export class ServiceRequestHomeComponent implements OnDestroy {
   protected readonly footerCaption = computed(() => {
     const translations = this.store.translations();
 
+    if (this.store.errorLoadingServices()) {
+      return translations.errorLoadingTitle;
+    }
+
+    if (this.store.loadingServices()) {
+      return translations.loadingServicesTitle;
+    }
+
     if (this.store.loadingTicket()) {
       return translations.loadingTitle;
+    }
+
+    if (this.isLanguageStepActive()) {
+      return translations.languageLabel;
+    }
+
+    if (this.isUserInputStepActive()) {
+      return this.isRtl() ? 'إدخال بيانات المستخدم مطلوب دائماً' : 'User input is mandatory';
     }
 
     switch (this.store.currentStep()) {
@@ -96,24 +182,99 @@ export class ServiceRequestHomeComponent implements OnDestroy {
       case ServiceRequestStep.Ticket:
         return translations.footerTicketPrompt;
       case ServiceRequestStep.ServiceType:
+      default:
         return translations.footerServicePrompt;
     }
   });
 
-  protected readonly canGoBack = computed(
-    () =>
-      this.store.currentStep() !== ServiceRequestStep.ServiceType && !this.store.loadingTicket(),
-  );
+  protected readonly canGoBack = computed(() => {
+    if (this.store.loadingTicket()) {
+      return false;
+    }
 
-  protected readonly showRestart = computed(
-    () =>
-      this.store.selectedServiceType() !== null ||
-      this.store.ticket() !== null ||
-      this.store.loadingTicket(),
-  );
+    if (this.isLanguageStepActive()) {
+      return false;
+    }
+
+    if (this.isUserInputStepActive()) {
+      return true;
+    }
+
+    if (this.store.currentStep() === ServiceRequestStep.ServiceType) {
+      return this.store.behavior()?.showLanguagePage === true;
+    }
+
+    return true;
+  });
+
+  protected readonly canGoForward = computed(() => {
+    if (this.store.loadingTicket()) {
+      return false;
+    }
+
+    if (this.isLanguageStepActive()) {
+      return true;
+    }
+
+    return this.hasForwardSelection();
+  });
+
+  protected readonly currentStepBadgeText = computed(() => {
+    if (this.isLanguageStepActive()) {
+      return this.isRtl() ? 'الخطوة 0: اختيار اللغة' : 'Step 0: Select Language';
+    }
+
+    if (this.isUserInputStepActive()) {
+      return this.isRtl() ? 'خطوة إدخال بيانات المستخدم' : 'User Input Step';
+    }
+
+    switch (this.store.currentStep()) {
+      case ServiceRequestStep.ServiceType:
+        return this.isRtl() ? 'الخطوة 1: اختيار الخدمة' : 'Step 1: Select Service';
+      case ServiceRequestStep.Specialty:
+        return this.isRtl() ? 'الخطوة 2: اختيار القسم / العيادة' : 'Step 2: Select Department';
+      case ServiceRequestStep.SubSpecialty:
+        return this.isRtl() ? 'الخطوة 3: التخصص الفرعي' : 'Step 3: Sub Specialty';
+      case ServiceRequestStep.Ticket:
+        return this.isRtl() ? 'تم إصدار التذكرة بنجاح' : 'Ticket Issued Successfully';
+      default:
+        return this.isRtl() ? 'الخطوة 1: اختيار الخدمة' : 'Step 1: Select Service';
+    }
+  });
+
+  protected readonly currentStepCounterText = computed(() => {
+    const showLang = this.store.behavior()?.showLanguagePage === true;
+    const total = showLang ? 4 : 3;
+
+    if (this.isLanguageStepActive()) {
+      return `1 / ${total}`;
+    }
+
+    if (this.isUserInputStepActive()) {
+      return `* / ${total}`;
+    }
+
+    switch (this.store.currentStep()) {
+      case ServiceRequestStep.ServiceType:
+        return showLang ? `2 / ${total}` : `1 / ${total}`;
+      case ServiceRequestStep.Specialty:
+        return showLang ? `3 / ${total}` : `2 / ${total}`;
+      case ServiceRequestStep.SubSpecialty:
+        return showLang ? `4 / ${total}` : `3 / ${total}`;
+      case ServiceRequestStep.Ticket:
+        return '✓';
+      default:
+        return showLang ? `2 / ${total}` : `1 / ${total}`;
+    }
+  });
 
   ngOnDestroy(): void {
     this.cancelTicketGeneration();
+  }
+
+  protected selectLanguageStep(lang: AppLanguage): void {
+    this.store.setLanguage(lang);
+    this.isLanguageStepActive.set(false);
   }
 
   protected selectServiceType(serviceTypeId: string): void {
@@ -121,7 +282,12 @@ export class ServiceRequestHomeComponent implements OnDestroy {
 
     if (serviceType) {
       this.cancelTicketGeneration();
+      this.hasForwardSelection.set(false);
       this.store.selectServiceType(serviceType);
+
+      if (this.store.availableSpecialties().length === 0 && serviceType.isTicketIssuable === true) {
+        this.handleTicketIssuanceTrigger();
+      }
     }
   }
 
@@ -132,10 +298,11 @@ export class ServiceRequestHomeComponent implements OnDestroy {
       return;
     }
 
+    this.hasForwardSelection.set(false);
     this.store.selectSpecialty(specialty);
 
-    if (specialty.subSpecialties.length === 0) {
-      this.generateTicket();
+    if (specialty.subSpecialties.length === 0 && specialty.isTicketIssuable === true) {
+      this.handleTicketIssuanceTrigger();
     }
   }
 
@@ -146,18 +313,69 @@ export class ServiceRequestHomeComponent implements OnDestroy {
       return;
     }
 
+    this.hasForwardSelection.set(false);
     this.store.selectSubSpecialty(specialty);
+    if (specialty.isTicketIssuable === true) {
+      this.handleTicketIssuanceTrigger();
+    }
+  }
+
+  protected onUserInputConfirmed(_userInput: string): void {
+    this.isUserInputStepActive.set(false);
     this.generateTicket();
+  }
+
+  private handleTicketIssuanceTrigger(): void {
+    if (this.store.behavior()?.alwaysRequireUserInput === true) {
+      this.isUserInputStepActive.set(true);
+    } else {
+      this.generateTicket();
+    }
   }
 
   protected goBack(): void {
     this.cancelTicketGeneration();
+
+    if (this.isUserInputStepActive()) {
+      this.isUserInputStepActive.set(false);
+      return;
+    }
+
+    if (this.store.currentStep() === ServiceRequestStep.ServiceType) {
+      if (this.store.behavior()?.showLanguagePage) {
+        this.isLanguageStepActive.set(true);
+        this.hasForwardSelection.set(true);
+      }
+      return;
+    }
+
+    this.hasForwardSelection.set(true);
     this.store.goBack();
+  }
+
+  protected goNext(): void {
+    if (this.isLanguageStepActive()) {
+      this.isLanguageStepActive.set(false);
+      return;
+    }
+
+    if (this.hasForwardSelection()) {
+      this.hasForwardSelection.set(false);
+    }
   }
 
   protected restart(): void {
     this.cancelTicketGeneration();
+    this.hasForwardSelection.set(false);
+    this.isUserInputStepActive.set(false);
+    if (this.store.behavior()?.showLanguagePage) {
+      this.isLanguageStepActive.set(true);
+    }
     this.store.restart();
+  }
+
+  protected retryLoading(): void {
+    this.store.loadServices();
   }
 
   private generateTicket(): void {
@@ -166,7 +384,15 @@ export class ServiceRequestHomeComponent implements OnDestroy {
     const ticketRequest = this.store.generateTicket();
 
     if (ticketRequest) {
-      this.ticketSubscription = ticketRequest.subscribe();
+      this.ticketSubscription = ticketRequest.subscribe({
+        next: (ticket) => {
+          if (ticket) {
+            this.autoRestartTimeoutId = setTimeout(() => {
+              this.restart();
+            }, 5000);
+          }
+        },
+      });
     }
   }
 
@@ -174,6 +400,10 @@ export class ServiceRequestHomeComponent implements OnDestroy {
     if (this.ticketSubscription) {
       this.ticketSubscription.unsubscribe();
       this.ticketSubscription = null;
+    }
+    if (this.autoRestartTimeoutId !== null) {
+      clearTimeout(this.autoRestartTimeoutId);
+      this.autoRestartTimeoutId = null;
     }
   }
 
@@ -200,6 +430,9 @@ export class ServiceRequestHomeComponent implements OnDestroy {
   }
 
   private createWaitingMeta(minutes: number): string {
+    if (!minutes || minutes <= 0) {
+      return '';
+    }
     return `${minutes} ${this.store.translations().minutesLabel}`;
   }
 }

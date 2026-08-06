@@ -16,7 +16,7 @@ export class TicketPreviewComponent {
   readonly translations = input.required<ServiceRequestTranslations>();
 
   protected readonly serviceType = computed(() => this.ticket().serviceTypeName[this.language()]);
-  protected readonly department = computed(() => this.ticket().departmentName[this.language()]);
+  protected readonly department = computed(() => this.ticket().departmentName?.[this.language()] ?? null);
   protected readonly subSpecialty = computed(() => this.ticket().subSpecialtyName?.[this.language()] ?? null);
   protected readonly counterHint = computed(() => this.ticket().counterHint[this.language()]);
   protected readonly issuedAt = computed(() => this.formatIssuedAt());

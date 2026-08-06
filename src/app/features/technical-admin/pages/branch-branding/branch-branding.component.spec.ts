@@ -142,13 +142,13 @@ describe('BranchBrandingComponent', () => {
     form.dispatchEvent(new Event('submit'));
     fixture.detectChanges();
 
-    expect(updateBranchTheme).toHaveBeenCalledWith(1, {
+    expect(updateBranchTheme).toHaveBeenCalledWith(1, expect.objectContaining({
       mainColor: '#112233',
       secondaryColor: '#0070C4',
       backgroundColor: '#FFFFFF',
       rowVersion: 'branding-version-1',
-    });
-    expect(fixture.nativeElement.textContent).toContain('Theme saved');
+    }));
+    expect(fixture.nativeElement.textContent).toContain('Visual identity and layout settings saved successfully.');
   });
 
   it('keeps theme controls read-only without update permission', () => {
@@ -161,7 +161,7 @@ describe('BranchBrandingComponent', () => {
     expect(
       (
         fixture.nativeElement.querySelector(
-          'input[type="text"][placeholder="#A7060F"]',
+          'input[type="text"][placeholder="#0070C4"]',
         ) as HTMLInputElement
       ).readOnly,
     ).toBe(true);
@@ -175,6 +175,43 @@ function createBranding(): BranchBrandingResponse {
     mainColor: '#A7060F',
     secondaryColor: '#0070C4',
     backgroundColor: '#FFFFFF',
+    headerColor: '#FFFFFF',
+    footerColor: '#FFFFFF',
+    mainTextColor: '#A7060F',
+
+    showLanguagePage: true,
+    defaultLanguageIsArabic: true,
+    alwaysRequireUserInput: false,
+    showServiceNavigationPath: true,
+    allowOperatorSelection: false,
+    allowRequestMoreServices: true,
+
+    languageButtonBackgroundColor: '#0070C4',
+    languageButtonTextColor: '#FFFFFF',
+    languageButtonWidth: 40,
+    languageButtonHeight: 22,
+    languageButtonText: 'اختيار اللغة',
+
+    serviceButtonBackgroundColor: '#0070C4',
+    serviceButtonTextColor: '#FFFFFF',
+    serviceButtonWidth: 40,
+    serviceButtonHeight: 20,
+    serviceButtonSpace: 2,
+    serviceButtonFontSize: 1.8,
+    serviceButtonText: 'اختيار الخدمة',
+
+    keypadButtonBackgroundColor: '#0070C4',
+    keypadButtonTextColor: '#FFFFFF',
+    keypadButtonWidth: 45,
+    keypadButtonHeight: 10,
+    keypadButtonText: 'تأكيد',
+
+    footerButtonBackgroundColor: '#0070C4',
+    footerButtonTextColor: '#FFFFFF',
+    footerButtonWidth: 10,
+    footerButtonHeight: 12,
+    footerButtonText: 'رجوع',
+
     isConfigured: true,
     rowVersion: 'branding-version-1',
     message: null,

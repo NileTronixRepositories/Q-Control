@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
+import { ServiceRequestStore } from '../../store/service-request.store';
 
 @Component({
   selector: 'app-service-request-kiosk-footer',
@@ -7,5 +8,7 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class KioskFooterComponent {
+  protected readonly store = inject(ServiceRequestStore);
+
   readonly caption = input.required<string>();
 }

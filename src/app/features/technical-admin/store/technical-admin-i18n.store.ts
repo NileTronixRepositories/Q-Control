@@ -29,6 +29,17 @@ interface TechnicalAdminTranslations {
   readonly inactiveBranchLabel: string;
   readonly branchEditorLabel: string;
   readonly branchBrandingLabel: string;
+  readonly branchConfigurationLabel: string;
+  readonly branchConfigurationDescription: string;
+  readonly allowedTimeLabel: string;
+  readonly allowedTimeHelp: string;
+  readonly hoursLabel: string;
+  readonly minutesLabel: string;
+  readonly secondsLabel: string;
+  readonly saveConfigurationLabel: string;
+  readonly configurationReadOnlyMessage: string;
+  readonly concurrencyConflictMessage: string;
+  readonly generalBrandLabel: string;
   readonly waitingAreasLabel: string;
   readonly windowsManagementLabel: string;
   readonly terminalsManagementLabel: string;
@@ -124,10 +135,14 @@ interface TechnicalAdminTranslations {
 
 const TECHNICAL_ADMIN_TRANSLATIONS: Record<AppLanguage, TechnicalAdminTranslations> = {
   ar: {
-    closeSidebarLabel: '\u0625\u063a\u0644\u0627\u0642 \u0627\u0644\u0642\u0627\u0626\u0645\u0629 \u0627\u0644\u062c\u0627\u0646\u0628\u064a\u0629',
-    openSidebarLabel: '\u0641\u062a\u062d \u0627\u0644\u0642\u0627\u0626\u0645\u0629 \u0627\u0644\u062c\u0627\u0646\u0628\u064a\u0629',
-    navigationLabel: '\u0635\u0641\u062d\u0627\u062a \u0627\u0644\u0645\u0633\u0624\u0648\u0644 \u0627\u0644\u062a\u0642\u0646\u064a',
-    accountActionsLabel: '\u0625\u062c\u0631\u0627\u0621\u0627\u062a \u0627\u0644\u062d\u0633\u0627\u0628',
+    closeSidebarLabel:
+      '\u0625\u063a\u0644\u0627\u0642 \u0627\u0644\u0642\u0627\u0626\u0645\u0629 \u0627\u0644\u062c\u0627\u0646\u0628\u064a\u0629',
+    openSidebarLabel:
+      '\u0641\u062a\u062d \u0627\u0644\u0642\u0627\u0626\u0645\u0629 \u0627\u0644\u062c\u0627\u0646\u0628\u064a\u0629',
+    navigationLabel:
+      '\u0635\u0641\u062d\u0627\u062a \u0627\u0644\u0645\u0633\u0624\u0648\u0644 \u0627\u0644\u062a\u0642\u0646\u064a',
+    accountActionsLabel:
+      '\u0625\u062c\u0631\u0627\u0621\u0627\u062a \u0627\u0644\u062d\u0633\u0627\u0628',
     topbarEyebrow: '\u0644\u0648\u062d\u0629 \u0627\u0644\u062a\u062d\u0643\u0645',
     topbarTitle: '\u0627\u0644\u0645\u0633\u0624\u0648\u0644 \u0627\u0644\u062a\u0642\u0646\u064a',
     languageButtonLabel: 'English',
@@ -137,67 +152,108 @@ const TECHNICAL_ADMIN_TRANSLATIONS: Record<AppLanguage, TechnicalAdminTranslatio
     branchAdminRoleLabel: 'مسؤول فرع',
     organizationAdminRoleLabel: 'مسؤول مؤسسة',
     themeConfigurationLabel: 'الهوية البصرية والإعدادات',
+    branchEditorLabel: 'محرر الفروع',
+    branchBrandingLabel: 'الهوية والإعلانات',
+    branchConfigurationLabel: 'إعدادات أوقات الفرع',
+    branchConfigurationDescription:
+      'إعداد المدة المسموح بها لظهور الخدمات في شاشة إصدار التذاكر قبل موعد بدايتها.',
+    allowedTimeLabel: 'المدة المسموح بها قبل بداية الخدمة',
+    allowedTimeHelp:
+      'تحدد هذه المدة الوقت الذي تظهر خلاله الخدمة قبل موعد بدايتها في شاشة إصدار التذاكر.',
+    hoursLabel: 'ساعات',
+    minutesLabel: 'دقائق',
+    secondsLabel: 'ثواني',
+    saveConfigurationLabel: 'حفظ الإعدادات',
+    configurationReadOnlyMessage:
+      'أنت تملك صلاحية العرض فقط. لا يمكنك إدخال تعديلات على هذه الإعدادات.',
+    concurrencyConflictMessage:
+      'قام مستخدم آخر بتحديث هذه الإعدادات. تم إعادة تحميل أحدث البيانات؛ يُرجى المراجعة والمحاولة مرة أخرى.',
+    generalBrandLabel: 'الهوية البصرية العامة',
     generalLabel: '\u0639\u0627\u0645',
     serviceRequestLabel: '\u0637\u0644\u0628 \u0627\u0644\u062e\u062f\u0645\u0629',
     branchManagementLabel: '\u0625\u062f\u0627\u0631\u0629 \u0627\u0644\u0641\u0631\u0648\u0639',
-    selectedBranchLabel: '\u0627\u0644\u0641\u0631\u0639 \u0627\u0644\u0645\u062e\u062a\u0627\u0631',
+    selectedBranchLabel:
+      '\u0627\u0644\u0641\u0631\u0639 \u0627\u0644\u0645\u062e\u062a\u0627\u0631',
     branchNavigationLabel: '\u062a\u0646\u0642\u0644 \u0627\u0644\u0641\u0631\u0639',
-    openBranchNavigationLabel: '\u0641\u062a\u062d \u0642\u0627\u0626\u0645\u0629 \u0627\u0644\u0641\u0631\u0639',
-    closeBranchNavigationLabel: '\u0625\u063a\u0644\u0627\u0642 \u0642\u0627\u0626\u0645\u0629 \u0627\u0644\u0641\u0631\u0639',
-    backToBranchesLabel: '\u0627\u0644\u0639\u0648\u062f\u0629 \u0625\u0644\u0649 \u0627\u0644\u0641\u0631\u0648\u0639',
+    openBranchNavigationLabel:
+      '\u0641\u062a\u062d \u0642\u0627\u0626\u0645\u0629 \u0627\u0644\u0641\u0631\u0639',
+    closeBranchNavigationLabel:
+      '\u0625\u063a\u0644\u0627\u0642 \u0642\u0627\u0626\u0645\u0629 \u0627\u0644\u0641\u0631\u0639',
+    backToBranchesLabel:
+      '\u0627\u0644\u0639\u0648\u062f\u0629 \u0625\u0644\u0649 \u0627\u0644\u0641\u0631\u0648\u0639',
     activeBranchLabel: '\u0646\u0634\u0637',
     inactiveBranchLabel: '\u063a\u064a\u0631 \u0646\u0634\u0637',
-    branchEditorLabel: '\u0645\u062d\u0631\u0631 \u0627\u0644\u0641\u0631\u0648\u0639',
-    branchBrandingLabel: '\u0627\u0644\u0647\u0648\u064a\u0629 \u0648\u0627\u0644\u0625\u0639\u0644\u0627\u0646\u0627\u062a',
-    waitingAreasLabel: '\u0645\u0646\u0627\u0637\u0642 \u0627\u0644\u0627\u0646\u062a\u0638\u0627\u0631',
+    waitingAreasLabel:
+      '\u0645\u0646\u0627\u0637\u0642 \u0627\u0644\u0627\u0646\u062a\u0638\u0627\u0631',
     windowsManagementLabel: 'أماكن الخدمات',
-    terminalsManagementLabel: '\u0627\u0644\u062c\u0647\u0627\u0632\u0627\u062a \u0627\u0644\u0637\u0631\u0641\u064a\u0629',
+    terminalsManagementLabel:
+      '\u0627\u0644\u062c\u0647\u0627\u0632\u0627\u062a \u0627\u0644\u0637\u0631\u0641\u064a\u0629',
     displaysManagementLabel: '\u0627\u0644\u0634\u0627\u0634\u0627\u062a',
-    onlineMonitoringLabel: '\u0627\u0644\u0645\u0631\u0627\u0642\u0628\u0629 \u0627\u0644\u0645\u0628\u0627\u0634\u0631\u0629',
-    savedSuccessfullyLabel: '\u062a\u0645 \u0627\u0644\u062d\u0641\u0638 \u0628\u0646\u062c\u0627\u062d',
+    onlineMonitoringLabel:
+      '\u0627\u0644\u0645\u0631\u0627\u0642\u0628\u0629 \u0627\u0644\u0645\u0628\u0627\u0634\u0631\u0629',
+    savedSuccessfullyLabel:
+      '\u062a\u0645 \u0627\u0644\u062d\u0641\u0638 \u0628\u0646\u062c\u0627\u062d',
     generalDescription: 'إدارة ألوان الهوية البصرية وصور الإعلانات.',
     mainLabel: '\u0627\u0644\u0631\u0626\u064a\u0633',
     secondaryLabel: '\u0627\u0644\u062b\u0627\u0646\u0648\u064a',
     backgroundLabel: '\u0627\u0644\u062e\u0644\u0641\u064a\u0629',
     advertisementLabel: '\u0627\u0644\u0625\u0639\u0644\u0627\u0646',
-    setAdvertiseImagesLabel: '\u062a\u062d\u062f\u064a\u062f \u0635\u0648\u0631 \u0627\u0644\u0625\u0639\u0644\u0627\u0646\u0627\u062a',
+    setAdvertiseImagesLabel:
+      '\u062a\u062d\u062f\u064a\u062f \u0635\u0648\u0631 \u0627\u0644\u0625\u0639\u0644\u0627\u0646\u0627\u062a',
     saveGeneralThemeLabel: 'حفظ الهوية البصرية العامة',
-    serviceRequestDescription: '\u0625\u0639\u062f\u0627\u062f \u0633\u0644\u0648\u0643 \u0634\u0627\u0634\u0629 \u0637\u0644\u0628 \u0627\u0644\u062e\u062f\u0645\u0629 \u0648\u0623\u0644\u0648\u0627\u0646\u0647\u0627 \u0648\u0623\u062d\u062c\u0627\u0645 \u0623\u0632\u0631\u0627\u0631\u0647\u0627.',
+    serviceRequestDescription:
+      '\u0625\u0639\u062f\u0627\u062f \u0633\u0644\u0648\u0643 \u0634\u0627\u0634\u0629 \u0637\u0644\u0628 \u0627\u0644\u062e\u062f\u0645\u0629 \u0648\u0623\u0644\u0648\u0627\u0646\u0647\u0627 \u0648\u0623\u062d\u062c\u0627\u0645 \u0623\u0632\u0631\u0627\u0631\u0647\u0627.',
     generalSectionLabel: '\u0639\u0627\u0645',
     screenColorsLabel: '\u0623\u0644\u0648\u0627\u0646 \u0627\u0644\u0634\u0627\u0634\u0629',
     buttonsLabel: '\u0627\u0644\u0623\u0632\u0631\u0627\u0631',
     backgroundColorLabel: '\u0644\u0648\u0646 \u0627\u0644\u062e\u0644\u0641\u064a\u0629',
     headerColorLabel: '\u0644\u0648\u0646 \u0627\u0644\u0647\u064a\u062f\u0631',
     footerColorLabel: '\u0644\u0648\u0646 \u0627\u0644\u0641\u0648\u062a\u0631',
-    mainTextColorLabel: '\u0644\u0648\u0646 \u0627\u0644\u0646\u0635 \u0627\u0644\u0631\u0626\u064a\u0633',
+    mainTextColorLabel:
+      '\u0644\u0648\u0646 \u0627\u0644\u0646\u0635 \u0627\u0644\u0631\u0626\u064a\u0633',
     textColorLabel: '\u0644\u0648\u0646 \u0627\u0644\u0646\u0635',
     widthLabel: '\u0627\u0644\u0639\u0631\u0636',
     heightLabel: '\u0627\u0644\u0627\u0631\u062a\u0641\u0627\u0639',
     spaceLabel: '\u0627\u0644\u0645\u0633\u0627\u0641\u0629',
     fontSizeLabel: '\u062d\u062c\u0645 \u0627\u0644\u062e\u0637',
-    saveServiceRequestLabel: '\u062d\u0641\u0638 \u0637\u0644\u0628 \u0627\u0644\u062e\u062f\u0645\u0629',
-    showLanguagePageLabel: '\u0625\u0638\u0647\u0627\u0631 \u0635\u0641\u062d\u0629 \u0627\u0644\u0644\u063a\u0629.',
-    defaultLanguageArabicLabel: '\u0627\u0644\u0644\u063a\u0629 \u0627\u0644\u0627\u0641\u062a\u0631\u0627\u0636\u064a\u0629 \u0639\u0631\u0628\u064a.',
-    alwaysRequireUserInputLabel: '\u062f\u0627\u0626\u0645\u0627 \u064a\u062a\u0637\u0644\u0628 \u0625\u062f\u062e\u0627\u0644 \u0627\u0644\u0645\u0633\u062a\u062e\u062f\u0645.',
-    showServiceNavigationPathLabel: '\u0625\u0638\u0647\u0627\u0631 \u0645\u0633\u0627\u0631 \u0627\u0644\u062e\u062f\u0645\u0629.',
-    allowOperatorSelectionLabel: '\u0627\u0644\u0633\u0645\u0627\u062d \u0628\u0627\u062e\u062a\u064a\u0627\u0631 \u0627\u0644\u0645\u0634\u063a\u0644.',
-    allowRequestMoreServicesLabel: '\u0627\u0644\u0633\u0645\u0627\u062d \u0628\u0637\u0644\u0628 \u062e\u062f\u0645\u0627\u062a \u0623\u0643\u062b\u0631.',
+    saveServiceRequestLabel:
+      '\u062d\u0641\u0638 \u0637\u0644\u0628 \u0627\u0644\u062e\u062f\u0645\u0629',
+    showLanguagePageLabel:
+      '\u0625\u0638\u0647\u0627\u0631 \u0635\u0641\u062d\u0629 \u0627\u0644\u0644\u063a\u0629.',
+    defaultLanguageArabicLabel:
+      '\u0627\u0644\u0644\u063a\u0629 \u0627\u0644\u0627\u0641\u062a\u0631\u0627\u0636\u064a\u0629 \u0639\u0631\u0628\u064a.',
+    alwaysRequireUserInputLabel:
+      '\u062f\u0627\u0626\u0645\u0627 \u064a\u062a\u0637\u0644\u0628 \u0625\u062f\u062e\u0627\u0644 \u0627\u0644\u0645\u0633\u062a\u062e\u062f\u0645.',
+    showServiceNavigationPathLabel:
+      '\u0625\u0638\u0647\u0627\u0631 \u0645\u0633\u0627\u0631 \u0627\u0644\u062e\u062f\u0645\u0629.',
+    allowOperatorSelectionLabel:
+      '\u0627\u0644\u0633\u0645\u0627\u062d \u0628\u0627\u062e\u062a\u064a\u0627\u0631 \u0627\u0644\u0645\u0634\u063a\u0644.',
+    allowRequestMoreServicesLabel:
+      '\u0627\u0644\u0633\u0645\u0627\u062d \u0628\u0637\u0644\u0628 \u062e\u062f\u0645\u0627\u062a \u0623\u0643\u062b\u0631.',
     languageButtonsLabel: '\u0623\u0632\u0631\u0627\u0631 \u0627\u0644\u0644\u063a\u0629',
-    serviceButtonsLabel: '\u0623\u0632\u0631\u0627\u0631 \u0627\u0644\u062e\u062f\u0645\u0627\u062a',
-    keypadButtonsLabel: '\u0623\u0632\u0631\u0627\u0631 \u0644\u0648\u062d\u0629 \u0627\u0644\u0623\u0631\u0642\u0627\u0645',
+    serviceButtonsLabel:
+      '\u0623\u0632\u0631\u0627\u0631 \u0627\u0644\u062e\u062f\u0645\u0627\u062a',
+    keypadButtonsLabel:
+      '\u0623\u0632\u0631\u0627\u0631 \u0644\u0648\u062d\u0629 \u0627\u0644\u0623\u0631\u0642\u0627\u0645',
     footerButtonsLabel: '\u0623\u0632\u0631\u0627\u0631 \u0627\u0644\u0641\u0648\u062a\u0631',
-    branchEditorDescription: '\u0625\u062f\u0627\u0631\u0629 \u0628\u064a\u0627\u0646\u0627\u062a \u0627\u0644\u0641\u0631\u0648\u0639 \u0648\u062d\u0627\u0644\u062a\u0647\u0627 \u0648\u0639\u062f\u0627\u062f\u0627\u062a \u0627\u0644\u062e\u062f\u0645\u0629.',
-    monitoringDescription: '\u0645\u062a\u0627\u0628\u0639\u0629 \u0627\u062a\u0635\u0627\u0644 \u0627\u0644\u0641\u0631\u0648\u0639 \u0648\u0627\u0644\u062a\u0630\u0627\u0643\u0631 \u0627\u0644\u0646\u0634\u0637\u0629 \u0648\u062a\u0648\u0641\u0631 \u0627\u0644\u062e\u062f\u0645\u0629.',
+    branchEditorDescription:
+      '\u0625\u062f\u0627\u0631\u0629 \u0628\u064a\u0627\u0646\u0627\u062a \u0627\u0644\u0641\u0631\u0648\u0639 \u0648\u062d\u0627\u0644\u062a\u0647\u0627 \u0648\u0639\u062f\u0627\u062f\u0627\u062a \u0627\u0644\u062e\u062f\u0645\u0629.',
+    monitoringDescription:
+      '\u0645\u062a\u0627\u0628\u0639\u0629 \u0627\u062a\u0635\u0627\u0644 \u0627\u0644\u0641\u0631\u0648\u0639 \u0648\u0627\u0644\u062a\u0630\u0627\u0643\u0631 \u0627\u0644\u0646\u0634\u0637\u0629 \u0648\u062a\u0648\u0641\u0631 \u0627\u0644\u062e\u062f\u0645\u0629.',
     totalBranchesLabel: '\u0625\u062c\u0645\u0627\u0644\u064a \u0627\u0644\u0641\u0631\u0648\u0639',
-    activeBranchesLabel: '\u0627\u0644\u0641\u0631\u0648\u0639 \u0627\u0644\u0646\u0634\u0637\u0629',
+    activeBranchesLabel:
+      '\u0627\u0644\u0641\u0631\u0648\u0639 \u0627\u0644\u0646\u0634\u0637\u0629',
     maintenanceLabel: '\u0635\u064a\u0627\u0646\u0629',
     inactiveLabel: '\u063a\u064a\u0631 \u0646\u0634\u0637',
     onlineBranchesLabel: '\u0641\u0631\u0648\u0639 \u0645\u062a\u0635\u0644\u0629',
     delayedHeartbeatLabel: '\u062a\u0623\u062e\u0631 \u0627\u0644\u0627\u062a\u0635\u0627\u0644',
-    offlineBranchesLabel: '\u0641\u0631\u0648\u0639 \u063a\u064a\u0631 \u0645\u062a\u0635\u0644\u0629',
-    ticketsWaitingLabel: '\u062a\u0630\u0627\u0643\u0631 \u0641\u064a \u0627\u0644\u0627\u0646\u062a\u0638\u0627\u0631',
+    offlineBranchesLabel:
+      '\u0641\u0631\u0648\u0639 \u063a\u064a\u0631 \u0645\u062a\u0635\u0644\u0629',
+    ticketsWaitingLabel:
+      '\u062a\u0630\u0627\u0643\u0631 \u0641\u064a \u0627\u0644\u0627\u0646\u062a\u0638\u0627\u0631',
     branchesLabel: '\u0627\u0644\u0641\u0631\u0648\u0639',
-    branchRecordsHint: '\u0625\u062f\u0627\u0631\u0629 \u0628\u064a\u0627\u0646\u0627\u062a \u0627\u0644\u0641\u0631\u0648\u0639 \u0648\u062a\u062d\u062f\u064a\u062b\u0647\u0627 \u0645\u0646 \u062e\u062f\u0645\u0629 \u0627\u0644\u0641\u0631\u0648\u0639.',
+    branchRecordsHint:
+      '\u0625\u062f\u0627\u0631\u0629 \u0628\u064a\u0627\u0646\u0627\u062a \u0627\u0644\u0641\u0631\u0648\u0639 \u0648\u062a\u062d\u062f\u064a\u062b\u0647\u0627 \u0645\u0646 \u062e\u062f\u0645\u0629 \u0627\u0644\u0641\u0631\u0648\u0639.',
     addBranchLabel: '\u0625\u0636\u0627\u0641\u0629 \u0641\u0631\u0639',
     searchLabel: '\u0628\u062d\u062b',
     cityLabel: '\u0627\u0644\u0645\u062f\u064a\u0646\u0629',
@@ -208,18 +264,26 @@ const TECHNICAL_ADMIN_TRANSLATIONS: Record<AppLanguage, TechnicalAdminTranslatio
     branchLabel: '\u0627\u0644\u0641\u0631\u0639',
     countersLabel: '\u0627\u0644\u0634\u0628\u0627\u0628\u064a\u0643',
     servicesLabel: '\u0627\u0644\u062e\u062f\u0645\u0627\u062a',
-    serviceManagementLabel: '\u0625\u062f\u0627\u0631\u0629 \u0627\u0644\u062e\u062f\u0645\u0627\u062a',
+    serviceManagementLabel:
+      '\u0625\u062f\u0627\u0631\u0629 \u0627\u0644\u062e\u062f\u0645\u0627\u062a',
     branchServicesLabel: '\u062e\u062f\u0645\u0627\u062a \u0627\u0644\u0641\u0631\u0639',
-    serviceWorkflowsLabel: '\u0645\u0633\u0627\u0631\u0627\u062a \u0627\u0644\u062e\u062f\u0645\u0627\u062a',
-    serviceSchedulesLabel: '\u062c\u062f\u0627\u0648\u0644 \u0627\u0644\u062e\u062f\u0645\u0627\u062a',
-    globalizationRequestsLabel: '\u0637\u0644\u0628\u0627\u062a \u0627\u0639\u062a\u0645\u0627\u062f \u0627\u0644\u062e\u062f\u0645\u0627\u062a',
-    centralServiceTreeLabel: '\u0634\u062c\u0631\u0629 \u0627\u0644\u062e\u062f\u0645\u0627\u062a \u0627\u0644\u0645\u0631\u0643\u0632\u064a\u0629',
+    serviceWorkflowsLabel:
+      '\u0645\u0633\u0627\u0631\u0627\u062a \u0627\u0644\u062e\u062f\u0645\u0627\u062a',
+    serviceSchedulesLabel:
+      '\u062c\u062f\u0627\u0648\u0644 \u0627\u0644\u062e\u062f\u0645\u0627\u062a',
+    globalizationRequestsLabel:
+      '\u0637\u0644\u0628\u0627\u062a \u0627\u0639\u062a\u0645\u0627\u062f \u0627\u0644\u062e\u062f\u0645\u0627\u062a',
+    centralServiceTreeLabel:
+      '\u0634\u062c\u0631\u0629 \u0627\u0644\u062e\u062f\u0645\u0627\u062a \u0627\u0644\u0645\u0631\u0643\u0632\u064a\u0629',
     managerLabel: '\u0627\u0644\u0645\u062f\u064a\u0631',
-    liveBranchStatusLabel: '\u062d\u0627\u0644\u0629 \u0627\u0644\u0641\u0631\u0648\u0639 \u0627\u0644\u062d\u064a\u0629',
-    monitoringHint: '\u0644\u0642\u0637\u0629 \u062a\u062c\u0631\u064a\u0628\u064a\u0629 \u0644\u0627\u062a\u0635\u0627\u0644 \u0627\u0644\u0641\u0631\u0648\u0639 \u0648\u0646\u0634\u0627\u0637 \u0627\u0644\u0637\u0648\u0627\u0628\u064a\u0631. ',
+    liveBranchStatusLabel:
+      '\u062d\u0627\u0644\u0629 \u0627\u0644\u0641\u0631\u0648\u0639 \u0627\u0644\u062d\u064a\u0629',
+    monitoringHint:
+      '\u0644\u0642\u0637\u0629 \u062a\u062c\u0631\u064a\u0628\u064a\u0629 \u0644\u0627\u062a\u0635\u0627\u0644 \u0627\u0644\u0641\u0631\u0648\u0639 \u0648\u0646\u0634\u0627\u0637 \u0627\u0644\u0637\u0648\u0627\u0628\u064a\u0631. ',
     refreshLabel: '\u062a\u062d\u062f\u064a\u062b',
     activeTicketsLabel: '\u062a\u0630\u0627\u0643\u0631 \u0646\u0634\u0637\u0629',
-    servedTodayLabel: '\u062a\u0645\u062a \u062e\u062f\u0645\u062a\u0647\u0627 \u0627\u0644\u064a\u0648\u0645',
+    servedTodayLabel:
+      '\u062a\u0645\u062a \u062e\u062f\u0645\u062a\u0647\u0627 \u0627\u0644\u064a\u0648\u0645',
     avgWaitLabel: '\u0645\u062a\u0648\u0633\u0637 \u0627\u0644\u0627\u0646\u062a\u0638\u0627\u0631',
     sortLabel: '\u0627\u0644\u062a\u0631\u062a\u064a\u0628',
     newestLabel: '\u0627\u0644\u0623\u062d\u062f\u062b',
@@ -227,19 +291,24 @@ const TECHNICAL_ADMIN_TRANSLATIONS: Record<AppLanguage, TechnicalAdminTranslatio
     pageSizeLabel: '\u062d\u062c\u0645 \u0627\u0644\u0635\u0641\u062d\u0629',
     previousLabel: '\u0627\u0644\u0633\u0627\u0628\u0642',
     nextLabel: '\u0627\u0644\u062a\u0627\u0644\u064a',
-    totalItemsLabel: '\u0625\u062c\u0645\u0627\u0644\u064a \u0627\u0644\u0639\u0646\u0627\u0635\u0631',
+    totalItemsLabel:
+      '\u0625\u062c\u0645\u0627\u0644\u064a \u0627\u0644\u0639\u0646\u0627\u0635\u0631',
     loadingLabel: '\u062c\u0627\u0631\u064a \u0627\u0644\u062a\u062d\u0645\u064a\u0644...',
-    apiFallbackLabel: '\u062a\u0639\u0630\u0631 \u0627\u0644\u0627\u062a\u0635\u0627\u0644 \u0628\u062e\u062f\u0645\u0629 \u0627\u0644\u0641\u0631\u0648\u0639.',
-    emptyBranchesLabel: '\u0644\u0627 \u062a\u0648\u062c\u062f \u0641\u0631\u0648\u0639 \u0645\u0637\u0627\u0628\u0642\u0629.',
+    apiFallbackLabel:
+      '\u062a\u0639\u0630\u0631 \u0627\u0644\u0627\u062a\u0635\u0627\u0644 \u0628\u062e\u062f\u0645\u0629 \u0627\u0644\u0641\u0631\u0648\u0639.',
+    emptyBranchesLabel:
+      '\u0644\u0627 \u062a\u0648\u062c\u062f \u0641\u0631\u0648\u0639 \u0645\u0637\u0627\u0628\u0642\u0629.',
     ipAddressLabel: 'IP Address',
     arabicNameLabel: '\u0627\u0644\u0627\u0633\u0645 \u0627\u0644\u0639\u0631\u0628\u064a',
-    englishNameLabel: '\u0627\u0644\u0627\u0633\u0645 \u0627\u0644\u0625\u0646\u062c\u0644\u064a\u0632\u064a',
+    englishNameLabel:
+      '\u0627\u0644\u0627\u0633\u0645 \u0627\u0644\u0625\u0646\u062c\u0644\u064a\u0632\u064a',
     governorateLabel: '\u0627\u0644\u0645\u062d\u0627\u0641\u0638\u0629',
-    updatesAvailableLabel: '\u062a\u062d\u062f\u064a\u062b\u0627\u062a \u0645\u062a\u0627\u062d\u0629',
+    updatesAvailableLabel:
+      '\u062a\u062d\u062f\u064a\u062b\u0627\u062a \u0645\u062a\u0627\u062d\u0629',
     lastUpdatedLabel: '\u0622\u062e\u0631 \u062a\u062d\u062f\u064a\u062b',
     createdByLabel: '\u0623\u0646\u0634\u0626 \u0628\u0648\u0627\u0633\u0637\u0629',
     yesLabel: '\u0646\u0639\u0645',
-    noLabel: '\u0644\u0627'
+    noLabel: '\u0644\u0627',
   },
   en: {
     closeSidebarLabel: 'Close sidebar',
@@ -267,6 +336,21 @@ const TECHNICAL_ADMIN_TRANSLATIONS: Record<AppLanguage, TechnicalAdminTranslatio
     inactiveBranchLabel: 'Inactive',
     branchEditorLabel: 'Branch Editor',
     branchBrandingLabel: 'Branding & Advertisements',
+    branchConfigurationLabel: 'Branch Configuration',
+    branchConfigurationDescription:
+      'Configure how early services appear on the ticket issuance screen before their scheduled start time.',
+    allowedTimeLabel: 'Allowed Time Before Service Start',
+    allowedTimeHelp:
+      'Defines how early a service appears on the ticket issuance screen before its scheduled start time.',
+    hoursLabel: 'Hours',
+    minutesLabel: 'Minutes',
+    secondsLabel: 'Seconds',
+    saveConfigurationLabel: 'Save Configuration',
+    configurationReadOnlyMessage:
+      'You have view-only access. Modification of these configuration settings is disabled.',
+    concurrencyConflictMessage:
+      'Another user modified this configuration. The latest data has been reloaded; please review and try saving again.',
+    generalBrandLabel: 'General Brand',
     waitingAreasLabel: 'Waiting Areas',
     windowsManagementLabel: 'Service Locations',
     terminalsManagementLabel: 'Terminals',
@@ -371,7 +455,9 @@ export class TechnicalAdminI18nStore {
 
   readonly language = this.appLanguageStore.language;
   readonly direction = this.appLanguageStore.direction;
-  readonly translations = computed(() => TECHNICAL_ADMIN_TRANSLATIONS[this.appLanguageStore.language()]);
+  readonly translations = computed(
+    () => TECHNICAL_ADMIN_TRANSLATIONS[this.appLanguageStore.language()],
+  );
 
   toggleLanguage(): void {
     this.appLanguageStore.toggleLanguage();

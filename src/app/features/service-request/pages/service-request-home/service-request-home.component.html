@@ -2,140 +2,267 @@
   class="service-request-kiosk"
   [attr.dir]="store.direction()"
   [attr.lang]="store.language()"
+  [style.--kiosk-main-color]="store.theme()?.mainColor || null"
+  [style.--kiosk-secondary-color]="store.theme()?.secondaryColor || null"
+  [style.--kiosk-background-color]="store.theme()?.backgroundColor || null"
+  [style.--kiosk-header-color]="store.theme()?.headerColor || null"
+  [style.--kiosk-footer-color]="store.theme()?.footerColor || null"
+  [style.--kiosk-main-text-color]="store.theme()?.mainTextColor || null"
+  [style.--kiosk-lang-btn-bg]="store.languageButton()?.backgroundColor || null"
+  [style.--kiosk-lang-btn-text]="store.languageButton()?.textColor || null"
+  [style.--kiosk-lang-btn-w]="
+    store.languageButton()?.width ? store.languageButton()?.width + '%' : null
+  "
+  [style.--kiosk-lang-btn-h]="
+    store.languageButton()?.height ? store.languageButton()?.height + 'vh' : null
+  "
+  [style.--kiosk-srv-btn-bg]="store.serviceButton()?.backgroundColor || null"
+  [style.--kiosk-srv-btn-text]="store.serviceButton()?.textColor || null"
+  [style.--kiosk-srv-btn-w]="
+    store.serviceButton()?.width ? store.serviceButton()?.width + '%' : null
+  "
+  [style.--kiosk-srv-btn-h]="
+    store.serviceButton()?.height ? store.serviceButton()?.height + 'vh' : null
+  "
+  [style.--kiosk-srv-btn-space]="
+    store.serviceButton()?.space != null ? store.serviceButton()?.space + '%' : null
+  "
+  [style.--kiosk-srv-btn-font-size]="
+    store.serviceButton()?.fontSize ? store.serviceButton()?.fontSize + 'rem' : null
+  "
+  [style.--kiosk-keypad-btn-bg]="store.keypadButton()?.backgroundColor || null"
+  [style.--kiosk-keypad-btn-text]="store.keypadButton()?.textColor || null"
+  [style.--kiosk-keypad-btn-w]="
+    store.keypadButton()?.width ? store.keypadButton()?.width + '%' : null
+  "
+  [style.--kiosk-keypad-btn-h]="
+    store.keypadButton()?.height ? store.keypadButton()?.height + '%' : null
+  "
+  [style.--kiosk-footer-btn-bg]="store.footerButton()?.backgroundColor || null"
+  [style.--kiosk-footer-btn-text]="store.footerButton()?.textColor || null"
+  [style.--kiosk-footer-btn-w]="
+    store.footerButton()?.width ? store.footerButton()?.width + '%' : null
+  "
+  [style.--kiosk-footer-btn-h]="
+    store.footerButton()?.height ? store.footerButton()?.height + '%' : null
+  "
 >
-  <div class="service-request-kiosk__shell container-fluid">
+  <div class="service-request-kiosk__shell container-fluid p-3 d-flex flex-column h-100">
+    <!-- KIOSK BRAND HEADER -->
     <app-service-request-kiosk-header
+      [logoUrl]="store.logoUrl()"
       [logoLabel]="store.translations().logoLabel"
       [title]="store.translations().kioskTitle"
       [subtitle]="store.translations().kioskSubtitle"
       [languageLabel]="store.translations().languageLabel"
       [languages]="store.languages"
       [selectedLanguage]="store.language()"
+      [languageButtonConfig]="store.languageButton()"
+      [showLanguagePage]="store.behavior()?.showLanguagePage !== false"
+      [stepItems]="store.stepItems()"
+      [isRtl]="isRtl()"
+      [showNavigationPath]="store.behavior()?.showServiceNavigationPath !== false"
       (languageChange)="store.setLanguage($event)"
     />
 
-    @if (canGoBack() || showRestart()) {
-      <section class="service-request-actions" aria-label="Request actions">
-        <div class="service-request-actions__side service-request-actions__side--start">
-          @if (canGoBack()) {
-            <button
-              type="button"
-              class="service-request-actions__button service-request-actions__button--secondary"
-              (click)="goBack()"
-            >
-              <i class="bi bi-chevron-left" aria-hidden="true"></i>
-              <span>{{ store.translations().backLabel }}</span>
-            </button>
-          }
-        </div>
-
-        <div class="service-request-actions__side service-request-actions__side--end">
-          @if (showRestart()) {
-            <button
-              type="button"
-              class="service-request-actions__button service-request-actions__button--primary"
-              [disabled]="store.loadingTicket()"
-              (click)="restart()"
-            >
-              <i class="bi bi-arrow-clockwise" aria-hidden="true"></i>
-              <span>{{ store.translations().restartLabel }}</span>
-            </button>
-          }
-        </div>
-      </section>
-    }
-
-    <main class="service-request-kiosk__main">
-      <ol class="service-request-stepper" aria-label="Request progress">
-        @for (stepItem of store.stepItems(); track stepItem.id) {
-          <li
-            class="service-request-stepper__item"
-            [class.is-active]="stepItem.status === 'active'"
-            [class.is-completed]="stepItem.status === 'completed'"
-          >
-            <span class="service-request-stepper__marker">
-              @if (stepItem.status === 'completed') {
-                <i class="bi bi-check2" aria-hidden="true"></i>
-              }
-            </span>
-
-            <span class="service-request-stepper__label">
-              {{ stepItem.label }}
-            </span>
-          </li>
-        }
-      </ol>
-
-      <section class="service-request-panel">
-        <div class="service-request-panel__heading">
-          <h2>
-            {{ pageTitle() }}
-          </h2>
-
-          <p>
-            {{ pageDescription() }}
-          </p>
-        </div>
-
-        @if (store.loadingTicket()) {
-          <div class="service-request-loading" role="status" aria-live="polite">
-            <span class="service-request-loading__spinner" aria-hidden="true"></span>
-            <strong>{{ store.translations().loadingTitle }}</strong>
-            <span>{{ store.translations().loadingDescription }}</span>
-          </div>
-        } @else {
-          @switch (store.currentStep()) {
-            @case (step.ServiceType) {
-              <div class="row g-2 g-lg-3 justify-content-center">
-                @for (card of serviceCards(); track card.id) {
-                  <div class="col-12 col-sm-6 col-lg-4">
-                    <app-service-request-service-card
-                      [card]="card"
-                      (selected)="selectServiceType($event)"
-                    />
-                  </div>
-                }
-              </div>
-            }
-
-            @case (step.Specialty) {
-              <div class="row g-2 g-lg-3 justify-content-center">
-                @for (card of specialtyCards(); track card.id) {
-                  <div class="col-12 col-sm-6 col-lg-4">
-                    <app-service-request-specialty-card
-                      [card]="card"
-                      (selected)="selectSpecialty($event)"
-                    />
-                  </div>
-                }
-              </div>
-            }
-
-            @case (step.SubSpecialty) {
-              <div class="row g-2 g-lg-3 justify-content-center">
-                @for (card of subSpecialtyCards(); track card.id) {
-                  <div class="col-12 col-sm-6 col-lg-4">
-                    <app-service-request-specialty-card
-                      [card]="card"
-                      (selected)="selectSubSpecialty($event)"
-                    />
-                  </div>
-                }
-              </div>
-            }
-
-            @case (step.Ticket) {
-              @if (store.ticket(); as ticket) {
-                <app-service-request-ticket-preview
-                  [ticket]="ticket"
-                  [language]="store.language()"
-                  [translations]="store.translations()"
+    <!-- MAIN TOUCHSCREEN KIOSK AREA -->
+    <main class="service-request-kiosk__main flex-grow-1 min-height-0">
+      <div class="row w-100 h-100 m-0 g-3 align-items-stretch">
+        <!-- COL 4 — BRAND LOGO PILLAR -->
+        <div class="col-4 h-100 p-0">
+          <div class="service-request-branch-logo-box">
+            <div class="service-request-logo-card">
+              @if (store.logoUrl(); as branchLogo) {
+                <img
+                  [src]="branchLogo"
+                  [alt]="store.translations().logoLabel"
+                  class="service-request-branch-logo"
                 />
+              } @else {
+                <div class="service-request-branch-logo-fallback">
+                  <span>Q</span>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- COL 8 — TOUCHSCREEN SERVICES WORKFLOW PANEL -->
+        <div class="col-8 h-100 p-0 d-flex flex-column">
+          <section class="service-request-panel flex-grow-1 position-relative">
+            <!-- PROMINENT PANEL HEADER (COMMENTED OUT TEMPORARILY)
+            @if (!store.errorLoadingServices() && !store.loadingServices() && !store.loadingTicket()) {
+              <div class="kiosk-panel-header mb-3">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                  <span class="kiosk-step-badge">
+                    <i class="bi bi-touchpad-fill me-1 ms-1" aria-hidden="true"></i>
+                    {{ currentStepBadgeText() }}
+                  </span>
+
+                  <span class="kiosk-step-counter badge bg-light text-primary border border-primary px-3 py-2 fs-6" dir="ltr">
+                    {{ currentStepCounterText() }}
+                  </span>
+                </div>
+
+                <h2 class="kiosk-panel-title m-0">{{ pageTitle() }}</h2>
+                <p class="kiosk-panel-description m-0 mt-1">{{ pageDescription() }}</p>
+              </div>
+            }
+            -->
+
+            @if (store.errorLoadingServices()) {
+              <div
+                class="service-request-loading service-request-loading--error"
+                role="alert"
+                aria-live="assertive"
+              >
+                <i
+                  class="bi bi-wifi-off service-request-loading__error-icon"
+                  aria-hidden="true"
+                ></i>
+                <strong>{{ store.translations().errorLoadingTitle }}</strong>
+                <span>{{ store.translations().errorLoadingDescription }}</span>
+                <button
+                  type="button"
+                  class="service-request-actions__button service-request-actions__button--primary mt-2"
+                  (click)="retryLoading()"
+                >
+                  <i class="bi bi-arrow-clockwise" aria-hidden="true"></i>
+                  <span>{{ store.translations().retryLabel }}</span>
+                </button>
+              </div>
+            } @else if (store.loadingServices()) {
+              <div class="service-request-loading" role="status" aria-live="polite">
+                <span class="service-request-loading__spinner" aria-hidden="true"></span>
+                <strong>{{ store.translations().loadingServicesTitle }}</strong>
+                <span>{{ store.translations().loadingServicesDescription }}</span>
+              </div>
+            } @else if (store.loadingTicket()) {
+              <div class="service-request-loading" role="status" aria-live="polite">
+                <span class="service-request-loading__spinner" aria-hidden="true"></span>
+                <strong>{{ store.translations().loadingTitle }}</strong>
+                <span>{{ store.translations().loadingDescription }}</span>
+              </div>
+            } @else if (isLanguageStepActive()) {
+              <!-- STEP 0 — DEDICATED LANGUAGE SELECTION STEP -->
+              <div class="kiosk-step-grid kiosk-step-grid--vertical">
+                <button
+                  type="button"
+                  class="kiosk-lang-card align-items-center justify-content-center"
+                  [class.active]="store.language() === 'ar'"
+                  (click)="selectLanguageStep('ar')"
+                >
+                  <img
+                    src="/images/service-request/ar.jpg"
+                    alt="العربية"
+                    class="kiosk-lang-flag-img"
+                  />
+                  <div class="kiosk-lang-info">
+                    <span class="kiosk-lang-name">العربية</span>
+                  </div>
+                  <!-- <i class="bi bi-check-circle-fill kiosk-lang-check" aria-hidden="true"></i> -->
+                </button>
+                <button
+                  type="button"
+                  class="kiosk-lang-card align-items-center justify-content-center"
+                  [class.active]="store.language() === 'en'"
+                  (click)="selectLanguageStep('en')"
+                >
+                  <img
+                    src="/images/service-request/en.jpg"
+                    alt="English"
+                    class="kiosk-lang-flag-img"
+                  />
+                  <div class="kiosk-lang-info">
+                    <span class="kiosk-lang-name">English</span>
+                  </div>
+                  <!-- <i class="bi bi-check-circle-fill kiosk-lang-check" aria-hidden="true"></i> -->
+                </button>
+              </div>
+            } @else if (isUserInputStepActive()) {
+              <app-service-request-keypad-input (confirmed)="onUserInputConfirmed($event)" />
+            } @else {
+              @switch (store.currentStep()) {
+                @case (step.ServiceType) {
+                  <div class="kiosk-step-grid">
+                    @for (card of serviceCards(); track card.id) {
+                      <app-service-request-service-card
+                        [card]="card"
+                        (selected)="selectServiceType($event)"
+                      />
+                    }
+                  </div>
+                }
+
+                @case (step.Specialty) {
+                  <div class="kiosk-step-grid">
+                    @for (card of specialtyCards(); track card.id) {
+                      <app-service-request-specialty-card
+                        [card]="card"
+                        (selected)="selectSpecialty($event)"
+                      />
+                    }
+                  </div>
+                }
+
+                @case (step.SubSpecialty) {
+                  <div class="kiosk-step-grid">
+                    @for (card of subSpecialtyCards(); track card.id) {
+                      <app-service-request-specialty-card
+                        [card]="card"
+                        (selected)="selectSubSpecialty($event)"
+                      />
+                    }
+                  </div>
+                }
+
+                @case (step.Ticket) {
+                  @if (store.ticket(); as ticket) {
+                    <app-service-request-ticket-preview
+                      [ticket]="ticket"
+                      [language]="store.language()"
+                      [translations]="store.translations()"
+                    />
+                  }
+                }
               }
             }
-          }
-        }
-      </section>
+
+            <!-- FLOATING CIRCULAR TOUCH NAV BUTTONS (BOTTOM START & BOTTOM END OF PANEL) -->
+            @if (
+              !store.errorLoadingServices() && !store.loadingServices() && !store.loadingTicket()
+            ) {
+              <!-- FLOATING PREV BUTTON (BOTTOM START CORNER) -->
+              <div class="kiosk-floating-nav-start">
+                <button
+                  type="button"
+                  class="kiosk-circular-btn kiosk-circular-btn--prev"
+                  [disabled]="!canGoBack()"
+                  [attr.aria-label]="store.translations().backLabel"
+                  [title]="store.translations().backLabel"
+                  (click)="goBack()"
+                >
+                  <i class="bi" [class]="prevButtonIcon()" aria-hidden="true"></i>
+                </button>
+              </div>
+
+              <!-- FLOATING NEXT BUTTON (BOTTOM END CORNER) -->
+              <div class="kiosk-floating-nav-end">
+                <button
+                  type="button"
+                  class="kiosk-circular-btn kiosk-circular-btn--next"
+                  [disabled]="!canGoForward()"
+                  [attr.aria-label]="store.translations().nextLabel"
+                  [title]="store.translations().nextLabel"
+                  (click)="goNext()"
+                >
+                  <i class="bi" [class]="nextButtonIcon()" aria-hidden="true"></i>
+                </button>
+              </div>
+            }
+          </section>
+        </div>
+      </div>
     </main>
   </div>
 

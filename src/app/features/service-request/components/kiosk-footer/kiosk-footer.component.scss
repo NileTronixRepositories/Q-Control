@@ -6,13 +6,13 @@
 .kiosk-footer {
   align-items: center;
   animation: footer-bg-pan 8s ease-in-out infinite alternate;
-  background: linear-gradient(135deg, #1886d3 0%, #0d6ea8 48%, #08446f 100%);
+  background: var(--kiosk-footer-btn-bg, var(--kiosk-footer-color, linear-gradient(135deg, #1886d3 0%, #0d6ea8 48%, #08446f 100%)));
   background-size: 180% 180%;
   border-radius: 42% 42% 0 0 / 2.4rem 2.4rem 0 0;
   box-shadow:
     inset 0 0.25rem 0.5rem rgba(255, 255, 255, 0.22),
     0 -0.35rem 1.4rem rgba(15, 63, 104, 0.14);
-  color: #ffffff;
+  color: var(--kiosk-footer-btn-text, #ffffff);
   display: flex;
   justify-content: center;
   min-height: 5.9rem;

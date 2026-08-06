@@ -1,4 +1,4 @@
-﻿<section
+<section
   class="technical-admin-responsive-page branch-branding-page technical-page container-fluid"
   [attr.dir]="direction()"
   [attr.lang]="language()"
@@ -178,93 +178,755 @@
           </section>
 
           <form class="branding-theme-form" [formGroup]="themeForm" (ngSubmit)="saveTheme()" novalidate>
-            <div class="branding-theme-heading gap-2 mb-3">
-              <span aria-hidden="true"><i class="bi bi-droplet-half"></i></span>
-              <h3 class="branding-theme-title m-0 fs-6 fw-bold">{{ copy().themeColors }}</h3>
-            </div>
+            <!-- SECTION A — General Colors -->
+            <fieldset class="branding-fieldset mb-4">
+              <legend class="branding-theme-heading gap-2 mb-3">
+                <span aria-hidden="true"><i class="bi bi-palette"></i></span>
+                <h3 class="branding-theme-title m-0 fs-6 fw-bold">{{ copy().generalColorsSection }}</h3>
+              </legend>
 
-            <div class="branding-color-grid">
-              <label class="branding-color-field">
-                <span>{{ copy().mainColor }}</span>
-                <div
-                  class="branding-color-control"
-                  [class.branding-control-invalid]="isThemeControlInvalid('mainColor')"
-                >
+              <div class="branding-color-grid">
+                <div class="branding-control-item">
+                  <label class="branding-control-label">{{ copy().mainColor }} *</label>
+                  <div
+                    class="branding-color-control"
+                    [class.branding-control-invalid]="isThemeControlInvalid('mainColor')"
+                  >
+                    <input
+                      type="color"
+                      [value]="themePickerValue('mainColor')"
+                      [disabled]="!canUpdate()"
+                      [attr.aria-label]="copy().mainColor"
+                      (input)="updateThemePicker('mainColor', $event)"
+                    />
+                    <input
+                      type="text"
+                      maxlength="7"
+                      [value]="themeControlValue('mainColor')"
+                      [readonly]="!canUpdate()"
+                      placeholder="#0070C4"
+                      (input)="updateThemeText('mainColor', $event)"
+                    />
+                  </div>
+                  @if (themeControlError('mainColor')) {
+                    <small class="validation-message">{{ themeControlError('mainColor') }}</small>
+                  }
+                </div>
+
+                <div class="branding-control-item">
+                  <label class="branding-control-label">{{ copy().secondaryColor }} *</label>
+                  <div
+                    class="branding-color-control"
+                    [class.branding-control-invalid]="isThemeControlInvalid('secondaryColor')"
+                  >
+                    <input
+                      type="color"
+                      [value]="themePickerValue('secondaryColor')"
+                      [disabled]="!canUpdate()"
+                      [attr.aria-label]="copy().secondaryColor"
+                      (input)="updateThemePicker('secondaryColor', $event)"
+                    />
+                    <input
+                      type="text"
+                      maxlength="7"
+                      [value]="themeControlValue('secondaryColor')"
+                      [readonly]="!canUpdate()"
+                      placeholder="#FFFFFF"
+                      (input)="updateThemeText('secondaryColor', $event)"
+                    />
+                  </div>
+                  @if (themeControlError('secondaryColor')) {
+                    <small class="validation-message">{{ themeControlError('secondaryColor') }}</small>
+                  }
+                </div>
+
+                <div class="branding-control-item">
+                  <label class="branding-control-label">{{ copy().backgroundColor }} *</label>
+                  <div
+                    class="branding-color-control"
+                    [class.branding-control-invalid]="isThemeControlInvalid('backgroundColor')"
+                  >
+                    <input
+                      type="color"
+                      [value]="themePickerValue('backgroundColor', '#FFFFFF')"
+                      [disabled]="!canUpdate()"
+                      [attr.aria-label]="copy().backgroundColor"
+                      (input)="updateThemePicker('backgroundColor', $event)"
+                    />
+                    <input
+                      type="text"
+                      maxlength="7"
+                      [value]="themeControlValue('backgroundColor')"
+                      [readonly]="!canUpdate()"
+                      placeholder="#FFFFFF"
+                      (input)="updateThemeText('backgroundColor', $event)"
+                    />
+                  </div>
+                  @if (themeControlError('backgroundColor')) {
+                    <small class="validation-message">{{ themeControlError('backgroundColor') }}</small>
+                  }
+                </div>
+
+                <div class="branding-control-item">
+                  <label class="branding-control-label">{{ copy().headerColor }}</label>
+                  <div
+                    class="branding-color-control"
+                    [class.branding-control-invalid]="isThemeControlInvalid('headerColor')"
+                  >
+                    <input
+                      type="color"
+                      [value]="themePickerValue('headerColor', '#FFFFFF')"
+                      [disabled]="!canUpdate()"
+                      [attr.aria-label]="copy().headerColor"
+                      (input)="updateThemePicker('headerColor', $event)"
+                    />
+                    <input
+                      type="text"
+                      maxlength="7"
+                      [value]="themeControlValue('headerColor')"
+                      [readonly]="!canUpdate()"
+                      placeholder="#FFFFFF"
+                      (input)="updateThemeText('headerColor', $event)"
+                    />
+                  </div>
+                  @if (themeControlError('headerColor')) {
+                    <small class="validation-message">{{ themeControlError('headerColor') }}</small>
+                  }
+                </div>
+
+                <div class="branding-control-item">
+                  <label class="branding-control-label">{{ copy().footerColor }}</label>
+                  <div
+                    class="branding-color-control"
+                    [class.branding-control-invalid]="isThemeControlInvalid('footerColor')"
+                  >
+                    <input
+                      type="color"
+                      [value]="themePickerValue('footerColor', '#FFFFFF')"
+                      [disabled]="!canUpdate()"
+                      [attr.aria-label]="copy().footerColor"
+                      (input)="updateThemePicker('footerColor', $event)"
+                    />
+                    <input
+                      type="text"
+                      maxlength="7"
+                      [value]="themeControlValue('footerColor')"
+                      [readonly]="!canUpdate()"
+                      placeholder="#FFFFFF"
+                      (input)="updateThemeText('footerColor', $event)"
+                    />
+                  </div>
+                  @if (themeControlError('footerColor')) {
+                    <small class="validation-message">{{ themeControlError('footerColor') }}</small>
+                  }
+                </div>
+
+                <div class="branding-control-item">
+                  <label class="branding-control-label">{{ copy().mainTextColor }}</label>
+                  <div
+                    class="branding-color-control"
+                    [class.branding-control-invalid]="isThemeControlInvalid('mainTextColor')"
+                  >
+                    <input
+                      type="color"
+                      [value]="themePickerValue('mainTextColor', '#A7060F')"
+                      [disabled]="!canUpdate()"
+                      [attr.aria-label]="copy().mainTextColor"
+                      (input)="updateThemePicker('mainTextColor', $event)"
+                    />
+                    <input
+                      type="text"
+                      maxlength="7"
+                      [value]="themeControlValue('mainTextColor')"
+                      [readonly]="!canUpdate()"
+                      placeholder="#A7060F"
+                      (input)="updateThemeText('mainTextColor', $event)"
+                    />
+                  </div>
+                  @if (themeControlError('mainTextColor')) {
+                    <small class="validation-message">{{ themeControlError('mainTextColor') }}</small>
+                  }
+                </div>
+              </div>
+            </fieldset>
+
+            <!-- SECTION B — Screen Behavior -->
+            <fieldset class="branding-fieldset mb-4">
+              <legend class="branding-theme-heading gap-2 mb-3">
+                <span aria-hidden="true"><i class="bi bi-sliders"></i></span>
+                <h3 class="branding-theme-title m-0 fs-6 fw-bold">{{ copy().behaviorSection }}</h3>
+              </legend>
+
+              <div class="branding-behavior-grid">
+                <label class="form-check form-switch branding-switch-card">
                   <input
-                    type="color"
-                    [value]="themePickerValue('mainColor')"
+                    id="showLanguagePage"
+                    class="form-check-input ms-0 me-2"
+                    type="checkbox"
+                    role="switch"
+                    formControlName="showLanguagePage"
                     [disabled]="!canUpdate()"
-                    [attr.aria-label]="copy().mainColor"
-                    (input)="updateThemePicker('mainColor', $event)"
                   />
+                  <span class="form-check-label fw-semibold">
+                    {{ copy().showLanguagePageLabel }}
+                  </span>
+                </label>
+
+                <label class="form-check form-switch branding-switch-card">
+                  <input
+                    id="defaultLanguageIsArabic"
+                    class="form-check-input ms-0 me-2"
+                    type="checkbox"
+                    role="switch"
+                    formControlName="defaultLanguageIsArabic"
+                    [disabled]="!canUpdate()"
+                  />
+                  <span class="form-check-label fw-semibold">
+                    {{ copy().defaultLanguageIsArabicLabel }}
+                  </span>
+                </label>
+
+                <label class="form-check form-switch branding-switch-card">
+                  <input
+                    id="alwaysRequireUserInput"
+                    class="form-check-input ms-0 me-2"
+                    type="checkbox"
+                    role="switch"
+                    formControlName="alwaysRequireUserInput"
+                    [disabled]="!canUpdate()"
+                  />
+                  <span class="form-check-label fw-semibold">
+                    {{ copy().alwaysRequireUserInputLabel }}
+                  </span>
+                </label>
+
+                <label class="form-check form-switch branding-switch-card">
+                  <input
+                    id="showServiceNavigationPath"
+                    class="form-check-input ms-0 me-2"
+                    type="checkbox"
+                    role="switch"
+                    formControlName="showServiceNavigationPath"
+                    [disabled]="!canUpdate()"
+                  />
+                  <span class="form-check-label fw-semibold">
+                    {{ copy().showServiceNavigationPathLabel }}
+                  </span>
+                </label>
+
+                <label class="form-check form-switch branding-switch-card">
+                  <input
+                    id="allowOperatorSelection"
+                    class="form-check-input ms-0 me-2"
+                    type="checkbox"
+                    role="switch"
+                    formControlName="allowOperatorSelection"
+                    [disabled]="!canUpdate()"
+                  />
+                  <span class="form-check-label fw-semibold">
+                    {{ copy().allowOperatorSelectionLabel }}
+                  </span>
+                </label>
+
+                <label class="form-check form-switch branding-switch-card">
+                  <input
+                    id="allowRequestMoreServices"
+                    class="form-check-input ms-0 me-2"
+                    type="checkbox"
+                    role="switch"
+                    formControlName="allowRequestMoreServices"
+                    [disabled]="!canUpdate()"
+                  />
+                  <span class="form-check-label fw-semibold">
+                    {{ copy().allowRequestMoreServicesLabel }}
+                  </span>
+                </label>
+              </div>
+            </fieldset>
+
+            <!-- SECTION C — Language Button -->
+            <fieldset class="branding-fieldset mb-4">
+              <legend class="branding-theme-heading gap-2 mb-3">
+                <span aria-hidden="true"><i class="bi bi-translate"></i></span>
+                <h3 class="branding-theme-title m-0 fs-6 fw-bold">{{ copy().languageButtonSection }}</h3>
+              </legend>
+
+              <div class="branding-inline-row">
+                <div class="branding-control-item branding-color-item">
+                  <label class="branding-control-label">{{ copy().buttonBackgroundColorLabel }}</label>
+                  <div
+                    class="branding-color-control"
+                    [class.branding-control-invalid]="isThemeControlInvalid('languageButtonBackgroundColor')"
+                  >
+                    <input
+                      type="color"
+                      [value]="themePickerValue('languageButtonBackgroundColor', '#0070C4')"
+                      [disabled]="!canUpdate()"
+                      (input)="updateThemePicker('languageButtonBackgroundColor', $event)"
+                    />
+                    <input
+                      type="text"
+                      maxlength="7"
+                      [value]="themeControlValue('languageButtonBackgroundColor')"
+                      [readonly]="!canUpdate()"
+                      placeholder="#0070C4"
+                      (input)="updateThemeText('languageButtonBackgroundColor', $event)"
+                    />
+                  </div>
+                </div>
+
+                <div class="branding-control-item branding-color-item">
+                  <label class="branding-control-label">{{ copy().buttonTextColorLabel }}</label>
+                  <div
+                    class="branding-color-control"
+                    [class.branding-control-invalid]="isThemeControlInvalid('languageButtonTextColor')"
+                  >
+                    <input
+                      type="color"
+                      [value]="themePickerValue('languageButtonTextColor', '#FFFFFF')"
+                      [disabled]="!canUpdate()"
+                      (input)="updateThemePicker('languageButtonTextColor', $event)"
+                    />
+                    <input
+                      type="text"
+                      maxlength="7"
+                      [value]="themeControlValue('languageButtonTextColor')"
+                      [readonly]="!canUpdate()"
+                      placeholder="#FFFFFF"
+                      (input)="updateThemeText('languageButtonTextColor', $event)"
+                    />
+                  </div>
+                </div>
+
+                <div class="branding-control-item branding-number-item">
+                  <label class="branding-control-label">{{ copy().buttonWidthLabel }}</label>
+                  <div class="input-group branding-unit-group">
+                    <input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      max="100"
+                      placeholder="40"
+                      formControlName="languageButtonWidth"
+                      [readonly]="!canUpdate()"
+                      class="form-control"
+                    />
+                    <span class="input-group-text unit-badge">%</span>
+                  </div>
+                  @if (themeControlError('languageButtonWidth')) {
+                    <small class="text-danger">{{ themeControlError('languageButtonWidth') }}</small>
+                  }
+                </div>
+
+                <div class="branding-control-item branding-number-item">
+                  <label class="branding-control-label">{{ copy().buttonHeightLabel }}</label>
+                  <div class="input-group branding-unit-group">
+                    <input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      max="100"
+                      placeholder="22"
+                      formControlName="languageButtonHeight"
+                      [readonly]="!canUpdate()"
+                      class="form-control"
+                    />
+                    <span class="input-group-text unit-badge">%</span>
+                  </div>
+                  @if (themeControlError('languageButtonHeight')) {
+                    <small class="text-danger">{{ themeControlError('languageButtonHeight') }}</small>
+                  }
+                </div>
+
+                <div class="branding-control-item branding-text-item">
+                  <label class="branding-control-label">{{ copy().buttonTextLabel }}</label>
                   <input
                     type="text"
-                    maxlength="7"
-                    [value]="themeControlValue('mainColor')"
+                    maxlength="200"
+                    placeholder="اختيار اللغة / Select Language"
+                    formControlName="languageButtonText"
                     [readonly]="!canUpdate()"
-                    placeholder="#A7060F"
-                    (input)="updateThemeText('mainColor', $event)"
+                    class="form-control"
                   />
+                  @if (themeControlError('languageButtonText')) {
+                    <small class="text-danger">{{ themeControlError('languageButtonText') }}</small>
+                  }
                 </div>
-                @if (themeControlError('mainColor')) {
-                  <small>{{ themeControlError('mainColor') }}</small>
-                }
-              </label>
+              </div>
+            </fieldset>
 
-              <label class="branding-color-field">
-                <span>{{ copy().secondaryColor }}</span>
-                <div
-                  class="branding-color-control"
-                  [class.branding-control-invalid]="isThemeControlInvalid('secondaryColor')"
-                >
-                  <input
-                    type="color"
-                    [value]="themePickerValue('secondaryColor')"
-                    [disabled]="!canUpdate()"
-                    [attr.aria-label]="copy().secondaryColor"
-                    (input)="updateThemePicker('secondaryColor', $event)"
-                  />
+            <!-- SECTION D — Service Button -->
+            <fieldset class="branding-fieldset mb-4">
+              <legend class="branding-theme-heading gap-2 mb-3">
+                <span aria-hidden="true"><i class="bi bi-grid-3x3-gap"></i></span>
+                <h3 class="branding-theme-title m-0 fs-6 fw-bold">{{ copy().serviceButtonSection }}</h3>
+              </legend>
+
+              <div class="branding-inline-row">
+                <div class="branding-control-item branding-color-item">
+                  <label class="branding-control-label">{{ copy().buttonBackgroundColorLabel }}</label>
+                  <div
+                    class="branding-color-control"
+                    [class.branding-control-invalid]="isThemeControlInvalid('serviceButtonBackgroundColor')"
+                  >
+                    <input
+                      type="color"
+                      [value]="themePickerValue('serviceButtonBackgroundColor', '#0070C4')"
+                      [disabled]="!canUpdate()"
+                      (input)="updateThemePicker('serviceButtonBackgroundColor', $event)"
+                    />
+                    <input
+                      type="text"
+                      maxlength="7"
+                      [value]="themeControlValue('serviceButtonBackgroundColor')"
+                      [readonly]="!canUpdate()"
+                      placeholder="#0070C4"
+                      (input)="updateThemeText('serviceButtonBackgroundColor', $event)"
+                    />
+                  </div>
+                </div>
+
+                <div class="branding-control-item branding-color-item">
+                  <label class="branding-control-label">{{ copy().buttonTextColorLabel }}</label>
+                  <div
+                    class="branding-color-control"
+                    [class.branding-control-invalid]="isThemeControlInvalid('serviceButtonTextColor')"
+                  >
+                    <input
+                      type="color"
+                      [value]="themePickerValue('serviceButtonTextColor', '#FFFFFF')"
+                      [disabled]="!canUpdate()"
+                      (input)="updateThemePicker('serviceButtonTextColor', $event)"
+                    />
+                    <input
+                      type="text"
+                      maxlength="7"
+                      [value]="themeControlValue('serviceButtonTextColor')"
+                      [readonly]="!canUpdate()"
+                      placeholder="#FFFFFF"
+                      (input)="updateThemeText('serviceButtonTextColor', $event)"
+                    />
+                  </div>
+                </div>
+
+                <div class="branding-control-item branding-number-item">
+                  <label class="branding-control-label">{{ copy().buttonWidthLabel }}</label>
+                  <div class="input-group branding-unit-group">
+                    <input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      max="100"
+                      placeholder="40"
+                      formControlName="serviceButtonWidth"
+                      [readonly]="!canUpdate()"
+                      class="form-control"
+                    />
+                    <span class="input-group-text unit-badge">%</span>
+                  </div>
+                  @if (themeControlError('serviceButtonWidth')) {
+                    <small class="text-danger">{{ themeControlError('serviceButtonWidth') }}</small>
+                  }
+                </div>
+
+                <div class="branding-control-item branding-number-item">
+                  <label class="branding-control-label">{{ copy().buttonHeightLabel }}</label>
+                  <div class="input-group branding-unit-group">
+                    <input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      max="100"
+                      placeholder="20"
+                      formControlName="serviceButtonHeight"
+                      [readonly]="!canUpdate()"
+                      class="form-control"
+                    />
+                    <span class="input-group-text unit-badge">%</span>
+                  </div>
+                  @if (themeControlError('serviceButtonHeight')) {
+                    <small class="text-danger">{{ themeControlError('serviceButtonHeight') }}</small>
+                  }
+                </div>
+
+                <div class="branding-control-item branding-number-item">
+                  <label class="branding-control-label">{{ copy().serviceButtonSpaceLabel }}</label>
+                  <div class="input-group branding-unit-group">
+                    <input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      max="100"
+                      placeholder="2"
+                      formControlName="serviceButtonSpace"
+                      [readonly]="!canUpdate()"
+                      class="form-control"
+                    />
+                    <span class="input-group-text unit-badge">%</span>
+                  </div>
+                  @if (themeControlError('serviceButtonSpace')) {
+                    <small class="text-danger">{{ themeControlError('serviceButtonSpace') }}</small>
+                  }
+                </div>
+
+                <div class="branding-control-item branding-number-item">
+                  <label class="branding-control-label">{{ copy().serviceButtonFontSizeLabel }}</label>
+                  <div class="input-group branding-unit-group">
+                    <input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      max="100"
+                      placeholder="1.8"
+                      formControlName="serviceButtonFontSize"
+                      [readonly]="!canUpdate()"
+                      class="form-control"
+                    />
+                    <span class="input-group-text unit-badge">rem</span>
+                  </div>
+                  @if (themeControlError('serviceButtonFontSize')) {
+                    <small class="text-danger">{{ themeControlError('serviceButtonFontSize') }}</small>
+                  }
+                </div>
+
+                <div class="branding-control-item branding-text-item">
+                  <label class="branding-control-label">{{ copy().buttonTextLabel }}</label>
                   <input
                     type="text"
-                    maxlength="7"
-                    [value]="themeControlValue('secondaryColor')"
+                    maxlength="200"
+                    placeholder="اختيار الخدمة / Select Service"
+                    formControlName="serviceButtonText"
                     [readonly]="!canUpdate()"
-                    placeholder="#0070C4"
-                    (input)="updateThemeText('secondaryColor', $event)"
+                    class="form-control"
                   />
+                  @if (themeControlError('serviceButtonText')) {
+                    <small class="text-danger">{{ themeControlError('serviceButtonText') }}</small>
+                  }
                 </div>
-                @if (themeControlError('secondaryColor')) {
-                  <small>{{ themeControlError('secondaryColor') }}</small>
-                }
-              </label>
+              </div>
+            </fieldset>
 
-              <label class="branding-color-field">
-                <span>{{ copy().backgroundColor }}</span>
-                <div
-                  class="branding-color-control"
-                  [class.branding-control-invalid]="isThemeControlInvalid('backgroundColor')"
-                >
-                  <input
-                    type="color"
-                    [value]="themePickerValue('backgroundColor')"
-                    [disabled]="!canUpdate()"
-                    [attr.aria-label]="copy().backgroundColor"
-                    (input)="updateThemePicker('backgroundColor', $event)"
-                  />
+            <!-- SECTION E — Keypad Button -->
+            <fieldset class="branding-fieldset mb-4">
+              <legend class="branding-theme-heading gap-2 mb-3">
+                <span aria-hidden="true"><i class="bi bi-calculator"></i></span>
+                <h3 class="branding-theme-title m-0 fs-6 fw-bold">{{ copy().keypadButtonSection }}</h3>
+              </legend>
+
+              <div class="branding-inline-row">
+                <div class="branding-control-item branding-color-item">
+                  <label class="branding-control-label">{{ copy().buttonBackgroundColorLabel }}</label>
+                  <div
+                    class="branding-color-control"
+                    [class.branding-control-invalid]="isThemeControlInvalid('keypadButtonBackgroundColor')"
+                  >
+                    <input
+                      type="color"
+                      [value]="themePickerValue('keypadButtonBackgroundColor', '#0070C4')"
+                      [disabled]="!canUpdate()"
+                      (input)="updateThemePicker('keypadButtonBackgroundColor', $event)"
+                    />
+                    <input
+                      type="text"
+                      maxlength="7"
+                      [value]="themeControlValue('keypadButtonBackgroundColor')"
+                      [readonly]="!canUpdate()"
+                      placeholder="#0070C4"
+                      (input)="updateThemeText('keypadButtonBackgroundColor', $event)"
+                    />
+                  </div>
+                </div>
+
+                <div class="branding-control-item branding-color-item">
+                  <label class="branding-control-label">{{ copy().buttonTextColorLabel }}</label>
+                  <div
+                    class="branding-color-control"
+                    [class.branding-control-invalid]="isThemeControlInvalid('keypadButtonTextColor')"
+                  >
+                    <input
+                      type="color"
+                      [value]="themePickerValue('keypadButtonTextColor', '#FFFFFF')"
+                      [disabled]="!canUpdate()"
+                      (input)="updateThemePicker('keypadButtonTextColor', $event)"
+                    />
+                    <input
+                      type="text"
+                      maxlength="7"
+                      [value]="themeControlValue('keypadButtonTextColor')"
+                      [readonly]="!canUpdate()"
+                      placeholder="#FFFFFF"
+                      (input)="updateThemeText('keypadButtonTextColor', $event)"
+                    />
+                  </div>
+                </div>
+
+                <div class="branding-control-item branding-number-item">
+                  <label class="branding-control-label">{{ copy().buttonWidthLabel }}</label>
+                  <div class="input-group branding-unit-group">
+                    <input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      max="100"
+                      placeholder="45"
+                      formControlName="keypadButtonWidth"
+                      [readonly]="!canUpdate()"
+                      class="form-control"
+                    />
+                    <span class="input-group-text unit-badge">%</span>
+                  </div>
+                  @if (themeControlError('keypadButtonWidth')) {
+                    <small class="text-danger">{{ themeControlError('keypadButtonWidth') }}</small>
+                  }
+                </div>
+
+                <div class="branding-control-item branding-number-item">
+                  <label class="branding-control-label">{{ copy().buttonHeightLabel }}</label>
+                  <div class="input-group branding-unit-group">
+                    <input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      max="100"
+                      placeholder="10"
+                      formControlName="keypadButtonHeight"
+                      [readonly]="!canUpdate()"
+                      class="form-control"
+                    />
+                    <span class="input-group-text unit-badge">%</span>
+                  </div>
+                  @if (themeControlError('keypadButtonHeight')) {
+                    <small class="text-danger">{{ themeControlError('keypadButtonHeight') }}</small>
+                  }
+                </div>
+
+                <div class="branding-control-item branding-text-item">
+                  <label class="branding-control-label">{{ copy().buttonTextLabel }}</label>
                   <input
                     type="text"
-                    maxlength="7"
-                    [value]="themeControlValue('backgroundColor')"
+                    maxlength="200"
+                    placeholder="تأكيد / Confirm"
+                    formControlName="keypadButtonText"
                     [readonly]="!canUpdate()"
-                    placeholder="#FFFFFF"
-                    (input)="updateThemeText('backgroundColor', $event)"
+                    class="form-control"
                   />
+                  @if (themeControlError('keypadButtonText')) {
+                    <small class="text-danger">{{ themeControlError('keypadButtonText') }}</small>
+                  }
                 </div>
-                @if (themeControlError('backgroundColor')) {
-                  <small>{{ themeControlError('backgroundColor') }}</small>
-                }
-              </label>
-            </div>
+              </div>
+            </fieldset>
+
+            <!-- SECTION F — Footer Button -->
+            <fieldset class="branding-fieldset mb-4">
+              <legend class="branding-theme-heading gap-2 mb-3">
+                <span aria-hidden="true"><i class="bi bi-layout-footer-reverse"></i></span>
+                <h3 class="branding-theme-title m-0 fs-6 fw-bold">{{ copy().footerButtonSection }}</h3>
+              </legend>
+
+              <div class="branding-inline-row">
+                <div class="branding-control-item branding-color-item">
+                  <label class="branding-control-label">{{ copy().buttonBackgroundColorLabel }}</label>
+                  <div
+                    class="branding-color-control"
+                    [class.branding-control-invalid]="isThemeControlInvalid('footerButtonBackgroundColor')"
+                  >
+                    <input
+                      type="color"
+                      [value]="themePickerValue('footerButtonBackgroundColor', '#0070C4')"
+                      [disabled]="!canUpdate()"
+                      (input)="updateThemePicker('footerButtonBackgroundColor', $event)"
+                    />
+                    <input
+                      type="text"
+                      maxlength="7"
+                      [value]="themeControlValue('footerButtonBackgroundColor')"
+                      [readonly]="!canUpdate()"
+                      placeholder="#0070C4"
+                      (input)="updateThemeText('footerButtonBackgroundColor', $event)"
+                    />
+                  </div>
+                </div>
+
+                <div class="branding-control-item branding-color-item">
+                  <label class="branding-control-label">{{ copy().buttonTextColorLabel }}</label>
+                  <div
+                    class="branding-color-control"
+                    [class.branding-control-invalid]="isThemeControlInvalid('footerButtonTextColor')"
+                  >
+                    <input
+                      type="color"
+                      [value]="themePickerValue('footerButtonTextColor', '#FFFFFF')"
+                      [disabled]="!canUpdate()"
+                      (input)="updateThemePicker('footerButtonTextColor', $event)"
+                    />
+                    <input
+                      type="text"
+                      maxlength="7"
+                      [value]="themeControlValue('footerButtonTextColor')"
+                      [readonly]="!canUpdate()"
+                      placeholder="#FFFFFF"
+                      (input)="updateThemeText('footerButtonTextColor', $event)"
+                    />
+                  </div>
+                </div>
+
+                <div class="branding-control-item branding-number-item">
+                  <label class="branding-control-label">{{ copy().buttonWidthLabel }}</label>
+                  <div class="input-group branding-unit-group">
+                    <input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      max="100"
+                      placeholder="10"
+                      formControlName="footerButtonWidth"
+                      [readonly]="!canUpdate()"
+                      class="form-control"
+                    />
+                    <span class="input-group-text unit-badge">%</span>
+                  </div>
+                  @if (themeControlError('footerButtonWidth')) {
+                    <small class="text-danger">{{ themeControlError('footerButtonWidth') }}</small>
+                  }
+                </div>
+
+                <div class="branding-control-item branding-number-item">
+                  <label class="branding-control-label">{{ copy().buttonHeightLabel }}</label>
+                  <div class="input-group branding-unit-group">
+                    <input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      max="100"
+                      placeholder="12"
+                      formControlName="footerButtonHeight"
+                      [readonly]="!canUpdate()"
+                      class="form-control"
+                    />
+                    <span class="input-group-text unit-badge">%</span>
+                  </div>
+                  @if (themeControlError('footerButtonHeight')) {
+                    <small class="text-danger">{{ themeControlError('footerButtonHeight') }}</small>
+                  }
+                </div>
+
+                <div class="branding-control-item branding-text-item">
+                  <label class="branding-control-label">{{ copy().buttonTextLabel }}</label>
+                  <input
+                    type="text"
+                    maxlength="200"
+                    placeholder="رجوع / Back"
+                    formControlName="footerButtonText"
+                    [readonly]="!canUpdate()"
+                    class="form-control"
+                  />
+                  @if (themeControlError('footerButtonText')) {
+                    <small class="text-danger">{{ themeControlError('footerButtonText') }}</small>
+                  }
+                </div>
+              </div>
+            </fieldset>
 
             @if (canUpdate()) {
               <div class="branding-theme-actions">

@@ -20,14 +20,9 @@ describe('KioskHeaderComponent', () => {
 
   afterEach(() => fixture.destroy());
 
-  it('renders kiosk identity and forwards language changes', () => {
-    const emitted = vi.fn();
-    fixture.componentInstance.languageChange.subscribe(emitted);
-
+  it('renders kiosk identity and NileTronix logo', () => {
     expect(fixture.nativeElement.textContent).toContain('Ticket service');
     expect(fixture.nativeElement.textContent).toContain('Choose your service');
-    (fixture.nativeElement.querySelectorAll('button')[0] as HTMLButtonElement).click();
-
-    expect(emitted).toHaveBeenCalledWith('ar');
+    expect(fixture.nativeElement.querySelector('.kiosk-header__nile-logo')).not.toBeNull();
   });
 });
