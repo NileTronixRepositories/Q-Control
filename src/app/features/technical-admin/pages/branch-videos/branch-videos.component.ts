@@ -12,8 +12,13 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { FormsModule, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import {
+  FormsModule,
+  NonNullableFormBuilder,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Subscription } from 'rxjs';
 
 import { NiletronixLoadingStateComponent } from '../../../../shared/components/niletronix-loading-state/niletronix-loading-state.component';
@@ -51,6 +56,7 @@ interface UiToastMessage {
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
+    RouterLink,
     TechnicalAdminPageHeroComponent,
     NiletronixLoadingStateComponent,
   ],
@@ -328,9 +334,7 @@ export class BranchVideosComponent implements OnInit, OnDestroy {
 
   openUploadModal(): void {
     const nextOrder =
-      this.videos().length > 0
-        ? Math.max(...this.videos().map((v) => v.displayOrder)) + 1
-        : 1;
+      this.videos().length > 0 ? Math.max(...this.videos().map((v) => v.displayOrder)) + 1 : 1;
 
     this.uploadForm.reset({ displayOrder: nextOrder });
     this.selectedUploadFile.set(null);
@@ -364,7 +368,9 @@ export class BranchVideosComponent implements OnInit, OnDestroy {
 
     if (displayOrder <= 0) {
       this.showMessage(
-        this.isAr() ? 'ترتيب العرض يجب أن يكون أكبر من 0.' : 'Display order must be greater than 0.',
+        this.isAr()
+          ? 'ترتيب العرض يجب أن يكون أكبر من 0.'
+          : 'Display order must be greater than 0.',
         'error',
       );
       return;
@@ -467,10 +473,7 @@ export class BranchVideosComponent implements OnInit, OnDestroy {
         next: (state) => {
           this.isSubmitting.set(false);
           this.updateLocalVideoState(state);
-          this.showMessage(
-            this.isAr() ? 'تم إلغاء تفعيل الفيديو.' : 'Video deactivated.',
-            'info',
-          );
+          this.showMessage(this.isAr() ? 'تم إلغاء تفعيل الفيديو.' : 'Video deactivated.', 'info');
         },
         error: (err: HttpErrorResponse) => {
           this.isSubmitting.set(false);
@@ -552,29 +555,31 @@ export class BranchVideosComponent implements OnInit, OnDestroy {
     if (!branchId || !video) return;
 
     this.isSubmitting.set(true);
-    this.branchVideosApi.deleteBranchVideoPermanently(branchId, video.id, video.rowVersion).subscribe({
-      next: () => {
-        this.isSubmitting.set(false);
-        this.videoToDelete.set(null);
-        this.videos.update((list) => list.filter((v) => v.id !== video.id));
-        this.showMessage(
-          this.isAr() ? 'تم حذف الفيديو نهائياً.' : 'Video permanently deleted.',
-          'success',
-        );
-      },
-      error: (err: HttpErrorResponse) => {
-        this.isSubmitting.set(false);
-        this.videoToDelete.set(null);
-        this.showMessage(
-          formatTechnicalAdminApiError(
-            err,
-            this.isAr() ? 'فشل الحذف النهائي' : 'Failed to delete video',
-          ),
-          'error',
-        );
-        this.loadVideos(branchId);
-      },
-    });
+    this.branchVideosApi
+      .deleteBranchVideoPermanently(branchId, video.id, video.rowVersion)
+      .subscribe({
+        next: () => {
+          this.isSubmitting.set(false);
+          this.videoToDelete.set(null);
+          this.videos.update((list) => list.filter((v) => v.id !== video.id));
+          this.showMessage(
+            this.isAr() ? 'تم حذف الفيديو نهائياً.' : 'Video permanently deleted.',
+            'success',
+          );
+        },
+        error: (err: HttpErrorResponse) => {
+          this.isSubmitting.set(false);
+          this.videoToDelete.set(null);
+          this.showMessage(
+            formatTechnicalAdminApiError(
+              err,
+              this.isAr() ? 'فشل الحذف النهائي' : 'Failed to delete video',
+            ),
+            'error',
+          );
+          this.loadVideos(branchId);
+        },
+      });
   }
 
   openSinglePreview(video: BranchVideo): void {
