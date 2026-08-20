@@ -4,6 +4,7 @@ import { Subscription } from 'rxjs';
 import { ServiceRequestStep } from '../../enums/service-request-step.enum';
 import { ServiceType } from '../../models/service-type.model';
 import { Specialty } from '../../models/specialty.model';
+import { ServiceCustomInput } from '../../../service-management/models/service-management.model';
 import { ServiceRequestStore } from '../../store/service-request.store';
 import { KioskFooterComponent } from '../../components/kiosk-footer/kiosk-footer.component';
 import { KioskHeaderComponent } from '../../components/kiosk-header/kiosk-header.component';
@@ -11,6 +12,7 @@ import { ServiceCardComponent } from '../../components/service-card/service-card
 import { SpecialtyCardComponent } from '../../components/specialty-card/specialty-card.component';
 import { TicketPreviewComponent } from '../../components/ticket-preview/ticket-preview.component';
 import { KeypadInputComponent } from '../../components/keypad-input/keypad-input.component';
+import { CustomerInputFormComponent } from '../../components/customer-input-form/customer-input-form.component';
 import { SelectionCardViewModel } from '../../shared/selection-card-view.model';
 import { AppLanguage } from '../../../../shared/models/app-language.model';
 
@@ -22,6 +24,7 @@ import { AppLanguage } from '../../../../shared/models/app-language.model';
     SpecialtyCardComponent,
     TicketPreviewComponent,
     KeypadInputComponent,
+    CustomerInputFormComponent,
     KioskFooterComponent,
   ],
   templateUrl: './service-request-home.component.html',
@@ -38,6 +41,9 @@ export class ServiceRequestHomeComponent implements OnDestroy {
   // Step 0 Language selection state & Keypad user input state & forward history tracking
   protected readonly isLanguageStepActive = signal<boolean>(false);
   protected readonly isUserInputStepActive = signal<boolean>(false);
+  protected readonly isCustomerInputStepActive = signal<boolean>(false);
+  protected readonly activeCustomInputs = signal<readonly ServiceCustomInput[]>([]);
+  protected readonly activeServiceTitle = signal<string>('');
   protected readonly hasForwardSelection = signal<boolean>(false);
   private initializedLanguageStep = false;
 
@@ -92,6 +98,10 @@ export class ServiceRequestHomeComponent implements OnDestroy {
       return this.isRtl() ? 'اختر لغة التواصل' : 'Select Preferred Language';
     }
 
+    if (this.isCustomerInputStepActive()) {
+      return this.store.translations().customerInputTitle;
+    }
+
     if (this.isUserInputStepActive()) {
       return this.isRtl() ? 'إدخال بيانات المستخدم' : 'Enter User Information';
     }
@@ -128,6 +138,10 @@ export class ServiceRequestHomeComponent implements OnDestroy {
       return this.isRtl()
         ? 'يرجى لمس الشاشة لاختيار اللغة المطلوبة للمتابعة.'
         : 'Please touch the screen to choose your language to continue.';
+    }
+
+    if (this.isCustomerInputStepActive()) {
+      return this.store.translations().customerInputDescription;
     }
 
     if (this.isUserInputStepActive()) {
@@ -170,6 +184,10 @@ export class ServiceRequestHomeComponent implements OnDestroy {
       return translations.languageLabel;
     }
 
+    if (this.isCustomerInputStepActive()) {
+      return translations.footerCustomerInputPrompt;
+    }
+
     if (this.isUserInputStepActive()) {
       return this.isRtl() ? 'إدخال بيانات المستخدم مطلوب دائماً' : 'User input is mandatory';
     }
@@ -196,7 +214,7 @@ export class ServiceRequestHomeComponent implements OnDestroy {
       return false;
     }
 
-    if (this.isUserInputStepActive()) {
+    if (this.isCustomerInputStepActive() || this.isUserInputStepActive()) {
       return true;
     }
 
@@ -222,6 +240,10 @@ export class ServiceRequestHomeComponent implements OnDestroy {
   protected readonly currentStepBadgeText = computed(() => {
     if (this.isLanguageStepActive()) {
       return this.isRtl() ? 'الخطوة 0: اختيار اللغة' : 'Step 0: Select Language';
+    }
+
+    if (this.isCustomerInputStepActive()) {
+      return this.isRtl() ? 'خطوة إدخال بيانات الخدمة' : 'Service Data Input Step';
     }
 
     if (this.isUserInputStepActive()) {
@@ -286,7 +308,7 @@ export class ServiceRequestHomeComponent implements OnDestroy {
       this.store.selectServiceType(serviceType);
 
       if (this.store.availableSpecialties().length === 0 && serviceType.isTicketIssuable === true) {
-        this.handleTicketIssuanceTrigger();
+        this.handleTicketIssuanceTrigger(serviceType);
       }
     }
   }
@@ -302,7 +324,7 @@ export class ServiceRequestHomeComponent implements OnDestroy {
     this.store.selectSpecialty(specialty);
 
     if (specialty.subSpecialties.length === 0 && specialty.isTicketIssuable === true) {
-      this.handleTicketIssuanceTrigger();
+      this.handleTicketIssuanceTrigger(specialty);
     }
   }
 
@@ -316,7 +338,7 @@ export class ServiceRequestHomeComponent implements OnDestroy {
     this.hasForwardSelection.set(false);
     this.store.selectSubSpecialty(specialty);
     if (specialty.isTicketIssuable === true) {
-      this.handleTicketIssuanceTrigger();
+      this.handleTicketIssuanceTrigger(specialty);
     }
   }
 
@@ -325,7 +347,19 @@ export class ServiceRequestHomeComponent implements OnDestroy {
     this.generateTicket();
   }
 
-  private handleTicketIssuanceTrigger(): void {
+  protected onCustomerInputConfirmed(_userInput: Record<string, string | number>): void {
+    this.isCustomerInputStepActive.set(false);
+    this.generateTicket();
+  }
+
+  private handleTicketIssuanceTrigger(targetNode: ServiceType | Specialty): void {
+    if (targetNode.isClientInputRequired && targetNode.customInputs && targetNode.customInputs.length > 0) {
+      this.activeCustomInputs.set(targetNode.customInputs);
+      this.activeServiceTitle.set(this.store.resolveText(targetNode.name));
+      this.isCustomerInputStepActive.set(true);
+      return;
+    }
+
     if (this.store.behavior()?.alwaysRequireUserInput === true) {
       this.isUserInputStepActive.set(true);
     } else {
@@ -335,6 +369,11 @@ export class ServiceRequestHomeComponent implements OnDestroy {
 
   protected goBack(): void {
     this.cancelTicketGeneration();
+
+    if (this.isCustomerInputStepActive()) {
+      this.isCustomerInputStepActive.set(false);
+      return;
+    }
 
     if (this.isUserInputStepActive()) {
       this.isUserInputStepActive.set(false);
@@ -366,11 +405,12 @@ export class ServiceRequestHomeComponent implements OnDestroy {
 
   protected restart(): void {
     this.cancelTicketGeneration();
-    this.hasForwardSelection.set(false);
+    this.isLanguageStepActive.set(false);
     this.isUserInputStepActive.set(false);
-    if (this.store.behavior()?.showLanguagePage) {
-      this.isLanguageStepActive.set(true);
-    }
+    this.isCustomerInputStepActive.set(false);
+    this.activeCustomInputs.set([]);
+    this.activeServiceTitle.set('');
+    this.hasForwardSelection.set(false);
     this.store.restart();
   }
 

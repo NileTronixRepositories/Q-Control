@@ -170,8 +170,36 @@ export interface ServiceManagementTranslations {
   readonly workflowSelectionNotRequired: string;
   readonly workflowStartModeNoWorkflow: string;
   readonly workflowStartModeAutoApply: string;
-  readonly workflowStartModeSelectionRequired: string;
   readonly workflows: string;
+  readonly customInputs: string;
+  readonly customInputsHelp: string;
+  readonly addCustomInput: string;
+  readonly removeCustomInput: string;
+  readonly customInputName: string;
+  readonly customInputLabelAr: string;
+  readonly customInputLabelEn: string;
+  readonly customInputType: string;
+  readonly customInputTypeString: string;
+  readonly customInputTypeInteger: string;
+  readonly customInputRequired: string;
+  readonly customInputOrder: string;
+  readonly customInputRestrictions: string;
+  readonly customInputMinLength: string;
+  readonly customInputMaxLength: string;
+  readonly customInputStartWith: string;
+  readonly customInputMinValue: string;
+  readonly customInputMaxValue: string;
+  readonly customInputsRequiredError: string;
+  readonly customInputDuplicateName: string;
+  readonly customInputDuplicateOrder: string;
+  readonly customInputMinLengthError: string;
+  readonly customInputMaxLengthError: string;
+  readonly customInputLengthRangeError: string;
+  readonly customInputValueRangeError: string;
+  readonly customInputStartWithMaxLength: string;
+  readonly customInputOrderMinError: string;
+  readonly noCustomInputs: string;
+  readonly customInputDetails: string;
 }
 
 export const SERVICE_MANAGEMENT_TRANSLATIONS: Record<AppLanguage, ServiceManagementTranslations> = {
@@ -345,8 +373,36 @@ export const SERVICE_MANAGEMENT_TRANSLATIONS: Record<AppLanguage, ServiceManagem
     workflowSelectionNotRequired: 'لا يلزم اختيار مسار عمل',
     workflowStartModeNoWorkflow: 'بدون مسار عمل',
     workflowStartModeAutoApply: 'تطبيق تلقائي',
-    workflowStartModeSelectionRequired: 'الاختيار مطلوب',
     workflows: 'مسارات العمل',
+    customInputs: 'البيانات المطلوبة من العميل',
+    customInputsHelp: 'تحديد الحقول والشروط التي يدخلها العميل عند اختيار هذه الخدمة في جهاز الخدمة الذاتية.',
+    addCustomInput: 'إضافة حقل جديد',
+    removeCustomInput: 'إزالة الحقل',
+    customInputName: 'اسم الحقل الداخلي',
+    customInputLabelAr: 'التسمية بالعربية',
+    customInputLabelEn: 'التسمية بالإنجليزية',
+    customInputType: 'نوع الحقل',
+    customInputTypeString: 'نص (String)',
+    customInputTypeInteger: 'رقم صحيح (Integer)',
+    customInputRequired: 'حقل إلزامي',
+    customInputOrder: 'الترتيب',
+    customInputRestrictions: 'شروط وقيود الإدخال',
+    customInputMinLength: 'أقل عدد أحرف',
+    customInputMaxLength: 'أقصى عدد أحرف',
+    customInputStartWith: 'يجب أن يبدأ بـ',
+    customInputMinValue: 'أقل قيمة رقمية',
+    customInputMaxValue: 'أقصى قيمة رقمية',
+    customInputsRequiredError: 'يجب تعريف حقل واحد على الأقل عند طلب بيانات العميل.',
+    customInputDuplicateName: 'اسم الحقل الداخلي مستخدم بالفعل داخل هذه الخدمة.',
+    customInputDuplicateOrder: 'ترتيب الحقل مستخدم بالفعل داخل هذه الخدمة.',
+    customInputMinLengthError: 'يجب أن يكون أقل عدد أحرف 0 أو أكثر.',
+    customInputMaxLengthError: 'يجب أن يكون أقصى عدد أحرف بين 1 و 3000.',
+    customInputLengthRangeError: 'يجب أن يكون أقصى عدد أحرف أكبر من أو يساوي أقل عدد أحرف.',
+    customInputValueRangeError: 'يجب أن تكون أقصى قيمة أكبر من أو تساوي أقل قيمة.',
+    customInputStartWithMaxLength: 'لا يمكن أن تتجاوز بادئة النص 100 حرف.',
+    customInputOrderMinError: 'يجب أن يكون الترتيب أكبر من 0.',
+    noCustomInputs: 'لا توجد حقول بيانات مخصصة.',
+    customInputDetails: 'بيانات العميل المطلوبة',
   },
   en: {
     title: 'Service Management',
@@ -521,7 +577,35 @@ export const SERVICE_MANAGEMENT_TRANSLATIONS: Record<AppLanguage, ServiceManagem
     workflowSelectionNotRequired: 'No workflow selection required',
     workflowStartModeNoWorkflow: 'No Workflow',
     workflowStartModeAutoApply: 'Auto Apply',
-    workflowStartModeSelectionRequired: 'Selection Required',
     workflows: 'Workflows',
+    customInputs: 'Customer Custom Inputs',
+    customInputsHelp: 'Configure fields and validation rules that the customer must provide when selecting this service at the kiosk.',
+    addCustomInput: 'Add Input',
+    removeCustomInput: 'Remove Input',
+    customInputName: 'Internal Field Name',
+    customInputLabelAr: 'Arabic Label',
+    customInputLabelEn: 'English Label',
+    customInputType: 'Field Type',
+    customInputTypeString: 'Text (String)',
+    customInputTypeInteger: 'Integer (Integer)',
+    customInputRequired: 'Required Field',
+    customInputOrder: 'Order',
+    customInputRestrictions: 'Input Restrictions',
+    customInputMinLength: 'Minimum Length',
+    customInputMaxLength: 'Maximum Length',
+    customInputStartWith: 'Must Start With',
+    customInputMinValue: 'Minimum Value',
+    customInputMaxValue: 'Maximum Value',
+    customInputsRequiredError: 'At least one custom input is required when client input is enabled.',
+    customInputDuplicateName: 'Internal field name must be unique within this service.',
+    customInputDuplicateOrder: 'Order number must be unique within this service.',
+    customInputMinLengthError: 'Minimum length must be 0 or greater.',
+    customInputMaxLengthError: 'Maximum length must be between 1 and 3000.',
+    customInputLengthRangeError: 'Maximum length must be greater than or equal to minimum length.',
+    customInputValueRangeError: 'Maximum value must be greater than or equal to minimum value.',
+    customInputStartWithMaxLength: 'Start with prefix cannot exceed 100 characters.',
+    customInputOrderMinError: 'Order must be greater than 0.',
+    noCustomInputs: 'No custom inputs configured.',
+    customInputDetails: 'Required Customer Inputs',
   },
 };

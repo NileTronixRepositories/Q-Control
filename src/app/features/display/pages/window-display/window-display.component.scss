@@ -1,0 +1,414 @@
+:host {
+  display: block;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  background-color: #f8fafc;
+}
+
+.window-display-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 15% 25%, rgba(11, 138, 168, 0.08) 0%, transparent 45%),
+    radial-gradient(circle at 85% 75%, rgba(3, 64, 120, 0.09) 0%, transparent 50%), #ffffff;
+
+  &.rtl-mode {
+    direction: rtl;
+  }
+}
+
+.brand-top-bar {
+  height: 80px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid rgba(11, 138, 168, 0.12);
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(8px);
+}
+
+.window-tv-workspace {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 48px;
+  height: calc(100vh - 80px - 56px);
+}
+
+/* Catchy Centered TV Container */
+.catchy-counter-container {
+  display: grid;
+  grid-template-columns: 1.1fr auto 1.4fr;
+  align-items: center;
+  gap: 48px;
+  width: 100%;
+  max-width: 1240px;
+  background: #ffffff;
+  padding: 44px 54px;
+  border-radius: 28px;
+  border: 2px solid rgba(11, 138, 168, 0.18);
+  box-shadow:
+    0 20px 60px -15px rgba(0, 31, 84, 0.12),
+    0 0 0 1px rgba(255, 255, 255, 0.8) inset;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+
+  &.calling-mode {
+    border-color: #f22745;
+    box-shadow:
+      0 0 50px rgba(242, 39, 69, 0.25),
+      0 25px 65px -10px rgba(0, 31, 84, 0.15);
+    animation: catchyContainerPulse 1.2s infinite alternate;
+  }
+}
+
+@keyframes catchyContainerPulse {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1.008);
+  }
+}
+
+/* Vertical Glow Divider */
+.vertical-glow-divider {
+  width: 2px;
+  height: 80%;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(11, 138, 168, 0.3) 50%,
+    transparent 100%
+  );
+}
+
+/* ========================================================
+   LEFT ZONE: Clinic Identity
+   ======================================================== */
+.clinic-showcase-zone {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.clinic-tag-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(11, 138, 168, 0.1);
+  color: #0b8aa8;
+  padding: 6px 16px;
+  border-radius: 30px;
+  font-size: 1.15rem;
+  font-weight: 800;
+  border: 1px solid rgba(11, 138, 168, 0.25);
+  letter-spacing: 0.02em;
+
+  i {
+    font-size: 1.25rem;
+  }
+}
+
+.clinic-number-hero {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  background: linear-gradient(135deg, #0b8aa8 0%, #034078 100%);
+  color: #ffffff;
+  padding: 16px 36px;
+  border-radius: 20px;
+  box-shadow: 0 10px 28px rgba(11, 138, 168, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.35);
+
+  .number-label {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #9fe2ec;
+  }
+
+  .number-value {
+    font-size: 4.8rem;
+    font-weight: 900;
+    line-height: 1;
+    font-family: 'Cairo', sans-serif;
+    letter-spacing: 0.02em;
+  }
+}
+
+.clinic-meta-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.service-name-heading {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 900;
+  color: #001f54;
+  line-height: 1.25;
+}
+
+.doctor-badge-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #f1f5f9;
+  color: #034078;
+  padding: 8px 18px;
+  border-radius: 12px;
+  font-size: 1.25rem;
+  font-weight: 700;
+  border: 1px solid #e2e8f0;
+  align-self: flex-start;
+
+  i {
+    color: #0b8aa8;
+    font-size: 1.3rem;
+  }
+}
+
+/* ========================================================
+   RIGHT ZONE: Huge Glowing Ticket & Service/Hospital Logo
+   ======================================================== */
+.ticket-showcase-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 20px;
+  width: 100%;
+}
+
+.beacon-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.service-logo-circle {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .logo-core-content {
+    position: relative;
+    z-index: 3;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #0b8aa8 0%, #034078 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 16px rgba(11, 138, 168, 0.35);
+    border: 2px solid #ffffff;
+    overflow: hidden;
+
+    .custom-service-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .service-icon-glyph,
+    .hospital-logo-glyph {
+      color: #ffffff;
+      font-size: 1.7rem;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+    }
+  }
+
+  .beacon-wave {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    border: 2px solid #0b8aa8;
+    animation: radarWave 2.4s infinite cubic-bezier(0.2, 0.8, 0.2, 1);
+    opacity: 0;
+
+    &.wave-1 {
+      width: 60px;
+      height: 60px;
+      animation-delay: 0s;
+    }
+    &.wave-2 {
+      width: 60px;
+      height: 60px;
+      animation-delay: 1.2s;
+    }
+  }
+
+  &.beacon-calling {
+    .logo-core-content {
+      background: linear-gradient(135deg, #f22745 0%, #b8001f 100%);
+      box-shadow: 0 0 25px rgba(242, 39, 69, 0.8);
+      animation: coreCallingPulse 0.8s infinite alternate;
+    }
+    .beacon-wave {
+      border-color: #f22745;
+    }
+  }
+}
+
+@keyframes radarWave {
+  0% {
+    width: 50px;
+    height: 50px;
+    opacity: 0.8;
+  }
+  100% {
+    width: 120px;
+    height: 120px;
+    opacity: 0;
+  }
+}
+
+@keyframes coreCallingPulse {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1.1);
+  }
+}
+
+.status-live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(11, 138, 168, 0.1);
+  color: #0b8aa8;
+  padding: 8px 18px;
+  border-radius: 30px;
+  font-size: 1.15rem;
+  font-weight: 800;
+  border: 1px solid rgba(11, 138, 168, 0.25);
+
+  .status-live-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #10b981;
+    box-shadow: 0 0 10px #10b981;
+  }
+
+  &.badge-calling {
+    background: rgba(242, 39, 69, 0.12);
+    color: #f22745;
+    border-color: rgba(242, 39, 69, 0.35);
+
+    .status-live-dot {
+      background: #f22745;
+      box-shadow: 0 0 12px #f22745;
+      animation: blinkDot 0.6s infinite;
+    }
+  }
+}
+
+@keyframes blinkDot {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.2;
+  }
+}
+
+/* Catchy Ticket Capsule */
+.catchy-ticket-capsule {
+  position: relative;
+  width: 100%;
+  min-height: 190px;
+  background: linear-gradient(135deg, #0b8aa8 0%, #034078 100%);
+  border-radius: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 32px;
+  box-shadow: 0 15px 40px rgba(11, 138, 168, 0.35);
+  border: 3px solid rgba(255, 255, 255, 0.35);
+  overflow: hidden;
+  transition: all 0.35s ease;
+
+  .ticket-inner-glow {
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .ticket-headline-label {
+    position: relative;
+    z-index: 2;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #9fe2ec;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 4px;
+  }
+
+  .ticket-bold-digits {
+    position: relative;
+    z-index: 2;
+    font-size: 5.6rem;
+    font-weight: 900;
+    color: #ffffff;
+    letter-spacing: 0.06em;
+    font-family: 'Cairo', 'Courier New', monospace;
+    line-height: 1;
+    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+  }
+
+  &.ticket-flash {
+    background: linear-gradient(135deg, #f22745 0%, #b8001f 100%);
+    box-shadow: 0 0 50px rgba(242, 39, 69, 0.7);
+    border-color: rgba(255, 255, 255, 0.6);
+    animation: ticketGlowPulse 0.8s infinite alternate;
+
+    .ticket-headline-label {
+      color: #ffd1d8;
+    }
+  }
+}
+
+@keyframes ticketGlowPulse {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1.03);
+  }
+}
+
+@media (max-width: 1024px) {
+  .catchy-counter-container {
+    grid-template-columns: 1fr;
+    gap: 32px;
+    padding: 32px;
+  }
+  .vertical-glow-divider {
+    display: none;
+  }
+  .ticket-showcase-zone {
+    align-items: flex-start;
+  }
+}

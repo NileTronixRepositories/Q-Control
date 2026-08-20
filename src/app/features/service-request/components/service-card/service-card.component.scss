@@ -10,11 +10,11 @@
 .service-card {
   --card-accent: var(--kiosk-srv-btn-bg, #0f75bc);
   align-items: stretch;
-  background: #ffffff;
-  border: 1px solid rgba(203, 213, 225, 0.8);
+  background: var(--kiosk-srv-btn-bg, #ffffff);
+  border: 1px solid color-mix(in srgb, var(--kiosk-srv-btn-bg, #cbd5e1) 60%, #cbd5e1);
   border-radius: 0.85rem;
   box-shadow: 0 4px 15px rgba(15, 23, 42, 0.05);
-  color: #0f172a;
+  color: var(--kiosk-srv-btn-text, #0f172a);
   cursor: pointer;
   display: flex;
   flex: 1 1 auto;
@@ -35,8 +35,8 @@
 
 .service-card:hover,
 .service-card:focus-visible {
-  border-color: var(--card-accent);
-  box-shadow: 0 12px 28px color-mix(in srgb, var(--card-accent) 22%, transparent);
+  border-color: color-mix(in srgb, var(--card-accent) 80%, #000000);
+  box-shadow: 0 12px 28px color-mix(in srgb, var(--card-accent) 25%, transparent);
   transform: translateY(-4px);
 
   .service-card__arrow {
@@ -62,11 +62,11 @@
 
 .service-card__icon {
   align-items: center;
-  background: color-mix(in srgb, var(--card-accent) 14%, #ffffff);
-  border: 1px solid color-mix(in srgb, var(--card-accent) 25%, #ffffff);
+  background: color-mix(in srgb, var(--kiosk-srv-btn-text, var(--card-accent)) 14%, var(--kiosk-srv-btn-bg, #ffffff));
+  border: 1px solid color-mix(in srgb, var(--kiosk-srv-btn-text, var(--card-accent)) 25%, var(--kiosk-srv-btn-bg, #ffffff));
   border-radius: 0.9rem;
   box-shadow: 0 4px 10px color-mix(in srgb, var(--card-accent) 15%, transparent);
-  color: var(--card-accent);
+  color: var(--kiosk-srv-btn-text, var(--card-accent));
   display: inline-flex;
   font-size: 1.55rem;
   height: 3.2rem;
@@ -76,10 +76,10 @@
 
 .service-card__meta {
   align-items: center;
-  background: #f1f5f9;
-  border: 1px solid #cbd5e1;
+  background: color-mix(in srgb, var(--kiosk-srv-btn-text, #334155) 12%, var(--kiosk-srv-btn-bg, #ffffff));
+  border: 1px solid color-mix(in srgb, var(--kiosk-srv-btn-text, #cbd5e1) 25%, transparent);
   border-radius: 999px;
-  color: #334155;
+  color: var(--kiosk-srv-btn-text, #334155);
   display: inline-flex;
   font-size: 0.8rem;
   font-weight: 800;
@@ -87,7 +87,7 @@
   padding: 0.3rem 0.75rem;
 
   i {
-    color: var(--card-accent);
+    color: var(--kiosk-srv-btn-text, var(--card-accent));
     font-size: 0.9rem;
   }
 }
@@ -106,7 +106,8 @@
 }
 
 .service-card__description {
-  color: var(--kiosk-secondary-color, #475569);
+  color: var(--kiosk-srv-btn-text, var(--kiosk-secondary-color, #475569));
+  opacity: 0.9;
   font-size: clamp(0.82rem, 1.1vw, 0.95rem);
   font-weight: 600;
   line-height: var(--q-line-height-body, 1.5);
@@ -114,7 +115,7 @@
 
 .service-card__footer {
   align-items: center;
-  border-top: 1px dashed #e2e8f0;
+  border-top: 1px dashed color-mix(in srgb, var(--kiosk-srv-btn-text, #e2e8f0) 25%, transparent);
   display: flex;
   justify-content: space-between;
   margin-top: auto;
@@ -123,14 +124,14 @@
 }
 
 .service-card__prompt {
-  color: var(--card-accent);
+  color: var(--kiosk-srv-btn-text, var(--card-accent));
   font-size: 0.85rem;
   font-weight: 900;
   letter-spacing: 0;
 }
 
 .service-card__arrow {
-  color: var(--card-accent);
+  color: var(--kiosk-srv-btn-text, var(--card-accent));
   font-size: 1.3rem;
   transition: transform 180ms ease;
 }

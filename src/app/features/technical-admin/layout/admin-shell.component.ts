@@ -109,6 +109,11 @@ export class AdminShellComponent {
         route: '/admin/branch-branding',
         icon: 'bi-brush',
       });
+      items.push({
+        label: translations.displayVideosLabel,
+        route: '/admin/display-videos',
+        icon: 'bi-film',
+      });
     }
 
     if (this.canShow(['BranchConfigurations.View', 'BranchConfigurations.Create', 'BranchConfigurations.Update'])) {

@@ -1,0 +1,145 @@
+:host {
+  display: block;
+  height: 100%;
+  width: 100%;
+}
+
+.queue-table-wrapper {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  background: #ffffff;
+  border-radius: 4px;
+
+  &.rtl-mode {
+    direction: rtl;
+  }
+}
+
+.tv-queue-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  background: #ffffff;
+
+  thead {
+    tr.table-header-row {
+      background: #0b8aa8 !important;
+      height: 44px;
+
+      th {
+        color: #ffffff !important;
+        font-size: 1.15rem;
+        font-weight: 800;
+        text-align: center;
+        padding: 0 12px;
+        letter-spacing: 0.02em;
+        border: none;
+        background: #0b8aa8 !important;
+
+        &.th-clinic {
+          width: 35%;
+          text-align: start;
+          padding-inline-start: 18px;
+        }
+
+        &.th-doctor-service {
+          width: 43%;
+          text-align: start;
+          padding-inline-start: 8px;
+        }
+
+        &.th-ticket {
+          width: 22%;
+          text-align: center;
+        }
+      }
+    }
+  }
+
+  tbody {
+    tr.table-data-row {
+      border-bottom: 1px solid #eef2f6;
+      background: #ffffff;
+      transition: background-color 0.2s ease;
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      td {
+        padding: 8px 12px;
+        vertical-align: middle;
+        background: transparent;
+        border: none;
+
+        &.td-clinic {
+          padding-inline-start: 18px;
+        }
+
+        &.td-doctor-service {
+          padding-inline-start: 8px;
+        }
+
+        &.td-ticket {
+          text-align: center;
+        }
+      }
+
+      .clinic-title {
+        font-size: 1.05rem;
+        font-weight: 800;
+        color: #034078;
+        display: block;
+        line-height: 1.2;
+      }
+
+      .doctor-service-text {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: #334155;
+        display: block;
+        line-height: 1.2;
+      }
+
+      .ticket-badge-tv {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 90px;
+        height: 36px;
+        padding: 0 12px;
+        background: #0b8aa8;
+        color: #ffffff;
+        border-radius: 6px;
+        font-size: 1.25rem;
+        font-weight: 900;
+        font-family: 'Cairo', 'Courier New', monospace;
+        letter-spacing: 0.03em;
+      }
+
+      /* Calling state */
+      &.calling-row {
+        background-color: #fff1f2 !important;
+
+        .clinic-title {
+          color: #d21f35;
+        }
+
+        .ticket-badge-tv {
+          background: #d21f35;
+          animation: pulseFlash 0.8s infinite alternate;
+        }
+      }
+    }
+  }
+}
+
+@keyframes pulseFlash {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1.05);
+  }
+}

@@ -136,7 +136,8 @@ const PAGE_TRANSLATIONS: Record<AppLanguage, BranchBrandingPageTranslations> = {
   ar: {
     pageEyebrow: 'إدارة الفروع',
     pageTitle: 'الهوية البصرية والإعلانات',
-    pageDescription: 'تحكم في شعار الفرع وإعدادات التصميم والسلوك وشاشة طلب الخدمة لكل فرع من لوحة المسؤول التقني.',
+    pageDescription:
+      'تحكم في شعار الفرع وإعدادات التصميم والسلوك وشاشة طلب الخدمة لكل فرع من لوحة المسؤول التقني.',
     branchLabel: 'الفرع',
     selectBranchPlaceholder: 'اختر فرعا',
     refreshLabel: 'تحديث',
@@ -166,7 +167,7 @@ const PAGE_TRANSLATIONS: Record<AppLanguage, BranchBrandingPageTranslations> = {
     languageButtonSection: 'إعدادات زر اللغة',
     serviceButtonSection: 'إعدادات زر الخدمة',
     keypadButtonSection: 'إعدادات لوحة الأرقام',
-    footerButtonSection: 'إعدادات زر الفوتر (رجوع)',
+    footerButtonSection: 'إعدادات زر الفوتر',
     buttonBackgroundColorLabel: 'لون خلفية الزر',
     buttonTextColorLabel: 'لون نص الزر',
     buttonWidthLabel: 'عرض الزر (%)',
@@ -200,7 +201,8 @@ const PAGE_TRANSLATIONS: Record<AppLanguage, BranchBrandingPageTranslations> = {
     orderLabel: 'الترتيب',
     confirmDelete: 'هل أنت متأكد من حذف هذا الإعلان نهائيا؟ لا يمكن التراجع عن هذا الإجراء.',
     loading: 'جاري التحميل...',
-    conflict: 'تم تعديل البيانات بواسطة مستخدم آخر. تم إعادة جلب البيانات برجاء المراجعة والحفظ مجدداً.',
+    conflict:
+      'تم تعديل البيانات بواسطة مستخدم آخر. تم إعادة جلب البيانات برجاء المراجعة والحفظ مجدداً.',
     invalidImage: 'نوع الصورة غير مدعوم. استخدم PNG أو JPG أو JPEG أو WEBP فقط.',
     tooManyImages: 'عدد الصور المحددة يتجاوز الحد المتاح لهذا الفرع.',
     genericError: 'حدث خطأ غير متوقع.',
@@ -212,7 +214,8 @@ const PAGE_TRANSLATIONS: Record<AppLanguage, BranchBrandingPageTranslations> = {
   en: {
     pageEyebrow: 'Branch Management',
     pageTitle: 'Branding & Ticket Issuance Layout',
-    pageDescription: 'Control branch logo, full design layout, button dimensions, screen behavior, and advertisements.',
+    pageDescription:
+      'Control branch logo, full design layout, button dimensions, screen behavior, and advertisements.',
     branchLabel: 'Branch',
     selectBranchPlaceholder: 'Select a branch',
     refreshLabel: 'Refresh',
@@ -274,9 +277,11 @@ const PAGE_TRANSLATIONS: Record<AppLanguage, BranchBrandingPageTranslations> = {
     moveDown: 'Move down',
     saveOrder: 'Save order',
     orderLabel: 'Order',
-    confirmDelete: 'Are you sure you want to permanently delete this advertisement? This action cannot be undone.',
+    confirmDelete:
+      'Are you sure you want to permanently delete this advertisement? This action cannot be undone.',
     loading: 'Loading...',
-    conflict: 'The data was modified by another user. Latest server data has been loaded for your review.',
+    conflict:
+      'The data was modified by another user. Latest server data has been loaded for your review.',
     invalidImage: 'Unsupported image type. Use PNG, JPG, JPEG, or WEBP only.',
     tooManyImages: 'Selected images exceed the available slots for this branch.',
     genericError: 'Unexpected error occurred.',
@@ -310,7 +315,8 @@ export class BranchBrandingComponent implements OnInit, OnDestroy {
   private readonly branchBrandingApiService = inject(BranchBrandingApiService);
   private readonly branchPermissionService = inject(BranchPermissionService);
   private readonly logoInput = viewChild<ElementRef<HTMLInputElement>>('logoInput');
-  private readonly advertisementsInput = viewChild<ElementRef<HTMLInputElement>>('advertisementsInput');
+  private readonly advertisementsInput =
+    viewChild<ElementRef<HTMLInputElement>>('advertisementsInput');
   private readonly themeRevision = signal(0);
   private messageTimeoutId: ReturnType<typeof setTimeout> | null = null;
 
@@ -408,7 +414,10 @@ export class BranchBrandingComponent implements OnInit, OnDestroy {
     }
 
     const branding = this.branding();
-    return this.branchBrandingApiService.resolveMediaUrl(branding?.logoUrl ?? null, branding?.rowVersion ?? null);
+    return this.branchBrandingApiService.resolveMediaUrl(
+      branding?.logoUrl ?? null,
+      branding?.rowVersion ?? null,
+    );
   });
 
   protected readonly hasUnconfiguredBranding = computed(() => {
@@ -434,7 +443,11 @@ export class BranchBrandingComponent implements OnInit, OnDestroy {
 
     return current.some((item, index) => {
       const confirmedItem = confirmed[index];
-      return !confirmedItem || item.id !== confirmedItem.id || item.displayOrder !== confirmedItem.displayOrder;
+      return (
+        !confirmedItem ||
+        item.id !== confirmedItem.id ||
+        item.displayOrder !== confirmedItem.displayOrder
+      );
     });
   });
 
@@ -501,7 +514,10 @@ export class BranchBrandingComponent implements OnInit, OnDestroy {
     this.updateThemeControl(controlName, value);
   }
 
-  protected updateThemePicker(controlName: keyof typeof this.themeForm.controls, event: Event): void {
+  protected updateThemePicker(
+    controlName: keyof typeof this.themeForm.controls,
+    event: Event,
+  ): void {
     const value = (event.target as HTMLInputElement).value.toUpperCase();
     this.updateThemeControl(controlName, value);
   }
@@ -510,7 +526,10 @@ export class BranchBrandingComponent implements OnInit, OnDestroy {
     return String(this.themeForm.controls[controlName].value ?? '');
   }
 
-  protected themePickerValue(controlName: keyof typeof this.themeForm.controls, fallback = '#000000'): string {
+  protected themePickerValue(
+    controlName: keyof typeof this.themeForm.controls,
+    fallback = '#000000',
+  ): string {
     const value = this.themeControlValue(controlName);
     return HEX_COLOR_PATTERN.test(value) ? value.toUpperCase() : fallback;
   }
@@ -619,7 +638,9 @@ export class BranchBrandingComponent implements OnInit, OnDestroy {
     return HEX_COLOR_PATTERN.test(val) ? val.toUpperCase() : null;
   }
 
-  private normalizeOptionalNumber(controlName: keyof typeof this.themeForm.controls): number | null {
+  private normalizeOptionalNumber(
+    controlName: keyof typeof this.themeForm.controls,
+  ): number | null {
     const val = this.themeForm.controls[controlName].value;
     if (val === null || val === undefined || val === '') {
       return null;
@@ -667,15 +688,17 @@ export class BranchBrandingComponent implements OnInit, OnDestroy {
     }
 
     this.logoUploading.set(true);
-    this.branchBrandingApiService.uploadBranchLogo(branchId, file, this.branding()?.rowVersion ?? null).subscribe({
-      next: (branding) => {
-        this.applyBranding(branding);
-        this.clearLogoSelection();
-        this.showMessage('success', branding.message ?? this.copy().themeSaved);
-      },
-      error: (error: HttpErrorResponse) => this.handleApiError(error, () => this.loadBranding()),
-      complete: () => this.logoUploading.set(false),
-    });
+    this.branchBrandingApiService
+      .uploadBranchLogo(branchId, file, this.branding()?.rowVersion ?? null)
+      .subscribe({
+        next: (branding) => {
+          this.applyBranding(branding);
+          this.clearLogoSelection();
+          this.showMessage('success', branding.message ?? this.copy().themeSaved);
+        },
+        error: (error: HttpErrorResponse) => this.handleApiError(error, () => this.loadBranding()),
+        complete: () => this.logoUploading.set(false),
+      });
   }
 
   protected selectAdvertisementFiles(event: Event): void {
@@ -711,7 +734,12 @@ export class BranchBrandingComponent implements OnInit, OnDestroy {
     const branchId = this.selectedBranchId();
     const files = this.selectedAdvertisementFiles();
 
-    if (!branchId || files.length === 0 || !this.canUpdate() || files.length > this.remainingAdvertisementSlots()) {
+    if (
+      !branchId ||
+      files.length === 0 ||
+      !this.canUpdate() ||
+      files.length > this.remainingAdvertisementSlots()
+    ) {
       return;
     }
 
@@ -722,7 +750,8 @@ export class BranchBrandingComponent implements OnInit, OnDestroy {
         this.showMessage('success', this.copy().advertisementsUploaded);
         this.loadAdvertisements();
       },
-      error: (error: HttpErrorResponse) => this.handleApiError(error, () => this.loadAdvertisements()),
+      error: (error: HttpErrorResponse) =>
+        this.handleApiError(error, () => this.loadAdvertisements()),
       complete: () => this.advertisementsUploading.set(false),
     });
   }
@@ -732,7 +761,10 @@ export class BranchBrandingComponent implements OnInit, OnDestroy {
   }
 
   protected advertisementPreviewUrl(advertisement: BranchAdvertisementResponse): string | null {
-    return this.branchBrandingApiService.resolveMediaUrl(advertisement.imageUrl, advertisement.rowVersion);
+    return this.branchBrandingApiService.resolveMediaUrl(
+      advertisement.imageUrl,
+      advertisement.rowVersion,
+    );
   }
 
   protected markLogoPreviewFailed(): void {
@@ -746,7 +778,6 @@ export class BranchBrandingComponent implements OnInit, OnDestroy {
   protected markAdvertisementImageFailed(advertisementId: number): void {
     this.failedAdvertisementImageIds.update((current) => new Set([...current, advertisementId]));
   }
-
 
   protected onAdvertisementDragStart(event: DragEvent, advertisementId: number): void {
     if (!this.canUpdate() || this.orderSaving()) {
@@ -968,7 +999,8 @@ export class BranchBrandingComponent implements OnInit, OnDestroy {
         this.updateAdvertisementState(response);
         this.showMessage('success', response.message);
       },
-      error: (error: HttpErrorResponse) => this.handleApiError(error, () => this.loadAdvertisements()),
+      error: (error: HttpErrorResponse) =>
+        this.handleApiError(error, () => this.loadAdvertisements()),
       complete: () => this.mutatingAdvertisementId.set(null),
     });
   }
@@ -988,7 +1020,8 @@ export class BranchBrandingComponent implements OnInit, OnDestroy {
           this.removeAdvertisement(response.advertisementId);
           this.showMessage('success', response.message);
         },
-        error: (error: HttpErrorResponse) => this.handleApiError(error, () => this.loadAdvertisements()),
+        error: (error: HttpErrorResponse) =>
+          this.handleApiError(error, () => this.loadAdvertisements()),
         complete: () => this.deletingAdvertisementId.set(null),
       });
   }
@@ -1027,7 +1060,7 @@ export class BranchBrandingComponent implements OnInit, OnDestroy {
     const queryBranchId = Number(this.route.snapshot.queryParamMap.get('branchId'));
     const nextBranchId = branches.some((branch) => branch.id === queryBranchId)
       ? queryBranchId
-      : branches[0]?.id ?? null;
+      : (branches[0]?.id ?? null);
 
     this.selectedBranchId.set(nextBranchId);
 
@@ -1125,7 +1158,9 @@ export class BranchBrandingComponent implements OnInit, OnDestroy {
   }
 
   private applyAdvertisements(advertisements: readonly BranchAdvertisementResponse[]): void {
-    const orderedAdvertisements = [...advertisements].sort((first, second) => first.displayOrder - second.displayOrder);
+    const orderedAdvertisements = [...advertisements].sort(
+      (first, second) => first.displayOrder - second.displayOrder,
+    );
     this.advertisements.set(orderedAdvertisements);
     this.confirmedAdvertisements.set(orderedAdvertisements);
     this.failedAdvertisementImageIds.set(new Set<number>());
@@ -1156,7 +1191,10 @@ export class BranchBrandingComponent implements OnInit, OnDestroy {
     this.confirmedAdvertisements.set(remove(this.confirmedAdvertisements()));
   }
 
-  private updateThemeControl(controlName: keyof typeof this.themeForm.controls, value: unknown): void {
+  private updateThemeControl(
+    controlName: keyof typeof this.themeForm.controls,
+    value: unknown,
+  ): void {
     const control = this.themeForm.controls[controlName];
     control.setValue(value as never);
     control.markAsDirty();
@@ -1174,8 +1212,10 @@ export class BranchBrandingComponent implements OnInit, OnDestroy {
   }
 
   private mapBranchOption(branch: BranchListItem): BranchOption {
-    const preferredName = this.i18nStore.language() === 'ar' ? branch.arabicName : branch.englishName;
-    const fallbackName = this.i18nStore.language() === 'ar' ? branch.englishName : branch.arabicName;
+    const preferredName =
+      this.i18nStore.language() === 'ar' ? branch.arabicName : branch.englishName;
+    const fallbackName =
+      this.i18nStore.language() === 'ar' ? branch.englishName : branch.arabicName;
     const label = preferredName?.trim() || fallbackName?.trim() || `BR-${branch.branchId}`;
 
     return {
@@ -1225,7 +1265,6 @@ export class BranchBrandingComponent implements OnInit, OnDestroy {
     this.selectedLogoPreviewUrl.set(nextUrl);
   }
 
-
   private revokeLogoPreviewUrl(): void {
     const currentUrl = this.selectedLogoPreviewUrl();
 
@@ -1236,7 +1275,6 @@ export class BranchBrandingComponent implements OnInit, OnDestroy {
 
     this.logoPreviewFailed.set(false);
   }
-
 
   private replaceAdvertisementPreviews(files: readonly File[]): void {
     this.revokeAdvertisementPreviewUrls();
@@ -1255,7 +1293,6 @@ export class BranchBrandingComponent implements OnInit, OnDestroy {
 
     this.selectedAdvertisementPreviews.set([]);
   }
-
 
   private handleApiError(error: HttpErrorResponse, onConflict?: () => void): void {
     if (this.authSessionService.shouldClearSessionForHttpStatus(error.status)) {
@@ -1279,10 +1316,13 @@ export class BranchBrandingComponent implements OnInit, OnDestroy {
     }
 
     this.message.set({ tone, text });
-    this.messageTimeoutId = setTimeout(() => {
-      this.message.set(null);
-      this.messageTimeoutId = null;
-    }, tone === 'error' ? 7000 : 4500);
+    this.messageTimeoutId = setTimeout(
+      () => {
+        this.message.set(null);
+        this.messageTimeoutId = null;
+      },
+      tone === 'error' ? 7000 : 4500,
+    );
   }
 
   private syncSelectedBranchQuery(branchId: number): void {

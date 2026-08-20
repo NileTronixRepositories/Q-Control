@@ -1,0 +1,155 @@
+:host {
+  position: fixed;
+  top: 10px;
+  right: 14px;
+  z-index: 1000;
+  display: block;
+}
+
+.display-control-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0, 31, 84, 0.92);
+  backdrop-filter: blur(12px);
+  padding: 5px 10px;
+  border-radius: 30px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+  opacity: 0.85;
+
+  &:hover {
+    opacity: 1;
+  }
+
+  &.collapsed {
+    background: rgba(0, 31, 84, 0.4);
+    opacity: 0.3;
+    padding: 4px 8px;
+
+    &:hover {
+      background: rgba(0, 31, 84, 0.9);
+      opacity: 1;
+    }
+  }
+
+  &.rtl-mode {
+    right: auto;
+    left: 14px;
+  }
+}
+
+.collapse-trigger-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 16px;
+  font-size: 0.85rem;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.15);
+  }
+
+  .pill-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+}
+
+.control-actions-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ctrl-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: none;
+  border-radius: 16px;
+  padding: 4px 10px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &.btn-call {
+    background: #d21f35;
+    color: #ffffff;
+
+    &:hover {
+      background: #b8001f;
+    }
+  }
+
+  &.btn-secondary {
+    background: rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.25);
+    }
+  }
+
+  &.btn-icon {
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    &.active {
+      background: #0b8aa8;
+      color: #ffffff;
+    }
+  }
+
+  &.btn-lang {
+    background: rgba(11, 138, 168, 0.4);
+    color: #ffffff;
+
+    &:hover {
+      background: #0b8aa8;
+    }
+  }
+}
+
+.view-switch-btns {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.window-selector-wrapper {
+  position: relative;
+}
+
+.window-select {
+  background: rgba(0, 15, 40, 0.9);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 16px;
+  padding: 3px 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+
+  option {
+    background: #001f54;
+    color: #ffffff;
+  }
+}

@@ -29,6 +29,7 @@ interface TechnicalAdminTranslations {
   readonly inactiveBranchLabel: string;
   readonly branchEditorLabel: string;
   readonly branchBrandingLabel: string;
+  readonly displayVideosLabel: string;
   readonly branchConfigurationLabel: string;
   readonly branchConfigurationDescription: string;
   readonly allowedTimeLabel: string;
@@ -131,6 +132,8 @@ interface TechnicalAdminTranslations {
   readonly createdByLabel: string;
   readonly yesLabel: string;
   readonly noLabel: string;
+  readonly close: string;
+  readonly closeLabel: string;
 }
 
 const TECHNICAL_ADMIN_TRANSLATIONS: Record<AppLanguage, TechnicalAdminTranslations> = {
@@ -154,6 +157,7 @@ const TECHNICAL_ADMIN_TRANSLATIONS: Record<AppLanguage, TechnicalAdminTranslatio
     themeConfigurationLabel: 'الهوية البصرية والإعدادات',
     branchEditorLabel: 'محرر الفروع',
     branchBrandingLabel: 'الهوية والإعلانات',
+    displayVideosLabel: 'فيديوهات الشاشات',
     branchConfigurationLabel: 'إعدادات أوقات الفرع',
     branchConfigurationDescription:
       'إعداد المدة المسموح بها لظهور الخدمات في شاشة إصدار التذاكر قبل موعد بدايتها.',
@@ -309,6 +313,8 @@ const TECHNICAL_ADMIN_TRANSLATIONS: Record<AppLanguage, TechnicalAdminTranslatio
     createdByLabel: '\u0623\u0646\u0634\u0626 \u0628\u0648\u0627\u0633\u0637\u0629',
     yesLabel: '\u0646\u0639\u0645',
     noLabel: '\u0644\u0627',
+    close: '\u0625\u063a\u0644\u0627\u0642',
+    closeLabel: '\u0625\u063a\u0644\u0627\u0642',
   },
   en: {
     closeSidebarLabel: 'Close sidebar',
@@ -336,6 +342,7 @@ const TECHNICAL_ADMIN_TRANSLATIONS: Record<AppLanguage, TechnicalAdminTranslatio
     inactiveBranchLabel: 'Inactive',
     branchEditorLabel: 'Branch Editor',
     branchBrandingLabel: 'Branding & Advertisements',
+    displayVideosLabel: 'Display Videos',
     branchConfigurationLabel: 'Branch Configuration',
     branchConfigurationDescription:
       'Configure how early services appear on the ticket issuance screen before their scheduled start time.',
@@ -446,6 +453,8 @@ const TECHNICAL_ADMIN_TRANSLATIONS: Record<AppLanguage, TechnicalAdminTranslatio
     createdByLabel: 'Created by',
     yesLabel: 'Yes',
     noLabel: 'No',
+    close: 'Close',
+    closeLabel: 'Close',
   },
 };
 

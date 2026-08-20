@@ -238,6 +238,15 @@
                       >
                         <i class="bi bi-brush" aria-hidden="true"></i>
                       </button>
+                      <button
+                        type="button"
+                        class="icon-action"
+                        [title]="branchEditorTranslations().displayVideos"
+                        [attr.aria-label]="branchEditorTranslations().displayVideos"
+                        (click)="$event.stopPropagation(); openDisplayVideos(branch.id)"
+                      >
+                        <i class="bi bi-film" aria-hidden="true"></i>
+                      </button>
                       @if (canCreateBranchAdmin() && branch.isActive) {
                         <button
                           type="button"
@@ -386,6 +395,16 @@
                 (click)="$event.stopPropagation(); openBranchBranding(branch.id)"
               >
                 <i class="bi bi-brush" aria-hidden="true"></i>
+              </button>
+              <button
+                record-actions
+                type="button"
+                class="icon-action"
+                [title]="branchEditorTranslations().displayVideos"
+                [attr.aria-label]="branchEditorTranslations().displayVideos"
+                (click)="$event.stopPropagation(); openDisplayVideos(branch.id)"
+              >
+                <i class="bi bi-film" aria-hidden="true"></i>
               </button>
               @if (canCreateBranchAdmin() && branch.isActive) {
                 <button

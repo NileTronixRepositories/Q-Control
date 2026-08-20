@@ -16,6 +16,7 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   AbstractControl,
+  FormArray,
   NonNullableFormBuilder,
   ReactiveFormsModule,
   ValidationErrors,
@@ -30,6 +31,11 @@ import { TechnicalAdminPageHeroComponent } from '../../../../shared/components/t
 import { AuthSessionService } from '../../../auth/services/auth-session.service';
 import { TechnicalAdminI18nStore } from '../../../technical-admin/store/technical-admin-i18n.store';
 import { formatTechnicalAdminApiError } from '../../../technical-admin/utils/api-error-message.util';
+import {
+  createCustomInputFormGroup,
+  CustomInputFormGroup,
+  ServiceCustomInputsBuilderComponent,
+} from '../../components/service-custom-inputs-builder/service-custom-inputs-builder.component';
 import { ServiceHierarchyTreeComponent } from '../../components/service-hierarchy-tree/service-hierarchy-tree.component';
 import { ServiceMediaManagerComponent } from '../../components/service-media-manager/service-media-manager.component';
 import { SERVICE_MANAGEMENT_TRANSLATIONS } from '../../i18n/service-management.translations';
@@ -41,9 +47,11 @@ import {
 } from '../../models/branch-services.model';
 import {
   CreateServiceRequest,
+  CustomInputType,
   ServiceBooleanFilter,
   ServiceConfirmAction,
   ServiceConfirmState,
+  ServiceCustomInput,
   ServiceDetails,
   ServiceListItem,
   ServiceManagementTab,
@@ -53,6 +61,7 @@ import {
   ServiceTreeNode,
   UpdateServiceRequest,
 } from '../../models/service-management.model';
+import { customInputsArrayValidator } from '../../utils/service-custom-inputs-validation.util';
 import { BranchServicesApiService } from '../../services/branch/branch-services-api.service';
 import { ServiceCatalogFacadeService } from '../../services/catalog/service-catalog-facade.service';
 import { ServiceManagementApiService } from '../../services/catalog/service-management-api.service';
@@ -111,6 +120,7 @@ type FormControlName =
     ReactiveFormsModule,
     ServiceHierarchyTreeComponent,
     ServiceMediaManagerComponent,
+    ServiceCustomInputsBuilderComponent,
     TechnicalAdminPageHeroComponent,
     NiletronixLoadingStateComponent,
   ],
@@ -297,6 +307,22 @@ export class ServicesComponent implements OnInit, OnDestroy {
           ),
         ],
       },
+      ...(details.isClientInputRequired && details.customInputs && details.customInputs.length > 0
+        ? [
+            {
+              key: 'customInputs',
+              title: translations.customInputDetails,
+              icon: 'bi-ui-checks-grid',
+              items: details.customInputs.map((input, idx) =>
+                this.detailText(
+                  `customInput_${idx}`,
+                  `${input.order}. ${this.i18nStore.language() === 'ar' ? input.labelAr || input.name : input.labelEn || input.name} (${input.type})`,
+                  input.isRequired ? translations.customInputRequired : translations.no,
+                ),
+              ),
+            },
+          ]
+        : []),
     ];
   });
 
@@ -342,6 +368,9 @@ export class ServicesComponent implements OnInit, OnDestroy {
       rangeEndNumber: [999, [Validators.required, Validators.min(0)]],
       waitingDuration: [0, [Validators.required, Validators.min(0)]],
       noOfTicketCopies: [1, [Validators.required, Validators.min(1)]],
+      customInputs: this.formBuilder.array<CustomInputFormGroup>([], {
+        validators: [customInputsArrayValidator()],
+      }),
     },
     { validators: [this.rangeValidator] },
   );
@@ -356,6 +385,7 @@ export class ServicesComponent implements OnInit, OnDestroy {
   public readonly noOfTicketCopiesControl = this.serviceForm.controls.noOfTicketCopies;
   public readonly rangeStartNumberControl = this.serviceForm.controls.rangeStartNumber;
   public readonly rangeEndNumberControl = this.serviceForm.controls.rangeEndNumber;
+  public readonly customInputsArray = this.serviceForm.controls.customInputs;
 
   private searchDebounceId: ReturnType<typeof setTimeout> | null = null;
   private treeSearchDebounceId: ReturnType<typeof setTimeout> | null = null;
@@ -655,6 +685,7 @@ export class ServicesComponent implements OnInit, OnDestroy {
     this.nameConflictControl = null;
     this.branchCreateParentNode = null;
     this.activeEditorTab.set('form');
+    this.customInputsArray.clear();
     this.serviceForm.markAsPristine();
     this.serviceForm.enable({ emitEvent: false });
     this.restoreDrawerTriggerFocus();
@@ -969,6 +1000,18 @@ export class ServicesComponent implements OnInit, OnDestroy {
     this.applyServiceCodeValidation();
   }
 
+  public onClientInputRequiredChange(event: Event): void {
+    const checked = (event.target as HTMLInputElement).checked;
+
+    if (!checked) {
+      this.customInputsArray.clear();
+      this.customInputsArray.markAsPristine();
+    } else if (this.customInputsArray.length === 0) {
+      this.customInputsArray.push(createCustomInputFormGroup({ order: 1 }));
+      this.customInputsArray.markAsDirty();
+    }
+  }
+
   public onServiceCodeInput(): void {
     this.clearServiceCodeConflict();
     this.applyServiceCodeValidation();
@@ -1176,6 +1219,7 @@ export class ServicesComponent implements OnInit, OnDestroy {
     this.reloadConflictServiceId.set(null);
     this.serviceCodeConflict = false;
     this.nameConflictControl = null;
+    this.customInputsArray.clear();
     if (!isBranchScopedCreate) {
       this.loadParentOptions();
     }
@@ -1217,12 +1261,12 @@ export class ServicesComponent implements OnInit, OnDestroy {
       .getServices(this.store.listQuery())
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-      next: (response) => {
-        this.store.servicePage.set(response);
-      },
-      error: (error: HttpErrorResponse) => this.handleApiError(error),
-      complete: () => this.store.listLoading.set(false),
-    });
+        next: (response) => {
+          this.store.servicePage.set(response);
+        },
+        error: (error: HttpErrorResponse) => this.handleApiError(error),
+        complete: () => this.store.listLoading.set(false),
+      });
   }
 
   private loadTree(): void {
@@ -1368,10 +1412,10 @@ export class ServicesComponent implements OnInit, OnDestroy {
       .getAvailableParents({ excludeServiceId })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-      next: (response) => this.store.parentOptions.set(response),
-      error: (error: HttpErrorResponse) => this.handleApiError(error),
-      complete: () => this.store.parentsLoading.set(false),
-    });
+        next: (response) => this.store.parentOptions.set(response),
+        error: (error: HttpErrorResponse) => this.handleApiError(error),
+        complete: () => this.store.parentsLoading.set(false),
+      });
   }
 
   private loadDetails(serviceId: number, mode: Extract<ServicePanelMode, 'view' | 'edit'>): void {
@@ -1522,20 +1566,20 @@ export class ServicesComponent implements OnInit, OnDestroy {
         takeUntilDestroyed(this.destroyRef),
       )
       .subscribe({
-      next: (response) => {
-        if (parent) {
-          this.store.expandAssignedBranchNodes([parent.id]);
-        }
+        next: (response) => {
+          if (parent) {
+            this.store.expandAssignedBranchNodes([parent.id]);
+          }
 
-        this.store.selectTreeNode(response.root.id);
-        this.showMessage('success', response.message || this.translations().fallbackSuccess);
-        this.closePanel();
-        this.loadTree();
-        this.loadAssignedBranchTree(response.root.id);
-        this.loadDetails(response.root.id, 'view');
-      },
-      error: (error: HttpErrorResponse) => this.handleApiError(error),
-    });
+          this.store.selectTreeNode(response.root.id);
+          this.showMessage('success', response.message || this.translations().fallbackSuccess);
+          this.closePanel();
+          this.loadTree();
+          this.loadAssignedBranchTree(response.root.id);
+          this.loadDetails(response.root.id, 'view');
+        },
+        error: (error: HttpErrorResponse) => this.handleApiError(error),
+      });
   }
   private updateService(): void {
     const details = this.store.selectedDetails();
@@ -1660,6 +1704,18 @@ export class ServicesComponent implements OnInit, OnDestroy {
     this.serviceCodeConflict = false;
     this.nameConflictControl = null;
     this.reloadConflictServiceId.set(null);
+    this.customInputsArray.clear();
+
+    const isParent = details.hasChildren;
+    const isClientInputRequired = isParent ? false : details.isClientInputRequired;
+
+    if (!isParent && isClientInputRequired && details.customInputs && details.customInputs.length > 0) {
+      const sortedInputs = [...details.customInputs].sort((a, b) => a.order - b.order);
+      for (const input of sortedInputs) {
+        this.customInputsArray.push(createCustomInputFormGroup(input));
+      }
+    }
+
     this.serviceForm.enable({ emitEvent: false });
     this.serviceForm.reset({
       parentServiceId: details.parentServiceId ?? 0,
@@ -1670,7 +1726,7 @@ export class ServicesComponent implements OnInit, OnDestroy {
       isServiceCodeRequired: details.isServiceCodeRequired,
       serviceCode: details.serviceCode ?? '',
       isTicketIssuable: details.isTicketIssuable ? 'true' : 'false',
-      isClientInputRequired: details.isClientInputRequired,
+      isClientInputRequired,
       hasReservation: details.hasReservation,
       orderNo: details.orderNo,
       priority: details.priority,
@@ -1698,6 +1754,24 @@ export class ServicesComponent implements OnInit, OnDestroy {
     if (details?.hasChildren && value.isTicketIssuable === 'true') {
       this.formError.set(this.translations().childTicketDisabled);
       return false;
+    }
+
+    const isParent = Boolean(details?.hasChildren);
+    if (!isParent && value.isClientInputRequired) {
+      if (this.customInputsArray.length === 0) {
+        this.formError.set(this.translations().customInputsRequiredError);
+        return false;
+      }
+      if (this.customInputsArray.invalid) {
+        if (this.customInputsArray.hasError('duplicateCustomInputNames')) {
+          this.formError.set(this.translations().customInputDuplicateName);
+        } else if (this.customInputsArray.hasError('duplicateCustomInputOrders')) {
+          this.formError.set(this.translations().customInputDuplicateOrder);
+        } else {
+          this.formError.set(this.translations().requiredField);
+        }
+        return false;
+      }
     }
 
     return true;
@@ -1747,6 +1821,54 @@ export class ServicesComponent implements OnInit, OnDestroy {
   private mapMutationRequest(): CreateServiceRequest {
     const value = this.serviceForm.getRawValue();
     const isTicketIssuable = value.isTicketIssuable === 'true';
+    const isParent = Boolean(this.store.selectedDetails()?.hasChildren);
+    const isClientInputRequired = !isParent && value.isClientInputRequired;
+
+    let customInputs: ServiceCustomInput[] | null = null;
+    if (isClientInputRequired && this.customInputsArray.length > 0) {
+      customInputs = this.customInputsArray.controls.map((group) => {
+        const item = group.getRawValue();
+        const type: CustomInputType = item.type;
+        return {
+          customInputId: item.customInputId ?? null,
+          name: item.name.trim(),
+          labelAr: this.toOptionalString(item.labelAr),
+          labelEn: this.toOptionalString(item.labelEn),
+          type,
+          isRequired: item.isRequired,
+          order: Number(item.order),
+          minLength:
+            type === 'String' &&
+            item.minLength !== null &&
+            item.minLength !== undefined &&
+            (item.minLength as unknown) !== ''
+              ? Number(item.minLength)
+              : null,
+          maxLength:
+            type === 'String' &&
+            item.maxLength !== null &&
+            item.maxLength !== undefined &&
+            (item.maxLength as unknown) !== ''
+              ? Number(item.maxLength)
+              : null,
+          startWith: type === 'String' ? this.toOptionalString(item.startWith) : null,
+          minValue:
+            type === 'Integer' &&
+            item.minValue !== null &&
+            item.minValue !== undefined &&
+            (item.minValue as unknown) !== ''
+              ? Number(item.minValue)
+              : null,
+          maxValue:
+            type === 'Integer' &&
+            item.maxValue !== null &&
+            item.maxValue !== undefined &&
+            (item.maxValue as unknown) !== ''
+              ? Number(item.maxValue)
+              : null,
+        };
+      });
+    }
 
     return {
       parentServiceId: value.parentServiceId > 0 ? Number(value.parentServiceId) : null,
@@ -1757,7 +1879,7 @@ export class ServicesComponent implements OnInit, OnDestroy {
       serviceCode: value.isServiceCodeRequired ? this.toOptionalString(value.serviceCode) : null,
       isServiceCodeRequired: value.isServiceCodeRequired,
       isTicketIssuable,
-      isClientInputRequired: value.isClientInputRequired,
+      isClientInputRequired,
       hasReservation: value.hasReservation,
       orderNo: Number(value.orderNo),
       priority: Number(value.priority),
@@ -1767,6 +1889,7 @@ export class ServicesComponent implements OnInit, OnDestroy {
       rangeEndNumber: isTicketIssuable ? Number(value.rangeEndNumber) : null,
       waitingDuration: isTicketIssuable ? Number(value.waitingDuration) : null,
       noOfTicketCopies: isTicketIssuable ? Number(value.noOfTicketCopies) : null,
+      customInputs,
     };
   }
 

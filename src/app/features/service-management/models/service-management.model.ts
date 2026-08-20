@@ -73,6 +73,24 @@ export interface ServiceListItem extends ServiceCodeFields {
   readonly rowVersion: string;
 }
 
+export type CustomInputType = 'String' | 'Integer';
+
+export interface ServiceCustomInput {
+  readonly customInputId?: number | null;
+  readonly name: string;
+  readonly labelEn: string | null;
+  readonly labelAr: string | null;
+  readonly type: CustomInputType;
+  readonly typeName?: string;
+  readonly isRequired: boolean;
+  readonly minLength?: number | null;
+  readonly maxLength?: number | null;
+  readonly minValue?: number | null;
+  readonly maxValue?: number | null;
+  readonly startWith?: string | null;
+  readonly order: number;
+}
+
 export interface ServiceDetails extends ServiceListItem {
   readonly parentServiceNameAr: string | null;
   readonly parentServiceNameEn: string | null;
@@ -86,6 +104,7 @@ export interface ServiceDetails extends ServiceListItem {
   readonly waitingDuration: number;
   readonly noOfTicketCopies: number;
   readonly adsImages?: readonly ServiceImageResponse[] | null;
+  readonly customInputs?: readonly ServiceCustomInput[] | null;
 }
 
 export interface ServiceTreeNode extends ServiceCodeFields {
@@ -148,6 +167,7 @@ export interface ServiceSelectionOption {
   readonly rangeEndNumber?: number | null;
   readonly waitingDuration?: number | null;
   readonly noOfTicketCopies?: number | null;
+  readonly customInputs?: readonly ServiceCustomInput[] | null;
 }
 
 export interface ServiceTreeQuery {
@@ -181,6 +201,7 @@ export interface ServiceMutationRequest extends ServiceCodeFields {
   readonly rangeEndNumber: number | null;
   readonly waitingDuration: number | null;
   readonly noOfTicketCopies: number | null;
+  readonly customInputs?: readonly ServiceCustomInput[] | null;
 }
 
 export type CreateServiceRequest = ServiceMutationRequest;

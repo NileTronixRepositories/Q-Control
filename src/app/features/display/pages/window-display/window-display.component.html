@@ -1,0 +1,101 @@
+<div class="window-display-layout" [class.rtl-mode]="isAr()">
+  <!-- Top Brand Header Bar with Glass Effect -->
+  <div class="brand-top-bar">
+    <app-display-header />
+  </div>
+
+  <!-- Main Single Counter Catchy Showcase -->
+  @if (currentWindow(); as window) {
+    <main class="window-tv-workspace">
+      <div
+        class="catchy-counter-container"
+        [class.calling-mode]="window.isFlashing || window.status === 'calling'"
+      >
+        <!-- Left Zone (or Right in RTL): Clinic / Counter Identity -->
+        <div class="clinic-showcase-zone">
+          <div class="clinic-tag-pill">
+            <i class="bi bi-door-open-fill"></i>
+            <span>{{ isAr() ? 'عيادة / شباك' : 'Clinic / Window' }}</span>
+          </div>
+
+          <div class="clinic-number-hero">
+            <span class="number-label">{{ isAr() ? 'رقم' : 'NO.' }}</span>
+            <span class="number-value">{{ window.windowNumber }}</span>
+          </div>
+
+          <div class="clinic-meta-card">
+            <h2 class="service-name-heading">{{ getServiceName(window) }}</h2>
+            @if (getDoctorName(window); as doc) {
+              <div class="doctor-badge-pill">
+                <i class="bi bi-person-badge-fill"></i>
+                <span>{{ doc }}</span>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Center Divider Glow Line -->
+        <div class="vertical-glow-divider"></div>
+
+        <!-- Right Zone (or Left in RTL): Huge Glowing Ticket & Live Beacon with Service/Hospital Logo -->
+        <div class="ticket-showcase-zone">
+          <div class="beacon-row">
+            <!-- Service Logo / Hospital Logo Circle -->
+            <div
+              class="service-logo-circle"
+              [class.beacon-calling]="window.isFlashing || window.status === 'calling'"
+            >
+              <span class="beacon-wave wave-1"></span>
+              <span class="beacon-wave wave-2"></span>
+              <div class="logo-core-content">
+                @if (window.serviceLogoUrl) {
+                  <img
+                    [src]="window.serviceLogoUrl"
+                    alt="Service Logo"
+                    class="custom-service-img"
+                  />
+                } @else if (window.serviceIcon) {
+                  <i class="bi {{ window.serviceIcon }} service-icon-glyph"></i>
+                } @else {
+                  <i class="bi bi-hospital-fill hospital-logo-glyph"></i>
+                }
+              </div>
+            </div>
+
+            <!-- Live Status Pill -->
+            <div
+              class="status-live-badge"
+              [class.badge-calling]="window.isFlashing || window.status === 'calling'"
+            >
+              <span class="status-live-dot"></span>
+              <span>{{
+                window.isFlashing || window.status === 'calling'
+                  ? isAr()
+                    ? 'جاري النداء الآن'
+                    : 'Calling Now'
+                  : isAr()
+                    ? 'جاري الخدمة'
+                    : 'Now Serving'
+              }}</span>
+            </div>
+          </div>
+
+          <!-- Huge Glowing Ticket Capsule -->
+          <div
+            class="catchy-ticket-capsule"
+            [class.ticket-flash]="window.isFlashing || window.status === 'calling'"
+          >
+            <div class="ticket-inner-glow"></div>
+            <span class="ticket-headline-label">{{
+              isAr() ? 'رقم التذكرة' : 'Ticket Number'
+            }}</span>
+            <span class="ticket-bold-digits">{{ window.currentTicket || '---' }}</span>
+          </div>
+        </div>
+      </div>
+    </main>
+  }
+
+  <!-- Bottom Ticker & Clock -->
+  <app-display-ticker-bar />
+</div>

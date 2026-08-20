@@ -89,6 +89,7 @@ export class ServiceRequestService {
     const childNodes = node.children ?? [];
     const specialties = childNodes.map((child, childIdx) => this.mapToSpecialty(child, childIdx, tone));
     const specialtyIds = specialties.map((s) => s.id);
+    const customInputs = node.customInputs ? [...node.customInputs].sort((a, b) => a.order - b.order) : [];
 
     const serviceType: ServiceType = {
       id,
@@ -101,6 +102,8 @@ export class ServiceRequestService {
       estimatedWaitingMinutes,
       specialtyIds,
       isTicketIssuable: node.isTicketIssuable,
+      isClientInputRequired: node.isClientInputRequired,
+      customInputs,
     };
 
     return { serviceType, specialties };
@@ -127,6 +130,7 @@ export class ServiceRequestService {
     const estimatedWaitingMinutes = 0;
     const childNodes = node.children ?? [];
     const subSpecialties = childNodes.map((child, childIdx) => this.mapToSpecialty(child, childIdx, tone));
+    const customInputs = node.customInputs ? [...node.customInputs].sort((a, b) => a.order - b.order) : [];
 
     return {
       id,
@@ -139,6 +143,8 @@ export class ServiceRequestService {
       subSpecialties,
       ticketPrefix: node.rangePrefix ?? undefined,
       isTicketIssuable: node.isTicketIssuable,
+      isClientInputRequired: node.isClientInputRequired,
+      customInputs,
     };
   }
 

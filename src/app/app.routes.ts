@@ -92,6 +92,13 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'display',
+    loadChildren: () =>
+      import('./features/display/display.routes').then(
+        (routes) => routes.DISPLAY_ROUTES,
+      ),
+  },
+  {
     path: '',
     pathMatch: 'full',
     redirectTo: 'auth/login',

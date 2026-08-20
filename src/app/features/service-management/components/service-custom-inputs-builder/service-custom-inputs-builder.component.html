@@ -1,0 +1,352 @@
+<section class="svc-custom-inputs-builder d-grid gap-3">
+  <!-- SECTION HEADER -->
+  <div class="svc-builder-header d-flex align-items-center justify-content-between flex-wrap gap-2">
+    <div>
+      <h4 class="svc-builder-title d-flex align-items-center gap-2 m-0">
+        <i class="bi bi-ui-checks-grid text-primary" aria-hidden="true"></i>
+        <span>{{ translations().customInputs }}</span>
+        <span class="badge rounded-pill bg-primary-subtle text-primary border border-primary-subtle px-2">
+          {{ customInputs().length }}
+        </span>
+      </h4>
+      <p class="svc-builder-subtitle m-0 mt-1">
+        {{ translations().customInputsHelp }}
+      </p>
+    </div>
+
+    <button
+      type="button"
+      class="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-2 px-3 py-1-5 rounded-3 fw-semibold shadow-none"
+      [disabled]="disabled()"
+      (click)="addInput()"
+    >
+      <i class="bi bi-plus-circle-fill" aria-hidden="true"></i>
+      <span>{{ translations().addCustomInput }}</span>
+    </button>
+  </div>
+
+  @if (customInputs().length === 0) {
+    <!-- EMPTY STATE -->
+    <div class="svc-builder-empty p-4 rounded-3 border border-dashed text-center bg-light">
+      <div class="empty-icon text-muted mb-2 fs-3">
+        <i class="bi bi-card-checklist" aria-hidden="true"></i>
+      </div>
+      <p class="fw-semibold text-secondary m-0 fs-7">{{ translations().noCustomInputs }}</p>
+      <p class="text-danger fw-bold fs-8 m-0 mt-1 d-flex align-items-center justify-content-center gap-1">
+        <i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>
+        {{ translations().customInputsRequiredError }}
+      </p>
+      <button
+        type="button"
+        class="btn btn-sm btn-primary mt-3 d-inline-flex align-items-center gap-2 shadow-none"
+        [disabled]="disabled()"
+        (click)="addInput()"
+      >
+        <i class="bi bi-plus-lg" aria-hidden="true"></i> {{ translations().addCustomInput }}
+      </button>
+    </div>
+  } @else {
+    <!-- INPUTS LIST -->
+    <div class="svc-inputs-list d-grid gap-3">
+      @for (group of customInputs().controls; track $index; let idx = $index) {
+        <article class="svc-input-card p-3 rounded-3 border bg-white d-grid gap-3">
+          <!-- CARD HEADER -->
+          <div class="svc-input-card-header d-flex align-items-center justify-content-between flex-wrap gap-2 pb-2 border-bottom">
+            <div class="d-flex align-items-center flex-wrap gap-2">
+              <span class="badge bg-secondary-subtle text-secondary border px-2 py-1 fs-8 fw-bold">
+                #{{ idx + 1 }}
+              </span>
+              <span class="fw-bold fs-7 text-dark">
+                {{
+                  group.get('labelAr')?.value ||
+                    group.get('labelEn')?.value ||
+                    group.get('name')?.value ||
+                    translations().customInputs + ' ' + (idx + 1)
+                }}
+              </span>
+              <span
+                class="badge"
+                [class.bg-info-subtle]="group.get('type')?.value === 'String'"
+                [class.text-info-emphasis]="group.get('type')?.value === 'String'"
+                [class.bg-warning-subtle]="group.get('type')?.value === 'Integer'"
+                [class.text-warning-emphasis]="group.get('type')?.value === 'Integer'"
+              >
+                {{
+                  group.get('type')?.value === 'String'
+                    ? translations().customInputTypeString
+                    : translations().customInputTypeInteger
+                }}
+              </span>
+              @if (group.get('isRequired')?.value) {
+                <span class="badge bg-danger-subtle text-danger border border-danger-subtle fs-8">
+                  {{ translations().customInputRequired }}
+                </span>
+              }
+            </div>
+
+            <div class="d-flex align-items-center gap-2">
+              <button
+                type="button"
+                class="svc-btn-remove"
+                [attr.aria-label]="translations().removeCustomInput"
+                [title]="translations().removeCustomInput"
+                [disabled]="disabled()"
+                (click)="removeInput(idx)"
+              >
+                <i class="bi bi-trash3-fill" aria-hidden="true"></i>
+                <span>{{ translations().removeCustomInput }}</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- CARD FORM BODY -->
+          <div [formGroup]="group" class="svc-input-card-body d-grid gap-3">
+            <!-- Row 1: Name, Type, Order, Required -->
+            <div class="row g-2 align-items-start">
+              <!-- Field: Name -->
+              <div class="col-12 col-md-4">
+                <label class="svc-field d-grid gap-1 m-0">
+                  <span class="svc-field-label d-flex align-items-center gap-1">
+                    {{ translations().customInputName }}
+                    <span class="text-danger">*</span>
+                  </span>
+                  <input
+                    type="text"
+                    class="form-control form-control-sm"
+                    dir="ltr"
+                    formControlName="name"
+                    maxlength="100"
+                    placeholder="e.g. NationalId"
+                  />
+                  @if (hasControlError(group, 'name', 'required')) {
+                    <span class="svc-field-error-msg">
+                      <i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>
+                      <span>{{ translations().requiredField }}</span>
+                    </span>
+                  }
+                  @if (hasControlError(group, 'name', 'maxlength')) {
+                    <span class="svc-field-error-msg">
+                      <i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>
+                      <span>{{ translations().maxLength100 }}</span>
+                    </span>
+                  }
+                  @if (isNameDuplicate(idx)) {
+                    <span class="svc-field-error-msg">
+                      <i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>
+                      <span>{{ translations().customInputDuplicateName }}</span>
+                    </span>
+                  }
+                </label>
+              </div>
+
+              <!-- Field: Type -->
+              <div class="col-12 col-md-3">
+                <label class="svc-field d-grid gap-1 m-0">
+                  <span class="svc-field-label">{{ translations().customInputType }}</span>
+                  <select
+                    class="form-select form-select-sm"
+                    formControlName="type"
+                    (change)="onTypeChange(group, $any($event.target).value)"
+                  >
+                    <option value="String">{{ translations().customInputTypeString }}</option>
+                    <option value="Integer">{{ translations().customInputTypeInteger }}</option>
+                  </select>
+                </label>
+              </div>
+
+              <!-- Field: Order -->
+              <div class="col-6 col-md-2">
+                <label class="svc-field d-grid gap-1 m-0">
+                  <span class="svc-field-label d-flex align-items-center gap-1">
+                    {{ translations().customInputOrder }}
+                    <span class="text-danger">*</span>
+                  </span>
+                  <input
+                    type="number"
+                    min="1"
+                    class="form-control form-control-sm text-center"
+                    formControlName="order"
+                  />
+                  @if (
+                    hasControlError(group, 'order', 'min') ||
+                    hasControlError(group, 'order', 'required')
+                  ) {
+                    <span class="svc-field-error-msg">
+                      <i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>
+                      <span>{{ translations().customInputOrderMinError }}</span>
+                    </span>
+                  }
+                  @if (isOrderDuplicate(idx)) {
+                    <span class="svc-field-error-msg">
+                      <i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>
+                      <span>{{ translations().customInputDuplicateOrder }}</span>
+                    </span>
+                  }
+                </label>
+              </div>
+
+              <!-- Field: IsRequired -->
+              <div class="col-6 col-md-3">
+                <label class="svc-field d-grid gap-1 m-0">
+                  <span class="svc-field-label">{{ translations().customInputRequired }}</span>
+                  <label class="svc-switch-box d-flex align-items-center justify-content-between px-3 m-0">
+                    <span
+                      class="fs-8 fw-semibold"
+                      [class.text-primary]="group.get('isRequired')?.value"
+                      [class.text-muted]="!group.get('isRequired')?.value"
+                    >
+                      {{ group.get('isRequired')?.value ? translations().yes : translations().no }}
+                    </span>
+                    <input
+                      type="checkbox"
+                      formControlName="isRequired"
+                      class="form-check-input m-0 flex-shrink-0"
+                    />
+                  </label>
+                </label>
+              </div>
+            </div>
+
+            <!-- Row 2: Arabic & English Labels -->
+            <div class="row g-2">
+              <div class="col-12 col-md-6">
+                <label class="svc-field d-grid gap-1 m-0">
+                  <span class="svc-field-label">{{ translations().customInputLabelAr }}</span>
+                  <input
+                    type="text"
+                    dir="rtl"
+                    class="form-control form-control-sm"
+                    formControlName="labelAr"
+                    maxlength="200"
+                    placeholder="مثال: الرقم القومي"
+                  />
+                </label>
+              </div>
+              <div class="col-12 col-md-6">
+                <label class="svc-field d-grid gap-1 m-0">
+                  <span class="svc-field-label">{{ translations().customInputLabelEn }}</span>
+                  <input
+                    type="text"
+                    dir="ltr"
+                    class="form-control form-control-sm"
+                    formControlName="labelEn"
+                    maxlength="200"
+                    placeholder="e.g. National ID"
+                  />
+                </label>
+              </div>
+            </div>
+
+            <!-- Row 3: Conditional Restrictions (String vs Integer) -->
+            <div class="svc-restrictions-box">
+              <div class="svc-restrictions-title">
+                <i class="bi bi-sliders2-vertical" aria-hidden="true"></i>
+                <span>{{ translations().customInputRestrictions }}</span>
+              </div>
+
+              @if (group.get('type')?.value === 'String') {
+                <div class="row g-2">
+                  <div class="col-12 col-sm-4">
+                    <label class="svc-field d-grid gap-1 m-0">
+                      <span class="svc-field-label text-muted fs-8">{{ translations().customInputMinLength }}</span>
+                      <input
+                        type="number"
+                        min="0"
+                        class="form-control form-control-sm text-center"
+                        formControlName="minLength"
+                        placeholder="0"
+                      />
+                    </label>
+                  </div>
+                  <div class="col-12 col-sm-4">
+                    <label class="svc-field d-grid gap-1 m-0">
+                      <span class="svc-field-label text-muted fs-8">{{ translations().customInputMaxLength }}</span>
+                      <input
+                        type="number"
+                        min="1"
+                        max="3000"
+                        class="form-control form-control-sm text-center"
+                        formControlName="maxLength"
+                        placeholder="3000"
+                      />
+                    </label>
+                  </div>
+                  <div class="col-12 col-sm-4">
+                    <label class="svc-field d-grid gap-1 m-0">
+                      <span class="svc-field-label text-muted fs-8">{{ translations().customInputStartWith }}</span>
+                      <input
+                        type="text"
+                        dir="ltr"
+                        maxlength="100"
+                        class="form-control form-control-sm"
+                        formControlName="startWith"
+                        placeholder="e.g. 2"
+                      />
+                    </label>
+                  </div>
+                </div>
+
+                @if (hasGroupError(group, 'invalidMinLength')) {
+                  <span class="svc-field-error-msg mt-2">
+                    <i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>
+                    <span>{{ translations().customInputMinLengthError }}</span>
+                  </span>
+                }
+                @if (hasGroupError(group, 'invalidMaxLength')) {
+                  <span class="svc-field-error-msg mt-2">
+                    <i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>
+                    <span>{{ translations().customInputMaxLengthError }}</span>
+                  </span>
+                }
+                @if (hasGroupError(group, 'invalidLengthRange')) {
+                  <span class="svc-field-error-msg mt-2">
+                    <i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>
+                    <span>{{ translations().customInputLengthRangeError }}</span>
+                  </span>
+                }
+                @if (hasGroupError(group, 'startWithMaxLength')) {
+                  <span class="svc-field-error-msg mt-2">
+                    <i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>
+                    <span>{{ translations().customInputStartWithMaxLength }}</span>
+                  </span>
+                }
+              } @else {
+                <div class="row g-2">
+                  <div class="col-12 col-sm-6">
+                    <label class="svc-field d-grid gap-1 m-0">
+                      <span class="svc-field-label text-muted fs-8">{{ translations().customInputMinValue }}</span>
+                      <input
+                        type="number"
+                        class="form-control form-control-sm text-center"
+                        formControlName="minValue"
+                        placeholder="e.g. 18"
+                      />
+                    </label>
+                  </div>
+                  <div class="col-12 col-sm-6">
+                    <label class="svc-field d-grid gap-1 m-0">
+                      <span class="svc-field-label text-muted fs-8">{{ translations().customInputMaxValue }}</span>
+                      <input
+                        type="number"
+                        class="form-control form-control-sm text-center"
+                        formControlName="maxValue"
+                        placeholder="e.g. 100"
+                      />
+                    </label>
+                  </div>
+                </div>
+
+                @if (hasGroupError(group, 'invalidValueRange')) {
+                  <span class="svc-field-error-msg mt-2">
+                    <i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>
+                    <span>{{ translations().customInputValueRangeError }}</span>
+                  </span>
+                }
+              }
+            </div>
+          </div>
+        </article>
+      }
+    </div>
+  }
+</section>

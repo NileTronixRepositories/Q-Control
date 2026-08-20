@@ -1,3 +1,4 @@
+import { ServiceCustomInput } from '../../service-management/models/service-management.model';
 import { LocalizedText } from './language.model';
 
 export type ServiceRequestCardTone = 'blue' | 'cyan' | 'green' | 'orange' | 'red' | 'purple';
@@ -13,4 +14,6 @@ export interface ServiceType {
   readonly estimatedWaitingMinutes: number;
   readonly specialtyIds: readonly string[];
   readonly isTicketIssuable?: boolean;
+  readonly isClientInputRequired?: boolean;
+  readonly customInputs?: readonly ServiceCustomInput[];
 }

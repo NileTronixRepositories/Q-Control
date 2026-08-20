@@ -1,0 +1,24 @@
+import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { DisplayStateService } from '../../services/display-state.service';
+
+@Component({
+  selector: 'app-display-header',
+  standalone: true,
+  imports: [CommonModule],
+  templateUrl: './display-header.component.html',
+  styleUrl: './display-header.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class DisplayHeaderComponent {
+  protected readonly state = inject(DisplayStateService);
+
+  readonly showTableHeaders = input<boolean>(true);
+
+  readonly branchTitle = computed(() => {
+    const branding = this.state.branding();
+    return this.state.language() === 'ar' ? branding.branchNameAr : branding.branchNameEn;
+  });
+
+  readonly isAr = computed(() => this.state.language() === 'ar');
+}

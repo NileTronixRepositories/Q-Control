@@ -1,0 +1,27 @@
+<div class="media-container">
+  @if (currentMedia(); as media) {
+    <div class="media-viewport">
+      @if (media.type === 'image') {
+        <img
+          [src]="media.url"
+          [alt]="media.title || 'Branch Media'"
+          class="media-content"
+        />
+      } @else {
+        <video
+          #videoPlayer
+          autoplay
+          muted
+          playsinline
+          class="media-content hls-video-element"
+        ></video>
+      }
+    </div>
+  } @else {
+    <div class="media-viewport empty-viewport">
+      <div class="empty-notice">
+        <i class="bi bi-film fs-1 text-muted"></i>
+      </div>
+    </div>
+  }
+</div>

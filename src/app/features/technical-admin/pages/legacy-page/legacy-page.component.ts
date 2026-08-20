@@ -17,7 +17,7 @@ import {
   CreateBranchRequest,
   UpdateBranchRequest,
   BranchOrderSort,
-  PagedBranchResponse
+  PagedBranchResponse,
 } from '../../models/branch-management.model';
 import { BranchManagementApiService } from '../../services/branch-management-api.service';
 import { BranchPermissionService } from '../../services/branch-permission.service';
@@ -73,6 +73,7 @@ interface BranchEditorTranslations {
   readonly view: string;
   readonly edit: string;
   readonly branding: string;
+  readonly displayVideos: string;
   readonly status: string;
   readonly active: string;
   readonly inactive: string;
@@ -112,51 +113,53 @@ interface BranchEditorTranslations {
 
 const BRANCH_EDITOR_TRANSLATIONS: Record<AppLanguage, BranchEditorTranslations> = {
   ar: {
-    addBranch: '\u0625\u0636\u0627\u0641\u0629 \u0641\u0631\u0639',
-    view: '\u0639\u0631\u0636',
-    edit: '\u062a\u0639\u062f\u064a\u0644',
-    branding: '\u0627\u0644\u0647\u0648\u064a\u0629 \u0648\u0627\u0644\u0625\u0639\u0644\u0627\u0646\u0627\u062a',
-    status: '\u0627\u0644\u062d\u0627\u0644\u0629',
-    active: '\u0646\u0634\u0637',
-    inactive: '\u063a\u064a\u0631 \u0646\u0634\u0637',
-    operationalStatus: '\u0627\u0644\u062d\u0627\u0644\u0629 \u0627\u0644\u062a\u0634\u063a\u064a\u0644\u064a\u0629',
-    operationalAvailable: '\u0645\u062a\u0627\u062d',
-    operationalUnavailable: '\u063a\u064a\u0631 \u0645\u062a\u0627\u062d \u0628\u0633\u0628\u0628 \u062d\u0627\u0644\u0629 \u0627\u0644\u0639\u0646\u0635\u0631 \u0627\u0644\u0623\u0628',
-    deactivate: '\u0625\u064a\u0642\u0627\u0641',
-    reactivate: '\u0625\u0639\u0627\u062f\u0629 \u062a\u0646\u0634\u064a\u0637',
-    permanentDelete: '\u062d\u0630\u0641 \u0646\u0647\u0627\u0626\u064a',
-    allStatuses: '\u0643\u0644 \u0627\u0644\u062d\u0627\u0644\u0627\u062a',
-    actions: '\u0627\u0644\u0625\u062c\u0631\u0627\u0621\u0627\u062a',
-    createTitle: '\u0625\u0636\u0627\u0641\u0629 \u0641\u0631\u0639',
-    editTitle: '\u062a\u0639\u062f\u064a\u0644 \u0641\u0631\u0639',
-    detailsTitle: '\u062a\u0641\u0627\u0635\u064a\u0644 \u0627\u0644\u0641\u0631\u0639',
-    save: '\u062d\u0641\u0638',
-    cancel: '\u0625\u0644\u063a\u0627\u0621',
-    close: '\u0625\u063a\u0644\u0627\u0642',
-    license: '\u0627\u0644\u0631\u062e\u0635\u0629',
-    location: '\u0627\u0644\u0645\u0648\u0642\u0639',
-    area: '\u0627\u0644\u0645\u0646\u0637\u0642\u0629',
-    address: '\u0627\u0644\u0639\u0646\u0648\u0627\u0646',
-    longitude: '\u062e\u0637 \u0627\u0644\u0637\u0648\u0644',
-    latitude: '\u062e\u0637 \u0627\u0644\u0639\u0631\u0636',
-    createdOn: '\u062a\u0627\u0631\u064a\u062e \u0627\u0644\u0625\u0646\u0634\u0627\u0621',
-    lastModifiedBy: '\u0622\u062e\u0631 \u062a\u0639\u062f\u064a\u0644 \u0628\u0648\u0627\u0633\u0637\u0629',
-    modifiedOn: '\u062a\u0627\u0631\u064a\u062e \u0622\u062e\u0631 \u062a\u0639\u062f\u064a\u0644',
-    requiredField: '\u0647\u0630\u0627 \u0627\u0644\u062d\u0642\u0644 \u0645\u0637\u0644\u0648\u0628.',
-    nameRequired: '\u0627\u0644\u0627\u0633\u0645 \u0627\u0644\u0639\u0631\u0628\u064a \u0648\u0627\u0644\u0625\u0646\u062c\u0644\u064a\u0632\u064a \u0645\u0637\u0644\u0648\u0628\u0627\u0646.',
-    invalidIp: 'IP Address \u063a\u064a\u0631 \u0635\u062d\u064a\u062d.',
-    max100: '\u0627\u0644\u062d\u062f \u0627\u0644\u0623\u0642\u0635\u0649 100 \u062d\u0631\u0641.',
-    max500: '\u0627\u0644\u062d\u062f \u0627\u0644\u0623\u0642\u0635\u0649 500 \u062d\u0631\u0641.',
-    deleteConfirm: '\u062a\u0623\u0643\u064a\u062f \u062d\u0630\u0641 \u0627\u0644\u0641\u0631\u0639',
-    fallbackSuccess: '\u062a\u0645 \u062a\u0646\u0641\u064a\u0630 \u0627\u0644\u0639\u0645\u0644\u064a\u0629 \u0628\u0646\u062c\u0627\u062d.',
-    fallbackError: '\u062d\u062f\u062b \u062e\u0637\u0623 \u063a\u064a\u0631 \u0645\u062a\u0648\u0642\u0639.',
-    emptyValue: '-'
+    addBranch: 'إضافة فرع',
+    view: 'عرض',
+    edit: 'تعديل',
+    branding: 'الهوية والإعلانات',
+    displayVideos: 'فيديوهات الشاشات',
+    status: 'الحالة',
+    active: 'نشط',
+    inactive: 'غير نشط',
+    operationalStatus: 'الحالة التشغيلية',
+    operationalAvailable: 'متاح',
+    operationalUnavailable: 'غير متاح بسبب حالة العنصر الأب',
+    deactivate: 'إيقاف',
+    reactivate: 'إعادة تنشيط',
+    permanentDelete: 'حذف نهائي',
+    allStatuses: 'كل الحالات',
+    actions: 'الإجراءات',
+    createTitle: 'إضافة فرع',
+    editTitle: 'تعديل فرع',
+    detailsTitle: 'تفاصيل الفرع',
+    save: 'حفظ',
+    cancel: 'إلغاء',
+    close: 'إغلاق',
+    license: 'الرخصة',
+    location: 'الموقع',
+    area: 'المنطقة',
+    address: 'العنوان',
+    longitude: 'خط الطول',
+    latitude: 'خط العرض',
+    createdOn: 'تاريخ الإنشاء',
+    lastModifiedBy: 'آخر تعديل بواسطة',
+    modifiedOn: 'تاريخ آخر تعديل',
+    requiredField: 'هذا الحقل مطلوب.',
+    nameRequired: 'الاسم العربي والإنجليزي مطلوبان.',
+    invalidIp: 'IP Address غير صحيح.',
+    max100: 'الحد الأقصى 100 حرف.',
+    max500: 'الحد الأقصى 500 حرف.',
+    deleteConfirm: 'تأكيد حذف الفرع',
+    fallbackSuccess: 'تم تنفيذ العملية بنجاح.',
+    fallbackError: 'حدث خطأ غير متوقع.',
+    emptyValue: '-',
   },
   en: {
     addBranch: 'Add Branch',
     view: 'View',
     edit: 'Edit',
     branding: 'Branding & Ads',
+    displayVideos: 'Display Videos',
     status: 'Status',
     active: 'Active',
     inactive: 'Inactive',
@@ -191,8 +194,8 @@ const BRANCH_EDITOR_TRANSLATIONS: Record<AppLanguage, BranchEditorTranslations> 
     deleteConfirm: 'Delete branch',
     fallbackSuccess: 'Operation completed successfully.',
     fallbackError: 'Unexpected error occurred.',
-    emptyValue: '-'
-  }
+    emptyValue: '-',
+  },
 };
 
 const EMPTY_BRANCH_TABLE_META: BranchTableMeta = {
@@ -201,7 +204,7 @@ const EMPTY_BRANCH_TABLE_META: BranchTableMeta = {
   totalPages: 0,
   totalItems: 0,
   hasPreviousPage: false,
-  hasNextPage: false
+  hasNextPage: false,
 };
 
 @Component({
@@ -210,10 +213,12 @@ const EMPTY_BRANCH_TABLE_META: BranchTableMeta = {
     ReactiveFormsModule,
     CreateBranchAdminDialogComponent,
     TechnicalAdminMobileRecordCardComponent,
-    TechnicalAdminPageHeroComponent, NiletronixLoadingStateComponent],
+    TechnicalAdminPageHeroComponent,
+    NiletronixLoadingStateComponent,
+  ],
   templateUrl: './legacy-page.component.html',
   styleUrl: './legacy-page.component.css',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LegacyPageComponent implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
@@ -254,7 +259,6 @@ export class LegacyPageComponent implements OnInit, OnDestroy {
     () => this.authSessionService.currentSession()?.userType === 'TechnicalAdmin',
   );
 
-
   protected readonly branchForm = this.formBuilder.group({
     arabicName: ['', [Validators.required, Validators.maxLength(100)]],
     englishName: ['', [Validators.required, Validators.maxLength(100)]],
@@ -265,11 +269,11 @@ export class LegacyPageComponent implements OnInit, OnDestroy {
     area: ['', [Validators.required, Validators.maxLength(100)]],
     address: ['', [Validators.required, Validators.maxLength(500)]],
     longitude: ['', [Validators.required, Validators.min(-180), Validators.max(180)]],
-    latitude: ['', [Validators.required, Validators.min(-90), Validators.max(90)]]
+    latitude: ['', [Validators.required, Validators.min(-90), Validators.max(90)]],
   });
 
   protected readonly pageKey = computed<BranchManagementPageKey>(
-    () => this.route.snapshot.data['pageKey'] as BranchManagementPageKey
+    () => this.route.snapshot.data['pageKey'] as BranchManagementPageKey,
   );
   protected readonly title = computed(() => this.translations().branchEditorLabel);
   protected readonly description = computed(() => this.translations().branchEditorDescription);
@@ -285,7 +289,7 @@ export class LegacyPageComponent implements OnInit, OnDestroy {
       { label: translations.totalBranchesLabel, value: String(meta.totalItems), tone: 'default' },
       { label: translations.pageSizeLabel, value: String(meta.pageSize), tone: 'default' },
       { label: this.branchEditorTranslations().active, value: String(activeCount), tone: 'success' },
-      { label: this.branchEditorTranslations().inactive, value: String(inactiveCount), tone: 'warning' }
+      { label: this.branchEditorTranslations().inactive, value: String(inactiveCount), tone: 'warning' },
     ];
   });
 
@@ -372,7 +376,7 @@ export class LegacyPageComponent implements OnInit, OnDestroy {
       area: '',
       address: '',
       longitude: '',
-      latitude: ''
+      latitude: '',
     });
   }
 
@@ -394,6 +398,7 @@ export class LegacyPageComponent implements OnInit, OnDestroy {
       queryParamsHandling: 'merge',
     });
   }
+
   protected openViewBranch(branchId: number): void {
     this.openBranchDetails(branchId, 'view');
   }
@@ -407,6 +412,13 @@ export class LegacyPageComponent implements OnInit, OnDestroy {
       queryParams: { branchId },
     });
   }
+
+  protected openDisplayVideos(branchId: number): void {
+    void this.router.navigate(['/admin/display-videos'], {
+      queryParams: { branchId },
+    });
+  }
+
   protected openCreateBranchAdmin(branch: BranchEditorRow): void {
     if (!this.canCreateBranchAdmin() || !branch.isActive) {
       return;
@@ -426,6 +438,7 @@ export class LegacyPageComponent implements OnInit, OnDestroy {
     this.selectedBranchForAdmin.set(null);
     this.showBranchMessage('success', message);
   }
+
   protected closeBranchPanel(): void {
     this.branchPanelRequestId += 1;
     this.branchPanelLoading.set(false);
@@ -474,6 +487,7 @@ export class LegacyPageComponent implements OnInit, OnDestroy {
 
     this.runBranchLifecycleAction(branch, 'permanent');
   }
+
   protected branchFormTitle(): string {
     const translations = this.branchEditorTranslations();
 
@@ -495,7 +509,7 @@ export class LegacyPageComponent implements OnInit, OnDestroy {
 
   protected hasBranchControlValidationError(
     controlName: keyof typeof this.branchForm.controls,
-    errorCode: BranchFormValidationError
+    errorCode: BranchFormValidationError,
   ): boolean {
     const control = this.branchForm.controls[controlName];
     return control.touched && control.hasError(errorCode);
@@ -528,7 +542,6 @@ export class LegacyPageComponent implements OnInit, OnDestroy {
     return this.formatDate(value ?? null);
   }
 
-
   private loadBranches(pageNumber = this.branchTableMeta().currentPage, force = false): void {
     if (this.branchTableLoading() && !force) {
       return;
@@ -543,7 +556,7 @@ export class LegacyPageComponent implements OnInit, OnDestroy {
         orderSort: this.branchOrderSort(),
         pageNumber,
         pageSize: this.branchPageSize(),
-        isActive: this.branchStatusFilter()
+        isActive: this.branchStatusFilter(),
       })
       .subscribe({
         next: (response) => this.applyBranchResponse(response),
@@ -552,7 +565,7 @@ export class LegacyPageComponent implements OnInit, OnDestroy {
           this.handleBranchApiError(error);
           this.branchTableLoading.set(false);
         },
-        complete: () => this.branchTableLoading.set(false)
+        complete: () => this.branchTableLoading.set(false),
       });
   }
 
@@ -591,7 +604,7 @@ export class LegacyPageComponent implements OnInit, OnDestroy {
         if (requestId === this.branchPanelRequestId && this.branchPanelMode() === mode) {
           this.branchPanelLoading.set(false);
         }
-      }
+      },
     });
   }
 
@@ -608,7 +621,7 @@ export class LegacyPageComponent implements OnInit, OnDestroy {
         this.handleBranchApiError(error);
         this.branchSaving.set(false);
       },
-      complete: () => this.branchSaving.set(false)
+      complete: () => this.branchSaving.set(false),
     });
   }
 
@@ -631,7 +644,7 @@ export class LegacyPageComponent implements OnInit, OnDestroy {
         this.handleBranchApiError(error);
         this.branchSaving.set(false);
       },
-      complete: () => this.branchSaving.set(false)
+      complete: () => this.branchSaving.set(false),
     });
   }
 
@@ -646,7 +659,7 @@ export class LegacyPageComponent implements OnInit, OnDestroy {
       area: details.location?.area ?? '',
       address: details.location?.address ?? '',
       longitude: details.location?.longitude?.toString() ?? '',
-      latitude: details.location?.latitude?.toString() ?? ''
+      latitude: details.location?.latitude?.toString() ?? '',
     });
   }
 
@@ -664,17 +677,18 @@ export class LegacyPageComponent implements OnInit, OnDestroy {
         area: value.area.trim(),
         address: value.address.trim(),
         longitude: Number(value.longitude),
-        latitude: Number(value.latitude)
-      }
+        latitude: Number(value.latitude),
+      },
     };
   }
 
   private createUpdateBranchRequest(): UpdateBranchRequest {
     return {
       ...this.createBranchRequest(),
-      rowVersion: this.selectedBranchDetails()?.rowVersion ?? ''
+      rowVersion: this.selectedBranchDetails()?.rowVersion ?? '',
     };
   }
+
   private isBranchFormValid(): boolean {
     return this.branchForm.valid && !this.isBranchNameMissing() && !this.isIpAddressInvalid();
   }
@@ -707,7 +721,7 @@ export class LegacyPageComponent implements OnInit, OnDestroy {
 
     return new Intl.DateTimeFormat(this.i18nStore.language() === 'ar' ? 'ar-EG' : 'en-US', {
       dateStyle: 'medium',
-      timeStyle: 'short'
+      timeStyle: 'short',
     }).format(parsedDate);
   }
 
@@ -730,7 +744,7 @@ export class LegacyPageComponent implements OnInit, OnDestroy {
       totalPages: response.totalPages,
       totalItems: response.totalItems,
       hasPreviousPage: response.hasPreviousPage,
-      hasNextPage: response.hasNextPage
+      hasNextPage: response.hasNextPage,
     });
   }
 
@@ -745,7 +759,7 @@ export class LegacyPageComponent implements OnInit, OnDestroy {
       isActive: branch.isActive,
       effectiveIsActive: branch.effectiveIsActive,
       rowVersion: branch.rowVersion,
-      createdBy: this.resolveUserName(branch.createdBy)
+      createdBy: this.resolveUserName(branch.createdBy),
     };
   }
 
@@ -765,7 +779,7 @@ export class LegacyPageComponent implements OnInit, OnDestroy {
 
   private runBranchLifecycleAction(
     branch: BranchEditorRow,
-    action: 'deactivate' | 'reactivate' | 'permanent'
+    action: 'deactivate' | 'reactivate' | 'permanent',
   ): void {
     this.deletingBranchId.set(branch.id);
     const request = action === 'deactivate'
@@ -784,9 +798,10 @@ export class LegacyPageComponent implements OnInit, OnDestroy {
         this.loadBranches(nextPage, true);
       },
       error: (error: HttpErrorResponse) => this.handleBranchApiError(error),
-      complete: () => this.deletingBranchId.set(null)
+      complete: () => this.deletingBranchId.set(null),
     });
   }
+
   private handleBranchApiError(error: HttpErrorResponse): void {
     if (this.authSessionService.shouldClearSessionForHttpStatus(error.status)) {
       this.authSessionService.clearSession();
@@ -809,6 +824,7 @@ export class LegacyPageComponent implements OnInit, OnDestroy {
       this.toastTimeoutId = null;
     }, tone === 'error' ? 6500 : 4200);
   }
+
   private extractApiMessage(error: HttpErrorResponse): string {
     return formatTechnicalAdminApiError(error, this.branchEditorTranslations().fallbackError);
   }

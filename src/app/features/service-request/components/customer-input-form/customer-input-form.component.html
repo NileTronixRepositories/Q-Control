@@ -1,0 +1,183 @@
+<div class="kiosk-customer-input-card">
+  <!-- HEADER -->
+  <div class="kiosk-customer-input-header mb-4 text-center">
+    <div class="kiosk-customer-input-icon-box mx-auto mb-2">
+      <i class="bi bi-person-lines-fill" aria-hidden="true"></i>
+    </div>
+    <h3 class="kiosk-customer-input-title m-0">
+      {{ translations().customerInputTitle }}
+      @if (serviceTitle()) {
+        <span class="d-block fs-6 text-primary mt-1 font-monospace">({{ serviceTitle() }})</span>
+      }
+    </h3>
+    <p class="kiosk-customer-input-sub m-0 mt-1">
+      {{ translations().customerInputDescription }}
+    </p>
+  </div>
+
+  <!-- DYNAMIC FORM -->
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="kiosk-customer-input-form d-grid gap-3 mb-4">
+    @for (inputItem of sortedInputs(); track inputItem.name) {
+      <div
+        class="kiosk-field-card p-3 rounded-3 border bg-white position-relative"
+        [class.has-error]="hasError(inputItem.name)"
+      >
+        <!-- FIELD LABEL & BADGES -->
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
+          <label [for]="'custom-input-' + inputItem.name" class="kiosk-field-label m-0 fw-bold fs-6 text-dark d-flex align-items-center gap-1">
+            <span>{{ getFieldLabel(inputItem) }}</span>
+            @if (inputItem.isRequired) {
+              <span class="text-danger">*</span>
+            }
+          </label>
+
+          <div class="d-flex align-items-center gap-1">
+            @if (inputItem.isRequired) {
+              <span class="badge bg-danger-subtle text-danger border border-danger-subtle fs-8">
+                {{ translations().fieldRequired }}
+              </span>
+            }
+            <span
+              class="badge"
+              [class.bg-info-subtle]="inputItem.type === 'String'"
+              [class.text-info-emphasis]="inputItem.type === 'String'"
+              [class.bg-warning-subtle]="inputItem.type === 'Integer'"
+              [class.text-warning-emphasis]="inputItem.type === 'Integer'"
+            >
+              {{ inputItem.type === 'String' ? 'String' : 'Number' }}
+            </span>
+          </div>
+        </div>
+
+        <!-- INPUT WRAPPER -->
+        <div class="kiosk-input-wrapper position-relative d-flex align-items-center">
+          @if (inputItem.type === 'String') {
+            <input
+              [id]="'custom-input-' + inputItem.name"
+              type="text"
+              class="kiosk-touch-input form-control form-control-lg"
+              [formControlName]="inputItem.name"
+              [placeholder]="getFieldLabel(inputItem)"
+              [attr.maxlength]="inputItem.maxLength ?? null"
+            />
+          } @else {
+            <input
+              [id]="'custom-input-' + inputItem.name"
+              type="number"
+              class="kiosk-touch-input form-control form-control-lg text-center"
+              [formControlName]="inputItem.name"
+              [placeholder]="getFieldLabel(inputItem)"
+              [attr.min]="inputItem.minValue ?? null"
+              [attr.max]="inputItem.maxValue ?? null"
+            />
+          }
+
+          @if (getControl(inputItem.name)?.value) {
+            <button
+              type="button"
+              class="kiosk-input-clear-btn"
+              (click)="clearField(inputItem.name)"
+              [attr.aria-label]="isRtl() ? 'مسح' : 'Clear'"
+            >
+              <i class="bi bi-x-circle-fill" aria-hidden="true"></i>
+            </button>
+          }
+        </div>
+
+        <!-- RESTRICTION HINTS -->
+        <div class="kiosk-field-hints d-flex flex-wrap align-items-center gap-2 mt-2">
+          @if (inputItem.type === 'String') {
+            @if (inputItem.minLength !== null && inputItem.minLength !== undefined && inputItem.minLength > 0) {
+              <span class="kiosk-hint-badge">
+                <i class="bi bi-arrow-right-short"></i>
+                {{ translations().minLengthRequirement }} {{ inputItem.minLength }}
+              </span>
+            }
+            @if (inputItem.maxLength !== null && inputItem.maxLength !== undefined && inputItem.maxLength > 0) {
+              <span class="kiosk-hint-badge">
+                <i class="bi bi-arrow-left-short"></i>
+                {{ translations().maxLengthRequirement }} {{ inputItem.maxLength }}
+              </span>
+            }
+            @if (inputItem.startWith) {
+              <span class="kiosk-hint-badge">
+                <i class="bi bi-quote"></i>
+                {{ translations().mustStartWith }} "{{ inputItem.startWith }}"
+              </span>
+            }
+          } @else {
+            @if (inputItem.minValue !== null && inputItem.minValue !== undefined) {
+              <span class="kiosk-hint-badge">
+                <i class="bi bi-chevron-bar-up"></i>
+                {{ translations().minValueRequirement }} {{ inputItem.minValue }}
+              </span>
+            }
+            @if (inputItem.maxValue !== null && inputItem.maxValue !== undefined) {
+              <span class="kiosk-hint-badge">
+                <i class="bi bi-chevron-bar-down"></i>
+                {{ translations().maxValueRequirement }} {{ inputItem.maxValue }}
+              </span>
+            }
+          }
+        </div>
+
+        <!-- ERROR MESSAGES -->
+        @if (hasError(inputItem.name, 'required')) {
+          <small class="kiosk-field-error text-danger fw-bold fs-7 mt-1 d-flex align-items-center gap-1">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            {{ translations().fieldRequired }}
+          </small>
+        }
+        @if (hasError(inputItem.name, 'minlength')) {
+          <small class="kiosk-field-error text-danger fw-bold fs-7 mt-1 d-flex align-items-center gap-1">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            {{ translations().minLengthRequirement }} {{ inputItem.minLength }}
+          </small>
+        }
+        @if (hasError(inputItem.name, 'maxlength')) {
+          <small class="kiosk-field-error text-danger fw-bold fs-7 mt-1 d-flex align-items-center gap-1">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            {{ translations().maxLengthRequirement }} {{ inputItem.maxLength }}
+          </small>
+        }
+        @if (hasError(inputItem.name, 'startWithMismatch')) {
+          <small class="kiosk-field-error text-danger fw-bold fs-7 mt-1 d-flex align-items-center gap-1">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            {{ translations().mustStartWith }} "{{ inputItem.startWith }}"
+          </small>
+        }
+        @if (hasError(inputItem.name, 'integerOnly')) {
+          <small class="kiosk-field-error text-danger fw-bold fs-7 mt-1 d-flex align-items-center gap-1">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            {{ translations().invalidNumber }}
+          </small>
+        }
+        @if (hasError(inputItem.name, 'min')) {
+          <small class="kiosk-field-error text-danger fw-bold fs-7 mt-1 d-flex align-items-center gap-1">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            {{ translations().minValueRequirement }} {{ inputItem.minValue }}
+          </small>
+        }
+        @if (hasError(inputItem.name, 'max')) {
+          <small class="kiosk-field-error text-danger fw-bold fs-7 mt-1 d-flex align-items-center gap-1">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            {{ translations().maxValueRequirement }} {{ inputItem.maxValue }}
+          </small>
+        }
+      </div>
+    }
+
+    <!-- SUBMIT BUTTON -->
+    <div class="kiosk-customer-input-footer mt-3 text-center">
+      <button
+        type="submit"
+        class="kiosk-confirm-btn w-100 d-inline-flex align-items-center justify-content-center gap-2"
+        [style.background-color]="store.keypadButton()?.backgroundColor || null"
+        [style.color]="store.keypadButton()?.textColor || null"
+      >
+        <i class="bi bi-check-circle-fill" aria-hidden="true"></i>
+        <span>{{ translations().confirmAndIssueTicket }}</span>
+      </button>
+    </div>
+  </form>
+</div>

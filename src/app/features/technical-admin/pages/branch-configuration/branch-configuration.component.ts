@@ -191,9 +191,11 @@ export class BranchConfigurationComponent implements OnInit, OnDestroy {
     }
   }
 
-  private loadConfiguration(branchId: number): void {
+  private loadConfiguration(branchId: number, clearMsg: boolean = true): void {
     this.configLoading.set(true);
-    this.clearMessage();
+    if (clearMsg) {
+      this.clearMessage();
+    }
 
     this.branchConfigurationApiService.getBranchConfiguration(branchId).subscribe({
       next: (response) => {
@@ -244,7 +246,9 @@ export class BranchConfigurationComponent implements OnInit, OnDestroy {
         'error',
         formatTechnicalAdminApiError(
           error,
-          'Access denied. You do not have authorization for this operation.',
+          this.language() === 'ar'
+            ? 'تم رفض الوصول. ليس لديك الصلاحية لتنفيذ هذه العملية.'
+            : 'Access denied. You do not have authorization for this operation.',
         ),
       );
       return;
@@ -252,16 +256,18 @@ export class BranchConfigurationComponent implements OnInit, OnDestroy {
 
     if (error.status === 409 && currentBranchId !== null) {
       this.showMessage('error', this.copy().concurrencyConflictMessage);
-      this.loadConfiguration(currentBranchId);
+      this.loadConfiguration(currentBranchId, false);
       return;
     }
 
     if (error.status === 404 && currentBranchId !== null && this.isConfigured()) {
       this.showMessage(
         'info',
-        'The configuration no longer exists on the server. Switched to create mode.',
+        this.language() === 'ar'
+          ? 'لم تعد التهيئة موجودة على الخادم. تم التحويل إلى وضع الإنشاء.'
+          : 'The configuration no longer exists on the server. Switched to create mode.',
       );
-      this.loadConfiguration(currentBranchId);
+      this.loadConfiguration(currentBranchId, false);
       return;
     }
 
@@ -269,7 +275,9 @@ export class BranchConfigurationComponent implements OnInit, OnDestroy {
       'error',
       formatTechnicalAdminApiError(
         error,
-        'An unexpected error occurred while communicating with the server.',
+        this.language() === 'ar'
+          ? 'حدث خطأ غير متوقع أثناء الاتصال بالخادم.'
+          : 'An unexpected error occurred while communicating with the server.',
       ),
     );
   }

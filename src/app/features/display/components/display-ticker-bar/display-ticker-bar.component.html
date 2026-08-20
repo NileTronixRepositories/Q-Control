@@ -1,0 +1,14 @@
+<footer class="display-ticker-bar" [class.rtl-mode]="isAr()">
+  <!-- Clock Capsule -->
+  <div class="clock-capsule">
+    <span class="digital-time">{{ currentTime() }}</span>
+  </div>
+
+  <!-- Smooth Scrolling Marquee Area -->
+  <div class="ticker-viewport">
+    <div class="marquee-content">
+      <span class="marquee-item">{{ combinedNewsText() }}</span>
+      <span class="marquee-item">{{ combinedNewsText() }}</span>
+    </div>
+  </div>
+</footer>

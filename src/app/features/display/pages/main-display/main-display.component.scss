@@ -1,0 +1,333 @@
+:host {
+  display: block;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  background-color: #ffffff;
+}
+
+.main-display-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  position: relative;
+  overflow: hidden;
+  background: #ffffff;
+
+  &.rtl-mode {
+    direction: rtl;
+  }
+}
+
+.tv-header-strip {
+  height: 72px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+}
+
+.tv-workspace-grid {
+  flex: 1 1 0;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 52%) minmax(0, 48%);
+  gap: 20px;
+  padding: 0 20px 12px 20px;
+  overflow: hidden;
+  height: calc(100vh - 72px - 56px);
+  align-items: stretch;
+}
+
+.media-video-column {
+  height: 100%;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.queue-table-column {
+  height: 100%;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+/* ============================================================
+   KIOSK AUTH MODAL (Theme Harmonized & Modern Glassmorphism)
+   ============================================================ */
+
+.display-auth-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(10, 17, 40, 0.78);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  animation: fadeIn 0.22s ease-out;
+}
+
+.display-auth-dialog {
+  width: 100%;
+  max-width: 460px;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  background: #ffffff;
+  padding: 34px 30px;
+  box-shadow:
+    0 24px 64px -12px rgba(10, 17, 40, 0.35),
+    0 4px 16px rgba(11, 138, 168, 0.08);
+  animation: scaleUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Subtle top gradient line */
+.display-auth-dialog::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #0b8aa8 0%, #034078 100%);
+}
+
+.auth-icon-circle {
+  width: 64px;
+  height: 64px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, rgba(11, 138, 168, 0.12) 0%, rgba(3, 64, 120, 0.08) 100%);
+  border: 1px solid rgba(11, 138, 168, 0.2);
+  display: grid;
+  place-items: center;
+
+  i {
+    font-size: 1.85rem;
+    color: #0b8aa8 !important;
+  }
+}
+
+.auth-title {
+  color: #001f54;
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: -0.2px;
+}
+
+.auth-subtitle {
+  color: #64748b;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  max-width: 360px;
+  margin: 0 auto;
+}
+
+.alert-error-box {
+  background: #fef2f2;
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  color: #991b1b;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+
+  i {
+    color: #dc2626;
+  }
+}
+
+/* ── Form Inputs ─────────────────────────────────────────────── */
+.auth-field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.auth-form-label {
+  margin: 0;
+  color: #334155;
+  font-size: 0.84rem;
+  font-weight: 700;
+
+  .required-mark {
+    color: #dc2626;
+    margin-inline-start: 3px;
+  }
+}
+
+.input-shell {
+  display: flex;
+  width: 100%;
+  min-height: 3rem;
+  align-items: stretch;
+  overflow: hidden;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  transition: all 0.2s ease;
+
+  &:focus-within {
+    border-color: #0b8aa8;
+    box-shadow: 0 0 0 3.5px rgba(11, 138, 168, 0.15);
+  }
+
+  &.input-invalid {
+    border-color: #ef4444;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.12);
+  }
+
+  > .bi {
+    display: inline-flex;
+    width: 2.85rem;
+    flex: 0 0 2.85rem;
+    align-items: center;
+    justify-content: center;
+    color: #0b8aa8;
+    background: #f8fafc;
+    border-inline-end: 1px solid #e2e8f0;
+    font-size: 1.1rem;
+    transition: all 0.2s ease;
+  }
+
+  &:focus-within > .bi {
+    color: #ffffff;
+    background: #0b8aa8;
+  }
+
+  .login-input {
+    width: 100%;
+    min-width: 0;
+    flex: 1 1 auto;
+    padding: 0.75rem 1rem;
+    color: #0f172a;
+    caret-color: #0b8aa8;
+    background: transparent;
+    border: 0;
+    outline: 0;
+    font: inherit;
+    font-size: 0.925rem;
+    font-weight: 600;
+    line-height: 1.5;
+    text-align: start;
+
+    &::placeholder {
+      color: #94a3b8;
+      font-weight: 500;
+      opacity: 0.75;
+    }
+  }
+
+  .password-toggle {
+    display: inline-flex;
+    width: 2.85rem;
+    flex: 0 0 2.85rem;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    color: #94a3b8;
+    background: transparent;
+    border: 0;
+    border-inline-start: 1px solid #e2e8f0;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      color: #0b8aa8;
+      background: #f1f5f9;
+    }
+  }
+}
+
+/* ── Buttons ─────────────────────────────────────────────────── */
+.btn-activate {
+  background: linear-gradient(135deg, #0b8aa8 0%, #034078 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  min-height: 48px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  box-shadow: 0 8px 20px -4px rgba(11, 138, 168, 0.38);
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    background: linear-gradient(135deg, #097791 0%, #02305c 100%);
+    transform: translateY(-1.5px);
+    box-shadow: 0 12px 28px -4px rgba(11, 138, 168, 0.48);
+    color: #ffffff;
+  }
+
+  &:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+  }
+}
+
+.btn-demo {
+  background: #f8fafc;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  min-height: 42px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  cursor: pointer;
+
+  &:hover {
+    background: #f1f5f9;
+    color: #0b8aa8;
+    border-color: #cbd5e1;
+  }
+}
+
+/* ── Animations ──────────────────────────────────────────────── */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scaleUp {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (max-width: 1024px) {
+  :host {
+    height: auto;
+    overflow-y: auto;
+  }
+
+  .main-display-layout {
+    height: auto;
+    min-height: 100vh;
+  }
+
+  .tv-workspace-grid {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+}

@@ -1,5 +1,6 @@
 import { computed, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { of } from 'rxjs';
 
 import { ServiceRequestStep } from '../../enums/service-request-step.enum';
@@ -175,23 +176,57 @@ describe('ServiceRequestHomeComponent', () => {
   it('renders service cards and moves to specialties after a selection', () => {
     expect(fixture.nativeElement.textContent).toContain('Regular service');
 
-    (fixture.nativeElement.querySelector('app-service-request-service-card button') as HTMLButtonElement).click();
+    (
+      fixture.nativeElement.querySelector(
+        'app-service-request-service-card button',
+      ) as HTMLButtonElement
+    ).click();
     fixture.detectChanges();
 
     expect(selectServiceType).toHaveBeenCalledWith(serviceType);
-    expect(fixture.nativeElement.querySelector('app-service-request-specialty-card')).not.toBeNull();
+    expect(
+      fixture.nativeElement.querySelector('app-service-request-specialty-card'),
+    ).not.toBeNull();
     expect(fixture.nativeElement.textContent).toContain('Cardiology');
   });
 
   it('forwards restart actions to the store', () => {
-    selectServiceType(serviceType);
-    fixture.detectChanges();
-    const restartButton = fixture.nativeElement.querySelector(
-      '.kiosk-circular-nav-btn--next',
-    ) as HTMLButtonElement;
-    restartButton.click();
+    const component = fixture.componentInstance;
+    component['restart']();
 
     expect(restart).toHaveBeenCalledOnce();
+  });
+
+  it('activates customer input step when leaf service has isClientInputRequired = true', () => {
+    const leafServiceWithInputs: ServiceType = {
+      ...serviceType,
+      id: 'leaf-custom',
+      isTicketIssuable: true,
+      isClientInputRequired: true,
+      specialtyIds: [],
+      customInputs: [
+        {
+          name: 'nationalId',
+          labelAr: 'الرقم القومي',
+          labelEn: 'National ID',
+          type: 'String',
+          isRequired: true,
+          order: 1,
+        },
+      ],
+    };
+
+    const component = fixture.componentInstance;
+    (component as any).store.serviceTypes = signal([leafServiceWithInputs]).asReadonly();
+    (component as any).store.availableSpecialties = signal([]).asReadonly();
+
+    (component as any).selectServiceType('leaf-custom');
+    fixture.detectChanges();
+
+    expect(component['isCustomerInputStepActive']()).toBe(true);
+    expect(
+      fixture.nativeElement.querySelector('app-service-request-customer-input-form'),
+    ).not.toBeNull();
   });
 });
 

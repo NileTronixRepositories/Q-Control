@@ -70,7 +70,7 @@ export class LoginComponent {
   protected readonly loginForm = this.formBuilder.group({
     username: ['', [Validators.required, Validators.maxLength(80)]],
     password: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(120)]],
-    rememberSession: [false],
+    rememberSession: [true],
   });
 
   protected readonly usernameControl = this.loginForm.controls.username;

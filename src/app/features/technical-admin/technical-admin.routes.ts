@@ -47,6 +47,17 @@ export const TECHNICAL_ADMIN_ROUTES: Routes = [
           ),
       },
       {
+        path: 'display-videos',
+        canActivate: [adminPermissionGuard],
+        data: {
+          requiredAnyPermissions: ['Branches.ViewDetails'],
+        },
+        loadComponent: () =>
+          import('./pages/branch-videos/branch-videos.component').then(
+            (component) => component.BranchVideosComponent,
+          ),
+      },
+      {
         path: 'branch-configuration',
         canActivate: [adminPermissionGuard],
         data: {

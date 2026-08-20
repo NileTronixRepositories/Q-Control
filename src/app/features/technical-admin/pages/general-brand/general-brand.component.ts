@@ -86,7 +86,8 @@ const PAGE_TRANSLATIONS: Record<AppLanguage, GeneralBrandPageTranslations> = {
   ar: {
     pageEyebrow: 'إدارة النظام العامة',
     pageTitle: 'الهوية البصرية العامة (GeneralBrand)',
-    pageDescription: 'تحكم في الإعداد العام الشامل للتصميم والسلوك لشاشة إصدار التذاكر على مستوى النظام كـ Fallback عند عدم وجود إعدادات خاصة بالفرع.',
+    pageDescription:
+      'تحكم في الإعداد العام الشامل للتصميم والسلوك لشاشة إصدار التذاكر على مستوى النظام كـ Fallback عند عدم وجود إعدادات خاصة بالفرع.',
     refreshLabel: 'تحديث',
     generalBrandSection: 'الإعدادات العامة للهوية والشاشة',
     themeColors: 'ألوان الهوية البصرية العامة',
@@ -107,7 +108,7 @@ const PAGE_TRANSLATIONS: Record<AppLanguage, GeneralBrandPageTranslations> = {
     languageButtonSection: 'إعدادات زر اللغة',
     serviceButtonSection: 'إعدادات زر الخدمة',
     keypadButtonSection: 'إعدادات لوحة الأرقام',
-    footerButtonSection: 'إعدادات زر الفوتر (رجوع)',
+    footerButtonSection: 'إعدادات زر الفوتر ',
     buttonBackgroundColorLabel: 'لون خلفية الزر',
     buttonTextColorLabel: 'لون نص الزر',
     buttonWidthLabel: 'عرض الزر (%)',
@@ -124,7 +125,8 @@ const PAGE_TRANSLATIONS: Record<AppLanguage, GeneralBrandPageTranslations> = {
     textTooLong: 'لا يمكن أن يتجاوز النص 200 حرف.',
     readOnlyNotice: 'يمكنك عرض البيانات فقط لأن صلاحية التحديث غير متاحة.',
     loading: 'جاري التحميل...',
-    conflict: 'تم تعديل البيانات بواسطة مستخدم آخر. تم إعادة جلب البيانات برجاء المراجعة والحفظ مجدداً.',
+    conflict:
+      'تم تعديل البيانات بواسطة مستخدم آخر. تم إعادة جلب البيانات برجاء المراجعة والحفظ مجدداً.',
     genericError: 'حدث خطأ غير متوقع.',
     brandSaved: 'تم حفظ إعدادات الهوية البصرية العامة بنجاح.',
     close: 'إغلاق',
@@ -132,7 +134,8 @@ const PAGE_TRANSLATIONS: Record<AppLanguage, GeneralBrandPageTranslations> = {
   en: {
     pageEyebrow: 'System Administration',
     pageTitle: 'General Brand Configuration',
-    pageDescription: 'Manage the single global branding and behavior configuration fallback for ticket issuance across the system.',
+    pageDescription:
+      'Manage the single global branding and behavior configuration fallback for ticket issuance across the system.',
     refreshLabel: 'Refresh',
     generalBrandSection: 'General Brand & Layout',
     themeColors: 'General Identity Colors',
@@ -170,7 +173,8 @@ const PAGE_TRANSLATIONS: Record<AppLanguage, GeneralBrandPageTranslations> = {
     textTooLong: 'Text cannot exceed 200 characters.',
     readOnlyNotice: 'You can view this data only because update permission is not available.',
     loading: 'Loading...',
-    conflict: 'The data was modified by another user. Latest server data has been loaded for your review.',
+    conflict:
+      'The data was modified by another user. Latest server data has been loaded for your review.',
     genericError: 'Unexpected error occurred.',
     brandSaved: 'General Brand settings saved successfully.',
     close: 'Close',
@@ -182,6 +186,7 @@ const PAGE_TRANSLATIONS: Record<AppLanguage, GeneralBrandPageTranslations> = {
   imports: [ReactiveFormsModule, TechnicalAdminPageHeroComponent, NiletronixLoadingStateComponent],
   templateUrl: './general-brand.component.html',
   styleUrls: [
+    './general-brand.component.css',
     '../branch-branding/branch-branding.component.css',
     '../branch-branding/branch-branding-identity.component.css',
   ],
@@ -308,7 +313,10 @@ export class GeneralBrandComponent implements OnInit, OnDestroy {
     this.updateThemeControl(controlName, value);
   }
 
-  protected updateThemePicker(controlName: keyof typeof this.themeForm.controls, event: Event): void {
+  protected updateThemePicker(
+    controlName: keyof typeof this.themeForm.controls,
+    event: Event,
+  ): void {
     const value = (event.target as HTMLInputElement).value.toUpperCase();
     this.updateThemeControl(controlName, value);
   }
@@ -521,9 +529,7 @@ export class GeneralBrandComponent implements OnInit, OnDestroy {
     this.themeRevision.update((v) => v + 1);
   }
 
-  private normalizeOptionalColor(
-    controlName: keyof typeof this.themeForm.controls,
-  ): string | null {
+  private normalizeOptionalColor(controlName: keyof typeof this.themeForm.controls): string | null {
     const val = String(this.themeForm.controls[controlName].value ?? '').trim();
     return HEX_COLOR_PATTERN.test(val) ? val.toUpperCase() : null;
   }
@@ -539,9 +545,7 @@ export class GeneralBrandComponent implements OnInit, OnDestroy {
     return Number.isFinite(num) ? num : null;
   }
 
-  private normalizeOptionalText(
-    controlName: keyof typeof this.themeForm.controls,
-  ): string | null {
+  private normalizeOptionalText(controlName: keyof typeof this.themeForm.controls): string | null {
     const val = String(this.themeForm.controls[controlName].value ?? '').trim();
     return val.length > 0 ? val : null;
   }
@@ -581,9 +585,12 @@ export class GeneralBrandComponent implements OnInit, OnDestroy {
     }
 
     this.message.set({ tone, text });
-    this.messageTimeoutId = setTimeout(() => {
-      this.message.set(null);
-      this.messageTimeoutId = null;
-    }, tone === 'error' ? 7000 : 4500);
+    this.messageTimeoutId = setTimeout(
+      () => {
+        this.message.set(null);
+        this.messageTimeoutId = null;
+      },
+      tone === 'error' ? 7000 : 4500,
+    );
   }
 }

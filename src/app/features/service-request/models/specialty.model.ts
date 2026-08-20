@@ -1,3 +1,4 @@
+import { ServiceCustomInput } from '../../service-management/models/service-management.model';
 import { LocalizedText } from './language.model';
 import { ServiceRequestCardTone } from './service-type.model';
 
@@ -12,4 +13,6 @@ export interface Specialty {
   readonly subSpecialties: readonly Specialty[];
   readonly ticketPrefix?: string;
   readonly isTicketIssuable?: boolean;
+  readonly isClientInputRequired?: boolean;
+  readonly customInputs?: readonly ServiceCustomInput[];
 }

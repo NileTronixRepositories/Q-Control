@@ -1,0 +1,31 @@
+<div class="queue-table-wrapper" [class.rtl-mode]="isAr()">
+  <table class="tv-queue-table">
+    <thead>
+      <tr class="table-header-row">
+        <th class="th-clinic">{{ isAr() ? 'العيادة / الشباك' : 'Clinic' }}</th>
+        <th class="th-doctor-service">{{ isAr() ? 'الطبيب - الخدمة' : 'Doctor-Service' }}</th>
+        <th class="th-ticket">{{ isAr() ? 'رقم التذكرة' : 'Ticket' }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (item of queueItems(); track item.windowId) {
+        <tr
+          class="table-data-row"
+          [class.calling-row]="item.isFlashing || item.status === 'calling'"
+        >
+          <td class="td-clinic">
+            <span class="clinic-title">{{ getWindowName(item) }}</span>
+          </td>
+          <td class="td-doctor-service">
+            <span class="doctor-service-text">{{ getDoctorAndService(item) }}</span>
+          </td>
+          <td class="td-ticket">
+            <div class="ticket-badge-tv" [class.pulse-flash]="item.isFlashing">
+              {{ item.currentTicket || '---' }}
+            </div>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>

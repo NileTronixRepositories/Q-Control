@@ -56,6 +56,18 @@ export interface ServiceRequestTranslations {
   readonly qrLabel: string;
   readonly successLabel: string;
   readonly counterHintLabel: string;
+  readonly stepCustomerInput: string;
+  readonly customerInputTitle: string;
+  readonly customerInputDescription: string;
+  readonly footerCustomerInputPrompt: string;
+  readonly confirmAndIssueTicket: string;
+  readonly fieldRequired: string;
+  readonly minLengthRequirement: string;
+  readonly maxLengthRequirement: string;
+  readonly mustStartWith: string;
+  readonly minValueRequirement: string;
+  readonly maxValueRequirement: string;
+  readonly invalidNumber: string;
 }
 
 export const SERVICE_REQUEST_LANGUAGES: readonly ServiceRequestLanguage[] = [
@@ -121,6 +133,18 @@ export const SERVICE_REQUEST_TRANSLATIONS: Record<AppLanguage, ServiceRequestTra
     qrLabel: 'رمز QR',
     successLabel: 'تم بنجاح',
     counterHintLabel: 'منطقة الخدمة',
+    stepCustomerInput: 'بيانات العميل',
+    customerInputTitle: 'إدخال بيانات الخدمة',
+    customerInputDescription: 'يرجى إدخال البيانات المطلوبة أدناه للمتابعة وإصدار التذكرة.',
+    footerCustomerInputPrompt: 'أدخل البيانات المطلوبة ثم اضغط تأكيد',
+    confirmAndIssueTicket: 'تأكيد البيانات وإصدار التذكرة',
+    fieldRequired: 'هذا الحقل مطلوب',
+    minLengthRequirement: 'أقل عدد أحرف:',
+    maxLengthRequirement: 'أقصى عدد أحرف:',
+    mustStartWith: 'يجب أن يبدأ بـ:',
+    minValueRequirement: 'أقل قيمة:',
+    maxValueRequirement: 'أقصى قيمة:',
+    invalidNumber: 'يرجى إدخال رقم صحيح صالح',
   },
   en: {
     kioskTitle: 'Queue Ticket Service',
@@ -163,5 +187,17 @@ export const SERVICE_REQUEST_TRANSLATIONS: Record<AppLanguage, ServiceRequestTra
     qrLabel: 'QR code',
     successLabel: 'Completed',
     counterHintLabel: 'Service area',
+    stepCustomerInput: 'Customer Info',
+    customerInputTitle: 'Service Details Input',
+    customerInputDescription: 'Please provide the required information below to continue and issue your ticket.',
+    footerCustomerInputPrompt: 'Enter the required details then press confirm',
+    confirmAndIssueTicket: 'Confirm & Issue Ticket',
+    fieldRequired: 'This field is required',
+    minLengthRequirement: 'Minimum length:',
+    maxLengthRequirement: 'Maximum length:',
+    mustStartWith: 'Must start with:',
+    minValueRequirement: 'Minimum value:',
+    maxValueRequirement: 'Maximum value:',
+    invalidNumber: 'Please enter a valid integer',
   },
 };

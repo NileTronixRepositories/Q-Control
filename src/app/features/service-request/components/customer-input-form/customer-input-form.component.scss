@@ -1,0 +1,140 @@
+.kiosk-customer-input-card {
+  animation: kioskFadeIn 0.3s ease-out;
+  background: var(--kiosk-background-color, rgba(255, 255, 255, 0.95));
+  backdrop-filter: blur(12px);
+  border-radius: 1.25rem;
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+  max-width: 650px;
+  margin: 0 auto;
+  padding: 2rem 2.5rem;
+  width: 100%;
+}
+
+.kiosk-customer-input-icon-box {
+  align-items: center;
+  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+  border-radius: 50%;
+  color: #ffffff;
+  display: flex;
+  font-size: 1.8rem;
+  height: 64px;
+  justify-content: center;
+  width: 64px;
+  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
+}
+
+.kiosk-customer-input-title {
+  color: var(--kiosk-main-color, #0f172a);
+  font-size: 1.45rem;
+  font-weight: 800;
+}
+
+.kiosk-customer-input-sub {
+  color: var(--kiosk-secondary-color, #64748b);
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.kiosk-field-card {
+  border: 1.5px solid #e2e8f0;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+
+  &:focus-within {
+    border-color: #0284c7;
+    box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.12);
+  }
+
+  &.has-error {
+    border-color: #ef4444;
+    background-color: #fffbfa;
+  }
+}
+
+.kiosk-touch-input {
+  border-radius: 0.75rem;
+  border: 1.5px solid #cbd5e1;
+  font-size: 1.25rem;
+  font-weight: 600;
+  height: 54px;
+  padding: 0.5rem 1rem;
+  transition: border-color 0.2s;
+
+  &:focus {
+    border-color: #0284c7;
+    box-shadow: none;
+  }
+}
+
+.kiosk-input-clear-btn {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  font-size: 1.35rem;
+  position: absolute;
+  inset-inline-end: 0.75rem;
+  padding: 0.25rem;
+  transition: color 0.2s;
+
+  &:hover {
+    color: #ef4444;
+  }
+}
+
+.kiosk-hint-badge {
+  align-items: center;
+  background-color: #f1f5f9;
+  border-radius: 0.5rem;
+  color: #475569;
+  display: inline-flex;
+  font-size: 0.78rem;
+  font-weight: 600;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+}
+
+.kiosk-confirm-btn {
+  align-items: center;
+  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+  border-radius: 0.85rem;
+  border: none;
+  color: #ffffff;
+  cursor: pointer;
+  display: flex;
+  font-size: 1.25rem;
+  font-weight: 800;
+  height: 60px;
+  justify-content: center;
+  letter-spacing: 0.02em;
+  padding: 0 1.5rem;
+  box-shadow: 0 6px 16px rgba(2, 132, 199, 0.35);
+  transition: all 0.2s ease-in-out;
+
+  &:hover:not(:disabled) {
+    background: linear-gradient(135deg, #0369a1 0%, #075985 100%);
+    box-shadow: 0 8px 20px rgba(2, 132, 199, 0.45);
+    transform: translateY(-2px);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: 0 3px 8px rgba(2, 132, 199, 0.25);
+  }
+}
+
+.fs-8 {
+  font-size: 0.75rem !important;
+}
+
+@keyframes kioskFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}

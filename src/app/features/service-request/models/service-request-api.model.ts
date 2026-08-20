@@ -1,3 +1,4 @@
+import { ServiceCustomInput } from '../../service-management/models/service-management.model';
 import { ServiceType } from './service-type.model';
 import { Specialty } from './specialty.model';
 
@@ -49,6 +50,8 @@ export interface BranchServiceNodeDto {
   readonly arabicUserMessage: string | null;
   readonly englishUserMessage: string | null;
   readonly isTicketIssuable: boolean;
+  readonly isClientInputRequired?: boolean;
+  readonly customInputs?: readonly ServiceCustomInput[] | null;
   readonly rangePrefix: string | null;
   readonly rangeStartNumber: number | null;
   readonly rangeEndNumber: number | null;

@@ -1,0 +1,88 @@
+<div class="display-control-bar" [class.collapsed]="isCollapsed()" [class.rtl-mode]="isAr()">
+  <!-- Toggle collapse pill -->
+  <button
+    type="button"
+    class="collapse-trigger-btn"
+    (click)="toggleCollapse()"
+    [attr.title]="isCollapsed() ? (isAr() ? 'إظهار لوحة التحكم' : 'Show Controls') : (isAr() ? 'إخفاء لوحة التحكم' : 'Hide Controls')"
+  >
+    <i class="bi" [class.bi-sliders]="isCollapsed()" [class.bi-chevron-down]="!isCollapsed()"></i>
+    @if (isCollapsed()) {
+      <span class="pill-label">{{ isAr() ? 'تحكم العرض' : 'Display Tools' }}</span>
+    }
+  </button>
+
+  @if (!isCollapsed()) {
+    <div class="control-actions-group">
+      <!-- Call Next Ticket Simulation -->
+      <button
+        type="button"
+        class="ctrl-btn btn-call"
+        (click)="simulateCall()"
+        [attr.title]="isAr() ? 'محاكاة نداء تذكرة جديدة' : 'Simulate Call Next Ticket'"
+      >
+        <i class="bi bi-bell-fill"></i>
+        <span>{{ isAr() ? 'محاكاة نداء تذكرة' : 'Simulate Call' }}</span>
+      </button>
+
+      <!-- View Switcher -->
+      <div class="view-switch-btns">
+        <button
+          type="button"
+          class="ctrl-btn btn-secondary"
+          (click)="navigateTo('/display/main')"
+          [attr.title]="isAr() ? 'الشاشة الرئيسية للانتظار' : 'Main Waiting Screen'"
+        >
+          <i class="bi bi-tv"></i>
+          <span>{{ isAr() ? 'شاشة الانتظار العامة' : 'Main Display' }}</span>
+        </button>
+
+        <!-- Window selection for single window display -->
+        <div class="window-selector-wrapper">
+          <select
+            class="window-select"
+            [value]="state.selectedWindowId()"
+            (change)="onWindowSelect($event)"
+          >
+            @for (w of queueWindows(); track w.windowId) {
+              <option [value]="w.windowId">
+                {{ isAr() ? w.windowNameAr : w.windowName }}
+              </option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <!-- Sound Toggle -->
+      <button
+        type="button"
+        class="ctrl-btn btn-icon"
+        [class.active]="state.isSoundEnabled()"
+        (click)="toggleSound()"
+        [attr.title]="state.isSoundEnabled() ? (isAr() ? 'كتم التنبيه الصوتي' : 'Mute Chime') : (isAr() ? 'تفعيل التنبيه الصوتي' : 'Enable Chime')"
+      >
+        <i class="bi" [class.bi-volume-up-fill]="state.isSoundEnabled()" [class.bi-volume-mute-fill]="!state.isSoundEnabled()"></i>
+      </button>
+
+      <!-- Fullscreen Toggle -->
+      <button
+        type="button"
+        class="ctrl-btn btn-icon"
+        (click)="toggleFullscreen()"
+        [attr.title]="isFullscreen() ? (isAr() ? 'إنهاء ملء الشاشة' : 'Exit Fullscreen') : (isAr() ? 'ملء الشاشة' : 'Fullscreen')"
+      >
+        <i class="bi" [class.bi-fullscreen-exit]="isFullscreen()" [class.bi-fullscreen]="!isFullscreen()"></i>
+      </button>
+
+      <!-- Language Toggle -->
+      <button
+        type="button"
+        class="ctrl-btn btn-lang"
+        (click)="toggleLanguage()"
+      >
+        <i class="bi bi-globe2"></i>
+        <span>{{ isAr() ? 'English' : 'عربي' }}</span>
+      </button>
+    </div>
+  }
+</div>

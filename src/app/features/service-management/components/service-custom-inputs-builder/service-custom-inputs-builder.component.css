@@ -1,0 +1,171 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.svc-custom-inputs-builder {
+  margin-top: 0.25rem;
+}
+
+.svc-builder-header {
+  padding-bottom: 0.5rem;
+}
+
+.svc-builder-title {
+  color: #0f172a;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.svc-builder-subtitle {
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+/* ── Card Styling ────────────────────────────────────────────── */
+.svc-input-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s ease-in-out;
+}
+
+.svc-input-card:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 10px -2px rgba(0, 0, 0, 0.06);
+}
+
+.svc-input-card-header {
+  background: transparent;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+/* ── Fields & Labels ─────────────────────────────────────────── */
+.svc-field {
+  display: grid;
+  gap: 4px;
+}
+
+.svc-field-label {
+  color: #334155;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+/* ── Input Overrides (Prevent Global SVG Background Overlaps) ── */
+:host input.form-control,
+:host select.form-select,
+:host input.form-control.ng-invalid,
+:host input.form-control.is-invalid,
+:host select.form-select.ng-invalid,
+:host select.form-select.is-invalid,
+:host .svc-input.ng-invalid {
+  background-image: none !important;
+  font-size: 0.85rem;
+  font-weight: 500;
+  height: 38px;
+  border: 1px solid #cbd5e1;
+  border-radius: 7px;
+  color: #0f172a;
+  padding-inline-start: 0.75rem !important;
+  padding-inline-end: 0.75rem !important;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+:host input.form-control:focus,
+:host select.form-select:focus {
+  border-color: #0284c7 !important;
+  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15) !important;
+  outline: none;
+}
+
+:host input.form-control.ng-invalid.ng-touched,
+:host select.form-select.ng-invalid.ng-touched {
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.2) !important;
+}
+
+/* ── Error Messages & Prevent Duplicate ::before Icons ───────── */
+:host .svc-field small::before,
+:host small.text-danger::before,
+:host .svc-field-error::before {
+  content: none !important;
+  display: none !important;
+}
+
+.svc-field-error-msg {
+  color: #dc2626;
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 3px;
+  line-height: 1.2;
+}
+
+/* ── Restrictions Box ────────────────────────────────────────── */
+.svc-restrictions-box {
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 0.75rem;
+}
+
+.svc-restrictions-title {
+  color: #475569;
+  font-size: 0.75rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* ── Switch Box ──────────────────────────────────────────────── */
+.svc-switch-box {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 7px;
+  height: 38px;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.15s ease;
+}
+
+.svc-switch-box:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+/* ── Badges & Buttons ────────────────────────────────────────── */
+.fs-7 {
+  font-size: 0.82rem !important;
+}
+
+.fs-8 {
+  font-size: 0.75rem !important;
+}
+
+.svc-btn-remove {
+  background-color: #fff1f2;
+  border: 1px solid #fecdd3;
+  color: #e11d48;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 6px;
+  padding: 0.3rem 0.65rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.15s ease;
+}
+
+.svc-btn-remove:hover:not(:disabled) {
+  background-color: #ffe4e6;
+  border-color: #fda4af;
+  color: #be123c;
+}
+
