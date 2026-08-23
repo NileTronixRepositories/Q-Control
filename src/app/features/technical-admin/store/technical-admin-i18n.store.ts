@@ -30,6 +30,7 @@ interface TechnicalAdminTranslations {
   readonly branchEditorLabel: string;
   readonly branchBrandingLabel: string;
   readonly displayVideosLabel: string;
+  readonly displayConfigurationLabel: string;
   readonly branchConfigurationLabel: string;
   readonly branchConfigurationDescription: string;
   readonly allowedTimeLabel: string;
@@ -158,6 +159,7 @@ const TECHNICAL_ADMIN_TRANSLATIONS: Record<AppLanguage, TechnicalAdminTranslatio
     branchEditorLabel: 'محرر الفروع',
     branchBrandingLabel: 'الهوية والإعلانات',
     displayVideosLabel: 'فيديوهات الشاشات',
+    displayConfigurationLabel: 'إعدادات شاشة العرض',
     branchConfigurationLabel: 'إعدادات أوقات الفرع',
     branchConfigurationDescription:
       'إعداد المدة المسموح بها لظهور الخدمات في شاشة إصدار التذاكر قبل موعد بدايتها.',
@@ -343,6 +345,7 @@ const TECHNICAL_ADMIN_TRANSLATIONS: Record<AppLanguage, TechnicalAdminTranslatio
     branchEditorLabel: 'Branch Editor',
     branchBrandingLabel: 'Branding & Advertisements',
     displayVideosLabel: 'Display Videos',
+    displayConfigurationLabel: 'Display Configuration',
     branchConfigurationLabel: 'Branch Configuration',
     branchConfigurationDescription:
       'Configure how early services appear on the ticket issuance screen before their scheduled start time.',

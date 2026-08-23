@@ -79,12 +79,24 @@
           </button>
         </div>
 
-        <div class="branch-api-filters row g-3 mb-3">
-          <label class="col-12 col-lg-6 col-xl-4 d-flex flex-column gap-2 w-100"
+        <div class="branch-api-filters row g-3 align-items-end mb-3">
+          <label class="col-12 col-md-5 col-lg-5 col-xl-5 d-flex flex-column gap-2"
             ><span>{{ translations().searchLabel }}</span>
             <div class="search-input-wrapper">
-              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="15"
+                height="15"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
               </svg>
               <input
                 class="form-control"
@@ -95,7 +107,7 @@
               />
             </div>
           </label>
-          <label class="col-12 col-md-4 col-lg-2 d-flex flex-column gap-2"
+          <label class="col-6 col-md-2 col-lg-2 col-xl-2 d-flex flex-column gap-2"
             ><span>{{ translations().sortLabel }}</span>
             <select
               class="form-select"
@@ -107,7 +119,7 @@
               <option value="Oldest">{{ translations().oldestLabel }}</option>
             </select>
           </label>
-          <label class="col-12 col-md-4 col-lg-3 d-flex flex-column gap-2"
+          <label class="col-6 col-md-3 col-lg-3 col-xl-3 d-flex flex-column gap-2"
             ><span>{{ branchEditorTranslations().status }}</span>
             <select
               class="form-select"
@@ -120,7 +132,7 @@
               <option value="false">{{ branchEditorTranslations().inactive }}</option>
             </select>
           </label>
-          <label class="col-12 col-md-4 col-lg-3 d-flex flex-column gap-2"
+          <label class="col-12 col-md-2 col-lg-2 col-xl-2 d-flex flex-column gap-2"
             ><span>{{ translations().pageSizeLabel }}</span>
             <select
               class="form-select"
@@ -493,11 +505,7 @@
       </section>
 
       @if (branchPanelMode() !== 'closed') {
-        <div
-          class="q-dialog-backdrop"
-          (click)="closeBranchPanel()"
-          aria-hidden="true"
-        ></div>
+        <div class="q-dialog-backdrop" (click)="closeBranchPanel()" aria-hidden="true"></div>
         <aside
           class="q-dialog q-dialog--xl branch-dialog"
           role="dialog"
@@ -558,7 +566,9 @@
                         <i class="bi bi-hdd-network" aria-hidden="true"></i>
                         {{ translations().ipAddressLabel }}
                       </span>
-                      <span class="q-detail-value" dir="ltr">{{ detailValue(details.ipAddress) }}</span>
+                      <span class="q-detail-value" dir="ltr">{{
+                        detailValue(details.ipAddress)
+                      }}</span>
                     </div>
                     <div class="q-detail-item">
                       <span class="q-detail-label">
@@ -583,7 +593,11 @@
                           [class.bi-x-circle-fill]="!details.isActive"
                           aria-hidden="true"
                         ></i>
-                        {{ details.isActive ? branchEditorTranslations().active : branchEditorTranslations().inactive }}
+                        {{
+                          details.isActive
+                            ? branchEditorTranslations().active
+                            : branchEditorTranslations().inactive
+                        }}
                       </span>
                     </div>
                     <div class="q-detail-item">
@@ -602,7 +616,11 @@
                           [class.bi-x-circle-fill]="!details.effectiveIsActive"
                           aria-hidden="true"
                         ></i>
-                        {{ details.effectiveIsActive ? branchEditorTranslations().operationalAvailable : branchEditorTranslations().operationalUnavailable }}
+                        {{
+                          details.effectiveIsActive
+                            ? branchEditorTranslations().operationalAvailable
+                            : branchEditorTranslations().operationalUnavailable
+                        }}
                       </span>
                     </div>
                   </div>
@@ -620,7 +638,9 @@
                         <i class="bi bi-map" aria-hidden="true"></i>
                         {{ translations().governorateLabel }}
                       </span>
-                      <span class="q-detail-value">{{ detailValue(details.location?.governorate) }}</span>
+                      <span class="q-detail-value">{{
+                        detailValue(details.location?.governorate)
+                      }}</span>
                     </div>
                     <div class="q-detail-item">
                       <span class="q-detail-label">
@@ -641,15 +661,19 @@
                         <i class="bi bi-signpost-2" aria-hidden="true"></i>
                         {{ branchEditorTranslations().address }}
                       </span>
-                      <span class="q-detail-value">{{ detailValue(details.location?.address) }}</span>
+                      <span class="q-detail-value">{{
+                        detailValue(details.location?.address)
+                      }}</span>
                     </div>
                     <div class="q-detail-item">
                       <span class="q-detail-label">
                         <i class="bi bi-geo" aria-hidden="true"></i>
-                        {{ branchEditorTranslations().longitude }} / {{ branchEditorTranslations().latitude }}
+                        {{ branchEditorTranslations().longitude }} /
+                        {{ branchEditorTranslations().latitude }}
                       </span>
                       <span class="q-detail-value" dir="ltr">
-                        {{ detailValue(details.location?.longitude) }}, {{ detailValue(details.location?.latitude) }}
+                        {{ detailValue(details.location?.longitude) }},
+                        {{ detailValue(details.location?.latitude) }}
                       </span>
                     </div>
                   </div>
@@ -674,7 +698,9 @@
                         <i class="bi bi-calendar-check" aria-hidden="true"></i>
                         {{ branchEditorTranslations().createdOn }}
                       </span>
-                      <span class="q-detail-value">{{ formatNullableDate(details.createdOnUtc) }}</span>
+                      <span class="q-detail-value">{{
+                        formatNullableDate(details.createdOnUtc)
+                      }}</span>
                     </div>
                     <div class="q-detail-item">
                       <span class="q-detail-label">
@@ -688,7 +714,9 @@
                         <i class="bi bi-clock-history" aria-hidden="true"></i>
                         {{ branchEditorTranslations().modifiedOn }}
                       </span>
-                      <span class="q-detail-value">{{ formatNullableDate(details.modifiedOnUtc) }}</span>
+                      <span class="q-detail-value">{{
+                        formatNullableDate(details.modifiedOnUtc)
+                      }}</span>
                     </div>
                   </div>
                 </section>
@@ -696,19 +724,23 @@
             }
 
             @if (branchPanelMode() === 'create' || branchPanelMode() === 'edit') {
-              <form
-                id="branchForm"
-                [formGroup]="branchForm"
-                (ngSubmit)="saveBranch()"
-                novalidate
-              >
-                <div class="row g-3 mb-4">
+              <form id="branchForm" [formGroup]="branchForm" (ngSubmit)="saveBranch()" novalidate>
+                <div class="row g-3">
                   <div class="col-12 col-md-6">
                     <label class="q-field">
                       <span class="q-field-label">{{ translations().arabicNameLabel }}</span>
-                      <input class="form-control" [class.is-invalid]="hasBranchControlError('arabicName')" type="text" maxlength="100" formControlName="arabicName" />
+                      <input
+                        class="form-control"
+                        [class.is-invalid]="hasBranchControlError('arabicName')"
+                        type="text"
+                        maxlength="100"
+                        formControlName="arabicName"
+                        dir="rtl"
+                      />
                       @if (hasBranchControlValidationError('arabicName', 'required')) {
-                        <span class="q-field-error">{{ branchEditorTranslations().requiredField }}</span>
+                        <span class="q-field-error">{{
+                          branchEditorTranslations().requiredField
+                        }}</span>
                       } @else if (hasBranchControlValidationError('arabicName', 'maxlength')) {
                         <span class="q-field-error">{{ branchEditorTranslations().max100 }}</span>
                       }
@@ -717,9 +749,18 @@
                   <div class="col-12 col-md-6">
                     <label class="q-field">
                       <span class="q-field-label">{{ translations().englishNameLabel }}</span>
-                      <input class="form-control" [class.is-invalid]="hasBranchControlError('englishName')" type="text" maxlength="100" formControlName="englishName" />
+                      <input
+                        class="form-control"
+                        [class.is-invalid]="hasBranchControlError('englishName')"
+                        type="text"
+                        maxlength="100"
+                        formControlName="englishName"
+                        dir="ltr"
+                      />
                       @if (hasBranchControlValidationError('englishName', 'required')) {
-                        <span class="q-field-error">{{ branchEditorTranslations().requiredField }}</span>
+                        <span class="q-field-error">{{
+                          branchEditorTranslations().requiredField
+                        }}</span>
                       } @else if (hasBranchControlValidationError('englishName', 'maxlength')) {
                         <span class="q-field-error">{{ branchEditorTranslations().max100 }}</span>
                       }
@@ -728,33 +769,60 @@
                   <div class="col-12 col-md-6">
                     <label class="q-field">
                       <span class="q-field-label">{{ translations().ipAddressLabel }}</span>
-                      <input class="form-control" [class.is-invalid]="hasBranchControlError('ipAddress') || isIpAddressInvalid()" type="text" maxlength="45" formControlName="ipAddress" />
+                      <input
+                        class="form-control"
+                        [class.is-invalid]="
+                          hasBranchControlError('ipAddress') || isIpAddressInvalid()
+                        "
+                        type="text"
+                        maxlength="45"
+                        formControlName="ipAddress"
+                        dir="ltr"
+                      />
                       @if (hasBranchControlValidationError('ipAddress', 'required')) {
-                        <span class="q-field-error">{{ branchEditorTranslations().requiredField }}</span>
+                        <span class="q-field-error">{{
+                          branchEditorTranslations().requiredField
+                        }}</span>
                       } @else if (isIpAddressInvalid()) {
-                        <span class="q-field-error">{{ branchEditorTranslations().invalidIp }}</span>
+                        <span class="q-field-error">{{
+                          branchEditorTranslations().invalidIp
+                        }}</span>
                       }
                     </label>
                   </div>
                   <div class="col-12 col-md-6">
                     <label class="q-field">
                       <span class="q-field-label">{{ branchEditorTranslations().license }}</span>
-                      <textarea class="form-control" rows="1" formControlName="license"></textarea>
+                      <input
+                        class="form-control"
+                        type="text"
+                        formControlName="license"
+                        [placeholder]="branchEditorTranslations().license"
+                      />
                     </label>
                   </div>
                 </div>
 
-                <p class="q-section-divider mb-3">
-                  <i class="bi bi-geo-alt me-2"></i>{{ branchEditorTranslations().location }}
-                </p>
+                <div class="d-flex align-items-center gap-2 mb-3 mt-4 pt-3 border-top">
+                  <i class="bi bi-geo-alt-fill text-primary" aria-hidden="true"></i>
+                  <span class="fw-bold text-dark">{{ branchEditorTranslations().location }}</span>
+                </div>
 
                 <div class="row g-3">
                   <div class="col-12 col-md-4">
                     <label class="q-field">
                       <span class="q-field-label">{{ translations().governorateLabel }}</span>
-                      <input class="form-control" [class.is-invalid]="hasBranchControlError('governorate')" type="text" maxlength="100" formControlName="governorate" />
+                      <input
+                        class="form-control"
+                        [class.is-invalid]="hasBranchControlError('governorate')"
+                        type="text"
+                        maxlength="100"
+                        formControlName="governorate"
+                      />
                       @if (hasBranchControlValidationError('governorate', 'required')) {
-                        <span class="q-field-error">{{ branchEditorTranslations().requiredField }}</span>
+                        <span class="q-field-error">{{
+                          branchEditorTranslations().requiredField
+                        }}</span>
                       } @else if (hasBranchControlValidationError('governorate', 'maxlength')) {
                         <span class="q-field-error">{{ branchEditorTranslations().max100 }}</span>
                       }
@@ -763,9 +831,17 @@
                   <div class="col-12 col-md-4">
                     <label class="q-field">
                       <span class="q-field-label">{{ translations().cityLabel }}</span>
-                      <input class="form-control" [class.is-invalid]="hasBranchControlError('city')" type="text" maxlength="100" formControlName="city" />
+                      <input
+                        class="form-control"
+                        [class.is-invalid]="hasBranchControlError('city')"
+                        type="text"
+                        maxlength="100"
+                        formControlName="city"
+                      />
                       @if (hasBranchControlValidationError('city', 'required')) {
-                        <span class="q-field-error">{{ branchEditorTranslations().requiredField }}</span>
+                        <span class="q-field-error">{{
+                          branchEditorTranslations().requiredField
+                        }}</span>
                       } @else if (hasBranchControlValidationError('city', 'maxlength')) {
                         <span class="q-field-error">{{ branchEditorTranslations().max100 }}</span>
                       }
@@ -774,9 +850,17 @@
                   <div class="col-12 col-md-4">
                     <label class="q-field">
                       <span class="q-field-label">{{ branchEditorTranslations().area }}</span>
-                      <input class="form-control" [class.is-invalid]="hasBranchControlError('area')" type="text" maxlength="100" formControlName="area" />
+                      <input
+                        class="form-control"
+                        [class.is-invalid]="hasBranchControlError('area')"
+                        type="text"
+                        maxlength="100"
+                        formControlName="area"
+                      />
                       @if (hasBranchControlValidationError('area', 'required')) {
-                        <span class="q-field-error">{{ branchEditorTranslations().requiredField }}</span>
+                        <span class="q-field-error">{{
+                          branchEditorTranslations().requiredField
+                        }}</span>
                       } @else if (hasBranchControlValidationError('area', 'maxlength')) {
                         <span class="q-field-error">{{ branchEditorTranslations().max100 }}</span>
                       }
@@ -785,29 +869,59 @@
                   <div class="col-12">
                     <label class="q-field">
                       <span class="q-field-label">{{ branchEditorTranslations().address }}</span>
-                      <input class="form-control" [class.is-invalid]="hasBranchControlError('address')" type="text" maxlength="500" formControlName="address" />
+                      <input
+                        class="form-control"
+                        [class.is-invalid]="hasBranchControlError('address')"
+                        type="text"
+                        maxlength="500"
+                        formControlName="address"
+                      />
                       @if (hasBranchControlValidationError('address', 'required')) {
-                        <span class="q-field-error">{{ branchEditorTranslations().requiredField }}</span>
+                        <span class="q-field-error">{{
+                          branchEditorTranslations().requiredField
+                        }}</span>
                       } @else if (hasBranchControlValidationError('address', 'maxlength')) {
                         <span class="q-field-error">{{ branchEditorTranslations().max500 }}</span>
                       }
                     </label>
                   </div>
-                  <div class="col-6 col-md-3">
+                  <div class="col-12 col-md-6">
                     <label class="q-field">
                       <span class="q-field-label">{{ branchEditorTranslations().longitude }}</span>
-                      <input class="form-control" [class.is-invalid]="hasBranchControlError('longitude')" type="number" min="-180" max="180" step="any" formControlName="longitude" />
+                      <input
+                        class="form-control"
+                        [class.is-invalid]="hasBranchControlError('longitude')"
+                        type="number"
+                        min="-180"
+                        max="180"
+                        step="any"
+                        formControlName="longitude"
+                        dir="ltr"
+                      />
                       @if (hasBranchControlValidationError('longitude', 'required')) {
-                        <span class="q-field-error">{{ branchEditorTranslations().requiredField }}</span>
+                        <span class="q-field-error">{{
+                          branchEditorTranslations().requiredField
+                        }}</span>
                       }
                     </label>
                   </div>
-                  <div class="col-6 col-md-3">
+                  <div class="col-12 col-md-6">
                     <label class="q-field">
                       <span class="q-field-label">{{ branchEditorTranslations().latitude }}</span>
-                      <input class="form-control" [class.is-invalid]="hasBranchControlError('latitude')" type="number" min="-90" max="90" step="any" formControlName="latitude" />
+                      <input
+                        class="form-control"
+                        [class.is-invalid]="hasBranchControlError('latitude')"
+                        type="number"
+                        min="-90"
+                        max="90"
+                        step="any"
+                        formControlName="latitude"
+                        dir="ltr"
+                      />
                       @if (hasBranchControlValidationError('latitude', 'required')) {
-                        <span class="q-field-error">{{ branchEditorTranslations().requiredField }}</span>
+                        <span class="q-field-error">{{
+                          branchEditorTranslations().requiredField
+                        }}</span>
                       }
                     </label>
                   </div>
@@ -821,7 +935,12 @@
               <button type="button" class="q-btn q-btn--secondary" (click)="closeBranchPanel()">
                 {{ branchEditorTranslations().cancel }}
               </button>
-              <button type="submit" form="branchForm" class="q-btn q-btn--primary" [disabled]="branchSaving()">
+              <button
+                type="submit"
+                form="branchForm"
+                class="q-btn q-btn--primary"
+                [disabled]="branchSaving()"
+              >
                 <i class="bi bi-floppy" aria-hidden="true"></i>
                 {{ branchEditorTranslations().save }}
               </button>

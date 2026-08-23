@@ -1,5 +1,9 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
+import { DisplayRuntimeApiService } from './display-runtime-api.service';
 import { BranchVideosApiService } from '../../technical-admin/services/branch-videos-api.service';
+import {
+  DisplayRuntimeConfiguration,
+} from '../../technical-admin/models/display-configuration.model';
 import {
   DisplayBranchBranding,
   DisplayMediaItem,
@@ -183,10 +187,38 @@ const INITIAL_NEWS: DisplayTickerNews[] = [
   },
 ];
 
+const DEFAULT_DISPLAY_CONFIG: DisplayRuntimeConfiguration = {
+  displayBackgroundColor: '#0a1128',
+  mainTitleAr: 'مستشفى نايل ترونكس التخصصي',
+  mainTitleEn: 'NileTronix Healthcare Hospital',
+  headerBackgroundColor: '#001f54',
+  mainTitleTextColor: '#ffffff',
+  mainTitleFontSize: 28,
+  tableHeaderBackgroundColor: '#0b8aa8',
+  tableHeaderTextColor: '#ffffff',
+  tableRowBackgroundColor: '#0a1128',
+  tableRowTextColor: '#ffffff',
+  ticketNumberBackgroundColor: '#0b8aa8',
+  ticketNumberTextColor: '#ffffff',
+  ticketColumnTitleAr: 'رقم التذكرة',
+  ticketColumnTitleEn: 'Ticket',
+  serviceColumnTitleAr: 'الطبيب - الخدمة',
+  serviceColumnTitleEn: 'Doctor-Service',
+  windowColumnTitleAr: 'العيادة / الشباك',
+  windowColumnTitleEn: 'Clinic',
+  tickerBackgroundColor: '#0b8aa8',
+  tickerTextColor: '#ffffff',
+  tickerFontSize: 18,
+  showClock: true,
+  clockBackgroundColor: '#034078',
+  clockTextColor: '#ffffff',
+};
+
 @Injectable({
   providedIn: 'root',
 })
 export class DisplayStateService {
+  private readonly runtimeApi = inject(DisplayRuntimeApiService, { optional: true });
   private readonly branchVideosApi = inject(BranchVideosApiService, { optional: true });
 
   readonly branding = signal<DisplayBranchBranding>(DEFAULT_BRANDING);
@@ -199,6 +231,11 @@ export class DisplayStateService {
   readonly isSoundEnabled = signal<boolean>(true);
   readonly selectedWindowId = signal<number>(1);
   readonly lastCalledWindow = signal<DisplayQueueItem | null>(null);
+
+  // ─── Runtime Display Configuration ─────────────────────────────────────
+  readonly runtimeConfig = signal<DisplayRuntimeConfiguration>(DEFAULT_DISPLAY_CONFIG);
+  readonly runtimeLogoUrl = signal<string | null>(null);
+  readonly runtimeConfigLoaded = signal<boolean>(false);
 
   // Computed properties
   readonly currentMedia = computed(() => {
@@ -219,6 +256,95 @@ export class DisplayStateService {
 
   constructor() {
     this.startMediaSlideshow();
+  }
+
+  // ─── Runtime Configuration Loading (New Public APIs) ───────────────────
+
+  loadRuntimeConfiguration(branchId: number): void {
+    if (!this.runtimeApi) return;
+
+    this.runtimeApi.getRuntimeConfiguration(branchId).subscribe({
+      next: (response) => {
+        // Apply display configuration
+        if (response.displayConfiguration) {
+          this.runtimeConfig.set(response.displayConfiguration);
+        }
+
+        // Apply logo
+        const logoUrl = response.branding?.logoUrl ?? null;
+        if (logoUrl) {
+          this.runtimeLogoUrl.set(this.runtimeApi!.resolveMediaUrl(logoUrl));
+        } else {
+          this.runtimeLogoUrl.set(null);
+        }
+
+        // Apply branding from config
+        const config = response.displayConfiguration;
+        if (config) {
+          this.branding.update((current) => ({
+            ...current,
+            branchId: response.branchId,
+            branchNameAr: config.mainTitleAr,
+            branchNameEn: config.mainTitleEn,
+          }));
+        }
+
+        // Apply active messages as ticker news
+        if (response.messages && response.messages.length > 0) {
+          this.tickerNews.set(
+            response.messages.map((msg) => ({
+              id: String(msg.id),
+              textAr: msg.textAr,
+              textEn: msg.textEn,
+            })),
+          );
+        }
+
+        this.runtimeConfigLoaded.set(true);
+      },
+      error: () => {
+        // Fallback: keep defaults, don't crash
+        this.runtimeConfigLoaded.set(true);
+      },
+    });
+  }
+
+  loadRuntimePlaylist(branchId: number): void {
+    if (!this.runtimeApi) {
+      // Fallback to old authenticated API if runtime API is not available
+      this.loadBranchPlaylist(branchId);
+      return;
+    }
+
+    this.runtimeApi.getRuntimePlaylist(branchId).subscribe({
+      next: (response) => {
+        if (response?.videos && response.videos.length > 0) {
+          const videoMediaItems: DisplayMediaItem[] = response.videos.map((v) => ({
+            id: `video-${v.videoId}`,
+            type: 'video',
+            url: this.runtimeApi!.resolveMediaUrl(v.streamUrl),
+            title: `Display Video #${v.displayOrder}`,
+            titleAr: `فيديو العرض #${v.displayOrder}`,
+          }));
+
+          this.stopMediaSlideshow();
+          this.isPlayingVideos.set(true);
+          this.mediaList.set(videoMediaItems);
+          this.activeMediaIndex.set(0);
+        } else {
+          this.isPlayingVideos.set(false);
+          this.mediaList.set(INITIAL_MEDIA);
+          this.activeMediaIndex.set(0);
+          this.startMediaSlideshow();
+        }
+      },
+      error: () => {
+        this.isPlayingVideos.set(false);
+        this.mediaList.set(INITIAL_MEDIA);
+        this.activeMediaIndex.set(0);
+        this.startMediaSlideshow();
+      },
+    });
   }
 
   loadBranchPlaylist(branchId: number): void {

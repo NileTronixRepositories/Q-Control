@@ -1,8 +1,15 @@
-<footer class="display-ticker-bar" [class.rtl-mode]="isAr()">
+<footer class="display-ticker-bar" [class.rtl-mode]="isAr()"
+  [style.backgroundColor]="tickerBgColor()"
+  [style.color]="tickerTextColor()"
+  [style.fontSize.px]="tickerFontSize()">
   <!-- Clock Capsule -->
-  <div class="clock-capsule">
-    <span class="digital-time">{{ currentTime() }}</span>
-  </div>
+  @if (showClock()) {
+    <div class="clock-capsule"
+      [style.backgroundColor]="clockBgColor()"
+      [style.color]="clockTextColor()">
+      <span class="digital-time">{{ currentTime() }}</span>
+    </div>
+  }
 
   <!-- Smooth Scrolling Marquee Area -->
   <div class="ticker-viewport">
@@ -12,3 +19,4 @@
     </div>
   </div>
 </footer>
+

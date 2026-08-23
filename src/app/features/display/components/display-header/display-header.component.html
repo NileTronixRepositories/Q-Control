@@ -1,12 +1,19 @@
-<header class="display-header" [class.rtl-mode]="isAr()">
+<header class="display-header" [class.rtl-mode]="isAr()"
+  [style.backgroundColor]="headerBgColor()">
   <div class="brand-zone">
     <div class="brand-logo-wrapper">
       <div class="brand-logo-circle">
-        <i class="bi bi-hospital-fill logo-icon"></i>
+        @if (logoUrl()) {
+          <img [src]="logoUrl()" alt="Branch Logo" class="logo-image" />
+        } @else {
+          <i class="bi bi-hospital-fill logo-icon"></i>
+        }
       </div>
     </div>
     <div class="brand-text">
-      <h1 class="brand-title">{{ branchTitle() }}</h1>
+      <h1 class="brand-title"
+        [style.color]="titleTextColor()"
+        [style.fontSize.px]="titleFontSize()">{{ branchTitle() }}</h1>
     </div>
   </div>
 </header>

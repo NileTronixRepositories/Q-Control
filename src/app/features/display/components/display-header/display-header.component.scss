@@ -6,11 +6,11 @@
 .display-header {
   display: flex;
   align-items: center;
-  height: 80px;
-  padding: 12px 32px;
-  background: transparent;
+  height: 72px;
+  padding: 8px 24px;
   width: 100%;
   box-sizing: border-box;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 
   &.rtl-mode {
     direction: rtl;
@@ -23,28 +23,39 @@
   gap: 16px;
 }
 
+.brand-logo-wrapper {
+  display: flex;
+  align-items: center;
+}
+
 .brand-logo-circle {
   width: 52px;
   height: 52px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, #0b8aa8 0%, #034078 100%);
+  border-radius: 10px;
+  background: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 12px rgba(11, 138, 168, 0.2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  padding: 4px;
   flex-shrink: 0;
 
+  .logo-image {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+  }
+
   .logo-icon {
-    font-size: 28px;
-    color: #ffffff;
+    font-size: 26px;
+    color: #087fa7;
   }
 }
 
 .brand-title {
   margin: 0;
-  font-size: 1.6rem;
   font-weight: 800;
-  color: #0b8aa8;
   letter-spacing: -0.01em;
   line-height: 1.2;
   white-space: nowrap;

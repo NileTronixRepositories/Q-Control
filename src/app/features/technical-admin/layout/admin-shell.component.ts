@@ -114,6 +114,11 @@ export class AdminShellComponent {
         route: '/admin/display-videos',
         icon: 'bi-film',
       });
+      items.push({
+        label: translations.displayConfigurationLabel,
+        route: '/admin/display-configuration',
+        icon: 'bi-display',
+      });
     }
 
     if (this.canShow(['BranchConfigurations.View', 'BranchConfigurations.Create', 'BranchConfigurations.Update'])) {

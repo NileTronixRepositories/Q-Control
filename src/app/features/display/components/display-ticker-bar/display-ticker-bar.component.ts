@@ -27,6 +27,14 @@ export class DisplayTickerBarComponent implements OnInit, OnDestroy {
 
   readonly isAr = computed(() => this.state.language() === 'ar');
 
+  // Dynamic config signals
+  readonly tickerBgColor = computed(() => this.state.runtimeConfig().tickerBackgroundColor);
+  readonly tickerTextColor = computed(() => this.state.runtimeConfig().tickerTextColor);
+  readonly tickerFontSize = computed(() => this.state.runtimeConfig().tickerFontSize);
+  readonly showClock = computed(() => this.state.runtimeConfig().showClock);
+  readonly clockBgColor = computed(() => this.state.runtimeConfig().clockBackgroundColor);
+  readonly clockTextColor = computed(() => this.state.runtimeConfig().clockTextColor);
+
   readonly combinedNewsText = computed(() => {
     const isArabic = this.isAr();
     const newsList = this.state.tickerNews();

@@ -58,6 +58,17 @@ export const TECHNICAL_ADMIN_ROUTES: Routes = [
           ),
       },
       {
+        path: 'display-configuration',
+        canActivate: [adminPermissionGuard],
+        data: {
+          requiredAnyPermissions: ['Branches.ViewDetails', 'Branches.Update'],
+        },
+        loadComponent: () =>
+          import('./pages/display-configuration/display-configuration.component').then(
+            (component) => component.DisplayConfigurationComponent,
+          ),
+      },
+      {
         path: 'branch-configuration',
         canActivate: [adminPermissionGuard],
         data: {

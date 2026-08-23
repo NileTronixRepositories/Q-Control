@@ -1,10 +1,14 @@
 <div class="queue-table-wrapper" [class.rtl-mode]="isAr()">
   <table class="tv-queue-table">
     <thead>
-      <tr class="table-header-row">
-        <th class="th-clinic">{{ isAr() ? 'العيادة / الشباك' : 'Clinic' }}</th>
-        <th class="th-doctor-service">{{ isAr() ? 'الطبيب - الخدمة' : 'Doctor-Service' }}</th>
-        <th class="th-ticket">{{ isAr() ? 'رقم التذكرة' : 'Ticket' }}</th>
+      <tr
+        class="table-header-row"
+        [style.backgroundColor]="tableHeaderBgColor()"
+        [style.color]="tableHeaderTextColor()"
+      >
+        <th class="th-clinic">{{ windowColumnTitle() }}</th>
+        <th class="th-doctor-service">{{ serviceColumnTitle() }}</th>
+        <th class="th-ticket">{{ ticketColumnTitle() }}</th>
       </tr>
     </thead>
     <tbody>
@@ -12,6 +16,8 @@
         <tr
           class="table-data-row"
           [class.calling-row]="item.isFlashing || item.status === 'calling'"
+          [style.backgroundColor]="tableRowBgColor()"
+          [style.color]="tableRowTextColor()"
         >
           <td class="td-clinic">
             <span class="clinic-title">{{ getWindowName(item) }}</span>
@@ -20,7 +26,12 @@
             <span class="doctor-service-text">{{ getDoctorAndService(item) }}</span>
           </td>
           <td class="td-ticket">
-            <div class="ticket-badge-tv" [class.pulse-flash]="item.isFlashing">
+            <div
+              class="ticket-badge-tv"
+              [class.pulse-flash]="item.isFlashing"
+              [style.backgroundColor]="ticketBadgeBgColor()"
+              [style.color]="ticketBadgeTextColor()"
+            >
               {{ item.currentTicket || '---' }}
             </div>
           </td>

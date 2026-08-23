@@ -16,9 +16,14 @@ export class DisplayHeaderComponent {
   readonly showTableHeaders = input<boolean>(true);
 
   readonly branchTitle = computed(() => {
-    const branding = this.state.branding();
-    return this.state.language() === 'ar' ? branding.branchNameAr : branding.branchNameEn;
+    const config = this.state.runtimeConfig();
+    return this.state.language() === 'ar' ? config.mainTitleAr : config.mainTitleEn;
   });
 
   readonly isAr = computed(() => this.state.language() === 'ar');
+
+  readonly headerBgColor = computed(() => this.state.runtimeConfig().headerBackgroundColor);
+  readonly titleTextColor = computed(() => this.state.runtimeConfig().mainTitleTextColor);
+  readonly titleFontSize = computed(() => this.state.runtimeConfig().mainTitleFontSize);
+  readonly logoUrl = computed(() => this.state.runtimeLogoUrl());
 }

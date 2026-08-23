@@ -22,6 +22,29 @@ export class DisplayQueueBoardComponent {
   readonly queueItems = this.state.queueItems;
   readonly isAr = computed(() => this.state.language() === 'ar');
 
+  // Dynamic config signals
+  readonly tableHeaderBgColor = computed(() => this.state.runtimeConfig().tableHeaderBackgroundColor);
+  readonly tableHeaderTextColor = computed(() => this.state.runtimeConfig().tableHeaderTextColor);
+  readonly tableRowBgColor = computed(() => this.state.runtimeConfig().tableRowBackgroundColor);
+  readonly tableRowTextColor = computed(() => this.state.runtimeConfig().tableRowTextColor);
+  readonly ticketBadgeBgColor = computed(() => this.state.runtimeConfig().ticketNumberBackgroundColor);
+  readonly ticketBadgeTextColor = computed(() => this.state.runtimeConfig().ticketNumberTextColor);
+
+  readonly windowColumnTitle = computed(() => {
+    const config = this.state.runtimeConfig();
+    return this.isAr() ? config.windowColumnTitleAr : config.windowColumnTitleEn;
+  });
+
+  readonly serviceColumnTitle = computed(() => {
+    const config = this.state.runtimeConfig();
+    return this.isAr() ? config.serviceColumnTitleAr : config.serviceColumnTitleEn;
+  });
+
+  readonly ticketColumnTitle = computed(() => {
+    const config = this.state.runtimeConfig();
+    return this.isAr() ? config.ticketColumnTitleAr : config.ticketColumnTitleEn;
+  });
+
   getWindowName(item: DisplayQueueItem): string {
     return this.isAr() ? item.windowNameAr : item.windowName;
   }
@@ -35,3 +58,4 @@ export class DisplayQueueBoardComponent {
     return doc || srv || '';
   }
 }
+

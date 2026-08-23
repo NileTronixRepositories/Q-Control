@@ -48,6 +48,7 @@ export class MainDisplayComponent implements OnInit, OnDestroy {
 
   readonly isAr = computed(() => this.state.language() === 'ar');
   readonly isAuthenticated = computed(() => !!this.authSessionService.activeSession());
+  readonly displayBgColor = computed(() => this.state.runtimeConfig().displayBackgroundColor);
 
   // Kiosk / Display Activation Modal State
   readonly isAuthModalOpen = signal<boolean>(false);
@@ -68,13 +69,12 @@ export class MainDisplayComponent implements OnInit, OnDestroy {
         branchId = this.branchContextStore?.selectedBranchId() ?? this.state.branding().branchId ?? 1;
       }
 
-      if (this.isAuthenticated()) {
-        this.isAuthModalOpen.set(false);
-        this.state.loadBranchPlaylist(branchId);
-      } else {
-        // Show activation dialog so user can log in and link display session
-        this.isAuthModalOpen.set(true);
-      }
+      // Load runtime data immediately using anonymous (public) APIs — no login required
+      this.state.loadRuntimeConfiguration(branchId);
+      this.state.loadRuntimePlaylist(branchId);
+
+      // Don't force login modal; display works without authentication
+      this.isAuthModalOpen.set(false);
     });
   }
 

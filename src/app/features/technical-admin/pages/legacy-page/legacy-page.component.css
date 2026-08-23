@@ -48,13 +48,26 @@
   position: relative;
 }
 
+.action-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.action-group .icon-action {
+  margin: 0;
+  flex-shrink: 0;
+}
+
 .branch-selectable-row[role='link'],
 .branch-selectable-card[role='link'] {
   cursor: pointer;
 }
 
 .branch-selectable-row[role='link'] {
-  transition: background-color 160ms ease, box-shadow 160ms ease;
+  transition:
+    background-color 160ms ease,
+    box-shadow 160ms ease;
 }
 
 .branch-selectable-row[role='link']:hover,
