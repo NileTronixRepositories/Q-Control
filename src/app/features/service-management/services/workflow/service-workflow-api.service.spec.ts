@@ -12,6 +12,7 @@ describe('ServiceWorkflowApiService branch scope', () => {
   let httpController: HttpTestingController;
 
   beforeEach(() => {
+    TestBed.resetTestingModule();
     TestBed.configureTestingModule({
       providers: [
         provideHttpClient(),

@@ -86,7 +86,7 @@ describe('CreateBranchAdminDialogComponent', () => {
   it('resets and emits close from the cancel action', () => {
     const closed = vi.fn();
     fixture.componentInstance.closed.subscribe(closed);
-    (fixture.nativeElement.querySelector('.secondary-action') as HTMLButtonElement).click();
+    (fixture.nativeElement.querySelector('.q-btn--secondary') as HTMLButtonElement).click();
     expect(closed).toHaveBeenCalledOnce();
   });
 

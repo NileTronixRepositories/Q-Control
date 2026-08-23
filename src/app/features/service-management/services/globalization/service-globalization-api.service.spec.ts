@@ -13,6 +13,7 @@ describe('ServiceGlobalizationApiService', () => {
   let http: HttpTestingController;
 
   beforeEach(() => {
+    TestBed.resetTestingModule();
     TestBed.configureTestingModule({
       providers: [
         provideHttpClient(),

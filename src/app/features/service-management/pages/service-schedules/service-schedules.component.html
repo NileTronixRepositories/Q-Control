@@ -17,7 +17,7 @@
         </button>
       }
     </div>
-    
+
     <div hero-filters class="w-100 schedule-compact-filters mt-1">
       @if (!hasRouteScope()) {
         <div class="row g-2 align-items-end">
@@ -41,7 +41,7 @@
               </label>
             </div>
           }
-          
+
           @if (selectedBranchId() && scheduleTree().length > 0) {
             @for (level of serviceSelectLevels(); track level.index) {
               <div class="col-12 col-sm-6 col-lg-3 flex-grow-1">
@@ -106,11 +106,7 @@
       <i class="bi bi-exclamation-triangle text-warning"></i>
       <h2>{{ error }}</h2>
       @if (hasRouteScope()) {
-        <button
-          type="button"
-          class="primary-action mt-2"
-          (click)="backToBranchServices()"
-        >
+        <button type="button" class="primary-action mt-2" (click)="backToBranchServices()">
           {{ translations().backToBranchServices }}
         </button>
       }
@@ -123,7 +119,6 @@
       size="lg"
     />
   } @else {
-    
     <div class="schedule-editor-container mt-2">
       @if (!hasRouteScope() && selectedBranchId() && scheduleTree().length === 0) {
         <section class="empty-state">
@@ -134,11 +129,65 @@
 
       @if (scope(); as currentScope) {
         <form class="schedule-editor-panel" [formGroup]="scheduleForm" (ngSubmit)="submit()">
-          
-          <div class="schedule-form-header d-flex align-items-center justify-content-between flex-wrap gap-3">
+          @if (schedule() && !schedule()?.isCurrentlyOperational) {
+            <div class="alert alert-warning d-flex align-items-center gap-2 mb-3">
+              <i class="bi bi-exclamation-triangle-fill"></i>
+              <div>
+                <strong>{{ translations().currentlyUnavailable }}</strong>
+                <p class="mb-0 small">{{ translations().currentlyUnavailableHint }}</p>
+              </div>
+            </div>
+          }
+
+          @if (reloadRequired()) {
+            <div
+              class="alert alert-danger d-flex align-items-center justify-content-between gap-3 mb-3"
+            >
+              <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-arrow-clockwise"></i>
+                <span>{{ translations().concurrencyError }}</span>
+              </div>
+              <button type="button" class="btn btn-sm btn-outline-danger" (click)="reloadLatest()">
+                {{ translations().reloadLatest }}
+              </button>
+            </div>
+          }
+
+          <div
+            class="schedule-scope-badges d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3"
+          >
+            <div class="d-flex align-items-center gap-2">
+              <span class="badge bg-primary fs-6">{{ currentScope.serviceName }}</span>
+              <span class="badge bg-light text-dark border">{{ currentScope.branchName }}</span>
+              <span
+                class="badge"
+                [class.bg-success]="schedule()?.isCurrentlyOperational"
+                [class.bg-secondary]="!schedule()?.isCurrentlyOperational"
+              >
+                {{
+                  schedule()?.isCurrentlyOperational
+                    ? language() === 'ar'
+                      ? 'تشغيلي'
+                      : 'Operational'
+                    : language() === 'ar'
+                      ? 'غير متاح'
+                      : 'Unavailable'
+                }}
+              </span>
+            </div>
+          </div>
+
+          <div
+            class="schedule-form-header d-flex align-items-center justify-content-between flex-wrap gap-3"
+          >
             <div class="d-flex align-items-center flex-wrap gap-4">
               <label class="filter-field flex-row align-items-center gap-2 mb-0">
-                <input type="checkbox" class="form-check-input mt-0" [formControl]="scheduleForm.controls.isSlotCodeRequired" [disabled]="inlineControlsDisabled()" />
+                <input
+                  type="checkbox"
+                  class="form-check-input mt-0"
+                  [formControl]="scheduleForm.controls.isSlotCodeRequired"
+                  [disabled]="inlineControlsDisabled()"
+                />
                 <span class="mb-0">{{ translations().slotCodeRequired }}</span>
               </label>
               @if (scheduleForm.controls.isSlotCodeRequired.value) {
@@ -159,11 +208,7 @@
 
             <div class="d-flex align-items-center gap-2">
               @if (scheduleForm.dirty && !saving()) {
-                <button
-                  type="button"
-                  class="secondary-action"
-                  (click)="resetInlineChanges()"
-                >
+                <button type="button" class="secondary-action" (click)="resetInlineChanges()">
                   <i class="bi bi-x-lg" aria-hidden="true"></i>
                   {{ translations().cancel }}
                 </button>
@@ -190,7 +235,9 @@
                   <th style="width: 170px">{{ translations().startTime }}</th>
                   <th style="width: 170px">{{ translations().endTime }}</th>
                   <th class="text-center">{{ translations().day }}</th>
-                  <th class="text-end" style="width: 130px">{{ language() === 'ar' ? 'الإجراءات' : 'Actions' }}</th>
+                  <th class="text-end" style="width: 130px">
+                    {{ language() === 'ar' ? 'الإجراءات' : 'Actions' }}
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -236,7 +283,11 @@
                             class="day-toggle-btn"
                             [class.active]="rule.controls.day.value === day"
                             [disabled]="inlineControlsDisabled()"
-                            (click)="rule.controls.day.setValue(day); scheduleForm.markAsDirty(); scheduleForm.updateValueAndValidity()"
+                            (click)="
+                              rule.controls.day.setValue(day);
+                              scheduleForm.markAsDirty();
+                              scheduleForm.updateValueAndValidity()
+                            "
                             [title]="dayLabel(day)"
                           >
                             {{ dayLabel(day) }}
@@ -255,14 +306,27 @@
                         >
                           <i class="bi bi-trash" aria-hidden="true"></i>
                         </button>
-                        <span 
+                        <span
                           class="d-inline-flex align-items-center justify-content-center rounded-circle"
                           [class.text-success]="rule.valid"
                           [class.bg-success]="rule.valid"
                           [class.text-warning]="!rule.valid"
                           [class.bg-warning]="!rule.valid"
-                          style="width: 36px; height: 36px; --bs-bg-opacity: .15; font-size: 1.15rem;"
-                          [title]="rule.valid ? (language() === 'ar' ? 'صحيح' : 'Valid') : (language() === 'ar' ? 'خطأ' : 'Invalid')"
+                          style="
+                            width: 36px;
+                            height: 36px;
+                            --bs-bg-opacity: 0.15;
+                            font-size: 1.15rem;
+                          "
+                          [title]="
+                            rule.valid
+                              ? language() === 'ar'
+                                ? 'صحيح'
+                                : 'Valid'
+                              : language() === 'ar'
+                                ? 'خطأ'
+                                : 'Invalid'
+                          "
                         >
                           @if (rule.valid) {
                             <i class="bi bi-check-lg" aria-hidden="true"></i>

@@ -14,21 +14,28 @@
     icon="bi bi-display"
   >
     <div hero-actions class="d-flex align-items-center gap-2 hero-controls flex-nowrap">
-      <label class="visually-hidden" for="displayConfigBranch">{{ copy().branchLabel }}</label>
-      <select
-        id="displayConfigBranch"
-        class="form-select branch-selector-control custom-select"
-        [value]="selectedBranchId() ?? ''"
-        [disabled]="branchesLoading() || configLoading() || saving()"
-        (change)="selectBranch($event)"
-      >
-        <option value="" [selected]="!selectedBranchId()">--</option>
-        @for (branch of branches(); track branch.id) {
-          <option [value]="branch.id" [selected]="branch.id === selectedBranchId()">
-            {{ branch.label }}
-          </option>
-        }
-      </select>
+      @if (isTechnicalAdmin() && branches().length > 1) {
+        <label class="visually-hidden" for="displayConfigBranch">{{ copy().branchLabel }}</label>
+        <select
+          id="displayConfigBranch"
+          class="form-select branch-selector-control custom-select"
+          [value]="selectedBranchId() ?? ''"
+          [disabled]="branchesLoading() || configLoading() || saving()"
+          (change)="selectBranch($event)"
+        >
+          <option value="" [selected]="!selectedBranchId()">--</option>
+          @for (branch of branches(); track branch.id) {
+            <option [value]="branch.id" [selected]="branch.id === selectedBranchId()">
+              {{ branch.label }}
+            </option>
+          }
+        </select>
+      } @else if (selectedBranchId()) {
+        <div class="d-inline-flex align-items-center gap-2 px-3 py-2 bg-white border rounded text-dark fw-bold small shadow-sm">
+          <i class="bi bi-buildings text-primary"></i>
+          <span>{{ selectedBranchLabel() }}</span>
+        </div>
+      }
       <button
         type="button"
         class="btn btn-refresh d-inline-flex align-items-center gap-2 flex-shrink-0"

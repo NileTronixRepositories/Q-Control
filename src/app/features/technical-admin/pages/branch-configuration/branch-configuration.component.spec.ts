@@ -72,9 +72,15 @@ describe('BranchConfigurationComponent', () => {
   const mockAuthSession = {
     clearSession: vi.fn(),
     shouldClearSessionForHttpStatus: vi.fn().mockReturnValue(false),
+    currentSession: vi.fn().mockReturnValue({
+      userType: 'TechnicalAdmin',
+      activeBranchId: null,
+      branches: [],
+    }),
   };
 
   beforeEach(async () => {
+    TestBed.resetTestingModule();
     vi.clearAllMocks();
 
     mockBranchManagementApi.getBranches.mockReturnValue(

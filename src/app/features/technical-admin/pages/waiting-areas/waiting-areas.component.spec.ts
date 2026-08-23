@@ -27,6 +27,7 @@ describe('WaitingAreasComponent', () => {
   );
 
   beforeEach(async () => {
+    TestBed.resetTestingModule();
     vi.clearAllMocks();
     language.set('en');
     session.set(null);

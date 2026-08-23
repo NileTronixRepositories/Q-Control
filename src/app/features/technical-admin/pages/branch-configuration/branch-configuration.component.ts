@@ -153,7 +153,45 @@ export class BranchConfigurationComponent implements OnInit, OnDestroy {
     this.message.set(null);
   }
 
+  readonly isTechnicalAdmin = computed(
+    () => this.authSessionService.currentSession()?.userType === 'TechnicalAdmin',
+  );
+
+  readonly currentBranchName = computed(() => {
+    const session = this.authSessionService.currentSession();
+    const branchId = this.selectedBranchId();
+    if (this.branches().length > 0) {
+      const match = this.branches().find((b) => b.id === branchId);
+      if (match) return match.label;
+    }
+    if (session?.branches && session.branches.length > 0) {
+      const match = session.branches.find((b) => b.branchId === branchId);
+      if (match) {
+        return (this.language() === 'ar' ? match.arabicName : match.englishName) || match.arabicName || match.englishName;
+      }
+    }
+    return branchId ? `فرع ${branchId}` : '';
+  });
+
   private loadBranches(): void {
+    const currentSession = this.authSessionService.currentSession();
+    const activeBranchId = currentSession?.activeBranchId ? Number(currentSession.activeBranchId) : null;
+    const isTechAdmin = currentSession?.userType === 'TechnicalAdmin';
+
+    if (!isTechAdmin && activeBranchId) {
+      const branch = currentSession?.branches?.find((b) => b.branchId === activeBranchId);
+      const branchName = branch
+        ? (this.language() === 'ar' ? branch.arabicName : branch.englishName) || branch.arabicName || branch.englishName
+        : `فرع ${activeBranchId}`;
+      const branchOption: BranchOption = { id: activeBranchId, label: branchName };
+      this.branches.set([branchOption]);
+      this.selectedBranchId.set(activeBranchId);
+      this.branchesLoading.set(false);
+      this.syncSelectedBranchQuery(activeBranchId);
+      this.loadConfiguration(activeBranchId);
+      return;
+    }
+
     this.branchesLoading.set(true);
     this.branchManagementApiService
       .getBranches({
@@ -171,7 +209,14 @@ export class BranchConfigurationComponent implements OnInit, OnDestroy {
         },
         error: (error: HttpErrorResponse) => {
           this.branchesLoading.set(false);
-          this.handleApiError(error, null);
+          if (activeBranchId) {
+            const branchOption: BranchOption = { id: activeBranchId, label: `فرع ${activeBranchId}` };
+            this.branches.set([branchOption]);
+            this.selectedBranchId.set(activeBranchId);
+            this.loadConfiguration(activeBranchId);
+          } else {
+            this.handleApiError(error, null);
+          }
         },
         complete: () => this.branchesLoading.set(false),
       });
@@ -179,9 +224,15 @@ export class BranchConfigurationComponent implements OnInit, OnDestroy {
 
   private selectInitialBranch(branches: readonly BranchOption[]): void {
     const queryBranchId = Number(this.route.snapshot.queryParamMap.get('branchId'));
+    const sessionActiveBranchId = this.authSessionService.currentSession()?.activeBranchId
+      ? Number(this.authSessionService.currentSession()?.activeBranchId)
+      : null;
+
     const nextBranchId = branches.some((branch) => branch.id === queryBranchId)
       ? queryBranchId
-      : (branches[0]?.id ?? null);
+      : sessionActiveBranchId && branches.some((branch) => branch.id === sessionActiveBranchId)
+        ? sessionActiveBranchId
+        : (branches[0]?.id ?? null);
 
     this.selectedBranchId.set(nextBranchId);
 

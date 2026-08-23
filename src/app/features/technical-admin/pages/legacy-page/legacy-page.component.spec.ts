@@ -24,6 +24,7 @@ describe('LegacyPageComponent branch management', () => {
   );
 
   beforeEach(async () => {
+    TestBed.resetTestingModule();
     vi.clearAllMocks();
     language.set('en');
     canCreateBranchAdmin.set(false);

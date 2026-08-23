@@ -32,10 +32,16 @@ describe('BranchBrandingComponent', () => {
     of(createAdvertisements()),
   );
   const updateBranchTheme = vi.fn<BranchBrandingApiService['updateBranchTheme']>(
-    (_branchId, request) => of({ ...branding, ...request, message: 'Theme saved' }),
+    (_branchId, request) =>
+      of({
+        ...branding,
+        ...request,
+        message: 'Visual identity and layout settings saved successfully.',
+      }),
   );
 
   beforeEach(async () => {
+    TestBed.resetTestingModule();
     vi.clearAllMocks();
     language.set('en');
     canUpdate.set(true);
@@ -68,9 +74,13 @@ describe('BranchBrandingComponent', () => {
         {
           provide: AuthSessionService,
           useValue: {
+            currentSession: signal({ userType: 'TechnicalAdmin', token: 'token' } as any),
             shouldClearSessionForHttpStatus: () => false,
             clearSession: vi.fn(),
-          } satisfies Pick<AuthSessionService, 'shouldClearSessionForHttpStatus' | 'clearSession'>,
+          } satisfies Pick<
+            AuthSessionService,
+            'currentSession' | 'shouldClearSessionForHttpStatus' | 'clearSession'
+          >,
         },
         {
           provide: BranchPermissionService,
@@ -115,14 +125,12 @@ describe('BranchBrandingComponent', () => {
   it('renders the enterprise branding workspace with accessible media controls', () => {
     const element = fixture.nativeElement as HTMLElement;
     const branchSelect = element.querySelector<HTMLSelectElement>('#branchBrandingBranch');
-    const advertisementCards = element.querySelectorAll('.branding-ad-card');
-    const iconButtons = element.querySelectorAll<HTMLButtonElement>('.branding-icon-action');
+    const advertisementCards = element.querySelectorAll('.ad-card');
+    const iconButtons = element.querySelectorAll<HTMLButtonElement>('.action-icon-btn');
 
     expect(branchSelect?.value).toBe('1');
     expect(element.querySelector('.branding-live-preview')).not.toBeNull();
-    expect(element.querySelector('.branding-logo-empty .bi-file-earmark-image')).not.toBeNull();
-    expect(element.querySelector('.bi-vector-pen')).not.toBeNull();
-    expect(element.querySelector('.bi-badge-ad')).not.toBeNull();
+    expect(element.querySelector('.bi-buildings')).not.toBeNull();
     expect(advertisementCards).toHaveLength(2);
     expect(Array.from(iconButtons).every((button) => !!button.getAttribute('aria-label'))).toBe(
       true,
@@ -131,9 +139,10 @@ describe('BranchBrandingComponent', () => {
   });
 
   it('submits a valid changed theme with the current row version', () => {
-    const mainColorInput = fixture.nativeElement.querySelector(
-      'input[type="text"][placeholder="#A7060F"]',
-    ) as HTMLInputElement;
+    const textInputs = fixture.nativeElement.querySelectorAll(
+      '.branding-theme-form .color-picker-control input[type="text"]',
+    );
+    const mainColorInput = textInputs[0] as HTMLInputElement;
     const form = fixture.nativeElement.querySelector('.branding-theme-form') as HTMLFormElement;
 
     mainColorInput.value = '#112233';
@@ -142,13 +151,18 @@ describe('BranchBrandingComponent', () => {
     form.dispatchEvent(new Event('submit'));
     fixture.detectChanges();
 
-    expect(updateBranchTheme).toHaveBeenCalledWith(1, expect.objectContaining({
-      mainColor: '#112233',
-      secondaryColor: '#0070C4',
-      backgroundColor: '#FFFFFF',
-      rowVersion: 'branding-version-1',
-    }));
-    expect(fixture.nativeElement.textContent).toContain('Visual identity and layout settings saved successfully.');
+    expect(updateBranchTheme).toHaveBeenCalledWith(
+      1,
+      expect.objectContaining({
+        mainColor: '#112233',
+        secondaryColor: '#0070C4',
+        backgroundColor: '#FFFFFF',
+        rowVersion: 'branding-version-1',
+      }),
+    );
+    expect(fixture.nativeElement.textContent).toContain(
+      'Visual identity and layout settings saved successfully.',
+    );
   });
 
   it('keeps theme controls read-only without update permission', () => {
@@ -158,13 +172,10 @@ describe('BranchBrandingComponent', () => {
     expect(
       fixture.nativeElement.querySelector('.branding-theme-form button[type="submit"]'),
     ).toBeNull();
-    expect(
-      (
-        fixture.nativeElement.querySelector(
-          'input[type="text"][placeholder="#0070C4"]',
-        ) as HTMLInputElement
-      ).readOnly,
-    ).toBe(true);
+    const textInputs = fixture.nativeElement.querySelectorAll(
+      '.branding-theme-form .color-picker-control input[type="text"]',
+    );
+    expect((textInputs[1] as HTMLInputElement).readOnly).toBe(true);
   });
 });
 
@@ -244,7 +255,7 @@ function createBranchPage(): PagedBranchResponse<BranchListItem> {
     currentPage: 1,
     pageSize: 100,
     totalPages: 1,
-    totalItems: 1,
+    totalItems: 2,
     hasPreviousPage: false,
     hasNextPage: false,
     data: [
@@ -262,6 +273,21 @@ function createBranchPage(): PagedBranchResponse<BranchListItem> {
         isActive: true,
         effectiveIsActive: true,
         rowVersion: 'branch-version-1',
+      },
+      {
+        branchId: 2,
+        arabicName: 'فرع الإسكندرية',
+        englishName: 'Alexandria Branch',
+        ipAddress: '10.0.0.2',
+        governorate: 'Alexandria',
+        city: 'Alexandria',
+        createdBy: null,
+        createdOnUtc: null,
+        lastModifiedBy: null,
+        modifiedOnUtc: null,
+        isActive: true,
+        effectiveIsActive: true,
+        rowVersion: 'branch-version-2',
       },
     ],
   };

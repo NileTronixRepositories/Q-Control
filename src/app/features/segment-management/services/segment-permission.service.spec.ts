@@ -4,7 +4,9 @@ import { AuthSessionService } from '../../auth/services/auth-session.service';
 import { SegmentPermissionService } from './segment-permission.service';
 
 describe('SegmentPermissionService', () => {
-  function createServiceFor(session: { token?: string; userType?: string } | null): SegmentPermissionService {
+  function createServiceFor(
+    session: { token?: string; userType?: string } | null,
+  ): SegmentPermissionService {
     TestBed.resetTestingModule();
     TestBed.configureTestingModule({
       providers: [
@@ -42,7 +44,7 @@ describe('SegmentPermissionService', () => {
       'BranchServiceSegments.Assign',
       'SegmentGlobalizationRequests.ViewOwn',
     ]);
-    const service = createServiceFor({ token, userType: 'BranchAdmin' });
+    const service = createServiceFor({ token, userType: 'BranchAdmin', activeBranchId: 1 } as any);
 
     expect(service.isBranchAdmin()).toBe(true);
     expect(service.canViewAllSegments()).toBe(true);

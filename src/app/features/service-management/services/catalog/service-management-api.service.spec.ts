@@ -13,6 +13,7 @@ describe('ServiceManagementApiService lifecycle requests', () => {
   let httpTestingController: HttpTestingController;
 
   beforeEach(() => {
+    TestBed.resetTestingModule();
     TestBed.configureTestingModule({
       providers: [
         provideHttpClient(),
@@ -129,7 +130,6 @@ describe('ServiceManagementApiService lifecycle requests', () => {
     });
   });
 
-
   it('sends permanent delete with no body and the current row version', () => {
     service.permanentlyDeleteService(100, 'row-version-3').subscribe();
 
@@ -162,7 +162,6 @@ describe('ServiceManagementApiService lifecycle requests', () => {
       message: 'Restored',
     });
   });
-
 
   it('loads service images with an optional image type filter', () => {
     service.getServiceImages(12, 'Logo').subscribe();

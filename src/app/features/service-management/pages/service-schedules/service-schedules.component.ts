@@ -66,17 +66,17 @@ function serviceScheduleRulesValidator(control: AbstractControl): ValidationErro
   const rulesControl = control.get('rules');
 
   if (!(rulesControl instanceof FormArray) || rulesControl.length === 0) {
-    return { rulesRequired: true };
+    return { daysRequired: true };
   }
 
   let hasInvalidTime = false;
   let hasInvalidRange = false;
   let hasNoDays = false;
+  let hasDuplicate = false;
   let hasOverlap = false;
 
-  // Track slots per day to check for overlaps
   const slotsPerDay = new Map<DayOfWeek, Array<{ start: number; end: number }>>();
-  SERVICE_SCHEDULE_DAYS.forEach(day => slotsPerDay.set(day, []));
+  SERVICE_SCHEDULE_DAYS.forEach((day) => slotsPerDay.set(day, []));
 
   for (const ruleControl of rulesControl.controls) {
     const startTime = String(ruleControl.get('startTime')?.value ?? '').trim();
@@ -105,20 +105,23 @@ function serviceScheduleRulesValidator(control: AbstractControl): ValidationErro
     }
   }
 
-  // Check overlaps per day
-  for (const [day, slots] of slotsPerDay.entries()) {
+  for (const [_, slots] of slotsPerDay.entries()) {
     slots.sort((a, b) => a.start - b.start || a.end - b.end);
     for (let i = 1; i < slots.length; i++) {
-      if (slots[i].start < slots[i - 1].end && slots[i].end > slots[i - 1].start) {
+      if (slots[i].start === slots[i - 1].start && slots[i].end === slots[i - 1].end) {
+        hasDuplicate = true;
+      } else if (slots[i].start < slots[i - 1].end && slots[i].end > slots[i - 1].start) {
         hasOverlap = true;
       }
     }
   }
 
+  const validRulesCount = rulesControl.controls.filter((r) => r.get('day')?.value).length;
   const errors: ValidationErrors = {};
-  if (hasNoDays) errors['daysRequired'] = true;
+  if (hasNoDays || validRulesCount === 0) errors['daysRequired'] = true;
   if (hasInvalidTime) errors['invalidTime'] = true;
   if (hasInvalidRange) errors['timeRange'] = true;
+  if (hasDuplicate) errors['duplicateTimeSlot'] = true;
   if (hasOverlap) errors['overlappingTimeSlots'] = true;
 
   return Object.keys(errors).length > 0 ? errors : null;
@@ -683,6 +686,63 @@ export class ServiceSchedulesComponent implements OnInit, OnDestroy, ServiceSche
   protected rules(): readonly ScheduleRuleGroup[] {
     return this.scheduleForm.controls.rules.controls;
   }
+
+  protected dayGroups(): any[] {
+    return this.days.map((day, idx) => ({
+      controls: {
+        isWorkingDay: {
+          value: this.timeSlotGroups(idx).length > 0,
+        },
+        dayOfWeek: {
+          value: day,
+        },
+      },
+    }));
+  }
+
+  protected timeSlotGroups(dayIndex: number): ScheduleRuleGroup[] {
+    const day = this.days[dayIndex];
+    return this.rules().filter((r) => r.controls.day.value === day) as ScheduleRuleGroup[];
+  }
+
+  protected toggleWorkingDay(dayIndex: number, checked: boolean): void {
+    const day = this.days[dayIndex];
+    if (checked) {
+      if (this.timeSlotGroups(dayIndex).length === 0) {
+        const nonPlaceholders = this.rules().filter((r) => !!r.controls.day.value);
+        this.scheduleForm.controls.rules.clear();
+        nonPlaceholders.forEach((r) => this.scheduleForm.controls.rules.push(r));
+        this.scheduleForm.controls.rules.push(this.createRuleGroup('08:00', '15:00', day));
+      }
+    } else {
+      const remaining = this.rules().filter((r) => r.controls.day.value !== day);
+      this.scheduleForm.controls.rules.clear();
+      remaining.forEach((r) => this.scheduleForm.controls.rules.push(r));
+    }
+    this.scheduleForm.markAsDirty();
+    this.scheduleForm.updateValueAndValidity();
+  }
+
+  protected addTimeSlot(dayIndex: number): void {
+    const day = this.days[dayIndex];
+    this.scheduleForm.controls.rules.push(this.createRuleGroup('08:00', '15:00', day));
+    this.scheduleForm.markAsDirty();
+    this.scheduleForm.updateValueAndValidity();
+  }
+
+  protected removeTimeSlot(dayIndex: number, slotIndex: number): void {
+    const daySlots = this.timeSlotGroups(dayIndex);
+    const targetSlot = daySlots[slotIndex];
+    if (targetSlot) {
+      const idx = this.rules().indexOf(targetSlot);
+      if (idx !== -1) {
+        this.scheduleForm.controls.rules.removeAt(idx);
+      }
+    }
+    this.scheduleForm.markAsDirty();
+    this.scheduleForm.updateValueAndValidity();
+  }
+
 
   protected addRule(): void {
     if (!this.canEditInline()) return;

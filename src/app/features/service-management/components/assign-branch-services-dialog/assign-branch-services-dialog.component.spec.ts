@@ -36,7 +36,9 @@ describe('AssignBranchServicesDialogComponent', () => {
   let fixture: ComponentFixture<AssignBranchServicesDialogComponent>;
 
   beforeEach(async () => {
-    await TestBed.configureTestingModule({ imports: [AssignBranchServicesDialogComponent] }).compileComponents();
+    await TestBed.configureTestingModule({
+      imports: [AssignBranchServicesDialogComponent],
+    }).compileComponents();
     fixture = TestBed.createComponent(AssignBranchServicesDialogComponent);
     fixture.componentRef.setInput('open', true);
     fixture.componentRef.setInput('nodes', [leaf]);
@@ -58,7 +60,9 @@ describe('AssignBranchServicesDialogComponent', () => {
     tree.leafSelectionChange.emit({ node: leaf, selected: true });
     fixture.detectChanges();
 
-    const assignButton = fixture.nativeElement.querySelector('.branch-services-primary-btn') as HTMLButtonElement;
+    const assignButton = fixture.nativeElement.querySelector(
+      '.q-btn--primary',
+    ) as HTMLButtonElement;
     expect(assignButton.disabled).toBe(false);
     expect(fixture.nativeElement.textContent).toContain('1');
     assignButton.click();
@@ -73,7 +77,7 @@ describe('AssignBranchServicesDialogComponent', () => {
       .componentInstance as ServiceHierarchyTreeComponent;
     tree.leafSelectionChange.emit({ node: leaf, selected: true });
 
-    (fixture.nativeElement.querySelector('.branch-services-secondary-btn') as HTMLButtonElement).click();
+    (fixture.nativeElement.querySelector('.q-btn--secondary') as HTMLButtonElement).click();
 
     expect(closed).toHaveBeenCalledOnce();
     expect(fixture.componentInstance.selectedCount()).toBe(0);

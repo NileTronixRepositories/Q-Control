@@ -34,6 +34,7 @@ describe('TerminalsComponent', () => {
   );
 
   beforeEach(async () => {
+    TestBed.resetTestingModule();
     vi.clearAllMocks();
     language.set('en');
     canCreate.set(true);

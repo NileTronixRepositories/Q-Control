@@ -33,6 +33,7 @@ describe('DisplaysComponent', () => {
   );
 
   beforeEach(async () => {
+    TestBed.resetTestingModule();
     vi.clearAllMocks();
     language.set('en');
     session.set(null);
@@ -123,10 +124,10 @@ describe('DisplaysComponent', () => {
 
   it('renders a compact responsive table with centered accessible actions', () => {
     const desktopTable = fixture.nativeElement.querySelector(
-      '[data-testid="displays-active-desktop"] .display-table',
+      '[data-testid="displays-active-desktop"] .admin-data-table',
     ) as HTMLTableElement;
     const actionButtons = Array.from(
-      desktopTable.querySelectorAll<HTMLButtonElement>('.display-actions-column .icon-action'),
+      desktopTable.querySelectorAll<HTMLButtonElement>('.admin-actions-column .icon-action'),
     );
 
     expect(desktopTable.classList.contains('table-sm')).toBe(true);
@@ -145,9 +146,9 @@ describe('DisplaysComponent', () => {
     fixture.detectChanges();
 
     const emptyState = fixture.nativeElement.querySelector(
-      '.display-list-empty',
+      '.admin-list-empty',
     ) as HTMLElement;
-    const emptyIcon = emptyState.querySelector('.display-list-empty-icon');
+    const emptyIcon = emptyState.querySelector('.admin-list-empty-icon');
 
     expect(emptyState.classList.contains('p-3')).toBe(true);
     expect(emptyIcon?.classList.contains('align-items-center')).toBe(true);

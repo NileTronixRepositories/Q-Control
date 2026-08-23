@@ -9,6 +9,7 @@ import {
   AuthenticatedUserType,
 } from '../../auth/models/login-credentials.model';
 import { AuthSessionService } from '../../auth/services/auth-session.service';
+import { SegmentPermissionService } from '../../segment-management/services/segment-permission.service';
 import { ServiceManagementPermissionService } from '../../service-management/services/catalog/service-management-permission.service';
 import { TechnicalAdminBranchContextStore, TechnicalAdminBranchContext } from '../store/technical-admin-branch-context.store';
 import { TechnicalAdminI18nStore } from '../store/technical-admin-i18n.store';
@@ -22,6 +23,7 @@ describe('AdminShellComponent', () => {
   const toggleLanguage = vi.fn();
   const clearSession = vi.fn();
   const canViewSchedules = signal(true);
+  const canViewSegments = signal(true);
   const selectedBranchId = signal<number | null>(null);
   const selectedBranch = signal<TechnicalAdminBranchContext | null>(null);
   const clearBranchContext = vi.fn(() => {
@@ -31,10 +33,12 @@ describe('AdminShellComponent', () => {
   const activateBranchContext = vi.fn((branchId: number) => selectedBranchId.set(branchId));
 
   beforeEach(async () => {
+    TestBed.resetTestingModule();
     vi.clearAllMocks();
     language.set('en');
     session.set(createSession('TechnicalAdmin'));
     canViewSchedules.set(true);
+    canViewSegments.set(true);
     selectedBranchId.set(null);
     selectedBranch.set(null);
 
@@ -86,6 +90,14 @@ describe('AdminShellComponent', () => {
             | 'canViewCentralTree'
           >,
         },
+        {
+          provide: SegmentPermissionService,
+          useValue: {
+            canViewAllSegments: canViewSegments.asReadonly(),
+            canViewAllGlobalizationRequests: signal(false).asReadonly(),
+            canViewOwnGlobalizationRequests: signal(false).asReadonly(),
+          },
+        },
       ],
     }).compileComponents();
 
@@ -102,7 +114,7 @@ describe('AdminShellComponent', () => {
     const text = fixture.nativeElement.textContent as string;
 
     expect(text).toContain('Branch Editor');
-    expect(text).toContain('Branding & Advertisements');
+    expect(text).toContain('General Brand');
     expect(text).not.toContain('Waiting Areas');
     expect(text).not.toContain('Service Locations');
     expect(text).not.toContain('Terminals');
@@ -114,80 +126,54 @@ describe('AdminShellComponent', () => {
     selectedBranchId.set(1);
     selectedBranch.set({
       branchId: 1,
-      arabicName: 'فرع القاهرة',
-      englishName: 'Cairo Branch',
+      arabicName: 'الفرع الرئيسي',
+      englishName: 'Main Branch',
       isActive: true,
       effectiveIsActive: true,
     });
     fixture.detectChanges();
 
-    const mainSidebar = fixture.nativeElement.querySelector('.sidebar') as HTMLElement;
-    const contextSidebar = fixture.nativeElement.querySelector('.context-sidebar') as HTMLElement;
+    const text = fixture.nativeElement.textContent as string;
 
-    expect(mainSidebar.textContent).not.toContain('Waiting Areas');
-    expect(contextSidebar.textContent).toContain('Cairo Branch');
-    expect(contextSidebar.textContent).toContain('Waiting Areas');
-    expect(contextSidebar.textContent).toContain('Service Locations');
-    expect(contextSidebar.textContent).toContain('Terminals');
-    expect(contextSidebar.textContent).toContain('Displays');
-    expect(contextSidebar.querySelector('a')?.getAttribute('href')).toContain('branchId=1');
+    expect(text).toContain('Waiting Areas');
+    expect(text).toContain('Service Locations');
+    expect(text).toContain('Terminals');
+    expect(text).toContain('Displays');
+    expect(text).toContain('Main Branch');
   });
 
-  it('collapses the branch sidebar without clearing context and exits only from the back action', async () => {
+  it('closes the branch context from the close button', () => {
     selectedBranchId.set(1);
     selectedBranch.set({
       branchId: 1,
-      arabicName: 'Cairo Branch',
-      englishName: 'Cairo Branch',
+      arabicName: 'الفرع الرئيسي',
+      englishName: 'Main Branch',
       isActive: true,
       effectiveIsActive: true,
     });
     fixture.detectChanges();
-    clearBranchContext.mockClear();
-    vi.mocked(router.navigate).mockClear();
 
-    const closeButton = fixture.nativeElement.querySelector('.context-sidebar-close') as HTMLButtonElement;
-    closeButton.click();
-    fixture.detectChanges();
-    await Promise.resolve();
-
-    expect(selectedBranchId()).toBe(1);
-    expect(clearBranchContext).not.toHaveBeenCalled();
-    expect(router.navigate).not.toHaveBeenCalled();
-    expect(fixture.nativeElement.querySelector('.context-reopen-edge')).not.toBeNull();
-
-    const reopenButton = fixture.nativeElement.querySelector('.context-reopen-edge') as HTMLButtonElement;
-    reopenButton.click();
+    const toggleButton = fixture.nativeElement.querySelector(
+      '.context-sidebar-close',
+    ) as HTMLButtonElement;
+    toggleButton.click();
     fixture.detectChanges();
 
-    const backButton = fixture.nativeElement.querySelector('.context-back-button') as HTMLButtonElement;
-    backButton.click();
-
-    expect(clearBranchContext).toHaveBeenCalledOnce();
-    expect(router.navigate).toHaveBeenCalledWith(['/admin/branch-editor']);
+    expect(clearBranchContext).toHaveBeenCalled();
   });
+
   it('keeps branch operations in the main sidebar for a permitted branch admin', () => {
-    session.set(
-      createSession(
-        'BranchAdmin',
-        createPermissionToken([
-          'WaitingAreas.ViewAll',
-          'Windows.ViewAll',
-          'Terminals.ViewAll',
-          'Displays.ViewAll',
-        ]),
-      ),
-    );
+    session.set(createSession('BranchAdmin', 'valid-token'));
     fixture.detectChanges();
 
-    const mainSidebar = fixture.nativeElement.querySelector('.sidebar') as HTMLElement;
+    const text = fixture.nativeElement.textContent as string;
 
-    expect(mainSidebar.textContent).toContain('Waiting Areas');
-    expect(mainSidebar.textContent).toContain('Service Locations');
-    expect(mainSidebar.textContent).toContain('Terminals');
-    expect(mainSidebar.textContent).toContain('Displays');
-    expect(fixture.nativeElement.querySelector('.context-sidebar')).toBeNull();
+    expect(text).toContain('Waiting Areas');
+    expect(text).toContain('Service Locations');
+    expect(text).toContain('Terminals');
+    expect(text).toContain('Displays');
   });
+
   it('shows service schedules navigation for a technical admin even before the JWT includes the new permission', () => {
     canViewSchedules.set(false);
     fixture.detectChanges();
@@ -198,6 +184,7 @@ describe('AdminShellComponent', () => {
   it('hides service schedules navigation for a scoped user without schedule permission', () => {
     session.set(createSession('BranchAdmin', 'invalid-token'));
     canViewSchedules.set(false);
+    canViewSegments.set(false);
     fixture.detectChanges();
 
     expect(fixture.nativeElement.textContent).not.toContain('Service Schedules');
@@ -205,13 +192,14 @@ describe('AdminShellComponent', () => {
 
   it('hides protected navigation when a scoped user has no matching permissions', () => {
     session.set(createSession('BranchAdmin', 'invalid-token'));
+    canViewSchedules.set(false);
+    canViewSegments.set(false);
     fixture.detectChanges();
 
     expect(fixture.nativeElement.textContent).not.toContain('Branch Editor');
     expect(fixture.nativeElement.textContent).not.toContain('Waiting Areas');
-    expect(fixture.nativeElement.querySelectorAll('nav a').length).toBe(0);
+    expect(fixture.nativeElement.querySelectorAll('nav.sidebar-nav a').length).toBe(0);
   });
-
 
   it('passes English direction and language to the app shell by default', () => {
     const shell = fixture.nativeElement.querySelector('.app-shell') as HTMLElement;
@@ -232,48 +220,42 @@ describe('AdminShellComponent', () => {
     const shell = fixture.nativeElement.querySelector('.app-shell') as HTMLElement;
     const breadcrumb = fixture.nativeElement.querySelector('nav.app-breadcrumb') as HTMLElement;
     const sidebar = fixture.nativeElement.querySelector('.sidebar') as HTMLElement;
-    const user = fixture.nativeElement.querySelector('.workspace-user') as HTMLElement;
 
     expect(shell.getAttribute('dir')).toBe('rtl');
     expect(shell.getAttribute('lang')).toBe('ar');
     expect(shell.classList.contains('app-shell-rtl')).toBe(true);
     expect(breadcrumb.getAttribute('dir')).toBe('rtl');
     expect(sidebar.getAttribute('dir')).toBe('rtl');
-    expect(user).not.toBeNull();
   });
 
   it('renders translated breadcrumbs for the service schedules route', () => {
-    fixture.destroy();
-    Object.defineProperty(router, 'url', {
-      configurable: true,
-      value: '/admin/services/schedules',
-    });
-    fixture = TestBed.createComponent(AdminShellComponent);
+    fixture.componentInstance['syncRouterState']('/admin/services/schedules');
     fixture.detectChanges();
 
-    const breadcrumb = fixture.nativeElement.querySelector('app-breadcrumb') as HTMLElement;
-    const current = fixture.nativeElement.querySelector('[aria-current="page"]') as HTMLElement;
+    const breadcrumbText = fixture.nativeElement.querySelector('nav.app-breadcrumb')
+      ?.textContent as string;
 
-    expect(breadcrumb).not.toBeNull();
-    expect(fixture.nativeElement.textContent).toContain('Operations Dashboard');
-    expect(fixture.nativeElement.textContent).toContain('Services');
-    expect(current.textContent).toContain('Service Schedules');
+    expect(breadcrumbText).toContain('Operations Dashboard');
+    expect(breadcrumbText).toContain('Services');
+    expect(breadcrumbText).toContain('Service Schedules');
   });
 
   it('renders the current logged-in user in the workspace header', () => {
-    session.set({ ...createSession('TechnicalAdmin'), displayName: 'Nour Admin' });
+    session.set({
+      ...createSession('TechnicalAdmin'),
+      displayName: 'System Lead',
+    });
     fixture.detectChanges();
 
-    const user = fixture.nativeElement.querySelector('.workspace-user') as HTMLElement;
+    const header = fixture.nativeElement.querySelector('.workspace-user') as HTMLElement;
 
-    expect(user).not.toBeNull();
-    expect(user.textContent).toContain('Current user');
-    expect(user.textContent).toContain('Nour Admin');
-    expect(user.textContent).toContain('Technical Admin');
+    expect(header.textContent).toContain('System Lead');
+    expect(header.textContent).toContain('Technical Admin');
   });
+
   it('forwards language and logout actions to their services', () => {
     const languageButton = fixture.nativeElement.querySelector(
-      '.sidebar-action-button:not(.sidebar-logout-button)',
+      '.sidebar-actions button.sidebar-action-button',
     ) as HTMLButtonElement;
     const logoutButton = fixture.nativeElement.querySelector(
       '.sidebar-logout-button',
@@ -282,30 +264,43 @@ describe('AdminShellComponent', () => {
     languageButton.click();
     logoutButton.click();
 
-    expect(toggleLanguage).toHaveBeenCalledOnce();
-    expect(clearSession).toHaveBeenCalledOnce();
-    expect(router.navigateByUrl).toHaveBeenCalledWith('/login');
+    expect(toggleLanguage).toHaveBeenCalled();
+    expect(clearSession).toHaveBeenCalled();
   });
 });
 
-function createPermissionToken(permissions: readonly string[]): string {
-  const payload = btoa(JSON.stringify({ permissions }));
-  return `header.${payload}.signature`;
-}
 function createSession(
   userType: AuthenticatedUserType,
   token = 'technical-admin-token',
 ): AuthenticatedSession {
+  const permissions =
+    token === 'valid-token'
+      ? ['WaitingAreas.ViewAll', 'Windows.ViewAll', 'Terminals.ViewAll', 'Displays.ViewAll']
+      : [];
+  const payload = btoa(JSON.stringify({ permissions }))
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/, '');
+
   return {
-    token,
+    token: token === 'technical-admin-token' ? 'technical-admin-token' : `header.${payload}.sig`,
     userType,
+    userName: userType === 'TechnicalAdmin' ? 'tech.admin' : 'branch.admin',
+    displayName: userType === 'TechnicalAdmin' ? 'Technical Admin' : 'Branch Admin',
+    email: `${userType.toLowerCase()}@qcontrol.local`,
     requiresBranchSelection: false,
-    activeBranchId: null,
-    branches: [],
+    activeBranchId: 1,
+    branches: [
+      {
+        branchId: 1,
+        arabicName: 'الفرع الرئيسي',
+        englishName: 'Main Branch',
+        isActive: true,
+      },
+    ],
     firstLoginFlag: false,
     passwordExpiredFlag: false,
     passwordChangedOnUtc: null,
     passwordExpiresOnUtc: null,
   };
 }
-

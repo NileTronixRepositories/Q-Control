@@ -177,6 +177,13 @@ export class ServiceHierarchyTreeComponent {
     this.includeDeletedChange.emit((event.target as HTMLInputElement).checked);
   }
 
+  public onNodeClick(node: ServiceTreeNode, event: MouseEvent): void {
+    this.selectNode.emit(node);
+    if (node.children && node.children.length > 0) {
+      this.toggleNode.emit(node);
+    }
+  }
+
   public requestToggle(node: ServiceTreeNode, event: MouseEvent): void {
     event.stopPropagation();
     this.toggleNode.emit(node);

@@ -14,13 +14,20 @@ describe('ServiceScheduleApiService', () => {
   let http: HttpTestingController;
 
   beforeEach(() => {
+    TestBed.resetTestingModule();
     TestBed.configureTestingModule({
       providers: [
         provideHttpClient(),
         provideHttpClientTesting(),
         ServiceScheduleApiService,
-        { provide: AuthSessionService, useValue: { currentSession: signal({ token: 'token' }).asReadonly() } },
-        { provide: AppLanguageStore, useValue: { language: signal<'ar' | 'en'>('en').asReadonly() } },
+        {
+          provide: AuthSessionService,
+          useValue: { currentSession: signal({ token: 'token' }).asReadonly() },
+        },
+        {
+          provide: AppLanguageStore,
+          useValue: { language: signal<'ar' | 'en'>('en').asReadonly() },
+        },
       ],
     });
 
@@ -80,7 +87,12 @@ describe('ServiceScheduleApiService', () => {
 
   it('creates a schedule using days and time slots without legacy fields', () => {
     const body = {
-      days: [{ dayOfWeek: 'Sunday' as const, timeSlots: [{ startTime: '08:00:00', endTime: '12:00:00' }] }],
+      days: [
+        {
+          dayOfWeek: 'Sunday' as const,
+          timeSlots: [{ startTime: '08:00:00', endTime: '12:00:00' }],
+        },
+      ],
       isSlotCodeRequired: false,
       slotCode: null,
     };
@@ -93,12 +105,24 @@ describe('ServiceScheduleApiService', () => {
     expect(request.request.body).not.toHaveProperty('startTime');
     expect(request.request.body).not.toHaveProperty('endTime');
     expect(request.request.body).not.toHaveProperty('workDays');
-    request.flush({ scheduleId: 3, branchId: 1, serviceId: 122, days: body.days, isCurrentlyOperational: true, rowVersion: 'rv-2' });
+    request.flush({
+      scheduleId: 3,
+      branchId: 1,
+      serviceId: 122,
+      days: body.days,
+      isCurrentlyOperational: true,
+      rowVersion: 'rv-2',
+    });
   });
 
   it('updates a schedule with rowVersion inside the request body', () => {
     const body = {
-      days: [{ dayOfWeek: 'Tuesday' as const, timeSlots: [{ startTime: '10:00:00', endTime: '13:00:00' }] }],
+      days: [
+        {
+          dayOfWeek: 'Tuesday' as const,
+          timeSlots: [{ startTime: '10:00:00', endTime: '13:00:00' }],
+        },
+      ],
       isSlotCodeRequired: true,
       slotCode: 'A1',
       rowVersion: 'rv-current',
@@ -110,7 +134,14 @@ describe('ServiceScheduleApiService', () => {
     expect(request.request.method).toBe('PUT');
     expect(request.request.body).toEqual(body);
     expect(request.request.headers.has('If-Match')).toBe(false);
-    request.flush({ scheduleId: 3, branchId: 1, serviceId: 122, days: body.days, isCurrentlyOperational: true, rowVersion: 'rv-next' });
+    request.flush({
+      scheduleId: 3,
+      branchId: 1,
+      serviceId: 122,
+      days: body.days,
+      isCurrentlyOperational: true,
+      rowVersion: 'rv-next',
+    });
   });
 });
 

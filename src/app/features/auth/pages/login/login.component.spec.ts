@@ -68,7 +68,7 @@ describe('LoginComponent', () => {
     expect(submitLogin).toHaveBeenCalledWith({
       username: 'admin',
       password: 'secret1',
-      rememberSession: false,
+      rememberSession: true,
     });
     expect(fixture.nativeElement.textContent).toContain('Invalid credentials');
   });

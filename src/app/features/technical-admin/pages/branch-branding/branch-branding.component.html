@@ -51,21 +51,28 @@
     </div>
 
     <div class="branding-context-actions d-flex align-items-center gap-2">
-      <label class="visually-hidden" for="branchBrandingBranch">{{ copy().branchLabel }}</label>
-      <select
-        id="branchBrandingBranch"
-        class="form-select branch-selector-control"
-        [value]="selectedBranchId() ?? ''"
-        [disabled]="branchesLoading()"
-        (change)="selectBranch($event)"
-      >
-        <option value="" [selected]="!selectedBranchId()">{{ copy().selectBranchPlaceholder }}</option>
-        @for (branch of branches(); track branch.id) {
-          <option [value]="branch.id" [selected]="branch.id === selectedBranchId()">
-            {{ branch.label }}
-          </option>
-        }
-      </select>
+      @if (isTechnicalAdmin() && branches().length > 1) {
+        <label class="visually-hidden" for="branchBrandingBranch">{{ copy().branchLabel }}</label>
+        <select
+          id="branchBrandingBranch"
+          class="form-select branch-selector-control"
+          [value]="selectedBranchId() ?? ''"
+          [disabled]="branchesLoading()"
+          (change)="selectBranch($event)"
+        >
+          <option value="" [selected]="!selectedBranchId()">{{ copy().selectBranchPlaceholder }}</option>
+          @for (branch of branches(); track branch.id) {
+            <option [value]="branch.id" [selected]="branch.id === selectedBranchId()">
+              {{ branch.label }}
+            </option>
+          }
+        </select>
+      } @else if (selectedBranchId()) {
+        <div class="d-inline-flex align-items-center gap-2 px-3 py-2 bg-light border rounded text-dark fw-bold small">
+          <i class="bi bi-buildings text-primary"></i>
+          <span>{{ selectedBranchLabel() }}</span>
+        </div>
+      }
       <button
         type="button"
         class="btn btn-outline-secondary d-inline-flex align-items-center gap-1 branding-refresh-action"

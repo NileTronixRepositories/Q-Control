@@ -18,6 +18,7 @@ describe('BranchServicesApiService', () => {
   let httpTestingController: HttpTestingController;
 
   beforeEach(() => {
+    TestBed.resetTestingModule();
     TestBed.configureTestingModule({
       providers: [
         provideHttpClient(),

@@ -224,6 +224,7 @@ describe('ServiceWorkflowsComponent', () => {
     workflowApi.getWorkflowStartOptions.mockClear();
 
     fixture.componentInstance.openNodeWorkflows(eligibleLeaf);
+    fixture.componentInstance.openCreate();
 
     expect(navigateSpy).not.toHaveBeenCalled();
     expect(fixture.componentInstance.store.panelMode()).toBe('create');

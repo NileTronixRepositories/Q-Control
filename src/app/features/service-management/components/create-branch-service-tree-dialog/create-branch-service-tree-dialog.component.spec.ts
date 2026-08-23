@@ -121,7 +121,7 @@ describe('CreateBranchServiceTreeDialogComponent', () => {
       addChild: (group: typeof fixture.componentInstance.root) => void;
     };
     const root = fixture.componentInstance.root;
-    root.controls.arabicName.setValue('Ø®Ø¯Ù…Ø© ÙØ±Ø¹Ù� Ø©');
+    root.controls.arabicName.setValue('Ø®Ø¯Ù…Ø© ÙØ±Ø¹Ù� Ø©');
     root.controls.englishName.setValue('Leaf service');
 
     component.addChild(root);
@@ -140,6 +140,6 @@ describe('CreateBranchServiceTreeDialogComponent', () => {
   });
 
   function submit(): void {
-    (fixture.nativeElement.querySelector('.branch-tree-primary-btn') as HTMLButtonElement).click();
+    (fixture.nativeElement.querySelector('.q-btn--primary') as HTMLButtonElement).click();
   }
 });

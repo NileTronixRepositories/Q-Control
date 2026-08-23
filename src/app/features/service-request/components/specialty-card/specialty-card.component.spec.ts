@@ -1,6 +1,8 @@
+import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { SelectionCardViewModel } from '../../shared/selection-card-view.model';
+import { ServiceRequestStore } from '../../store/service-request.store';
 import { SpecialtyCardComponent } from './specialty-card.component';
 
 describe('SpecialtyCardComponent', () => {
@@ -15,7 +17,22 @@ describe('SpecialtyCardComponent', () => {
   };
 
   beforeEach(async () => {
-    await TestBed.configureTestingModule({ imports: [SpecialtyCardComponent] }).compileComponents();
+    TestBed.resetTestingModule();
+    await TestBed.configureTestingModule({
+      imports: [SpecialtyCardComponent],
+      providers: [
+        {
+          provide: ServiceRequestStore,
+          useValue: {
+            serviceButtonStyle: signal({}),
+            serviceButton: signal(null),
+            theme: signal(null),
+            language: signal('en'),
+            direction: signal('ltr'),
+          },
+        },
+      ],
+    }).compileComponents();
     fixture = TestBed.createComponent(SpecialtyCardComponent);
     fixture.componentRef.setInput('card', card);
     fixture.detectChanges();

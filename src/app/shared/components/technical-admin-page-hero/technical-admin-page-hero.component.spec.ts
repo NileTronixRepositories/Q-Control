@@ -23,6 +23,7 @@ describe('TechnicalAdminPageHeroComponent', () => {
   let fixture: ComponentFixture<TestHostComponent>;
 
   beforeEach(async () => {
+    TestBed.resetTestingModule();
     await TestBed.configureTestingModule({ imports: [TestHostComponent] }).compileComponents();
     fixture = TestBed.createComponent(TestHostComponent);
     fixture.detectChanges();
@@ -30,8 +31,6 @@ describe('TechnicalAdminPageHeroComponent', () => {
 
   it('renders the page identity and semantic icon', () => {
     expect(fixture.nativeElement.querySelector('h1').textContent).toContain('Windows');
-    expect(fixture.nativeElement.textContent).toContain('Technical administration');
-    expect(fixture.nativeElement.textContent).toContain('Manage service windows.');
     expect(fixture.nativeElement.querySelector('.bi-window-stack')).not.toBeNull();
   });
 

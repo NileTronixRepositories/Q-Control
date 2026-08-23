@@ -23,6 +23,7 @@ import { Subscription } from 'rxjs';
 
 import { NiletronixLoadingStateComponent } from '../../../../shared/components/niletronix-loading-state/niletronix-loading-state.component';
 import { TechnicalAdminPageHeroComponent } from '../../../../shared/components/technical-admin-page-hero/technical-admin-page-hero.component';
+import { AuthSessionService } from '../../../auth/services/auth-session.service';
 import { AppLanguage } from '../../../../shared/models/app-language.model';
 import {
   BranchDisplayPlaylistResponse,
@@ -74,6 +75,11 @@ export class BranchVideosComponent implements OnInit, OnDestroy {
   private readonly i18nStore = inject(TechnicalAdminI18nStore);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly authSessionService = inject(AuthSessionService);
+
+  readonly isTechnicalAdmin = computed(
+    () => this.authSessionService.currentSession()?.userType === 'TechnicalAdmin',
+  );
 
   readonly singleVideoPlayerRef = viewChild<ElementRef<HTMLVideoElement>>('singleVideoPlayer');
   readonly playlistVideoPlayerRef = viewChild<ElementRef<HTMLVideoElement>>('playlistVideoPlayer');
@@ -226,6 +232,15 @@ export class BranchVideosComponent implements OnInit, OnDestroy {
   }
 
   loadBranches(): void {
+    const currentSession = this.authSessionService.currentSession();
+    const activeBranchId = currentSession?.activeBranchId ? Number(currentSession.activeBranchId) : null;
+    const isTechAdmin = currentSession?.userType === 'TechnicalAdmin';
+
+    if (!isTechAdmin && activeBranchId) {
+      this.setSelectedBranch(activeBranchId);
+      return;
+    }
+
     this.branchesLoading.set(true);
     this.branchManagementApi
       .getBranches({
@@ -249,13 +264,17 @@ export class BranchVideosComponent implements OnInit, OnDestroy {
         },
         error: (err: HttpErrorResponse) => {
           this.branchesLoading.set(false);
-          this.showMessage(
-            formatTechnicalAdminApiError(
-              err,
-              this.isAr() ? 'فشل تحميل قائمة الفروع' : 'Failed to load branches',
-            ),
-            'error',
-          );
+          if (activeBranchId) {
+            this.setSelectedBranch(activeBranchId);
+          } else {
+            this.showMessage(
+              formatTechnicalAdminApiError(
+                err,
+                this.isAr() ? 'فشل تحميل قائمة الفروع' : 'Failed to load branches',
+              ),
+              'error',
+            );
+          }
         },
       });
   }

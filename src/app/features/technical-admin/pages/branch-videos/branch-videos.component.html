@@ -52,22 +52,29 @@
     </div>
 
     <div class="branding-context-actions">
-      <select
-        id="branchVideosSelect"
-        class="form-select branch-selector-control"
-        [value]="selectedBranchId() ?? ''"
-        [disabled]="branchesLoading()"
-        (change)="onBranchSelect($event)"
-      >
-        <option value="" [selected]="!selectedBranchId()">
-          {{ isAr() ? 'اختر الفرع...' : 'Select Branch...' }}
-        </option>
-        @for (branch of branches(); track branch.branchId) {
-          <option [value]="branch.branchId" [selected]="branch.branchId === selectedBranchId()">
-            {{ isAr() ? branch.arabicName : branch.englishName }}
+      @if (isTechnicalAdmin() && branches().length > 1) {
+        <select
+          id="branchVideosSelect"
+          class="form-select branch-selector-control"
+          [value]="selectedBranchId() ?? ''"
+          [disabled]="branchesLoading()"
+          (change)="onBranchSelect($event)"
+        >
+          <option value="" [selected]="!selectedBranchId()">
+            {{ isAr() ? 'اختر الفرع...' : 'Select Branch...' }}
           </option>
-        }
-      </select>
+          @for (branch of branches(); track branch.branchId) {
+            <option [value]="branch.branchId" [selected]="branch.branchId === selectedBranchId()">
+              {{ isAr() ? branch.arabicName : branch.englishName }}
+            </option>
+          }
+        </select>
+      } @else if (selectedBranchId()) {
+        <div class="d-inline-flex align-items-center gap-2 px-3 py-2 bg-light border rounded text-dark fw-bold small">
+          <i class="bi bi-buildings text-primary"></i>
+          <span>{{ selectedBranchLabel() }}</span>
+        </div>
+      }
       <button
         type="button"
         class="secondary-action branding-refresh-action"

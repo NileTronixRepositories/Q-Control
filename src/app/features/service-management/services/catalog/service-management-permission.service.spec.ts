@@ -12,6 +12,7 @@ describe('ServiceManagementPermissionService', () => {
       .replace(/=+$/, '');
     const token = `header.${payload}.signature`;
 
+    TestBed.resetTestingModule();
     TestBed.configureTestingModule({
       providers: [
         ServiceManagementPermissionService,

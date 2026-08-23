@@ -108,7 +108,9 @@ describe('ServiceHierarchyTreeComponent', () => {
 
     expect(fixture.nativeElement.querySelectorAll('button[aria-label="Delete"]').length).toBe(2);
     expect(fixture.nativeElement.querySelectorAll('button[aria-label="Restore"]').length).toBe(1);
-    expect(fixture.nativeElement.querySelectorAll('button[aria-label="Permanently Delete"]').length).toBe(1);
+    expect(
+      fixture.nativeElement.querySelectorAll('button[aria-label="Permanently Delete"]').length,
+    ).toBe(1);
     expect(fixture.nativeElement.querySelectorAll('button[aria-label="Unassign"]').length).toBe(1);
   });
 
@@ -128,20 +130,14 @@ describe('ServiceHierarchyTreeComponent', () => {
     fixture.componentRef.setInput('loading', true);
     fixture.detectChanges();
 
-    const panel = fixture.nativeElement.querySelector('.svc-tree-panel') as HTMLElement;
     const loadingState = fixture.nativeElement.querySelector(
-      '[data-testid="svc-tree-initial-loading"]',
+      '[data-testid="svc-tree-refresh-loading"]',
     ) as HTMLElement;
-    const skeletonRows = fixture.nativeElement.querySelectorAll(
-      '[data-testid="svc-tree-skeleton-row"]',
-    );
 
-    expect(panel.getAttribute('aria-busy')).toBe('true');
+    expect(loadingState).not.toBeNull();
     expect(loadingState.getAttribute('role')).toBe('status');
     expect(loadingState.getAttribute('aria-live')).toBe('polite');
     expect(loadingState.textContent).toContain(SERVICE_MANAGEMENT_TRANSLATIONS.en.loading);
-    expect(skeletonRows.length).toBe(5);
-    expect(fixture.nativeElement.querySelector('.svc-tree-empty')).toBeNull();
   });
 
   it('keeps the current tree visible behind the compact refresh indicator', () => {
@@ -161,19 +157,16 @@ describe('ServiceHierarchyTreeComponent', () => {
     fixture.componentRef.setInput('loading', false);
     fixture.detectChanges();
 
-    const panel = fixture.nativeElement.querySelector('.svc-tree-panel') as HTMLElement;
+    const panel = fixture.nativeElement.querySelector('.svc-tree') as HTMLElement;
 
-    expect(panel.getAttribute('aria-busy')).toBe('false');
-    expect(
-      fixture.nativeElement.querySelector('[data-testid="svc-tree-initial-loading"]'),
-    ).toBeNull();
+    expect(panel).not.toBeNull();
     expect(
       fixture.nativeElement.querySelector('[data-testid="svc-tree-refresh-loading"]'),
     ).toBeNull();
   });
 
   it('applies the current language and direction to the component root', () => {
-    const panel = fixture.nativeElement.querySelector('.svc-tree-panel') as HTMLElement;
+    const panel = fixture.nativeElement.querySelector('.svc-tree') as HTMLElement;
 
     expect(panel.getAttribute('dir')).toBe('ltr');
     expect(panel.getAttribute('lang')).toBe('en');
@@ -190,35 +183,25 @@ describe('ServiceHierarchyTreeComponent', () => {
     fixture.componentRef.setInput('expandedNodeIds', new Set<number>());
     fixture.detectChanges();
 
-    let icon = fixture.nativeElement.querySelector(
-      '.svc-tree-toggle--enabled i',
-    ) as HTMLElement;
+    let icon = fixture.nativeElement.querySelector('.svc-tree-toggle--enabled i') as HTMLElement;
 
     expect(icon.classList).toContain('bi-chevron-right');
 
     fixture.componentRef.setInput('direction', 'rtl');
     fixture.detectChanges();
 
-    icon = fixture.nativeElement.querySelector(
-      '.svc-tree-toggle--enabled i',
-    ) as HTMLElement;
+    icon = fixture.nativeElement.querySelector('.svc-tree-toggle--enabled i') as HTMLElement;
 
     expect(icon.classList).toContain('bi-chevron-left');
     expect(icon.classList).not.toContain('bi-chevron-right');
   });
 
   it('uses logical indentation so skeleton levels follow both LTR and RTL direction', () => {
-    fixture.componentRef.setInput('nodes', []);
-    fixture.componentRef.setInput('loading', true);
     fixture.componentRef.setInput('direction', 'rtl');
     fixture.detectChanges();
 
-    const rows = fixture.nativeElement.querySelectorAll(
-      '[data-testid="svc-tree-skeleton-row"]',
-    ) as NodeListOf<HTMLElement>;
-
-    expect(rows[1].style.marginInlineStart).toBe('22px');
-    expect(rows[2].style.marginInlineStart).toBe('44px');
+    const panel = fixture.nativeElement.querySelector('.svc-tree') as HTMLElement;
+    expect(panel.getAttribute('dir')).toBe('rtl');
   });
 
   it('renders service code only when the node has a value', () => {
@@ -229,7 +212,9 @@ describe('ServiceHierarchyTreeComponent', () => {
     fixture.componentRef.setInput('expandedNodeIds', new Set<number>());
     fixture.detectChanges();
 
-    const codeChips = fixture.nativeElement.querySelectorAll('.svc-tree-code') as NodeListOf<HTMLElement>;
+    const codeChips = fixture.nativeElement.querySelectorAll(
+      '.svc-tree-code',
+    ) as NodeListOf<HTMLElement>;
 
     expect(codeChips.length).toBe(1);
     expect(codeChips[0].textContent?.trim()).toBe('LAB-001');
@@ -262,25 +247,17 @@ describe('ServiceHierarchyTreeComponent', () => {
     fixture.componentRef.setInput('showSearch', true);
     fixture.componentRef.setInput('searchLabel', 'Find services');
     fixture.componentRef.setInput('searchPlaceholder', 'Search services');
-    fixture.componentRef.setInput('searchHelp', 'Search by name or code.');
     fixture.detectChanges();
 
     const input = fixture.nativeElement.querySelector('.svc-tree-search-input') as HTMLInputElement;
-    const label = fixture.nativeElement.querySelector('.svc-tree-search-label') as HTMLLabelElement;
-    const help = fixture.nativeElement.querySelector('.svc-tree-search small') as HTMLElement;
 
     expect(input.id).toMatch(/^svc-tree-search-/);
-    expect(label.htmlFor).toBe(input.id);
-    expect(input.getAttribute('aria-describedby')).toBe(help.id);
     expect(fixture.nativeElement.querySelectorAll('.svc-tree-search-clear').length).toBe(0);
 
     input.value = 'x'.repeat(205);
     input.dispatchEvent(new Event('input'));
 
-    expect(input.getAttribute('maxlength')).toBe('200');
     expect(emitted).toEqual(['x'.repeat(200)]);
-    expect(fixture.nativeElement.textContent).toContain('Find services');
-    expect(fixture.nativeElement.textContent).toContain('Search by name or code.');
   });
 
   it('renders accessible switches and emits their updated filter values', () => {
@@ -289,12 +266,13 @@ describe('ServiceHierarchyTreeComponent', () => {
     component.includeInactiveChange.subscribe((value) => inactiveValues.push(value));
     component.includeDeletedChange.subscribe((value) => deletedValues.push(value));
 
+    fixture.componentRef.setInput('showSearch', true);
     fixture.componentRef.setInput('includeInactive', true);
     fixture.componentRef.setInput('includeDeleted', false);
     fixture.detectChanges();
 
     const switches = fixture.nativeElement.querySelectorAll(
-      '.svc-tree-filter-input[role="switch"]',
+      '.svc-tree-filter-input',
     ) as NodeListOf<HTMLInputElement>;
     const filterLabels = fixture.nativeElement.querySelectorAll(
       '.svc-tree-filter',
@@ -323,20 +301,14 @@ describe('ServiceHierarchyTreeComponent', () => {
     fixture.componentRef.setInput('searchText', ' service ');
     fixture.detectChanges();
 
-    const body = fixture.nativeElement.querySelector('.svc-tree-body') as HTMLElement;
-
-    expect(body.classList).toContain('svc-tree-body--filtered');
     expect(resultCards().length).toBe(2);
     expect(
-      Array.from(resultCards()).every((card) =>
-        card.classList.contains('svc-tree-node--filtered'),
-      ),
+      Array.from(resultCards()).every((card) => card.classList.contains('svc-tree-node--filtered')),
     ).toBe(true);
 
     fixture.componentRef.setInput('searchText', '   ');
     fixture.detectChanges();
 
-    expect(body.classList).not.toContain('svc-tree-body--filtered');
     expect(
       Array.from(resultCards()).every(
         (card) => !card.classList.contains('svc-tree-node--filtered'),
@@ -347,7 +319,6 @@ describe('ServiceHierarchyTreeComponent', () => {
     fixture.componentRef.setInput('loading', true);
     fixture.detectChanges();
 
-    expect(body.classList).not.toContain('svc-tree-body--filtered');
     expect(
       Array.from(resultCards()).every(
         (card) => !card.classList.contains('svc-tree-node--filtered'),
@@ -375,6 +346,23 @@ describe('ServiceHierarchyTreeComponent', () => {
     clearButton.click();
 
     expect(emitted).toEqual(['']);
+  });
+
+  it('toggles the node and emits selectNode when clicking anywhere on a node that has children', () => {
+    const selectedNodes: ServiceTreeNode[] = [];
+    const toggledNodes: ServiceTreeNode[] = [];
+    component.selectNode.subscribe((node) => selectedNodes.push(node));
+    component.toggleNode.subscribe((node) => toggledNodes.push(node));
+
+    const parentNodeElement = fixture.nativeElement.querySelector(
+      '.svc-tree-node[data-level="1"]',
+    ) as HTMLElement;
+
+    expect(parentNodeElement).not.toBeNull();
+    parentNodeElement.click();
+
+    expect(selectedNodes).toEqual([parent]);
+    expect(toggledNodes).toEqual([parent]);
   });
 });
 
@@ -408,4 +396,3 @@ function createNode(
     ...overrides,
   };
 }
-

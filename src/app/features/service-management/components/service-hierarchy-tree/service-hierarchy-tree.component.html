@@ -87,7 +87,7 @@
           [attr.draggable]="entry.canDragLeaf ? 'true' : null"
           (dragstart)="onLeafDragStart(entry.node, $event)"
           (dragend)="onLeafDragEnd()"
-          (click)="selectNode.emit(entry.node)"
+          (click)="onNodeClick(entry.node, $event)"
         >
           <button
             type="button"

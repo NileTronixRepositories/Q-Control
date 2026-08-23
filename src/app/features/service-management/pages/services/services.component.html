@@ -268,109 +268,65 @@
       <p>{{ translations().noPermissionHint }}</p>
     </section>
   } @else {
-    <section class="svc-central-filters row g-2 w-100 m-0" [attr.inert]="isWriteDrawerOpen() ? '' : null">
-      <label class="svc-field d-grid gap-1 m-0 col-12 col-md-6 col-xl-4">
-        <span>{{ translations().scopeFilter }}</span>
-        <select
-          class="svc-input form-select"
-          [value]="scopeFilterValue()"
-          (change)="updateScopeFilter($event)"
-        >
-          <option value="all">{{ translations().all }}</option>
-          <option value="Global">{{ translations().globalScope }}</option>
-          <option value="BranchScoped">{{ translations().branchScopedScope }}</option>
-        </select>
-      </label>
-      <label class="svc-field d-grid gap-1 m-0 col-12 col-md-6 col-xl-4">
-        <span>{{ translations().ownerBranchFilter }}</span>
-        <input
-          class="svc-input form-control w-100 p-2"
-          type="number"
-          min="1"
-          [value]="store.listQuery().ownerBranchId ?? ''"
-          (change)="updateOwnerBranchFilter($event)"
-        />
-      </label>
-      @if (!isTechnicalAdmin()) {
-        <label class="svc-field d-grid gap-1 m-0 col-12 col-md-6 col-xl-4">
-          <span>{{ translations().assignedFilter }}</span>
-          <select
-            class="svc-input form-control"
-            [value]="assignedFilterValue()"
-            (change)="updateAssignedFilter($event)"
-          >
-            <option value="all">{{ translations().all }}</option>
-            <option value="true">{{ translations().yes }}</option>
-            <option value="false">{{ translations().no }}</option>
-          </select>
-        </label>
-      }
-    </section>
+    <!-- Filter Card -->
+    <div class="card config-panel shadow-sm mb-3" [attr.inert]="isWriteDrawerOpen() ? '' : null">
+      <div class="panel-body p-3 p-xl-4">
+        <div class="row g-3 align-items-end">
+          <div class="col-12 col-md-4">
+            <label class="form-label fw-semibold small mb-1">{{ translations().scopeFilter }}</label>
+            <select
+              class="form-select form-select-sm"
+              [value]="scopeFilterValue()"
+              (change)="updateScopeFilter($event)"
+            >
+              <option value="all">{{ translations().all }}</option>
+              <option value="Global">{{ translations().globalScope }}</option>
+              <option value="BranchScoped">{{ translations().branchScopedScope }}</option>
+            </select>
+          </div>
+          <div class="col-12 col-md-4">
+            <label class="form-label fw-semibold small mb-1">{{ translations().ownerBranchFilter }}</label>
+            <input
+              class="form-control form-control-sm"
+              type="number"
+              min="1"
+              [value]="store.listQuery().ownerBranchId ?? ''"
+              (change)="updateOwnerBranchFilter($event)"
+            />
+          </div>
+          @if (!isTechnicalAdmin()) {
+            <div class="col-12 col-md-4">
+              <label class="form-label fw-semibold small mb-1">{{ translations().assignedFilter }}</label>
+              <select
+                class="form-select form-select-sm"
+                [value]="assignedFilterValue()"
+                (change)="updateAssignedFilter($event)"
+              >
+                <option value="all">{{ translations().all }}</option>
+                <option value="true">{{ translations().yes }}</option>
+                <option value="false">{{ translations().no }}</option>
+              </select>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
 
     @if (canUseBranchAssignment()) {
-      <section class="svc-hero" [attr.inert]="isWriteDrawerOpen() ? '' : null">
-        <div>
-          <p class="svc-eyebrow">{{ translations().branchAssignmentTitle }}</p>
-          <h1>{{ translations().branchAssignmentTitle }}</h1>
-          <span>{{ translations().branchAssignmentDescription }}</span>
-        </div>
-        @if (store.branchAssigning()) {
-          <span class="svc-mini-loading">{{ translations().loading }}</span>
-        }
-      </section>
-      <section class="svc-branch-assignment-workspace row g-2 align-items-start" [attr.inert]="isWriteDrawerOpen() ? '' : null">
-        <div
-          class="svc-branch-tree-area col-12 col-xxl-12"
-        >
-          <div class="row g-2 align-items-start">
-            <div class="svc-branch-assignment-column col-12 col-xl-6">
-              <header class="svc-panel-header d-flex align-items-center justify-content-between gap-2">
+      <div class="row g-4 align-items-stretch" [attr.inert]="isWriteDrawerOpen() ? '' : null">
+        <!-- Target Column: Assigned Branch Services (خدمات الفرع المسندة) -->
+        <div class="col-12 col-xl-6">
+          <div class="card config-panel h-100 shadow-sm d-flex flex-column">
+            <div class="panel-header d-flex align-items-center justify-content-between gap-2">
+              <div class="d-flex align-items-center gap-2">
+                <span class="panel-icon"><i class="bi bi-diagram-3-fill"></i></span>
                 <div>
-                  <p class="svc-eyebrow">{{ translations().serviceCentral }}</p>
-                  <h2>{{ translations().branchAssignmentSourceTitle }}</h2>
+                  <h5 class="panel-title m-0">{{ translations().branchAssignmentTargetTitle }}</h5>
+                  <small class="text-muted">{{ translations().branchAssignmentDropHint }}</small>
                 </div>
-              </header>
-              <app-service-hierarchy-tree
-                [nodes]="store.availableBranchAssignmentTree()"
-                [expandedNodeIds]="store.expandedTreeNodeIds()"
-                [selectedServiceId]="store.selectedTreeServiceId()"
-                [translations]="translations()"
-                [language]="language()"
-                [direction]="direction()"
-                [loading]="store.treeLoading()"
-                [showSearch]="true"
-                [searchText]="store.serviceTreeSearchText()"
-                [searchLabel]="translations().treeSearchLabel"
-                [searchPlaceholder]="translations().treeSearchPlaceholder"
-                [searchHelp]="translations().treeSearchHelp"
-                [includeInactive]="includeInactiveTree()"
-                [includeDeleted]="includeDeletedTree()"
-                [canCreate]="false"
-                [canViewDetails]="canViewDetails()"
-                [canUpdate]="false"
-                [canDelete]="false"
-                [canRestore]="false"
-                [draggableLeaves]="canUseBranchAssignment() && !store.branchAssigning()"
-                [canDragLeafNode]="canAssignBranchService"
-                (refresh)="refresh()"
-                (searchTextChange)="updateServiceTreeSearch($event)"
-                (includeInactiveChange)="updateTreeToggle('inactive', $event)"
-                (includeDeletedChange)="updateTreeToggle('deleted', $event)"
-                (toggleNode)="toggleTreeNode($event)"
-                (selectNode)="selectTreeNode($event)"
-                (viewNode)="openViewFromTree($event)"
-                (leafDragStarted)="startBranchAssignmentDrag($event)"
-                (leafDragEnded)="clearBranchAssignmentDrag()"
-              />
+              </div>
             </div>
-            <div class="svc-branch-assignment-column col-12 col-xl-6">
-              <header class="svc-panel-header d-flex align-items-center justify-content-between gap-2">
-                <div>
-                  <p class="svc-eyebrow">{{ translations().branchAssignmentTargetTitle }}</p>
-                  <h2>{{ translations().branchAssignmentTargetTitle }}</h2>
-                  <span>{{ translations().branchAssignmentDropHint }}</span>
-                </div>
-              </header>
+            <div class="panel-body p-2 p-md-3 flex-grow-1">
               <app-service-hierarchy-tree
                 [nodes]="store.assignedBranchServiceTree()"
                 [expandedNodeIds]="store.expandedAssignedBranchNodeIds()"
@@ -414,7 +370,56 @@
             </div>
           </div>
         </div>
-      </section>
+
+        <!-- Source Column: Central Services (مركز الخدمات) -->
+        <div class="col-12 col-xl-6">
+          <div class="card config-panel h-100 shadow-sm d-flex flex-column">
+            <div class="panel-header d-flex align-items-center justify-content-between gap-2">
+              <div class="d-flex align-items-center gap-2">
+                <span class="panel-icon"><i class="bi bi-layers-fill"></i></span>
+                <div>
+                  <h5 class="panel-title m-0">{{ translations().branchAssignmentSourceTitle }}</h5>
+                  <small class="text-muted">{{ translations().serviceCentral }}</small>
+                </div>
+              </div>
+            </div>
+            <div class="panel-body p-2 p-md-3 flex-grow-1">
+              <app-service-hierarchy-tree
+                [nodes]="store.availableBranchAssignmentTree()"
+                [expandedNodeIds]="store.expandedTreeNodeIds()"
+                [selectedServiceId]="store.selectedTreeServiceId()"
+                [translations]="translations()"
+                [language]="language()"
+                [direction]="direction()"
+                [loading]="store.treeLoading()"
+                [showSearch]="true"
+                [searchText]="store.serviceTreeSearchText()"
+                [searchLabel]="translations().treeSearchLabel"
+                [searchPlaceholder]="translations().treeSearchPlaceholder"
+                [searchHelp]="translations().treeSearchHelp"
+                [includeInactive]="includeInactiveTree()"
+                [includeDeleted]="includeDeletedTree()"
+                [canCreate]="false"
+                [canViewDetails]="canViewDetails()"
+                [canUpdate]="false"
+                [canDelete]="false"
+                [canRestore]="false"
+                [draggableLeaves]="canUseBranchAssignment() && !store.branchAssigning()"
+                [canDragLeafNode]="canAssignBranchService"
+                (refresh)="refresh()"
+                (searchTextChange)="updateServiceTreeSearch($event)"
+                (includeInactiveChange)="updateTreeToggle('inactive', $event)"
+                (includeDeletedChange)="updateTreeToggle('deleted', $event)"
+                (toggleNode)="toggleTreeNode($event)"
+                (selectNode)="selectTreeNode($event)"
+                (viewNode)="openViewFromTree($event)"
+                (leafDragStarted)="startBranchAssignmentDrag($event)"
+                (leafDragEnded)="clearBranchAssignmentDrag()"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
     } @else {
       <section class="svc-workspace row g-2 align-items-start" [attr.inert]="isWriteDrawerOpen() ? '' : null">
         @if (store.panelMode() === 'closed' || store.panelMode() === 'view') {

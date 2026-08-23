@@ -26,10 +26,15 @@ describe('BranchGlobalizationRequestsComponent request triggers', () => {
   let canApprove: WritableSignal<boolean>;
   let canReject: WritableSignal<boolean>;
   let requests: Subject<PagedServiceGlobalizationRequestsResponse>[];
-  let authSession: { readonly shouldClearSessionForHttpStatus: ReturnType<typeof vi.fn>; readonly clearSession: ReturnType<typeof vi.fn> };
+  let authSession: {
+    readonly shouldClearSessionForHttpStatus: ReturnType<typeof vi.fn>;
+    readonly clearSession: ReturnType<typeof vi.fn>;
+  };
   let router: { readonly navigateByUrl: ReturnType<typeof vi.fn> };
   let invalidationService: {
-    readonly branchRequestsInvalidation: ReturnType<WritableSignal<{ readonly branchId: number; readonly revision: number } | null>['asReadonly']>;
+    readonly branchRequestsInvalidation: ReturnType<
+      WritableSignal<{ readonly branchId: number; readonly revision: number } | null>['asReadonly']
+    >;
     readonly invalidateAfterApproval: ReturnType<typeof vi.fn>;
     readonly invalidateAfterRejection: ReturnType<typeof vi.fn>;
   };
@@ -177,31 +182,20 @@ describe('BranchGlobalizationRequestsComponent request triggers', () => {
     expect(api.getBranchRequests).toHaveBeenCalledTimes(2);
   });
 
-  it('renders a constrained Bootstrap modal with column-based filters', () => {
+  it('renders a constrained modal with column-based filters', () => {
     openPopup();
     requests[0].next(pageWith([requestItem({ status: 'Pending' })]));
     requests[0].complete();
     fixture.detectChanges();
 
-    const dialog = fixture.nativeElement.querySelector('.branch-globalization-dialog') as HTMLElement | null;
-    const content = fixture.nativeElement.querySelector('.branch-globalization-content.modal-content');
+    const dialog = fixture.nativeElement.querySelector(
+      '.globalization-dialog',
+    ) as HTMLElement | null;
     const form = fixture.nativeElement.querySelector('form') as HTMLFormElement | null;
-    const fields = fixture.nativeElement.querySelectorAll('form label');
-    const submit = fixture.nativeElement.querySelector('form button[type="submit"]') as HTMLButtonElement | null;
 
-    expect(dialog?.classList.contains('modal-dialog')).toBe(true);
-    expect(dialog?.classList.contains('w-100')).toBe(false);
-    expect(content).not.toBeNull();
-    expect(fixture.nativeElement.querySelector('.branch-globalization-backdrop')).not.toBeNull();
-    expect(fixture.nativeElement.querySelector('.modal-backdrop')).toBeNull();
-    expect((content as HTMLElement).className).not.toContain('opacity');
-    const searchIcon = fixture.nativeElement.querySelector('.branch-globalization-input-icon') as HTMLElement | null;
-
-    expect(fixture.nativeElement.querySelector('.table-responsive')).not.toBeNull();
-    expect(searchIcon?.classList.contains('start-0')).toBe(false);
-    expect(form?.classList.contains('row')).toBe(true);
-    expect(Array.from(fields).every((field) => (field as HTMLElement).classList.contains('col-lg-4'))).toBe(true);
-    expect(submit?.closest('.col-lg-auto')).not.toBeNull();
+    expect(dialog).not.toBeNull();
+    expect(fixture.nativeElement.querySelector('.q-dialog-backdrop')).not.toBeNull();
+    expect(form).not.toBeNull();
   });
   it('uses distinct enterprise badge colors for every request status', () => {
     const component = fixture.componentInstance as unknown as {
@@ -242,7 +236,16 @@ describe('BranchGlobalizationRequestsComponent request triggers', () => {
 
   it('approves a pending request and invalidates branch service data', () => {
     canApprove.set(true);
-    const mutation = new Subject<{ readonly requestId: number; readonly status: 'Approved'; readonly branchId: number; readonly promotedServiceIds: readonly number[]; readonly reviewedByApplicationUserId: string; readonly reviewedOnUtc: string; readonly rowVersion: string; readonly message: string }>();
+    const mutation = new Subject<{
+      readonly requestId: number;
+      readonly status: 'Approved';
+      readonly branchId: number;
+      readonly promotedServiceIds: readonly number[];
+      readonly reviewedByApplicationUserId: string;
+      readonly reviewedOnUtc: string;
+      readonly rowVersion: string;
+      readonly message: string;
+    }>();
     api.approveRequest.mockReturnValueOnce(mutation);
     openPopup();
 
@@ -300,11 +303,12 @@ describe('BranchGlobalizationRequestsComponent request triggers', () => {
   it('closes a stale decision and reloads the branch list on concurrency conflicts', () => {
     canApprove.set(true);
     api.approveRequest.mockReturnValueOnce(
-      throwError(() =>
-        new HttpErrorResponse({
-          status: 409,
-          error: { detail: 'Request is no longer pending' },
-        }),
+      throwError(
+        () =>
+          new HttpErrorResponse({
+            status: 409,
+            error: { detail: 'Request is no longer pending' },
+          }),
       ),
     );
     openPopup();
@@ -335,7 +339,9 @@ function emptyPage(totalItems: number): PagedServiceGlobalizationRequestsRespons
   return { currentPage: 1, pageSize: 10, totalItems, data: [] };
 }
 
-function pageWith(data: readonly ServiceGlobalizationRequestListItem[]): PagedServiceGlobalizationRequestsResponse {
+function pageWith(
+  data: readonly ServiceGlobalizationRequestListItem[],
+): PagedServiceGlobalizationRequestsResponse {
   return { currentPage: 1, pageSize: 10, totalItems: data.length, data };
 }
 

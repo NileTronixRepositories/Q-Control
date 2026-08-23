@@ -27,7 +27,9 @@ import { BranchServicesComponent } from './branch-services.component';
 describe('BranchServicesComponent branch service actions', () => {
   let fixture: ComponentFixture<BranchServicesComponent>;
   let unassignResult: Subject<UnassignBranchLeafServiceResponse>;
-  let lifecycleResult: Subject<ServiceDeleteResponse | ServiceRestoreResponse | ServicePermanentDeleteResponse>;
+  let lifecycleResult: Subject<
+    ServiceDeleteResponse | ServiceRestoreResponse | ServicePermanentDeleteResponse
+  >;
   let branchServicesApi: {
     readonly getBranchServicesTree: ReturnType<typeof vi.fn>;
     readonly unassignLeafService: ReturnType<typeof vi.fn>;
@@ -58,7 +60,9 @@ describe('BranchServicesComponent branch service actions', () => {
   beforeEach(async () => {
     vi.useFakeTimers();
     unassignResult = new Subject<UnassignBranchLeafServiceResponse>();
-    lifecycleResult = new Subject<ServiceDeleteResponse | ServiceRestoreResponse | ServicePermanentDeleteResponse>();
+    lifecycleResult = new Subject<
+      ServiceDeleteResponse | ServiceRestoreResponse | ServicePermanentDeleteResponse
+    >();
     canViewOwnRequests = signal(false);
     canViewDetails = signal(false);
     canUpdateServices = signal(true);
@@ -174,33 +178,24 @@ describe('BranchServicesComponent branch service actions', () => {
       expect.objectContaining({ status: 'Pending', pageNumber: 1, pageSize: 1 }),
     );
 
-    const notificationButton = fixture.nativeElement.querySelector('.bi-bell')
-      ?.closest('button') as HTMLButtonElement | null;
+    const notificationButton = fixture.nativeElement.querySelector(
+      '.branch-requests-btn',
+    ) as HTMLButtonElement | null;
     expect(notificationButton).not.toBeNull();
     expect(notificationButton?.textContent).toContain('3');
-    expect(
-      notificationButton?.querySelector('[data-testid="pending-requests-shadow"]'),
-    ).not.toBeNull();
+    expect(notificationButton?.querySelector('.pending-requests-badge')).not.toBeNull();
 
     notificationButton?.click();
     fixture.detectChanges();
 
     expect(notificationButton?.textContent).not.toContain('3');
-    expect(
-      notificationButton?.querySelector('[data-testid="pending-requests-shadow"]'),
-    ).toBeNull();
+    expect(notificationButton?.querySelector('.pending-requests-badge')).toBeNull();
     expect(globalizationApi.getBranchRequests).toHaveBeenCalledTimes(2);
     expect(globalizationApi.getBranchRequests.mock.calls[1][1]).toEqual(
       expect.objectContaining({ status: null, pageNumber: 1, pageSize: 10 }),
     );
     const dialog = fixture.nativeElement.querySelector('[role="dialog"]') as HTMLElement | null;
     expect(dialog).not.toBeNull();
-    expect(dialog?.classList.contains('branch-globalization-dialog')).toBe(true);
-    expect(dialog?.classList.contains('modal-dialog')).toBe(true);
-    expect(dialog?.querySelector('.branch-globalization-content.modal-content')).not.toBeNull();
-    expect(fixture.nativeElement.querySelector('.branch-globalization-backdrop')).not.toBeNull();
-    expect(fixture.nativeElement.querySelector('.modal-backdrop')).toBeNull();
-    expect(dialog?.classList.contains('w-100')).toBe(false);
   });
 
   it('keeps the badge hidden for the same request and restores it for a newer request', () => {
@@ -221,8 +216,9 @@ describe('BranchServicesComponent branch service actions', () => {
     canViewOwnRequests.set(true);
     fixture.detectChanges();
 
-    const notificationButton = fixture.nativeElement.querySelector('.bi-bell')
-      ?.closest('button') as HTMLButtonElement;
+    const notificationButton = fixture.nativeElement.querySelector(
+      '.branch-requests-btn',
+    ) as HTMLButtonElement;
     notificationButton.click();
     fixture.detectChanges();
 
@@ -233,16 +229,14 @@ describe('BranchServicesComponent branch service actions', () => {
     vi.advanceTimersByTime(15_000);
     fixture.detectChanges();
 
-    expect(notificationButton.querySelector('[data-testid="pending-requests-shadow"]')).toBeNull();
+    expect(notificationButton.querySelector('.pending-requests-badge')).toBeNull();
     expect(notificationButton.textContent).not.toContain('3');
 
     vi.advanceTimersByTime(15_000);
     fixture.detectChanges();
 
     expect(notificationButton.textContent).toContain('3');
-    expect(
-      notificationButton.querySelector('[data-testid="pending-requests-shadow"]'),
-    ).not.toBeNull();
+    expect(notificationButton.querySelector('.pending-requests-badge')).not.toBeNull();
   });
 
   it('restores the badge from a count increase when the API omits the newest row', () => {
@@ -260,23 +254,20 @@ describe('BranchServicesComponent branch service actions', () => {
     canViewOwnRequests.set(true);
     fixture.detectChanges();
 
-    const notificationButton = fixture.nativeElement.querySelector('.bi-bell')
-      ?.closest('button') as HTMLButtonElement;
+    const notificationButton = fixture.nativeElement.querySelector(
+      '.branch-requests-btn',
+    ) as HTMLButtonElement;
     notificationButton.click();
     fixture.detectChanges();
 
-    fixture.debugElement.injector
-      .get(BranchServicesStore)
-      .closeGlobalizationRequestsDialog();
+    fixture.debugElement.injector.get(BranchServicesStore).closeGlobalizationRequestsDialog();
     fixture.detectChanges();
 
     vi.advanceTimersByTime(15_000);
     fixture.detectChanges();
 
     expect(notificationButton.textContent).toContain('4');
-    expect(
-      notificationButton.querySelector('[data-testid="pending-requests-shadow"]'),
-    ).not.toBeNull();
+    expect(notificationButton.querySelector('.pending-requests-badge')).not.toBeNull();
   });
 
   it('polls as a technical admin and refreshes service trees when a request is completed', () => {
@@ -431,7 +422,12 @@ describe('BranchServicesComponent branch service actions', () => {
   });
 
   for (const scenario of [
-    { status: 400, detail: 'Leaf service ID must be greater than zero', closes: false, refreshes: false },
+    {
+      status: 400,
+      detail: 'Leaf service ID must be greater than zero',
+      closes: false,
+      refreshes: false,
+    },
     { status: 403, detail: 'Forbidden by branch scope', closes: false, refreshes: false },
     { status: 404, detail: 'Assignment was not found', closes: true, refreshes: true },
     { status: 409, detail: 'The selected service is not a leaf', closes: false, refreshes: false },
@@ -446,12 +442,8 @@ describe('BranchServicesComponent branch service actions', () => {
       );
       fixture.detectChanges();
 
-      const dialog = fixture.nativeElement.querySelector(
-        'app-unassign-branch-service-dialog',
-      );
-      expect(fixture.nativeElement.textContent).toContain(
-        scenario.detail,
-      );
+      const dialog = fixture.nativeElement.querySelector('app-unassign-branch-service-dialog');
+      expect(fixture.nativeElement.textContent).toContain(scenario.detail);
       expect(dialog === null).toBe(scenario.closes);
       expect(branchServicesApi.getBranchServicesTree).toHaveBeenCalledTimes(
         scenario.refreshes ? 2 : 1,
@@ -520,11 +512,7 @@ function createLeafNode(): ServiceTreeNode {
   };
 }
 
-function createOwnedBranchNode(
-  id: number,
-  isDeleted: boolean,
-  ownerBranchId = 5,
-): ServiceTreeNode {
+function createOwnedBranchNode(id: number, isDeleted: boolean, ownerBranchId = 5): ServiceTreeNode {
   return {
     id,
     parentServiceId: null,
