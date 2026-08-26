@@ -51,7 +51,7 @@ label {
   border-radius: 0 !important;
 }
 
-/* ── Unified Input Groups (e.g. % addon) ── */
+/* ── Unified Input Groups  ── */
 .input-group {
   display: flex !important;
   flex-wrap: nowrap !important;

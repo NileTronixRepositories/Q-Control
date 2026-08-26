@@ -130,56 +130,70 @@
   position: relative;
   display: flex;
   align-items: center;
+  width: 100%;
   max-width: 160px;
 }
 
 .time-input-container i {
   position: absolute;
-  color: var(--q-text-secondary, #64748b);
+  inset-inline-start: 12px;
+  color: var(--q-primary, #0f7da8);
   pointer-events: none;
-}
-
-:host-context([dir="rtl"]) .time-input-container i {
-  right: 12px;
-}
-
-:host-context([dir="ltr"]) .time-input-container i {
-  left: 12px;
+  font-size: 0.95rem;
+  z-index: 2;
 }
 
 .time-field {
+  width: 100%;
+  height: 38px;
+  min-height: 38px;
   font-weight: 600;
-  color: var(--q-text-primary, #334155);
-  transition: all 0.2s;
+  font-size: 0.88rem;
+  color: var(--q-text-primary, #1e293b);
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding-inline-start: 36px !important;
+  padding-inline-end: 10px !important;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-:host-context([dir="rtl"]) .time-field {
-  padding-right: 36px;
+/* Hide duplicate native clock icon in Chrome/Blink browsers */
+.time-field::-webkit-calendar-picker-indicator {
+  display: none !important;
+  -webkit-appearance: none !important;
+  opacity: 0 !important;
+  width: 0 !important;
+  height: 0 !important;
+  pointer-events: none !important;
 }
 
-:host-context([dir="ltr"]) .time-field {
-  padding-left: 36px;
+.time-field:focus {
+  border-color: var(--q-primary, #0f7da8);
+  box-shadow: 0 0 0 3px rgba(15, 125, 168, 0.15);
+  outline: none;
 }
 
 .add-rule-action {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
+  padding: 0.45rem 1.15rem;
+  border-radius: 8px;
   background: var(--q-primary, #0f7da8);
-  color: var(--q-primary-contrast, #ffffff);
+  color: #ffffff;
   border: none;
-  font-size: 1.2rem;
-  display: flex;
+  font-size: 0.85rem;
+  font-weight: 700;
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 12px var(--q-primary-soft, rgba(15, 125, 168, 0.3));
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  gap: 0.5rem;
+  box-shadow: 0 2px 8px rgba(15, 125, 168, 0.25);
+  transition: all 0.2s ease;
   cursor: pointer;
 }
 
 .add-rule-action:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px var(--q-primary-soft, rgba(15, 125, 168, 0.4));
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(15, 125, 168, 0.35);
   background: var(--q-primary-hover, #0c6487);
 }
 
