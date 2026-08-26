@@ -1,0 +1,45 @@
+/**
+ * Q-SYSTEM Design Tokens: Typography
+ * Fonts, Scales, Weights, and Line-Heights
+ */
+
+:root {
+  /* Font Families */
+  --q-font-family-arabic:
+    'Cairo', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --q-font-family-latin:
+    system-ui, -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, sans-serif;
+  --q-font-family: var(--q-font-family-arabic);
+  --q-font-family-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  /* Font Weights */
+  --q-font-weight-regular: 400;
+  --q-font-weight-medium: 500;
+  --q-font-weight-semibold: 600;
+  --q-font-weight-bold: 700;
+  --q-font-weight-extrabold: 800;
+
+  /* Type Scale */
+  --q-text-2xs: 10px;
+  --q-text-xs: 11.5px;
+  --q-text-sm: 13px; 
+  --q-text-base: 14px;
+  --q-text-md: 15px;
+  --q-text-lg: 17px;
+  --q-text-xl: 20px;
+  --q-text-2xl: 24px;
+  --q-text-3xl: 28px;
+  --q-text-4xl: 34px;
+
+  /* Line Heights */
+  --q-leading-none: 1;
+  --q-leading-tight: 1.2;
+  --q-leading-snug: 1.35;
+  --q-leading-normal: 1.5;
+  --q-leading-relaxed: 1.65;
+
+  /* Letter Spacing */
+  --q-tracking-tight: -0.02em;
+  --q-tracking-normal: 0em;
+  --q-tracking-wide: 0.025em;
+}

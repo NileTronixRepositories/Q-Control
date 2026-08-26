@@ -219,6 +219,68 @@ export class AdminShellComponent {
       }
     }
 
+    // Deep sub-routes under branch services (workflows)
+    const workflowMatch = /^\/admin\/services\/branches\/([^/]+)\/services\/([^/]+)\/workflows$/.exec(
+      currentUrl,
+    );
+    if (workflowMatch) {
+      const routeBranchId = Number(workflowMatch[1]);
+      return [
+        root,
+        {
+          label: translations.branchManagementLabel,
+          route: '/admin/branch-editor',
+          icon: 'bi-diagram-3',
+        },
+        {
+          label: translations.servicesLabel,
+          route: '/admin/services/catalog',
+          icon: 'bi-ui-checks-grid',
+        },
+        {
+          label: translations.branchServicesLabel,
+          route: '/admin/services/branch-services',
+          queryParams: Number.isFinite(routeBranchId) && routeBranchId > 0 ? { branchId: routeBranchId } : undefined,
+          icon: 'bi-diagram-2',
+        },
+        {
+          label: translations.serviceWorkflowsLabel,
+          icon: 'bi-diagram-3',
+        },
+      ];
+    }
+
+    // Deep sub-routes under branch services (schedule)
+    const scheduleMatch = /^\/admin\/services\/branches\/([^/]+)\/services\/([^/]+)\/schedule$/.exec(
+      currentUrl,
+    );
+    if (scheduleMatch) {
+      const routeBranchId = Number(scheduleMatch[1]);
+      return [
+        root,
+        {
+          label: translations.branchManagementLabel,
+          route: '/admin/branch-editor',
+          icon: 'bi-diagram-3',
+        },
+        {
+          label: translations.servicesLabel,
+          route: '/admin/services/catalog',
+          icon: 'bi-ui-checks-grid',
+        },
+        {
+          label: translations.branchServicesLabel,
+          route: '/admin/services/branch-services',
+          queryParams: Number.isFinite(routeBranchId) && routeBranchId > 0 ? { branchId: routeBranchId } : undefined,
+          icon: 'bi-diagram-2',
+        },
+        {
+          label: translations.serviceSchedulesLabel,
+          icon: 'bi-calendar-week',
+        },
+      ];
+    }
+
     const navigationPath = this.findNavigationPath(this.navigationItems(), currentUrl);
 
     if (navigationPath.length === 0) {

@@ -11,7 +11,10 @@ import {
 import { AuthSessionService } from '../../auth/services/auth-session.service';
 import { SegmentPermissionService } from '../../segment-management/services/segment-permission.service';
 import { ServiceManagementPermissionService } from '../../service-management/services/catalog/service-management-permission.service';
-import { TechnicalAdminBranchContextStore, TechnicalAdminBranchContext } from '../store/technical-admin-branch-context.store';
+import {
+  TechnicalAdminBranchContextStore,
+  TechnicalAdminBranchContext,
+} from '../store/technical-admin-branch-context.store';
 import { TechnicalAdminI18nStore } from '../store/technical-admin-i18n.store';
 import { AdminShellComponent } from './admin-shell.component';
 
@@ -238,6 +241,21 @@ describe('AdminShellComponent', () => {
     expect(breadcrumbText).toContain('Operations Dashboard');
     expect(breadcrumbText).toContain('Services');
     expect(breadcrumbText).toContain('Service Schedules');
+  });
+
+  it('renders deep contextual breadcrumbs for branch service workflows', () => {
+    fixture.componentInstance['syncRouterState'](
+      '/admin/services/branches/5/services/25/workflows',
+    );
+    fixture.detectChanges();
+
+    const breadcrumbText = fixture.nativeElement.querySelector('nav.app-breadcrumb')
+      ?.textContent as string;
+
+    expect(breadcrumbText).toContain('Operations Dashboard');
+    expect(breadcrumbText).toContain('Services');
+    expect(breadcrumbText).toContain('Branch Services');
+    expect(breadcrumbText).toContain('Service Workflows');
   });
 
   it('renders the current logged-in user in the workspace header', () => {

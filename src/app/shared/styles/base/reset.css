@@ -1,0 +1,93 @@
+/**
+ * Q-SYSTEM Base: Modern Reset & Normalization
+ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  min-height: 100%;
+  width: 100%;
+  -webkit-text-size-adjust: 100%;
+  tab-size: 4;
+}
+
+body {
+  font-family: var(--q-font-family);
+  font-size: var(--q-text-sm);
+  font-weight: var(--q-font-weight-regular);
+  line-height: var(--q-leading-normal);
+  color: var(--q-text-secondary);
+  background-color: var(--q-bg-app);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+/* Media Elements */
+img,
+svg,
+video,
+canvas,
+audio,
+iframe,
+embed,
+object {
+  display: inline-block;
+  max-width: 100%;
+  vertical-align: middle;
+}
+
+/* Lists & Buttons Reset */
+ul,
+ol {
+  list-style: none;
+}
+
+button,
+input,
+optgroup,
+select,
+textarea {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  background: transparent;
+  border: none;
+}
+
+a {
+  color: inherit;
+  text-decoration: inherit;
+}
+
+/* Clean Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--q-color-slate-300);
+  border-radius: var(--q-radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--q-color-slate-400);
+}

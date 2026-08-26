@@ -8,7 +8,9 @@ export interface ServiceWorkflowTranslations {
   readonly selectBranchFirst: string;
   readonly invalidWorkflowScope: string;
   readonly backToWorkflowSelection: string;
+  readonly backToBranchServices: string;
   readonly changeWorkflowScope: string;
+  readonly changeService: string;
   readonly manageWorkflows: string;
   readonly workflowOwner: string;
   readonly autoAppliedWorkflow: string;
@@ -124,7 +126,9 @@ export const SERVICE_WORKFLOW_TRANSLATIONS: Record<AppLanguage, ServiceWorkflowT
     selectBranchFirst: 'اختر فرعًا لعرض شجرة الخدمات المؤهلة',
     invalidWorkflowScope: 'الفرع أو الخدمة المحددة غير متاحة لإدارة المسارات.',
     backToWorkflowSelection: 'العودة لاختيار الخدمة',
+    backToBranchServices: 'الرجوع لخدمات الفرع',
     changeWorkflowScope: 'تغيير الفرع أو الخدمة',
+    changeService: 'تغيير الخدمة',
     manageWorkflows: 'إدارة مسارات الخدمة',
     workflowOwner: 'الخدمة المالكة للمسارات',
     autoAppliedWorkflow: 'المسار المطبق تلقائيًا',
@@ -237,7 +241,9 @@ export const SERVICE_WORKFLOW_TRANSLATIONS: Record<AppLanguage, ServiceWorkflowT
     selectBranchFirst: 'Select a branch to view eligible leaf services.',
     invalidWorkflowScope: 'The selected branch or leaf service is not available for workflow management.',
     backToWorkflowSelection: 'Back to service selection',
+    backToBranchServices: 'Back to Branch Services',
     changeWorkflowScope: 'Change branch or service',
+    changeService: 'Change Service',
     manageWorkflows: 'Manage service workflows',
     workflowOwner: 'Workflow owner service',
     autoAppliedWorkflow: 'Auto-applied workflow',

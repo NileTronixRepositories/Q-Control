@@ -1,0 +1,34 @@
+/**
+ * Q-SYSTEM Design Tokens: Central Index
+ * Imports tokens and establishes backward-compatible alias mappings
+ */
+
+@import './colors.css';
+@import './typography.css';
+@import './spacing-elevation.css';
+
+:root {
+  /* Backward-compatibility aliases for legacy --nt-* variables */
+  --nt-primary: var(--q-primary);
+  --nt-primary-hover: var(--q-primary-hover);
+  --nt-primary-soft: var(--q-primary-soft);
+  --nt-text: var(--q-text-primary);
+  --nt-text-heading: var(--q-text-primary);
+  --nt-muted: var(--q-text-muted);
+  --nt-subtle: var(--q-text-subtle);
+  --nt-bg: var(--q-bg-app);
+  --nt-card: var(--q-bg-surface);
+  --nt-border: var(--q-border-subtle);
+  --nt-radius: var(--q-radius-lg);
+
+  /* Backward-compatibility aliases for legacy --q-* variables */
+  --q-bg-base: var(--q-bg-app);
+  --q-surface-card: var(--q-bg-surface);
+  --q-surface-muted: var(--q-bg-surface-subtle);
+  --q-text-heading: var(--q-text-primary);
+  --q-shadow-premium: var(--q-shadow-card);
+  --q-shadow-md: var(--q-shadow-card);
+  --q-shadow-soft: var(--q-shadow-subtle);
+  --q-focus-ring: var(--q-ring-primary);
+  --q-focus-visible-ring: var(--q-ring-primary);
+}

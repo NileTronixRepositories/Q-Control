@@ -1,0 +1,109 @@
+/**
+ * Q-SYSTEM Craft UI: Form Controls & Inputs
+ * Compact, modern controls without bloating
+ */
+
+.craft-form-group,
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--q-space-1);
+}
+
+.craft-label,
+.form-label,
+label {
+  display: inline-block;
+  font-size: var(--q-text-xs);
+  font-weight: var(--q-font-weight-bold);
+  color: var(--q-text-secondary);
+  margin-bottom: 2px;
+}
+
+/* ── Unified Input / Select Controls ── */
+.craft-input,
+.craft-select,
+.form-control,
+.form-select,
+input:not([type='checkbox']):not([type='radio']):not([type='color']):not([type='range']),
+select,
+textarea {
+  display: block;
+  width: 100%;
+  min-height: var(--q-control-height-md);
+  height: var(--q-control-height-md);
+  padding: 6px var(--q-space-3);
+  font-size: var(--q-text-sm);
+  font-weight: var(--q-font-weight-medium);
+  color: var(--q-text-primary);
+  background-color: var(--q-bg-surface);
+  border: 1px solid var(--q-border-default);
+  border-radius: var(--q-radius-md);
+  box-shadow: var(--q-shadow-subtle);
+  transition: var(--q-transition-snappy);
+}
+
+textarea.craft-input,
+textarea.form-control,
+textarea {
+  min-height: 72px;
+  height: auto;
+  padding-block: var(--q-space-2);
+}
+
+input::placeholder,
+textarea::placeholder,
+.form-control::placeholder {
+  color: var(--q-text-subtle);
+  font-weight: var(--q-font-weight-regular);
+}
+
+/* Focus States */
+.craft-input:focus,
+.craft-select:focus,
+.form-control:focus,
+.form-select:focus,
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--q-primary);
+  box-shadow: var(--q-ring-primary);
+  background-color: #ffffff;
+}
+
+/* Disabled State */
+.craft-input:disabled,
+.craft-select:disabled,
+.form-control:disabled,
+input:disabled,
+select:disabled,
+textarea:disabled {
+  background-color: var(--q-color-slate-100);
+  border-color: var(--q-border-default);
+  color: var(--q-text-muted);
+  cursor: not-allowed;
+}
+
+/* ── Input with Icon Wrapper ── */
+.craft-input-wrap,
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.craft-input-wrap i,
+.input-wrapper i {
+  position: absolute;
+  font-size: 14px;
+  color: var(--q-text-muted);
+  pointer-events: none;
+  margin-inline-start: var(--q-space-3);
+}
+
+.craft-input-wrap input,
+.input-wrapper input {
+  padding-inline-start: 34px;
+}

@@ -11,7 +11,7 @@ import {
   signal,
   untracked,
 } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize, Observable } from 'rxjs';
 
@@ -64,7 +64,10 @@ import {
 } from '../../utils/service-action-rules.util';
 
 import { LeafServiceSegmentsDrawerComponent } from '../../../segment-management/components/leaf-service-segments-drawer/leaf-service-segments-drawer.component';
-import { SEGMENT_TRANSLATIONS_AR, SEGMENT_TRANSLATIONS_EN } from '../../../segment-management/i18n/segment.translations';
+import {
+  SEGMENT_TRANSLATIONS_AR,
+  SEGMENT_TRANSLATIONS_EN,
+} from '../../../segment-management/i18n/segment.translations';
 import {
   AssignSegmentItem,
   AssignedBranchServiceSegmentsResponse,
@@ -97,6 +100,7 @@ const STATUS_POLL_INTERVAL_MS = 15_000;
 })
 export class BranchServicesComponent implements OnInit, OnDestroy {
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
   private readonly authSessionService = inject(AuthSessionService);
   private readonly i18nStore = inject(TechnicalAdminI18nStore);
   private readonly branchApiService = inject(BranchManagementApiService);
@@ -288,8 +292,7 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
   protected readonly canViewWorkflows = this.permissionService.canViewWorkflows;
   protected readonly canViewSchedules = this.permissionService.canViewSchedules;
   protected readonly canAssignBranchServices = this.permissionService.canAssignBranchServices;
-  protected readonly canUnassignBranchServices =
-    this.permissionService.canUnassignBranchServices;
+  protected readonly canUnassignBranchServices = this.permissionService.canUnassignBranchServices;
   protected readonly canDeleteBranchServices = this.permissionService.canDelete;
   protected readonly canRestoreBranchServices = this.permissionService.canRestore;
   protected readonly canDeletePermanentBranchServices = this.permissionService.canDeletePermanent;
@@ -313,7 +316,9 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
   protected readonly mediaDetails = signal<ServiceDetails | null>(null);
   protected readonly mediaLoading = signal(false);
   protected readonly createTreeResetKey = signal(0);
-  protected readonly creationRequestSummary = signal<ServiceGlobalizationRequestSummary | null>(null);
+  protected readonly creationRequestSummary = signal<ServiceGlobalizationRequestSummary | null>(
+    null,
+  );
   protected readonly pendingRequestsBadge = computed(() => {
     if (!this.store.hasUnreadPendingGlobalizationRequests()) {
       return null;
@@ -326,7 +331,8 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
     () => this.authSessionService.currentSession()?.userType === 'BranchAdmin',
   );
   protected readonly canOpenCreateTree = computed(
-    () => this.isBranchAdmin() && this.canCreateBranchServiceTree() && this.store.hasSelectedBranch(),
+    () =>
+      this.isBranchAdmin() && this.canCreateBranchServiceTree() && this.store.hasSelectedBranch(),
   );
   protected readonly canCreateBranchSubtreeFor = (node: ServiceTreeNode): boolean =>
     this.canOpenCreateTree() &&
@@ -603,7 +609,6 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
     ]);
   }
 
-
   protected openServiceMedia(node: ServiceTreeNode): void {
     if (!this.canManageMediaFor(node) || this.mediaLoading()) {
       this.showMessage('error', this.translations().accessDenied);
@@ -641,7 +646,10 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
     return this.canUpdate() && details.canEditDefinition && !details.isDeleted;
   }
 
-  protected handleMediaMessage(message: { readonly tone: 'success' | 'error' | 'info'; readonly text: string }): void {
+  protected handleMediaMessage(message: {
+    readonly tone: 'success' | 'error' | 'info';
+    readonly text: string;
+  }): void {
     this.showMessage(message.tone, message.text);
   }
 
@@ -708,10 +716,7 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
     });
   }
 
-  protected requestLifecycle(
-    node: ServiceTreeNode,
-    action: BranchServiceLifecycleAction,
-  ): void {
+  protected requestLifecycle(node: ServiceTreeNode, action: BranchServiceLifecycleAction): void {
     const branchId = this.store.selectedBranchId();
     const hasPermission = this.hasLifecyclePermission(action);
     const canUseAction = this.canUseLifecycleAction(node, action);
@@ -759,12 +764,17 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const request$: Observable<ServiceDeleteResponse | ServiceRestoreResponse | ServicePermanentDeleteResponse> =
+    const request$: Observable<
+      ServiceDeleteResponse | ServiceRestoreResponse | ServicePermanentDeleteResponse
+    > =
       state.action === 'delete'
         ? this.serviceManagementApiService.deleteService(state.serviceId, state.rowVersion)
         : state.action === 'restore'
           ? this.serviceManagementApiService.restoreService(state.serviceId, state.rowVersion)
-          : this.serviceManagementApiService.permanentlyDeleteService(state.serviceId, state.rowVersion);
+          : this.serviceManagementApiService.permanentlyDeleteService(
+              state.serviceId,
+              state.rowVersion,
+            );
 
     this.store.lifecycleMutating.set(true);
     request$
@@ -808,10 +818,7 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
       return;
     }
 
-    if (
-      !this.canUnassignBranchServices() ||
-      this.store.selectedBranchId() !== state.branchId
-    ) {
+    if (!this.canUnassignBranchServices() || this.store.selectedBranchId() !== state.branchId) {
       this.store.unassignConfirmState.set(null);
       this.showMessage('error', this.translations().accessDenied);
       return;
@@ -831,10 +838,7 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
             .replace('{count}', String(response.removedAssignmentsCount));
           const selectedNodeId = this.store.selectedBranchNodeId();
 
-          if (
-            selectedNodeId !== null &&
-            response.unassignedServiceIds.includes(selectedNodeId)
-          ) {
+          if (selectedNodeId !== null && response.unassignedServiceIds.includes(selectedNodeId)) {
             this.store.selectBranchNode(null);
           }
 
@@ -895,10 +899,12 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const createRequest$: Observable<CreateBranchServiceTreeResponse | CreateBranchServiceSubtreeResponse> | null =
+    const createRequest$: Observable<
+      CreateBranchServiceTreeResponse | CreateBranchServiceSubtreeResponse
+    > | null =
       this.store.createTreeMode() === 'subtree'
-      ? this.createBranchSubtree(branchId, request)
-      : this.branchServicesApiService.createBranchServiceTree(branchId, request);
+        ? this.createBranchSubtree(branchId, request)
+        : this.branchServicesApiService.createBranchServiceTree(branchId, request);
 
     if (!createRequest$) {
       return;
@@ -959,7 +965,10 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
   private serviceName(node: ServiceTreeNode): string {
     return this.language() === 'ar' ? node.arabicName : node.englishName;
   }
-  private branchSessionName(branch: { readonly arabicName: string; readonly englishName: string }): string {
+  private branchSessionName(branch: {
+    readonly arabicName: string;
+    readonly englishName: string;
+  }): string {
     return this.language() === 'ar' ? branch.arabicName : branch.englishName;
   }
 
@@ -1027,7 +1036,10 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
   private collectTreeNodeIds(nodes: readonly ServiceTreeNode[]): readonly number[] {
     return nodes.flatMap((node) => [node.id, ...this.collectTreeNodeIds(node.children)]);
   }
-  private findTreeNode(nodes: readonly ServiceTreeNode[], serviceId: number): ServiceTreeNode | null {
+  private findTreeNode(
+    nodes: readonly ServiceTreeNode[],
+    serviceId: number,
+  ): ServiceTreeNode | null {
     for (const node of nodes) {
       if (node.id === serviceId) {
         return node;
@@ -1084,7 +1096,19 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
         takeUntilDestroyed(this.destroyRef),
       )
       .subscribe({
-        next: (response) => this.branches.set(response.data),
+        next: (response) => {
+          this.branches.set(response.data);
+          const queryBranchId = this.toOptionalNumber(
+            this.route.snapshot.queryParamMap.get('branchId'),
+          );
+          if (queryBranchId && !this.store.selectedBranchId()) {
+            const branch = response.data.find((item) => item.branchId === queryBranchId) ?? null;
+            if (branch) {
+              this.store.selectBranch(queryBranchId, this.branchName(branch));
+              this.loadBranchTree();
+            }
+          }
+        },
         error: (error: HttpErrorResponse) => this.handleApiError(error),
       });
   }
@@ -1159,7 +1183,10 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
       )
       .subscribe({
         next: (response) => {
-          if (requestId === this.pendingCountRequestId && this.store.selectedBranchId() === branchId) {
+          if (
+            requestId === this.pendingCountRequestId &&
+            this.store.selectedBranchId() === branchId
+          ) {
             const previousCount = this.lastPendingRequestsCount;
             this.lastPendingRequestsCount = response.totalItems;
             this.store.pendingGlobalizationRequestsCount.set(response.totalItems);
@@ -1177,7 +1204,10 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
           }
         },
         error: (error: HttpErrorResponse) => {
-          if (requestId === this.pendingCountRequestId && this.store.selectedBranchId() === branchId) {
+          if (
+            requestId === this.pendingCountRequestId &&
+            this.store.selectedBranchId() === branchId
+          ) {
             this.store.pendingGlobalizationRequestsCount.set(0);
             this.store.pendingGlobalizationRequestsNewestId.set(null);
             this.handleApiError(error);
@@ -1259,7 +1289,10 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
     }
 
     if (error.status === 404) {
-      this.showMessage('error', formatTechnicalAdminApiError(error, this.translations().branchNotFound));
+      this.showMessage(
+        'error',
+        formatTechnicalAdminApiError(error, this.translations().branchNotFound),
+      );
 
       if (this.isBranchAdmin()) {
         this.loadBranchTree();
@@ -1271,16 +1304,25 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
     }
 
     if (this.containsErrorCode(error, 'ServiceCodeAlreadyExists')) {
-      this.showMessage('error', formatTechnicalAdminApiError(error, this.translations().serviceCodeAlreadyExists));
+      this.showMessage(
+        'error',
+        formatTechnicalAdminApiError(error, this.translations().serviceCodeAlreadyExists),
+      );
       return;
     }
 
     if (this.containsErrorCode(error, 'DuplicateServiceCodeInTreePayload')) {
-      this.showMessage('error', formatTechnicalAdminApiError(error, this.translations().duplicateServiceCodeInTree));
+      this.showMessage(
+        'error',
+        formatTechnicalAdminApiError(error, this.translations().duplicateServiceCodeInTree),
+      );
       return;
     }
 
-    this.showMessage('error', formatTechnicalAdminApiError(error, this.translations().fallbackError));
+    this.showMessage(
+      'error',
+      formatTechnicalAdminApiError(error, this.translations().fallbackError),
+    );
   }
 
   private handleUnassignApiError(error: HttpErrorResponse): void {
@@ -1291,9 +1333,7 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
 
     if (error.status === 400 || error.status === 403 || error.status === 409) {
       const fallback =
-        error.status === 403
-          ? this.translations().accessDenied
-          : this.translations().fallbackError;
+        error.status === 403 ? this.translations().accessDenied : this.translations().fallbackError;
       this.showMessage('error', formatTechnicalAdminApiError(error, fallback));
       return;
     }
@@ -1323,11 +1363,14 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
 
     this.store.lifecycleConfirmState.set(null);
 
-    if (error.status === 400 || error.status === 403 || error.status === 404 || error.status === 409) {
+    if (
+      error.status === 400 ||
+      error.status === 403 ||
+      error.status === 404 ||
+      error.status === 409
+    ) {
       const fallback =
-        error.status === 403
-          ? this.translations().accessDenied
-          : this.translations().fallbackError;
+        error.status === 403 ? this.translations().accessDenied : this.translations().fallbackError;
       this.showMessage('error', formatTechnicalAdminApiError(error, fallback));
       this.loadBranchTree();
       return;
@@ -1364,7 +1407,8 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
     );
   }
 
-  private toOptionalNumber(value: string): number | null {
+  private toOptionalNumber(value: string | null | undefined): number | null {
+    if (!value) return null;
     const parsed = Number(value);
     return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
   }

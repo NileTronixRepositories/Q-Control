@@ -11,13 +11,33 @@
   >
     @if (store.scope()) {
       <div hero-actions class="workflow-hero-actions d-flex align-items-center flex-wrap gap-2">
+        @if (eligibleBranchServices().length > 1) {
+          <div class="workflow-service-switcher d-flex align-items-center gap-2 px-3 py-1 bg-white rounded-pill border shadow-sm">
+            <i class="bi bi-diagram-3-fill text-primary fs-6"></i>
+            <span class="fw-bold text-dark fs-7 text-nowrap">{{ translations().changeService }}:</span>
+            <select
+              class="form-select border-0 bg-transparent shadow-none fs-7 fw-semibold p-0 cursor-pointer"
+              [value]="store.scope()?.leafServiceId ?? ''"
+              (change)="switchService($event)"
+            >
+              @for (svc of eligibleBranchServices(); track svc.id) {
+                <option [value]="svc.id">{{ serviceName(svc) }}</option>
+              }
+            </select>
+          </div>
+        }
         @if (canCreate()) {
           <button type="button" class="branch-services-primary-btn d-inline-flex align-items-center gap-2" (click)="openCreate()">
             <i class="bi bi-plus-lg" aria-hidden="true"></i> {{ translations().createWorkflow }}
           </button>
         }
-        <button type="button" class="branch-services-secondary-btn d-inline-flex align-items-center gap-2" (click)="backToScopeSelection()">
-          <i class="bi bi-arrow-right-short" aria-hidden="true"></i> {{ translations().changeWorkflowScope }}
+        <button type="button" class="branch-services-secondary-btn d-inline-flex align-items-center gap-2" (click)="backToBranchServices()">
+          <i class="bi" [class.bi-arrow-left]="direction() === 'ltr'" [class.bi-arrow-right]="direction() === 'rtl'" aria-hidden="true"></i>
+          {{ translations().backToBranchServices }}
+        </button>
+        <button type="button" class="branch-services-secondary-btn d-inline-flex align-items-center gap-2" (click)="backToScopeSelection()" [title]="translations().changeWorkflowScope">
+          <i class="bi bi-diagram-2" aria-hidden="true"></i>
+          {{ translations().changeWorkflowScope }}
         </button>
       </div>
     } @else if (!isBranchAdmin()) {

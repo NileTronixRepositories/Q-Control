@@ -113,6 +113,22 @@ export class ServiceWorkflowsComponent implements OnInit, OnDestroy {
     this.findTreeNode(this.store.branchTree(), this.store.selectedBranchNodeId()),
   );
   readonly parentOptions = computed(() => this.collectParentOptions(this.store.branchTree()));
+  readonly eligibleBranchServices = computed(() => {
+    const tree = this.store.branchTree();
+    const result: ServiceTreeNode[] = [];
+    const collect = (nodes: readonly ServiceTreeNode[]) => {
+      for (const node of nodes) {
+        if (this.canManageWorkflowFor(node)) {
+          result.push(node);
+        }
+        if (node.children.length > 0) {
+          collect(node.children);
+        }
+      }
+    };
+    collect(tree);
+    return result;
+  });
 
   readonly workflowForm = this.formBuilder.group({
     arabicName: ['', [Validators.maxLength(100)]],
@@ -274,9 +290,43 @@ export class ServiceWorkflowsComponent implements OnInit, OnDestroy {
   }
 
   backToScopeSelection(): void {
+    const branchId = this.store.selectedBranchId() ?? this.routeBranchId;
     this.store.clearScope();
     this.scopeError.set(null);
+    if (branchId) {
+      this.store.selectBranch(branchId);
+      this.loadBranchTree(branchId);
+    }
     void this.router.navigateByUrl('/admin/services/workflows');
+  }
+
+  backToBranchServices(): void {
+    const branchId = this.store.selectedBranchId() ?? this.routeBranchId;
+    if (branchId) {
+      void this.router.navigate(['/admin/services/branch-services'], {
+        queryParams: { branchId },
+      });
+    } else {
+      void this.router.navigateByUrl('/admin/services/branch-services');
+    }
+  }
+
+  switchService(event: Event): void {
+    const serviceId = this.readPositiveInt(this.readInputValue(event));
+    const branchId = this.store.selectedBranchId() ?? this.routeBranchId;
+    if (!serviceId || !branchId) return;
+
+    const node = this.findTreeNode(this.store.branchTree(), serviceId);
+    if (node && this.canManageWorkflowFor(node)) {
+      this.activateScope(branchId, node);
+      void this.router.navigate([
+        '/admin/services/branches',
+        branchId,
+        'services',
+        node.id,
+        'workflows',
+      ]);
+    }
   }
 
   readonly canManageWorkflowFor = (node: ServiceTreeNode): boolean =>

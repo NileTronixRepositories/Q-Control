@@ -209,6 +209,7 @@ export class ServicesComponent implements OnInit, OnDestroy {
   public readonly formError = signal<string | null>(null);
   public readonly reloadConflictServiceId = signal<number | null>(null);
   public readonly activeEditorTab = signal<ServiceEditorTab>('form');
+  public readonly activeDetailsTab = signal<'data' | 'media'>('data');
   public readonly isWriteDrawerOpen = computed(
     () => this.store.panelMode() === 'create' || this.store.panelMode() === 'edit',
   );
@@ -223,8 +224,9 @@ export class ServicesComponent implements OnInit, OnDestroy {
     }
 
     const translations = this.translations();
+    const isArabic = this.language() === 'ar';
 
-    return [
+    const sections: ServiceDetailSection[] = [
       {
         key: 'basic',
         title: translations.basicInfo,
@@ -232,25 +234,48 @@ export class ServicesComponent implements OnInit, OnDestroy {
         items: [
           this.detailText('arabicName', translations.arabicName, details.arabicName),
           this.detailText('englishName', translations.englishName, details.englishName),
+          this.detailText('scope', translations.scope, this.scopeLabel(details.scope)),
+          ...(details.scope === 'BranchScoped' || details.ownerBranchId
+            ? [
+                this.detailText(
+                  'ownerBranch',
+                  translations.ownerBranch,
+                  this.ownerBranchLabel(details),
+                ),
+              ]
+            : []),
           this.detailBoolean(
             'serviceCodeRequired',
             translations.serviceCodeRequired,
             details.isServiceCodeRequired,
           ),
-          this.detailText(
-            'serviceCode',
-            translations.serviceCode,
-            this.formatText(details.serviceCode),
-          ),
-        ],
-      },
-      {
-        key: 'ownership',
-        title: translations.ownershipInfo,
-        icon: 'bi-building',
-        items: [
-          this.detailText('scope', translations.scope, this.scopeLabel(details.scope)),
-          this.detailText('ownerBranch', translations.ownerBranch, this.ownerBranchLabel(details)),
+          ...(details.isServiceCodeRequired || details.serviceCode
+            ? [
+                this.detailText(
+                  'serviceCode',
+                  translations.serviceCode,
+                  this.formatText(details.serviceCode),
+                ),
+              ]
+            : []),
+          ...(details.arabicUserMessage
+            ? [
+                this.detailText(
+                  'arabicUserMessage',
+                  translations.arabicUserMessage,
+                  details.arabicUserMessage,
+                ),
+              ]
+            : []),
+          ...(details.englishUserMessage
+            ? [
+                this.detailText(
+                  'englishUserMessage',
+                  translations.englishUserMessage,
+                  details.englishUserMessage,
+                ),
+              ]
+            : []),
         ],
       },
       {
@@ -264,18 +289,21 @@ export class ServicesComponent implements OnInit, OnDestroy {
             this.statusLabel(details),
             details.isActive && !details.isDeleted,
           ),
-          this.detailStatus(
-            'effectiveActive',
-            translations.effectiveActive,
-            this.effectiveStatusLabel(details),
-            details.effectiveIsActive,
-          ),
+          ...(!details.effectiveIsActive
+            ? [
+                this.detailStatus(
+                  'effectiveActive',
+                  translations.effectiveActive,
+                  this.effectiveStatusLabel(details),
+                  false,
+                ),
+              ]
+            : []),
           this.detailBoolean(
             'ticketIssuable',
             translations.ticketIssuable,
             details.isTicketIssuable,
           ),
-          this.detailBoolean('canIssueTicket', translations.canIssueTicket, details.canIssueTicket),
           this.detailBoolean(
             'clientInputRequired',
             translations.clientInputRequired,
@@ -305,6 +333,18 @@ export class ServicesComponent implements OnInit, OnDestroy {
             translations.noOfTicketCopies,
             details.noOfTicketCopies,
           ),
+          this.detailText(
+            'waitingDuration',
+            translations.waitingDuration,
+            details.waitingDuration
+              ? `${details.waitingDuration} ${isArabic ? 'دقيقة' : 'min'}`
+              : isArabic
+                ? '0 دقيقة'
+                : '0 min',
+          ),
+          this.detailText('priority', translations.priority, details.priority ?? 0),
+          this.detailText('weight', translations.weight, details.weight ?? 0),
+          this.detailText('orderNo', translations.orderNo, details.orderNo ?? 0),
         ],
       },
       ...(details.isClientInputRequired && details.customInputs && details.customInputs.length > 0
@@ -316,7 +356,7 @@ export class ServicesComponent implements OnInit, OnDestroy {
               items: details.customInputs.map((input, idx) =>
                 this.detailText(
                   `customInput_${idx}`,
-                  `${input.order}. ${this.i18nStore.language() === 'ar' ? input.labelAr || input.name : input.labelEn || input.name} (${input.type})`,
+                  `${input.order}. ${isArabic ? input.labelAr || input.name : input.labelEn || input.name} (${input.type})`,
                   input.isRequired ? translations.customInputRequired : translations.no,
                 ),
               ),
@@ -324,6 +364,8 @@ export class ServicesComponent implements OnInit, OnDestroy {
           ]
         : []),
     ];
+
+    return sections;
   });
 
   public readonly serviceForm = this.formBuilder.group(
@@ -701,6 +743,10 @@ export class ServicesComponent implements OnInit, OnDestroy {
     }
 
     this.activeEditorTab.set(tab);
+  }
+
+  public openDetailsTab(tab: 'data' | 'media'): void {
+    this.activeDetailsTab.set(tab);
   }
 
   @HostListener('document:keydown', ['$event'])
@@ -1709,7 +1755,12 @@ export class ServicesComponent implements OnInit, OnDestroy {
     const isParent = details.hasChildren;
     const isClientInputRequired = isParent ? false : details.isClientInputRequired;
 
-    if (!isParent && isClientInputRequired && details.customInputs && details.customInputs.length > 0) {
+    if (
+      !isParent &&
+      isClientInputRequired &&
+      details.customInputs &&
+      details.customInputs.length > 0
+    ) {
       const sortedInputs = [...details.customInputs].sort((a, b) => a.order - b.order);
       for (const input of sortedInputs) {
         this.customInputsArray.push(createCustomInputFormGroup(input));

@@ -74,7 +74,6 @@
         <div class="logo-container d-flex flex-grow-1 align-items-center">
           <img src="/images/nile.png" alt="" class="sidebar-logo d-block" />
         </div>
-
       }
       <button
         #sidebarToggleButton
@@ -312,11 +311,15 @@
           </button>
         </div>
         <div class="context-sidebar-identity">
-          <strong class="context-sidebar-title text-truncate">{{ contextNavigationTitle() }}</strong>
+          <strong class="context-sidebar-title text-truncate">{{
+            contextNavigationTitle()
+          }}</strong>
           @if (contextNavigationMeta() || contextNavigationStatusLabel()) {
             <div class="context-sidebar-meta d-flex align-items-center flex-wrap gap-1">
               @if (contextNavigationMeta()) {
-                <small class="context-sidebar-code text-truncate">{{ contextNavigationMeta() }}</small>
+                <small class="context-sidebar-code text-truncate">{{
+                  contextNavigationMeta()
+                }}</small>
               }
               @if (contextNavigationMeta() && contextNavigationStatusLabel()) {
                 <span class="context-sidebar-meta-separator" aria-hidden="true">&middot;</span>
@@ -349,7 +352,9 @@
             (click)="contextNavigationSelected()"
           >
             @if (item.icon) {
-              <span class="context-link-icon d-inline-flex flex-shrink-0 align-items-center justify-content-center">
+              <span
+                class="context-link-icon d-inline-flex flex-shrink-0 align-items-center justify-content-center"
+              >
                 <i class="bi {{ item.icon }}" aria-hidden="true"></i>
               </span>
             }
@@ -396,9 +401,7 @@
     [attr.lang]="language()"
   >
     @if (hasWorkspaceHeader()) {
-      <div
-        class="workspace-header d-flex align-items-center justify-content-between gap-3"
-      >
+      <div class="workspace-header d-flex align-items-center justify-content-between gap-3">
         @if (breadcrumbs().length > 0) {
           <div class="workspace-breadcrumb flex-grow-1 overflow-hidden">
             <app-breadcrumb
@@ -415,14 +418,16 @@
             class="workspace-user d-inline-flex flex-shrink-0 align-items-center gap-2"
             [attr.aria-label]="currentUserLabel()"
           >
-            <span
-              class="workspace-user-avatar d-inline-flex align-items-center justify-content-center"
-              aria-hidden="true"
-            >
-              <i class="bi bi-person-circle"></i>
-            </span>
+            <div class="workspace-user-avatar-wrap">
+              <span
+                class="workspace-user-avatar d-inline-flex align-items-center justify-content-center"
+                aria-hidden="true"
+              >
+                <i class="bi bi-person-fill"></i>
+              </span>
+              <span class="workspace-user-status-dot" aria-hidden="true"></span>
+            </div>
             <span class="workspace-user-copy d-grid">
-              <span class="text-truncate">{{ currentUserLabel() }}</span>
               <strong class="text-truncate">{{ trimmedCurrentUserDisplayName() }}</strong>
               @if (trimmedCurrentUserRoleLabel()) {
                 <small class="text-truncate">{{ trimmedCurrentUserRoleLabel() }}</small>

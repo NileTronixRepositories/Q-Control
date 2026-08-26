@@ -128,6 +128,23 @@
   background: #ffffff !important;
 }
 
+.workflow-service-switcher {
+  height: 38px;
+  background: #ffffff;
+  border-color: #dbeafe !important;
+  transition: all 0.2s ease;
+}
+
+.workflow-service-switcher:hover {
+  border-color: #93c5fd !important;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08) !important;
+}
+
+.workflow-service-switcher select {
+  max-width: 180px;
+  color: #0f172a;
+}
+
 .success-action:hover:not(:disabled) {
   background: #f0fdf4 !important;
   border-color: #16a34a !important;

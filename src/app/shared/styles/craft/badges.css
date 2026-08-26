@@ -1,0 +1,92 @@
+/**
+ * Q-SYSTEM Craft UI: Badges & Living Status Indicators
+ */
+
+.craft-badge,
+.status-pill,
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 22px;
+  padding: 2px 8px;
+  font-size: var(--q-text-xs);
+  font-weight: var(--q-font-weight-bold);
+  line-height: 1;
+  border-radius: var(--q-radius-full);
+  white-space: nowrap;
+  border: 1px solid transparent;
+}
+
+/* ── 1. Success / Online Badge ── */
+.craft-badge-success,
+.status-pill.status-active,
+.status-pill.status-online {
+  color: var(--q-color-success-700) !important;
+  background-color: var(--q-color-success-50) !important;
+  border-color: var(--q-color-success-100) !important;
+}
+
+/* ── 2. Warning / Maintenance Badge ── */
+.craft-badge-warning,
+.status-pill.status-maintenance,
+.status-pill.status-delayed {
+  color: var(--q-color-warning-700) !important;
+  background-color: var(--q-color-warning-50) !important;
+  border-color: var(--q-color-warning-100) !important;
+}
+
+/* ── 3. Danger / Offline Badge ── */
+.craft-badge-danger,
+.status-pill.status-inactive,
+.status-pill.status-offline {
+  color: var(--q-color-danger-700) !important;
+  background-color: var(--q-color-danger-50) !important;
+  border-color: var(--q-color-danger-100) !important;
+}
+
+/* ── 4. Neutral / Tag Badge ── */
+.craft-badge-neutral {
+  color: var(--q-text-secondary);
+  background-color: var(--q-color-slate-100);
+  border-color: var(--q-color-slate-200);
+}
+
+/* ── Living Pulse Indicator Dot ── */
+.living-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  position: relative;
+}
+
+.living-dot-success {
+  background-color: var(--q-color-success-500);
+  box-shadow: 0 0 0 2px var(--q-color-success-100);
+}
+
+.living-dot-warning {
+  background-color: var(--q-color-warning-500);
+  box-shadow: 0 0 0 2px var(--q-color-warning-100);
+}
+
+.living-dot-danger {
+  background-color: var(--q-color-danger-500);
+  box-shadow: 0 0 0 2px var(--q-color-danger-100);
+}
+
+.living-dot-pulse {
+  animation: craft-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes craft-pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(0.9);
+  }
+}

@@ -90,6 +90,7 @@ export interface ServiceManagementTranslations {
   readonly waitingDuration: string;
   readonly noOfTicketCopies: string;
   readonly uploadLogo: string;
+  readonly serviceData: string;
   readonly serviceMedia: string;
   readonly serviceLogo: string;
   readonly serviceIcon: string;
@@ -218,11 +219,14 @@ export const SERVICE_MANAGEMENT_TRANSLATIONS: Record<AppLanguage, ServiceManagem
     editorEmptyBody: 'استخدم الشجرة لإضافة خدمة رئيسية، أو اضغط + بجانب أي خدمة لإضافة خدمة فرعية.',
     createUnder: 'إنشاء تحت',
     searchPlaceholder: 'ابحث بالاسم العربي أو الإنجليزي',
-    treeSearchLabel: '\u0627\u0644\u0628\u062d\u062b \u0628\u0627\u0633\u0645 \u0627\u0644\u062e\u062f\u0645\u0629 \u0623\u0648 \u0643\u0648\u062f \u0627\u0644\u062e\u062f\u0645\u0629',
+    treeSearchLabel:
+      '\u0627\u0644\u0628\u062d\u062b \u0628\u0627\u0633\u0645 \u0627\u0644\u062e\u062f\u0645\u0629 \u0623\u0648 \u0643\u0648\u062f \u0627\u0644\u062e\u062f\u0645\u0629',
     treeSearchPlaceholder: '\u0627\u0628\u062d\u062b \u0639\u0646 \u062e\u062f\u0645\u0629...',
-    treeSearchHelp: '\u0627\u0628\u062d\u062b \u0628\u0627\u0633\u0645 \u0627\u0644\u062e\u062f\u0645\u0629 \u0623\u0648 \u0643\u0648\u062f \u0627\u0644\u062e\u062f\u0645\u0629.',
+    treeSearchHelp:
+      '\u0627\u0628\u062d\u062b \u0628\u0627\u0633\u0645 \u0627\u0644\u062e\u062f\u0645\u0629 \u0623\u0648 \u0643\u0648\u062f \u0627\u0644\u062e\u062f\u0645\u0629.',
     clearSearch: '\u0645\u0633\u062d \u0627\u0644\u0628\u062d\u062b',
-    noSearchResults: '\u0644\u0627 \u062a\u0648\u062c\u062f \u062e\u062f\u0645\u0627\u062a \u0645\u0637\u0627\u0628\u0642\u0629 \u0644\u0639\u0645\u0644\u064a\u0629 \u0627\u0644\u0628\u062d\u062b.',
+    noSearchResults:
+      '\u0644\u0627 \u062a\u0648\u062c\u062f \u062e\u062f\u0645\u0627\u062a \u0645\u0637\u0627\u0628\u0642\u0629 \u0644\u0639\u0645\u0644\u064a\u0629 \u0627\u0644\u0628\u062d\u062b.',
     activeFilter: 'الحالة',
     deletedFilter: 'المحذوفة',
     ticketFilter: 'إصدار التذاكر',
@@ -293,6 +297,7 @@ export const SERVICE_MANAGEMENT_TRANSLATIONS: Record<AppLanguage, ServiceManagem
     waitingDuration: 'مدة الانتظار',
     noOfTicketCopies: 'عدد نسخ التذكرة',
     uploadLogo: 'رفع شعار',
+    serviceData: 'بيانات الخدمة والتذاكر',
     serviceMedia: 'وسائط الخدمة',
     serviceLogo: 'شعار الخدمة',
     serviceIcon: 'أيقونة الخدمة',
@@ -334,16 +339,20 @@ export const SERVICE_MANAGEMENT_TRANSLATIONS: Record<AppLanguage, ServiceManagem
     fallbackError: 'حدث خطأ غير متوقع.',
     accessDenied: 'تم رفض الوصول.',
     noPermissionHint: 'ليست لديك صلاحية لهذا الإجراء.',
-    concurrencyError: 'تم تعديل الخدمة بواسطة مستخدم آخر. يرجى إعادة تحميل أحدث البيانات قبل الحفظ مرة أخرى.',
+    concurrencyError:
+      'تم تعديل الخدمة بواسطة مستخدم آخر. يرجى إعادة تحميل أحدث البيانات قبل الحفظ مرة أخرى.',
     reloadService: 'إعادة تحميل الخدمة',
     deleteConfirmTitle: 'حذف الخدمة',
     restoreConfirmTitle: 'استعادة الخدمة',
     permanentDeleteConfirmTitle: 'حذف الخدمة نهائيًا',
     deleteConfirmBody: 'هل أنت متأكد من حذف هذه الخدمة؟',
     restoreConfirmBody: 'هل أنت متأكد من استعادة هذه الخدمة؟',
-    permanentDeleteConfirmBody: 'سيؤدي ذلك إلى حذف الخدمة نهائيًا وأي سجلات مرتبطة يسمح الخادم بحذفها. لا يمكن التراجع عن هذا الإجراء.',
-    deleteChildrenWarning: 'هذه الخدمة تحتوي على خدمات فرعية. حذفها لن يحذف الخدمات الفرعية، لكنها لن تتمكن من إصدار التذاكر طالما أن الخدمة الرئيسية محذوفة.',
-    restoredButDisabled: 'تمت استعادة الخدمة بنجاح، لكنها لا تزال غير متاحة تشغيليًا لأن الخدمة الرئيسية غير نشطة أو محذوفة.',
+    permanentDeleteConfirmBody:
+      'سيؤدي ذلك إلى حذف الخدمة نهائيًا وأي سجلات مرتبطة يسمح الخادم بحذفها. لا يمكن التراجع عن هذا الإجراء.',
+    deleteChildrenWarning:
+      'هذه الخدمة تحتوي على خدمات فرعية. حذفها لن يحذف الخدمات الفرعية، لكنها لن تتمكن من إصدار التذاكر طالما أن الخدمة الرئيسية محذوفة.',
+    restoredButDisabled:
+      'تمت استعادة الخدمة بنجاح، لكنها لا تزال غير متاحة تشغيليًا لأن الخدمة الرئيسية غير نشطة أو محذوفة.',
     yes: 'نعم',
     no: 'لا',
     notAvailable: '-',
@@ -375,7 +384,8 @@ export const SERVICE_MANAGEMENT_TRANSLATIONS: Record<AppLanguage, ServiceManagem
     workflowStartModeAutoApply: 'تطبيق تلقائي',
     workflows: 'مسارات العمل',
     customInputs: 'البيانات المطلوبة من العميل',
-    customInputsHelp: 'تحديد الحقول والشروط التي يدخلها العميل عند اختيار هذه الخدمة في جهاز الخدمة الذاتية.',
+    customInputsHelp:
+      'تحديد الحقول والشروط التي يدخلها العميل عند اختيار هذه الخدمة في جهاز الخدمة الذاتية.',
     addCustomInput: 'إضافة حقل جديد',
     removeCustomInput: 'إزالة الحقل',
     customInputName: 'اسم الحقل الداخلي',
@@ -495,6 +505,7 @@ export const SERVICE_MANAGEMENT_TRANSLATIONS: Record<AppLanguage, ServiceManagem
     waitingDuration: 'Waiting Duration',
     noOfTicketCopies: 'Ticket Copies',
     uploadLogo: 'Upload Logo',
+    serviceData: 'Service Data & Tickets',
     serviceMedia: 'Service Media',
     serviceLogo: 'Service Logo',
     serviceIcon: 'Service Icon',
@@ -514,7 +525,8 @@ export const SERVICE_MANAGEMENT_TRANSLATIONS: Record<AppLanguage, ServiceManagem
     imagesRequired: 'At least one image is required.',
     uploadSuccessful: 'Image uploaded successfully.',
     deleteSuccessful: 'Image deleted successfully.',
-    imageConcurrencyConflict: 'The service or image was modified by another user. The latest data has been loaded.',
+    imageConcurrencyConflict:
+      'The service or image was modified by another user. The latest data has been loaded.',
     confirmImageDeletion: 'Are you sure you want to delete this service image?',
     selectedImages: 'selected images',
     removeSelectedImage: 'Remove selected image',
@@ -536,14 +548,16 @@ export const SERVICE_MANAGEMENT_TRANSLATIONS: Record<AppLanguage, ServiceManagem
     fallbackError: 'Unexpected error occurred.',
     accessDenied: 'Access denied.',
     noPermissionHint: 'You do not have permission for this action.',
-    concurrencyError: 'This service was modified by another user. Reload the latest service details before saving again.',
+    concurrencyError:
+      'This service was modified by another user. Reload the latest service details before saving again.',
     reloadService: 'Reload Service',
     deleteConfirmTitle: 'Delete Service',
     restoreConfirmTitle: 'Restore Service',
     permanentDeleteConfirmTitle: 'Permanently Delete Service',
     deleteConfirmBody: 'Are you sure you want to delete this service?',
     restoreConfirmBody: 'Are you sure you want to restore this service?',
-    permanentDeleteConfirmBody: 'This permanently removes the service and any related records the server allows. This action cannot be undone.',
+    permanentDeleteConfirmBody:
+      'This permanently removes the service and any related records the server allows. This action cannot be undone.',
     deleteChildrenWarning:
       'This service has child services. Deleting it will not delete the children, but they will not be able to issue tickets while this parent is deleted.',
     restoredButDisabled:
@@ -579,7 +593,8 @@ export const SERVICE_MANAGEMENT_TRANSLATIONS: Record<AppLanguage, ServiceManagem
     workflowStartModeAutoApply: 'Auto Apply',
     workflows: 'Workflows',
     customInputs: 'Customer Custom Inputs',
-    customInputsHelp: 'Configure fields and validation rules that the customer must provide when selecting this service at the kiosk.',
+    customInputsHelp:
+      'Configure fields and validation rules that the customer must provide when selecting this service at the kiosk.',
     addCustomInput: 'Add Input',
     removeCustomInput: 'Remove Input',
     customInputName: 'Internal Field Name',
@@ -596,7 +611,8 @@ export const SERVICE_MANAGEMENT_TRANSLATIONS: Record<AppLanguage, ServiceManagem
     customInputStartWith: 'Must Start With',
     customInputMinValue: 'Minimum Value',
     customInputMaxValue: 'Maximum Value',
-    customInputsRequiredError: 'At least one custom input is required when client input is enabled.',
+    customInputsRequiredError:
+      'At least one custom input is required when client input is enabled.',
     customInputDuplicateName: 'Internal field name must be unique within this service.',
     customInputDuplicateOrder: 'Order number must be unique within this service.',
     customInputMinLengthError: 'Minimum length must be 0 or greater.',

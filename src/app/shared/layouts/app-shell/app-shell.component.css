@@ -54,13 +54,12 @@
 
 .workspace-header {
   min-width: 0;
-  min-height: 64px;
-  padding: 10px var(--workspace-header-padding-x);
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(11, 138, 168, 0.12);
-  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
+  min-height: 52px;
+  padding: 6px var(--workspace-header-padding-x, 28px);
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.85);
 }
 
 .workspace-breadcrumb {
@@ -68,52 +67,78 @@
   min-width: 0;
 }
 
+/* ── Seamless Executive User Lockup (No Box, No Border) ── */
 .workspace-user {
   flex: 0 0 auto;
   min-width: 0;
-  min-height: 42px;
+  min-height: 40px;
   max-width: min(280px, 34vw);
-  padding: 4px 12px;
-  color: var(--nt-text, #1b2430);
-  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-  border: 1px solid rgba(11, 138, 168, 0.18);
-  border-radius: 50rem;
-  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 4px 10px;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.18s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .workspace-user:hover {
-  border-color: var(--q-primary, #0b8aa8);
-  box-shadow: 0 4px 14px rgba(11, 138, 168, 0.14);
-  transform: translateY(-1px);
+  background: rgba(241, 245, 249, 0.75);
+}
+
+.workspace-user-avatar-wrap {
+  position: relative;
+  flex: 0 0 32px;
 }
 
 .workspace-user-avatar {
-  flex: 0 0 32px;
   width: 32px;
   height: 32px;
   color: #ffffff;
-  background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);
+  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+  border-radius: 8px;
+  font-size: 15px;
+  box-shadow: 0 2px 5px rgba(2, 132, 199, 0.2);
+}
+
+.workspace-user-status-dot {
+  position: absolute;
+  bottom: -1px;
+  right: -1px;
+  width: 8px;
+  height: 8px;
+  background: #10b981;
+  border: 1.5px solid #ffffff;
   border-radius: 50%;
-  box-shadow: 0 2px 6px rgba(225, 29, 72, 0.28);
-  font-size: 16px;
+}
+
+.app-shell[dir='rtl'] .workspace-user-status-dot {
+  right: auto;
+  left: -1px;
 }
 
 .workspace-user-copy {
   min-width: 0;
-  line-height: 1.15;
-}
-
-.workspace-user-copy span,
-.workspace-user-copy small {
-  color: var(--nt-muted, #687386);
-  font-size: 0.65rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1px;
+  line-height: normal;
 }
 
 .workspace-user-copy strong {
-  color: var(--nt-text, #1b2430);
-  font-size: 0.8rem;
-  font-weight: 750;
+  color: #0f172a;
+  font-size: 12.5px;
+  font-weight: 800;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+}
+
+.workspace-user-copy small {
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.45;
+  padding-bottom: 2px;
 }
 
 .workspace-header + .workspace-content {

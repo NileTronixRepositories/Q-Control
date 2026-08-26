@@ -1,26 +1,40 @@
-/* Bootstrap CSS - Note: To optimize bundle size, consider switching to SCSS partial imports
-   This requires setting up SCSS build process. For now, using compiled CSS. */
+/* Bootstrap CSS */
 @import 'bootstrap/dist/css/bootstrap.min.css';
 
-/* CSS Layers for better specificity control */
+/* CSS Layers for specificity control */
 @layer theme, base, components, utilities;
 @import 'tailwindcss/theme.css' layer(theme);
 @import 'tailwindcss/utilities.css' layer(utilities);
 
-/* Design Tokens and Shared Styles */
-@import './app/shared/styles/design-tokens.css';
-@import './app/shared/styles/animations.css';
-@import './app/shared/styles/components-shared.css';
+/* ==========================================================================
+   1. DESIGN TOKENS (Single Source of Truth)
+   ========================================================================== */
+@import './app/shared/styles/tokens/index.css';
 
-/* Feature-specific Styles */
+/* ==========================================================================
+   2. BASE LAYER (Reset, Normalization, Global Typography)
+   ========================================================================== */
+@import './app/shared/styles/base/reset.css';
+@import './app/shared/styles/base/typography.css';
+
+/* ==========================================================================
+   3. CRAFT UI COMPONENT SYSTEM (Clean, Borderless, Tactile Components)
+   ========================================================================== */
+@import './app/shared/styles/craft/surfaces.css';
+@import './app/shared/styles/craft/buttons.css';
+@import './app/shared/styles/craft/forms.css';
+@import './app/shared/styles/craft/tables.css';
+@import './app/shared/styles/craft/badges.css';
+@import './app/shared/styles/craft/dialogs.css';
+
+/* ==========================================================================
+   4. UTILITIES & MOTION
+   ========================================================================== */
+@import './app/shared/styles/utilities/animations.css';
+@import './app/shared/styles/utilities/layout.css';
+
+/* ==========================================================================
+   5. FEATURE SPECIFIC & DIALOG SYSTEM
+   ========================================================================== */
 @import './app/features/auth/pages/login/login-brand-animation.css';
-
-/* Global Foundation and Utilities */
-@import './app/shared/styles/global/foundation.css';
-@import './app/shared/styles/global/responsive.css';
-@import './app/shared/styles/global/enterprise-normalization.css';
-@import './app/shared/styles/global/ui-refresh.css';
-@import './app/shared/styles/global/typography-rhythm.css';
-
-/* Dialog System */
 @import './app/shared/styles/dialog-system.css';

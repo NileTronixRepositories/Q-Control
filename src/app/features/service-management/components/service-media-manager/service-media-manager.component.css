@@ -65,12 +65,12 @@
 .service-media-card {
   display: grid;
   align-content: start;
-  gap: 10px;
+  gap: 8px;
   min-width: 0;
-  padding: 12px;
+  padding: 10px;
   background: #f8fbff;
   border: 1px solid #dbeafe;
-  border-radius: 8px;
+  border-radius: 10px;
 }
 
 .service-media-card--ads {
@@ -94,14 +94,14 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 34px;
-  height: 34px;
-  flex: 0 0 34px;
+  width: 28px;
+  height: 28px;
+  flex: 0 0 28px;
   color: #0369a1;
   background: #ecfeff;
   border: 1px solid #bae6fd;
-  border-radius: 8px;
-  font-size: 15px;
+  border-radius: 7px;
+  font-size: 13px;
 }
 
 .service-media-card h4 {
@@ -128,8 +128,9 @@
 }
 
 .service-media-preview {
-  aspect-ratio: 16 / 6;
-  min-height: 96px;
+  aspect-ratio: 16 / 5;
+  min-height: 64px;
+  max-height: 90px;
 }
 
 .service-media-preview img,
@@ -282,7 +283,7 @@
 }
 
 .service-media-ad.is-deleting {
-  opacity: .6;
+  opacity: 0.6;
 }
 
 .service-media-empty {
@@ -362,7 +363,7 @@
 
 :where(button, input):disabled {
   cursor: not-allowed;
-  opacity: .55;
+  opacity: 0.55;
 }
 
 :where(button, .service-media-btn):focus-visible {
