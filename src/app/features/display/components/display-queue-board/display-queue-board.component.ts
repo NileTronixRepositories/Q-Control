@@ -5,8 +5,8 @@ import {
   inject,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { DisplayStateService } from '../../services/display-state.service';
-import { DisplayQueueItem } from '../../models/display.model';
+import { DisplayStateService } from '../../services/display-state/display-state.service';
+import { DisplayQueueItem } from '../../models/display/display.model';
 
 @Component({
   selector: 'app-display-queue-board',

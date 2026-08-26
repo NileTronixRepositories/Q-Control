@@ -3,9 +3,9 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { of } from 'rxjs';
 
-import { AppDirection, AppLanguage } from '../../../../shared/models/app-language.model';
+import { AppDirection, AppLanguage } from '../../../../shared/models/app-language/app-language.model';
 import { AppLanguageStore } from '../../../../shared/store/app-language.store';
-import { AuthSessionService } from '../../services/auth-session.service';
+import { AuthSessionService } from '../../services/auth-session/auth-session.service';
 import { LoginComponent } from './login.component';
 
 describe('LoginComponent', () => {

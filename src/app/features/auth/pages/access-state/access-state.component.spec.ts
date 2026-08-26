@@ -2,10 +2,10 @@ import { computed, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 
-import { AppDirection, AppLanguage } from '../../../../shared/models/app-language.model';
+import { AppDirection, AppLanguage } from '../../../../shared/models/app-language/app-language.model';
 import { AppLanguageStore } from '../../../../shared/store/app-language.store';
-import { AuthNavigationService } from '../../services/auth-navigation.service';
-import { AuthSessionService } from '../../services/auth-session.service';
+import { AuthNavigationService } from '../../services/auth-navigation/auth-navigation.service';
+import { AuthSessionService } from '../../services/auth-session/auth-session.service';
 import { AccessStateComponent } from './access-state.component';
 
 describe('AccessStateComponent', () => {

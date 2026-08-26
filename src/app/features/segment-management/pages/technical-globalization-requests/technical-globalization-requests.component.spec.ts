@@ -2,12 +2,12 @@ import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
 import { vi } from 'vitest';
-import { AuthSessionService } from '../../../auth/services/auth-session.service';
-import { BranchManagementApiService } from '../../../technical-admin/services/branch-management-api.service';
-import { TechnicalAdminI18nStore } from '../../../technical-admin/store/technical-admin-i18n.store';
+import { AuthSessionService } from '../../../auth/services/auth-session/auth-session.service';
+import { BranchManagementApiService } from '@features/branch-management/public-api';
+import { AdminI18nStore } from '@layout/admin-shell/store/admin-i18n.store';
 import { TechnicalGlobalizationRequestsComponent } from './technical-globalization-requests.component';
-import { SegmentApiService } from '../../services/segment-api.service';
-import { SegmentPermissionService } from '../../services/segment-permission.service';
+import { SegmentApiService } from '../../services/segment-api/segment-api.service';
+import { SegmentPermissionService } from '../../services/segment-permission/segment-permission.service';
 
 describe('TechnicalGlobalizationRequestsComponent', () => {
   let component: TechnicalGlobalizationRequestsComponent;
@@ -36,7 +36,7 @@ describe('TechnicalGlobalizationRequestsComponent', () => {
           useValue: { currentSession: signal({ userType: 'TechnicalAdmin', token: 'token' }).asReadonly() },
         },
         {
-          provide: TechnicalAdminI18nStore,
+          provide: AdminI18nStore,
           useValue: { language: signal('en').asReadonly(), direction: signal('ltr').asReadonly() },
         },
         SegmentPermissionService,

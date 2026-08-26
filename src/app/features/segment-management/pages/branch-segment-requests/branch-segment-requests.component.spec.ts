@@ -2,10 +2,10 @@ import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
 import { vi } from 'vitest';
-import { AuthSessionService } from '../../../auth/services/auth-session.service';
-import { TechnicalAdminI18nStore } from '../../../technical-admin/store/technical-admin-i18n.store';
+import { AuthSessionService } from '../../../auth/services/auth-session/auth-session.service';
+import { AdminI18nStore } from '@layout/admin-shell/store/admin-i18n.store';
 import { BranchSegmentRequestsComponent } from './branch-segment-requests.component';
-import { SegmentApiService } from '../../services/segment-api.service';
+import { SegmentApiService } from '../../services/segment-api/segment-api.service';
 
 describe('BranchSegmentRequestsComponent', () => {
   let component: BranchSegmentRequestsComponent;
@@ -28,7 +28,7 @@ describe('BranchSegmentRequestsComponent', () => {
           useValue: { currentSession: signal({ userType: 'BranchAdmin', activeBranchId: 7, token: 'token' }).asReadonly() },
         },
         {
-          provide: TechnicalAdminI18nStore,
+          provide: AdminI18nStore,
           useValue: { language: signal('en').asReadonly(), direction: signal('ltr').asReadonly() },
         },
       ],

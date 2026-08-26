@@ -3,7 +3,7 @@ import {
   RejectServiceGlobalizationRequestResponse,
   ServiceGlobalizationRequestDetails,
   ServiceGlobalizationRequestListItem,
-} from '../models/service-globalization.model';
+} from '../models/service-globalization/service-globalization.model';
 import { ServiceGlobalizationStore } from './service-globalization.store';
 
 describe('ServiceGlobalizationStore decision responses', () => {

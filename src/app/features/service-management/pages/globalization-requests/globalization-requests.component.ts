@@ -5,13 +5,13 @@ import { Router } from '@angular/router';
 import { finalize, Observable } from 'rxjs';
 
 import { NiletronixLoadingStateComponent } from '../../../../shared/components/niletronix-loading-state/niletronix-loading-state.component';
-import { TechnicalAdminPageHeroComponent } from '../../../../shared/components/technical-admin-page-hero/technical-admin-page-hero.component';
+import { PageHeroComponent } from '../../../../shared/components/page-hero/page-hero.component';
 
-import { AuthSessionService } from '../../../auth/services/auth-session.service';
-import { BranchListItem } from '../../../technical-admin/models/branch-management.model';
-import { BranchManagementApiService } from '../../../technical-admin/services/branch-management-api.service';
-import { TechnicalAdminI18nStore } from '../../../technical-admin/store/technical-admin-i18n.store';
-import { formatTechnicalAdminApiError } from '../../../technical-admin/utils/api-error-message.util';
+import { AuthSessionService } from '../../../auth/services/auth-session/auth-session.service';
+import { BranchListItem } from '@features/branch-management/public-api';
+import { BranchManagementApiService } from '@features/branch-management/public-api';
+import { AdminI18nStore } from '@layout/admin-shell/store/admin-i18n.store';
+import { formatApiError } from '@shared/utils/api-error-message.util';
 import { SERVICE_GLOBALIZATION_TRANSLATIONS } from '../../i18n/service-globalization.translations';
 import {
   ApproveServiceGlobalizationRequestResponse,
@@ -21,10 +21,10 @@ import {
   ServiceGlobalizationRequestServiceNode,
   ServiceGlobalizationRequestStatus,
   ServiceGlobalizationRequestType,
-} from '../../models/service-globalization.model';
-import { ServiceDataInvalidationService } from '../../services/catalog/service-data-invalidation.service';
-import { ServiceGlobalizationApiService } from '../../services/globalization/service-globalization-api.service';
-import { ServiceManagementPermissionService } from '../../services/catalog/service-management-permission.service';
+} from '../../models/service-globalization/service-globalization.model';
+import { ServiceDataInvalidationService } from '../../services/catalog/service-data-invalidation/service-data-invalidation.service';
+import { ServiceGlobalizationApiService } from '../../services/globalization/service-globalization-api/service-globalization-api.service';
+import { ServiceManagementPermissionService } from '../../services/catalog/service-management-permission/service-management-permission.service';
 import { ServiceGlobalizationStore } from '../../store/service-globalization.store';
 
 interface FlatRequestServiceNode {
@@ -35,7 +35,7 @@ interface FlatRequestServiceNode {
 @Component({
   selector: 'app-globalization-requests',
   standalone: true,
-  imports: [TechnicalAdminPageHeroComponent, NiletronixLoadingStateComponent],
+  imports: [PageHeroComponent, NiletronixLoadingStateComponent],
   providers: [ServiceGlobalizationStore],
   templateUrl: './globalization-requests.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -43,7 +43,7 @@ interface FlatRequestServiceNode {
 export class GlobalizationRequestsComponent implements OnInit, OnDestroy {
   private readonly router = inject(Router);
   private readonly authSessionService = inject(AuthSessionService);
-  private readonly i18nStore = inject(TechnicalAdminI18nStore);
+  private readonly i18nStore = inject(AdminI18nStore);
   private readonly apiService = inject(ServiceGlobalizationApiService);
   private readonly branchApiService = inject(BranchManagementApiService);
   private readonly permissionService = inject(ServiceManagementPermissionService);
@@ -363,7 +363,7 @@ export class GlobalizationRequestsComponent implements OnInit, OnDestroy {
   private handleMutationError(error: HttpErrorResponse, requestId: number): void {
     if (error.status === 409) {
       this.store.decisionState.set(null);
-      this.showMessage('error', formatTechnicalAdminApiError(error, this.translations().conflictReloaded));
+      this.showMessage('error', formatApiError(error, this.translations().conflictReloaded));
       this.loadRequests(this.store.page().currentPage);
       if (this.store.detailsOpen()) this.loadDetails(requestId);
       return;
@@ -371,7 +371,7 @@ export class GlobalizationRequestsComponent implements OnInit, OnDestroy {
     if (error.status === 404) {
       this.store.decisionState.set(null);
       this.store.closeDetails();
-      this.showMessage('error', formatTechnicalAdminApiError(error, this.translations().fallbackError));
+      this.showMessage('error', formatApiError(error, this.translations().fallbackError));
       this.loadRequests(this.store.page().currentPage);
       return;
     }
@@ -390,7 +390,7 @@ export class GlobalizationRequestsComponent implements OnInit, OnDestroy {
       return;
     }
     const fallback = error.status === 403 ? this.translations().accessDenied : this.translations().fallbackError;
-    this.showMessage('error', formatTechnicalAdminApiError(error, fallback));
+    this.showMessage('error', formatApiError(error, fallback));
   }
 
   private flattenNodes(nodes: readonly ServiceGlobalizationRequestServiceNode[], depth = 0): readonly FlatRequestServiceNode[] {

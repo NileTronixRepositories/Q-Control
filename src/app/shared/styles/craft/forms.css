@@ -24,10 +24,7 @@ label {
 .craft-input,
 .craft-select,
 .form-control,
-.form-select,
-input:not([type='checkbox']):not([type='radio']):not([type='color']):not([type='range']),
-select,
-textarea {
+.form-select {
   display: block;
   width: 100%;
   min-height: var(--q-control-height-md);
@@ -41,6 +38,74 @@ textarea {
   border-radius: var(--q-radius-md);
   box-shadow: var(--q-shadow-subtle);
   transition: var(--q-transition-snappy);
+}
+
+/* Reset for nested inputs inside composite shells */
+.input-shell input,
+.color-picker-control input,
+.color-picker-control input[type='text'],
+.color-picker-control input[type='color'] {
+  border: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  border-radius: 0 !important;
+}
+
+/* ── Unified Input Groups (e.g. % addon) ── */
+.input-group {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  align-items: stretch !important;
+  width: 100% !important;
+}
+
+.input-group > .form-control {
+  position: relative !important;
+  flex: 1 1 auto !important;
+  width: 1% !important;
+  min-width: 0 !important;
+  border-radius: 0 !important;
+  border-start-start-radius: var(--q-radius-md, 8px) !important;
+  border-end-start-radius: var(--q-radius-md, 8px) !important;
+  border-start-end-radius: 0 !important;
+  border-end-end-radius: 0 !important;
+  z-index: 1;
+}
+
+.input-group > .input-group-text {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0.375rem 0.85rem !important;
+  font-size: var(--q-text-sm, 0.875rem) !important;
+  font-weight: var(--q-font-weight-bold, 700) !important;
+  color: var(--q-text-secondary, #64748b) !important;
+  background: #f8fafc !important;
+  border: 1px solid var(--q-border-default, #cbd5e1) !important;
+  border-inline-start: 0 !important;
+  border-radius: 0 !important;
+  border-start-end-radius: var(--q-radius-md, 8px) !important;
+  border-end-end-radius: var(--q-radius-md, 8px) !important;
+  border-start-start-radius: 0 !important;
+  border-end-start-radius: 0 !important;
+}
+
+[dir='rtl'] .input-group > .form-control,
+:host-context([dir='rtl']) .input-group > .form-control {
+  border-top-right-radius: var(--q-radius-md, 8px) !important;
+  border-bottom-right-radius: var(--q-radius-md, 8px) !important;
+  border-top-left-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
+}
+
+[dir='rtl'] .input-group > .input-group-text,
+:host-context([dir='rtl']) .input-group > .input-group-text {
+  border-right: 0 !important;
+  border-left: 1px solid var(--q-border-default, #cbd5e1) !important;
+  border-top-left-radius: var(--q-radius-md, 8px) !important;
+  border-bottom-left-radius: var(--q-radius-md, 8px) !important;
+  border-top-right-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
 }
 
 textarea.craft-input,

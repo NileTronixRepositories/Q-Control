@@ -1,5 +1,5 @@
-import { AppLanguage } from '../../../shared/models/app-language.model';
-import { DayOfWeek } from '../models/service-schedule.model';
+import { AppLanguage } from '../../../shared/models/app-language/app-language.model';
+import { DayOfWeek } from '../models/service-schedule/service-schedule.model';
 
 export interface ServiceScheduleTranslations {
   readonly title: string;

@@ -1,0 +1,521 @@
+<section
+  class="admin-responsive-page waiting-areas-page container-fluid"
+  [attr.dir]="direction()"
+  [attr.lang]="language()"
+>
+  <app-page-hero
+    [eyebrow]="translations().branch"
+    [title]="translations().title"
+    [description]="translations().description"
+    icon="bi bi-people-fill"
+  >
+    <button hero-actions type="button" class="primary-action" (click)="openCreate()">
+      <i class="bi bi-plus-lg" aria-hidden="true"></i>
+      <span class="text-white">{{ translations().addButton }}</span>
+    </button>
+    <div hero-filters class="w-100">
+      <div class="row g-3 align-items-end" data-testid="waiting-areas-filters">
+        <div class="col-12 col-xl-4">
+          <label class="filter-field w-100">
+            <span>{{ translations().searchPlaceholder }}</span>
+            <div class="search-input-wrapper">
+              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              </svg>
+              <input class="form-control" type="search" [value]="search()" [placeholder]="translations().searchPlaceholder" (input)="updateSearch($event)" />
+            </div>
+          </label>
+        </div>
+        <div class="col-12 col-md-6 col-xl-3">
+          <label class="filter-field">
+            <span>{{ translations().branchFilter }}</span>
+            <!-- <i class="bi bi-building filter-icon" aria-hidden="true"></i> -->
+            <select data-testid="waiting-areas-branch-filter" class="form-select" [value]="selectedBranchId() ?? ''" [disabled]="isBranchContextLocked()" (change)="updateBranchFilter($event)">
+              <option value="">{{ translations().allBranches }}</option>
+              @for (branch of branchOptions(); track branch.id) {
+                <option [value]="branch.id">{{ optionName(branch) }}</option>
+              }
+            </select>
+          </label>
+        </div>
+        <div class="col-12 col-md-6 col-xl-2">
+          <label class="filter-field">
+            <span>{{ translations().status }}</span>
+            <!-- <i class="bi bi-check2-circle filter-icon pe-2" aria-hidden="true"></i> -->
+            <select class="form-select" [value]="statusFilter() === null ? '' : statusFilter()" (change)="updateStatusFilter($event)">
+              <option value="">{{ translations().allStatuses }}</option>
+              <option value="true">{{ translations().active }}</option>
+              <option value="false">{{ translations().inactive }}</option>
+            </select>
+          </label>
+        </div>
+        <div class="col-12 col-sm-6 col-md-4 col-xl-1">
+          <label class="filter-field">
+            <span>{{ translations().pageSize }}</span>
+            <!-- <i class="bi bi-list-ul filter-icon" aria-hidden="true"></i> -->
+            <select class="form-select" [value]="pageSize()" (change)="updatePageSize($event)">
+              <option value="10">10</option>
+              <option value="25">25</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+            </select>
+          </label>
+        </div>
+        <div class="col-12 col-sm-6 col-md-4 col-xl-2 d-grid">
+          <button type="button" class="btn secondary-action w-100" [disabled]="loading()" (click)="refresh()">
+            <i class="bi bi-arrow-repeat" aria-hidden="true"></i>
+            <span>{{ translations().refresh }}</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </app-page-hero>
+
+  @if (message(); as currentMessage) {
+    <div class="toast-stack" role="status" aria-live="polite" aria-atomic="true">
+      <div
+        class="toast-item"
+        [class.toast-success]="currentMessage.tone === 'success'"
+        [class.toast-error]="currentMessage.tone === 'error'"
+        [class.toast-info]="currentMessage.tone === 'info'"
+      >
+        <i
+          class="bi"
+          [class.bi-check-circle-fill]="currentMessage.tone === 'success'"
+          [class.bi-x-octagon-fill]="currentMessage.tone === 'error'"
+          [class.bi-info-circle-fill]="currentMessage.tone === 'info'"
+          aria-hidden="true"
+        ></i>
+        <p class="mb-0">{{ currentMessage.text }}</p>
+        <button
+          type="button"
+          class="toast-close"
+          [attr.aria-label]="translations().close"
+          (click)="clearMessage()"
+        >
+          <i class="bi bi-x-lg" aria-hidden="true"></i>
+        </button>
+      </div>
+    </div>
+  }
+
+  <section class="content-grid">
+    <div class="list-panel d-grid gap-3 p-3">
+      @if (loading()) {
+        <app-niletronix-loading-state [title]="translations().loading" variant="inline" size="sm" />
+      }
+
+      @if (waitingAreaPage().data.length > 0) {
+        <div
+          data-testid="waiting-areas-desktop"
+          class="table-responsive table-wrap d-none d-md-block"
+        >
+          <table class="admin-data-table table table-sm table-hover align-middle custom-table mb-0">
+            <thead>
+              <tr>
+                <th scope="col">{{ translations().number }}</th>
+                <th scope="col">{{ translations().descriptiveName }}</th>
+                <th scope="col">{{ translations().branch }}</th>
+                <th scope="col">{{ translations().audioDevice }}</th>
+                <th scope="col">{{ translations().controlDevice }}</th>
+                <th scope="col">{{ translations().windowsCount }}</th>
+                <th scope="col">{{ translations().status }}</th>
+                <th scope="col" class="admin-actions-column text-center">
+                  {{ translations().actions }}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of waitingAreaPage().data; track item.id) {
+                <tr>
+                  <td class="admin-number-cell">
+                    <strong>{{ item.number }}</strong>
+                  </td>
+                  <td>{{ textOrFallback(item.descriptiveName) }}</td>
+                  <td>{{ branchName(item) }}</td>
+                  <td>{{ textOrFallback(item.audioDevice) }}</td>
+                  <td>{{ textOrFallback(item.controlDevice) }}</td>
+                  <td class="admin-number-cell">{{ item.windowsCount }}</td>
+                  <td class="admin-actions-column">
+                    <span
+                      class="status-pill"
+                      [class.status-active]="item.isActive"
+                      [class.status-inactive]="!item.isActive"
+                    >
+                      {{ statusLabel(item) }}
+                    </span>
+                    @if (showOperationalWarning(item)) {
+                      <small class="d-block text-warning fw-bold mt-2">{{
+                        translations().operationalUnavailable
+                      }}</small>
+                    }
+                  </td>
+                  <td>
+                    <div class="d-flex flex-wrap align-items-center justify-content-center gap-2">
+                      <button
+                        type="button"
+                        class="icon-action"
+                        [attr.aria-label]="translations().view"
+                        [title]="translations().view"
+                        (click)="openView(item.id)"
+                      >
+                        <i class="bi bi-eye" aria-hidden="true"></i>
+                      </button>
+                      <button
+                        type="button"
+                        class="icon-action"
+                        [attr.aria-label]="translations().edit"
+                        [title]="translations().edit"
+                        (click)="openEdit(item.id)"
+                      >
+                        <i class="bi bi-pencil" aria-hidden="true"></i>
+                      </button>
+                      @if (item.isActive) {
+                        <button
+                          type="button"
+                          class="icon-action warning-action"
+                          [attr.aria-label]="translations().deactivate"
+                          [title]="translations().deactivate"
+                          [disabled]="deletingId() === item.id"
+                          (click)="deactivateWaitingArea(item)"
+                        >
+                          <i class="bi bi-power" aria-hidden="true"></i>
+                        </button>
+                      } @else {
+                        <button
+                          type="button"
+                          class="icon-action success-action"
+                          [attr.aria-label]="translations().reactivate"
+                          [title]="translations().reactivate"
+                          [disabled]="deletingId() === item.id"
+                          (click)="reactivateWaitingArea(item)"
+                        >
+                          <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
+                        </button>
+                        <button
+                          type="button"
+                          class="icon-action danger-action"
+                          [attr.aria-label]="translations().permanentDelete"
+                          [title]="translations().permanentDelete"
+                          [disabled]="deletingId() === item.id"
+                          (click)="permanentlyDeleteWaitingArea(item)"
+                        >
+                          <i class="bi bi-trash3" aria-hidden="true"></i>
+                        </button>
+                      }
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <div data-testid="waiting-areas-mobile" class="d-grid gap-2 d-md-none">
+          @for (item of waitingAreaPage().data; track item.id) {
+            <app-mobile-record-card
+              [eyebrow]="translations().number"
+              [title]="textOrFallback(item.descriptiveName)"
+              icon="bi bi-hourglass-split"
+              [recordId]="item.number"
+            >
+              <span
+                record-badges
+                class="status-pill"
+                [class.status-active]="item.isActive"
+                [class.status-inactive]="!item.isActive"
+              >
+                {{ statusLabel(item) }}
+              </span>
+              <div record-fields>
+                <dt class="small fw-bold text-muted text-uppercase">{{ translations().branch }}</dt>
+                <dd class="mb-0 mt-1 text-break fw-bold">{{ branchName(item) }}</dd>
+              </div>
+              <div record-fields>
+                <dt class="small fw-bold text-muted text-uppercase">
+                  {{ translations().windowsCount }}
+                </dt>
+                <dd class="mb-0 mt-1 fw-bold">{{ item.windowsCount }}</dd>
+              </div>
+              <div record-fields>
+                <dt class="small fw-bold text-muted text-uppercase">
+                  {{ translations().audioDevice }}
+                </dt>
+                <dd class="mb-0 mt-1 text-break fw-bold">{{ textOrFallback(item.audioDevice) }}</dd>
+              </div>
+              <div record-fields>
+                <dt class="small fw-bold text-muted text-uppercase">
+                  {{ translations().controlDevice }}
+                </dt>
+                <dd class="mb-0 mt-1 text-break fw-bold">
+                  {{ textOrFallback(item.controlDevice) }}
+                </dd>
+              </div>
+              <button
+                record-actions
+                type="button"
+                class="icon-action"
+                [attr.aria-label]="translations().view"
+                [title]="translations().view"
+                (click)="openView(item.id)"
+              >
+                <i class="bi bi-eye" aria-hidden="true"></i>
+              </button>
+              <button
+                record-actions
+                type="button"
+                class="icon-action"
+                [attr.aria-label]="translations().edit"
+                [title]="translations().edit"
+                (click)="openEdit(item.id)"
+              >
+                <i class="bi bi-pencil" aria-hidden="true"></i>
+              </button>
+              @if (item.isActive) {
+                <button
+                  record-actions
+                  type="button"
+                  class="icon-action warning-action"
+                  [attr.aria-label]="translations().deactivate"
+                  [title]="translations().deactivate"
+                  [disabled]="deletingId() === item.id"
+                  (click)="deactivateWaitingArea(item)"
+                >
+                  <i class="bi bi-power" aria-hidden="true"></i>
+                </button>
+              } @else {
+                <ng-container record-actions>
+                  <button
+                    type="button"
+                    class="icon-action success-action"
+                    [attr.aria-label]="translations().reactivate"
+                    [title]="translations().reactivate"
+                    [disabled]="deletingId() === item.id"
+                    (click)="reactivateWaitingArea(item)"
+                  >
+                    <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
+                  </button>
+                  <button
+                    type="button"
+                    class="icon-action danger-action"
+                    [attr.aria-label]="translations().permanentDelete"
+                    [title]="translations().permanentDelete"
+                    [disabled]="deletingId() === item.id"
+                    (click)="permanentlyDeleteWaitingArea(item)"
+                  >
+                    <i class="bi bi-trash3" aria-hidden="true"></i>
+                  </button>
+                </ng-container>
+              }
+            </app-mobile-record-card>
+          }
+        </div>
+      } @else if (!loading()) {
+        <div class="admin-list-empty d-flex align-items-center gap-3 p-3" role="status">
+          <span
+            class="admin-list-empty-icon d-inline-flex align-items-center justify-content-center flex-shrink-0"
+            aria-hidden="true"
+          >
+            <i class="bi bi-hourglass-split"></i>
+          </span>
+          <div class="d-grid gap-1">
+            <h2>{{ translations().emptyTitle }}</h2>
+            <p>{{ translations().emptyDescription }}</p>
+          </div>
+        </div>
+      }
+
+      <footer
+        class="pagination-bar d-flex flex-column flex-md-row align-items-center justify-content-between gap-2 pt-3"
+      >
+        <span class="admin-pagination-total"
+          >{{ translations().totalItems }}: {{ waitingAreaPage().totalItems }}</span
+        >
+        <div
+          class="pagination-actions d-flex flex-wrap align-items-center justify-content-center gap-2"
+        >
+          <button
+            type="button"
+            class="btn secondary-action compact-action"
+            [disabled]="!waitingAreaPage().hasPreviousPage || loading()"
+            (click)="previousPage()"
+          >
+            <i class="bi bi-chevron-left" aria-hidden="true"></i>
+            <span>{{ translations().previous }}</span>
+          </button>
+          <span class="page-indicator"
+            >{{ waitingAreaPage().currentPage }} / {{ waitingAreaPage().totalPages || 1 }}</span
+          >
+          <button
+            type="button"
+            class="btn secondary-action compact-action"
+            [disabled]="!waitingAreaPage().hasNextPage || loading()"
+            (click)="nextPage()"
+          >
+            <span>{{ translations().next }}</span>
+            <i class="bi bi-chevron-right" aria-hidden="true"></i>
+          </button>
+        </div>
+      </footer>
+    </div>
+
+    @if (panelMode() !== 'closed') {
+      <div class="editor-backdrop app-popup-overlay" (click)="closePanel()"></div>
+      <aside
+        class="editor-panel app-popup-panel waiting-area-editor-panel"
+        role="dialog"
+        [attr.aria-label]="formTitle()"
+      >
+        <header class="panel-header">
+          <h2>{{ formTitle() }}</h2>
+          <button
+            type="button"
+            class="icon-action"
+            [attr.aria-label]="translations().close"
+            (click)="closePanel()"
+          >
+            <i class="bi bi-x-lg" aria-hidden="true"></i>
+          </button>
+        </header>
+
+        @if (panelLoading()) {
+          <app-niletronix-loading-state
+            [title]="translations().loading"
+            variant="inline"
+            size="sm"
+          />
+        }
+
+        @if (panelMode() === 'view' && selectedDetails(); as details) {
+          <dl class="details-list">
+            <div>
+              <dt>{{ translations().number }}</dt>
+              <dd>{{ details.number }}</dd>
+            </div>
+            <div>
+              <dt>{{ translations().descriptiveName }}</dt>
+              <dd>{{ textOrFallback(details.descriptiveName) }}</dd>
+            </div>
+            <div>
+              <dt>{{ translations().branch }}</dt>
+              <dd>{{ branchName(details) }}</dd>
+            </div>
+            <div>
+              <dt>{{ translations().audioDevice }}</dt>
+              <dd>{{ textOrFallback(details.audioDevice) }}</dd>
+            </div>
+            <div>
+              <dt>{{ translations().controlDevice }}</dt>
+              <dd>{{ textOrFallback(details.controlDevice) }}</dd>
+            </div>
+          </dl>
+        }
+
+        @if (panelMode() === 'create' || panelMode() === 'edit') {
+          <form
+            class="waiting-area-form row g-3"
+            [formGroup]="waitingAreaForm"
+            (ngSubmit)="save()"
+            novalidate
+          >
+            <div class="col-12">
+              <label class="form-field has-field-icon w-100">
+                <span>{{ translations().branch }}</span>
+                <i class="bi bi-diagram-3 form-field-icon" aria-hidden="true"></i>
+                <select
+                  class="form-select"
+                  formControlName="branchId"
+                  [class.is-invalid]="hasFieldError('branchId')"
+                  [disabled]="panelMode() === 'edit' || isBranchContextLocked()"
+                >
+                  <option [ngValue]="0">{{ translations().selectBranch }}</option>
+                  @for (branch of branchOptions(); track branch.id) {
+                    <option [ngValue]="branch.id">{{ optionName(branch) }}</option>
+                  }
+                </select>
+                @if (hasFieldError('branchId')) {
+                  <small>{{ translations().requiredField }}</small>
+                }
+              </label>
+            </div>
+            <div class="col-12 col-md-6">
+              <label class="form-field has-field-icon w-100">
+                <span>{{ translations().number }}</span>
+                <i class="bi bi-hash form-field-icon" aria-hidden="true"></i>
+                <input
+                  class="form-control"
+                  type="number"
+                  formControlName="number"
+                  [class.is-invalid]="hasFieldError('number') || !isFormNumberValid()"
+                />
+                @if (hasFieldError('number') || !isFormNumberValid()) {
+                  <small>{{ translations().positiveNumber }}</small>
+                }
+              </label>
+            </div>
+            <div class="col-12 col-md-6">
+              <label class="form-field has-field-icon w-100">
+                <span>{{ translations().descriptiveName }}</span>
+                <i class="bi bi-card-text form-field-icon" aria-hidden="true"></i>
+                <input
+                  class="form-control"
+                  type="text"
+                  maxlength="100"
+                  formControlName="descriptiveName"
+                  [class.is-invalid]="hasFieldError('descriptiveName')"
+                />
+                @if (hasFieldError('descriptiveName')) {
+                  <small>{{ translations().maxLength }}</small>
+                }
+              </label>
+            </div>
+            <div class="col-12 col-md-6">
+              <label class="form-field has-field-icon w-100">
+                <span>{{ translations().audioDevice }}</span>
+                <i class="bi bi-volume-up form-field-icon" aria-hidden="true"></i>
+                <input
+                  class="form-control"
+                  type="text"
+                  maxlength="100"
+                  formControlName="audioDevice"
+                  [class.is-invalid]="hasFieldError('audioDevice')"
+                />
+                @if (hasFieldError('audioDevice')) {
+                  <small>{{ translations().maxLength }}</small>
+                }
+              </label>
+            </div>
+            <div class="col-12 col-md-6">
+              <label class="form-field has-field-icon w-100">
+                <span>{{ translations().controlDevice }}</span>
+                <i class="bi bi-cpu form-field-icon" aria-hidden="true"></i>
+                <input
+                  class="form-control"
+                  type="text"
+                  maxlength="100"
+                  formControlName="controlDevice"
+                  [class.is-invalid]="hasFieldError('controlDevice')"
+                />
+                @if (hasFieldError('controlDevice')) {
+                  <small>{{ translations().maxLength }}</small>
+                }
+              </label>
+            </div>
+            <div
+              class="panel-actions col-12 d-flex flex-column flex-sm-row justify-content-end gap-2"
+            >
+              <button type="button" class="btn secondary-action" (click)="closePanel()">
+                <i class="bi bi-x-lg" aria-hidden="true"></i>
+                <span>{{ translations().cancel }}</span>
+              </button>
+              <button type="submit" class="btn primary-action" [disabled]="saving()">
+                <i class="bi bi-check2" aria-hidden="true"></i>
+                <span>{{ translations().save }}</span>
+              </button>
+            </div>
+          </form>
+        }
+      </aside>
+    }
+  </section>
+</section>

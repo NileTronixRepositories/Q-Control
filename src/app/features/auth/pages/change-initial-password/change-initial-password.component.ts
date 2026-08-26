@@ -4,9 +4,9 @@ import { Router } from '@angular/router';
 import { take } from 'rxjs';
 
 import { LanguageHeaderComponent } from '../../../../shared/components/language-header/language-header.component';
-import { AppLanguage } from '../../../../shared/models/app-language.model';
-import { AuthNavigationService } from '../../services/auth-navigation.service';
-import { AuthSessionService } from '../../services/auth-session.service';
+import { AppLanguage } from '../../../../shared/models/app-language/app-language.model';
+import { AuthNavigationService } from '../../services/auth-navigation/auth-navigation.service';
+import { AuthSessionService } from '../../services/auth-session/auth-session.service';
 import { LoginI18nStore } from '../../store/login-i18n.store';
 
 type ChangePasswordStatus = 'idle' | 'submitting' | 'success' | 'error';

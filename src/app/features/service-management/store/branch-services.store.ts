@@ -5,9 +5,9 @@ import {
   BranchServicesUiMessage,
   BranchServiceLifecycleConfirmState,
   BranchServiceUnassignConfirmState,
-} from '../models/branch-services.model';
-import { ServiceTreeNode } from '../models/service-management.model';
-import { ServiceScope } from '../models/service-management.model';
+} from '../models/branch-services/branch-services.model';
+import { ServiceTreeNode } from '../models/service-management/service-management.model';
+import { ServiceScope } from '../models/service-management/service-management.model';
 
 type CreateBranchTreeMode = 'root' | 'subtree';
 interface CreateBranchSubtreeParent {

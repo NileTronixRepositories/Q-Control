@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { SERVICE_MANAGEMENT_TRANSLATIONS } from '../../i18n/service-management.translations';
-import { ServiceTreeNode } from '../../models/service-management.model';
+import { ServiceTreeNode } from '../../models/service-management/service-management.model';
 import { ServiceHierarchyTreeComponent } from './service-hierarchy-tree.component';
 
 describe('ServiceHierarchyTreeComponent', () => {
@@ -381,7 +381,7 @@ function createNode(
     isOwnedByCurrentBranch: false,
     isAssignedToCurrentBranch: true,
     canEditDefinition: false,
-    arabicName: `Ø®Ø¯Ù…Ø© ${id}`,
+    arabicName: `خد�&ة ${id}`,
     englishName: `Service ${id}`,
     serviceCode: null,
     isServiceCodeRequired: false,

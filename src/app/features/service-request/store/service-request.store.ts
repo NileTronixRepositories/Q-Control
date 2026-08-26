@@ -2,21 +2,21 @@ import { computed, DestroyRef, inject, Injectable, signal } from '@angular/core'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize, interval, Observable, tap } from 'rxjs';
 
-import { AppLanguage } from '../../../shared/models/app-language.model';
+import { AppLanguage } from '../../../shared/models/app-language/app-language.model';
 import { AppLanguageStore } from '../../../shared/store/app-language.store';
-import { AuthSessionService } from '../../auth/services/auth-session.service';
+import { AuthSessionService } from '../../auth/services/auth-session/auth-session.service';
 import { ServiceRequestStep } from '../enums/service-request-step.enum';
 import {
   LocalizedText,
   SERVICE_REQUEST_LANGUAGES,
   SERVICE_REQUEST_TRANSLATIONS,
-} from '../models/language.model';
-import { TicketIssuanceBranding, TicketIssuanceTheme } from '../models/service-request-api.model';
-import { ServiceType } from '../models/service-type.model';
-import { Specialty } from '../models/specialty.model';
-import { QueueTicket, ServiceRequestSelection } from '../models/ticket.model';
-import { ServiceRequestService } from '../services/service-request.service';
-import { TicketGeneratorService } from '../services/ticket-generator.service';
+} from '../models/language/language.model';
+import { TicketIssuanceBranding, TicketIssuanceTheme } from '../models/service-request-api/service-request-api.model';
+import { ServiceType } from '../models/service-type/service-type.model';
+import { Specialty } from '../models/specialty/specialty.model';
+import { QueueTicket, ServiceRequestSelection } from '../models/ticket/ticket.model';
+import { ServiceRequestService } from '../services/service-request/service-request.service';
+import { TicketGeneratorService } from '../services/ticket-generator/ticket-generator.service';
 import { StepIndicatorItem } from '../shared/selection-card-view.model';
 
 const REFRESH_INTERVAL_MS = 10 * 60 * 1000;

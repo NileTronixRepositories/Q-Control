@@ -19,16 +19,16 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { finalize } from 'rxjs';
 
 import { NiletronixLoadingStateComponent } from '../../../../shared/components/niletronix-loading-state/niletronix-loading-state.component';
-import { TechnicalAdminPageHeroComponent } from '../../../../shared/components/technical-admin-page-hero/technical-admin-page-hero.component';
-import { AuthSessionService } from '../../../auth/services/auth-session.service';
-import { BranchListItem } from '../../../technical-admin/models/branch-management.model';
-import { BranchManagementApiService } from '../../../technical-admin/services/branch-management-api.service';
-import { TechnicalAdminI18nStore } from '../../../technical-admin/store/technical-admin-i18n.store';
-import { formatTechnicalAdminApiError } from '../../../technical-admin/utils/api-error-message.util';
+import { PageHeroComponent } from '../../../../shared/components/page-hero/page-hero.component';
+import { AuthSessionService } from '../../../auth/services/auth-session/auth-session.service';
+import { BranchListItem } from '@features/branch-management/public-api';
+import { BranchManagementApiService } from '@features/branch-management/public-api';
+import { AdminI18nStore } from '@layout/admin-shell/store/admin-i18n.store';
+import { formatApiError } from '@shared/utils/api-error-message.util';
 import { ServiceHierarchyTreeComponent } from '../../components/service-hierarchy-tree/service-hierarchy-tree.component';
 import { SERVICE_MANAGEMENT_TRANSLATIONS } from '../../i18n/service-management.translations';
 import { SERVICE_WORKFLOW_TRANSLATIONS } from '../../i18n/service-workflow.translations';
-import { ServiceTreeNode } from '../../models/service-management.model';
+import { ServiceTreeNode } from '../../models/service-management/service-management.model';
 import {
   ServiceWorkflowDetails,
   ServiceWorkflowListItem,
@@ -37,10 +37,10 @@ import {
   WorkflowBuilderStep,
   WorkflowCandidateService,
   WorkflowConfirmAction,
-} from '../../models/service-workflow.model';
-import { BranchServicesApiService } from '../../services/branch/branch-services-api.service';
-import { ServiceManagementPermissionService } from '../../services/catalog/service-management-permission.service';
-import { ServiceWorkflowApiService } from '../../services/workflow/service-workflow-api.service';
+} from '../../models/service-workflow/service-workflow.model';
+import { BranchServicesApiService } from '../../services/branch/branch-services-api/branch-services-api.service';
+import { ServiceManagementPermissionService } from '../../services/catalog/service-management-permission/service-management-permission.service';
+import { ServiceWorkflowApiService } from '../../services/workflow/service-workflow-api/service-workflow-api.service';
 import { ServiceWorkflowStore } from '../../store/service-workflow.store';
 
 type BooleanSelectValue = 'all' | 'true' | 'false';
@@ -61,7 +61,7 @@ interface WorkflowParentOption {
 @Component({
   selector: 'app-service-workflows',
   standalone: true,
-  imports: [ReactiveFormsModule, TechnicalAdminPageHeroComponent, ServiceHierarchyTreeComponent, NiletronixLoadingStateComponent],
+  imports: [ReactiveFormsModule, PageHeroComponent, ServiceHierarchyTreeComponent, NiletronixLoadingStateComponent],
   providers: [ServiceWorkflowStore],
   templateUrl: './service-workflows.component.html',
   styleUrl: './service-workflows.component.css',
@@ -72,7 +72,7 @@ export class ServiceWorkflowsComponent implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly authSessionService = inject(AuthSessionService);
-  private readonly i18nStore = inject(TechnicalAdminI18nStore);
+  private readonly i18nStore = inject(AdminI18nStore);
   private readonly branchApiService = inject(BranchManagementApiService);
   private readonly branchServicesApiService = inject(BranchServicesApiService);
   private readonly apiService = inject(ServiceWorkflowApiService);
@@ -1079,7 +1079,7 @@ export class ServiceWorkflowsComponent implements OnInit, OnDestroy {
       this.showMessage('error', this.translations().accessDenied);
       return;
     }
-    this.showMessage('error', formatTechnicalAdminApiError(error, this.translations().fallbackError));
+    this.showMessage('error', formatApiError(error, this.translations().fallbackError));
   }
 
   private isConcurrencyError(error: HttpErrorResponse): boolean {

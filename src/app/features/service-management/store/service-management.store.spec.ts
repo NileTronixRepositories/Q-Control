@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { ServiceTreeNode } from '../models/service-management.model';
+import { ServiceTreeNode } from '../models/service-management/service-management.model';
 import { ServiceManagementStore } from './service-management.store';
 
 describe('ServiceManagementStore available branch assignment tree', () => {
@@ -104,7 +104,7 @@ function createNode(id: number, overrides: Partial<ServiceTreeNode> = {}): Servi
     isOwnedByCurrentBranch: false,
     isAssignedToCurrentBranch: null,
     canEditDefinition: false,
-    arabicName: `Ø®Ø¯Ù…Ø© ${id}`,
+    arabicName: `خد�&ة ${id}`,
     englishName: `Service ${id}`,
     serviceCode: null,
     isServiceCodeRequired: false,

@@ -13,14 +13,14 @@ import {
 import { Router } from '@angular/router';
 import { finalize } from 'rxjs';
 
-import { AuthSessionService } from '../../../auth/services/auth-session.service';
-import { TechnicalAdminI18nStore } from '../../../technical-admin/store/technical-admin-i18n.store';
-import { formatTechnicalAdminApiError } from '../../../technical-admin/utils/api-error-message.util';
+import { AuthSessionService } from '../../../auth/services/auth-session/auth-session.service';
+import { AdminI18nStore } from '@layout/admin-shell/store/admin-i18n.store';
+import { formatApiError } from '@shared/utils/api-error-message.util';
 import { SERVICE_WORKFLOW_TRANSLATIONS } from '../../i18n/service-workflow.translations';
-import { ServiceSelectionOption } from '../../models/service-management.model';
-import { WorkflowCandidateService } from '../../models/service-workflow.model';
-import { ServiceManagementApiService } from '../../services/catalog/service-management-api.service';
-import { ServiceManagementPermissionService } from '../../services/catalog/service-management-permission.service';
+import { ServiceSelectionOption } from '../../models/service-management/service-management.model';
+import { WorkflowCandidateService } from '../../models/service-workflow/service-workflow.model';
+import { ServiceManagementApiService } from '../../services/catalog/service-management-api/service-management-api.service';
+import { ServiceManagementPermissionService } from '../../services/catalog/service-management-permission/service-management-permission.service';
 
 export interface WorkflowSelectionLevel {
   readonly parentServiceId: number | null;
@@ -40,7 +40,7 @@ export interface WorkflowSelectionLevel {
 export class ServiceCascadeSelectorComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly authSessionService = inject(AuthSessionService);
-  private readonly i18nStore = inject(TechnicalAdminI18nStore);
+  private readonly i18nStore = inject(AdminI18nStore);
   private readonly serviceManagementApiService = inject(ServiceManagementApiService);
   private readonly permissionService = inject(ServiceManagementPermissionService);
 
@@ -250,7 +250,7 @@ export class ServiceCascadeSelectorComponent implements OnInit {
       return this.translations().selectedServiceNotFound;
     }
 
-    return formatTechnicalAdminApiError(error, this.translations().fallbackError);
+    return formatApiError(error, this.translations().fallbackError);
   }
 
   private commitSelectionOptionAsStep(

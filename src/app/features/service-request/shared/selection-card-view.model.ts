@@ -1,4 +1,4 @@
-import { ServiceRequestCardTone } from '../models/service-type.model';
+import { ServiceRequestCardTone } from '../models/service-type/service-type.model';
 
 export interface SelectionCardViewModel {
   readonly id: string;

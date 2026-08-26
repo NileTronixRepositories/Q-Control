@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 
-import { adminPermissionGuard } from '../technical-admin/guards/admin-permission.guard';
+import { adminPermissionGuard } from '@core/authorization/guards/admin-permission.guard';
 import { serviceSchedulePendingChangesGuard } from './guards/service-schedule-pending-changes.guard';
 
 export const SERVICE_MANAGEMENT_ROUTES: Routes = [

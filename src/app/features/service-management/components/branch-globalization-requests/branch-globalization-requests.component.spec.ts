@@ -4,15 +4,15 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Subject, throwError } from 'rxjs';
 
-import { AuthSessionService } from '../../../auth/services/auth-session.service';
-import { TechnicalAdminI18nStore } from '../../../technical-admin/store/technical-admin-i18n.store';
+import { AuthSessionService } from '../../../auth/services/auth-session/auth-session.service';
+import { AdminI18nStore } from '@layout/admin-shell/store/admin-i18n.store';
 import {
   PagedServiceGlobalizationRequestsResponse,
   ServiceGlobalizationRequestListItem,
-} from '../../models/service-globalization.model';
-import { ServiceDataInvalidationService } from '../../services/catalog/service-data-invalidation.service';
-import { ServiceGlobalizationApiService } from '../../services/globalization/service-globalization-api.service';
-import { ServiceManagementPermissionService } from '../../services/catalog/service-management-permission.service';
+} from '../../models/service-globalization/service-globalization.model';
+import { ServiceDataInvalidationService } from '../../services/catalog/service-data-invalidation/service-data-invalidation.service';
+import { ServiceGlobalizationApiService } from '../../services/globalization/service-globalization-api/service-globalization-api.service';
+import { ServiceManagementPermissionService } from '../../services/catalog/service-management-permission/service-management-permission.service';
 import { BranchGlobalizationRequestsComponent } from './branch-globalization-requests.component';
 
 describe('BranchGlobalizationRequestsComponent request triggers', () => {
@@ -80,7 +80,7 @@ describe('BranchGlobalizationRequestsComponent request triggers', () => {
           },
         },
         {
-          provide: TechnicalAdminI18nStore,
+          provide: AdminI18nStore,
           useValue: {
             language: signal<'ar' | 'en'>('en').asReadonly(),
             direction: signal<'rtl' | 'ltr'>('ltr').asReadonly(),

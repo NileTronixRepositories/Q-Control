@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 
-import { AppLanguage } from '../../../../shared/models/app-language.model';
-import { ServiceRequestTranslations } from '../../models/language.model';
-import { QueueTicket } from '../../models/ticket.model';
+import { AppLanguage } from '../../../../shared/models/app-language/app-language.model';
+import { ServiceRequestTranslations } from '../../models/language/language.model';
+import { QueueTicket } from '../../models/ticket/ticket.model';
 
 @Component({
   selector: 'app-service-request-ticket-preview',

@@ -8,7 +8,7 @@ import {
   signal,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { DisplayStateService } from '../../services/display-state.service';
+import { DisplayStateService } from '../../services/display-state/display-state.service';
 
 @Component({
   selector: 'app-display-ticker-bar',

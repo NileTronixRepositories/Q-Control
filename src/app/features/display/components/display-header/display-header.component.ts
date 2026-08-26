@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { DisplayStateService } from '../../services/display-state.service';
+import { DisplayStateService } from '../../services/display-state/display-state.service';
 
 @Component({
   selector: 'app-display-header',

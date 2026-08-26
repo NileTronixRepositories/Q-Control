@@ -1,9 +1,9 @@
 import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
 
 import { NiletronixLoadingStateComponent } from '../../../../shared/components/niletronix-loading-state/niletronix-loading-state.component';
-import { AppDirection, AppLanguage } from '../../../../shared/models/app-language.model';
+import { AppDirection, AppLanguage } from '../../../../shared/models/app-language/app-language.model';
 import { ServiceManagementTranslations } from '../../i18n/service-management.translations';
-import { ServiceTreeNode } from '../../models/service-management.model';
+import { ServiceTreeNode } from '../../models/service-management/service-management.model';
 
 interface ServiceHierarchyTreeEntry {
   readonly node: ServiceTreeNode;

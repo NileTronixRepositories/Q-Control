@@ -10,10 +10,12 @@
 }
 
 .app-header-navbar {
-  min-height: 3.75rem;
-  background: rgba(255, 255, 255, 0.96);
-  border-bottom: 1px solid var(--border-subtle);
-  box-shadow: 0 8px 24px rgba(16, 24, 32, 0.06);
+  min-height: 3.5rem;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--craft-border-subtle, #f1f5f9);
+  box-shadow: var(--craft-shadow-xs, 0 1px 2px rgb(15 23 42 / 0.04));
   pointer-events: auto;
 }
 
@@ -29,94 +31,40 @@
   justify-content: flex-start;
 }
 
-.navbar-brand {
-  min-width: 0;
-  max-width: calc(100% - 15rem);
-}
-
-.brand-mark {
-  display: inline-flex;
-  width: 2.3rem;
-  height: 2.3rem;
-  flex: 0 0 auto;
-  align-items: center;
-  justify-content: center;
-  background: #ffffff;
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-card);
-}
-
-.brand-icon {
-  width: 1.48rem;
-  height: 1.48rem;
-  object-fit: contain;
-}
-
-.brand-copy {
-  display: grid;
-  gap: 2px;
-  min-width: 0;
-}
-
-.brand-name,
-.brand-subtitle {
-  letter-spacing: 0;
-  text-transform: uppercase;
-}
-
-.brand-name {
-  color: var(--text-heading);
-  font-size: 0.86rem;
-  font-weight: 900;
-  line-height: var(--q-line-height-title, 1.3);
-}
-
-.brand-subtitle {
-  color: var(--text-muted);
-  font-size: 0.66rem;
-  font-weight: 700;
-  line-height: var(--q-line-height-supporting, 1.5);
-}
-
 .language-switcher {
   display: inline-flex;
   flex: 0 0 auto;
-  gap: 4px;
-  padding: 4px;
-  background: var(--surface-muted);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
+  gap: 3px;
+  padding: 3px;
+  background: var(--craft-surface-subtle, #f8fafc);
+  border: 1px solid var(--craft-border-subtle, #f1f5f9);
+  border-radius: var(--craft-radius-md, 12px);
   box-shadow: none;
 }
 
 .language-button {
   display: inline-flex;
-  min-width: 86px;
-  min-height: 34px;
+  min-width: 82px;
+  min-height: 32px;
   align-items: center;
   justify-content: center;
-  gap: 7px;
-  padding: 0 12px;
-  color: var(--primary-hover);
+  gap: 6px;
+  padding: 0 10px;
+  color: var(--craft-text-secondary, #475569);
   background: transparent;
   border: 1px solid transparent;
-  border-radius: var(--radius-sm) !important;
+  border-radius: var(--craft-radius-sm, 8px) !important;
   font: inherit;
-  font-size: 0.78rem;
-  font-weight: 850;
-  line-height: 1.2;
-  transition:
-    color 160ms ease,
-    background-color 160ms ease,
-    border-color 160ms ease,
-    box-shadow 160ms ease;
+  font-size: var(--craft-font-size-xs, 0.75rem);
+  font-weight: 700;
+  line-height: 1.45;
+  transition: all var(--craft-transition-fast, 120ms ease);
 }
 
 .language-icon {
   display: block;
-  width: 1rem;
-  height: 1rem;
+  width: 0.95rem;
+  height: 0.95rem;
   flex: 0 0 auto;
 }
 
@@ -127,39 +75,35 @@
 }
 
 .language-button:hover {
-  color: var(--primary-color);
-  background: var(--primary-soft);
-  border-color: var(--primary-border);
+  color: var(--craft-brand-dark, #085e82);
+  background: var(--craft-surface-base, #ffffff);
 }
 
 .language-button:focus-visible {
   outline: 0;
-  box-shadow: var(--focus-ring);
+  box-shadow:
+    0 0 0 2px var(--craft-brand-light, #ecfeff),
+    0 0 0 4px var(--craft-brand-primary, #0f7da8);
 }
 
 .language-button.active {
   color: #ffffff;
-  background: var(--primary-color);
-  border-color: var(--primary-color);
-  box-shadow: 0 8px 18px rgba(0, 166, 180, 0.18);
+  background: var(--craft-brand-gradient, linear-gradient(135deg, #0f7da8 0%, #085e82 100%));
+  border-color: transparent;
+  box-shadow: 0 2px 8px -1px rgb(15 125 168 / 0.35);
+  font-weight: 800;
 }
 
 .language-button.active:hover {
   color: #ffffff;
-  background: var(--primary-hover);
-  border-color: var(--primary-hover);
 }
 
 @media (max-width: 575.98px) {
   .app-header-navbar > .container-fluid {
     align-items: stretch;
     flex-direction: column;
-    gap: 0.6rem;
-    padding: 0.65rem !important;
-  }
-
-  .navbar-brand {
-    max-width: 100%;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem !important;
   }
 
   .language-switcher {

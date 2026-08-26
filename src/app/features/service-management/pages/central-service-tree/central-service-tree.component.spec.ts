@@ -4,12 +4,12 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
 import { vi } from 'vitest';
 
-import { AuthSessionService } from '../../../auth/services/auth-session.service';
-import { TechnicalAdminI18nStore } from '../../../technical-admin/store/technical-admin-i18n.store';
+import { AuthSessionService } from '../../../auth/services/auth-session/auth-session.service';
+import { AdminI18nStore } from '@layout/admin-shell/store/admin-i18n.store';
 import { ServiceHierarchyTreeComponent } from '../../components/service-hierarchy-tree/service-hierarchy-tree.component';
-import { ServiceTreeNode } from '../../models/service-management.model';
-import { ServiceDataInvalidationService } from '../../services/catalog/service-data-invalidation.service';
-import { ServiceManagementApiService } from '../../services/catalog/service-management-api.service';
+import { ServiceTreeNode } from '../../models/service-management/service-management.model';
+import { ServiceDataInvalidationService } from '../../services/catalog/service-data-invalidation/service-data-invalidation.service';
+import { ServiceManagementApiService } from '../../services/catalog/service-management-api/service-management-api.service';
 import { CentralServiceTreeComponent } from './central-service-tree.component';
 
 const rootNode: ServiceTreeNode = {
@@ -47,7 +47,7 @@ describe('CentralServiceTreeComponent', () => {
       providers: [
         { provide: ServiceManagementApiService, useValue: api },
         {
-          provide: TechnicalAdminI18nStore,
+          provide: AdminI18nStore,
           useValue: {
             language: signal<'ar' | 'en'>('en').asReadonly(),
             direction: signal<'rtl' | 'ltr'>('ltr').asReadonly(),

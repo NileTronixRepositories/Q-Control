@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 
-import { AppLanguage } from '../../../../shared/models/app-language.model';
-import { ServiceRequestLanguage } from '../../models/language.model';
-import { TicketIssuanceButton } from '../../models/service-request-api.model';
+import { AppLanguage } from '../../../../shared/models/app-language/app-language.model';
+import { ServiceRequestLanguage } from '../../models/language/language.model';
+import { TicketIssuanceButton } from '../../models/service-request-api/service-request-api.model';
 import { StepIndicatorItem } from '../../shared/selection-card-view.model';
 
 @Component({

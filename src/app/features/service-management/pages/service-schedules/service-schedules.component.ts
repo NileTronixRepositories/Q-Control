@@ -23,15 +23,15 @@ import {
 import { ActivatedRoute, Router } from '@angular/router';
 import { finalize } from 'rxjs';
 
-import { TechnicalAdminPageHeroComponent } from '../../../../shared/components/technical-admin-page-hero/technical-admin-page-hero.component';
+import { PageHeroComponent } from '../../../../shared/components/page-hero/page-hero.component';
 import { NiletronixLoadingStateComponent } from '../../../../shared/components/niletronix-loading-state/niletronix-loading-state.component';
-import { AuthSessionService } from '../../../auth/services/auth-session.service';
-import { BranchListItem } from '../../../technical-admin/models/branch-management.model';
-import { BranchManagementApiService } from '../../../technical-admin/services/branch-management-api.service';
-import { TechnicalAdminI18nStore } from '../../../technical-admin/store/technical-admin-i18n.store';
-import { formatTechnicalAdminApiError } from '../../../technical-admin/utils/api-error-message.util';
+import { AuthSessionService } from '../../../auth/services/auth-session/auth-session.service';
+import { BranchListItem } from '@features/branch-management/public-api';
+import { BranchManagementApiService } from '@features/branch-management/public-api';
+import { AdminI18nStore } from '@layout/admin-shell/store/admin-i18n.store';
+import { formatApiError } from '@shared/utils/api-error-message.util';
 import { SERVICE_SCHEDULE_TRANSLATIONS } from '../../i18n/service-schedule.translations';
-import { ServiceTreeNode } from '../../models/service-management.model';
+import { ServiceTreeNode } from '../../models/service-management/service-management.model';
 import {
   CreateServiceScheduleRequest,
   DayOfWeek,
@@ -41,10 +41,10 @@ import {
   ServiceScheduleScope,
   ServiceScheduleTimeSlot,
   ServiceScheduleUiMessage,
-} from '../../models/service-schedule.model';
-import { BranchServicesApiService } from '../../services/branch/branch-services-api.service';
-import { ServiceManagementPermissionService } from '../../services/catalog/service-management-permission.service';
-import { ServiceScheduleApiService } from '../../services/schedule/service-schedule-api.service';
+} from '../../models/service-schedule/service-schedule.model';
+import { BranchServicesApiService } from '../../services/branch/branch-services-api/branch-services-api.service';
+import { ServiceManagementPermissionService } from '../../services/catalog/service-management-permission/service-management-permission.service';
+import { ServiceScheduleApiService } from '../../services/schedule/service-schedule-api/service-schedule-api.service';
 
 const TIME_PATTERN = /^([01]\d|2[0-3]):[0-5]\d$/;
 const API_TIME_PATTERN = /^([01]\d|2[0-3]):[0-5]\d(?::[0-5]\d)?$/;
@@ -141,7 +141,7 @@ interface ServiceScheduleSelectLevel {
 @Component({
   selector: 'app-service-schedules',
   standalone: true,
-  imports: [ReactiveFormsModule, TechnicalAdminPageHeroComponent, NiletronixLoadingStateComponent],
+  imports: [ReactiveFormsModule, PageHeroComponent, NiletronixLoadingStateComponent],
   templateUrl: './service-schedules.component.html',
   styleUrl: './service-schedules.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -151,7 +151,7 @@ export class ServiceSchedulesComponent implements OnInit, OnDestroy, ServiceSche
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly authSessionService = inject(AuthSessionService);
-  private readonly i18nStore = inject(TechnicalAdminI18nStore);
+  private readonly i18nStore = inject(AdminI18nStore);
   private readonly branchApiService = inject(BranchManagementApiService);
   private readonly branchServicesApiService = inject(BranchServicesApiService);
   private readonly apiService = inject(ServiceScheduleApiService);
@@ -870,7 +870,7 @@ export class ServiceSchedulesComponent implements OnInit, OnDestroy, ServiceSche
 
     this.showMessage(
       'error',
-      formatTechnicalAdminApiError(error, this.translations().fallbackError),
+      formatApiError(error, this.translations().fallbackError),
     );
   }
 

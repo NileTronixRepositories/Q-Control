@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { DatePipe } from '@angular/common';
-import { SegmentDetails } from '../../models/segment.model';
+import { SegmentDetails } from '../../models/segment/segment.model';
 import { SegmentTranslations } from '../../i18n/segment.translations';
 
 @Component({

@@ -5,15 +5,15 @@ import { ActivatedRoute, convertToParamMap, ParamMap, Router } from '@angular/ro
 import { of, throwError } from 'rxjs';
 import { vi } from 'vitest';
 
-import { AuthenticatedSession } from '../../../auth/models/login-credentials.model';
-import { AuthSessionService } from '../../../auth/services/auth-session.service';
-import { BranchManagementApiService } from '../../../technical-admin/services/branch-management-api.service';
-import { TechnicalAdminI18nStore } from '../../../technical-admin/store/technical-admin-i18n.store';
-import { ServiceTreeNode } from '../../models/service-management.model';
-import { ServiceSchedule } from '../../models/service-schedule.model';
-import { BranchServicesApiService } from '../../services/branch/branch-services-api.service';
-import { ServiceManagementPermissionService } from '../../services/catalog/service-management-permission.service';
-import { ServiceScheduleApiService } from '../../services/schedule/service-schedule-api.service';
+import { AuthenticatedSession } from '../../../auth/models/login-credentials/login-credentials.model';
+import { AuthSessionService } from '../../../auth/services/auth-session/auth-session.service';
+import { BranchManagementApiService } from '@features/branch-management/public-api';
+import { AdminI18nStore } from '@layout/admin-shell/store/admin-i18n.store';
+import { ServiceTreeNode } from '../../models/service-management/service-management.model';
+import { ServiceSchedule } from '../../models/service-schedule/service-schedule.model';
+import { BranchServicesApiService } from '../../services/branch/branch-services-api/branch-services-api.service';
+import { ServiceManagementPermissionService } from '../../services/catalog/service-management-permission/service-management-permission.service';
+import { ServiceScheduleApiService } from '../../services/schedule/service-schedule-api/service-schedule-api.service';
 import { ServiceSchedulesComponent } from './service-schedules.component';
 
 const eligibleLeaf: ServiceTreeNode = {
@@ -142,7 +142,7 @@ describe('ServiceSchedulesComponent', () => {
         { provide: Router, useValue: router },
         { provide: AuthSessionService, useValue: authSession },
         {
-          provide: TechnicalAdminI18nStore,
+          provide: AdminI18nStore,
           useValue: {
             language: signal<'ar' | 'en'>('en').asReadonly(),
             direction: signal<'rtl' | 'ltr'>('ltr').asReadonly(),
@@ -323,7 +323,7 @@ describe('ServiceSchedulesComponent', () => {
   it('uses the compact Bootstrap selector layout on the generic schedules route', () => {
     recreateGenericRoute([parentService]);
 
-    const hero = fixture.nativeElement.querySelector('app-technical-admin-page-hero') as HTMLElement | null;
+    const hero = fixture.nativeElement.querySelector('app-page-hero') as HTMLElement | null;
     expect(hero).not.toBeNull();
 
     selectDropdown(0, '10');
@@ -340,7 +340,7 @@ describe('ServiceSchedulesComponent', () => {
     });
     expect(fixture.nativeElement.textContent).toContain('Certificates');
     expect(fixture.nativeElement.textContent).toContain('Please select a service to view the schedule details.');
-    expect(fixture.nativeElement.textContent).not.toContain('Ø§Ù');
+    expect(fixture.nativeElement.textContent).not.toContain('ا�');
     expect(scheduleApi.getSchedule).not.toHaveBeenCalled();
   });
 

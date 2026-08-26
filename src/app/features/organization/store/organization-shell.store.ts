@@ -1,6 +1,6 @@
 import { computed, inject, Injectable } from '@angular/core';
 
-import { AppLanguage } from '../../../shared/models/app-language.model';
+import { AppLanguage } from '../../../shared/models/app-language/app-language.model';
 import { AppLanguageStore } from '../../../shared/store/app-language.store';
 
 interface OrganizationShellTranslations {

@@ -1,9 +1,9 @@
 import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
 
-import { AppDirection, AppLanguage } from '../../../../shared/models/app-language.model';
+import { AppDirection, AppLanguage } from '../../../../shared/models/app-language/app-language.model';
 import { BranchServicesTranslations } from '../../i18n/branch-services.translations';
 import { ServiceManagementTranslations } from '../../i18n/service-management.translations';
-import { ServiceTreeNode } from '../../models/service-management.model';
+import { ServiceTreeNode } from '../../models/service-management/service-management.model';
 import { ServiceHierarchyTreeComponent } from '../service-hierarchy-tree/service-hierarchy-tree.component';
 
 @Component({

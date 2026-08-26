@@ -2,7 +2,7 @@ import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { AppLanguageStore } from '../../../../shared/store/app-language.store';
-import { SERVICE_REQUEST_LANGUAGES } from '../../models/language.model';
+import { SERVICE_REQUEST_LANGUAGES } from '../../models/language/language.model';
 import { ServiceRequestStore } from '../../store/service-request.store';
 import { KioskHeaderComponent } from './kiosk-header.component';
 

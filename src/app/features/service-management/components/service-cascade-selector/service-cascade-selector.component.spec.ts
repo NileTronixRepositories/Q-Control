@@ -4,11 +4,11 @@ import { provideRouter } from '@angular/router';
 import { of } from 'rxjs';
 import { vi } from 'vitest';
 
-import { AuthSessionService } from '../../../auth/services/auth-session.service';
-import { TechnicalAdminI18nStore } from '../../../technical-admin/store/technical-admin-i18n.store';
-import { ServiceSelectionOption } from '../../models/service-management.model';
-import { ServiceManagementApiService } from '../../services/catalog/service-management-api.service';
-import { ServiceManagementPermissionService } from '../../services/catalog/service-management-permission.service';
+import { AuthSessionService } from '../../../auth/services/auth-session/auth-session.service';
+import { AdminI18nStore } from '@layout/admin-shell/store/admin-i18n.store';
+import { ServiceSelectionOption } from '../../models/service-management/service-management.model';
+import { ServiceManagementApiService } from '../../services/catalog/service-management-api/service-management-api.service';
+import { ServiceManagementPermissionService } from '../../services/catalog/service-management-permission/service-management-permission.service';
 import { ServiceCascadeSelectorComponent } from './service-cascade-selector.component';
 
 const ticketService: ServiceSelectionOption = {
@@ -52,7 +52,7 @@ describe('ServiceCascadeSelectorComponent', () => {
           },
         },
         {
-          provide: TechnicalAdminI18nStore,
+          provide: AdminI18nStore,
           useValue: {
             language: signal<'ar' | 'en'>('en').asReadonly(),
             direction: signal<'rtl' | 'ltr'>('ltr').asReadonly(),

@@ -1,8 +1,8 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { take } from 'rxjs';
 
-import { AuthenticatedSession, LoginCredentials } from '../models/login-credentials.model';
-import { AuthSessionService } from '../services/auth-session.service';
+import { AuthenticatedSession, LoginCredentials } from '../models/login-credentials/login-credentials.model';
+import { AuthSessionService } from '../services/auth-session/auth-session.service';
 
 export type LoginStatus = 'idle' | 'submitting' | 'success' | 'error';
 

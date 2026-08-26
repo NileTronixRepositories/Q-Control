@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { CreateGlobalSegmentRequest, Segment, UpdateSegmentRequest } from '../../models/segment.model';
+import { CreateGlobalSegmentRequest, Segment, UpdateSegmentRequest } from '../../models/segment/segment.model';
 import { SegmentTranslations } from '../../i18n/segment.translations';
 
 @Component({

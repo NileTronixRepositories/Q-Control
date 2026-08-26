@@ -9,8 +9,8 @@ import {
   viewChild,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { DisplayStateService } from '../../services/display-state.service';
-import { HlsPlayerService } from '../../../technical-admin/services/hls-player.service';
+import { DisplayStateService } from '../../services/display-state/display-state.service';
+import { HlsPlayerService } from '@features/branch-management/services/hls-player/hls-player.service';
 
 @Component({
   selector: 'app-display-media-player',

@@ -4,23 +4,23 @@ import { provideRouter, Router } from '@angular/router';
 import { computed, signal, WritableSignal } from '@angular/core';
 import { of, Subject } from 'rxjs';
 
-import { AuthSessionService } from '../../../auth/services/auth-session.service';
-import { BranchManagementApiService } from '../../../technical-admin/services/branch-management-api.service';
-import { TechnicalAdminI18nStore } from '../../../technical-admin/store/technical-admin-i18n.store';
+import { AuthSessionService } from '../../../auth/services/auth-session/auth-session.service';
+import { BranchManagementApiService } from '@features/branch-management/public-api';
+import { AdminI18nStore } from '@layout/admin-shell/store/admin-i18n.store';
 import {
   ServiceDeleteResponse,
   ServiceDetails,
   ServicePermanentDeleteResponse,
   ServiceRestoreResponse,
   ServiceTreeNode,
-} from '../../models/service-management.model';
-import { BranchServicesApiService } from '../../services/branch/branch-services-api.service';
-import { ServiceManagementApiService } from '../../services/catalog/service-management-api.service';
-import { ServiceManagementPermissionService } from '../../services/catalog/service-management-permission.service';
-import { ServiceGlobalizationApiService } from '../../services/globalization/service-globalization-api.service';
-import { UnassignBranchLeafServiceResponse } from '../../models/branch-services.model';
+} from '../../models/service-management/service-management.model';
+import { BranchServicesApiService } from '../../services/branch/branch-services-api/branch-services-api.service';
+import { ServiceManagementApiService } from '../../services/catalog/service-management-api/service-management-api.service';
+import { ServiceManagementPermissionService } from '../../services/catalog/service-management-permission/service-management-permission.service';
+import { ServiceGlobalizationApiService } from '../../services/globalization/service-globalization-api/service-globalization-api.service';
+import { UnassignBranchLeafServiceResponse } from '../../models/branch-services/branch-services.model';
 import { SERVICE_MANAGEMENT_TRANSLATIONS } from '../../i18n/service-management.translations';
-import { PagedServiceGlobalizationRequestsResponse } from '../../models/service-globalization.model';
+import { PagedServiceGlobalizationRequestsResponse } from '../../models/service-globalization/service-globalization.model';
 import { BranchServicesStore } from '../../store/branch-services.store';
 import { BranchServicesComponent } from './branch-services.component';
 
@@ -58,6 +58,7 @@ describe('BranchServicesComponent branch service actions', () => {
   const foreignBranchLeaf = createOwnedBranchNode(202, false, 9);
 
   beforeEach(async () => {
+    TestBed.resetTestingModule();
     vi.useFakeTimers();
     unassignResult = new Subject<UnassignBranchLeafServiceResponse>();
     lifecycleResult = new Subject<
@@ -123,7 +124,7 @@ describe('BranchServicesComponent branch service actions', () => {
           },
         },
         {
-          provide: TechnicalAdminI18nStore,
+          provide: AdminI18nStore,
           useValue: {
             language: signal<'ar' | 'en'>('en').asReadonly(),
             direction: signal<'rtl' | 'ltr'>('ltr').asReadonly(),
@@ -153,18 +154,19 @@ describe('BranchServicesComponent branch service actions', () => {
             canRejectGlobalizationRequests: signal(false).asReadonly(),
           },
         },
-        { provide: Router, useValue: { navigate: vi.fn(), navigateByUrl: vi.fn() } },
       ],
     }).compileComponents();
 
+    vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
     fixture = TestBed.createComponent(BranchServicesComponent);
     fixture.detectChanges();
   });
 
   afterEach(() => {
-    if (!fixture.componentRef.hostView.destroyed) {
+    if (fixture && !fixture.componentRef.hostView.destroyed) {
       fixture.destroy();
     }
+    TestBed.resetTestingModule();
     vi.useRealTimers();
   });
 

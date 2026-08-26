@@ -22,7 +22,7 @@ import { BranchServicesTranslations } from '../../i18n/branch-services.translati
 import {
   CreateBranchServiceTreeNodeRequest,
   CreateBranchServiceTreeRequest,
-} from '../../models/branch-services.model';
+} from '../../models/branch-services/branch-services.model';
 
 export type CreateBranchServiceTreeMode = 'root' | 'subtree';
 

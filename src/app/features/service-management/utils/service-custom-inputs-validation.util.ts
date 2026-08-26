@@ -1,5 +1,5 @@
 import { AbstractControl, FormArray, FormGroup, ValidationErrors, ValidatorFn } from '@angular/forms';
-import { CustomInputType } from '../models/service-management.model';
+import { CustomInputType } from '../models/service-management/service-management.model';
 
 export function stringRestrictionsValidator(): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {

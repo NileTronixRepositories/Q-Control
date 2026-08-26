@@ -5,15 +5,15 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { NEVER, of, throwError } from 'rxjs';
 import { vi } from 'vitest';
 
-import { AuthSessionService } from '../../../auth/services/auth-session.service';
-import { AuthenticatedSession } from '../../../auth/models/login-credentials.model';
-import { BranchManagementApiService } from '../../../technical-admin/services/branch-management-api.service';
-import { TechnicalAdminI18nStore } from '../../../technical-admin/store/technical-admin-i18n.store';
-import { ServiceTreeNode } from '../../models/service-management.model';
-import { ServiceWorkflowListItem, WorkflowCandidateService } from '../../models/service-workflow.model';
-import { BranchServicesApiService } from '../../services/branch/branch-services-api.service';
-import { ServiceManagementPermissionService } from '../../services/catalog/service-management-permission.service';
-import { ServiceWorkflowApiService } from '../../services/workflow/service-workflow-api.service';
+import { AuthSessionService } from '../../../auth/services/auth-session/auth-session.service';
+import { AuthenticatedSession } from '../../../auth/models/login-credentials/login-credentials.model';
+import { BranchManagementApiService } from '@features/branch-management/public-api';
+import { AdminI18nStore } from '@layout/admin-shell/store/admin-i18n.store';
+import { ServiceTreeNode } from '../../models/service-management/service-management.model';
+import { ServiceWorkflowListItem, WorkflowCandidateService } from '../../models/service-workflow/service-workflow.model';
+import { BranchServicesApiService } from '../../services/branch/branch-services-api/branch-services-api.service';
+import { ServiceManagementPermissionService } from '../../services/catalog/service-management-permission/service-management-permission.service';
+import { ServiceWorkflowApiService } from '../../services/workflow/service-workflow-api/service-workflow-api.service';
 import { ServiceWorkflowsComponent } from './service-workflows.component';
 
 const emptyPage = {
@@ -122,7 +122,7 @@ describe('ServiceWorkflowsComponent', () => {
           },
         },
         {
-          provide: TechnicalAdminI18nStore,
+          provide: AdminI18nStore,
           useValue: {
             language: signal<'ar' | 'en'>('en').asReadonly(),
             direction: signal<'rtl' | 'ltr'>('ltr').asReadonly(),

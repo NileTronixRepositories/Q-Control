@@ -1,8 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { ServiceCustomInput } from '../../../service-management/models/service-management.model';
-import { SERVICE_REQUEST_TRANSLATIONS } from '../../models/language.model';
+import { ServiceCustomInput } from '../../../service-management/models/service-management/service-management.model';
+import { SERVICE_REQUEST_TRANSLATIONS } from '../../models/language/language.model';
 import { ServiceRequestStore } from '../../store/service-request.store';
 import { CustomerInputFormComponent } from './customer-input-form.component';
 

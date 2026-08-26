@@ -17,9 +17,10 @@ import { DisplayHeaderComponent } from '../../components/display-header/display-
 import { DisplayMediaPlayerComponent } from '../../components/display-media-player/display-media-player.component';
 import { DisplayQueueBoardComponent } from '../../components/display-queue-board/display-queue-board.component';
 import { DisplayTickerBarComponent } from '../../components/display-ticker-bar/display-ticker-bar.component';
-import { DisplayStateService } from '../../services/display-state.service';
-import { AuthSessionService } from '../../../auth/services/auth-session.service';
-import { TechnicalAdminBranchContextStore } from '../../../technical-admin/store/technical-admin-branch-context.store';
+import { DisplayStateService } from '../../services/display-state/display-state.service';
+import { AuthSessionService } from '../../../auth/services/auth-session/auth-session.service';
+import { AdminBranchContextStore } from '@layout/admin-shell/store/admin-branch-context.store';
+import { DISPLAY_TRANSLATIONS } from '../../i18n/display.translations';
 
 @Component({
   selector: 'app-main-display',
@@ -42,11 +43,12 @@ export class MainDisplayComponent implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
   private readonly formBuilder = inject(NonNullableFormBuilder);
   private readonly authSessionService = inject(AuthSessionService);
-  private readonly branchContextStore = inject(TechnicalAdminBranchContextStore, { optional: true });
+  private readonly branchContextStore = inject(AdminBranchContextStore, { optional: true });
 
   private routeSubscription: Subscription | null = null;
 
   readonly isAr = computed(() => this.state.language() === 'ar');
+  readonly translations = computed(() => DISPLAY_TRANSLATIONS[this.state.language()]);
   readonly isAuthenticated = computed(() => !!this.authSessionService.activeSession());
   readonly displayBgColor = computed(() => this.state.runtimeConfig().displayBackgroundColor);
 

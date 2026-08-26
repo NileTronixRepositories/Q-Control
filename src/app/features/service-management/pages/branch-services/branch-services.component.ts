@@ -16,13 +16,13 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize, Observable } from 'rxjs';
 
 import { NiletronixLoadingStateComponent } from '../../../../shared/components/niletronix-loading-state/niletronix-loading-state.component';
-import { TechnicalAdminPageHeroComponent } from '../../../../shared/components/technical-admin-page-hero/technical-admin-page-hero.component';
+import { PageHeroComponent } from '../../../../shared/components/page-hero/page-hero.component';
 
-import { AuthSessionService } from '../../../auth/services/auth-session.service';
-import { BranchListItem } from '../../../technical-admin/models/branch-management.model';
-import { BranchManagementApiService } from '../../../technical-admin/services/branch-management-api.service';
-import { TechnicalAdminI18nStore } from '../../../technical-admin/store/technical-admin-i18n.store';
-import { formatTechnicalAdminApiError } from '../../../technical-admin/utils/api-error-message.util';
+import { AuthSessionService } from '../../../auth/services/auth-session/auth-session.service';
+import { BranchListItem } from '@features/branch-management/public-api';
+import { BranchManagementApiService } from '@features/branch-management/public-api';
+import { AdminI18nStore } from '@layout/admin-shell/store/admin-i18n.store';
+import { formatApiError } from '@shared/utils/api-error-message.util';
 import { AssignBranchServicesDialogComponent } from '../../components/assign-branch-services-dialog/assign-branch-services-dialog.component';
 import { BranchGlobalizationRequestsComponent } from '../../components/branch-globalization-requests/branch-globalization-requests.component';
 import { BranchServiceLifecycleDialogComponent } from '../../components/branch-service-lifecycle-dialog/branch-service-lifecycle-dialog.component';
@@ -39,21 +39,21 @@ import {
   CreateBranchServiceSubtreeResponse,
   CreateBranchServiceTreeRequest,
   CreateBranchServiceTreeResponse,
-} from '../../models/branch-services.model';
-import { ServiceGlobalizationRequestSummary } from '../../models/service-globalization.model';
+} from '../../models/branch-services/branch-services.model';
+import { ServiceGlobalizationRequestSummary } from '../../models/service-globalization/service-globalization.model';
 import {
   ServiceDeleteResponse,
   ServiceDetails,
   ServicePermanentDeleteResponse,
   ServiceRestoreResponse,
   ServiceTreeNode,
-} from '../../models/service-management.model';
-import { BranchServicesApiService } from '../../services/branch/branch-services-api.service';
-import { ServiceManagementApiService } from '../../services/catalog/service-management-api.service';
-import { ServiceManagementPermissionService } from '../../services/catalog/service-management-permission.service';
-import { ServiceGlobalizationApiService } from '../../services/globalization/service-globalization-api.service';
+} from '../../models/service-management/service-management.model';
+import { BranchServicesApiService } from '../../services/branch/branch-services-api/branch-services-api.service';
+import { ServiceManagementApiService } from '../../services/catalog/service-management-api/service-management-api.service';
+import { ServiceManagementPermissionService } from '../../services/catalog/service-management-permission/service-management-permission.service';
+import { ServiceGlobalizationApiService } from '../../services/globalization/service-globalization-api/service-globalization-api.service';
 import { BranchServicesStore } from '../../store/branch-services.store';
-import { ServiceDataInvalidationService } from '../../services/catalog/service-data-invalidation.service';
+import { ServiceDataInvalidationService } from '../../services/catalog/service-data-invalidation/service-data-invalidation.service';
 import {
   ServiceActionPermissions,
   canAssignServiceLeaf,
@@ -72,9 +72,9 @@ import {
   AssignSegmentItem,
   AssignedBranchServiceSegmentsResponse,
   AvailableSegmentItem,
-} from '../../../segment-management/models/segment.model';
-import { SegmentApiService } from '../../../segment-management/services/segment-api.service';
-import { SegmentPermissionService } from '../../../segment-management/services/segment-permission.service';
+} from '../../../segment-management/models/segment/segment.model';
+import { SegmentApiService } from '../../../segment-management/services/segment-api/segment-api.service';
+import { SegmentPermissionService } from '../../../segment-management/services/segment-permission/segment-permission.service';
 
 const STATUS_POLL_INTERVAL_MS = 15_000;
 
@@ -89,7 +89,7 @@ const STATUS_POLL_INTERVAL_MS = 15_000;
     ServiceHierarchyTreeComponent,
     ServiceMediaManagerComponent,
     NiletronixLoadingStateComponent,
-    TechnicalAdminPageHeroComponent,
+    PageHeroComponent,
     UnassignBranchServiceDialogComponent,
     LeafServiceSegmentsDrawerComponent,
   ],
@@ -102,7 +102,7 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly authSessionService = inject(AuthSessionService);
-  private readonly i18nStore = inject(TechnicalAdminI18nStore);
+  private readonly i18nStore = inject(AdminI18nStore);
   private readonly branchApiService = inject(BranchManagementApiService);
   private readonly branchServicesApiService = inject(BranchServicesApiService);
   private readonly serviceManagementApiService = inject(ServiceManagementApiService);
@@ -157,7 +157,7 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
       error: (err) => {
         this.segmentsLoading.set(false);
         this.store.message.set({
-          text: formatTechnicalAdminApiError(err, 'Failed to load service segments'),
+          text: formatApiError(err, 'Failed to load service segments'),
           tone: 'error',
         });
       },
@@ -178,7 +178,7 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
       error: (err) => {
         this.availableSegmentsLoading.set(false);
         this.store.message.set({
-          text: formatTechnicalAdminApiError(err, 'Failed to load available segments'),
+          text: formatApiError(err, 'Failed to load available segments'),
           tone: 'error',
         });
       },
@@ -203,7 +203,7 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
       error: (err) => {
         this.segmentsAssigning.set(false);
         this.store.message.set({
-          text: formatTechnicalAdminApiError(err, 'Failed to assign segments'),
+          text: formatApiError(err, 'Failed to assign segments'),
           tone: 'error',
         });
       },
@@ -233,7 +233,7 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
         error: (err) => {
           this.segmentsUpdatingQuota.set(false);
           this.store.message.set({
-            text: formatTechnicalAdminApiError(err, 'Failed to update quota'),
+            text: formatApiError(err, 'Failed to update quota'),
             tone: 'error',
           });
         },
@@ -264,7 +264,7 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
         error: (err) => {
           this.segmentsUnassigning.set(false);
           this.store.message.set({
-            text: formatTechnicalAdminApiError(err, 'Failed to unassign segment'),
+            text: formatApiError(err, 'Failed to unassign segment'),
             tone: 'error',
           });
         },
@@ -1289,10 +1289,7 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
     }
 
     if (error.status === 404) {
-      this.showMessage(
-        'error',
-        formatTechnicalAdminApiError(error, this.translations().branchNotFound),
-      );
+      this.showMessage('error', formatApiError(error, this.translations().branchNotFound));
 
       if (this.isBranchAdmin()) {
         this.loadBranchTree();
@@ -1306,7 +1303,7 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
     if (this.containsErrorCode(error, 'ServiceCodeAlreadyExists')) {
       this.showMessage(
         'error',
-        formatTechnicalAdminApiError(error, this.translations().serviceCodeAlreadyExists),
+        formatApiError(error, this.translations().serviceCodeAlreadyExists),
       );
       return;
     }
@@ -1314,15 +1311,12 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
     if (this.containsErrorCode(error, 'DuplicateServiceCodeInTreePayload')) {
       this.showMessage(
         'error',
-        formatTechnicalAdminApiError(error, this.translations().duplicateServiceCodeInTree),
+        formatApiError(error, this.translations().duplicateServiceCodeInTree),
       );
       return;
     }
 
-    this.showMessage(
-      'error',
-      formatTechnicalAdminApiError(error, this.translations().fallbackError),
-    );
+    this.showMessage('error', formatApiError(error, this.translations().fallbackError));
   }
 
   private handleUnassignApiError(error: HttpErrorResponse): void {
@@ -1334,7 +1328,7 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
     if (error.status === 400 || error.status === 403 || error.status === 409) {
       const fallback =
         error.status === 403 ? this.translations().accessDenied : this.translations().fallbackError;
-      this.showMessage('error', formatTechnicalAdminApiError(error, fallback));
+      this.showMessage('error', formatApiError(error, fallback));
       return;
     }
 
@@ -1344,10 +1338,7 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
     }
 
     this.store.unassignConfirmState.set(null);
-    this.showMessage(
-      'error',
-      formatTechnicalAdminApiError(error, this.translations().branchNotFound),
-    );
+    this.showMessage('error', formatApiError(error, this.translations().branchNotFound));
     this.loadBranchTree();
 
     if (!this.isBranchAdmin()) {
@@ -1371,7 +1362,7 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
     ) {
       const fallback =
         error.status === 403 ? this.translations().accessDenied : this.translations().fallbackError;
-      this.showMessage('error', formatTechnicalAdminApiError(error, fallback));
+      this.showMessage('error', formatApiError(error, fallback));
       this.loadBranchTree();
       return;
     }

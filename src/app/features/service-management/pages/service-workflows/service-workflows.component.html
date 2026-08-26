@@ -1,9 +1,9 @@
 <section
-  class="technical-admin-responsive-page workflow-page container-fluid d-grid gap-3 p-3 p-lg-4 w-100"
+  class="admin-responsive-page workflow-page container-fluid d-grid gap-3 p-3 p-lg-4 w-100"
   [attr.dir]="direction()"
   [attr.lang]="language()"
 >
-  <app-technical-admin-page-hero
+  <app-page-hero
     [eyebrow]="language() === 'ar' ? 'إدارة مسارات العمليات' : 'Workflow Operations'"
     [title]="translations().title"
     [description]="language() === 'ar' ? 'قم باختيار الفرع والخدمة لإنشاء وتتبع مسارات الخدمة وخطوات التنفيذ بكل سهولة.' : 'Select a branch and service to create and configure workflows effortlessly.'"
@@ -57,7 +57,7 @@
         </select>
       </div>
     }
-  </app-technical-admin-page-hero>
+  </app-page-hero>
 
   @if (store.message(); as message) {
     <div class="toast-stack workflow-toast" role="status" aria-live="polite" aria-atomic="true">

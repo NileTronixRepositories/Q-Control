@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
-import { AppDirection, AppLanguage } from '../../models/app-language.model';
-import { AppBreadcrumbItem } from '../../models/breadcrumb.model';
+import { AppDirection, AppLanguage } from '../../models/app-language/app-language.model';
+import { AppBreadcrumbItem } from '../../models/breadcrumb/breadcrumb.model';
 
 @Component({
   selector: 'app-breadcrumb',

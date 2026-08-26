@@ -1,4 +1,4 @@
-import { AppLanguage } from '../../../shared/models/app-language.model';
+import { AppLanguage } from '../../../shared/models/app-language/app-language.model';
 
 export interface ServiceGlobalizationTranslations {
   readonly eyebrow: string;

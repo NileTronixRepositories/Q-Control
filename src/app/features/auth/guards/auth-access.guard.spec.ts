@@ -1,8 +1,8 @@
 import { TestBed } from '@angular/core/testing';
 import { provideRouter, Router, UrlTree } from '@angular/router';
 
-import { AuthenticatedSession, AuthenticatedUserType } from '../models/login-credentials.model';
-import { AuthSessionService } from '../services/auth-session.service';
+import { AuthenticatedSession, AuthenticatedUserType } from '../models/login-credentials/login-credentials.model';
+import { AuthSessionService } from '../services/auth-session/auth-session.service';
 import { adminConsoleAccessGuard } from './auth-access.guard';
 
 describe('adminConsoleAccessGuard', () => {

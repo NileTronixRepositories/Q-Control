@@ -15,11 +15,11 @@
         <div class="clinic-showcase-zone">
           <div class="clinic-tag-pill">
             <i class="bi bi-door-open-fill"></i>
-            <span>{{ isAr() ? 'عيادة / شباك' : 'Clinic / Window' }}</span>
+            <span>{{ translations().clinicWindowLabel }}</span>
           </div>
 
           <div class="clinic-number-hero">
-            <span class="number-label">{{ isAr() ? 'رقم' : 'NO.' }}</span>
+            <span class="number-label">{{ translations().numberLabel }}</span>
             <span class="number-value">{{ window.windowNumber }}</span>
           </div>
 
@@ -51,7 +51,7 @@
                 @if (window.serviceLogoUrl) {
                   <img
                     [src]="window.serviceLogoUrl"
-                    alt="Service Logo"
+                    [alt]="translations().serviceLogoLabel"
                     class="custom-service-img"
                   />
                 } @else if (window.serviceIcon) {
@@ -68,15 +68,7 @@
               [class.badge-calling]="window.isFlashing || window.status === 'calling'"
             >
               <span class="status-live-dot"></span>
-              <span>{{
-                window.isFlashing || window.status === 'calling'
-                  ? isAr()
-                    ? 'جاري النداء الآن'
-                    : 'Calling Now'
-                  : isAr()
-                    ? 'جاري الخدمة'
-                    : 'Now Serving'
-              }}</span>
+              <span>{{ window.isFlashing || window.status === 'calling' ? translations().callingNowLabel : translations().nowServingLabel }}</span>
             </div>
           </div>
 
@@ -86,9 +78,7 @@
             [class.ticket-flash]="window.isFlashing || window.status === 'calling'"
           >
             <div class="ticket-inner-glow"></div>
-            <span class="ticket-headline-label">{{
-              isAr() ? 'رقم التذكرة' : 'Ticket Number'
-            }}</span>
+            <span class="ticket-headline-label">{{ translations().ticketNumberLabel }}</span>
             <span class="ticket-bold-digits">{{ window.currentTicket || '---' }}</span>
           </div>
         </div>

@@ -26,11 +26,11 @@ import { Router } from '@angular/router';
 import { finalize, Observable } from 'rxjs';
 
 import { NiletronixLoadingStateComponent } from '../../../../shared/components/niletronix-loading-state/niletronix-loading-state.component';
-import { TechnicalAdminPageHeroComponent } from '../../../../shared/components/technical-admin-page-hero/technical-admin-page-hero.component';
+import { PageHeroComponent } from '../../../../shared/components/page-hero/page-hero.component';
 
-import { AuthSessionService } from '../../../auth/services/auth-session.service';
-import { TechnicalAdminI18nStore } from '../../../technical-admin/store/technical-admin-i18n.store';
-import { formatTechnicalAdminApiError } from '../../../technical-admin/utils/api-error-message.util';
+import { AuthSessionService } from '../../../auth/services/auth-session/auth-session.service';
+import { AdminI18nStore } from '@layout/admin-shell/store/admin-i18n.store';
+import { formatApiError } from '@shared/utils/api-error-message.util';
 import {
   createCustomInputFormGroup,
   CustomInputFormGroup,
@@ -44,7 +44,7 @@ import {
   CreateBranchServiceTreeNodeRequest,
   CreateBranchServiceTreeRequest,
   CreateBranchServiceTreeResponse,
-} from '../../models/branch-services.model';
+} from '../../models/branch-services/branch-services.model';
 import {
   CreateServiceRequest,
   CustomInputType,
@@ -60,12 +60,12 @@ import {
   ServiceScope,
   ServiceTreeNode,
   UpdateServiceRequest,
-} from '../../models/service-management.model';
+} from '../../models/service-management/service-management.model';
 import { customInputsArrayValidator } from '../../utils/service-custom-inputs-validation.util';
-import { BranchServicesApiService } from '../../services/branch/branch-services-api.service';
-import { ServiceCatalogFacadeService } from '../../services/catalog/service-catalog-facade.service';
-import { ServiceManagementApiService } from '../../services/catalog/service-management-api.service';
-import { ServiceManagementPermissionService } from '../../services/catalog/service-management-permission.service';
+import { BranchServicesApiService } from '../../services/branch/branch-services-api/branch-services-api.service';
+import { ServiceCatalogFacadeService } from '../../services/catalog/service-catalog-facade/service-catalog-facade.service';
+import { ServiceManagementApiService } from '../../services/catalog/service-management-api/service-management-api.service';
+import { ServiceManagementPermissionService } from '../../services/catalog/service-management-permission/service-management-permission.service';
 import { ServiceManagementStore } from '../../store/service-management.store';
 import {
   ServiceActionPermissions,
@@ -121,7 +121,7 @@ type FormControlName =
     ServiceHierarchyTreeComponent,
     ServiceMediaManagerComponent,
     ServiceCustomInputsBuilderComponent,
-    TechnicalAdminPageHeroComponent,
+    PageHeroComponent,
     NiletronixLoadingStateComponent,
   ],
   providers: [ServiceManagementStore],
@@ -144,7 +144,7 @@ export class ServicesComponent implements OnInit, OnDestroy {
   private readonly document = inject(DOCUMENT);
   private readonly router = inject(Router);
   private readonly authSessionService = inject(AuthSessionService);
-  private readonly i18nStore = inject(TechnicalAdminI18nStore);
+  private readonly i18nStore = inject(AdminI18nStore);
   private readonly apiService = inject(ServiceManagementApiService);
   private readonly branchServicesApiService = inject(BranchServicesApiService);
   private readonly permissionService = inject(ServiceManagementPermissionService);
@@ -2095,7 +2095,7 @@ export class ServicesComponent implements OnInit, OnDestroy {
     }
 
     if (error.status === 409) {
-      const message = formatTechnicalAdminApiError(error, this.translations().fallbackError);
+      const message = formatApiError(error, this.translations().fallbackError);
       this.formError.set(message);
       this.showMessage('error', message);
       return;
@@ -2103,7 +2103,7 @@ export class ServicesComponent implements OnInit, OnDestroy {
 
     this.showMessage(
       'error',
-      formatTechnicalAdminApiError(error, this.translations().fallbackError),
+      formatApiError(error, this.translations().fallbackError),
     );
   }
 

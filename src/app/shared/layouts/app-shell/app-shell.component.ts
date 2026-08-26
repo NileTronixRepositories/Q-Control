@@ -18,9 +18,9 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
 import { AppBreadcrumbComponent } from '../../components/app-breadcrumb/app-breadcrumb.component';
 
 
-import { AppDirection, AppLanguage } from '../../models/app-language.model';
-import { AppBreadcrumbItem } from '../../models/breadcrumb.model';
-import { AppNavigationItem } from '../../models/navigation.model';
+import { AppDirection, AppLanguage } from '../../models/app-language/app-language.model';
+import { AppBreadcrumbItem } from '../../models/breadcrumb/breadcrumb.model';
+import { AppNavigationItem } from '../../models/navigation/navigation.model';
 
 @Component({
   selector: 'app-shell',

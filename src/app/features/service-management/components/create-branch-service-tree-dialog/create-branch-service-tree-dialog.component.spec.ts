@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { vi } from 'vitest';
 
 import { BRANCH_SERVICES_TRANSLATIONS } from '../../i18n/branch-services.translations';
-import { CreateBranchServiceTreeRequest } from '../../models/branch-services.model';
+import { CreateBranchServiceTreeRequest } from '../../models/branch-services/branch-services.model';
 import { CreateBranchServiceTreeDialogComponent } from './create-branch-service-tree-dialog.component';
 
 describe('CreateBranchServiceTreeDialogComponent', () => {
@@ -31,7 +31,7 @@ describe('CreateBranchServiceTreeDialogComponent', () => {
   it('trims valid names and emits default empty service-code fields', () => {
     const created = vi.fn<(request: CreateBranchServiceTreeRequest) => void>();
     fixture.componentInstance.created.subscribe(created);
-    fixture.componentInstance.root.controls.arabicName.setValue('  Ø§Ù„Ù…Ø¯ÙÙˆØ¹Ø§Øª  ');
+    fixture.componentInstance.root.controls.arabicName.setValue('  ا��&دف��عات  ');
     fixture.componentInstance.root.controls.englishName.setValue('  Payments  ');
 
     submit();
@@ -39,7 +39,7 @@ describe('CreateBranchServiceTreeDialogComponent', () => {
     expect(created).toHaveBeenCalledWith(
       expect.objectContaining({
         root: expect.objectContaining({
-          arabicName: 'Ø§Ù„Ù…Ø¯ÙÙˆØ¹Ø§Øª',
+          arabicName: 'ا��&دف��عات',
           englishName: 'Payments',
           serviceCode: null,
           isServiceCodeRequired: false,
@@ -52,7 +52,7 @@ describe('CreateBranchServiceTreeDialogComponent', () => {
   it('emits a trimmed service code when the node requires one', () => {
     const created = vi.fn<(request: CreateBranchServiceTreeRequest) => void>();
     fixture.componentInstance.created.subscribe(created);
-    fixture.componentInstance.root.controls.arabicName.setValue('Ø§Ù„Ù…Ø®ØªØ¨Ø±');
+    fixture.componentInstance.root.controls.arabicName.setValue('ا��&ختبر');
     fixture.componentInstance.root.controls.englishName.setValue('Laboratory');
     fixture.componentInstance.root.controls.isServiceCodeRequired.setValue(true);
     fixture.componentInstance.root.controls.serviceCode.setValue(' LAB-001 ');
@@ -69,7 +69,7 @@ describe('CreateBranchServiceTreeDialogComponent', () => {
   it('blocks whitespace-only service codes when the node requires one', () => {
     const created = vi.fn<(request: CreateBranchServiceTreeRequest) => void>();
     fixture.componentInstance.created.subscribe(created);
-    fixture.componentInstance.root.controls.arabicName.setValue('Ø§Ù„Ù…Ø®ØªØ¨Ø±');
+    fixture.componentInstance.root.controls.arabicName.setValue('ا��&ختبر');
     fixture.componentInstance.root.controls.englishName.setValue('Laboratory');
     fixture.componentInstance.root.controls.isServiceCodeRequired.setValue(true);
     fixture.componentInstance.root.controls.serviceCode.setValue('   ');
@@ -89,14 +89,14 @@ describe('CreateBranchServiceTreeDialogComponent', () => {
     };
     const root = fixture.componentInstance.root;
 
-    root.controls.arabicName.setValue('Ø§Ù„Ø£ØµÙ„');
+    root.controls.arabicName.setValue('ا�أص�');
     root.controls.englishName.setValue('Root');
     root.controls.isServiceCodeRequired.setValue(true);
     root.controls.serviceCode.setValue('DUP-001');
     component.addChild(root);
 
     const child = root.controls.children.at(0);
-    child.controls.arabicName.setValue('Ø§Ù„ÙØ±Ø¹');
+    child.controls.arabicName.setValue('ا�فرع');
     child.controls.englishName.setValue('Child');
     child.controls.isServiceCodeRequired.setValue(true);
     child.controls.serviceCode.setValue(' DUP-001 ');
@@ -121,7 +121,7 @@ describe('CreateBranchServiceTreeDialogComponent', () => {
       addChild: (group: typeof fixture.componentInstance.root) => void;
     };
     const root = fixture.componentInstance.root;
-    root.controls.arabicName.setValue('Ø®Ø¯Ù…Ø© ÙØ±Ø¹Ù� Ø©');
+    root.controls.arabicName.setValue('خد�&ة فرع�� ة');
     root.controls.englishName.setValue('Leaf service');
 
     component.addChild(root);

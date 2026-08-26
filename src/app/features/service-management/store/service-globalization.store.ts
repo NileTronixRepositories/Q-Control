@@ -10,7 +10,7 @@ import {
   ServiceGlobalizationRequestListItem,
   ServiceGlobalizationRequestStatus,
   ServiceGlobalizationRequestType,
-} from '../models/service-globalization.model';
+} from '../models/service-globalization/service-globalization.model';
 
 const EMPTY_PAGE: PagedServiceGlobalizationRequestsResponse = {
   currentPage: 1,

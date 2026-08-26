@@ -1,6 +1,6 @@
 ﻿import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 
-import { AppLanguage } from '../../models/app-language.model';
+import { AppLanguage } from '../../models/app-language/app-language.model';
 
 @Component({
   selector: 'app-language-header',

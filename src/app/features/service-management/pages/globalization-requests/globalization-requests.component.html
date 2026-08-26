@@ -1,5 +1,5 @@
-<section class="technical-admin-responsive-page container-fluid d-grid gap-3 p-lg-4 w-100" [attr.dir]="direction()" [attr.lang]="language()">
-<app-technical-admin-page-hero [eyebrow]="translations().eyebrow" [title]="translations().title" [description]="translations().description" icon="bi bi-patch-check-fill" />
+<section class="admin-responsive-page container-fluid d-grid gap-3 p-lg-4 w-100" [attr.dir]="direction()" [attr.lang]="language()">
+<app-page-hero [eyebrow]="translations().eyebrow" [title]="translations().title" [description]="translations().description" icon="bi bi-patch-check-fill" />
 @if (store.message(); as message) { <div class="position-fixed end-0 top-0 d-flex align-items-start gap-3 rounded-3 border p-3 shadow-lg" [class]="messageClasses(message.tone)" role="status" >
 <i class="mt-1" [class]="messageIcon(message.tone)" aria-hidden="true"></i>
 <p class="m-0 flex-grow-1 lh-lg">{{ message.text }}</p>

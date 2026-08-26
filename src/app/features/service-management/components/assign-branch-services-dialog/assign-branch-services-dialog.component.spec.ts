@@ -4,7 +4,7 @@ import { vi } from 'vitest';
 
 import { BRANCH_SERVICES_TRANSLATIONS } from '../../i18n/branch-services.translations';
 import { SERVICE_MANAGEMENT_TRANSLATIONS } from '../../i18n/service-management.translations';
-import { ServiceTreeNode } from '../../models/service-management.model';
+import { ServiceTreeNode } from '../../models/service-management/service-management.model';
 import { ServiceHierarchyTreeComponent } from '../service-hierarchy-tree/service-hierarchy-tree.component';
 import { AssignBranchServicesDialogComponent } from './assign-branch-services-dialog.component';
 
@@ -36,6 +36,7 @@ describe('AssignBranchServicesDialogComponent', () => {
   let fixture: ComponentFixture<AssignBranchServicesDialogComponent>;
 
   beforeEach(async () => {
+    TestBed.resetTestingModule();
     await TestBed.configureTestingModule({
       imports: [AssignBranchServicesDialogComponent],
     }).compileComponents();

@@ -1,6 +1,6 @@
 ﻿import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 
-import { OrganizationLanguage } from '../../models/organization.model';
+import { OrganizationLanguage } from '../../models/organization/organization.model';
 import { OrganizationStore } from '../../store/organization.store';
 import { OrganizationShellStore } from '../../store/organization-shell.store';
 

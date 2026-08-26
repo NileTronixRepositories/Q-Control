@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { SegmentGlobalizationRequest } from '../../models/segment.model';
+import { SegmentGlobalizationRequest } from '../../models/segment/segment.model';
 import { SegmentTranslations } from '../../i18n/segment.translations';
 
 @Component({

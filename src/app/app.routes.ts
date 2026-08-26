@@ -4,7 +4,7 @@ import { RedirectFunction, Router, Routes } from '@angular/router';
 import {
   adminConsoleAccessGuard,
   organizationAccessGuard,
-} from './features/auth/guards/auth-access.guard';
+} from '@core';
 
 const redirectLegacyTechnicalAdminRoute: RedirectFunction = (route) => {
   const router = inject(Router);
@@ -76,8 +76,8 @@ export const routes: Routes = [
     path: 'admin',
     canMatch: [adminConsoleAccessGuard],
     loadChildren: () =>
-      import('./features/technical-admin/technical-admin.routes').then(
-        (routes) => routes.TECHNICAL_ADMIN_ROUTES,
+      import('./layout/admin-shell/admin-shell.routes').then(
+        (routes) => routes.ADMIN_SHELL_ROUTES,
       ),
   },
   {

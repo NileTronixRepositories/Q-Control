@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, HostListener, input, output } from '@angular/core';
 
 import { BranchServicesTranslations } from '../../i18n/branch-services.translations';
-import { BranchServiceUnassignConfirmState } from '../../models/branch-services.model';
+import { BranchServiceUnassignConfirmState } from '../../models/branch-services/branch-services.model';
 
 @Component({
   selector: 'app-unassign-branch-service-dialog',

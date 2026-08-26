@@ -16,7 +16,7 @@ import {
   ValidatorFn,
   Validators,
 } from '@angular/forms';
-import { ServiceCustomInput } from '../../../service-management/models/service-management.model';
+import { ServiceCustomInput } from '../../../service-management/models/service-management/service-management.model';
 import { ServiceRequestStore } from '../../store/service-request.store';
 
 @Component({

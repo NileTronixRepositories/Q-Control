@@ -3,12 +3,12 @@ import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 
-import { TechnicalAdminPageHeroComponent } from '../../../../shared/components/technical-admin-page-hero/technical-admin-page-hero.component';
-import { AuthSessionService } from '../../../auth/services/auth-session.service';
-import { BranchListItem } from '../../../technical-admin/models/branch-management.model';
-import { BranchManagementApiService } from '../../../technical-admin/services/branch-management-api.service';
-import { TechnicalAdminI18nStore } from '../../../technical-admin/store/technical-admin-i18n.store';
-import { formatTechnicalAdminApiError } from '../../../technical-admin/utils/api-error-message.util';
+import { PageHeroComponent } from '../../../../shared/components/page-hero/page-hero.component';
+import { AuthSessionService } from '../../../auth/services/auth-session/auth-session.service';
+import { BranchListItem } from '@features/branch-management/public-api';
+import { BranchManagementApiService } from '@features/branch-management/public-api';
+import { AdminI18nStore } from '@layout/admin-shell/store/admin-i18n.store';
+import { formatApiError } from '@shared/utils/api-error-message.util';
 
 import { SegmentFormModalComponent } from '../../components/segment-form-modal/segment-form-modal.component';
 import { SegmentDetailsModalComponent } from '../../components/segment-details-modal/segment-details-modal.component';
@@ -21,9 +21,9 @@ import {
   SegmentGlobalizationRequest,
   SegmentScope,
   UpdateSegmentRequest,
-} from '../../models/segment.model';
-import { SegmentApiService } from '../../services/segment-api.service';
-import { SegmentPermissionService } from '../../services/segment-permission.service';
+} from '../../models/segment/segment.model';
+import { SegmentApiService } from '../../services/segment-api/segment-api.service';
+import { SegmentPermissionService } from '../../services/segment-permission/segment-permission.service';
 
 @Component({
   selector: 'app-segment-list-page',
@@ -31,7 +31,7 @@ import { SegmentPermissionService } from '../../services/segment-permission.serv
   imports: [
     DatePipe,
     FormsModule,
-    TechnicalAdminPageHeroComponent,
+    PageHeroComponent,
     SegmentFormModalComponent,
     SegmentDetailsModalComponent,
     GlobalizationRequestDetailsModalComponent,
@@ -43,7 +43,7 @@ import { SegmentPermissionService } from '../../services/segment-permission.serv
 export class SegmentListComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly authSessionService = inject(AuthSessionService);
-  private readonly i18nStore = inject(TechnicalAdminI18nStore);
+  private readonly i18nStore = inject(AdminI18nStore);
   private readonly segmentApiService = inject(SegmentApiService);
   protected readonly permissionService = inject(SegmentPermissionService);
   private readonly branchApiService = inject(BranchManagementApiService);
@@ -125,7 +125,7 @@ export class SegmentListComponent implements OnInit {
         },
         error: (err) => {
           this.loading.set(false);
-          this.showToast(formatTechnicalAdminApiError(err, 'Failed to load segments'), 'error');
+          this.showToast(formatApiError(err, 'Failed to load segments'), 'error');
         },
       });
   }
@@ -205,7 +205,7 @@ export class SegmentListComponent implements OnInit {
           },
           error: (err) => {
             this.saving.set(false);
-            this.showToast(formatTechnicalAdminApiError(err, 'Failed to create global segment'), 'error');
+            this.showToast(formatApiError(err, 'Failed to create global segment'), 'error');
           },
         });
     } else if (this.formModalMode() === 'createBranch') {
@@ -229,7 +229,7 @@ export class SegmentListComponent implements OnInit {
           },
           error: (err) => {
             this.saving.set(false);
-            this.showToast(formatTechnicalAdminApiError(err, 'Failed to create branch segment'), 'error');
+            this.showToast(formatApiError(err, 'Failed to create branch segment'), 'error');
           },
         });
     } else if (this.formModalMode() === 'edit' && this.selectedSegmentForEdit()) {
@@ -247,7 +247,7 @@ export class SegmentListComponent implements OnInit {
             this.showToast(this.translations().concurrencyError, 'error');
             this.loadSegments();
           } else {
-            this.showToast(formatTechnicalAdminApiError(err, 'Failed to update segment'), 'error');
+            this.showToast(formatApiError(err, 'Failed to update segment'), 'error');
           }
         },
       });
@@ -261,7 +261,7 @@ export class SegmentListComponent implements OnInit {
         this.detailsModalOpen.set(true);
       },
       error: (err) => {
-        this.showToast(formatTechnicalAdminApiError(err, 'Failed to load segment details'), 'error');
+        this.showToast(formatApiError(err, 'Failed to load segment details'), 'error');
       },
     });
   }
@@ -278,7 +278,7 @@ export class SegmentListComponent implements OnInit {
         this.globalizationRequestModalOpen.set(true);
       },
       error: (err) => {
-        this.showToast(formatTechnicalAdminApiError(err, 'Failed to load request details'), 'error');
+        this.showToast(formatApiError(err, 'Failed to load request details'), 'error');
       },
     });
   }
@@ -300,7 +300,7 @@ export class SegmentListComponent implements OnInit {
         },
         error: (err) => {
           this.requestProcessing.set(false);
-          this.showToast(formatTechnicalAdminApiError(err, 'Failed to approve request'), 'error');
+          this.showToast(formatApiError(err, 'Failed to approve request'), 'error');
         },
       });
   }
@@ -320,7 +320,7 @@ export class SegmentListComponent implements OnInit {
         },
         error: (err) => {
           this.requestProcessing.set(false);
-          this.showToast(formatTechnicalAdminApiError(err, 'Failed to reject request'), 'error');
+          this.showToast(formatApiError(err, 'Failed to reject request'), 'error');
         },
       });
   }

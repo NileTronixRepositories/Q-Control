@@ -1,8 +1,8 @@
 import { computed, inject, Injectable } from '@angular/core';
 
 import { AppLanguageStore } from '../../../shared/store/app-language.store';
-import { LoginDirection, LoginLanguage } from '../models/login-translations.model';
-import { LoginTranslationService } from '../services/login-translation.service';
+import { LoginDirection, LoginLanguage } from '../models/login-translations/login-translations.model';
+import { LoginTranslationService } from '../services/login-translation/login-translation.service';
 
 @Injectable()
 export class LoginI18nStore {

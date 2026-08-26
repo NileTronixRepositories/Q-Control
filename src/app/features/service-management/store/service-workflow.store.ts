@@ -1,7 +1,7 @@
 import { computed, Injectable, signal } from '@angular/core';
 
-import { BranchListItem } from '../../technical-admin/models/branch-management.model';
-import { PagedServiceResponse, ServiceTreeNode } from '../models/service-management.model';
+import { BranchListItem } from '@features/branch-management/public-api';
+import { PagedServiceResponse, ServiceTreeNode } from '../models/service-management/service-management.model';
 import {
   ServiceWorkflowDetails,
   ServiceWorkflowListItem,
@@ -12,7 +12,7 @@ import {
   WorkflowConfirmState,
   WorkflowPanelMode,
   WorkflowStartOptions,
-} from '../models/service-workflow.model';
+} from '../models/service-workflow/service-workflow.model';
 
 export const EMPTY_WORKFLOW_PAGE: PagedServiceResponse<ServiceWorkflowListItem> = {
   currentPage: 1,

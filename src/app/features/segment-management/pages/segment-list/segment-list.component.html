@@ -1,9 +1,9 @@
 <section
-  class="technical-admin-responsive-page segment-management-page container-fluid"
+  class="admin-responsive-page segment-management-page container-fluid"
   [attr.dir]="direction()"
   [attr.lang]="language()"
 >
-  <app-technical-admin-page-hero
+  <app-page-hero
     [eyebrow]="language() === 'ar' ? 'إدارة النظم والشرائح' : 'System & Segment Administration'"
     [title]="translations().title"
     [description]="translations().description"
@@ -105,7 +105,7 @@
         </div>
       </div>
     </div>
-  </app-technical-admin-page-hero>
+  </app-page-hero>
 
   <!-- Toast Notification -->
   @if (toastMessage(); as msg) {

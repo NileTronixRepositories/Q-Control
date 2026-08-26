@@ -2,8 +2,8 @@ import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/c
 import { Router, RouterOutlet } from '@angular/router';
 
 import { AppShellComponent } from '../../../shared/layouts/app-shell/app-shell.component';
-import { AppNavigationItem } from '../../../shared/models/navigation.model';
-import { AuthSessionService } from '../../auth/services/auth-session.service';
+import { AppNavigationItem } from '../../../shared/models/navigation/navigation.model';
+import { AuthSessionService } from '../../auth/services/auth-session/auth-session.service';
 import { OrganizationShellStore } from '../store/organization-shell.store';
 
 @Component({

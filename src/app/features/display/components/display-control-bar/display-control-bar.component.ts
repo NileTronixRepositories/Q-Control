@@ -7,7 +7,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { DisplayStateService } from '../../services/display-state.service';
+import { DisplayStateService } from '../../services/display-state/display-state.service';
 
 @Component({
   selector: 'app-display-control-bar',

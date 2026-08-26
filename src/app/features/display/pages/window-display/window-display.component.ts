@@ -10,8 +10,9 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { DisplayHeaderComponent } from '../../components/display-header/display-header.component';
 import { DisplayTickerBarComponent } from '../../components/display-ticker-bar/display-ticker-bar.component';
-import { DisplayStateService } from '../../services/display-state.service';
-import { DisplayQueueItem } from '../../models/display.model';
+import { DisplayStateService } from '../../services/display-state/display-state.service';
+import { DisplayQueueItem } from '../../models/display/display.model';
+import { DISPLAY_TRANSLATIONS } from '../../i18n/display.translations';
 
 @Component({
   selector: 'app-window-display',
@@ -30,6 +31,7 @@ export class WindowDisplayComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
 
   readonly isAr = computed(() => this.state.language() === 'ar');
+  readonly translations = computed(() => DISPLAY_TRANSLATIONS[this.state.language()]);
   readonly currentWindow = this.state.selectedWindow;
 
   ngOnInit(): void {

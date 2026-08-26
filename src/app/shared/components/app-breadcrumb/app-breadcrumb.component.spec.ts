@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 
-import { AppBreadcrumbItem } from '../../models/breadcrumb.model';
+import { AppBreadcrumbItem } from '../../models/breadcrumb/breadcrumb.model';
 import { AppBreadcrumbComponent } from './app-breadcrumb.component';
 
 @Component({

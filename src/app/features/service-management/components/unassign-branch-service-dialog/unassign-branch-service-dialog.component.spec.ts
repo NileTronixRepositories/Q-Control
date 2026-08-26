@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { vi } from 'vitest';
 
 import { BRANCH_SERVICES_TRANSLATIONS } from '../../i18n/branch-services.translations';
-import { BranchServiceUnassignConfirmState } from '../../models/branch-services.model';
+import { BranchServiceUnassignConfirmState } from '../../models/branch-services/branch-services.model';
 import { UnassignBranchServiceDialogComponent } from './unassign-branch-service-dialog.component';
 
 const state: BranchServiceUnassignConfirmState = {

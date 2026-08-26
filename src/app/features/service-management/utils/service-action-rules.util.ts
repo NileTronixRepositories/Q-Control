@@ -1,4 +1,4 @@
-import { ServiceListItem, ServiceDetails, ServiceTreeNode } from '../models/service-management.model';
+import { ServiceListItem, ServiceDetails, ServiceTreeNode } from '../models/service-management/service-management.model';
 
 export type ServiceActionSubject = Pick<
   ServiceListItem | ServiceDetails | ServiceTreeNode,

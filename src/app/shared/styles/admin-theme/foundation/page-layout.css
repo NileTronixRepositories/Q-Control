@@ -39,68 +39,10 @@ body
 }
 
 body :where(.page-header, .page-hero) {
-  position: relative !important;
-  isolation: isolate;
-  min-height: var(--nt-hero-min-height) !important;
-  overflow: hidden !important;
-  padding: var(--nt-hero-padding-y) var(--nt-hero-padding-x) !important;
-  align-items: center !important;
-  color: var(--q-page-hero-text, var(--nt-text)) !important;
-  background: var(
-    --q-page-hero-bg,
-    linear-gradient(
-      90deg,
-      rgba(255, 255, 255, 0.99) 0%,
-      rgba(255, 255, 255, 0.97) 66%,
-      rgba(234, 246, 251, 0.62) 100%
-    ),
-    var(--nt-card)
-  ) !important;
-  border: 1px solid var(--q-page-hero-border, var(--nt-border)) !important;
-  border-radius: var(--q-page-hero-radius, 12px) !important;
-  box-shadow: var(--q-page-hero-shadow, 0 10px 28px rgba(27, 36, 48, 0.055)) !important;
-}
-
-body :where(.page-header, .page-hero)::before {
-  position: absolute !important;
-  inset: 0 -8px 0 auto !important;
-  z-index: -1 !important;
-  width: 260px !important;
-  height: 100% !important;
-  content: '' !important;
-  background: var(
-    --q-page-hero-accent-bg,
-    linear-gradient(
-      135deg,
-      transparent 0 17%,
-      rgba(15, 125, 168, 0.14) 17% 29%,
-      transparent 29% 45%,
-      rgba(243, 24, 45, 0.14) 45% 58%,
-      transparent 58% 68%,
-      rgba(15, 125, 168, 0.12) 68% 100%
-    )
-  ) !important;
-  border-radius: 0 12px 12px 0 !important;
-  opacity: 0.74 !important;
-  transform: skewX(-8deg) !important;
-}
-
-body :where(.page-header, .page-hero)::after {
-  position: absolute !important;
-  inset: 92px 246px auto auto !important;
-  z-index: -1 !important;
-  width: 70px !important;
-  height: 70px !important;
-  content: '' !important;
-  background-color: transparent !important;
-  background-image: radial-gradient(
-    circle,
-    var(--q-page-hero-dot-color, rgba(15, 125, 168, 0.18)) 2px,
-    transparent 3px
-  ) !important;
-  background-size: 14px 14px !important;
-  clip-path: none !important;
-  opacity: 0.52 !important;
+  position: relative;
+  overflow: hidden;
+  align-items: center;
+  color: var(--q-page-hero-text, var(--nt-text));
 }
 
 body :where(.page-header .eyebrow, .page-hero .eyebrow, .eyebrow) {

@@ -1,9 +1,9 @@
 <section
-  class="technical-admin-responsive-page branch-services-page container-fluid d-flex flex-column gap-3 p-3 p-lg-4"
+  class="admin-responsive-page branch-services-page container-fluid d-flex flex-column gap-3 p-3 p-lg-4"
   [attr.dir]="direction()"
   [attr.lang]="language()"
 >
-  <app-technical-admin-page-hero
+  <app-page-hero
     [eyebrow]="language() === 'ar' ? 'إدارة الخدمات والعمليات' : 'Services & Workflows Management'"
     [title]="translations().title"
     [description]="language() === 'ar' ? 'عرض وتخصيص شجرة الخدمات المتاحة للفرع والموافقة على طلبات الاعتماد المركزية.' : 'View and customize the branch service tree and approve central requests.'"
@@ -47,7 +47,7 @@
         </button>
       }
     </div>
-  </app-technical-admin-page-hero>
+  </app-page-hero>
   @if (store.message(); as currentMessage) {
     <div class="branch-services-toast" role="status" aria-live="polite" aria-atomic="true">
       <div

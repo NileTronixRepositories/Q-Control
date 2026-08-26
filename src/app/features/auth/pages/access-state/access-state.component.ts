@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 
-import { AuthNavigationService } from '../../services/auth-navigation.service';
-import { AuthSessionService } from '../../services/auth-session.service';
+import { AuthNavigationService } from '../../services/auth-navigation/auth-navigation.service';
+import { AuthSessionService } from '../../services/auth-session/auth-session.service';
 import { LoginI18nStore } from '../../store/login-i18n.store';
 
 @Component({

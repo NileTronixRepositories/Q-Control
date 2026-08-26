@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, HostListener, input, outp
 
 import { BranchServicesTranslations } from '../../i18n/branch-services.translations';
 import { ServiceManagementTranslations } from '../../i18n/service-management.translations';
-import { BranchServiceLifecycleConfirmState } from '../../models/branch-services.model';
+import { BranchServiceLifecycleConfirmState } from '../../models/branch-services/branch-services.model';
 
 @Component({
   selector: 'app-branch-service-lifecycle-dialog',

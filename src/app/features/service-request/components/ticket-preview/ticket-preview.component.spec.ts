@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { SERVICE_REQUEST_TRANSLATIONS } from '../../models/language.model';
-import { QueueTicket } from '../../models/ticket.model';
+import { SERVICE_REQUEST_TRANSLATIONS } from '../../models/language/language.model';
+import { QueueTicket } from '../../models/ticket/ticket.model';
 import { TicketPreviewComponent } from './ticket-preview.component';
 
 describe('TicketPreviewComponent', () => {

@@ -4,16 +4,16 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { of, Subject, throwError } from 'rxjs';
 
-import { AuthSessionService } from '../../../auth/services/auth-session.service';
-import { BranchManagementApiService } from '../../../technical-admin/services/branch-management-api.service';
-import { TechnicalAdminI18nStore } from '../../../technical-admin/store/technical-admin-i18n.store';
+import { AuthSessionService } from '../../../auth/services/auth-session/auth-session.service';
+import { BranchManagementApiService } from '@features/branch-management/public-api';
+import { AdminI18nStore } from '@layout/admin-shell/store/admin-i18n.store';
 import {
   PagedServiceGlobalizationRequestsResponse,
   ServiceGlobalizationRequestListItem,
-} from '../../models/service-globalization.model';
-import { ServiceDataInvalidationService } from '../../services/catalog/service-data-invalidation.service';
-import { ServiceGlobalizationApiService } from '../../services/globalization/service-globalization-api.service';
-import { ServiceManagementPermissionService } from '../../services/catalog/service-management-permission.service';
+} from '../../models/service-globalization/service-globalization.model';
+import { ServiceDataInvalidationService } from '../../services/catalog/service-data-invalidation/service-data-invalidation.service';
+import { ServiceGlobalizationApiService } from '../../services/globalization/service-globalization-api/service-globalization-api.service';
+import { ServiceManagementPermissionService } from '../../services/catalog/service-management-permission/service-management-permission.service';
 import { ServiceGlobalizationStore } from '../../store/service-globalization.store';
 import { GlobalizationRequestsComponent } from './globalization-requests.component';
 
@@ -47,7 +47,7 @@ describe('GlobalizationRequestsComponent responsive presentation', () => {
           },
         },
         {
-          provide: TechnicalAdminI18nStore,
+          provide: AdminI18nStore,
           useValue: {
             language: signal<'ar' | 'en'>('en').asReadonly(),
             direction: signal<'rtl' | 'ltr'>('ltr').asReadonly(),
@@ -252,10 +252,10 @@ function createItem(
     requestType: 'BranchServiceTree',
     status,
     branchId: 5,
-    branchArabicName: 'Ø§Ù„ÙØ±Ø¹ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠ',
+    branchArabicName: 'ا�فرع ا�رئ�`س�`',
     branchEnglishName: 'Main Branch',
     rootServiceId: 100 + requestId,
-    rootServiceArabicName: `Ø®Ø¯Ù…Ø© ${requestId}`,
+    rootServiceArabicName: `خد�&ة ${requestId}`,
     rootServiceEnglishName: `Service ${requestId}`,
     parentServiceId: null,
     parentServiceArabicName: null,
@@ -276,7 +276,7 @@ function createDetails() {
     requestType: 'BranchServiceTree' as const,
     status: 'Pending' as const,
     branchId: 5,
-    branchArabicName: 'Ø§Ù„ÙØ±Ø¹ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠ',
+    branchArabicName: 'ا�فرع ا�رئ�`س�`',
     branchEnglishName: 'Main Branch',
     rootServiceId: 101,
     requestedByApplicationUserId: 'user-1',
@@ -289,7 +289,7 @@ function createDetails() {
       {
         serviceId: 101,
         parentServiceId: null,
-        arabicName: 'Ø®Ø¯Ù…Ø© 1',
+        arabicName: 'خد�&ة 1',
         englishName: 'Service 1',
         scope: 'BranchScoped' as const,
         ownerBranchId: 5,

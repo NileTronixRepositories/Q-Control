@@ -13,28 +13,28 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs';
 
-import { TechnicalAdminPageHeroComponent } from '../../../../shared/components/technical-admin-page-hero/technical-admin-page-hero.component';
+import { PageHeroComponent } from '../../../../shared/components/page-hero/page-hero.component';
 
-import { AuthSessionService } from '../../../auth/services/auth-session.service';
-import { TechnicalAdminI18nStore } from '../../../technical-admin/store/technical-admin-i18n.store';
-import { formatTechnicalAdminApiError } from '../../../technical-admin/utils/api-error-message.util';
+import { AuthSessionService } from '../../../auth/services/auth-session/auth-session.service';
+import { AdminI18nStore } from '@layout/admin-shell/store/admin-i18n.store';
+import { formatApiError } from '@shared/utils/api-error-message.util';
 import { ServiceHierarchyTreeComponent } from '../../components/service-hierarchy-tree/service-hierarchy-tree.component';
 import { SERVICE_GLOBALIZATION_TRANSLATIONS } from '../../i18n/service-globalization.translations';
 import { SERVICE_MANAGEMENT_TRANSLATIONS } from '../../i18n/service-management.translations';
-import { ServiceTreeNode } from '../../models/service-management.model';
-import { ServiceDataInvalidationService } from '../../services/catalog/service-data-invalidation.service';
-import { ServiceManagementApiService } from '../../services/catalog/service-management-api.service';
+import { ServiceTreeNode } from '../../models/service-management/service-management.model';
+import { ServiceDataInvalidationService } from '../../services/catalog/service-data-invalidation/service-data-invalidation.service';
+import { ServiceManagementApiService } from '../../services/catalog/service-management-api/service-management-api.service';
 
 @Component({
   selector: 'app-central-service-tree',
   standalone: true,
-  imports: [ServiceHierarchyTreeComponent, TechnicalAdminPageHeroComponent],
+  imports: [ServiceHierarchyTreeComponent, PageHeroComponent],
   templateUrl: './central-service-tree.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CentralServiceTreeComponent implements OnInit {
   private readonly apiService = inject(ServiceManagementApiService);
-  private readonly i18nStore = inject(TechnicalAdminI18nStore);
+  private readonly i18nStore = inject(AdminI18nStore);
   private readonly authSessionService = inject(AuthSessionService);
   private readonly invalidationService = inject(ServiceDataInvalidationService);
   private readonly destroyRef = inject(DestroyRef);
@@ -87,7 +87,7 @@ export class CentralServiceTreeComponent implements OnInit {
         },
         error: (error: HttpErrorResponse) =>
           requestId === this.requestId
-            ? this.error.set(formatTechnicalAdminApiError(error, this.translations().fallbackError))
+            ? this.error.set(formatApiError(error, this.translations().fallbackError))
             : undefined,
       });
   }

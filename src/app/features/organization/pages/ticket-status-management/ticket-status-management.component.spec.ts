@@ -1,7 +1,7 @@
 import { computed, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { AppDirection, AppLanguage } from '../../../../shared/models/app-language.model';
+import { AppDirection, AppLanguage } from '../../../../shared/models/app-language/app-language.model';
 import { AppLanguageStore } from '../../../../shared/store/app-language.store';
 import { OrganizationShellStore } from '../../store/organization-shell.store';
 import { OrganizationStore } from '../../store/organization.store';

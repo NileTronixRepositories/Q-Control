@@ -3,15 +3,15 @@ import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 
-import { TechnicalAdminPageHeroComponent } from '../../../../shared/components/technical-admin-page-hero/technical-admin-page-hero.component';
-import { AuthSessionService } from '../../../auth/services/auth-session.service';
-import { TechnicalAdminI18nStore } from '../../../technical-admin/store/technical-admin-i18n.store';
-import { formatTechnicalAdminApiError } from '../../../technical-admin/utils/api-error-message.util';
+import { PageHeroComponent } from '../../../../shared/components/page-hero/page-hero.component';
+import { AuthSessionService } from '../../../auth/services/auth-session/auth-session.service';
+import { AdminI18nStore } from '@layout/admin-shell/store/admin-i18n.store';
+import { formatApiError } from '@shared/utils/api-error-message.util';
 
 import { GlobalizationRequestDetailsModalComponent } from '../../components/globalization-request-details-modal/globalization-request-details-modal.component';
 import { SEGMENT_TRANSLATIONS_AR, SEGMENT_TRANSLATIONS_EN, SegmentTranslations } from '../../i18n/segment.translations';
-import { SegmentGlobalizationRequest, SegmentGlobalizationRequestStatus } from '../../models/segment.model';
-import { SegmentApiService } from '../../services/segment-api.service';
+import { SegmentGlobalizationRequest, SegmentGlobalizationRequestStatus } from '../../models/segment/segment.model';
+import { SegmentApiService } from '../../services/segment-api/segment-api.service';
 
 @Component({
   selector: 'app-branch-segment-requests-page',
@@ -19,7 +19,7 @@ import { SegmentApiService } from '../../services/segment-api.service';
   imports: [
     DatePipe,
     FormsModule,
-    TechnicalAdminPageHeroComponent,
+    PageHeroComponent,
     GlobalizationRequestDetailsModalComponent,
   ],
   templateUrl: './branch-segment-requests.component.html',
@@ -28,7 +28,7 @@ import { SegmentApiService } from '../../services/segment-api.service';
 })
 export class BranchSegmentRequestsComponent implements OnInit {
   private readonly authSessionService = inject(AuthSessionService);
-  private readonly i18nStore = inject(TechnicalAdminI18nStore);
+  private readonly i18nStore = inject(AdminI18nStore);
   private readonly segmentApiService = inject(SegmentApiService);
 
   requests = signal<SegmentGlobalizationRequest[]>([]);
@@ -80,7 +80,7 @@ export class BranchSegmentRequestsComponent implements OnInit {
         },
         error: (err) => {
           this.loading.set(false);
-          this.showToast(formatTechnicalAdminApiError(err, 'Failed to load branch requests'), 'error');
+          this.showToast(formatApiError(err, 'Failed to load branch requests'), 'error');
         },
       });
   }

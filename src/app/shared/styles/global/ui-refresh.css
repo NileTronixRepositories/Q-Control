@@ -8,11 +8,10 @@
     .terminal-management-page
   )
   :where(
-    input:not([type='checkbox']):not([type='radio']):not([type='color']),
-    select,
-    textarea,
     .form-control,
-    .form-select
+    .form-select,
+    select,
+    textarea
   ) {
   color: var(--text-primary) !important;
   background: var(--surface-muted) !important;
@@ -29,11 +28,10 @@
     .terminal-management-page
   )
   :where(
-    input:not([type='checkbox']):not([type='radio']):not([type='color']):focus,
-    select:focus,
-    textarea:focus,
     .form-control:focus,
-    .form-select:focus
+    .form-select:focus,
+    select:focus,
+    textarea:focus
   ) {
   background: #ffffff !important;
   border-color: var(--primary-color) !important;

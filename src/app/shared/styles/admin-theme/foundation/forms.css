@@ -13,7 +13,7 @@ body[data-admin-theme]
 }
 
 body[data-admin-theme]
-  :where(input:not([type='checkbox']):not([type='radio']):not([type='color']), select, textarea, .form-control, .form-select) {
+  :where(.form-control, .form-select, select, textarea) {
   min-height: var(--nt-control-height);
   color: var(--q-text-primary, var(--nt-text));
   background-color: #ffffff;
@@ -25,11 +25,23 @@ body[data-admin-theme]
 }
 
 body[data-admin-theme]
-  :where(input:not([type='checkbox']):not([type='radio']):not([type='color']):focus, select:focus, textarea:focus, .form-control:focus, .form-select:focus) {
+  :where(.form-control:focus, .form-select:focus, select:focus, textarea:focus) {
   background-color: #ffffff;
   border-color: rgba(var(--q-primary-rgb, 15 125 168) / 0.52);
   box-shadow: var(--nt-focus);
   outline: 0;
+}
+
+/* Reset for nested inputs inside composite shells */
+body[data-admin-theme] .input-shell input,
+body[data-admin-theme] .color-picker-control input,
+body[data-admin-theme] .color-picker-control input[type='text'],
+body[data-admin-theme] .color-picker-control input[type='color'] {
+  border: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  border-radius: 0 !important;
+  min-height: auto !important;
 }
 
 body[data-admin-theme] :where(.input-wrapper, .color-control) {

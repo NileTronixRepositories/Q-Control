@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 
-import { AppLanguage } from '../../../../shared/models/app-language.model';
-import { ServiceRequestLanguage } from '../../models/language.model';
+import { AppLanguage } from '../../../../shared/models/app-language/app-language.model';
+import { ServiceRequestLanguage } from '../../models/language/language.model';
 
 @Component({
   selector: 'app-service-request-language-selector',

@@ -11,7 +11,7 @@ import {
   ServiceParentOption,
   ServiceTreeNode,
   ServiceUiMessage,
-} from '../models/service-management.model';
+} from '../models/service-management/service-management.model';
 
 export const EMPTY_SERVICE_PAGE: PagedServiceResponse<ServiceListItem> = {
   currentPage: 1,

@@ -1,0 +1,655 @@
+<section
+  class="admin-responsive-page branch-videos-page technical-page container-fluid"
+  [attr.dir]="isAr() ? 'rtl' : 'ltr'"
+  [attr.lang]="language()"
+>
+  <!-- Page Hero Header -->
+  <app-page-hero
+    [eyebrow]="isAr() ? 'إدارة الفرع' : 'Branch Management'"
+    [title]="isAr() ? 'فيديوهات الشاشات' : 'Display Videos'"
+    [description]="
+      isAr()
+        ? 'إدارة قائمة الفيديوهات الموحدة المشتركة بين جميع شاشات العرض التابعة للفرع.'
+        : 'Manage the unified display video playlist shared across all displays in this branch.'
+    "
+    icon="bi bi-film"
+  />
+
+  <!-- Toast Notification Alert -->
+  @if (message(); as currentMessage) {
+    <div class="toast-stack" role="status" aria-live="polite" aria-atomic="true">
+      <div
+        class="toast-item"
+        [class.toast-success]="currentMessage.tone === 'success'"
+        [class.toast-error]="currentMessage.tone === 'error'"
+        [class.toast-info]="currentMessage.tone === 'info'"
+      >
+        <i
+          class="bi"
+          [class.bi-check-circle-fill]="currentMessage.tone === 'success'"
+          [class.bi-x-octagon-fill]="currentMessage.tone === 'error'"
+          [class.bi-info-circle-fill]="currentMessage.tone === 'info'"
+          aria-hidden="true"
+        ></i>
+        <p>{{ currentMessage.text }}</p>
+        <button type="button" class="toast-close" (click)="clearMessage()" aria-label="Close">
+          <i class="bi bi-x-lg" aria-hidden="true"></i>
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- Branch Selector Context Bar -->
+  <section class="branding-context" [attr.aria-label]="isAr() ? 'اختيار الفرع' : 'Branch Selector'">
+    <div class="branding-context-copy">
+      <span class="branding-context-icon" aria-hidden="true">
+        <i class="bi bi-buildings"></i>
+      </span>
+      <div>
+        <strong>{{ isAr() ? 'الفرع المحدد' : 'Selected Branch' }}</strong>
+        <span>{{ selectedBranchLabel() || (isAr() ? 'اختر الفرع...' : 'Select Branch...') }}</span>
+      </div>
+    </div>
+
+    <div class="branding-context-actions">
+      @if (isTechnicalAdmin() && branches().length > 1) {
+        <select
+          id="branchVideosSelect"
+          class="form-select branch-selector-control"
+          [value]="selectedBranchId() ?? ''"
+          [disabled]="branchesLoading()"
+          (change)="onBranchSelect($event)"
+        >
+          <option value="" [selected]="!selectedBranchId()">
+            {{ isAr() ? 'اختر الفرع...' : 'Select Branch...' }}
+          </option>
+          @for (branch of branches(); track branch.branchId) {
+            <option [value]="branch.branchId" [selected]="branch.branchId === selectedBranchId()">
+              {{ isAr() ? branch.arabicName : branch.englishName }}
+            </option>
+          }
+        </select>
+      } @else if (selectedBranchId()) {
+        <div class="d-inline-flex align-items-center gap-2 px-3 py-2 bg-light border rounded text-dark fw-bold small">
+          <i class="bi bi-buildings text-primary"></i>
+          <span>{{ selectedBranchLabel() }}</span>
+        </div>
+      }
+      <button
+        type="button"
+        class="secondary-action branding-refresh-action"
+        [disabled]="!selectedBranchId() || videosLoading()"
+        (click)="selectedBranchId() && loadVideos(selectedBranchId()!)"
+        [attr.title]="isAr() ? 'تحديث' : 'Refresh'"
+      >
+        <i class="bi bi-arrow-repeat" aria-hidden="true"></i>
+        {{ isAr() ? 'تحديث' : 'Refresh' }}
+      </button>
+    </div>
+  </section>
+
+  @if (branchesLoading()) {
+    <app-niletronix-loading-state
+      [title]="isAr() ? 'جاري تحميل الفروع...' : 'Loading branches...'"
+      variant="inline"
+      size="sm"
+    />
+  }
+
+  @if (selectedBranchId()) {
+    <!-- Main Video Management Content -->
+    <section class="videos-management-workspace d-grid gap-4 mt-3">
+      <!-- Action Toolbar -->
+      <div class="videos-toolbar d-flex align-items-center justify-content-between flex-wrap gap-3">
+        <!-- Filter Pills -->
+        <div class="filter-pills-group d-flex align-items-center gap-2">
+          <button
+            type="button"
+            class="filter-pill"
+            [class.active]="activeFilter() === 'all'"
+            (click)="setFilter('all')"
+          >
+            {{ isAr() ? 'الكل' : 'All' }} ({{ videos().length }})
+          </button>
+          <button
+            type="button"
+            class="filter-pill"
+            [class.active]="activeFilter() === 'active'"
+            (click)="setFilter('active')"
+          >
+            <span class="status-dot-mini active-dot"></span>
+            {{ isAr() ? 'المفعلة' : 'Active' }}
+          </button>
+          <button
+            type="button"
+            class="filter-pill"
+            [class.active]="activeFilter() === 'inactive'"
+            (click)="setFilter('inactive')"
+          >
+            <span class="status-dot-mini inactive-dot"></span>
+            {{ isAr() ? 'غير المفعلة' : 'Inactive' }}
+          </button>
+          <!-- route to display/main preview  -->
+          <a
+            routerLink="/display/main"
+            [queryParams]="selectedBranchId() ? { branchId: selectedBranchId() } : null"
+            target="_blank"
+            class="filter-pill text-decoration-none"
+            [attr.title]="
+              isAr() ? 'فتح شاشة العرض الرئيسية في نافذة جديدة' : 'Open Main Display in new tab'
+            "
+          >
+            <i class="bi bi-tv me-1"></i>
+            {{ isAr() ? 'معاينة شاشة العرض' : 'Display Preview' }}
+            <i class="bi bi-box-arrow-up-right ms-1" style="font-size: 0.75rem"></i>
+          </a>
+        </div>
+
+        <!-- Primary Action Buttons -->
+        <div class="primary-actions-group d-flex align-items-center gap-2">
+          @if (canUpdate()) {
+            <button type="button" class="btn-primary-action" (click)="openUploadModal()">
+              <i class="bi bi-cloud-arrow-up-fill"></i>
+              <span>{{ isAr() ? 'رفع فيديو جديد' : 'Upload Video' }}</span>
+            </button>
+          }
+
+          <button
+            type="button"
+            class="btn-playlist-action"
+            (click)="openPlaylistPreview()"
+            [attr.title]="isAr() ? 'معاينة قائمة التشغيل الكاملة' : 'Preview Full Playlist'"
+          >
+            <i class="bi bi-play-circle-fill"></i>
+            <span>{{ isAr() ? 'معاينة قائمة التشغيل ▶' : 'Preview Playlist ▶' }}</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Video List Table Panel -->
+      <article class="content-panel videos-table-panel">
+        @if (videosLoading()) {
+          <app-niletronix-loading-state
+            [title]="isAr() ? 'جاري تحميل الفيديوهات...' : 'Loading display videos...'"
+            variant="panel"
+            size="md"
+          />
+        } @else if (filteredVideos().length === 0) {
+          <div class="empty-videos-state text-center p-5">
+            <div class="empty-icon-circle mb-3">
+              <i class="bi bi-film"></i>
+            </div>
+            <h4>{{ isAr() ? 'لا توجد فيديوهات حالياً' : 'No Display Videos Found' }}</h4>
+            <p class="text-muted">
+              {{
+                isAr()
+                  ? 'قم برفع فيديوهات لتعرض على جميع شاشات العرض التابعة لهذا الفرع.'
+                  : 'Upload videos to display across all screens in this branch.'
+              }}
+            </p>
+            @if (canUpdate()) {
+              <button type="button" class="btn-primary-action mt-2" (click)="openUploadModal()">
+                <i class="bi bi-cloud-arrow-up-fill"></i>
+                <span>{{ isAr() ? 'رفع فيديو الآن' : 'Upload Video Now' }}</span>
+              </button>
+            }
+          </div>
+        } @else {
+          <div class="table-responsive">
+            <table class="table modern-videos-table">
+              <thead>
+                <tr>
+                  <th style="width: 100px">{{ isAr() ? 'الترتيب' : 'Order' }}</th>
+                  <th>{{ isAr() ? 'اسم الفيديو' : 'Video Name' }}</th>
+                  <th style="width: 180px">{{ isAr() ? 'حالة المعالجة' : 'Processing' }}</th>
+                  <th style="width: 140px">{{ isAr() ? 'الحالة' : 'Status' }}</th>
+                  <th style="width: 220px" class="text-end">
+                    {{ isAr() ? 'الإجراءات' : 'Actions' }}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (video of filteredVideos(); track video.id; let idx = $index) {
+                  <tr class="video-row" [class.inactive-row]="!video.isActive">
+                    <!-- Order Column with Reorder Arrows -->
+                    <td>
+                      <div class="order-cell d-flex align-items-center gap-1">
+                        <span class="order-badge">{{ video.displayOrder }}</span>
+                        @if (canUpdate()) {
+                          <div class="reorder-btn-group d-flex flex-column">
+                            <button
+                              type="button"
+                              class="reorder-arrow-btn"
+                              [disabled]="idx === 0 || isSubmitting()"
+                              (click)="moveVideo(idx, 'up')"
+                              [attr.title]="isAr() ? 'تقديم الترتيب' : 'Move Up'"
+                            >
+                              <i class="bi bi-chevron-up"></i>
+                            </button>
+                            <button
+                              type="button"
+                              class="reorder-arrow-btn"
+                              [disabled]="idx === filteredVideos().length - 1 || isSubmitting()"
+                              (click)="moveVideo(idx, 'down')"
+                              [attr.title]="isAr() ? 'تأخير الترتيب' : 'Move Down'"
+                            >
+                              <i class="bi bi-chevron-down"></i>
+                            </button>
+                          </div>
+                        }
+                      </div>
+                    </td>
+
+                    <!-- Video Name -->
+                    <td>
+                      <div class="video-info-cell">
+                        <div class="d-flex align-items-center gap-2">
+                          <i class="bi bi-file-earmark-play-fill video-file-icon"></i>
+                          <span class="video-filename" [attr.title]="video.originalFileName">
+                            {{ video.originalFileName }}
+                          </span>
+                        </div>
+                      </div>
+                    </td>
+
+                    <!-- Processing Status Badge -->
+                    <td>
+                      @if (video.processingStatus === 'Processing') {
+                        <span class="badge-status status-processing">
+                          <span
+                            class="spinner-border spinner-border-sm"
+                            role="status"
+                            aria-hidden="true"
+                          ></span>
+                          {{ isAr() ? 'جاري المعالجة...' : 'Processing' }}
+                        </span>
+                      } @else if (video.processingStatus === 'Ready') {
+                        <span class="badge-status status-ready">
+                          <i class="bi bi-check-circle-fill"></i>
+                          {{ isAr() ? 'جاهز للعرض' : 'Ready' }}
+                        </span>
+                      } @else if (video.processingStatus === 'Failed') {
+                        <span class="badge-status status-failed">
+                          <i class="bi bi-exclamation-triangle-fill"></i>
+                          {{ isAr() ? 'فشلت المعالجة' : 'Failed' }}
+                        </span>
+                      }
+                    </td>
+
+                    <!-- Active Status Badge -->
+                    <td>
+                      @if (video.isActive) {
+                        <span class="badge-status status-active">
+                          <span class="status-live-dot"></span>
+                          {{ isAr() ? 'مفعل' : 'Active' }}
+                        </span>
+                      } @else {
+                        <span class="badge-status status-inactive">
+                          {{ isAr() ? 'غير مفعل' : 'Inactive' }}
+                        </span>
+                      }
+                    </td>
+
+                    <!-- Actions -->
+                    <td class="text-end">
+                      <div class="d-flex align-items-center justify-content-end gap-1">
+                        <!-- Preview Button: Only for Ready videos with streamUrl -->
+                        @if (video.processingStatus === 'Ready' && video.streamUrl) {
+                          <button
+                            type="button"
+                            class="action-btn btn-preview"
+                            (click)="openSinglePreview(video)"
+                            [attr.title]="isAr() ? 'معاينة الفيديو' : 'Preview Video'"
+                          >
+                            <i class="bi bi-play-fill"></i>
+                            <span>{{ isAr() ? 'معاينة' : 'Preview' }}</span>
+                          </button>
+                        }
+
+                        <!-- Deactivate / Reactivate Action -->
+                        @if (canUpdate()) {
+                          @if (video.isActive) {
+                            <button
+                              type="button"
+                              class="action-btn btn-deactivate"
+                              [disabled]="isSubmitting()"
+                              (click)="toggleActive(video)"
+                              [attr.title]="isAr() ? 'إلغاء التفعيل' : 'Deactivate'"
+                            >
+                              <i class="bi bi-pause-fill"></i>
+                              <span>{{ isAr() ? 'إلغاء التفعيل' : 'Deactivate' }}</span>
+                            </button>
+                          } @else {
+                            <button
+                              type="button"
+                              class="action-btn btn-reactivate"
+                              [disabled]="isSubmitting()"
+                              (click)="toggleActive(video)"
+                              [attr.title]="isAr() ? 'تفعيل' : 'Reactivate'"
+                            >
+                              <i class="bi bi-play-circle"></i>
+                              <span>{{ isAr() ? 'تفعيل' : 'Reactivate' }}</span>
+                            </button>
+                          }
+
+                          <!-- Delete Permanently Button: Only enabled when inactive -->
+                          <button
+                            type="button"
+                            class="action-btn btn-delete"
+                            [disabled]="video.isActive || isSubmitting()"
+                            (click)="confirmDelete(video)"
+                            [attr.title]="
+                              video.isActive
+                                ? isAr()
+                                  ? 'يجب إلغاء تفعيل الفيديو أولاً قبل حذفه'
+                                  : 'Deactivate the video before permanently deleting it'
+                                : isAr()
+                                  ? 'حذف نهائي'
+                                  : 'Delete Permanently'
+                            "
+                          >
+                            <i class="bi bi-trash3-fill"></i>
+                          </button>
+                        }
+                      </div>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </article>
+    </section>
+  }
+
+  <!-- ========================================================
+       MODAL 1: Upload Video
+       ======================================================== -->
+  @if (isUploadModalOpen()) {
+    <div class="custom-modal-backdrop" (click)="closeUploadModal()">
+      <div class="custom-modal-dialog" (click)="$event.stopPropagation()">
+        <div class="modal-header-custom d-flex align-items-center justify-content-between">
+          <h5 class="modal-title m-0 d-flex align-items-center gap-2">
+            <i class="bi bi-cloud-arrow-up-fill text-primary"></i>
+            {{ isAr() ? 'رفع فيديو شاشات جديد' : 'Upload Display Video' }}
+          </h5>
+          <button type="button" class="btn-close-modal" (click)="closeUploadModal()">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div>
+
+        <form
+          [formGroup]="uploadForm"
+          (ngSubmit)="submitUpload()"
+          class="modal-body-custom d-grid gap-3"
+        >
+          <!-- File Input -->
+          <div class="form-group">
+            <label class="form-label fw-bold">
+              {{ isAr() ? 'ملف الفيديو' : 'Video File' }} <span class="text-danger">*</span>
+            </label>
+            <input
+              type="file"
+              class="form-control"
+              accept=".mp4,.m4v,.mov,.webm,.avi,.mkv,.mpeg,.mpg,.3gp"
+              (change)="onFileSelected($event)"
+            />
+            <small class="text-muted d-block mt-1">
+              {{
+                isAr()
+                  ? 'الصيغ المدعومة: MP4, MOV, WEBM, MKV, AVI'
+                  : 'Supported formats: MP4, MOV, WEBM, MKV, AVI'
+              }}
+            </small>
+          </div>
+
+          <!-- Display Order -->
+          <div class="form-group">
+            <label class="form-label fw-bold">
+              {{ isAr() ? 'ترتيب العرض (Display Order)' : 'Display Order' }}
+              <span class="text-danger">*</span>
+            </label>
+            <input type="number" class="form-control" formControlName="displayOrder" min="1" />
+            <small class="text-muted d-block mt-1">
+              {{
+                isAr()
+                  ? 'يحدد تسلسل تشغيل الفيديو في قائمة الفرع.'
+                  : 'Determines playback order in the branch playlist.'
+              }}
+            </small>
+          </div>
+
+          <!-- Modal Actions -->
+          <div class="modal-footer-custom d-flex justify-content-end gap-2 mt-3">
+            <button
+              type="button"
+              class="btn-secondary-action"
+              (click)="closeUploadModal()"
+              [disabled]="isSubmitting()"
+            >
+              {{ isAr() ? 'إلغاء' : 'Cancel' }}
+            </button>
+            <button
+              type="submit"
+              class="btn-primary-action"
+              [disabled]="!selectedUploadFile() || uploadForm.invalid || isSubmitting()"
+            >
+              @if (isSubmitting()) {
+                <span
+                  class="spinner-border spinner-border-sm me-1"
+                  role="status"
+                  aria-hidden="true"
+                ></span>
+              }
+              {{ isAr() ? 'رفع الفيديو' : 'Upload' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+
+  <!-- ========================================================
+       MODAL 2: Single Video Preview
+       ======================================================== -->
+  @if (previewVideo(); as video) {
+    <div class="custom-modal-backdrop" (click)="closeSinglePreview()">
+      <div class="custom-modal-dialog preview-dialog" (click)="$event.stopPropagation()">
+        <div class="modal-header-custom d-flex align-items-center justify-content-between">
+          <h5 class="modal-title m-0 text-truncate" style="max-width: 80%">
+            <i class="bi bi-play-circle-fill text-primary me-2"></i>
+            {{ video.originalFileName }}
+          </h5>
+          <button type="button" class="btn-close-modal" (click)="closeSinglePreview()">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div>
+
+        <div class="modal-body-custom video-player-container">
+          <video #singleVideoPlayer controls autoplay playsinline class="hls-video-element"></video>
+
+          <div
+            class="video-meta-bar mt-3 d-flex align-items-center justify-content-between flex-wrap gap-2"
+          >
+            <div>
+              <strong>{{ isAr() ? 'الترتيب:' : 'Order:' }}</strong> {{ video.displayOrder }} |
+              <strong>{{ isAr() ? 'الحالة:' : 'Status:' }}</strong>
+              <span [class.text-success]="video.isActive" [class.text-muted]="!video.isActive">
+                {{
+                  video.isActive ? (isAr() ? 'مفعل' : 'Active') : isAr() ? 'غير مفعل' : 'Inactive'
+                }}
+              </span>
+            </div>
+            <button type="button" class="btn-secondary-action" (click)="closeSinglePreview()">
+              {{ isAr() ? 'إغلاق' : 'Close' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- ========================================================
+       MODAL 3: Full Playlist Preview
+       ======================================================== -->
+  @if (isPlaylistModalOpen()) {
+    <div class="custom-modal-backdrop" (click)="closePlaylistPreview()">
+      <div class="custom-modal-dialog playlist-dialog" (click)="$event.stopPropagation()">
+        <div class="modal-header-custom d-flex align-items-center justify-content-between">
+          <h5 class="modal-title m-0">
+            <i class="bi bi-collection-play-fill text-primary me-2"></i>
+            {{
+              isAr()
+                ? 'معاينة قائمة التشغيل للفرع (Playlist Preview)'
+                : 'Branch Display Playlist Preview'
+            }}
+          </h5>
+          <button type="button" class="btn-close-modal" (click)="closePlaylistPreview()">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div>
+
+        <div class="modal-body-custom">
+          @if (playlistLoading()) {
+            <app-niletronix-loading-state
+              [title]="isAr() ? 'جاري تحميل قائمة التشغيل...' : 'Loading playlist...'"
+              variant="panel"
+              size="md"
+            />
+          } @else if (!playlistData() || playlistData()!.videos.length === 0) {
+            <div class="empty-playlist-notice text-center p-4">
+              <i class="bi bi-film text-muted fs-1 mb-2"></i>
+              <h5>
+                {{
+                  isAr()
+                    ? 'لا توجد فيديوهات جاهزة للعرض حالياً'
+                    : 'No videos are currently available for display.'
+                }}
+              </h5>
+              <p class="text-muted">
+                {{
+                  isAr()
+                    ? 'يجب أن يكون الفيديو مفعلاً (Active) وجاهزاً (Ready) ليظهر في قائمة تشغيل الشاشات.'
+                    : 'Videos must be Active and Ready to appear in the runtime display playlist.'
+                }}
+              </p>
+            </div>
+          } @else {
+            <div class="playlist-player-wrapper">
+              <div class="video-player-container">
+                @if (currentPlayingPlaylistVideo()) {
+                  <video
+                    #playlistVideoPlayer
+                    controls
+                    autoplay
+                    playsinline
+                    class="hls-video-element"
+                  ></video>
+                }
+              </div>
+
+              <div
+                class="playlist-track-info mt-3 d-flex align-items-center justify-content-between flex-wrap gap-2"
+              >
+                <div class="track-details">
+                  <span class="badge bg-primary me-2">
+                    {{ isAr() ? 'فيديو ' : 'Video ' }} {{ currentPlaylistIndex() + 1 }} /
+                    {{ playlistData()!.videos.length }}
+                  </span>
+                  <strong>{{ currentPlayingVideoName() }}</strong>
+                </div>
+
+                <div class="playlist-controls-mini d-flex align-items-center gap-2">
+                  <button
+                    type="button"
+                    class="btn-secondary-action"
+                    (click)="onPlaylistVideoEnded()"
+                    [attr.title]="isAr() ? 'الفيديو التالي' : 'Next Video'"
+                  >
+                    <i class="bi bi-skip-forward-fill"></i>
+                    {{ isAr() ? 'التالي' : 'Next' }}
+                  </button>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- ========================================================
+       MODAL 4: Permanent Delete Confirmation Dialog
+       ======================================================== -->
+  @if (videoToDelete(); as v) {
+    <div class="custom-modal-backdrop" (click)="cancelDelete()">
+      <div class="custom-modal-dialog delete-confirm-dialog" (click)="$event.stopPropagation()">
+        <div class="delete-dialog-header">
+          <div class="delete-icon-wrapper">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+          </div>
+          <button type="button" class="btn-close-modal" (click)="cancelDelete()" aria-label="Close">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div>
+
+        <div class="delete-dialog-body">
+          <h4 class="delete-dialog-title">
+            {{ isAr() ? 'تأكيد الحذف النهائي' : 'Permanent Delete Confirmation' }}
+          </h4>
+          <p class="delete-dialog-description">
+            {{
+              isAr()
+                ? 'هل أنت متأكد من رغبتك في حذف هذا الفيديو نهائياً؟ لا يمكن التراجع عن هذا الإجراء.'
+                : 'Are you sure you want to permanently delete this video? This action cannot be undone.'
+            }}
+          </p>
+
+          <div class="delete-target-preview">
+            <div class="target-file-info">
+              <i class="bi bi-file-earmark-play-fill file-icon"></i>
+              <span class="file-name" [title]="v.originalFileName">{{ v.originalFileName }}</span>
+            </div>
+            <div class="target-warning-hint">
+              <i class="bi bi-info-circle-fill"></i>
+              <span>{{
+                isAr()
+                  ? 'سيتم مسح كافة ملفات البث والجودات المرتبطة بهذا الفيديو بشكل كامل.'
+                  : 'All streaming files and encoded segments will be permanently deleted.'
+              }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="delete-dialog-footer">
+          <button
+            type="button"
+            class="btn-modal-cancel"
+            (click)="cancelDelete()"
+            [disabled]="isSubmitting()"
+          >
+            {{ isAr() ? 'إلغاء' : 'Cancel' }}
+          </button>
+          <button
+            type="button"
+            class="btn-modal-delete"
+            (click)="executeDelete()"
+            [disabled]="isSubmitting()"
+          >
+            @if (isSubmitting()) {
+              <span
+                class="spinner-border spinner-border-sm me-1"
+                role="status"
+                aria-hidden="true"
+              ></span>
+            } @else {
+              <i class="bi bi-trash3-fill"></i>
+            }
+            {{ isAr() ? 'حذف نهائي' : 'Delete Permanently' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</section>

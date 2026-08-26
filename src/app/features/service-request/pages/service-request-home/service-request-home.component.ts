@@ -2,9 +2,9 @@ import { ChangeDetectionStrategy, Component, OnDestroy, computed, inject, signal
 import { Subscription } from 'rxjs';
 
 import { ServiceRequestStep } from '../../enums/service-request-step.enum';
-import { ServiceType } from '../../models/service-type.model';
-import { Specialty } from '../../models/specialty.model';
-import { ServiceCustomInput } from '../../../service-management/models/service-management.model';
+import { ServiceType } from '../../models/service-type/service-type.model';
+import { Specialty } from '../../models/specialty/specialty.model';
+import { ServiceCustomInput } from '../../../service-management/models/service-management/service-management.model';
 import { ServiceRequestStore } from '../../store/service-request.store';
 import { KioskFooterComponent } from '../../components/kiosk-footer/kiosk-footer.component';
 import { KioskHeaderComponent } from '../../components/kiosk-header/kiosk-header.component';
@@ -14,7 +14,7 @@ import { TicketPreviewComponent } from '../../components/ticket-preview/ticket-p
 import { KeypadInputComponent } from '../../components/keypad-input/keypad-input.component';
 import { CustomerInputFormComponent } from '../../components/customer-input-form/customer-input-form.component';
 import { SelectionCardViewModel } from '../../shared/selection-card-view.model';
-import { AppLanguage } from '../../../../shared/models/app-language.model';
+import { AppLanguage } from '../../../../shared/models/app-language/app-language.model';
 
 @Component({
   selector: 'app-service-request-home',
@@ -95,7 +95,7 @@ export class ServiceRequestHomeComponent implements OnDestroy {
     }
 
     if (this.isLanguageStepActive()) {
-      return this.isRtl() ? 'اختر لغة التواصل' : 'Select Preferred Language';
+      return this.store.translations().languageStepTitle;
     }
 
     if (this.isCustomerInputStepActive()) {
@@ -103,7 +103,7 @@ export class ServiceRequestHomeComponent implements OnDestroy {
     }
 
     if (this.isUserInputStepActive()) {
-      return this.isRtl() ? 'إدخال بيانات المستخدم' : 'Enter User Information';
+      return this.store.translations().userInputTitle;
     }
 
     const translations = this.store.translations();
@@ -135,9 +135,7 @@ export class ServiceRequestHomeComponent implements OnDestroy {
     }
 
     if (this.isLanguageStepActive()) {
-      return this.isRtl()
-        ? 'يرجى لمس الشاشة لاختيار اللغة المطلوبة للمتابعة.'
-        : 'Please touch the screen to choose your language to continue.';
+      return this.store.translations().languageStepDescription;
     }
 
     if (this.isCustomerInputStepActive()) {
@@ -145,9 +143,7 @@ export class ServiceRequestHomeComponent implements OnDestroy {
     }
 
     if (this.isUserInputStepActive()) {
-      return this.isRtl()
-        ? 'استخدم لوحة الأرقام لإدخال بياناتك كشرط إضافي قبل طباعة التذكرة.'
-        : 'Use touchscreen keypad to submit user data before printing ticket.';
+      return this.store.translations().userInputDescription;
     }
 
     const translations = this.store.translations();
@@ -189,7 +185,7 @@ export class ServiceRequestHomeComponent implements OnDestroy {
     }
 
     if (this.isUserInputStepActive()) {
-      return this.isRtl() ? 'إدخال بيانات المستخدم مطلوب دائماً' : 'User input is mandatory';
+      return this.store.translations().userInputRequired;
     }
 
     switch (this.store.currentStep()) {
@@ -239,28 +235,28 @@ export class ServiceRequestHomeComponent implements OnDestroy {
 
   protected readonly currentStepBadgeText = computed(() => {
     if (this.isLanguageStepActive()) {
-      return this.isRtl() ? 'الخطوة 0: اختيار اللغة' : 'Step 0: Select Language';
+      return this.store.translations().languageStepBadge;
     }
 
     if (this.isCustomerInputStepActive()) {
-      return this.isRtl() ? 'خطوة إدخال بيانات الخدمة' : 'Service Data Input Step';
+      return this.store.translations().customerInputStepBadge;
     }
 
     if (this.isUserInputStepActive()) {
-      return this.isRtl() ? 'خطوة إدخال بيانات المستخدم' : 'User Input Step';
+      return this.store.translations().userInputStepBadge;
     }
 
     switch (this.store.currentStep()) {
       case ServiceRequestStep.ServiceType:
-        return this.isRtl() ? 'الخطوة 1: اختيار الخدمة' : 'Step 1: Select Service';
+        return this.store.translations().serviceTypeStepBadge;
       case ServiceRequestStep.Specialty:
-        return this.isRtl() ? 'الخطوة 2: اختيار القسم / العيادة' : 'Step 2: Select Department';
+        return this.store.translations().departmentStepBadge;
       case ServiceRequestStep.SubSpecialty:
-        return this.isRtl() ? 'الخطوة 3: التخصص الفرعي' : 'Step 3: Sub Specialty';
+        return this.store.translations().subSpecialtyStepBadge;
       case ServiceRequestStep.Ticket:
-        return this.isRtl() ? 'تم إصدار التذكرة بنجاح' : 'Ticket Issued Successfully';
+        return this.store.translations().ticketIssuedStepBadge;
       default:
-        return this.isRtl() ? 'الخطوة 1: اختيار الخدمة' : 'Step 1: Select Service';
+        return this.store.translations().serviceTypeStepBadge;
     }
   });
 

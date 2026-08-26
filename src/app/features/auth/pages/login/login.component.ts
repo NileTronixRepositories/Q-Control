@@ -10,9 +10,9 @@ import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angula
 import { Router } from '@angular/router';
 
 import { LanguageHeaderComponent } from '../../../../shared/components/language-header/language-header.component';
-import { LoginCredentials } from '../../models/login-credentials.model';
-import { LoginLanguage } from '../../models/login-translations.model';
-import { AuthNavigationService } from '../../services/auth-navigation.service';
+import { LoginCredentials } from '../../models/login-credentials/login-credentials.model';
+import { LoginLanguage } from '../../models/login-translations/login-translations.model';
+import { AuthNavigationService } from '../../services/auth-navigation/auth-navigation.service';
 import { LoginI18nStore } from '../../store/login-i18n.store';
 import { LoginStore } from '../../store/login.store';
 

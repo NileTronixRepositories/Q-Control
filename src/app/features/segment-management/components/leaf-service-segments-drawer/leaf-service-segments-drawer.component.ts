@@ -5,7 +5,7 @@ import {
   AssignedBranchServiceSegmentItem,
   AssignedBranchServiceSegmentsResponse,
   AvailableSegmentItem,
-} from '../../models/segment.model';
+} from '../../models/segment/segment.model';
 import { SegmentTranslations } from '../../i18n/segment.translations';
 import { AssignAvailableSegmentsModalComponent } from '../assign-available-segments-modal/assign-available-segments-modal.component';
 

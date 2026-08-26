@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { SERVICE_REQUEST_LANGUAGES } from '../../models/language.model';
+import { SERVICE_REQUEST_LANGUAGES } from '../../models/language/language.model';
 import { LanguageSelectorComponent } from './language-selector.component';
 
 describe('LanguageSelectorComponent', () => {

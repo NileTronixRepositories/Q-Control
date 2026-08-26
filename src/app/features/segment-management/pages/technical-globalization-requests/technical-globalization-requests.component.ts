@@ -2,17 +2,17 @@ import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } 
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import { TechnicalAdminPageHeroComponent } from '../../../../shared/components/technical-admin-page-hero/technical-admin-page-hero.component';
-import { BranchListItem } from '../../../technical-admin/models/branch-management.model';
-import { BranchManagementApiService } from '../../../technical-admin/services/branch-management-api.service';
-import { TechnicalAdminI18nStore } from '../../../technical-admin/store/technical-admin-i18n.store';
-import { formatTechnicalAdminApiError } from '../../../technical-admin/utils/api-error-message.util';
+import { PageHeroComponent } from '../../../../shared/components/page-hero/page-hero.component';
+import { BranchListItem } from '@features/branch-management/public-api';
+import { BranchManagementApiService } from '@features/branch-management/public-api';
+import { AdminI18nStore } from '@layout/admin-shell/store/admin-i18n.store';
+import { formatApiError } from '@shared/utils/api-error-message.util';
 
 import { GlobalizationRequestDetailsModalComponent } from '../../components/globalization-request-details-modal/globalization-request-details-modal.component';
 import { SEGMENT_TRANSLATIONS_AR, SEGMENT_TRANSLATIONS_EN, SegmentTranslations } from '../../i18n/segment.translations';
-import { SegmentGlobalizationRequest, SegmentGlobalizationRequestStatus } from '../../models/segment.model';
-import { SegmentApiService } from '../../services/segment-api.service';
-import { SegmentPermissionService } from '../../services/segment-permission.service';
+import { SegmentGlobalizationRequest, SegmentGlobalizationRequestStatus } from '../../models/segment/segment.model';
+import { SegmentApiService } from '../../services/segment-api/segment-api.service';
+import { SegmentPermissionService } from '../../services/segment-permission/segment-permission.service';
 
 @Component({
   selector: 'app-technical-globalization-requests-page',
@@ -20,7 +20,7 @@ import { SegmentPermissionService } from '../../services/segment-permission.serv
   imports: [
     DatePipe,
     FormsModule,
-    TechnicalAdminPageHeroComponent,
+    PageHeroComponent,
     GlobalizationRequestDetailsModalComponent,
   ],
   templateUrl: './technical-globalization-requests.component.html',
@@ -28,7 +28,7 @@ import { SegmentPermissionService } from '../../services/segment-permission.serv
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TechnicalGlobalizationRequestsComponent implements OnInit {
-  private readonly i18nStore = inject(TechnicalAdminI18nStore);
+  private readonly i18nStore = inject(AdminI18nStore);
   private readonly segmentApiService = inject(SegmentApiService);
   protected readonly permissionService = inject(SegmentPermissionService);
   private readonly branchApiService = inject(BranchManagementApiService);
@@ -95,7 +95,7 @@ export class TechnicalGlobalizationRequestsComponent implements OnInit {
         },
         error: (err) => {
           this.loading.set(false);
-          this.showToast(formatTechnicalAdminApiError(err, 'Failed to load requests'), 'error');
+          this.showToast(formatApiError(err, 'Failed to load requests'), 'error');
         },
       });
   }
@@ -153,7 +153,7 @@ export class TechnicalGlobalizationRequestsComponent implements OnInit {
         },
         error: (err) => {
           this.processing.set(false);
-          this.showToast(formatTechnicalAdminApiError(err, 'Failed to approve request'), 'error');
+          this.showToast(formatApiError(err, 'Failed to approve request'), 'error');
         },
       });
   }
@@ -173,7 +173,7 @@ export class TechnicalGlobalizationRequestsComponent implements OnInit {
         },
         error: (err) => {
           this.processing.set(false);
-          this.showToast(formatTechnicalAdminApiError(err, 'Failed to reject request'), 'error');
+          this.showToast(formatApiError(err, 'Failed to reject request'), 'error');
         },
       });
   }

@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { AssignSegmentItem, AvailableSegmentItem } from '../../models/segment.model';
+import { AssignSegmentItem, AvailableSegmentItem } from '../../models/segment/segment.model';
 import { SegmentTranslations } from '../../i18n/segment.translations';
 
 interface SelectableSegmentState {

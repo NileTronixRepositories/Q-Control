@@ -15,9 +15,9 @@ import {
 } from '@angular/core';
 import { finalize, Observable } from 'rxjs';
 
-import { AuthSessionService } from '../../../auth/services/auth-session.service';
-import { TechnicalAdminI18nStore } from '../../../technical-admin/store/technical-admin-i18n.store';
-import { formatTechnicalAdminApiError } from '../../../technical-admin/utils/api-error-message.util';
+import { AuthSessionService } from '../../../auth/services/auth-session/auth-session.service';
+import { AdminI18nStore } from '@layout/admin-shell/store/admin-i18n.store';
+import { formatApiError } from '@shared/utils/api-error-message.util';
 import { SERVICE_GLOBALIZATION_TRANSLATIONS } from '../../i18n/service-globalization.translations';
 import {
   ApproveServiceGlobalizationRequestResponse,
@@ -29,10 +29,10 @@ import {
   ServiceGlobalizationRequestListItem,
   ServiceGlobalizationRequestStatus,
   ServiceGlobalizationRequestType,
-} from '../../models/service-globalization.model';
-import { ServiceDataInvalidationService } from '../../services/catalog/service-data-invalidation.service';
-import { ServiceGlobalizationApiService } from '../../services/globalization/service-globalization-api.service';
-import { ServiceManagementPermissionService } from '../../services/catalog/service-management-permission.service';
+} from '../../models/service-globalization/service-globalization.model';
+import { ServiceDataInvalidationService } from '../../services/catalog/service-data-invalidation/service-data-invalidation.service';
+import { ServiceGlobalizationApiService } from '../../services/globalization/service-globalization-api/service-globalization-api.service';
+import { ServiceManagementPermissionService } from '../../services/catalog/service-management-permission/service-management-permission.service';
 
 const STATUS_POLL_INTERVAL_MS = 15_000;
 
@@ -47,7 +47,7 @@ export class BranchGlobalizationRequestsComponent implements OnDestroy {
   private readonly router = inject(Router);
   private readonly authSessionService = inject(AuthSessionService);
   private readonly apiService = inject(ServiceGlobalizationApiService);
-  private readonly i18nStore = inject(TechnicalAdminI18nStore);
+  private readonly i18nStore = inject(AdminI18nStore);
   private readonly invalidationService = inject(ServiceDataInvalidationService);
   private readonly permissionService = inject(ServiceManagementPermissionService);
   readonly branchId = input.required<number>();
@@ -277,7 +277,7 @@ export class BranchGlobalizationRequestsComponent implements OnDestroy {
   }
   private handleMutationError(error: HttpErrorResponse): void {
     if (error.status === 409) {
-      const message = formatTechnicalAdminApiError(error, this.translations().conflictReloaded);
+      const message = formatApiError(error, this.translations().conflictReloaded);
       this.decisionState.set(null);
       this.rejectionReason.set('');
       this.load(this.page().currentPage, this.branchId(), true);
@@ -286,7 +286,7 @@ export class BranchGlobalizationRequestsComponent implements OnDestroy {
     }
 
     if (error.status === 404) {
-      const message = formatTechnicalAdminApiError(error, this.translations().fallbackError);
+      const message = formatApiError(error, this.translations().fallbackError);
       this.decisionState.set(null);
       this.rejectionReason.set('');
       this.load(this.page().currentPage, this.branchId(), true);
@@ -305,7 +305,7 @@ export class BranchGlobalizationRequestsComponent implements OnDestroy {
     }
 
     const fallback = error.status === 403 ? this.translations().accessDenied : this.translations().fallbackError;
-    this.error.set(formatTechnicalAdminApiError(error, fallback));
+    this.error.set(formatApiError(error, fallback));
   }
 
   private resetForBranch(): void {

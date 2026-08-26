@@ -14,15 +14,15 @@ import {
 import { finalize } from 'rxjs';
 
 import { NiletronixLoadingStateComponent } from '../../../../shared/components/niletronix-loading-state/niletronix-loading-state.component';
-import { formatTechnicalAdminApiError } from '../../../technical-admin/utils/api-error-message.util';
+import { formatApiError } from '@shared/utils/api-error-message.util';
 import { ServiceManagementTranslations } from '../../i18n/service-management.translations';
 import {
   ServiceDetails,
   ServiceImageResponse,
   ServiceImageType,
   ServiceUiMessage,
-} from '../../models/service-management.model';
-import { ServiceManagementApiService } from '../../services/catalog/service-management-api.service';
+} from '../../models/service-management/service-management.model';
+import { ServiceManagementApiService } from '../../services/catalog/service-management-api/service-management-api.service';
 
 interface ServiceMediaState {
   readonly logo: ServiceImageResponse | null;
@@ -404,7 +404,7 @@ export class ServiceMediaManagerComponent implements OnDestroy {
   ): void {
     const message = this.isConcurrencyError(error)
       ? this.translations().imageConcurrencyConflict
-      : formatTechnicalAdminApiError(error, this.translations().fallbackError);
+      : formatApiError(error, this.translations().fallbackError);
 
     this.message.emit({ tone: 'error', text: message });
 

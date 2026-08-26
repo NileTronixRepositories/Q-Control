@@ -1,0 +1,1022 @@
+<div
+  class="admin-responsive-page display-configuration-page technical-page container-fluid"
+  [attr.dir]="direction()"
+  [attr.lang]="language()"
+>
+  <app-page-hero
+    [eyebrow]="copy().topbarEyebrow"
+    [title]="language() === 'ar' ? 'إعدادات شاشة العرض' : 'Display Configuration'"
+    [description]="
+      language() === 'ar'
+        ? 'إدارة ألوان ونصوص شاشة العرض الخاصة بالفرع ورسائل الشريط المتحرك.'
+        : 'Manage display colors, texts, and ticker messages for the branch.'
+    "
+    icon="bi bi-display"
+  >
+    <div hero-actions class="d-flex align-items-center gap-2 hero-controls flex-nowrap">
+      @if (isTechnicalAdmin() && branches().length > 1) {
+        <label class="visually-hidden" for="displayConfigBranch">{{ copy().branchLabel }}</label>
+        <select
+          id="displayConfigBranch"
+          class="form-select branch-selector-control custom-select"
+          [value]="selectedBranchId() ?? ''"
+          [disabled]="branchesLoading() || configLoading() || saving()"
+          (change)="selectBranch($event)"
+        >
+          <option value="" [selected]="!selectedBranchId()">--</option>
+          @for (branch of branches(); track branch.id) {
+            <option [value]="branch.id" [selected]="branch.id === selectedBranchId()">
+              {{ branch.label }}
+            </option>
+          }
+        </select>
+      } @else if (selectedBranchId()) {
+        <div class="d-inline-flex align-items-center gap-2 px-3 py-2 bg-white border rounded text-dark fw-bold small shadow-sm">
+          <i class="bi bi-buildings text-primary"></i>
+          <span>{{ selectedBranchLabel() }}</span>
+        </div>
+      }
+      <button
+        type="button"
+        class="btn btn-refresh d-inline-flex align-items-center gap-2 flex-shrink-0"
+        [disabled]="!selectedBranchId() || configLoading() || saving()"
+        [attr.title]="copy().refreshLabel"
+        (click)="refresh()"
+      >
+        <i class="bi bi-arrow-repeat fs-5" [class.spin]="configLoading()" aria-hidden="true"></i>
+        <span>{{ copy().refreshLabel }}</span>
+      </button>
+    </div>
+  </app-page-hero>
+
+  <!-- ─── Toast Messages ──────────────────────────────────────────────── -->
+  @if (message(); as currentMessage) {
+    <div class="toast-stack" role="status" aria-live="polite" aria-atomic="true">
+      <div
+        class="toast-item"
+        [class.toast-success]="currentMessage.tone === 'success'"
+        [class.toast-error]="currentMessage.tone === 'error'"
+        [class.toast-info]="currentMessage.tone === 'info'"
+      >
+        <i
+          class="bi"
+          [class.bi-check-circle-fill]="currentMessage.tone === 'success'"
+          [class.bi-x-octagon-fill]="currentMessage.tone === 'error'"
+          [class.bi-info-circle-fill]="currentMessage.tone === 'info'"
+          aria-hidden="true"
+        ></i>
+        <p>{{ currentMessage.text }}</p>
+        <button type="button" class="toast-close" (click)="clearMessage()" aria-label="Close">
+          <i class="bi bi-x-lg" aria-hidden="true"></i>
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- ─── Read-Only Banner ────────────────────────────────────────────── -->
+  @if (!canUpdate() && selectedBranchId()) {
+    <div
+      class="alert alert-warning read-only-banner my-3 d-flex align-items-center gap-3 shadow-sm"
+      role="alert"
+    >
+      <div class="alert-icon-wrap bg-warning-subtle text-warning-emphasis">
+        <i class="bi bi-shield-lock-fill fs-4" aria-hidden="true"></i>
+      </div>
+      <div>
+        <h6 class="mb-1 fw-bold">
+          {{ language() === 'ar' ? 'وضعية القراءة فقط' : 'Read-Only Mode' }}
+        </h6>
+        <span class="small text-muted">{{ copy().configurationReadOnlyMessage }}</span>
+      </div>
+    </div>
+  }
+
+  <!-- ─── Loading ─────────────────────────────────────────────────────── -->
+  @if (branchesLoading() || configLoading()) {
+    <div class="my-5 p-5 text-center">
+      <app-niletronix-loading-state [title]="copy().loadingLabel" variant="inline" size="sm" />
+    </div>
+  }
+
+  <!-- ─── Empty State ─────────────────────────────────────────────────── -->
+  @if (!selectedBranchId() && !branchesLoading()) {
+    <div class="empty-branch-placeholder card shadow-sm border-0 my-4 p-5 text-center">
+      <div class="empty-icon-circle mx-auto mb-3">
+        <i class="bi bi-display text-primary fs-1"></i>
+      </div>
+      <h4 class="fw-bold text-dark mb-2">
+        {{
+          language() === 'ar'
+            ? 'يرجى اختيار الفرع للبدء في ضبط شاشة العرض'
+            : 'Select a branch to configure its display'
+        }}
+      </h4>
+      <p class="text-muted max-w-md mx-auto mb-0">
+        {{
+          language() === 'ar'
+            ? 'قم بتحديد الفرع من القائمة المنسدلة بالأعلى لعرض وضبط إعدادات شاشة العرض والرسائل.'
+            : 'Choose a branch from the dropdown above to view and configure display settings and messages.'
+        }}
+      </p>
+    </div>
+  }
+
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <!--       CONFIGURATION FORM (REFACTORED WITH BOOTSTRAP GRID)          -->
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  @if (selectedBranchId() && !branchesLoading() && !configLoading()) {
+    <form [formGroup]="configForm" (ngSubmit)="saveConfig()" class="configuration-workspace mt-3">
+      <!-- Status Mode Strip -->
+      <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+        <div>
+          @if (isConfigured()) {
+            <span class="badge status-badge badge-active d-inline-flex align-items-center gap-2">
+              <span class="pulse-dot active-dot"></span>
+              <span>{{
+                language() === 'ar' ? 'وضع التعديل (إعدادات محفوظة)' : 'Edit Mode (Configured)'
+              }}</span>
+            </span>
+          } @else {
+            <span class="badge status-badge badge-create d-inline-flex align-items-center gap-2">
+              <i class="bi bi-plus-circle-fill" aria-hidden="true"></i>
+              <span>{{
+                language() === 'ar'
+                  ? 'وضع الإنشاء (إعدادات جديدة)'
+                  : 'Create Mode (New Configuration)'
+              }}</span>
+            </span>
+          }
+        </div>
+        <span class="text-muted small">
+          {{
+            language() === 'ar'
+              ? 'يتم تطبيق الإعدادات على جميع شاشات هذا الفرع'
+              : 'Settings apply to all displays in this branch'
+          }}
+        </span>
+      </div>
+
+      <div class="row g-4">
+        <!-- ─── Panel 1: Display & Header (col-lg-6) ───────────────────── -->
+        <div class="col-lg-6">
+          <div class="card config-panel h-100 shadow-sm">
+            <div class="panel-header">
+              <div class="d-flex align-items-center gap-2">
+                <span class="panel-icon"><i class="bi bi-palette2"></i></span>
+                <h5 class="panel-title m-0">
+                  {{ language() === 'ar' ? 'الشاشة والترويسة' : 'Display & Header' }}
+                </h5>
+              </div>
+            </div>
+            <div class="panel-body p-3 p-xl-4">
+              <div class="row g-3">
+                <!-- Display Background Color -->
+                <div class="col-sm-6">
+                  <label class="form-label" for="displayBackgroundColor">
+                    {{ language() === 'ar' ? 'لون خلفية الشاشة' : 'Display Background' }}
+                  </label>
+                  <div class="color-picker-control">
+                    <input
+                      type="color"
+                      id="displayBackgroundColor"
+                      [value]="configForm.controls.displayBackgroundColor.value"
+                      (input)="onColorPickerChange('displayBackgroundColor', $event)"
+                      [disabled]="!canUpdate() || saving()"
+                    />
+                    <input
+                      type="text"
+                      [value]="configForm.controls.displayBackgroundColor.value"
+                      (input)="onColorTextInput('displayBackgroundColor', $event)"
+                      [readonly]="!canUpdate() || saving()"
+                      maxlength="7"
+                      placeholder="#FFFFFF"
+                    />
+                  </div>
+                </div>
+
+                <!-- Header Background Color -->
+                <div class="col-sm-6">
+                  <label class="form-label" for="headerBackgroundColor">
+                    {{ language() === 'ar' ? 'لون خلفية الترويسة' : 'Header Background' }}
+                  </label>
+                  <div class="color-picker-control">
+                    <input
+                      type="color"
+                      id="headerBackgroundColor"
+                      [value]="configForm.controls.headerBackgroundColor.value"
+                      (input)="onColorPickerChange('headerBackgroundColor', $event)"
+                      [disabled]="!canUpdate() || saving()"
+                    />
+                    <input
+                      type="text"
+                      [value]="configForm.controls.headerBackgroundColor.value"
+                      (input)="onColorTextInput('headerBackgroundColor', $event)"
+                      [readonly]="!canUpdate() || saving()"
+                      maxlength="7"
+                      placeholder="#FFFFFF"
+                    />
+                  </div>
+                </div>
+
+                <!-- Main Title Ar -->
+                <div class="col-12">
+                  <label class="form-label" for="mainTitleAr">
+                    {{ language() === 'ar' ? 'العنوان الرئيسي (عربي)' : 'Main Title (Arabic)' }}
+                  </label>
+                  <input
+                    type="text"
+                    id="mainTitleAr"
+                    class="form-control"
+                    formControlName="mainTitleAr"
+                    [readonly]="!canUpdate() || saving()"
+                    maxlength="200"
+                    dir="rtl"
+                  />
+                </div>
+
+                <!-- Main Title En -->
+                <div class="col-12">
+                  <label class="form-label" for="mainTitleEn">
+                    {{ language() === 'ar' ? 'العنوان الرئيسي (إنجليزي)' : 'Main Title (English)' }}
+                  </label>
+                  <input
+                    type="text"
+                    id="mainTitleEn"
+                    class="form-control"
+                    formControlName="mainTitleEn"
+                    [readonly]="!canUpdate() || saving()"
+                    maxlength="200"
+                    dir="ltr"
+                  />
+                </div>
+
+                <!-- Title Text Color -->
+                <div class="col-sm-6">
+                  <label class="form-label" for="mainTitleTextColor">
+                    {{ language() === 'ar' ? 'لون نص العنوان' : 'Title Text Color' }}
+                  </label>
+                  <div class="color-picker-control">
+                    <input
+                      type="color"
+                      id="mainTitleTextColor"
+                      [value]="configForm.controls.mainTitleTextColor.value"
+                      (input)="onColorPickerChange('mainTitleTextColor', $event)"
+                      [disabled]="!canUpdate() || saving()"
+                    />
+                    <input
+                      type="text"
+                      [value]="configForm.controls.mainTitleTextColor.value"
+                      (input)="onColorTextInput('mainTitleTextColor', $event)"
+                      [readonly]="!canUpdate() || saving()"
+                      maxlength="7"
+                    />
+                  </div>
+                </div>
+
+                <!-- Title Font Size -->
+                <div class="col-sm-6">
+                  <label class="form-label" for="mainTitleFontSize">
+                    {{ language() === 'ar' ? 'حجم خط العنوان (px)' : 'Title Font Size (px)' }}
+                  </label>
+                  <input
+                    type="number"
+                    id="mainTitleFontSize"
+                    class="form-control"
+                    formControlName="mainTitleFontSize"
+                    min="1"
+                    max="100"
+                    [readonly]="!canUpdate() || saving()"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ─── Panel 2: Ticker & Clock (col-lg-6) ──────────────────────── -->
+        <div class="col-lg-6">
+          <div class="card config-panel h-100 shadow-sm">
+            <div class="panel-header">
+              <div class="d-flex align-items-center gap-2">
+                <span class="panel-icon"><i class="bi bi-clock-history"></i></span>
+                <h5 class="panel-title m-0">
+                  {{ language() === 'ar' ? 'شريط التيكر والساعة' : 'Ticker & Clock' }}
+                </h5>
+              </div>
+            </div>
+            <div class="panel-body p-3 p-xl-4">
+              <div class="row g-3">
+                <!-- Ticker Background -->
+                <div class="col-sm-6">
+                  <label class="form-label" for="tickerBackgroundColor">
+                    {{ language() === 'ar' ? 'خلفية شريط التيكر' : 'Ticker Background' }}
+                  </label>
+                  <div class="color-picker-control">
+                    <input
+                      type="color"
+                      id="tickerBackgroundColor"
+                      [value]="configForm.controls.tickerBackgroundColor.value"
+                      (input)="onColorPickerChange('tickerBackgroundColor', $event)"
+                      [disabled]="!canUpdate() || saving()"
+                    />
+                    <input
+                      type="text"
+                      [value]="configForm.controls.tickerBackgroundColor.value"
+                      (input)="onColorTextInput('tickerBackgroundColor', $event)"
+                      [readonly]="!canUpdate() || saving()"
+                      maxlength="7"
+                    />
+                  </div>
+                </div>
+
+                <!-- Ticker Text Color -->
+                <div class="col-sm-6">
+                  <label class="form-label" for="tickerTextColor">
+                    {{ language() === 'ar' ? 'لون نص التيكر' : 'Ticker Text Color' }}
+                  </label>
+                  <div class="color-picker-control">
+                    <input
+                      type="color"
+                      id="tickerTextColor"
+                      [value]="configForm.controls.tickerTextColor.value"
+                      (input)="onColorPickerChange('tickerTextColor', $event)"
+                      [disabled]="!canUpdate() || saving()"
+                    />
+                    <input
+                      type="text"
+                      [value]="configForm.controls.tickerTextColor.value"
+                      (input)="onColorTextInput('tickerTextColor', $event)"
+                      [readonly]="!canUpdate() || saving()"
+                      maxlength="7"
+                    />
+                  </div>
+                </div>
+
+                <!-- Ticker Font Size -->
+                <div class="col-sm-6">
+                  <label class="form-label" for="tickerFontSize">
+                    {{ language() === 'ar' ? 'حجم خط التيكر (px)' : 'Ticker Font Size (px)' }}
+                  </label>
+                  <input
+                    type="number"
+                    id="tickerFontSize"
+                    class="form-control"
+                    formControlName="tickerFontSize"
+                    min="1"
+                    max="100"
+                    [readonly]="!canUpdate() || saving()"
+                  />
+                </div>
+
+                <!-- Show Clock Switch -->
+                <div class="col-sm-6 d-flex align-items-end">
+                  <div class="form-check form-switch pb-2">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      id="showClock"
+                      formControlName="showClock"
+                      [attr.disabled]="!canUpdate() || saving() ? true : null"
+                    />
+                    <label class="form-check-label fw-semibold" for="showClock">
+                      {{ language() === 'ar' ? 'إظهار الساعة بالشريط' : 'Show Clock in Ticker' }}
+                    </label>
+                  </div>
+                </div>
+
+                <!-- Clock Background -->
+                <div class="col-sm-6">
+                  <label class="form-label" for="clockBackgroundColor">
+                    {{ language() === 'ar' ? 'لون خلفية الساعة' : 'Clock Background' }}
+                  </label>
+                  <div class="color-picker-control">
+                    <input
+                      type="color"
+                      id="clockBackgroundColor"
+                      [value]="configForm.controls.clockBackgroundColor.value"
+                      (input)="onColorPickerChange('clockBackgroundColor', $event)"
+                      [disabled]="!canUpdate() || saving()"
+                    />
+                    <input
+                      type="text"
+                      [value]="configForm.controls.clockBackgroundColor.value"
+                      (input)="onColorTextInput('clockBackgroundColor', $event)"
+                      [readonly]="!canUpdate() || saving()"
+                      maxlength="7"
+                    />
+                  </div>
+                </div>
+
+                <!-- Clock Text Color -->
+                <div class="col-sm-6">
+                  <label class="form-label" for="clockTextColor">
+                    {{ language() === 'ar' ? 'لون نص الساعة' : 'Clock Text Color' }}
+                  </label>
+                  <div class="color-picker-control">
+                    <input
+                      type="color"
+                      id="clockTextColor"
+                      [value]="configForm.controls.clockTextColor.value"
+                      (input)="onColorPickerChange('clockTextColor', $event)"
+                      [disabled]="!canUpdate() || saving()"
+                    />
+                    <input
+                      type="text"
+                      [value]="configForm.controls.clockTextColor.value"
+                      (input)="onColorTextInput('clockTextColor', $event)"
+                      [readonly]="!canUpdate() || saving()"
+                      maxlength="7"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ─── Panel 3: Calling Table & Columns (col-12) ──────────────── -->
+        <div class="col-12">
+          <div class="card config-panel shadow-sm">
+            <div class="panel-header">
+              <div class="d-flex align-items-center gap-2">
+                <span class="panel-icon"><i class="bi bi-table"></i></span>
+                <h5 class="panel-title m-0">
+                  {{
+                    language() === 'ar'
+                      ? 'جدول النداء وعناوين الأعمدة'
+                      : 'Calling Table & Column Titles'
+                  }}
+                </h5>
+              </div>
+            </div>
+            <div class="panel-body p-3 p-xl-4">
+              <!-- Subheading: Column Titles -->
+              <h6 class="section-subtitle mb-3 d-flex align-items-center gap-2">
+                <i class="bi bi-layout-three-columns text-primary"></i>
+                <span>{{
+                  language() === 'ar' ? 'عناوين الأعمدة في شاشة العرض' : 'Display Column Titles'
+                }}</span>
+              </h6>
+              <div class="row g-3 mb-4">
+                <!-- Ticket Column Titles -->
+                <div class="col-md-4 col-sm-6">
+                  <label class="form-label" for="ticketColumnTitleAr">{{
+                    language() === 'ar' ? 'عمود التذكرة (عربي)' : 'Ticket (Arabic)'
+                  }}</label>
+                  <input
+                    type="text"
+                    id="ticketColumnTitleAr"
+                    class="form-control"
+                    formControlName="ticketColumnTitleAr"
+                    [readonly]="!canUpdate() || saving()"
+                    maxlength="200"
+                    dir="rtl"
+                  />
+                </div>
+                <div class="col-md-4 col-sm-6">
+                  <label class="form-label" for="serviceColumnTitleAr">{{
+                    language() === 'ar' ? 'عمود الخدمة (عربي)' : 'Service (Arabic)'
+                  }}</label>
+                  <input
+                    type="text"
+                    id="serviceColumnTitleAr"
+                    class="form-control"
+                    formControlName="serviceColumnTitleAr"
+                    [readonly]="!canUpdate() || saving()"
+                    maxlength="200"
+                    dir="rtl"
+                  />
+                </div>
+                <div class="col-md-4 col-sm-6">
+                  <label class="form-label" for="windowColumnTitleAr">{{
+                    language() === 'ar' ? 'عمود الشباك (عربي)' : 'Window (Arabic)'
+                  }}</label>
+                  <input
+                    type="text"
+                    id="windowColumnTitleAr"
+                    class="form-control"
+                    formControlName="windowColumnTitleAr"
+                    [readonly]="!canUpdate() || saving()"
+                    maxlength="200"
+                    dir="rtl"
+                  />
+                </div>
+
+                <div class="col-md-4 col-sm-6">
+                  <label class="form-label" for="ticketColumnTitleEn">{{
+                    language() === 'ar' ? 'عمود التذكرة (إنجليزي)' : 'Ticket (English)'
+                  }}</label>
+                  <input
+                    type="text"
+                    id="ticketColumnTitleEn"
+                    class="form-control"
+                    formControlName="ticketColumnTitleEn"
+                    [readonly]="!canUpdate() || saving()"
+                    maxlength="200"
+                    dir="ltr"
+                  />
+                </div>
+                <div class="col-md-4 col-sm-6">
+                  <label class="form-label" for="serviceColumnTitleEn">{{
+                    language() === 'ar' ? 'عمود الخدمة (إنجليزي)' : 'Service (English)'
+                  }}</label>
+                  <input
+                    type="text"
+                    id="serviceColumnTitleEn"
+                    class="form-control"
+                    formControlName="serviceColumnTitleEn"
+                    [readonly]="!canUpdate() || saving()"
+                    maxlength="200"
+                    dir="ltr"
+                  />
+                </div>
+                <div class="col-md-4 col-sm-6">
+                  <label class="form-label" for="windowColumnTitleEn">{{
+                    language() === 'ar' ? 'عمود الشباك (إنجليزي)' : 'Window (English)'
+                  }}</label>
+                  <input
+                    type="text"
+                    id="windowColumnTitleEn"
+                    class="form-control"
+                    formControlName="windowColumnTitleEn"
+                    [readonly]="!canUpdate() || saving()"
+                    maxlength="200"
+                    dir="ltr"
+                  />
+                </div>
+              </div>
+
+              <!-- Subheading: Table Colors -->
+              <h6 class="section-subtitle mb-3 d-flex align-items-center gap-2 pt-3 border-top">
+                <i class="bi bi-brush text-primary"></i>
+                <span>{{
+                  language() === 'ar'
+                    ? 'ألوان جدول النداء وبادج التذكرة'
+                    : 'Calling Table Colors & Ticket Badge'
+                }}</span>
+              </h6>
+              <div class="row g-3">
+                <div class="col-lg-4 col-sm-6">
+                  <label class="form-label" for="tableHeaderBackgroundColor">{{
+                    language() === 'ar' ? 'خلفية ترويسة الجدول' : 'Header Background'
+                  }}</label>
+                  <div class="color-picker-control">
+                    <input
+                      type="color"
+                      id="tableHeaderBackgroundColor"
+                      [value]="configForm.controls.tableHeaderBackgroundColor.value"
+                      (input)="onColorPickerChange('tableHeaderBackgroundColor', $event)"
+                      [disabled]="!canUpdate() || saving()"
+                    />
+                    <input
+                      type="text"
+                      [value]="configForm.controls.tableHeaderBackgroundColor.value"
+                      (input)="onColorTextInput('tableHeaderBackgroundColor', $event)"
+                      [readonly]="!canUpdate() || saving()"
+                      maxlength="7"
+                    />
+                  </div>
+                </div>
+
+                <div class="col-lg-4 col-sm-6">
+                  <label class="form-label" for="tableHeaderTextColor">{{
+                    language() === 'ar' ? 'نص ترويسة الجدول' : 'Header Text'
+                  }}</label>
+                  <div class="color-picker-control">
+                    <input
+                      type="color"
+                      id="tableHeaderTextColor"
+                      [value]="configForm.controls.tableHeaderTextColor.value"
+                      (input)="onColorPickerChange('tableHeaderTextColor', $event)"
+                      [disabled]="!canUpdate() || saving()"
+                    />
+                    <input
+                      type="text"
+                      [value]="configForm.controls.tableHeaderTextColor.value"
+                      (input)="onColorTextInput('tableHeaderTextColor', $event)"
+                      [readonly]="!canUpdate() || saving()"
+                      maxlength="7"
+                    />
+                  </div>
+                </div>
+
+                <div class="col-lg-4 col-sm-6">
+                  <label class="form-label" for="tableRowBackgroundColor">{{
+                    language() === 'ar' ? 'خلفية صفوف الجدول' : 'Row Background'
+                  }}</label>
+                  <div class="color-picker-control">
+                    <input
+                      type="color"
+                      id="tableRowBackgroundColor"
+                      [value]="configForm.controls.tableRowBackgroundColor.value"
+                      (input)="onColorPickerChange('tableRowBackgroundColor', $event)"
+                      [disabled]="!canUpdate() || saving()"
+                    />
+                    <input
+                      type="text"
+                      [value]="configForm.controls.tableRowBackgroundColor.value"
+                      (input)="onColorTextInput('tableRowBackgroundColor', $event)"
+                      [readonly]="!canUpdate() || saving()"
+                      maxlength="7"
+                    />
+                  </div>
+                </div>
+
+                <div class="col-lg-4 col-sm-6">
+                  <label class="form-label" for="tableRowTextColor">{{
+                    language() === 'ar' ? 'نص صفوف الجدول' : 'Row Text'
+                  }}</label>
+                  <div class="color-picker-control">
+                    <input
+                      type="color"
+                      id="tableRowTextColor"
+                      [value]="configForm.controls.tableRowTextColor.value"
+                      (input)="onColorPickerChange('tableRowTextColor', $event)"
+                      [disabled]="!canUpdate() || saving()"
+                    />
+                    <input
+                      type="text"
+                      [value]="configForm.controls.tableRowTextColor.value"
+                      (input)="onColorTextInput('tableRowTextColor', $event)"
+                      [readonly]="!canUpdate() || saving()"
+                      maxlength="7"
+                    />
+                  </div>
+                </div>
+
+                <div class="col-lg-4 col-sm-6">
+                  <label class="form-label" for="ticketNumberBackgroundColor">{{
+                    language() === 'ar' ? 'خلفية بادج التذكرة' : 'Ticket Badge Background'
+                  }}</label>
+                  <div class="color-picker-control">
+                    <input
+                      type="color"
+                      id="ticketNumberBackgroundColor"
+                      [value]="configForm.controls.ticketNumberBackgroundColor.value"
+                      (input)="onColorPickerChange('ticketNumberBackgroundColor', $event)"
+                      [disabled]="!canUpdate() || saving()"
+                    />
+                    <input
+                      type="text"
+                      [value]="configForm.controls.ticketNumberBackgroundColor.value"
+                      (input)="onColorTextInput('ticketNumberBackgroundColor', $event)"
+                      [readonly]="!canUpdate() || saving()"
+                      maxlength="7"
+                    />
+                  </div>
+                </div>
+
+                <div class="col-lg-4 col-sm-6">
+                  <label class="form-label" for="ticketNumberTextColor">{{
+                    language() === 'ar' ? 'نص بادج التذكرة' : 'Ticket Badge Text'
+                  }}</label>
+                  <div class="color-picker-control">
+                    <input
+                      type="color"
+                      id="ticketNumberTextColor"
+                      [value]="configForm.controls.ticketNumberTextColor.value"
+                      (input)="onColorPickerChange('ticketNumberTextColor', $event)"
+                      [disabled]="!canUpdate() || saving()"
+                    />
+                    <input
+                      type="text"
+                      [value]="configForm.controls.ticketNumberTextColor.value"
+                      (input)="onColorTextInput('ticketNumberTextColor', $event)"
+                      [readonly]="!canUpdate() || saving()"
+                      maxlength="7"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ─── Panel 4: Ticker Messages Management (col-12) ──────────── -->
+        <div class="col-12">
+          <div class="card config-panel shadow-sm">
+            <div
+              class="panel-header d-flex align-items-center justify-content-between flex-wrap gap-2"
+            >
+              <div class="d-flex align-items-center gap-2">
+                <span class="panel-icon"><i class="bi bi-chat-left-text"></i></span>
+                <h5 class="panel-title m-0">
+                  {{
+                    language() === 'ar'
+                      ? 'رسائل الشريط المتحرك (Ticker Messages)'
+                      : 'Ticker Messages'
+                  }}
+                </h5>
+              </div>
+              @if (canUpdate()) {
+                <button
+                  type="button"
+                  class="btn btn-sm btn-primary d-inline-flex align-items-center gap-2"
+                  (click)="openAddMessageForm()"
+                  [disabled]="
+                    messageSaving() || showAddMessageForm() || editingMessageId() !== null
+                  "
+                >
+                  <i class="bi bi-plus-lg" aria-hidden="true"></i>
+                  <span>{{ language() === 'ar' ? 'إضافة رسالة' : 'Add Message' }}</span>
+                </button>
+              }
+            </div>
+            <div class="panel-body p-3 p-xl-4">
+              @if (messagesLoading()) {
+                <div class="text-center py-4">
+                  <app-niletronix-loading-state
+                    [title]="copy().loadingLabel"
+                    variant="inline"
+                    size="sm"
+                  />
+                </div>
+              }
+
+              <!-- Add/Edit Message Inline Form -->
+              @if (showAddMessageForm() || editingMessageId() !== null) {
+                <div class="message-composer card border p-3 mb-3 bg-light">
+                  <div class="d-flex align-items-center justify-content-between mb-2">
+                    <h6 class="m-0 fw-bold text-primary d-flex align-items-center gap-2">
+                      <i
+                        class="bi"
+                        [class.bi-plus-circle]="showAddMessageForm()"
+                        [class.bi-pencil-square]="editingMessageId() !== null"
+                      ></i>
+                      <span>
+                        {{
+                          showAddMessageForm()
+                            ? language() === 'ar'
+                              ? 'إضافة رسالة جديدة'
+                              : 'Add New Message'
+                            : language() === 'ar'
+                              ? 'تعديل الرسالة'
+                              : 'Edit Message'
+                        }}
+                      </span>
+                    </h6>
+                  </div>
+                  <div class="row g-2" [formGroup]="messageForm">
+                    <div class="col-md-5">
+                      <label class="form-label small" for="msgTextAr">{{
+                        language() === 'ar' ? 'النص العربي' : 'Arabic Text'
+                      }}</label>
+                      <input
+                        type="text"
+                        id="msgTextAr"
+                        class="form-control form-control-sm"
+                        formControlName="textAr"
+                        maxlength="500"
+                        dir="rtl"
+                      />
+                    </div>
+                    <div class="col-md-5">
+                      <label class="form-label small" for="msgTextEn">{{
+                        language() === 'ar' ? 'النص الإنجليزي' : 'English Text'
+                      }}</label>
+                      <input
+                        type="text"
+                        id="msgTextEn"
+                        class="form-control form-control-sm"
+                        formControlName="textEn"
+                        maxlength="500"
+                        dir="ltr"
+                      />
+                    </div>
+                    <div class="col-md-2">
+                      <label class="form-label small" for="msgOrder">{{
+                        language() === 'ar' ? 'الترتيب' : 'Order'
+                      }}</label>
+                      <input
+                        type="number"
+                        id="msgOrder"
+                        class="form-control form-control-sm"
+                        formControlName="displayOrder"
+                        min="1"
+                      />
+                    </div>
+                  </div>
+                  <div class="d-flex gap-2 justify-content-end mt-3">
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-outline-secondary"
+                      (click)="cancelMessageForm()"
+                      [disabled]="messageSaving()"
+                    >
+                      {{ language() === 'ar' ? 'إلغاء' : 'Cancel' }}
+                    </button>
+                    @if (showAddMessageForm()) {
+                      <button
+                        type="button"
+                        class="btn btn-sm btn-primary"
+                        (click)="submitNewMessage()"
+                        [disabled]="messageSaving() || messageForm.invalid"
+                      >
+                        @if (messageSaving()) {
+                          <span
+                            class="spinner-border spinner-border-sm"
+                            role="status"
+                            aria-hidden="true"
+                          ></span>
+                        }
+                        {{ language() === 'ar' ? 'حفظ الرسالة' : 'Save Message' }}
+                      </button>
+                    } @else {
+                      <button
+                        type="button"
+                        class="btn btn-sm btn-primary"
+                        (click)="submitEditMessage()"
+                        [disabled]="messageSaving() || messageForm.invalid"
+                      >
+                        @if (messageSaving()) {
+                          <span
+                            class="spinner-border spinner-border-sm"
+                            role="status"
+                            aria-hidden="true"
+                          ></span>
+                        }
+                        {{ language() === 'ar' ? 'تحديث الرسالة' : 'Update Message' }}
+                      </button>
+                    }
+                  </div>
+                </div>
+              }
+
+              <!-- Empty Messages State -->
+              @if (!messagesLoading() && messages().length === 0 && !showAddMessageForm()) {
+                <div class="text-center py-4 text-muted">
+                  <i class="bi bi-chat-square-dots fs-2 d-block mb-2 opacity-50"></i>
+                  <p class="mb-0">
+                    {{
+                      language() === 'ar'
+                        ? 'لا توجد رسائل تيكر مضافة لهذا الفرع بعد.'
+                        : 'No ticker messages added for this branch yet.'
+                    }}
+                  </p>
+                </div>
+              }
+
+              <!-- Messages Compact Table -->
+              @if (!messagesLoading() && messages().length > 0) {
+                <div class="table-responsive">
+                  <table class="table table-hover align-middle messages-table mb-0">
+                    <thead>
+                      <tr>
+                        <th style="width: 60px" class="text-center">#</th>
+                        <th>{{ language() === 'ar' ? 'النص العربي' : 'Arabic Text' }}</th>
+                        <th>{{ language() === 'ar' ? 'النص الإنجليزي' : 'English Text' }}</th>
+                        <th style="width: 100px" class="text-center">
+                          {{ language() === 'ar' ? 'الحالة' : 'Status' }}
+                        </th>
+                        @if (canUpdate()) {
+                          <th style="width: 110px" class="text-end">
+                            {{ language() === 'ar' ? 'الإجراءات' : 'Actions' }}
+                          </th>
+                        }
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (msg of messages(); track msg.id; let i = $index) {
+                        <tr
+                          [class.table-light]="!msg.isActive"
+                          [class.table-active]="editingMessageId() === msg.id"
+                          [attr.draggable]="
+                            canUpdate() && editingMessageId() === null && !showAddMessageForm()
+                              ? 'true'
+                              : 'false'
+                          "
+                          (dragstart)="onDragStart(i)"
+                          (dragover)="onDragOver($event)"
+                          (drop)="onDrop(i)"
+                          class="draggable-row"
+                        >
+                          <td class="text-center">
+                            <div class="d-flex align-items-center justify-content-center gap-1">
+                              @if (canUpdate() && editingMessageId() === null) {
+                                <i
+                                  class="bi bi-grip-vertical text-muted drag-handle"
+                                  title="اسحب لإعادة الترتيب"
+                                ></i>
+                              }
+                              <span class="badge bg-light text-dark border">{{
+                                msg.displayOrder
+                              }}</span>
+                            </div>
+                          </td>
+                          <td dir="rtl" class="text-truncate" style="max-width: 250px">
+                            {{ msg.textAr }}
+                          </td>
+                          <td dir="ltr" class="text-truncate text-muted" style="max-width: 250px">
+                            {{ msg.textEn }}
+                          </td>
+                          <td class="text-center">
+                            @if (msg.isActive) {
+                              <span
+                                class="badge bg-success-subtle text-success border border-success-subtle"
+                              >
+                                {{ language() === 'ar' ? 'نشط' : 'Active' }}
+                              </span>
+                            } @else {
+                              <span
+                                class="badge bg-secondary-subtle text-secondary border border-secondary-subtle"
+                              >
+                                {{ language() === 'ar' ? 'متوقف' : 'Inactive' }}
+                              </span>
+                            }
+                          </td>
+                          @if (canUpdate()) {
+                            <td class="text-end">
+                              <div class="d-inline-flex align-items-center gap-1">
+                                <button
+                                  type="button"
+                                  class="btn btn-sm btn-outline-primary action-icon-btn"
+                                  (click)="startEditMessage(msg)"
+                                  [disabled]="
+                                    messageSaving() ||
+                                    editingMessageId() !== null ||
+                                    showAddMessageForm()
+                                  "
+                                  [title]="language() === 'ar' ? 'تعديل' : 'Edit'"
+                                >
+                                  <i class="bi bi-pencil-fill"></i>
+                                </button>
+                                @if (msg.isActive) {
+                                  <button
+                                    type="button"
+                                    class="btn btn-sm btn-outline-danger action-icon-btn"
+                                    (click)="deactivateMessage(msg)"
+                                    [disabled]="messageSaving()"
+                                    [title]="language() === 'ar' ? 'إيقاف' : 'Deactivate'"
+                                  >
+                                    <i class="bi bi-pause-fill"></i>
+                                  </button>
+                                } @else {
+                                  <button
+                                    type="button"
+                                    class="btn btn-sm btn-outline-success action-icon-btn"
+                                    (click)="reactivateMessage(msg)"
+                                    [disabled]="messageSaving()"
+                                    [title]="language() === 'ar' ? 'تفعيل' : 'Reactivate'"
+                                  >
+                                    <i class="bi bi-play-fill"></i>
+                                  </button>
+                                }
+                              </div>
+                            </td>
+                          }
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- ─── Bottom Actions Sticky Save Bar (col-12) ────────────────────────── -->
+        @if (canUpdate()) {
+          <div class="col-12 sticky-save-bar-wrapper">
+            <div class="sticky-save-bar">
+              <div class="d-flex align-items-center gap-2">
+                @if (configForm.dirty) {
+                  <div class="save-status-pill status-unsaved">
+                    <span class="status-pulse-dot warning"></span>
+                    <i class="bi bi-exclamation-triangle-fill text-warning"></i>
+                    <span class="fw-semibold">{{
+                      language() === 'ar' ? 'توجد تعديلات غير محفوظة' : 'Unsaved Changes'
+                    }}</span>
+                  </div>
+                } @else {
+                  <div class="save-status-pill status-saved">
+                    <span class="status-pulse-dot success"></span>
+                    <i class="bi bi-check-circle-fill text-success"></i>
+                    <span class="fw-semibold">{{
+                      language() === 'ar' ? 'جميع الإعدادات محفوظة ومحدثة' : 'All Settings Saved'
+                    }}</span>
+                  </div>
+                }
+              </div>
+              <button
+                type="submit"
+                class="btn btn-catchy-save"
+                [disabled]="saving() || configForm.invalid"
+              >
+                @if (saving()) {
+                  <span
+                    class="spinner-border spinner-border-sm"
+                    role="status"
+                    aria-hidden="true"
+                  ></span>
+                } @else {
+                  <i class="bi bi-cloud-check-fill fs-5"></i>
+                }
+                <span>{{ copy().saveConfigurationLabel }}</span>
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    </form>
+  }
+</div>

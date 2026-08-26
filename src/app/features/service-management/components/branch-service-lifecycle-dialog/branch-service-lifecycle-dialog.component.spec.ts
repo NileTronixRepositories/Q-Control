@@ -3,7 +3,7 @@ import { vi } from 'vitest';
 
 import { BRANCH_SERVICES_TRANSLATIONS } from '../../i18n/branch-services.translations';
 import { SERVICE_MANAGEMENT_TRANSLATIONS } from '../../i18n/service-management.translations';
-import { BranchServiceLifecycleConfirmState } from '../../models/branch-services.model';
+import { BranchServiceLifecycleConfirmState } from '../../models/branch-services/branch-services.model';
 import { BranchServiceLifecycleDialogComponent } from './branch-service-lifecycle-dialog.component';
 
 const deleteState: BranchServiceLifecycleConfirmState = {

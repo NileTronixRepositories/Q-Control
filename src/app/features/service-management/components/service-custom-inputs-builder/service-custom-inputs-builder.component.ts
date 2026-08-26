@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import { FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { TechnicalAdminI18nStore } from '../../../technical-admin/store/technical-admin-i18n.store';
+import { AdminI18nStore } from '@layout/admin-shell/store/admin-i18n.store';
 import { SERVICE_MANAGEMENT_TRANSLATIONS } from '../../i18n/service-management.translations';
-import { CustomInputType } from '../../models/service-management.model';
+import { CustomInputType } from '../../models/service-management/service-management.model';
 import {
   integerRestrictionsValidator,
   stringRestrictionsValidator,
@@ -86,7 +86,7 @@ export function createCustomInputFormGroup(initial?: {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ServiceCustomInputsBuilderComponent {
-  private readonly i18nStore = inject(TechnicalAdminI18nStore);
+  private readonly i18nStore = inject(AdminI18nStore);
 
   public readonly customInputs = input.required<FormArray<CustomInputFormGroup>>();
   public readonly disabled = input<boolean>(false);

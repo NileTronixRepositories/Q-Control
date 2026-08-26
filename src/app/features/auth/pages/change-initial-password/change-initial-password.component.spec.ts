@@ -3,11 +3,11 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { of } from 'rxjs';
 
-import { AppDirection, AppLanguage } from '../../../../shared/models/app-language.model';
+import { AppDirection, AppLanguage } from '../../../../shared/models/app-language/app-language.model';
 import { AppLanguageStore } from '../../../../shared/store/app-language.store';
-import { AuthenticatedSession } from '../../models/login-credentials.model';
-import { AuthNavigationService } from '../../services/auth-navigation.service';
-import { AuthSessionService } from '../../services/auth-session.service';
+import { AuthenticatedSession } from '../../models/login-credentials/login-credentials.model';
+import { AuthNavigationService } from '../../services/auth-navigation/auth-navigation.service';
+import { AuthSessionService } from '../../services/auth-session/auth-session.service';
 import { ChangeInitialPasswordComponent } from './change-initial-password.component';
 
 describe('ChangeInitialPasswordComponent', () => {

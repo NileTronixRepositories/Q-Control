@@ -115,7 +115,7 @@ describe('AppShellComponent responsive navigation', () => {
     const user = header.querySelector('.workspace-user') as HTMLElement;
 
     expect(header.querySelector('app-breadcrumb')).not.toBeNull();
-    expect(user.textContent).toContain('Current user');
+    expect(user.getAttribute('aria-label')).toBe('Current user');
     expect(user.textContent).toContain('Nour Admin');
     expect(user.textContent).toContain('Technical Admin');
   });

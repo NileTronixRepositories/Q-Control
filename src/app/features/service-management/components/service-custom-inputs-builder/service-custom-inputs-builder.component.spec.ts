@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormArray } from '@angular/forms';
 import { describe, it, expect, beforeEach } from 'vitest';
-import { TechnicalAdminI18nStore } from '../../../technical-admin/store/technical-admin-i18n.store';
+import { AdminI18nStore } from '@layout/admin-shell/store/admin-i18n.store';
 import {
   createCustomInputFormGroup,
   CustomInputFormGroup,
@@ -18,7 +18,7 @@ describe('ServiceCustomInputsBuilderComponent', () => {
 
     await TestBed.configureTestingModule({
       imports: [ServiceCustomInputsBuilderComponent],
-      providers: [TechnicalAdminI18nStore],
+      providers: [AdminI18nStore],
     }).compileComponents();
 
     fixture = TestBed.createComponent(ServiceCustomInputsBuilderComponent);

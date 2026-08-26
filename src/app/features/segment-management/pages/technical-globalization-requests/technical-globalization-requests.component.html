@@ -1,9 +1,9 @@
 <section
-  class="technical-admin-responsive-page technical-globalization-requests-page container-fluid d-flex flex-column gap-3 p-3 p-lg-4"
+  class="admin-responsive-page technical-globalization-requests-page container-fluid d-flex flex-column gap-3 p-3 p-lg-4"
   [attr.dir]="direction()"
   [attr.lang]="language()"
 >
-  <app-technical-admin-page-hero
+  <app-page-hero
     [eyebrow]="language() === 'ar' ? 'إدارة الطلبات المركزية' : 'Central Request Governance'"
     [title]="translations().technicalRequestsTitle"
     [description]="language() === 'ar' ? 'مراجعة وقبول أو رفض طلبات تعميم شرائح الخدمات المحولة من الفروع.' : 'Review and approve or reject segment globalization requests submitted by branches.'"
@@ -56,7 +56,7 @@
         </div>
       </div>
     </div>
-  </app-technical-admin-page-hero>
+  </app-page-hero>
 
   @if (toastMessage(); as msg) {
     <div class="toast-stack" role="status" aria-live="polite" aria-atomic="true">

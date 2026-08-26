@@ -7,10 +7,10 @@ import { ServiceRequestStep } from '../../enums/service-request-step.enum';
 import {
   SERVICE_REQUEST_LANGUAGES,
   SERVICE_REQUEST_TRANSLATIONS,
-} from '../../models/language.model';
-import { ServiceType } from '../../models/service-type.model';
-import { Specialty } from '../../models/specialty.model';
-import { QueueTicket } from '../../models/ticket.model';
+} from '../../models/language/language.model';
+import { ServiceType } from '../../models/service-type/service-type.model';
+import { Specialty } from '../../models/specialty/specialty.model';
+import { QueueTicket } from '../../models/ticket/ticket.model';
 import { ServiceRequestStore } from '../../store/service-request.store';
 import { ServiceRequestHomeComponent } from './service-request-home.component';
 

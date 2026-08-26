@@ -5,7 +5,7 @@ import {
   GlobalConfiguration,
   TicketCallingConfiguration,
   TicketStatus
-} from '../models/organization.model';
+} from '../models/organization/organization.model';
 
 @Injectable()
 export class OrganizationStore {

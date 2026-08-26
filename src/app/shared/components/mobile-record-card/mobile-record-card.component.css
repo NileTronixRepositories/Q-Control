@@ -1,0 +1,103 @@
+:host {
+  display: block;
+}
+
+.mobile-record-card {
+  background: var(--craft-surface-base, #ffffff);
+  border: 1px solid var(--craft-border-subtle, #f1f5f9);
+  border-radius: var(--craft-radius-lg, 16px);
+  box-shadow: var(--craft-shadow-xs, 0 1px 2px rgb(15 23 42 / 0.04));
+  transition: box-shadow var(--craft-transition-normal, 200ms ease),
+              transform var(--craft-transition-fast, 120ms ease);
+}
+
+.mobile-record-card:hover {
+  box-shadow: var(--craft-shadow-md, 0 8px 24px -6px rgb(15 23 42 / 0.1));
+}
+
+.record-card-header {
+  padding: var(--craft-space-4, 16px);
+  background: linear-gradient(180deg, var(--craft-surface-subtle, #f8fafc) 0%, var(--craft-surface-base, #ffffff) 100%);
+  border-bottom: 1px solid var(--craft-border-subtle, #f1f5f9);
+}
+
+.record-card-icon {
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  color: var(--craft-brand-dark, #0b4566);
+  background: var(--craft-brand-light, #ecfeff);
+  border: 1px solid var(--craft-brand-glow, #a5f3fc);
+  border-radius: var(--craft-radius-md, 12px);
+  font-size: 1.15rem;
+}
+
+.record-card-main,
+.record-card-title {
+  min-width: 0;
+}
+
+.record-card-eyebrow {
+  color: var(--craft-brand-dark, #085e82);
+  font-size: var(--craft-font-size-xs, 0.75rem);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  line-height: 1.45;
+}
+
+.record-card-heading {
+  color: var(--craft-text-primary, #0f172a);
+  font-size: var(--craft-font-size-md, 1rem);
+  font-weight: 800;
+  line-height: 1.45;
+}
+
+.record-card-id {
+  padding: 3px 9px;
+  color: #ffffff;
+  background: var(--craft-navy-deep, #0f172a);
+  border-radius: var(--craft-radius-sm, 8px);
+  font-size: var(--craft-font-size-xs, 0.75rem);
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.record-card-badges:empty {
+  display: none;
+}
+
+.record-card-fields {
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--craft-space-2, 8px);
+  padding: var(--craft-space-3, 12px) var(--craft-space-4, 16px);
+}
+
+:host ::ng-deep [record-fields] {
+  min-width: 0;
+  margin: 0;
+  padding: var(--craft-space-2, 8px) var(--craft-space-3, 12px);
+  background: var(--craft-surface-subtle, #f8fafc);
+  border: 1px solid var(--craft-border-subtle, #f1f5f9);
+  border-radius: var(--craft-radius-md, 12px);
+}
+
+.record-card-actions {
+  padding: var(--craft-space-3, 12px) var(--craft-space-4, 16px);
+  background: var(--craft-surface-subtle, #f8fafc);
+  border-top: 1px solid var(--craft-border-subtle, #f1f5f9);
+}
+
+:host ::ng-deep [record-actions] {
+  flex: 1 1 42px;
+  min-height: 42px;
+}
+
+@media (min-width: 430px) {
+  .record-card-fields {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  :host ::ng-deep [record-fields].record-field-wide {
+    grid-column: 1 / -1;
+  }
+}
