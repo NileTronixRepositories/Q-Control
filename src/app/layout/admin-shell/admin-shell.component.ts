@@ -73,6 +73,14 @@ export class AdminShellComponent {
     const translations = this.translations();
     const items: AppNavigationItem[] = [];
 
+    if (this.canShow(['Tickets.View', 'Reservations.View', 'Tickets.ViewArchive', 'Reservations.ViewArchive'])) {
+      items.push({
+        label: this.i18nStore.language() === 'ar' ? 'تشغيل التذاكر والحجوزات' : 'Queue Operations',
+        route: '/admin/queue-operations',
+        icon: 'bi-ticket-perforated',
+      });
+    }
+
     if (this.canShow(['WaitingAreas.ViewAll'])) {
       items.push({
         label: translations.waitingAreasLabel,

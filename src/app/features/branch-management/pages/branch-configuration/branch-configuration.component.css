@@ -280,6 +280,43 @@
   border-inline-start: 4px solid #ef4444;
 }
 
+.ticket-settings {
+  border-top: 1px solid #e2e8f0;
+  padding-top: 1.5rem;
+}
+
+.ticket-settings.disabled {
+  opacity: .72;
+}
+
+.ticket-settings-header {
+  align-items: center;
+  display: flex;
+  gap: .75rem;
+  margin-bottom: 1rem;
+}
+
+.ticket-settings-header .section-icon-box {
+  flex: 0 0 auto;
+  height: 2.25rem;
+  width: 2.25rem;
+}
+
+.ticket-settings-header h5,
+.ticket-settings-header p {
+  margin: 0;
+}
+
+.ticket-settings-header h5 {
+  font-size: .95rem;
+  font-weight: 700;
+}
+
+.ticket-settings-header p {
+  color: var(--q-text-muted);
+  font-size: .8rem;
+}
+
 /* ── Action Footer Strip ─────────────────────────────────────── */
 .config-card-footer {
   padding: 1rem 1.5rem;
@@ -412,6 +449,35 @@
   }
 }
 
+/* ── Ticket Settings & Field Cards ──────────────────────────── */
+.ticket-field-card {
+  background-color: #f8fafc;
+  border-color: #e2e8f0 !important;
+  transition: all 0.2s ease;
+}
+
+.ticket-field-card:hover {
+  background-color: #ffffff;
+  border-color: #bae6fd !important;
+  box-shadow: 0 4px 12px rgba(8, 127, 167, 0.06);
+}
+
+.ticket-field-card .input-group-text {
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.field-subtext {
+  font-size: 0.75rem;
+  line-height: 1.35;
+  margin-top: 4px;
+}
+
+.runtime-overview-box {
+  background-color: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+}
+
 /* Responsive adjustments for Mobile/Tablet */
 @media (max-width: 768px) {
   .time-inputs-grid {
@@ -435,3 +501,4 @@
     width: 100%;
   }
 }
+

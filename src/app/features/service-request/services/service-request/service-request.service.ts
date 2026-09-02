@@ -14,7 +14,14 @@ import {
 import { ServiceRequestCardTone, ServiceType } from '../../models/service-type/service-type.model';
 import { Specialty } from '../../models/specialty/specialty.model';
 
-const TONES: readonly ServiceRequestCardTone[] = ['blue', 'cyan', 'green', 'orange', 'red', 'purple'];
+const TONES: readonly ServiceRequestCardTone[] = [
+  'blue',
+  'cyan',
+  'green',
+  'orange',
+  'red',
+  'purple',
+];
 const BRANCHES_PATH = 'api/branches';
 
 @Injectable({
@@ -24,7 +31,9 @@ export class ServiceRequestService {
   private readonly httpClient = inject(HttpClient);
   private readonly authSessionService = inject(AuthSessionService);
   private readonly appLanguageStore = inject(AppLanguageStore);
-  private readonly branchesEndpoint = new URL(BRANCHES_PATH, environment.apiBaseUrl).toString().replace(/\/$/, '');
+  private readonly branchesEndpoint = new URL(BRANCHES_PATH, environment.apiBaseUrl)
+    .toString()
+    .replace(/\/$/, '');
 
   loadBranchServices(branchId: number): Observable<MappedServiceRequestData> {
     const url = `${this.branchesEndpoint}/${branchId}/ticket-issuable-services`;
@@ -59,7 +68,7 @@ export class ServiceRequestService {
 
     return {
       branchId: response.branchId,
-      branchBranding,
+      branchBranding: branchBranding ? { ...branchBranding, logoUrl: resolvedLogo } : null,
       logoUrl: resolvedLogo,
       theme,
       serviceTypes,
@@ -73,7 +82,8 @@ export class ServiceRequestService {
   ): { readonly serviceType: ServiceType; readonly specialties: readonly Specialty[] } {
     const id = String(node.serviceId);
     const code = node.rangePrefix ?? `SRV-${node.serviceId}`;
-    const ticketPrefix = node.rangePrefix ?? (String(node.serviceId).charAt(0).toUpperCase() || 'Q');
+    const ticketPrefix =
+      node.rangePrefix ?? (String(node.serviceId).charAt(0).toUpperCase() || 'Q');
     const name: LocalizedText = {
       ar: node.arabicName ?? node.englishName ?? `خدمة ${node.serviceId}`,
       en: node.englishName ?? node.arabicName ?? `Service ${node.serviceId}`,
@@ -87,9 +97,23 @@ export class ServiceRequestService {
     const estimatedWaitingMinutes = 0;
 
     const childNodes = node.children ?? [];
-    const specialties = childNodes.map((child, childIdx) => this.mapToSpecialty(child, childIdx, tone));
+    const specialties = childNodes.map((child, childIdx) =>
+      this.mapToSpecialty(child, childIdx, tone),
+    );
     const specialtyIds = specialties.map((s) => s.id);
-    const customInputs = node.customInputs ? [...node.customInputs].sort((a, b) => a.order - b.order) : [];
+    const customInputs = node.customInputs
+      ? [...node.customInputs].sort((a, b) => a.order - b.order)
+      : [];
+    const rawImage =
+      node.logoUrl ??
+      node.imageUrl ??
+      node.iconUrl ??
+      node.imagePath ??
+      (node as any).LogoUrl ??
+      (node as any).ImageUrl ??
+      (node as any).IconUrl ??
+      null;
+    const imageUrl = this.resolveMediaUrl(rawImage);
 
     const serviceType: ServiceType = {
       id,
@@ -104,6 +128,8 @@ export class ServiceRequestService {
       isTicketIssuable: node.isTicketIssuable,
       isClientInputRequired: node.isClientInputRequired,
       customInputs,
+      hasReservation: node.hasReservation ?? undefined,
+      imageUrl,
     };
 
     return { serviceType, specialties };
@@ -129,8 +155,22 @@ export class ServiceRequestService {
     const icon = this.resolveServiceIcon(name.en, name.ar, index + 2);
     const estimatedWaitingMinutes = 0;
     const childNodes = node.children ?? [];
-    const subSpecialties = childNodes.map((child, childIdx) => this.mapToSpecialty(child, childIdx, tone));
-    const customInputs = node.customInputs ? [...node.customInputs].sort((a, b) => a.order - b.order) : [];
+    const subSpecialties = childNodes.map((child, childIdx) =>
+      this.mapToSpecialty(child, childIdx, tone),
+    );
+    const customInputs = node.customInputs
+      ? [...node.customInputs].sort((a, b) => a.order - b.order)
+      : [];
+    const rawImage =
+      node.logoUrl ??
+      node.imageUrl ??
+      node.iconUrl ??
+      node.imagePath ??
+      (node as any).LogoUrl ??
+      (node as any).ImageUrl ??
+      (node as any).IconUrl ??
+      null;
+    const imageUrl = this.resolveMediaUrl(rawImage);
 
     return {
       id,
@@ -145,45 +185,108 @@ export class ServiceRequestService {
       isTicketIssuable: node.isTicketIssuable,
       isClientInputRequired: node.isClientInputRequired,
       customInputs,
+      hasReservation: node.hasReservation ?? undefined,
+      imageUrl,
     };
   }
 
   private resolveServiceIcon(enName: string, arName: string, fallbackIdx: number): string {
     const text = `${enName} ${arName}`.toLowerCase();
-    if (text.includes('outpatient') || text.includes('consult') || text.includes('كشف') || text.includes('عياد')) {
+    if (
+      text.includes('outpatient') ||
+      text.includes('consult') ||
+      text.includes('كشف') ||
+      text.includes('عياد')
+    ) {
       return 'bi-clipboard2-pulse';
     }
     if (text.includes('internal') || text.includes('medicine') || text.includes('باطن')) {
       return 'bi-heart-pulse';
     }
-    if (text.includes('pediatr') || text.includes('child') || text.includes('أطفال') || text.includes('طفل')) {
+    if (
+      text.includes('pediatr') ||
+      text.includes('child') ||
+      text.includes('أطفال') ||
+      text.includes('طفل')
+    ) {
       return 'bi-emoji-smile';
     }
-    if (text.includes('emergenc') || text.includes('triage') || text.includes('طوارئ') || text.includes('عاجل')) {
+    if (
+      text.includes('emergenc') ||
+      text.includes('triage') ||
+      text.includes('طوارئ') ||
+      text.includes('عاجل')
+    ) {
       return 'bi-exclamation-triangle';
     }
-    if (text.includes('lab') || text.includes('patho') || text.includes('معمل') || text.includes('تحاليل') || text.includes('عين')) {
+    if (
+      text.includes('lab') ||
+      text.includes('patho') ||
+      text.includes('معمل') ||
+      text.includes('تحاليل') ||
+      text.includes('عين')
+    ) {
       return 'bi-beaker';
     }
-    if (text.includes('radio') || text.includes('ray') || text.includes('sonar') || text.includes('أشعة') || text.includes('سونار')) {
+    if (
+      text.includes('radio') ||
+      text.includes('ray') ||
+      text.includes('sonar') ||
+      text.includes('أشعة') ||
+      text.includes('سونار')
+    ) {
       return 'bi-camera-fill';
     }
-    if (text.includes('ortho') || text.includes('bone') || text.includes('عظام') || text.includes('مفاصل')) {
+    if (
+      text.includes('ortho') ||
+      text.includes('bone') ||
+      text.includes('عظام') ||
+      text.includes('مفاصل')
+    ) {
       return 'bi-bandaid';
     }
-    if (text.includes('derma') || text.includes('skin') || text.includes('جلد') || text.includes('ليزر')) {
+    if (
+      text.includes('derma') ||
+      text.includes('skin') ||
+      text.includes('جلد') ||
+      text.includes('ليزر')
+    ) {
       return 'bi-stars';
     }
-    if (text.includes('cardio') || text.includes('heart') || text.includes('قلب') || text.includes('ضغط')) {
+    if (
+      text.includes('cardio') ||
+      text.includes('heart') ||
+      text.includes('قلب') ||
+      text.includes('ضغط')
+    ) {
       return 'bi-heart';
     }
-    if (text.includes('gastro') || text.includes('stomach') || text.includes('liver') || text.includes('هضمي') || text.includes('كبد') || text.includes('معدة')) {
+    if (
+      text.includes('gastro') ||
+      text.includes('stomach') ||
+      text.includes('liver') ||
+      text.includes('هضمي') ||
+      text.includes('كبد') ||
+      text.includes('معدة')
+    ) {
       return 'bi-capsule';
     }
-    if (text.includes('recep') || text.includes('inquir') || text.includes('استقبال') || text.includes('تسجيل')) {
+    if (
+      text.includes('recep') ||
+      text.includes('inquir') ||
+      text.includes('استقبال') ||
+      text.includes('تسجيل')
+    ) {
       return 'bi-person-lines-fill';
     }
-    const FALLBACK_ICONS = ['bi-clipboard2-pulse', 'bi-hospital', 'bi-activity', 'bi-shield-check', 'bi-building-fill', 'bi-person-check'];
+    const FALLBACK_ICONS = [
+      'bi-clipboard2-pulse',
+      'bi-hospital',
+      'bi-activity',
+      'bi-shield-check',
+      'bi-building-fill',
+      'bi-person-check',
+    ];
     return FALLBACK_ICONS[fallbackIdx % FALLBACK_ICONS.length];
   }
 
@@ -193,9 +296,13 @@ export class ServiceRequestService {
     }
 
     try {
-      const mediaUrl = mediaPath.startsWith('http://') || mediaPath.startsWith('https://')
-        ? new URL(mediaPath)
-        : new URL(mediaPath.startsWith('/') ? mediaPath : `/${mediaPath}`, this.resolveMediaOrigin(environment.apiBaseUrl));
+      const mediaUrl =
+        mediaPath.startsWith('http://') || mediaPath.startsWith('https://')
+          ? new URL(mediaPath)
+          : new URL(
+              mediaPath.startsWith('/') ? mediaPath : `/${mediaPath}`,
+              this.resolveMediaOrigin(environment.apiBaseUrl),
+            );
 
       mediaUrl.searchParams.set('t', String(Date.now()));
       return mediaUrl.toString();

@@ -1,4 +1,4 @@
-﻿/* Admin panels and compact detail surfaces. */
+/* Admin panels and compact detail surfaces. */
 body[data-admin-theme]
   :where(
     .settings-panel,
@@ -7,14 +7,11 @@ body[data-admin-theme]
     .form-panel,
     .logo-preview-panel,
     .status-list,
-    .empty-state,
     .card,
     .summary-card,
     .monitor-card,
     .voice-preview,
     .queue-preview,
-    .table-wrap,
-    .table-responsive,
     .editor-panel:not(.app-popup-panel),
     .terminal-editor-panel:not(.app-popup-panel),
     .display-editor-panel:not(.app-popup-panel),
@@ -27,7 +24,7 @@ body[data-admin-theme]
   box-shadow: var(--q-panel-shadow, 0 10px 28px rgba(27, 36, 48, 0.052));
 }
 
-body[data-admin-theme] :where(.settings-panel, .content-panel, .list-panel, .form-panel, .logo-preview-panel, .status-list, .empty-state) {
+body[data-admin-theme] :where(.settings-panel, .content-panel, .list-panel, .form-panel, .logo-preview-panel, .status-list) {
   padding: var(--nt-panel-padding-y) var(--nt-panel-padding-x);
 }
 

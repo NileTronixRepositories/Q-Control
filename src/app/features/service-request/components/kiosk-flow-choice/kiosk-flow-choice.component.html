@@ -1,0 +1,64 @@
+<section class="kiosk-flow-choice" aria-labelledby="kiosk-flow-choice-title">
+  <div class="kiosk-flow-choice__header text-center mb-4">
+    <div class="kiosk-flow-choice__badge">
+      <i class="bi bi-diagram-3-fill me-1 ms-1" aria-hidden="true"></i>
+      <span>{{ translations().chooseFlowStepBadge }}</span>
+    </div>
+    <h2 id="kiosk-flow-choice-title" class="kiosk-flow-choice__title">
+      {{ translations().chooseFlowTitle }}
+    </h2>
+    <p class="kiosk-flow-choice__description">
+      {{ translations().chooseFlowDescription }}
+    </p>
+  </div>
+
+  <div class="kiosk-flow-choice__grid">
+    <!-- Option A: Previous Reservation -->
+    <button
+      type="button"
+      class="kiosk-flow-card kiosk-flow-card--reservation"
+      (click)="onSelectChoice('reservation')"
+      [attr.aria-label]="translations().haveReservationLabel"
+    >
+      <div class="kiosk-flow-card__icon-wrapper">
+        <i class="bi bi-calendar2-check-fill kiosk-flow-card__icon" aria-hidden="true"></i>
+      </div>
+      <div class="kiosk-flow-card__body">
+        <h3 class="kiosk-flow-card__title">{{ translations().haveReservationLabel }}</h3>
+        <p class="kiosk-flow-card__subtitle">{{ translations().haveReservationDesc }}</p>
+      </div>
+      <div class="kiosk-flow-card__arrow">
+        <i
+          class="bi"
+          [class.bi-arrow-left-circle-fill]="isRtl()"
+          [class.bi-arrow-right-circle-fill]="!isRtl()"
+          aria-hidden="true"
+        ></i>
+      </div>
+    </button>
+
+    <!-- Option B: New Direct Ticket -->
+    <button
+      type="button"
+      class="kiosk-flow-card kiosk-flow-card--direct"
+      (click)="onSelectChoice('direct')"
+      [attr.aria-label]="translations().newTicketLabel"
+    >
+      <div class="kiosk-flow-card__icon-wrapper">
+        <i class="bi bi-ticket-perforated-fill kiosk-flow-card__icon" aria-hidden="true"></i>
+      </div>
+      <div class="kiosk-flow-card__body">
+        <h3 class="kiosk-flow-card__title">{{ translations().newTicketLabel }}</h3>
+        <p class="kiosk-flow-card__subtitle">{{ translations().newTicketDesc }}</p>
+      </div>
+      <div class="kiosk-flow-card__arrow">
+        <i
+          class="bi"
+          [class.bi-arrow-left-circle-fill]="isRtl()"
+          [class.bi-arrow-right-circle-fill]="!isRtl()"
+          aria-hidden="true"
+        ></i>
+      </div>
+    </button>
+  </div>
+</section>

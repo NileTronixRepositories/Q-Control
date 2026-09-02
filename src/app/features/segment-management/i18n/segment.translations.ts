@@ -64,10 +64,15 @@ export interface SegmentTranslations {
   readonly concurrencyError: string;
   readonly noAvailableSegments: string;
   readonly selectSegmentsToAdd: string;
-  readonly  quota: string;
+  readonly quota: string;
   readonly assignedSegmentsList: string;
   readonly protected: string;
   readonly selectedTotal: string;
+  readonly cannotIssueTicketTitle?: string;
+  readonly cannotIssueTicketDesc?: string;
+  readonly cannotIssueTicketBadge?: string;
+  readonly retry?: string;
+  readonly loadError?: string;
 }
 
 export const SEGMENT_TRANSLATIONS_AR: SegmentTranslations = {
@@ -140,6 +145,11 @@ export const SEGMENT_TRANSLATIONS_AR: SegmentTranslations = {
   assignedSegmentsList: 'قائمة الشرائح المربوطة بالخدمة',
   protected: 'محمي',
   selectedTotal: 'إجمالي المختار',
+  cannotIssueTicketTitle: 'هذه الخدمة لا تصدر تذاكر',
+  cannotIssueTicketDesc: 'تم ضبط هذه الخدمة كخدمة لا تصدر تذاكر، لذلك لا يمكن تخصيص نطاق أرقام أو ربط وإدارة شرائح بها. يمكنك تفعيل خيار إصدار التذاكر من شاشة إعدادات وتعديل الخدمة.',
+  cannotIssueTicketBadge: 'لا يمكن إصدار تذكرة',
+  retry: 'إعادة المحاولة',
+  loadError: 'حدث خطأ أثناء تحميل بيانات الشرائح',
 };
 
 export const SEGMENT_TRANSLATIONS_EN: SegmentTranslations = {
@@ -212,5 +222,9 @@ export const SEGMENT_TRANSLATIONS_EN: SegmentTranslations = {
   assignedSegmentsList: 'Assigned Segments List',
   protected: 'Protected',
   selectedTotal: 'Selected Total',
+  cannotIssueTicketTitle: 'This Service Cannot Issue Tickets',
+  cannotIssueTicketDesc: 'This service is configured not to issue tickets, so ticket ranges and segments cannot be assigned. You can enable ticket issuing from the service settings.',
+  cannotIssueTicketBadge: 'Cannot Issue Ticket',
+  retry: 'Retry',
+  loadError: 'An error occurred while loading service segments',
 };
-

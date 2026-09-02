@@ -7,6 +7,7 @@ export interface SelectionCardViewModel {
   readonly icon: string;
   readonly tone: ServiceRequestCardTone;
   readonly meta: string;
+  readonly imageUrl?: string | null;
 }
 
 export interface StepIndicatorItem {

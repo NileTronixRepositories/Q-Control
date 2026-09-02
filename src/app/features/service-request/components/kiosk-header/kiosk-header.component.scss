@@ -5,15 +5,13 @@
 
 .kiosk-header {
   align-items: center;
-  // background: var(--kiosk-header-color, #ffffff);
-  // border: 1px solid rgba(203, 213, 225, 0.7);
-  // border-radius: 0.6rem;
-  // box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
   display: flex;
   justify-content: space-between;
-  // gap: 0.8rem;
-  // grid-template-columns: minmax(10rem, 1fr) minmax(14rem, 2fr) minmax(10rem, 1fr);
-  padding: 0.85rem 1.4rem;
+  padding: 0.5rem 0.75rem;
   width: 100%;
 }
 
@@ -47,13 +45,13 @@
 }
 
 .kiosk-header__brand-text {
-  color: #0f2942;
+  color: var(--kiosk-main-text-color, #0f2942);
   font-size: 1.05rem;
   font-weight: 900;
   overflow-wrap: anywhere;
 }
 
-/* NAVIGATION PATH NEXT TO Q LOGO */
+/* NAVIGATION PATH */
 .service-request-navigation-path {
   align-items: center;
   display: flex;
@@ -62,23 +60,46 @@
 }
 
 .nav-path-step {
-  border-radius: 0.5rem;
-  font-size: 0.925rem;
-  font-weight: 700;
-  padding: 0.4rem 0.85rem;
+  align-items: center;
+  border-radius: 9999px;
+  display: inline-flex;
+  font-size: 0.95rem;
+  font-weight: 800;
+  justify-content: center;
+  line-height: 1.2;
+  padding: 0.45rem 1.15rem;
   transition: all 180ms ease;
+  user-select: none;
 
-  &--last {
-    background-color: var(--kiosk-secondary-color, #0f2942) !important;
+  &--active {
+    background: var(--kiosk-main-color, #0f75bc) !important;
+    box-shadow: 0 4px 14px color-mix(in srgb, var(--kiosk-main-color, #0f75bc) 35%, transparent);
     color: #ffffff !important;
-    box-shadow: 0 3px 10px color-mix(in srgb, var(--kiosk-secondary-color, #0f2942) 25%, transparent);
+    transform: scale(1.02);
+  }
+
+  &--completed {
+    background: color-mix(in srgb, var(--kiosk-main-color, #0f75bc) 12%, #ffffff) !important;
+    border: 1px solid color-mix(in srgb, var(--kiosk-main-color, #0f75bc) 30%, transparent);
+    color: var(--kiosk-main-color, #0f75bc) !important;
+  }
+
+  &--pending {
+    background: rgba(0, 0, 0, 0.04) !important;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    color: #94a3b8 !important;
   }
 }
 
 .nav-path-arrow {
-  color: var(--kiosk-secondary-color, #64748b);
+  color: #cbd5e1;
   font-size: 0.85rem;
-  font-weight: bold;
+  font-weight: 900;
+  transition: color 180ms ease;
+
+  &--completed {
+    color: var(--kiosk-main-color, #0f75bc);
+  }
 }
 
 .kiosk-header__title {
@@ -88,7 +109,7 @@
 }
 
 .kiosk-header__title h1 {
-  color: var(--kiosk-secondary-color, #0f3f68);
+  color: var(--kiosk-main-text-color, #0f3f68);
   font-size: clamp(1.4rem, 2.6vw, 2.2rem);
   font-weight: 900;
   letter-spacing: 0;
@@ -97,7 +118,7 @@
 }
 
 .kiosk-header__title p {
-  color: #64748b;
+  color: var(--kiosk-secondary-color, #64748b);
   font-size: clamp(0.85rem, 1.1vw, 0.98rem);
   font-weight: 600;
   line-height: var(--q-line-height-body, 1.5);
@@ -112,11 +133,11 @@
 
 .kiosk-header__lang-btn {
   align-items: center;
-  background: var(--kiosk-main-color, #0f75bc);
+  background: var(--kiosk-lang-btn-bg, var(--kiosk-main-color, #0f75bc));
   border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 0.5rem;
-  box-shadow: 0 4px 12px rgba(15, 117, 188, 0.22);
-  color: #ffffff;
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--kiosk-main-color, #0f75bc) 22%, transparent);
+  color: var(--kiosk-lang-btn-text, #ffffff);
   cursor: pointer;
   display: inline-flex;
   font-size: 0.95rem;
@@ -144,7 +165,7 @@
   }
 
   &:hover {
-    box-shadow: 0 6px 18px rgba(15, 117, 188, 0.35);
+    box-shadow: 0 6px 18px color-mix(in srgb, var(--kiosk-main-color, #0f75bc) 35%, transparent);
     transform: translateY(-1px);
   }
 

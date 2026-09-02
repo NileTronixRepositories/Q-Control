@@ -17,66 +17,68 @@
   padding-bottom: 3rem;
 }
 
-/* ─── Context Selector Bar ────────────────────────────────────────────── */
-
-.branding-context {
-  display: flex;
+/* ─── Premium Branch Selector & Badge Container ────────────────────────────── */
+.branch-select-wrapper {
+  display: inline-flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 14px 18px;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid var(--bb-border, #d7e2ea);
+  border-radius: var(--q-radius-md, 10px);
+  padding: 4px 8px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+  transition: all 0.2s ease-in-out;
+}
+
+.branch-select-wrapper:focus-within {
+  border-color: var(--bb-primary, #0284c7);
+  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
   background: #ffffff;
-  border: 1px solid var(--bb-border);
-  border-radius: 8px;
-  position: relative;
-  overflow: hidden;
 }
 
-.branding-context::before {
-  position: absolute;
-  inset-block: 0;
-  inset-inline-start: 0;
-  width: 4px;
-  background: var(--bb-primary);
-  content: '';
+.branch-select-wrapper.static-badge {
+  padding: 4px 12px 4px 4px;
 }
 
-.branding-context-copy {
-  display: flex;
+.branch-icon-badge {
+  display: inline-flex;
   align-items: center;
-  gap: 12px;
-  min-width: 0;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+  color: #ffffff;
+  box-shadow: 0 2px 6px -1px rgba(2, 132, 199, 0.4);
+  transition: transform 0.2s ease;
 }
 
-.branding-context-copy > div {
-  display: grid;
-  min-width: 0;
+.branch-icon-badge svg {
+  display: block;
+  stroke: currentColor;
 }
 
-.branding-context-copy span:last-child {
-  overflow: hidden;
-  margin: 0;
-  color: var(--bb-subtle);
-  font-size: 0.8rem;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.branding-context-icon {
-  display: grid;
-  flex: 0 0 auto;
-  place-items: center;
-  width: 36px;
-  height: 36px;
-  color: var(--bb-primary);
-  background: #e8f5f8;
-  border: 1px solid #c8e8ef;
-  border-radius: 6px;
-  font-size: 1.1rem;
+.branch-select-wrapper:hover .branch-icon-badge {
+  transform: scale(1.05);
 }
 
 .branch-selector-control {
-  width: min(100%, 300px);
+  min-width: 200px;
+  max-width: 280px;
+  border: none !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #1e293b;
+  padding: 4px 8px;
+  cursor: pointer;
+}
+
+.branch-selector-control:focus {
+  outline: none !important;
+  box-shadow: none !important;
 }
 
 /* ─── Unified Panels (Content Panel) ──────────────────────────────────── */
@@ -454,6 +456,10 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }

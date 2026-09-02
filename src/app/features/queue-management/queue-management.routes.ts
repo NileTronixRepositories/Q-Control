@@ -5,6 +5,14 @@ import { adminBranchContextGuard } from '../../layout/admin-shell/guards/admin-b
 
 export const QUEUE_MANAGEMENT_ROUTES: Routes = [
   {
+    path: 'queue-operations',
+    canActivate: [adminPermissionGuard, adminBranchContextGuard],
+    data: {
+      requiredAnyPermissions: ['Tickets.View', 'Reservations.View', 'Tickets.ViewArchive', 'Reservations.ViewArchive'],
+    },
+    loadComponent: () => import('./pages/ticket-reservation-operations/ticket-reservation-operations.component').then((component) => component.TicketReservationOperationsComponent),
+  },
+  {
     path: 'waiting-areas',
     canActivate: [adminPermissionGuard, adminBranchContextGuard],
     data: {

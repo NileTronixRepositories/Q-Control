@@ -85,6 +85,7 @@ describe('ServiceRequestHomeComponent', () => {
             selectedSubSpecialty: signal<Specialty | null>(null).asReadonly(),
             ticket: ticket.asReadonly(),
             loadingTicket: loadingTicket.asReadonly(),
+            errorMessage: signal<string | null>(null).asReadonly(),
             loadingServices: signal(false).asReadonly(),
             errorLoadingServices: signal(false).asReadonly(),
             logoUrl: signal<string | null>(null).asReadonly(),
@@ -95,6 +96,16 @@ describe('ServiceRequestHomeComponent', () => {
             serviceButton: signal<any>(null).asReadonly(),
             keypadButton: signal<any>(null).asReadonly(),
             footerButton: signal<any>(null).asReadonly(),
+            kioskFlowChoice: signal<'reservation' | 'direct' | null>(null).asReadonly(),
+            reservationSearchResults: signal<readonly any[]>([]).asReadonly(),
+            searchingReservations: signal(false).asReadonly(),
+            searchAttempted: signal(false).asReadonly(),
+            selectedReservation: signal<any>(null).asReadonly(),
+            convertingReservation: signal(false).asReadonly(),
+            setFlowChoice: vi.fn<ServiceRequestStore['setFlowChoice']>(),
+            clearReservationSearch: vi.fn<ServiceRequestStore['clearReservationSearch']>(),
+            searchReservations: vi.fn<ServiceRequestStore['searchReservations']>(),
+            convertReservationToTicket: vi.fn<ServiceRequestStore['convertReservationToTicket']>(),
             availableSpecialties: signal<readonly Specialty[]>([specialty]).asReadonly(),
             availableSubSpecialties: signal<readonly Specialty[]>(
               specialty.subSpecialties,
@@ -137,8 +148,15 @@ describe('ServiceRequestHomeComponent', () => {
             | 'selectedServiceType'
             | 'selectedSpecialty'
             | 'selectedSubSpecialty'
+            | 'kioskFlowChoice'
+            | 'reservationSearchResults'
+            | 'searchingReservations'
+            | 'searchAttempted'
+            | 'selectedReservation'
+            | 'convertingReservation'
             | 'ticket'
             | 'loadingTicket'
+            | 'errorMessage'
             | 'loadingServices'
             | 'errorLoadingServices'
             | 'logoUrl'
@@ -157,6 +175,10 @@ describe('ServiceRequestHomeComponent', () => {
             | 'selectServiceType'
             | 'selectSpecialty'
             | 'selectSubSpecialty'
+            | 'setFlowChoice'
+            | 'clearReservationSearch'
+            | 'searchReservations'
+            | 'convertReservationToTicket'
             | 'generateTicket'
             | 'goBack'
             | 'restart'
@@ -197,12 +219,13 @@ describe('ServiceRequestHomeComponent', () => {
     expect(restart).toHaveBeenCalledOnce();
   });
 
-  it('activates customer input step when leaf service has isClientInputRequired = true', () => {
+  it('activates customer input step when leaf service has isClientInputRequired = true and hasReservation = false', () => {
     const leafServiceWithInputs: ServiceType = {
       ...serviceType,
       id: 'leaf-custom',
       isTicketIssuable: true,
       isClientInputRequired: true,
+      hasReservation: false,
       specialtyIds: [],
       customInputs: [
         {
@@ -226,6 +249,29 @@ describe('ServiceRequestHomeComponent', () => {
     expect(component['isCustomerInputStepActive']()).toBe(true);
     expect(
       fixture.nativeElement.querySelector('app-service-request-customer-input-form'),
+    ).not.toBeNull();
+  });
+
+  it('shows flow choice step when leaf service has reservation capability', () => {
+    const leafServiceWithReservation: ServiceType = {
+      ...serviceType,
+      id: 'leaf-res',
+      isTicketIssuable: true,
+      hasReservation: true,
+      specialtyIds: [],
+      customInputs: [],
+    };
+
+    const component = fixture.componentInstance;
+    (component as any).store.serviceTypes = signal([leafServiceWithReservation]).asReadonly();
+    (component as any).store.availableSpecialties = signal([]).asReadonly();
+
+    (component as any).selectServiceType('leaf-res');
+    fixture.detectChanges();
+
+    expect(component['isFlowChoiceStepActive']()).toBe(true);
+    expect(
+      fixture.nativeElement.querySelector('app-service-request-kiosk-flow-choice'),
     ).not.toBeNull();
   });
 });

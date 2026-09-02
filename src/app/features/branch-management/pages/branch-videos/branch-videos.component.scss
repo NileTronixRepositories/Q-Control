@@ -7,65 +7,67 @@
   padding-bottom: 3rem;
 }
 
-/* Branch Context Selector */
-.branding-context {
-  display: flex;
+/* ─── Premium Branch Selector & Badge Container ────────────────────────────── */
+.branch-select-wrapper {
+  display: inline-flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 1rem 1.25rem;
-  background: var(--q-surface-card, #ffffff);
-  border-radius: var(--q-radius-md, 12px);
-  border: 1px solid var(--q-border-subtle, #e2e8f0);
-  box-shadow: var(--q-shadow-soft, 0 4px 12px rgba(0, 0, 0, 0.03));
-  flex-wrap: wrap;
-}
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid var(--q-border-subtle, #d7e2ea);
+  border-radius: var(--q-radius-md, 10px);
+  padding: 4px 8px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+  transition: all 0.2s ease-in-out;
 
-.branding-context-copy {
-  display: flex;
-  align-items: center;
-  gap: 0.85rem;
-
-  .branding-context-icon {
-    width: 42px;
-    height: 42px;
-    border-radius: 10px;
-    background: var(--q-primary-soft, #e0f6f8);
-    color: var(--q-primary, #0b8aa8);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.25rem;
+  &:focus-within {
+    border-color: var(--q-primary, #0284c7);
+    box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+    background: #ffffff;
   }
 
-  div {
-    display: flex;
-    flex-direction: column;
-
-    strong {
-      font-size: 0.85rem;
-      color: var(--q-text-secondary, #64748b);
-    }
-
-    span {
-      font-size: 1.05rem;
-      font-weight: 700;
-      color: var(--q-text-primary, #0f172a);
-    }
+  &.static-badge {
+    padding: 4px 12px 4px 4px;
   }
 }
 
-.branding-context-actions {
-  display: flex;
+.branch-icon-badge {
+  display: inline-flex;
   align-items: center;
-  gap: 0.75rem;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+  color: #ffffff;
+  box-shadow: 0 2px 6px -1px rgba(2, 132, 199, 0.4);
+  transition: transform 0.2s ease;
 
-  .branch-selector-control {
-    min-width: 220px;
-    height: 38px;
-    border-radius: 8px;
-    border: 1px solid #cbd5e1;
-    font-weight: 600;
+  svg {
+    display: block;
+    stroke: currentColor;
+  }
+}
+
+.branch-select-wrapper:hover .branch-icon-badge {
+  transform: scale(1.05);
+}
+
+.branch-selector-control {
+  min-width: 200px;
+  max-width: 280px;
+  border: none !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #1e293b;
+  padding: 4px 8px;
+  cursor: pointer;
+
+  &:focus {
+    outline: none !important;
+    box-shadow: none !important;
   }
 }
 

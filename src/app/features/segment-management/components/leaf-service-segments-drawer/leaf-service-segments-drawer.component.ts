@@ -28,12 +28,14 @@ export class LeafServiceSegmentsDrawerComponent {
   @Input() updatingQuota = false;
   @Input() unassigning = false;
   @Input() translations!: SegmentTranslations;
+  @Input() canIssueTicket = true;
   @Input() canAssign = false;
   @Input() canUpdateQuota = false;
   @Input() canUnassign = false;
 
   @Output() closed = new EventEmitter<void>();
   @Output() refresh = new EventEmitter<void>();
+  @Output() retry = new EventEmitter<void>();
   @Output() openAddAvailableModal = new EventEmitter<void>();
   @Output() assignSubmitted = new EventEmitter<AssignSegmentItem[]>();
   @Output() quotaUpdated = new EventEmitter<{ segmentId: number; quota: number; rowVersion: string }>();
@@ -55,6 +57,10 @@ export class LeafServiceSegmentsDrawerComponent {
 
   closeDrawer(): void {
     this.closed.emit();
+  }
+
+  onRetry(): void {
+    this.retry.emit();
   }
 
   onOpenAddModal(): void {

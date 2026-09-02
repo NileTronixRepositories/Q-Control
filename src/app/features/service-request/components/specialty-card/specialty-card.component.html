@@ -1,7 +1,11 @@
 <button type="button" [class]="cardClass()" (click)="selectCard()">
   <div class="specialty-card__header">
     <span class="specialty-card__icon">
-      <i class="bi {{ card().icon }}" aria-hidden="true"></i>
+      @if (card().imageUrl) {
+        <img [src]="card().imageUrl" alt="" class="specialty-card__img" />
+      } @else {
+        <i class="bi {{ card().icon }}" aria-hidden="true"></i>
+      }
     </span>
 
     @if (card().meta) {

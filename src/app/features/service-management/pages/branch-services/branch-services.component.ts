@@ -129,7 +129,8 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
 
   canManageSegmentsFor = (node: ServiceTreeNode): boolean =>
     !node.isDeleted &&
-    (node.canIssueTicket || node.children.length === 0 || !node.hasChildren) &&
+    Boolean(node.canIssueTicket) &&
+    (node.children.length === 0 || !node.hasChildren) &&
     this.segmentPermissionService.canViewBranchServiceSegments();
 
   openServiceSegments(node: ServiceTreeNode): void {
@@ -138,6 +139,13 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
 
     this.selectedSegmentLeafNode.set(node);
     this.segmentsDrawerOpen.set(true);
+
+    if (!node.canIssueTicket) {
+      this.assignedSegmentsResponse.set(null);
+      this.segmentsLoading.set(false);
+      return;
+    }
+
     this.loadAssignedSegments(branchId, node.id);
   }
 

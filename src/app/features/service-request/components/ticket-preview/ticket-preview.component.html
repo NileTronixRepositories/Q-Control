@@ -1,77 +1,116 @@
 <section class="ticket-preview" aria-live="polite">
-  <div class="ticket-preview__success">
-    <span class="ticket-preview__check" aria-hidden="true">
-      <i class="bi bi-check2"></i>
-    </span>
+  <!-- 1. Hospital / Clinic Header -->
+  <header class="ticket-preview__hospital-header">
+    @if (branchLogoUrl(); as logo) {
+      @if (!logoLoadFailed()) {
+        <div class="ticket-preview__hospital-logo-wrapper">
+          <img
+            [src]="logo"
+            alt="Hospital Logo"
+            class="ticket-preview__hospital-logo"
+            (error)="logoLoadFailed.set(true)"
+          />
+        </div>
+      }
+    }
+    <h2 class="ticket-preview__hospital-name">
+      {{ language() === 'ar' ? 'مستشفى فريد حبيب' : 'Farid Habib Hospital' }}
+    </h2>
+    <p class="ticket-preview__clinic-tag">
+      {{
+        language() === 'ar' ? 'تذكرة انتظار العيادات الخارجية' : 'Outpatient Clinic Queue Ticket'
+      }}
+    </p>
+  </header>
 
-    <span>
-      {{ translations().successLabel }}
-    </span>
-  </div>
+  <!-- 2. Thermal Dashed Separator -->
+  <div class="ticket-preview__divider" aria-hidden="true"></div>
 
+  <!-- 3. Big Hero Ticket Number -->
   <div class="ticket-preview__number-block">
-    <span>
+    <span class="ticket-preview__number-label">
       {{ translations().ticketNumberLabel }}
     </span>
-
-    <strong>
+    <strong class="ticket-preview__number">
       {{ ticket().ticketNumber }}
     </strong>
   </div>
 
-  <div class="ticket-preview__details row g-3">
-    <div class="col-12 col-md-6">
-      <div class="ticket-preview__detail">
-        <span>{{ translations().serviceTypeLabel }}</span>
-        <strong>{{ serviceType() }}</strong>
-      </div>
+  <!-- 4. Thermal Dashed Separator -->
+  <div class="ticket-preview__divider" aria-hidden="true"></div>
+
+  <!-- 5. Real Receipt Lines (Key-Value Rows with Dotted Dividers) -->
+  <div class="ticket-preview__receipt-body">
+    <div class="ticket-preview__row">
+      <span class="ticket-preview__row-label">{{ translations().serviceTypeLabel }}</span>
+      <strong class="ticket-preview__row-value">{{ serviceType() }}</strong>
     </div>
 
     @if (department(); as selectedDepartment) {
-      <div class="col-12 col-md-6">
-        <div class="ticket-preview__detail">
-          <span>{{ translations().departmentLabel }}</span>
-          <strong>{{ selectedDepartment }}</strong>
-        </div>
+      <div class="ticket-preview__row">
+        <span class="ticket-preview__row-label">{{ translations().departmentLabel }}</span>
+        <strong class="ticket-preview__row-value">{{ selectedDepartment }}</strong>
       </div>
     }
 
     @if (subSpecialty(); as selectedSubSpecialty) {
-      <div class="col-12 col-md-6">
-        <div class="ticket-preview__detail">
-          <span>{{ translations().subSpecialtyLabel }}</span>
-          <strong>{{ selectedSubSpecialty }}</strong>
-        </div>
+      <div class="ticket-preview__row">
+        <span class="ticket-preview__row-label">{{ translations().subSpecialtyLabel }}</span>
+        <strong class="ticket-preview__row-value">{{ selectedSubSpecialty }}</strong>
       </div>
     }
 
-    <div class="col-12 col-md-6">
-      <div class="ticket-preview__detail">
-        <span>{{ translations().dateTimeLabel }}</span>
-        <strong>{{ issuedAt() }}</strong>
-      </div>
+    <div class="ticket-preview__row">
+      <span class="ticket-preview__row-label">{{ translations().dateTimeLabel }}</span>
+      <strong class="ticket-preview__row-value">{{ issuedAt() }}</strong>
     </div>
 
-    <div class="col-12 col-md-6">
-      <div class="ticket-preview__detail">
-        <span>{{ translations().estimatedWaitingLabel }}</span>
-        <strong>
-          {{ ticket().estimatedWaitingMinutes }}
-          {{ translations().minutesLabel }}
-        </strong>
-      </div>
+    <div class="ticket-preview__row">
+      <span class="ticket-preview__row-label">{{ translations().counterHintLabel }}</span>
+      <strong class="ticket-preview__row-value">{{ counterHint() }}</strong>
     </div>
 
-    <div class="col-12 col-md-6">
-      <div class="ticket-preview__detail">
-        <span>{{ translations().counterHintLabel }}</span>
-        <strong>{{ counterHint() }}</strong>
-      </div>
+    <div class="ticket-preview__row">
+      <span class="ticket-preview__row-label">{{ translations().estimatedWaitingLabel }}</span>
+      <strong class="ticket-preview__row-value">
+        {{ ticket().estimatedWaitingMinutes }} {{ translations().minutesLabel }}
+      </strong>
     </div>
   </div>
 
-  <div class="ticket-preview__qr" [attr.aria-label]="translations().qrLabel">
-    <span class="ticket-preview__qr-grid" aria-hidden="true"></span>
-    <span>{{ translations().qrLabel }}</span>
+  <!-- 6. Actions: Print Ticket Button (Visible on screen only) -->
+  <div class="ticket-preview__actions mt-3 d-print-none">
+    <button
+      type="button"
+      class="btn btn-primary w-100 py-3 d-flex align-items-center justify-content-center gap-2"
+      (click)="printTicket()"
+    >
+      <i class="bi bi-printer-fill" aria-hidden="true"></i>
+      <span>{{ language() === 'ar' ? 'طباعة التذكرة' : 'Print Ticket' }}</span>
+    </button>
   </div>
+
+  <!-- 9. Hospital Greeting & Thermal Brand Line -->
+  <footer class="ticket-preview__footer">
+    <p class="ticket-preview__greeting">
+      {{
+        language() === 'ar'
+          ? 'نتمنى لكم دوام الصحة والعافية'
+          : 'Wishing you good health and wellness'
+      }}
+    </p>
+    <div class="ticket-preview__brand">
+      <span class="ticket-preview__powered">
+        NILETRONIX · Powered by
+        <a
+          [href]="niletronixUrl"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="ticket-preview__brand-link"
+        >
+          <strong>https://www.niletronix.com/</strong>
+        </a>
+      </span>
+    </div>
+  </footer>
 </section>

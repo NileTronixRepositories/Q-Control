@@ -2,7 +2,10 @@ import { ChangeDetectionStrategy, Component, computed, inject, input } from '@an
 import { FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AdminI18nStore } from '@layout/admin-shell/store/admin-i18n.store';
 import { SERVICE_MANAGEMENT_TRANSLATIONS } from '../../i18n/service-management.translations';
-import { CustomInputType } from '../../models/service-management/service-management.model';
+import {
+  CustomInputType,
+  ServiceCustomInput,
+} from '../../models/service-management/service-management.model';
 import {
   integerRestrictionsValidator,
   stringRestrictionsValidator,
@@ -23,53 +26,123 @@ export type CustomInputFormGroup = FormGroup<{
   maxValue: FormControl<number | null>;
 }>;
 
-export function createCustomInputFormGroup(initial?: {
-  customInputId?: number | null;
-  name?: string;
-  labelAr?: string | null;
-  labelEn?: string | null;
-  type?: CustomInputType;
-  isRequired?: boolean;
-  order?: number;
-  minLength?: number | null;
-  maxLength?: number | null;
-  startWith?: string | null;
-  minValue?: number | null;
-  maxValue?: number | null;
-}): CustomInputFormGroup {
+export function createCustomInputFormGroup(
+  initial?: Partial<ServiceCustomInput> | null,
+): CustomInputFormGroup {
+  const raw = (initial ?? {}) as Record<string, unknown>;
+
+  const resolveNumber = (...keys: string[]): number | null => {
+    for (const key of keys) {
+      const val = raw[key];
+      if (val !== undefined && val !== null && val !== '') {
+        const parsed = Number(val);
+        if (!Number.isNaN(parsed)) {
+          return parsed;
+        }
+      }
+    }
+    return null;
+  };
+
+  const resolveString = (...keys: string[]): string => {
+    for (const key of keys) {
+      const val = raw[key];
+      if (val !== undefined && val !== null) {
+        return String(val);
+      }
+    }
+    return '';
+  };
+
+  const rawType = resolveString('type', 'Type', 'typeName', 'TypeName') || 'String';
+  const type: CustomInputType = rawType.toLowerCase() === 'integer' ? 'Integer' : 'String';
+
+  const minLength = resolveNumber(
+    'minLength',
+    'MinLength',
+    'minimumLength',
+    'MinimumLength',
+    'min_length',
+  );
+  const maxLength = resolveNumber(
+    'maxLength',
+    'MaxLength',
+    'maximumLength',
+    'MaximumLength',
+    'max_length',
+  );
+  const startWith = resolveString(
+    'startWith',
+    'StartWith',
+    'startsWith',
+    'StartsWith',
+    'start_with',
+  );
+  const minValue = resolveNumber(
+    'minValue',
+    'MinValue',
+    'minimumValue',
+    'MinimumValue',
+    'min_value',
+    'min',
+    'Min',
+  );
+  const maxValue = resolveNumber(
+    'maxValue',
+    'MaxValue',
+    'maximumValue',
+    'MaximumValue',
+    'max_value',
+    'max',
+    'Max',
+  );
+  const customInputId = resolveNumber('customInputId', 'CustomInputId', 'id', 'Id');
+  const order = resolveNumber('order', 'Order', 'orderNo', 'OrderNo', 'displayOrder') ?? 1;
+
+  const isRequiredRaw =
+    raw['isRequired'] ?? raw['IsRequired'] ?? raw['required'] ?? raw['Required'];
+  const isRequired =
+    isRequiredRaw !== undefined && isRequiredRaw !== null ? Boolean(isRequiredRaw) : true;
+
   return new FormGroup(
     {
-      customInputId: new FormControl<number | null>(initial?.customInputId ?? null),
-      name: new FormControl<string>(initial?.name ?? '', {
+      customInputId: new FormControl<number | null>(customInputId),
+      name: new FormControl<string>(resolveString('name', 'Name'), {
         nonNullable: true,
         validators: [Validators.required, Validators.maxLength(100)],
       }),
-      labelAr: new FormControl<string>(initial?.labelAr ?? '', {
-        nonNullable: true,
-        validators: [Validators.maxLength(200)],
-      }),
-      labelEn: new FormControl<string>(initial?.labelEn ?? '', {
-        nonNullable: true,
-        validators: [Validators.maxLength(200)],
-      }),
-      type: new FormControl<CustomInputType>(initial?.type ?? 'String', {
+      labelAr: new FormControl<string>(
+        resolveString('labelAr', 'LabelAr', 'arabicLabel', 'ArabicLabel'),
+        {
+          nonNullable: true,
+          validators: [Validators.maxLength(200)],
+        },
+      ),
+      labelEn: new FormControl<string>(
+        resolveString('labelEn', 'LabelEn', 'englishLabel', 'EnglishLabel'),
+        {
+          nonNullable: true,
+          validators: [Validators.maxLength(200)],
+        },
+      ),
+      type: new FormControl<CustomInputType>(type, {
         nonNullable: true,
         validators: [Validators.required],
       }),
-      isRequired: new FormControl<boolean>(initial?.isRequired ?? true, {
+      isRequired: new FormControl<boolean>(isRequired, {
         nonNullable: true,
       }),
-      order: new FormControl<number>(initial?.order ?? 1, {
+      order: new FormControl<number>(order, {
         nonNullable: true,
         validators: [Validators.required, Validators.min(1)],
       }),
-      minLength: new FormControl<number | null>(initial?.minLength ?? null),
-      maxLength: new FormControl<number | null>(initial?.maxLength ?? null),
-      startWith: new FormControl<string>(initial?.startWith ?? '', {
+      minLength: new FormControl<number | null>(minLength),
+      maxLength: new FormControl<number | null>(maxLength),
+      startWith: new FormControl<string>(startWith, {
         nonNullable: true,
       }),
-      minValue: new FormControl<number | null>(initial?.minValue ?? null),
-      maxValue: new FormControl<number | null>(initial?.maxValue ?? null),
+      minValue: new FormControl<number | null>(minValue),
+      maxValue: new FormControl<number | null>(maxValue),
     },
     {
       validators: [stringRestrictionsValidator(), integerRestrictionsValidator()],

@@ -15,4 +15,6 @@ export interface Specialty {
   readonly isTicketIssuable?: boolean;
   readonly isClientInputRequired?: boolean;
   readonly customInputs?: readonly ServiceCustomInput[];
+  readonly hasReservation?: boolean;
+  readonly imageUrl?: string | null;
 }

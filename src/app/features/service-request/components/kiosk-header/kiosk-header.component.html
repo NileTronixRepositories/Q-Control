@@ -13,9 +13,9 @@
         @for (item of stepItems(); track item.id; let last = $last) {
           <span
             class="nav-path-step badge px-3 py-2 fs-6 fw-bold"
-            [class.nav-path-step--last]="last"
-            [class.bg-light]="!last"
-            [class.text-dark]="!last"
+            [class.nav-path-step--active]="item.status === 'active'"
+            [class.nav-path-step--completed]="item.status === 'completed'"
+            [class.nav-path-step--pending]="item.status === 'pending'"
           >
             {{ item.label }}
           </span>
@@ -24,6 +24,7 @@
               class="bi nav-path-arrow"
               [class.bi-chevron-left]="isRtl()"
               [class.bi-chevron-right]="!isRtl()"
+              [class.nav-path-arrow--completed]="item.status === 'completed'"
               aria-hidden="true"
             ></i>
           }

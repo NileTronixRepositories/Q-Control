@@ -47,4 +47,35 @@ describe('KioskHeaderComponent', () => {
     expect(fixture.nativeElement.querySelector('.kiosk-header__mark')).not.toBeNull();
     expect(fixture.nativeElement.querySelector('.kiosk-header__nile-logo')).not.toBeNull();
   });
+
+  it('renders navigation path steps with proper status classes when enabled', () => {
+    fixture.componentRef.setInput('showNavigationPath', true);
+    fixture.componentRef.setInput('stepItems', [
+      { id: 'service-type', label: 'نوع الخدمة', status: 'completed' },
+      { id: 'specialty', label: 'التخصص', status: 'active' },
+      { id: 'ticket', label: 'التذكرة', status: 'pending' },
+    ]);
+    fixture.detectChanges();
+
+    const nav = fixture.nativeElement.querySelector('.service-request-navigation-path');
+    expect(nav).not.toBeNull();
+
+    const steps = fixture.nativeElement.querySelectorAll('.nav-path-step');
+    expect(steps.length).toBe(3);
+
+    expect(steps[0].classList.contains('nav-path-step--completed')).toBe(true);
+    expect(steps[1].classList.contains('nav-path-step--active')).toBe(true);
+    expect(steps[2].classList.contains('nav-path-step--pending')).toBe(true);
+  });
+
+  it('does not render navigation path when showNavigationPath is false', () => {
+    fixture.componentRef.setInput('showNavigationPath', false);
+    fixture.componentRef.setInput('stepItems', [
+      { id: 'service-type', label: 'Service', status: 'active' },
+    ]);
+    fixture.detectChanges();
+
+    const nav = fixture.nativeElement.querySelector('.service-request-navigation-path');
+    expect(nav).toBeNull();
+  });
 });

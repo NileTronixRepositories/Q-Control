@@ -1,0 +1,1548 @@
+<section
+  class="admin-responsive-page queue-operations-page container-fluid"
+  [attr.dir]="isRtl() ? 'rtl' : 'ltr'"
+  [attr.lang]="currentLang()"
+>
+  <!-- Page Hero (Niletronix Signature Hero Header) -->
+  <app-page-hero
+    [eyebrow]="
+      isRtl()
+        ? 'الفرع #' + (branchStore.selectedBranchId() ?? '')
+        : 'Branch #' + (branchStore.selectedBranchId() ?? '')
+    "
+    [title]="isRtl() ? 'إدارة التذاكر والحجوزات' : 'Tickets & Reservations'"
+    [description]="
+      isRtl()
+        ? 'متابعة وإدارة دورة حياة التذاكر الفورية والحجوزات المجدولة وسجل العمليات والأرشيف.'
+        : 'Manage live ticket queues, scheduled reservations, workflow journeys, and operational archives.'
+    "
+    icon="bi bi-ticket-perforated-fill"
+  >
+    <!-- Hero Actions -->
+    <div hero-actions class="d-flex flex-wrap align-items-center gap-2">
+      <button
+        type="button"
+        class="secondary-action d-inline-flex align-items-center gap-2"
+        [disabled]="loading()"
+        (click)="loadData()"
+        [title]="isRtl() ? 'تحديث البيانات' : 'Refresh queue'"
+      >
+        <i class="bi bi-arrow-clockwise" [class.spin]="loading()" aria-hidden="true"></i>
+        <span>{{ isRtl() ? 'تحديث' : 'Refresh' }}</span>
+      </button>
+
+      <!-- @if (activeTab() === 'tickets' && canCreateTicket()) {
+        <button
+          type="button"
+          class="primary-action d-inline-flex align-items-center gap-2"
+          (click)="openCreateTicketModal()"
+        >
+          <i class="bi bi-plus-lg" aria-hidden="true"></i>
+          <span class="text-white">{{ isRtl() ? 'إصدار تذكرة جديدة' : 'Issue Ticket' }}</span>
+        </button>
+      } -->
+
+      @if (activeTab() === 'reservations' && canCreateReservation()) {
+        <button
+          type="button"
+          class="primary-action d-inline-flex align-items-center gap-2"
+          (click)="openCreateReservationModal()"
+        >
+          <i class="bi bi-calendar-plus" aria-hidden="true"></i>
+          <span class="text-white">{{ isRtl() ? 'حجز جديد' : 'New Reservation' }}</span>
+        </button>
+      }
+    </div>
+
+    <!-- Hero Filters Toolbar -->
+    <div hero-filters class="w-100">
+      <div class="row g-3 align-items-end" data-testid="queue-filters">
+        <!-- Ticket Search -->
+        @if (
+          activeTab() === 'tickets' ||
+          (activeTab() === 'archive' && archiveSubTab() === 'archived-tickets')
+        ) {
+          <div class="col-12 col-sm-6 col-lg-3">
+            <label class="filter-field w-100">
+              <span>{{ isRtl() ? 'رقم التذكرة' : 'Ticket Number' }}</span>
+              <div class="search-input-wrapper">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="15"
+                  height="15"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <circle cx="11" cy="11" r="8" />
+                  <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                </svg>
+                <input
+                  id="searchTicketNumber"
+                  type="search"
+                  class="form-control"
+                  [placeholder]="isRtl() ? 'مثال: A15' : 'e.g. A15'"
+                  [ngModel]="searchTicketNumber()"
+                  (ngModelChange)="searchTicketNumber.set($event); onFilterChange()"
+                />
+              </div>
+            </label>
+          </div>
+        }
+
+        <!-- Status Filter -->
+        <div class="col-6 col-sm-6 col-lg-2">
+          <label class="filter-field w-100">
+            <span>{{ isRtl() ? 'الحالة' : 'Status' }}</span>
+            <select
+              id="filterStatus"
+              class="form-select"
+              [ngModel]="filterStatus()"
+              (ngModelChange)="filterStatus.set($event); onFilterChange()"
+            >
+              <option value="">{{ isRtl() ? 'جميع الحالات' : 'All Statuses' }}</option>
+              @if (
+                activeTab() === 'reservations' ||
+                (activeTab() === 'archive' && archiveSubTab() === 'archived-reservations')
+              ) {
+                @for (st of reservationStatuses; track st) {
+                  <option [value]="st">{{ getStatusLabel(st) }}</option>
+                }
+              } @else {
+                @for (st of ticketStatuses; track st) {
+                  <option [value]="st">{{ getStatusLabel(st) }}</option>
+                }
+              }
+            </select>
+          </label>
+        </div>
+
+        <!-- Service Filter -->
+        <div class="col-6 col-sm-6 col-lg-2">
+          <label class="filter-field w-100">
+            <span>{{ isRtl() ? 'الخدمة' : 'Service' }}</span>
+            <select
+              id="filterService"
+              class="form-select"
+              [ngModel]="filterServiceId()"
+              (ngModelChange)="filterServiceId.set($event ? +$event : null); onFilterChange()"
+            >
+              <option [ngValue]="null">{{ isRtl() ? 'جميع الخدمات' : 'All Services' }}</option>
+              @for (srv of issuableServices(); track srv.id) {
+                <option [ngValue]="srv.id">
+                  {{ isRtl() ? srv.fullPathAr || srv.nameAr : srv.fullPathEn || srv.nameEn }}
+                </option>
+              }
+            </select>
+          </label>
+        </div>
+
+        <!-- Segment Filter -->
+        <div class="col-6 col-sm-6 col-lg-2">
+          <label class="filter-field w-100">
+            <span>{{ isRtl() ? 'الشريحة' : 'Segment' }}</span>
+            <select
+              id="filterSegment"
+              class="form-select"
+              [ngModel]="filterSegmentId()"
+              (ngModelChange)="filterSegmentId.set($event ? +$event : null); onFilterChange()"
+            >
+              <option [ngValue]="null">{{ isRtl() ? 'جميع الشرائح' : 'All Segments' }}</option>
+              @for (seg of segmentsLookup(); track seg.id) {
+                <option [ngValue]="seg.id">{{ isRtl() ? seg.nameAr : seg.nameEn }}</option>
+              }
+            </select>
+          </label>
+        </div>
+
+        <!-- Business Date Filter -->
+        <div class="col-6 col-sm-6 col-lg-2">
+          <label class="filter-field w-100">
+            <span>{{ isRtl() ? 'تاريخ العمل' : 'Business Date' }}</span>
+            <input
+              id="filterDate"
+              type="date"
+              class="form-control"
+              [ngModel]="filterBusinessDate()"
+              (ngModelChange)="filterBusinessDate.set($event); onFilterChange()"
+            />
+          </label>
+        </div>
+
+        <!-- Reset Button -->
+        <div class="col-12 col-lg-1 d-grid">
+          <button
+            type="button"
+            class="secondary-action w-100"
+            (click)="resetFilters()"
+            [title]="isRtl() ? 'إعادة ضبط الفلاتر' : 'Reset filters'"
+          >
+            <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
+            <span>{{ isRtl() ? 'إلغاء' : 'Reset' }}</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </app-page-hero>
+
+  <!-- Alert Notifications Banner -->
+  @if (alertMessage(); as alert) {
+    <div class="toast-stack mb-2" role="status" aria-live="polite" aria-atomic="true">
+      <div
+        class="toast-item"
+        [class.toast-success]="alert.tone === 'success'"
+        [class.toast-error]="alert.tone === 'danger'"
+        [class.toast-info]="alert.tone === 'info' || alert.tone === 'warning'"
+      >
+        <i
+          class="bi"
+          [class.bi-check-circle-fill]="alert.tone === 'success'"
+          [class.bi-x-octagon-fill]="alert.tone === 'danger'"
+          [class.bi-info-circle-fill]="alert.tone === 'info' || alert.tone === 'warning'"
+          aria-hidden="true"
+        ></i>
+        <p class="mb-0">{{ alert.text }}</p>
+        <button
+          type="button"
+          class="toast-close"
+          [attr.aria-label]="isRtl() ? 'إغلاق' : 'Close'"
+          (click)="alertMessage.set(null)"
+        >
+          <i class="bi bi-x-lg" aria-hidden="true"></i>
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- Main Navigation Tabs (Segmented Button Pills matching Theme) -->
+  <div
+    class="tabs d-flex flex-wrap align-items-center justify-content-between gap-3 mb-2"
+    data-testid="queue-operations-tabs"
+  >
+    <div class="d-flex flex-wrap align-items-center gap-2">
+      @if (canViewTickets()) {
+        <button
+          type="button"
+          class="tab-btn"
+          [class.primary-action]="activeTab() === 'tickets'"
+          [class.secondary-action]="activeTab() !== 'tickets'"
+          (click)="switchTab('tickets')"
+        >
+          <i class="bi bi-ticket-perforated" aria-hidden="true"></i>
+          <span>{{ isRtl() ? 'التذاكر الحالية' : 'Live Tickets' }}</span>
+          @if (ticketPage().totalItems > 0) {
+            <span class="tab-count-badge">{{ ticketPage().totalItems }}</span>
+          }
+        </button>
+      }
+
+      @if (canViewReservations()) {
+        <button
+          type="button"
+          class="tab-btn"
+          [class.primary-action]="activeTab() === 'reservations'"
+          [class.secondary-action]="activeTab() !== 'reservations'"
+          (click)="switchTab('reservations')"
+        >
+          <i class="bi bi-calendar-check" aria-hidden="true"></i>
+          <span>{{ isRtl() ? 'الحجوزات' : 'Reservations' }}</span>
+          @if (reservationPage().totalItems > 0) {
+            <span class="tab-count-badge">{{ reservationPage().totalItems }}</span>
+          }
+        </button>
+      }
+
+      @if (canViewTicketArchive() || canViewReservationArchive()) {
+        <button
+          type="button"
+          class="tab-btn"
+          [class.primary-action]="activeTab() === 'archive'"
+          [class.secondary-action]="activeTab() !== 'archive'"
+          (click)="switchTab('archive')"
+        >
+          <i class="bi bi-archive" aria-hidden="true"></i>
+          <span>{{ isRtl() ? 'الأرشيف' : 'Archive' }}</span>
+        </button>
+      }
+    </div>
+
+    <!-- Archive Sub-Tabs Switcher -->
+    @if (activeTab() === 'archive') {
+      <div class="archive-subnav">
+        @if (canViewTicketArchive()) {
+          <button
+            type="button"
+            class="sub-tab-btn"
+            [class.active]="archiveSubTab() === 'archived-tickets'"
+            (click)="switchArchiveSubTab('archived-tickets')"
+          >
+            <i class="bi bi-ticket-detailed" aria-hidden="true"></i>
+            <span>{{ isRtl() ? 'أرشيف التذاكر' : 'Archived Tickets' }}</span>
+          </button>
+        }
+        @if (canViewReservationArchive()) {
+          <button
+            type="button"
+            class="sub-tab-btn"
+            [class.active]="archiveSubTab() === 'archived-reservations'"
+            (click)="switchArchiveSubTab('archived-reservations')"
+          >
+            <i class="bi bi-calendar-event" aria-hidden="true"></i>
+            <span>{{ isRtl() ? 'أرشيف الحجوزات' : 'Archived Reservations' }}</span>
+          </button>
+        }
+      </div>
+    }
+  </div>
+
+  <!-- Content Grid: Data Table & Interactive Details Drawer -->
+  <div class="row g-3 position-relative content-grid" [class.panel-open]="drawerOpen()">
+    <!-- Main Column: Data Table Panel -->
+    <section class="col-12" [ngClass]="{ 'col-lg-8 col-xl-8': drawerOpen() }">
+      <div class="list-panel">
+        <!-- Loading State Indicator -->
+        @if (loading()) {
+          <div class="p-3 border-bottom">
+            <app-niletronix-loading-state
+              [title]="isRtl() ? 'جاري تحميل البيانات...' : 'Loading operational data...'"
+              variant="inline"
+              size="sm"
+            />
+          </div>
+        }
+
+        <!-- Data Table Container -->
+        <div class="table-responsive table-wrap">
+          <table class="admin-data-table table table-sm table-hover align-middle custom-table mb-0">
+            <thead>
+              <tr>
+                @if (
+                  activeTab() === 'reservations' ||
+                  (activeTab() === 'archive' && archiveSubTab() === 'archived-reservations')
+                ) {
+                  <th scope="col">{{ isRtl() ? 'رقم الحجز' : 'Reservation #' }}</th>
+                  <th scope="col">{{ isRtl() ? 'الحالة' : 'Status' }}</th>
+                  <th scope="col">{{ isRtl() ? 'الخدمة' : 'Service' }}</th>
+                  <th scope="col">{{ isRtl() ? 'الشريحة' : 'Segment' }}</th>
+                  <th scope="col">{{ isRtl() ? 'الموعد المجدول' : 'Scheduled Time' }}</th>
+                  <th scope="col" class="text-center">{{ isRtl() ? 'الإجراءات' : 'Actions' }}</th>
+                } @else {
+                  <th scope="col">{{ isRtl() ? 'رقم التذكرة' : 'Ticket #' }}</th>
+                  <th scope="col">{{ isRtl() ? 'الحالة' : 'Status' }}</th>
+                  <th scope="col">{{ isRtl() ? 'الخدمة الحالية' : 'Current Service' }}</th>
+                  <th scope="col">{{ isRtl() ? 'الشريحة' : 'Segment' }}</th>
+                  <th scope="col">{{ isRtl() ? 'تاريخ العمل' : 'Business Date' }}</th>
+                  <th scope="col">{{ isRtl() ? 'وقت الدخول' : 'Queue Entry' }}</th>
+                  <th scope="col" class="text-center">{{ isRtl() ? 'الإجراءات' : 'Actions' }}</th>
+                }
+              </tr>
+            </thead>
+            <tbody>
+              @if (
+                activeTab() === 'reservations' ||
+                (activeTab() === 'archive' && archiveSubTab() === 'archived-reservations')
+              ) {
+                <!-- Reservations Rows -->
+                @for (res of reservationPage().data; track res.id) {
+                  <tr [class.table-active]="selectedReservation()?.id === res.id">
+                    <td class="admin-number-cell">
+                      <strong class="text-primary">#{{ res.id }}</strong>
+                    </td>
+                    <td>
+                      <span
+                        class="badge status-pill"
+                        [ngClass]="'status-' + res.status.toLowerCase()"
+                      >
+                        {{ getStatusLabel(res.status) }}
+                      </span>
+                    </td>
+                    <td>{{ getServiceName(res.serviceId) }}</td>
+                    <td>{{ getSegmentName(res.segmentId) }}</td>
+                    <td>{{ formatDate(res.scheduledOnUtc) }}</td>
+                    <td class="text-center">
+                      <button
+                        type="button"
+                        class="icon-action"
+                        [title]="isRtl() ? 'عرض التفاصيل' : 'View Details'"
+                        (click)="openReservation(res)"
+                      >
+                        <i class="bi bi-eye" aria-hidden="true"></i>
+                      </button>
+                    </td>
+                  </tr>
+                }
+                @if (reservationPage().data.length === 0 && !loading()) {
+                  <tr>
+                    <td colspan="6" class="p-0 border-0">
+                      <div class="table-empty-state text-center">
+                        <div class="empty-icon-badge">
+                          <i class="bi bi-calendar-x" aria-hidden="true"></i>
+                        </div>
+                        <h3 class="h6 fw-bold text-dark mb-1">
+                          {{ isRtl() ? 'لا توجد حجوزات مطابقة' : 'No Reservations Found' }}
+                        </h3>
+                        <p class="text-muted small mb-0">
+                          {{
+                            isRtl()
+                              ? 'لا توجد حجوزات مطابقة لمعايير الفلترة المحددة في هذا الفرع.'
+                              : 'No reservations match the specified filters.'
+                          }}
+                        </p>
+                      </div>
+                    </td>
+                  </tr>
+                }
+              } @else {
+                <!-- Tickets Rows -->
+                @for (t of ticketPage().data; track t.id) {
+                  <tr [class.table-active]="selectedTicket()?.id === t.id">
+                    <td class="admin-number-cell">
+                      <span class="ticket-badge">{{ t.ticketNumber }}</span>
+                    </td>
+                    <td>
+                      <span
+                        class="badge status-pill"
+                        [ngClass]="'status-' + t.status.toLowerCase()"
+                      >
+                        {{ getStatusLabel(t.status) }}
+                      </span>
+                    </td>
+                    <td>{{ getServiceName(t.currentServiceId) }}</td>
+                    <td>{{ getSegmentName(t.segmentId) }}</td>
+                    <td>{{ t.businessDate }}</td>
+                    <td>{{ formatDate(t.currentQueueEnteredOnUtc) }}</td>
+                    <td class="text-center">
+                      <button
+                        type="button"
+                        class="icon-action"
+                        [title]="isRtl() ? 'عرض التفاصيل' : 'View Details'"
+                        (click)="openTicket(t)"
+                      >
+                        <i class="bi bi-eye" aria-hidden="true"></i>
+                      </button>
+                    </td>
+                  </tr>
+                }
+                @if (ticketPage().data.length === 0 && !loading()) {
+                  <tr>
+                    <td colspan="7" class="p-0 border-0">
+                      <div class="table-empty-state text-center">
+                        <div class="empty-icon-badge">
+                          <i class="bi bi-ticket-perforated" aria-hidden="true"></i>
+                        </div>
+                        <h3 class="h6 fw-bold text-dark mb-1">
+                          {{ isRtl() ? 'لا توجد تذاكر مطابقة' : 'No Tickets Found' }}
+                        </h3>
+                        <p class="text-muted small mb-0">
+                          {{
+                            isRtl()
+                              ? 'لا توجد تذاكر تطابق معايير الفلترة المحددة في هذا الفرع.'
+                              : 'No tickets match the specified filters.'
+                          }}
+                        </p>
+                      </div>
+                    </td>
+                  </tr>
+                }
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination Controls Footer -->
+        <div class="pagination-footer">
+          <span class="text-muted small">
+            {{ isRtl() ? 'إجمالي السجلات:' : 'Total Records:' }}
+            <strong>{{
+              activeTab() === 'reservations' ||
+              (activeTab() === 'archive' && archiveSubTab() === 'archived-reservations')
+                ? reservationPage().totalItems
+                : ticketPage().totalItems
+            }}</strong>
+          </span>
+
+          <div class="d-flex align-items-center gap-2">
+            <button
+              type="button"
+              class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-1"
+              [disabled]="pageNumber() === 1 || loading()"
+              (click)="previousPage()"
+            >
+              <i class="bi" [ngClass]="isRtl() ? 'bi-chevron-right' : 'bi-chevron-left'"></i>
+              <span>{{ isRtl() ? 'السابق' : 'Previous' }}</span>
+            </button>
+            <span class="badge bg-light text-dark border px-2 py-1 small">
+              {{ isRtl() ? 'صفحة' : 'Page' }} {{ pageNumber() }}
+            </span>
+            <button
+              type="button"
+              class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-1"
+              [disabled]="
+                loading() ||
+                (activeTab() === 'reservations' ||
+                (activeTab() === 'archive' && archiveSubTab() === 'archived-reservations')
+                  ? reservationPage().data.length < 20
+                  : ticketPage().data.length < 20)
+              "
+              (click)="nextPage()"
+            >
+              <span>{{ isRtl() ? 'التالي' : 'Next' }}</span>
+              <i class="bi" [ngClass]="isRtl() ? 'bi-chevron-left' : 'bi-chevron-right'"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Side Column: Interactive Details Drawer -->
+    @if (drawerOpen()) {
+      <aside class="col-12 col-lg-4 col-xl-4 drawer-container">
+        <div class="card shadow-sm border rounded-4 overflow-hidden sticky-top drawer-card">
+          <!-- Drawer Header -->
+          <header
+            class="card-header bg-white d-flex align-items-center justify-content-between py-3 border-bottom"
+          >
+            <div>
+              <p class="text-muted small text-uppercase mb-0 fw-semibold">
+                {{
+                  selectedTicket()
+                    ? isRtl()
+                      ? 'تفاصيل التذكرة'
+                      : 'Ticket Details'
+                    : isRtl()
+                      ? 'تفاصيل الحجز'
+                      : 'Reservation Details'
+                }}
+              </p>
+              <h2 class="h5 mb-0 fw-bold d-flex align-items-center gap-2">
+                @if (selectedTicket(); as t) {
+                  <span class="ticket-title-badge">{{ t.ticketNumber }}</span>
+                  <span class="badge status-pill" [ngClass]="'status-' + t.status.toLowerCase()">
+                    {{ getStatusLabel(t.status) }}
+                  </span>
+                  @if (t.isArchived) {
+                    <span class="badge bg-secondary text-white">{{
+                      isRtl() ? 'مؤرشف' : 'ARCHIVED'
+                    }}</span>
+                  }
+                }
+                @if (selectedReservation(); as r) {
+                  <span class="text-primary">#{{ r.id }}</span>
+                  <span class="badge status-pill" [ngClass]="'status-' + r.status.toLowerCase()">
+                    {{ getStatusLabel(r.status) }}
+                  </span>
+                  @if (r.isArchived) {
+                    <span class="badge bg-secondary text-white">{{
+                      isRtl() ? 'مؤرشف' : 'ARCHIVED'
+                    }}</span>
+                  }
+                }
+              </h2>
+            </div>
+            <button
+              type="button"
+              class="btn-close"
+              aria-label="Close Details"
+              (click)="closeDrawer()"
+            ></button>
+          </header>
+
+          <!-- Drawer Body -->
+          <div class="card-body drawer-body p-3">
+            <!-- Ticket Details Sections -->
+            @if (selectedTicket(); as t) {
+              <!-- Overview Grid -->
+              <section class="mb-3" aria-label="Ticket Overview">
+                <h3 class="h6 fw-bold border-bottom pb-2 mb-2 text-secondary">
+                  <i class="bi bi-info-circle me-1"></i>
+                  {{ isRtl() ? 'بيانات التذكرة الأساسية' : 'Summary Overview' }}
+                </h3>
+                <div class="details-grid small">
+                  <div class="detail-row">
+                    <span class="text-muted">{{
+                      isRtl() ? 'الخدمة المصدرة:' : 'Issuing Service:'
+                    }}</span>
+                    <strong class="text-dark">{{ getServiceName(t.issuingServiceId) }}</strong>
+                  </div>
+                  <div class="detail-row">
+                    <span class="text-muted">{{
+                      isRtl() ? 'الخدمة الحالية:' : 'Current Service:'
+                    }}</span>
+                    <strong class="text-dark">{{ getServiceName(t.currentServiceId) }}</strong>
+                  </div>
+                  <div class="detail-row">
+                    <span class="text-muted">{{ isRtl() ? 'الشريحة:' : 'Segment:' }}</span>
+                    <strong class="text-dark">{{ getSegmentName(t.segmentId) }}</strong>
+                  </div>
+                  <div class="detail-row">
+                    <span class="text-muted">{{
+                      isRtl() ? 'تاريخ العمل:' : 'Business Date:'
+                    }}</span>
+                    <span>{{ t.businessDate }}</span>
+                  </div>
+                  @if (t.reservationId) {
+                    <div class="detail-row">
+                      <span class="text-muted">{{
+                        isRtl() ? 'الحجز المرتبط:' : 'Linked Reservation:'
+                      }}</span>
+                      <span class="badge bg-light text-dark border">#{{ t.reservationId }}</span>
+                    </div>
+                  }
+                  @if (t.currentWindowId) {
+                    <div class="detail-row">
+                      <span class="text-muted">{{
+                        isRtl() ? 'الشباك الحالي:' : 'Current Window:'
+                      }}</span>
+                      <span
+                        class="badge bg-primary-subtle text-primary border border-primary-subtle"
+                        >#{{ t.currentWindowId }}</span
+                      >
+                    </div>
+                  }
+                  <div class="detail-row">
+                    <span class="text-muted">{{
+                      isRtl() ? 'دخول الطابور:' : 'Queue Entered:'
+                    }}</span>
+                    <span>{{ formatDate(t.currentQueueEnteredOnUtc) }}</span>
+                  </div>
+                  @if (t.currentServiceStartedOnUtc) {
+                    <div class="detail-row">
+                      <span class="text-muted">{{
+                        isRtl() ? 'بدء الخدمة:' : 'Service Started:'
+                      }}</span>
+                      <span>{{ formatDate(t.currentServiceStartedOnUtc) }}</span>
+                    </div>
+                  }
+                  @if (t.completedOnUtc) {
+                    <div class="detail-row">
+                      <span class="text-muted">{{
+                        isRtl() ? 'اكتمال الخدمة:' : 'Completed On:'
+                      }}</span>
+                      <span>{{ formatDate(t.completedOnUtc) }}</span>
+                    </div>
+                  }
+                  @if (t.cancelledOnUtc) {
+                    <div class="detail-row">
+                      <span class="text-muted">{{
+                        isRtl() ? 'تاريخ الإلغاء:' : 'Cancelled On:'
+                      }}</span>
+                      <span>{{ formatDate(t.cancelledOnUtc) }}</span>
+                    </div>
+                  }
+                  @if (t.cancellationReason) {
+                    <div class="detail-row alert alert-danger py-1 px-2 mb-0">
+                      <span class="fw-bold">{{ isRtl() ? 'سبب الإلغاء:' : 'Reason:' }}</span>
+                      <span>{{ t.cancellationReason }}</span>
+                    </div>
+                  }
+                </div>
+              </section>
+
+              <!-- Workflow Info Section -->
+              @if (t.boundWorkflowId) {
+                <section class="mb-3 p-2 bg-light rounded-3 border" aria-label="Workflow Info">
+                  <h3 class="h6 fw-bold mb-1 text-primary">
+                    <i class="bi bi-diagram-3 me-1"></i>
+                    {{ isRtl() ? 'مسار العمل المرتبط (Workflow)' : 'Bound Workflow' }}
+                  </h3>
+                  <p class="small text-muted mb-0">
+                    {{ isRtl() ? 'معرف المسار:' : 'Workflow ID:' }}
+                    <strong>#{{ t.boundWorkflowId }}</strong> |
+                    {{ isRtl() ? 'الخطوة الحالية:' : 'Current Step:' }}
+                    <strong>#{{ t.currentWorkflowStepOrder }}</strong>
+                  </p>
+                </section>
+              }
+
+              <!-- Dynamic Custom Inputs Section -->
+              @if (t.customInputs && t.customInputs.length > 0) {
+                <section class="mb-3" aria-label="Custom Inputs">
+                  <h3 class="h6 fw-bold border-bottom pb-2 mb-2 text-secondary">
+                    <i class="bi bi-input-cursor-text me-1"></i>
+                    {{ isRtl() ? 'الحقول المخصصة' : 'Custom Inputs' }}
+                  </h3>
+                  <ul class="list-group list-group-flush small">
+                    @for (inp of t.customInputs; track inp.serviceCustomInputId) {
+                      <li
+                        class="list-group-item d-flex justify-content-between align-items-center px-0 py-1"
+                      >
+                        <span class="text-muted"
+                          >{{ isRtl() ? inp.labelAr || inp.name : inp.labelEn || inp.name }}:</span
+                        >
+                        <strong class="text-dark">{{ inp.value || '—' }}</strong>
+                      </li>
+                    }
+                  </ul>
+                </section>
+              }
+
+              <!-- Service Journeys Stepper -->
+              @if (t.journeys && t.journeys.length > 0) {
+                <section class="mb-3" aria-label="Service Journeys">
+                  <h3 class="h6 fw-bold border-bottom pb-2 mb-2 text-secondary">
+                    <i class="bi bi-signpost-split me-1"></i>
+                    {{ isRtl() ? 'رحلات تقديم الخدمة' : 'Service Journeys' }}
+                  </h3>
+                  <div class="journeys-list">
+                    @for (j of t.journeys; track $index) {
+                      <div class="journey-card p-2 mb-2 rounded-3 border bg-light small">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                          <strong class="text-primary">{{ getServiceName(j.serviceId) }}</strong>
+                          @if (j.outcome) {
+                            <span class="badge bg-secondary-subtle text-secondary border">{{
+                              j.outcome
+                            }}</span>
+                          }
+                        </div>
+                        <div class="text-muted d-flex flex-wrap gap-2">
+                          @if (j.entryType) {
+                            <span
+                              ><i class="bi bi-box-arrow-in-right me-1"></i>{{ j.entryType }}</span
+                            >
+                          }
+                          @if (j.workflowStepOrder) {
+                            <span
+                              ><i class="bi bi-list-ol me-1"></i>Step #{{
+                                j.workflowStepOrder
+                              }}</span
+                            >
+                          }
+                        </div>
+                        <div class="text-muted mt-1 small">
+                          @if (j.enteredWaitingOnUtc) {
+                            <div>
+                              {{ isRtl() ? 'دخول الانتظار:' : 'Entered:' }}
+                              {{ formatDate(j.enteredWaitingOnUtc) }}
+                            </div>
+                          }
+                          @if (j.serviceStartedOnUtc) {
+                            <div>
+                              {{ isRtl() ? 'بدء الخدمة:' : 'Started:' }}
+                              {{ formatDate(j.serviceStartedOnUtc) }}
+                            </div>
+                          }
+                          @if (j.serviceEndedOnUtc) {
+                            <div>
+                              {{ isRtl() ? 'انتهاء الخدمة:' : 'Ended:' }}
+                              {{ formatDate(j.serviceEndedOnUtc) }}
+                            </div>
+                          }
+                        </div>
+                      </div>
+                    }
+                  </div>
+                </section>
+              }
+
+              <!-- History Timeline Component -->
+              <app-history-timeline [events]="historyEvents()" />
+
+              <!-- Ticket Action Matrix Buttons -->
+              @if (!t.isArchived) {
+                <div class="actions-panel d-flex flex-wrap gap-2 mt-4 pt-3 border-top">
+                  @if (t.status === 'Waiting' && canCancelTicket()) {
+                    <button
+                      type="button"
+                      class="btn btn-outline-danger btn-sm rounded-pill"
+                      [disabled]="actionLoading()"
+                      (click)="openCancelModal('ticket')"
+                    >
+                      <i class="bi bi-x-circle me-1"></i>
+                      {{ isRtl() ? 'إلغاء التذكرة' : 'Cancel Ticket' }}
+                    </button>
+                  }
+
+                  @if (t.status === 'Called' && canStartService()) {
+                    <button
+                      type="button"
+                      class="primary-action btn-sm"
+                      [disabled]="actionLoading()"
+                      (click)="openConfirmModal('startService')"
+                    >
+                      <i class="bi bi-play-fill me-1"></i>
+                      {{ isRtl() ? 'بدء تقديم الخدمة' : 'Start Service' }}
+                    </button>
+                  }
+
+                  @if (t.status === 'InProgress' && canCompleteService()) {
+                    <button
+                      type="button"
+                      class="btn btn-success btn-sm rounded-pill"
+                      [disabled]="actionLoading()"
+                      (click)="openConfirmModal('completeService')"
+                    >
+                      <i class="bi bi-check2-circle me-1"></i>
+                      {{ isRtl() ? 'إنهاء الخدمة' : 'Complete Service' }}
+                    </button>
+                  }
+
+                  @if (
+                    t.status === 'InProgress' && t.boundWorkflowId === null && canManualTransfer()
+                  ) {
+                    <button
+                      type="button"
+                      class="btn btn-outline-primary btn-sm rounded-pill"
+                      [disabled]="actionLoading()"
+                      (click)="openTransferModal()"
+                    >
+                      <i class="bi bi-arrow-left-right me-1"></i>
+                      {{ isRtl() ? 'تحويل يدوي' : 'Manual Transfer' }}
+                    </button>
+                  }
+
+                  @if (t.status === 'NoShow' && canReturnNoShow()) {
+                    <button
+                      type="button"
+                      class="btn btn-outline-primary btn-sm rounded-pill"
+                      [disabled]="actionLoading()"
+                      (click)="openConfirmModal('returnToWaiting')"
+                    >
+                      <i class="bi bi-arrow-counterclockwise me-1"></i>
+                      {{ isRtl() ? 'إعادة لقائمة الانتظار' : 'Return to Queue' }}
+                    </button>
+                  }
+
+                  @if (t.status === 'NoShow' && canCancelTicket()) {
+                    <button
+                      type="button"
+                      class="btn btn-outline-danger btn-sm rounded-pill"
+                      [disabled]="actionLoading()"
+                      (click)="openCancelModal('ticket')"
+                    >
+                      <i class="bi bi-x-circle me-1"></i>
+                      {{ isRtl() ? 'إلغاء التذكرة' : 'Cancel Ticket' }}
+                    </button>
+                  }
+                </div>
+              }
+            }
+
+            <!-- Reservation Details Sections -->
+            @if (selectedReservation(); as r) {
+              <section class="mb-3" aria-label="Reservation Overview">
+                <h3 class="h6 fw-bold border-bottom pb-2 mb-2 text-secondary">
+                  <i class="bi bi-info-circle me-1"></i>
+                  {{ isRtl() ? 'بيانات الحجز الأساسية' : 'Summary Overview' }}
+                </h3>
+                <div class="details-grid small">
+                  <div class="detail-row">
+                    <span class="text-muted">{{ isRtl() ? 'الخدمة:' : 'Service:' }}</span>
+                    <strong class="text-dark">{{ getServiceName(r.serviceId) }}</strong>
+                  </div>
+                  <div class="detail-row">
+                    <span class="text-muted">{{ isRtl() ? 'الشريحة:' : 'Segment:' }}</span>
+                    <strong class="text-dark">{{ getSegmentName(r.segmentId) }}</strong>
+                  </div>
+                  <div class="detail-row">
+                    <span class="text-muted">{{
+                      isRtl() ? 'الموعد المجدول:' : 'Scheduled For:'
+                    }}</span>
+                    <span>{{ formatDate(r.scheduledOnUtc) }}</span>
+                  </div>
+                  @if (r.convertedTicketId) {
+                    <div class="detail-row">
+                      <span class="text-muted">{{
+                        isRtl() ? 'التذكرة المحولة:' : 'Converted Ticket:'
+                      }}</span>
+                      <span class="badge bg-success-subtle text-success border"
+                        >#{{ r.convertedTicketId }}</span
+                      >
+                    </div>
+                  }
+                  @if (r.cancelledOnUtc) {
+                    <div class="detail-row">
+                      <span class="text-muted">{{
+                        isRtl() ? 'تاريخ الإلغاء:' : 'Cancelled On:'
+                      }}</span>
+                      <span>{{ formatDate(r.cancelledOnUtc) }}</span>
+                    </div>
+                  }
+                  @if (r.cancellationReason) {
+                    <div class="detail-row alert alert-danger py-1 px-2 mb-0">
+                      <span class="fw-bold">{{ isRtl() ? 'سبب الإلغاء:' : 'Reason:' }}</span>
+                      <span>{{ r.cancellationReason }}</span>
+                    </div>
+                  }
+                </div>
+              </section>
+
+              <!-- Dynamic Custom Inputs Section -->
+              @if (r.customInputs && r.customInputs.length > 0) {
+                <section class="mb-3" aria-label="Custom Inputs">
+                  <h3 class="h6 fw-bold border-bottom pb-2 mb-2 text-secondary">
+                    <i class="bi bi-input-cursor-text me-1"></i>
+                    {{ isRtl() ? 'الحقول المخصصة' : 'Custom Inputs' }}
+                  </h3>
+                  <ul class="list-group list-group-flush small">
+                    @for (inp of r.customInputs; track inp.serviceCustomInputId) {
+                      <li
+                        class="list-group-item d-flex justify-content-between align-items-center px-0 py-1"
+                      >
+                        <span class="text-muted"
+                          >{{ isRtl() ? inp.labelAr || inp.name : inp.labelEn || inp.name }}:</span
+                        >
+                        <strong class="text-dark">{{ inp.value || '—' }}</strong>
+                      </li>
+                    }
+                  </ul>
+                </section>
+              }
+
+              <!-- History Timeline Component -->
+              <app-history-timeline [events]="historyEvents()" />
+
+              <!-- Reservation Action Matrix Buttons -->
+              @if (!r.isArchived) {
+                <div class="actions-panel d-flex flex-wrap gap-2 mt-4 pt-3 border-top">
+                  @if (r.status === 'Active' && canCancelReservation()) {
+                    <button
+                      type="button"
+                      class="btn btn-outline-danger btn-sm rounded-pill"
+                      [disabled]="actionLoading()"
+                      (click)="openCancelModal('reservation')"
+                    >
+                      <i class="bi bi-x-circle me-1"></i>
+                      {{ isRtl() ? 'إلغاء الحجز' : 'Cancel Reservation' }}
+                    </button>
+                  }
+
+                  @if (r.status === 'Active' && canConvertReservation()) {
+                    <button
+                      type="button"
+                      class="primary-action btn-sm"
+                      [disabled]="actionLoading()"
+                      (click)="openConfirmModal('convertToTicket')"
+                    >
+                      <i class="bi bi-arrow-repeat me-1"></i>
+                      {{ isRtl() ? 'تحويل لتذكرة' : 'Convert to Ticket' }}
+                    </button>
+                  }
+                </div>
+              }
+            }
+          </div>
+        </div>
+      </aside>
+    }
+  </div>
+
+  <!-- Accessible Dialog Modals Container -->
+
+  <!-- Modal 1: Create Ticket Modal -->
+  @if (showCreateTicketModal()) {
+    <div class="modal-backdrop-custom" tabindex="-1" role="dialog" aria-modal="true">
+      <div class="modal-dialog-custom">
+        <div class="modal-card-custom">
+          <header class="modal-header-custom">
+            <div class="modal-title-group">
+              <div class="modal-badge-icon">
+                <i class="bi bi-ticket-perforated-fill" aria-hidden="true"></i>
+              </div>
+              <div>
+                <h5 class="h6 fw-bold mb-0 text-dark">
+                  {{ isRtl() ? 'إصدار تذكرة فورية جديدة' : 'Issue New Live Ticket' }}
+                </h5>
+                <span class="text-muted small">
+                  {{
+                    isRtl()
+                      ? 'إدراج تذكرة مباشرة في طابور الانتظار'
+                      : 'Enqueue live customer ticket'
+                  }}
+                </span>
+              </div>
+            </div>
+            <button
+              type="button"
+              class="btn-close"
+              (click)="closeAllModals()"
+              [attr.aria-label]="isRtl() ? 'إغلاق' : 'Close'"
+            ></button>
+          </header>
+
+          <form (ngSubmit)="submitCreateTicket()">
+            <div class="modal-body-custom">
+              <!-- Service Selection -->
+              <div class="mb-3">
+                <label
+                  for="createTicketService"
+                  class="form-label small fw-semibold text-dark mb-1"
+                >
+                  {{ isRtl() ? 'الخدمة المطلوبة' : 'Target Service' }}
+                  <span class="text-danger">*</span>
+                </label>
+                <select
+                  id="createTicketService"
+                  class="form-select modal-form-control"
+                  [ngModel]="createServiceId()"
+                  (ngModelChange)="onServiceSelected($event)"
+                  name="serviceId"
+                  required
+                >
+                  <option [ngValue]="null" disabled>
+                    {{ isRtl() ? '-- اختر الخدمة --' : '-- Select Service --' }}
+                  </option>
+                  @for (srv of issuableServices(); track srv.id) {
+                    <option [ngValue]="srv.id">
+                      {{ isRtl() ? srv.fullPathAr || srv.nameAr : srv.fullPathEn || srv.nameEn }}
+                    </option>
+                  }
+                </select>
+              </div>
+
+              <!-- Segment Selection -->
+              <div class="mb-3">
+                <label
+                  for="createTicketSegment"
+                  class="form-label small fw-semibold text-dark mb-1"
+                >
+                  {{ isRtl() ? 'الشريحة المستهدفة' : 'Target Segment' }}
+                  <span class="text-danger">*</span>
+                </label>
+                <select
+                  id="createTicketSegment"
+                  class="form-select modal-form-control"
+                  [ngModel]="createSegmentId()"
+                  (ngModelChange)="createSegmentId.set($event)"
+                  name="segmentId"
+                  required
+                >
+                  <option [ngValue]="null" disabled>
+                    {{ isRtl() ? '-- اختر الشريحة --' : '-- Select Segment --' }}
+                  </option>
+                  @for (
+                    seg of serviceSegmentsLookup().length > 0
+                      ? serviceSegmentsLookup()
+                      : segmentsLookup();
+                    track seg.id
+                  ) {
+                    <option [ngValue]="seg.id">{{ isRtl() ? seg.nameAr : seg.nameEn }}</option>
+                  }
+                </select>
+              </div>
+
+              <!-- Dynamic Custom Inputs Fields -->
+              @if (createCustomInputs().length > 0) {
+                <div class="mt-4 pt-3 border-top">
+                  <h6 class="fw-bold small text-secondary mb-3">
+                    <i class="bi bi-input-cursor-text me-1"></i>
+                    {{ isRtl() ? 'الحقول المطلوبة للخدمة' : 'Required Custom Inputs' }}
+                  </h6>
+
+                  @for (field of createCustomInputs(); track field.serviceCustomInputId) {
+                    <div class="mb-3">
+                      <label
+                        [for]="'dyn_' + field.serviceCustomInputId"
+                        class="form-label small fw-semibold text-dark mb-1"
+                      >
+                        {{ isRtl() ? field.labelAr : field.labelEn }}
+                      </label>
+                      <input
+                        [id]="'dyn_' + field.serviceCustomInputId"
+                        [type]="
+                          field.type === 'Number' || field.type === 'Integer' ? 'number' : 'text'
+                        "
+                        class="form-control modal-form-control"
+                        [(ngModel)]="field.value"
+                        [name]="'dyn_' + field.serviceCustomInputId"
+                      />
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+
+            <footer class="modal-footer-custom">
+              <button type="button" class="secondary-action" (click)="closeAllModals()">
+                <span>{{ isRtl() ? 'إلغاء' : 'Cancel' }}</span>
+              </button>
+              <button
+                type="submit"
+                class="primary-action"
+                [disabled]="!createServiceId() || !createSegmentId() || actionLoading()"
+              >
+                @if (actionLoading()) {
+                  <span class="spinner-border spinner-border-sm me-1" role="status"></span>
+                }
+                <span>{{ isRtl() ? 'إصدار التذكرة' : 'Issue Ticket' }}</span>
+              </button>
+            </footer>
+          </form>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Modal 2: Create Reservation Modal -->
+  @if (showCreateReservationModal()) {
+    <div class="modal-backdrop-custom" tabindex="-1" role="dialog" aria-modal="true">
+      <div class="modal-dialog-custom">
+        <div class="modal-card-custom">
+          <header class="modal-header-custom">
+            <div class="modal-title-group">
+              <div class="modal-badge-icon">
+                <i class="bi bi-calendar-plus-fill" aria-hidden="true"></i>
+              </div>
+              <div>
+                <h5 class="h6 fw-bold mb-0 text-dark">
+                  {{ isRtl() ? 'تسجيل حجز موعد جديد' : 'New Scheduled Reservation' }}
+                </h5>
+                <span class="text-muted small">
+                  {{ isRtl() ? 'جدولة حجز عميل في الفرع' : 'Schedule a customer appointment' }}
+                </span>
+              </div>
+            </div>
+            <button
+              type="button"
+              class="btn-close"
+              (click)="closeAllModals()"
+              [attr.aria-label]="isRtl() ? 'إغلاق' : 'Close'"
+            ></button>
+          </header>
+
+          <form (ngSubmit)="submitCreateReservation()">
+            <div class="modal-body-custom">
+              <!-- Service Selection -->
+              <div class="mb-3">
+                <label for="createResService" class="form-label small fw-semibold text-dark mb-1">
+                  {{ isRtl() ? 'الخدمة' : 'Service' }}
+                  <span class="text-danger">*</span>
+                </label>
+                <select
+                  id="createResService"
+                  class="form-select modal-form-control"
+                  [ngModel]="createServiceId()"
+                  (ngModelChange)="onServiceSelected($event)"
+                  name="serviceId"
+                  required
+                >
+                  <option [ngValue]="null" disabled>
+                    {{ isRtl() ? '-- اختر الخدمة --' : '-- Select Service --' }}
+                  </option>
+                  @for (srv of issuableServices(); track srv.id) {
+                    <option [ngValue]="srv.id">
+                      {{ isRtl() ? srv.fullPathAr || srv.nameAr : srv.fullPathEn || srv.nameEn }}
+                    </option>
+                  }
+                </select>
+              </div>
+
+              <!-- Segment Selection -->
+              <div class="mb-3">
+                <label for="createResSegment" class="form-label small fw-semibold text-dark mb-1">
+                  {{ isRtl() ? 'الشريحة' : 'Segment' }}
+                  <span class="text-danger">*</span>
+                </label>
+                <select
+                  id="createResSegment"
+                  class="form-select modal-form-control"
+                  [ngModel]="createSegmentId()"
+                  (ngModelChange)="createSegmentId.set($event)"
+                  name="segmentId"
+                  required
+                >
+                  <option [ngValue]="null" disabled>
+                    {{ isRtl() ? '-- اختر الشريحة --' : '-- Select Segment --' }}
+                  </option>
+                  @for (
+                    seg of serviceSegmentsLookup().length > 0
+                      ? serviceSegmentsLookup()
+                      : segmentsLookup();
+                    track seg.id
+                  ) {
+                    <option [ngValue]="seg.id">{{ isRtl() ? seg.nameAr : seg.nameEn }}</option>
+                  }
+                </select>
+              </div>
+
+              <!-- Scheduled Date & Time -->
+              <div class="mb-3">
+                <label for="createResTime" class="form-label small fw-semibold text-dark mb-1">
+                  {{ isRtl() ? 'الموعد المحدد' : 'Scheduled Date & Time' }}
+                  <span class="text-danger">*</span>
+                </label>
+                <input
+                  id="createResTime"
+                  type="datetime-local"
+                  class="form-control modal-form-control"
+                  [ngModel]="createReservationDate()"
+                  (ngModelChange)="createReservationDate.set($event)"
+                  name="scheduledTime"
+                  required
+                />
+
+                <!-- Schedule Helper Info -->
+                @if (serviceSchedule(); as sched) {
+                  @if (sched.days && sched.days.length > 0) {
+                    <div class="mt-2 p-2 bg-light rounded border border-light-subtle">
+                      <div
+                        class="d-flex align-items-center gap-1 text-primary fw-semibold small mb-1"
+                      >
+                        <i class="bi bi-clock-history"></i>
+                        <span>{{
+                          isRtl() ? 'مواعيد العمل المتاحة للخدمة:' : 'Available Service Schedule:'
+                        }}</span>
+                      </div>
+                      <div class="d-flex flex-wrap gap-1">
+                        @for (d of sched.days; track d.dayOfWeek) {
+                          @if (d.timeSlots && d.timeSlots.length > 0) {
+                            @for (slot of d.timeSlots; track slot.startTime + '-' + slot.endTime) {
+                              <span class="badge bg-secondary-subtle text-secondary small">
+                                {{ getDayLabel(d.dayOfWeek) }}: {{ slot.startTime }} -
+                                {{ slot.endTime }}
+                              </span>
+                            }
+                          } @else {
+                            <span class="badge bg-secondary-subtle text-secondary small">
+                              {{ getDayLabel(d.dayOfWeek) }}
+                            </span>
+                          }
+                        }
+                      </div>
+                    </div>
+                  }
+                }
+              </div>
+
+              <!-- Dynamic Custom Inputs Fields -->
+              @if (createCustomInputs().length > 0) {
+                <div class="mt-4 pt-3 border-top">
+                  <h6 class="fw-bold small text-secondary mb-3">
+                    <i class="bi bi-input-cursor-text me-1"></i>
+                    {{ isRtl() ? 'الحقول المطلوبة للخدمة' : 'Required Custom Inputs' }}
+                  </h6>
+
+                  @for (field of createCustomInputs(); track field.serviceCustomInputId) {
+                    <div class="mb-3">
+                      <label
+                        [for]="'dyn_res_' + field.serviceCustomInputId"
+                        class="form-label small fw-semibold text-dark mb-1"
+                      >
+                        {{ isRtl() ? field.labelAr : field.labelEn }}
+                      </label>
+                      <input
+                        [id]="'dyn_res_' + field.serviceCustomInputId"
+                        [type]="
+                          field.type === 'Number' || field.type === 'Integer' ? 'number' : 'text'
+                        "
+                        class="form-control modal-form-control"
+                        [(ngModel)]="field.value"
+                        [name]="'dyn_res_' + field.serviceCustomInputId"
+                      />
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+
+            <footer class="modal-footer-custom">
+              <button type="button" class="secondary-action" (click)="closeAllModals()">
+                <span>{{ isRtl() ? 'إلغاء' : 'Cancel' }}</span>
+              </button>
+              <button
+                type="submit"
+                class="primary-action"
+                [disabled]="
+                  !createServiceId() ||
+                  !createSegmentId() ||
+                  !createReservationDate() ||
+                  actionLoading()
+                "
+              >
+                @if (actionLoading()) {
+                  <span class="spinner-border spinner-border-sm me-1" role="status"></span>
+                }
+                <span>{{ isRtl() ? 'حفظ الحجز' : 'Save Reservation' }}</span>
+              </button>
+            </footer>
+          </form>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Modal 3: Cancellation Modal (Required Reason with 500 Char Counter) -->
+  @if (showCancelModal()) {
+    <div class="modal-backdrop-custom" tabindex="-1" role="dialog" aria-modal="true">
+      <div class="modal-dialog-custom">
+        <div class="modal-card-custom">
+          <header class="modal-header-custom">
+            <div class="modal-title-group">
+              <div class="modal-badge-icon danger">
+                <i class="bi bi-x-circle-fill" aria-hidden="true"></i>
+              </div>
+              <div>
+                <h5 class="h6 fw-bold mb-0 text-dark">
+                  {{
+                    cancelTargetType() === 'ticket'
+                      ? isRtl()
+                        ? 'إلغاء التذكرة'
+                        : 'Cancel Ticket'
+                      : isRtl()
+                        ? 'إلغاء الحجز'
+                        : 'Cancel Reservation'
+                  }}
+                </h5>
+                <span class="text-muted small">
+                  {{
+                    isRtl()
+                      ? 'يرجى كتابة سبب واضح للإلغاء ليتم توثيقه'
+                      : 'Provide an audit reason for cancellation'
+                  }}
+                </span>
+              </div>
+            </div>
+            <button
+              type="button"
+              class="btn-close"
+              (click)="closeAllModals()"
+              [attr.aria-label]="isRtl() ? 'إغلاق' : 'Close'"
+            ></button>
+          </header>
+
+          <form (ngSubmit)="submitCancel()">
+            <div class="modal-body-custom">
+              <div class="mb-3">
+                <label for="cancellationReason" class="form-label small fw-semibold text-dark mb-1">
+                  {{ isRtl() ? 'سبب الإلغاء' : 'Cancellation Reason' }}
+                  <span class="text-danger">*</span>
+                </label>
+                <textarea
+                  id="cancellationReason"
+                  class="form-control modal-form-control"
+                  rows="4"
+                  maxlength="500"
+                  [ngModel]="cancelReason()"
+                  (ngModelChange)="cancelReason.set($event)"
+                  name="reason"
+                  [placeholder]="
+                    isRtl()
+                      ? 'اكتب سبب الإلغاء هنا (مطلوب)...'
+                      : 'Enter cancellation reason (required)...'
+                  "
+                  required
+                ></textarea>
+                <div class="d-flex justify-content-end mt-1">
+                  <small class="text-muted">{{ cancelReason().length }} / 500</small>
+                </div>
+              </div>
+            </div>
+
+            <footer class="modal-footer-custom">
+              <button type="button" class="secondary-action" (click)="closeAllModals()">
+                <span>{{ isRtl() ? 'تراجع' : 'Back' }}</span>
+              </button>
+              <button
+                type="submit"
+                class="danger-action"
+                [disabled]="!cancelReason().trim() || actionLoading()"
+              >
+                @if (actionLoading()) {
+                  <span class="spinner-border spinner-border-sm me-1" role="status"></span>
+                }
+                <span>{{ isRtl() ? 'تأكيد الإلغاء' : 'Confirm Cancellation' }}</span>
+              </button>
+            </footer>
+          </form>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Modal 4: Manual Transfer Modal -->
+  @if (showTransferModal()) {
+    <div class="modal-backdrop-custom" tabindex="-1" role="dialog" aria-modal="true">
+      <div class="modal-dialog-custom">
+        <div class="modal-card-custom">
+          <header class="modal-header-custom">
+            <div class="modal-title-group">
+              <div class="modal-badge-icon warning">
+                <i class="bi bi-arrow-left-right" aria-hidden="true"></i>
+              </div>
+              <div>
+                <h5 class="h6 fw-bold mb-0 text-dark">
+                  {{ isRtl() ? 'تحويل يدوي للتذكرة' : 'Manual Service Transfer' }}
+                </h5>
+                <span class="text-muted small">
+                  {{
+                    isRtl()
+                      ? 'نقل العميل إلى خدمة أخرى في الفرع'
+                      : 'Transfer ticket to another service'
+                  }}
+                </span>
+              </div>
+            </div>
+            <button
+              type="button"
+              class="btn-close"
+              (click)="closeAllModals()"
+              [attr.aria-label]="isRtl() ? 'إغلاق' : 'Close'"
+            ></button>
+          </header>
+
+          <form (ngSubmit)="submitTransfer()">
+            <div class="modal-body-custom">
+              <!-- Target Service Selection -->
+              <div class="mb-3">
+                <label
+                  for="transferTargetService"
+                  class="form-label small fw-semibold text-dark mb-1"
+                >
+                  {{ isRtl() ? 'الخدمة المحول إليها' : 'Target Service' }}
+                  <span class="text-danger">*</span>
+                </label>
+                <select
+                  id="transferTargetService"
+                  class="form-select modal-form-control"
+                  [ngModel]="transferTargetServiceId()"
+                  (ngModelChange)="transferTargetServiceId.set($event)"
+                  name="targetServiceId"
+                  required
+                >
+                  <option [ngValue]="null" disabled>
+                    {{ isRtl() ? '-- اختر الخدمة الهدف --' : '-- Select Target Service --' }}
+                  </option>
+                  @for (srv of issuableServices(); track srv.id) {
+                    @if (srv.id !== selectedTicket()?.currentServiceId) {
+                      <option [ngValue]="srv.id">
+                        {{ isRtl() ? srv.fullPathAr || srv.nameAr : srv.fullPathEn || srv.nameEn }}
+                      </option>
+                    }
+                  }
+                </select>
+              </div>
+
+              <!-- Optional Transfer Reason -->
+              <div class="mb-3">
+                <label for="transferReason" class="form-label small fw-semibold text-dark mb-1">
+                  {{ isRtl() ? 'سبب التحويل (اختياري)' : 'Transfer Reason (Optional)' }}
+                </label>
+                <textarea
+                  id="transferReason"
+                  class="form-control modal-form-control"
+                  rows="3"
+                  maxlength="500"
+                  [ngModel]="transferReason()"
+                  (ngModelChange)="transferReason.set($event)"
+                  name="transferReason"
+                  [placeholder]="
+                    isRtl()
+                      ? 'ملاحظات أو سبب التحويل...'
+                      : 'Notes or reasons for manual transfer...'
+                  "
+                ></textarea>
+                <div class="d-flex justify-content-end mt-1">
+                  <small class="text-muted">{{ transferReason().length }} / 500</small>
+                </div>
+              </div>
+            </div>
+
+            <footer class="modal-footer-custom">
+              <button type="button" class="secondary-action" (click)="closeAllModals()">
+                <span>{{ isRtl() ? 'إلغاء' : 'Cancel' }}</span>
+              </button>
+              <button
+                type="submit"
+                class="primary-action"
+                [disabled]="!transferTargetServiceId() || actionLoading()"
+              >
+                @if (actionLoading()) {
+                  <span class="spinner-border spinner-border-sm me-1" role="status"></span>
+                }
+                <span>{{ isRtl() ? 'تأكيد التحويل' : 'Execute Transfer' }}</span>
+              </button>
+            </footer>
+          </form>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Modal 5: General Confirmations (StartService, CompleteService, ReturnNoShow, ConvertToTicket) -->
+  @if (showConfirmModal()) {
+    <div class="modal-backdrop-custom" tabindex="-1" role="dialog" aria-modal="true">
+      <div class="modal-dialog-custom">
+        <div class="modal-card-custom">
+          <header class="modal-header-custom">
+            <div class="modal-title-group">
+              <div class="modal-badge-icon success">
+                <i class="bi bi-question-circle-fill" aria-hidden="true"></i>
+              </div>
+              <div>
+                <h5 class="h6 fw-bold mb-0 text-dark">
+                  {{ isRtl() ? 'تأكيد العملية' : 'Confirm Action' }}
+                </h5>
+                <span class="text-muted small">
+                  {{
+                    isRtl() ? 'يرجى مراجعة وتأكيد هذا الإجراء' : 'Review and confirm this operation'
+                  }}
+                </span>
+              </div>
+            </div>
+            <button
+              type="button"
+              class="btn-close"
+              (click)="closeAllModals()"
+              [attr.aria-label]="isRtl() ? 'إغلاق' : 'Close'"
+            ></button>
+          </header>
+
+          <div class="modal-body-custom">
+            <p class="mb-0 text-dark fs-6 lh-base">
+              @switch (confirmAction()) {
+                @case ('startService') {
+                  {{
+                    isRtl()
+                      ? 'هل أنت متأكد من بدء تقديم الخدمة لهذه التذكرة؟ ستتحول حالة التذكرة إلى جاري تقديم الخدمة (InProgress).'
+                      : 'Are you sure you want to start service for this ticket? Status will change to InProgress.'
+                  }}
+                }
+                @case ('completeService') {
+                  {{
+                    isRtl()
+                      ? 'هل أنت متأكد من اكتمال تقديم الخدمة؟ إذا كان هناك مسار عمل مرتبط ستنتقل التذكرة للخطوة التالية، أو تكتمل الخدمة نهائياً.'
+                      : 'Are you sure you want to complete service? If workflow is bound it will advance or complete.'
+                  }}
+                }
+                @case ('returnToWaiting') {
+                  {{
+                    isRtl()
+                      ? 'هل أنت متأكد من إعادة التذكرة من حالة عدم الحضور (NoShow) إلى قائمة الانتظار (Waiting)؟'
+                      : 'Are you sure you want to return this NoShow ticket to Waiting status?'
+                  }}
+                }
+                @case ('convertToTicket') {
+                  {{
+                    isRtl()
+                      ? 'هل أنت متأكد من تحويل هذا الحجز إلى تذكرة فعلية وإدراجها في طابور الانتظار؟'
+                      : 'Are you sure you want to convert this reservation into a live queue ticket?'
+                  }}
+                }
+              }
+            </p>
+          </div>
+
+          <footer class="modal-footer-custom">
+            <button type="button" class="secondary-action" (click)="closeAllModals()">
+              <span>{{ isRtl() ? 'تراجع' : 'Back' }}</span>
+            </button>
+            <button
+              type="button"
+              class="primary-action"
+              [disabled]="actionLoading()"
+              (click)="executeConfirmedAction()"
+            >
+              @if (actionLoading()) {
+                <span class="spinner-border spinner-border-sm me-1" role="status"></span>
+              }
+              <span>{{ isRtl() ? 'تأكيد ومتابعة' : 'Confirm' }}</span>
+            </button>
+          </footer>
+        </div>
+      </div>
+    </div>
+  }
+</section>

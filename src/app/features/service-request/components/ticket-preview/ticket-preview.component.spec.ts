@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 
 import { SERVICE_REQUEST_TRANSLATIONS } from '../../models/language/language.model';
 import { QueueTicket } from '../../models/ticket/ticket.model';
@@ -47,5 +48,32 @@ describe('TicketPreviewComponent', () => {
     expect(text).toContain('Regular');
     expect(text).not.toContain('Cardiology');
     expect(text).not.toContain('null');
+  });
+
+  it('renders hospital/clinic header and NileTronix branding link', () => {
+    const header = fixture.nativeElement.querySelector('.ticket-preview__hospital-header');
+    expect(header).toBeTruthy();
+    expect(fixture.nativeElement.textContent).toContain('Farid Habib Hospital');
+
+    const links = fixture.nativeElement.querySelectorAll('a[href="https://www.niletronix.com/"]');
+    expect(links.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('renders hospital logo image when provided and hides it if load fails', () => {
+    fixture.componentRef.setInput('branchLogoUrl', 'https://example.com/logo.png');
+    fixture.detectChanges();
+
+    const logoImg = fixture.nativeElement.querySelector(
+      '.ticket-preview__hospital-logo',
+    ) as HTMLImageElement;
+    expect(logoImg).not.toBeNull();
+    expect(logoImg.src).toContain('https://example.com/logo.png');
+
+    // Trigger error event
+    logoImg.dispatchEvent(new Event('error'));
+    fixture.detectChanges();
+
+    const logoImgAfterError = fixture.nativeElement.querySelector('.ticket-preview__hospital-logo');
+    expect(logoImgAfterError).toBeNull();
   });
 });

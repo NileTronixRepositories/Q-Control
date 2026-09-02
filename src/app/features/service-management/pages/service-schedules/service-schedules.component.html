@@ -13,7 +13,7 @@
       @if (hasRouteScope()) {
         <button type="button" class="secondary-action" (click)="backToBranchServices()">
           <i class="bi bi-arrow-left" aria-hidden="true"></i>
-          {{ translations().backToBranchServices }}
+          <span>{{ translations().backToBranchServices }}</span>
         </button>
       }
     </div>
@@ -130,8 +130,8 @@
       @if (scope(); as currentScope) {
         <form class="schedule-editor-panel" [formGroup]="scheduleForm" (ngSubmit)="submit()">
           @if (schedule() && !schedule()?.isCurrentlyOperational) {
-            <div class="alert alert-warning d-flex align-items-center gap-2 mb-3">
-              <i class="bi bi-exclamation-triangle-fill"></i>
+            <div class="alert alert-warning d-flex align-items-center gap-2 m-3 mb-0 rounded-3">
+              <i class="bi bi-exclamation-triangle-fill flex-shrink-0"></i>
               <div>
                 <strong>{{ translations().currentlyUnavailable }}</strong>
                 <p class="mb-0 small">{{ translations().currentlyUnavailableHint }}</p>
@@ -141,7 +141,7 @@
 
           @if (reloadRequired()) {
             <div
-              class="alert alert-danger d-flex align-items-center justify-content-between gap-3 mb-3"
+              class="alert alert-danger d-flex align-items-center justify-content-between gap-3 m-3 mb-0 rounded-3"
             >
               <div class="d-flex align-items-center gap-2">
                 <i class="bi bi-arrow-clockwise"></i>
@@ -153,89 +153,118 @@
             </div>
           }
 
-          <div
-            class="schedule-scope-badges d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3"
+          <!-- Single Unified Header: Scope & Status + Code Config + Action Buttons -->
+          <header
+            class="schedule-unified-header d-flex align-items-center justify-content-between flex-wrap gap-3"
           >
-            <div class="d-flex align-items-center gap-2">
-              <span class="badge bg-primary fs-6">{{ currentScope.serviceName }}</span>
-              <span class="badge bg-light text-dark border">{{ currentScope.branchName }}</span>
-              <span
-                class="badge"
-                [class.bg-success]="schedule()?.isCurrentlyOperational"
-                [class.bg-secondary]="!schedule()?.isCurrentlyOperational"
-              >
-                {{
-                  schedule()?.isCurrentlyOperational
-                    ? language() === 'ar'
-                      ? 'تشغيلي'
-                      : 'Operational'
-                    : language() === 'ar'
-                      ? 'غير متاح'
-                      : 'Unavailable'
-                }}
-              </span>
+            <!-- Start: Service Icon, Title, Branch & Operational Status -->
+            <div class="d-flex align-items-center gap-3 flex-wrap">
+              <div class="schedule-service-icon">
+                <i class="bi bi-calendar-check" aria-hidden="true"></i>
+              </div>
+              <div class="schedule-title-area">
+                <span class="schedule-eyebrow d-block">{{
+                  translations().service || 'الخدمة'
+                }}</span>
+                <h4 class="schedule-main-title">{{ currentScope.serviceName }}</h4>
+              </div>
+              <div class="d-flex align-items-center gap-2">
+                <span
+                  class="badge bg-light text-secondary border px-3 py-1.5 rounded-pill fw-semibold"
+                >
+                  <i class="bi bi-geo-alt me-1"></i>
+                  {{ currentScope.branchName }}
+                </span>
+                <span
+                  class="badge px-3 py-1.5 rounded-pill fw-semibold"
+                  [class.bg-success-subtle]="schedule()?.isCurrentlyOperational"
+                  [class.text-success-emphasis]="schedule()?.isCurrentlyOperational"
+                  [class.border]="true"
+                  [class.border-success-subtle]="schedule()?.isCurrentlyOperational"
+                  [class.bg-secondary-subtle]="!schedule()?.isCurrentlyOperational"
+                  [class.text-secondary]="!schedule()?.isCurrentlyOperational"
+                  [class.border-secondary-subtle]="!schedule()?.isCurrentlyOperational"
+                >
+                  <i
+                    class="bi"
+                    [class.bi-check-circle-fill]="schedule()?.isCurrentlyOperational"
+                    [class.bi-dash-circle-fill]="!schedule()?.isCurrentlyOperational"
+                  ></i>
+                  {{
+                    schedule()?.isCurrentlyOperational
+                      ? language() === 'ar'
+                        ? 'تشغيلي'
+                        : 'Operational'
+                      : language() === 'ar'
+                        ? 'غير متاح'
+                        : 'Unavailable'
+                  }}
+                </span>
+              </div>
             </div>
-          </div>
 
-          <div
-            class="schedule-form-header d-flex align-items-center justify-content-between flex-wrap gap-3"
-          >
-            <div class="d-flex align-items-center flex-wrap gap-4">
-              <label class="filter-field flex-row align-items-center gap-2 mb-0">
-                <input
-                  type="checkbox"
-                  class="form-check-input mt-0"
-                  [formControl]="scheduleForm.controls.isSlotCodeRequired"
-                  [disabled]="inlineControlsDisabled()"
-                />
-                <span class="mb-0">{{ translations().slotCodeRequired }}</span>
-              </label>
-              @if (scheduleForm.controls.isSlotCodeRequired.value) {
-                <div class="filter-field flex-row align-items-center gap-2 mb-0">
-                  <span class="mb-0">{{ translations().slotCode }}:</span>
+            <!-- End: Slot Code Configuration & Action Buttons -->
+            <div class="d-flex align-items-center gap-3 flex-wrap">
+              <div class="code-config-group d-flex align-items-center gap-2">
+                <label
+                  class="form-check-label d-inline-flex align-items-center gap-2 mb-0 fw-bold small text-dark cursor-pointer"
+                >
                   <input
-                    class="form-control form-control-sm"
-                    type="text"
-                    maxlength="100"
-                    [formControl]="scheduleForm.controls.slotCode"
-                    [placeholder]="translations().slotCode"
-                    [readonly]="inlineControlsDisabled()"
-                    style="width: 150px"
+                    type="checkbox"
+                    class="form-check-input mt-0"
+                    [formControl]="scheduleForm.controls.isSlotCodeRequired"
+                    [disabled]="inlineControlsDisabled()"
                   />
-                </div>
-              }
-            </div>
+                  <span>{{ translations().slotCodeRequired }}</span>
+                </label>
 
-            <div class="d-flex align-items-center gap-2">
-              @if (scheduleForm.dirty && !saving()) {
-                <button type="button" class="secondary-action" (click)="resetInlineChanges()">
-                  <i class="bi bi-x-lg" aria-hidden="true"></i>
-                  {{ translations().cancel }}
-                </button>
-              }
-              <button
-                type="submit"
-                class="primary-action"
-                [disabled]="!canSave() || scheduleForm.invalid || !scheduleForm.dirty"
-              >
-                @if (saving()) {
-                  <i class="bi bi-arrow-repeat spin" aria-hidden="true"></i>
-                } @else {
-                  <i class="bi bi-check2" aria-hidden="true"></i>
+                @if (scheduleForm.controls.isSlotCodeRequired.value) {
+                  <div class="d-inline-flex align-items-center gap-1.5 ms-1">
+                    <span class="small fw-bold text-muted">{{ translations().slotCode }}:</span>
+                    <input
+                      class="form-control form-control-sm code-input-field"
+                      type="text"
+                      maxlength="100"
+                      [formControl]="scheduleForm.controls.slotCode"
+                      [placeholder]="translations().slotCode"
+                      [readonly]="inlineControlsDisabled()"
+                    />
+                  </div>
                 }
-                {{ translations().saveChanges }}
-              </button>
-            </div>
-          </div>
+              </div>
 
+              <div class="d-flex align-items-center gap-2">
+                @if (scheduleForm.dirty && !saving()) {
+                  <button type="button" class="secondary-action" (click)="resetInlineChanges()">
+                    <i class="bi bi-x-lg" aria-hidden="true"></i>
+                    <span>{{ translations().cancel }}</span>
+                  </button>
+                }
+                <button
+                  type="submit"
+                  class="primary-action"
+                  [disabled]="!canSave() || scheduleForm.invalid || !scheduleForm.dirty"
+                >
+                  @if (saving()) {
+                    <i class="bi bi-arrow-repeat spin" aria-hidden="true"></i>
+                  } @else {
+                    <i class="bi bi-check2" aria-hidden="true"></i>
+                  }
+                  <span>{{ translations().saveChanges }}</span>
+                </button>
+              </div>
+            </div>
+          </header>
+
+          <!-- Schedule Rules Table -->
           <div class="table-responsive table-wrap">
             <table class="table align-middle custom-table mb-0">
               <thead>
                 <tr>
-                  <th style="width: 170px">{{ translations().startTime }}</th>
-                  <th style="width: 170px">{{ translations().endTime }}</th>
+                  <th style="width: 175px">{{ translations().startTime }}</th>
+                  <th style="width: 175px">{{ translations().endTime }}</th>
                   <th class="text-center">{{ translations().day }}</th>
-                  <th class="text-end" style="width: 130px">
+                  <th class="text-center" style="width: 120px">
                     {{ language() === 'ar' ? 'الإجراءات' : 'Actions' }}
                   </th>
                 </tr>
@@ -276,7 +305,7 @@
                       }
                     </td>
                     <td class="text-center">
-                      <div class="d-flex justify-content-center gap-2 flex-wrap">
+                      <div class="day-toggle-group">
                         @for (day of days; track day) {
                           <button
                             type="button"
@@ -295,36 +324,19 @@
                         }
                       </div>
                     </td>
-                    <td class="text-end">
-                      <div class="d-flex justify-content-end gap-2 align-items-center">
-                        <button
-                          type="button"
-                          class="icon-action danger-action"
-                          [disabled]="inlineControlsDisabled()"
-                          (click)="removeRule(ruleIndex)"
-                          [title]="language() === 'ar' ? 'حذف' : 'Delete'"
-                        >
-                          <i class="bi bi-trash" aria-hidden="true"></i>
-                        </button>
+                    <td class="text-center">
+                      <div class="d-inline-flex justify-content-center gap-1.5 align-items-center">
                         <span
-                          class="d-inline-flex align-items-center justify-content-center rounded-circle"
-                          [class.text-success]="rule.valid"
-                          [class.bg-success]="rule.valid"
-                          [class.text-warning]="!rule.valid"
-                          [class.bg-warning]="!rule.valid"
-                          style="
-                            width: 36px;
-                            height: 36px;
-                            --bs-bg-opacity: 0.15;
-                            font-size: 1.15rem;
-                          "
+                          class="status-badge-compact"
+                          [class.valid]="rule.valid"
+                          [class.invalid]="!rule.valid"
                           [title]="
                             rule.valid
                               ? language() === 'ar'
                                 ? 'صحيح'
                                 : 'Valid'
                               : language() === 'ar'
-                                ? 'خطأ'
+                                ? 'خطأ في الموعد'
                                 : 'Invalid'
                           "
                         >
@@ -334,6 +346,15 @@
                             <i class="bi bi-exclamation-lg" aria-hidden="true"></i>
                           }
                         </span>
+                        <button
+                          type="button"
+                          class="btn-icon-danger"
+                          [disabled]="inlineControlsDisabled()"
+                          (click)="removeRule(ruleIndex)"
+                          [title]="language() === 'ar' ? 'حذف' : 'Delete'"
+                        >
+                          <i class="bi bi-trash" aria-hidden="true"></i>
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -343,15 +364,21 @@
           </div>
 
           @if (formError(); as error) {
-            <div class="p-3 bg-danger bg-opacity-10 text-danger border-top">
-              <i class="bi bi-exclamation-triangle-fill me-2"></i> <strong>{{ error }}</strong>
+            <div
+              class="p-3 bg-danger-subtle text-danger border-top d-flex align-items-center gap-2"
+            >
+              <i class="bi bi-exclamation-triangle-fill flex-shrink-0"></i>
+              <strong class="small">{{ error }}</strong>
             </div>
           }
 
-          <div class="p-3 bg-light bg-opacity-50 d-flex justify-content-between align-items-center border-top">
+          <!-- Footer Bar with Add Slot & Summary -->
+          <footer
+            class="schedule-footer d-flex justify-content-between align-items-center flex-wrap gap-2"
+          >
             <button
               type="button"
-              class="add-rule-action"
+              class="btn-add-rule"
               [disabled]="inlineControlsDisabled()"
               (click)="addRule()"
               [title]="translations().addTimeSlot"
@@ -359,10 +386,10 @@
               <i class="bi bi-plus-lg" aria-hidden="true"></i>
               <span>{{ translations().addTimeSlot }}</span>
             </button>
-            <small class="text-muted fw-semibold">
+            <span class="badge bg-light text-secondary border px-3 py-1.5 rounded-pill fw-semibold">
               {{ rules().length }} {{ language() === 'ar' ? 'فترات تشغيلية' : 'time slots' }}
-            </small>
-          </div>
+            </span>
+          </footer>
         </form>
       } @else {
         <section class="schedule-empty-placeholder-card mt-3">

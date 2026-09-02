@@ -1,182 +1,267 @@
-<div class="kiosk-customer-input-card">
-  <!-- HEADER -->
-  <div class="kiosk-customer-input-header mb-4 text-center">
-    <div class="kiosk-customer-input-icon-box mx-auto mb-2">
-      <i class="bi bi-person-lines-fill" aria-hidden="true"></i>
-    </div>
-    <h3 class="kiosk-customer-input-title m-0">
-      {{ translations().customerInputTitle }}
+<div class="kiosk-customer-input-shell" [attr.dir]="isRtl() ? 'rtl' : 'ltr'">
+  <!-- KIOSK HEADER -->
+  <div class="kiosk-input-header text-center mb-3">
+    <div class="kiosk-header-badge d-inline-flex align-items-center gap-2 mb-1">
+      <i
+        class="bi"
+        [class.bi-search]="mode() === 'search'"
+        [class.bi-person-lines-fill]="mode() !== 'search'"
+        aria-hidden="true"
+      ></i>
+      <span class="fw-bold fs-7">
+        {{
+          mode() === 'search'
+            ? translations().reservationSearchTitle
+            : translations().customerInputTitle
+        }}
+      </span>
       @if (serviceTitle()) {
-        <span class="d-block fs-6 text-primary mt-1 font-monospace">({{ serviceTitle() }})</span>
+        <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1">
+          {{ serviceTitle() }}
+        </span>
       }
-    </h3>
-    <p class="kiosk-customer-input-sub m-0 mt-1">
-      {{ translations().customerInputDescription }}
+    </div>
+    <p class="kiosk-header-hint m-0">
+      {{
+        mode() === 'search'
+          ? translations().reservationSearchDescription
+          : isRtl()
+            ? 'المس الحقل المطلوب ثم استخدم لوحة الأرقام لإدخال بياناتك'
+            : 'Touch the field and use the keypad to enter your details'
+      }}
     </p>
   </div>
 
-  <!-- DYNAMIC FORM -->
-  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="kiosk-customer-input-form d-grid gap-3 mb-4">
-    @for (inputItem of sortedInputs(); track inputItem.name) {
-      <div
-        class="kiosk-field-card p-3 rounded-3 border bg-white position-relative"
-        [class.has-error]="hasError(inputItem.name)"
-      >
-        <!-- FIELD LABEL & BADGES -->
-        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
-          <label [for]="'custom-input-' + inputItem.name" class="kiosk-field-label m-0 fw-bold fs-6 text-dark d-flex align-items-center gap-1">
-            <span>{{ getFieldLabel(inputItem) }}</span>
-            @if (inputItem.isRequired) {
-              <span class="text-danger">*</span>
-            }
-          </label>
+  @if (searchValidationError(); as searchErr) {
+    <div class="alert alert-warning d-flex align-items-center gap-2 py-2 mb-2 fs-7" role="alert">
+      <i class="bi bi-exclamation-triangle-fill flex-shrink-0"></i>
+      <div>{{ searchErr }}</div>
+    </div>
+  }
 
-          <div class="d-flex align-items-center gap-1">
-            @if (inputItem.isRequired) {
-              <span class="badge bg-danger-subtle text-danger border border-danger-subtle fs-8">
-                {{ translations().fieldRequired }}
-              </span>
-            }
-            <span
-              class="badge"
-              [class.bg-info-subtle]="inputItem.type === 'String'"
-              [class.text-info-emphasis]="inputItem.type === 'String'"
-              [class.bg-warning-subtle]="inputItem.type === 'Integer'"
-              [class.text-warning-emphasis]="inputItem.type === 'Integer'"
+  <!-- MAIN KIOSK WORKSPACE FORM -->
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="kiosk-input-workspace">
+      <!-- COL 1: INTERACTIVE FIELD CARDS -->
+      <div class="kiosk-fields-panel">
+        <div class="kiosk-fields-list d-flex flex-column gap-2">
+          @for (item of sortedInputs(); track item.name) {
+            <div
+              class="kiosk-field-card"
+              [class.active]="isFieldActive(item.name)"
+              [class.valid]="isFieldValid(item.name)"
+              [class.has-error]="hasError(item.name)"
+              (click)="setActiveField(item.name)"
+              role="button"
+              tabindex="0"
+              (keydown.enter)="setActiveField(item.name)"
             >
-              {{ inputItem.type === 'String' ? 'String' : 'Number' }}
-            </span>
-          </div>
-        </div>
+              <!-- CARD HEADER ROW -->
+              <div class="d-flex align-items-center justify-content-between gap-2 mb-1">
+                <div class="d-flex align-items-center gap-2">
+                  <span class="kiosk-field-icon">
+                    <i class="bi" [class]="getFieldIcon(item)" aria-hidden="true"></i>
+                  </span>
+                  <span class="kiosk-field-title fw-bold">
+                    {{ getFieldLabel(item) }}
+                    @if (item.isRequired && mode() !== 'search') {
+                      <span class="text-danger ms-1 me-1">*</span>
+                    }
+                  </span>
+                </div>
 
-        <!-- INPUT WRAPPER -->
-        <div class="kiosk-input-wrapper position-relative d-flex align-items-center">
-          @if (inputItem.type === 'String') {
-            <input
-              [id]="'custom-input-' + inputItem.name"
-              type="text"
-              class="kiosk-touch-input form-control form-control-lg"
-              [formControlName]="inputItem.name"
-              [placeholder]="getFieldLabel(inputItem)"
-              [attr.maxlength]="inputItem.maxLength ?? null"
-            />
-          } @else {
-            <input
-              [id]="'custom-input-' + inputItem.name"
-              type="number"
-              class="kiosk-touch-input form-control form-control-lg text-center"
-              [formControlName]="inputItem.name"
-              [placeholder]="getFieldLabel(inputItem)"
-              [attr.min]="inputItem.minValue ?? null"
-              [attr.max]="inputItem.maxValue ?? null"
-            />
+                <div class="d-flex align-items-center gap-1">
+                  @if (isFieldValid(item.name)) {
+                    <span class="kiosk-status-badge kiosk-status-badge--valid">
+                      <i class="bi bi-check-circle-fill"></i>
+                      <span>{{ isRtl() ? 'مكتمل' : 'Completed' }}</span>
+                    </span>
+                  } @else if (isFieldActive(item.name)) {
+                    <span class="kiosk-status-badge kiosk-status-badge--active">
+                      <span class="kiosk-pulse-dot"></span>
+                      <span>{{ isRtl() ? 'جاري الإدخال' : 'Active' }}</span>
+                    </span>
+                  } @else if (item.isRequired && mode() !== 'search') {
+                    <span class="kiosk-status-badge kiosk-status-badge--required">
+                      {{ isRtl() ? 'إلزامي' : 'Required' }}
+                    </span>
+                  }
+                </div>
+              </div>
+
+              <!-- FIELD DISPLAY BOX -->
+              <div class="kiosk-display-box position-relative" (click)="setActiveField(item.name)">
+                <input
+                  [id]="'custom-input-' + item.name"
+                  [type]="item.type === 'Integer' ? 'number' : 'text'"
+                  class="kiosk-touch-display-input"
+                  [formControlName]="item.name"
+                  [attr.maxlength]="item.maxLength ?? null"
+                  [placeholder]="getFieldLabel(item)"
+                  (focus)="setActiveField(item.name)"
+                  (input)="onFieldInput(item.name, $event)"
+                  dir="ltr"
+                />
+
+                @if (getFieldValue(item.name)) {
+                  <button
+                    type="button"
+                    class="kiosk-field-clear-btn"
+                    (click)="$event.stopPropagation(); clearField(item.name)"
+                    [attr.aria-label]="isRtl() ? 'مسح الحقل' : 'Clear field'"
+                  >
+                    <i class="bi bi-x-circle-fill"></i>
+                  </button>
+                }
+              </div>
+
+              <!-- HINTS & COUNTER FOOTER -->
+              <div
+                class="d-flex align-items-center justify-content-between flex-wrap gap-1 mt-1 fs-8"
+              >
+                <div class="kiosk-field-rules text-muted d-flex align-items-center gap-2">
+                  @if (item.startWith) {
+                    <span class="badge bg-light text-dark border">
+                      {{ translations().mustStartWith }} <strong>"{{ item.startWith }}"</strong>
+                    </span>
+                  }
+                  @if (item.minLength && item.minLength === item.maxLength) {
+                    <span class="badge bg-light text-dark border">
+                      {{ item.minLength }} {{ isRtl() ? 'أرقام مطلوبة' : 'digits required' }}
+                    </span>
+                  } @else if (item.minLength) {
+                    <span class="badge bg-light text-dark border">
+                      {{ translations().minLengthRequirement }} {{ item.minLength }}
+                    </span>
+                  }
+                </div>
+
+                @if (item.maxLength) {
+                  <div
+                    class="kiosk-char-counter fw-bold"
+                    [class.text-success]="getFieldValue(item.name).length === item.maxLength"
+                    [class.text-muted]="getFieldValue(item.name).length !== item.maxLength"
+                    dir="ltr"
+                  >
+                    {{ getFieldValue(item.name).length }} / {{ item.maxLength }}
+                  </div>
+                }
+              </div>
+
+              <!-- ERROR MESSAGES -->
+              @if (hasError(item.name, 'required')) {
+                <div class="kiosk-error-alert text-danger fs-8 mt-1">
+                  <i class="bi bi-exclamation-circle-fill me-1 ms-1"></i>
+                  {{ translations().fieldRequired }}
+                </div>
+              }
+              @if (hasError(item.name, 'minlength')) {
+                <div class="kiosk-error-alert text-danger fs-8 mt-1">
+                  <i class="bi bi-exclamation-circle-fill me-1 ms-1"></i>
+                  {{ translations().minLengthRequirement }} {{ item.minLength }}
+                </div>
+              }
+              @if (hasError(item.name, 'startWithMismatch')) {
+                <div class="kiosk-error-alert text-danger fs-8 mt-1">
+                  <i class="bi bi-exclamation-circle-fill me-1 ms-1"></i>
+                  {{ translations().mustStartWith }} "{{ item.startWith }}"
+                </div>
+              }
+              @if (hasError(item.name, 'integerOnly')) {
+                <div class="kiosk-error-alert text-danger fs-8 mt-1">
+                  <i class="bi bi-exclamation-circle-fill me-1 ms-1"></i>
+                  {{ translations().invalidNumber }}
+                </div>
+              }
+            </div>
           }
+        </div>
+      </div>
 
-          @if (getControl(inputItem.name)?.value) {
+      <!-- COL 2: ON-SCREEN TOUCH NUMERIC KEYPAD -->
+      <div class="kiosk-keypad-panel">
+        <div class="kiosk-keypad-card">
+          <!-- KEYPAD TARGET BAR -->
+          <div class="kiosk-target-bar mb-2 d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center gap-1">
+              <span class="kiosk-target-dot"></span>
+              <span class="kiosk-target-label fs-8 text-muted">
+                {{ isRtl() ? 'الحقل النشط:' : 'Active Field:' }}
+              </span>
+              <span class="kiosk-target-name fw-bold text-dark fs-7">
+                {{ activeField() ? getFieldLabel(activeField()!) : '' }}
+              </span>
+            </div>
+
+            @if (hasMultipleFields()) {
+              <div class="d-flex align-items-center gap-1">
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-secondary kiosk-nav-arrow-btn"
+                  [disabled]="isFirstFieldActive()"
+                  (click)="selectPrevField()"
+                  [title]="isRtl() ? 'الحقل السابق' : 'Previous field'"
+                >
+                  <i class="bi bi-chevron-up"></i>
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-secondary kiosk-nav-arrow-btn"
+                  [disabled]="isLastFieldActive()"
+                  (click)="selectNextField()"
+                  [title]="isRtl() ? 'الحقل التالي' : 'Next field'"
+                >
+                  <i class="bi bi-chevron-down"></i>
+                </button>
+              </div>
+            }
+          </div>
+
+          <!-- 3x4 TOUCH KEYPAD GRID -->
+          <div class="kiosk-keypad-grid" dir="ltr">
+            <button type="button" class="kiosk-key-btn" (click)="appendDigit('1')">1</button>
+            <button type="button" class="kiosk-key-btn" (click)="appendDigit('2')">2</button>
+            <button type="button" class="kiosk-key-btn" (click)="appendDigit('3')">3</button>
+
+            <button type="button" class="kiosk-key-btn" (click)="appendDigit('4')">4</button>
+            <button type="button" class="kiosk-key-btn" (click)="appendDigit('5')">5</button>
+            <button type="button" class="kiosk-key-btn" (click)="appendDigit('6')">6</button>
+
+            <button type="button" class="kiosk-key-btn" (click)="appendDigit('7')">7</button>
+            <button type="button" class="kiosk-key-btn" (click)="appendDigit('8')">8</button>
+            <button type="button" class="kiosk-key-btn" (click)="appendDigit('9')">9</button>
+
             <button
               type="button"
-              class="kiosk-input-clear-btn"
-              (click)="clearField(inputItem.name)"
-              [attr.aria-label]="isRtl() ? 'مسح' : 'Clear'"
+              class="kiosk-key-btn kiosk-key-btn--action"
+              (click)="clearActiveField()"
             >
-              <i class="bi bi-x-circle-fill" aria-hidden="true"></i>
+              <span>C</span>
             </button>
-          }
+            <button type="button" class="kiosk-key-btn" (click)="appendDigit('0')">0</button>
+            <button type="button" class="kiosk-key-btn kiosk-key-btn--action" (click)="backspace()">
+              <i class="bi bi-backspace-fill"></i>
+            </button>
+          </div>
         </div>
-
-        <!-- RESTRICTION HINTS -->
-        <div class="kiosk-field-hints d-flex flex-wrap align-items-center gap-2 mt-2">
-          @if (inputItem.type === 'String') {
-            @if (inputItem.minLength !== null && inputItem.minLength !== undefined && inputItem.minLength > 0) {
-              <span class="kiosk-hint-badge">
-                <i class="bi bi-arrow-right-short"></i>
-                {{ translations().minLengthRequirement }} {{ inputItem.minLength }}
-              </span>
-            }
-            @if (inputItem.maxLength !== null && inputItem.maxLength !== undefined && inputItem.maxLength > 0) {
-              <span class="kiosk-hint-badge">
-                <i class="bi bi-arrow-left-short"></i>
-                {{ translations().maxLengthRequirement }} {{ inputItem.maxLength }}
-              </span>
-            }
-            @if (inputItem.startWith) {
-              <span class="kiosk-hint-badge">
-                <i class="bi bi-quote"></i>
-                {{ translations().mustStartWith }} "{{ inputItem.startWith }}"
-              </span>
-            }
-          } @else {
-            @if (inputItem.minValue !== null && inputItem.minValue !== undefined) {
-              <span class="kiosk-hint-badge">
-                <i class="bi bi-chevron-bar-up"></i>
-                {{ translations().minValueRequirement }} {{ inputItem.minValue }}
-              </span>
-            }
-            @if (inputItem.maxValue !== null && inputItem.maxValue !== undefined) {
-              <span class="kiosk-hint-badge">
-                <i class="bi bi-chevron-bar-down"></i>
-                {{ translations().maxValueRequirement }} {{ inputItem.maxValue }}
-              </span>
-            }
-          }
-        </div>
-
-        <!-- ERROR MESSAGES -->
-        @if (hasError(inputItem.name, 'required')) {
-          <small class="kiosk-field-error text-danger fw-bold fs-7 mt-1 d-flex align-items-center gap-1">
-            <i class="bi bi-exclamation-triangle-fill"></i>
-            {{ translations().fieldRequired }}
-          </small>
-        }
-        @if (hasError(inputItem.name, 'minlength')) {
-          <small class="kiosk-field-error text-danger fw-bold fs-7 mt-1 d-flex align-items-center gap-1">
-            <i class="bi bi-exclamation-triangle-fill"></i>
-            {{ translations().minLengthRequirement }} {{ inputItem.minLength }}
-          </small>
-        }
-        @if (hasError(inputItem.name, 'maxlength')) {
-          <small class="kiosk-field-error text-danger fw-bold fs-7 mt-1 d-flex align-items-center gap-1">
-            <i class="bi bi-exclamation-triangle-fill"></i>
-            {{ translations().maxLengthRequirement }} {{ inputItem.maxLength }}
-          </small>
-        }
-        @if (hasError(inputItem.name, 'startWithMismatch')) {
-          <small class="kiosk-field-error text-danger fw-bold fs-7 mt-1 d-flex align-items-center gap-1">
-            <i class="bi bi-exclamation-triangle-fill"></i>
-            {{ translations().mustStartWith }} "{{ inputItem.startWith }}"
-          </small>
-        }
-        @if (hasError(inputItem.name, 'integerOnly')) {
-          <small class="kiosk-field-error text-danger fw-bold fs-7 mt-1 d-flex align-items-center gap-1">
-            <i class="bi bi-exclamation-triangle-fill"></i>
-            {{ translations().invalidNumber }}
-          </small>
-        }
-        @if (hasError(inputItem.name, 'min')) {
-          <small class="kiosk-field-error text-danger fw-bold fs-7 mt-1 d-flex align-items-center gap-1">
-            <i class="bi bi-exclamation-triangle-fill"></i>
-            {{ translations().minValueRequirement }} {{ inputItem.minValue }}
-          </small>
-        }
-        @if (hasError(inputItem.name, 'max')) {
-          <small class="kiosk-field-error text-danger fw-bold fs-7 mt-1 d-flex align-items-center gap-1">
-            <i class="bi bi-exclamation-triangle-fill"></i>
-            {{ translations().maxValueRequirement }} {{ inputItem.maxValue }}
-          </small>
-        }
       </div>
-    }
+    </div>
 
-    <!-- SUBMIT BUTTON -->
-    <div class="kiosk-customer-input-footer mt-3 text-center">
+    <!-- KIOSK CONFIRMATION ACTION BUTTON -->
+    <div class="kiosk-submit-container mt-3 text-center">
       <button
         type="submit"
-        class="kiosk-confirm-btn w-100 d-inline-flex align-items-center justify-content-center gap-2"
+        class="kiosk-submit-btn w-100 d-inline-flex align-items-center justify-content-center gap-2"
         [style.background-color]="store.keypadButton()?.backgroundColor || null"
         [style.color]="store.keypadButton()?.textColor || null"
       >
-        <i class="bi bi-check-circle-fill" aria-hidden="true"></i>
-        <span>{{ translations().confirmAndIssueTicket }}</span>
+        @if (mode() === 'search') {
+          <i class="bi bi-search" aria-hidden="true"></i>
+          <span>{{ translations().searchReservationBtn }}</span>
+        } @else {
+          <i class="bi bi-check-circle-fill" aria-hidden="true"></i>
+          <span>{{ translations().confirmAndIssueTicket }}</span>
+        }
       </button>
     </div>
   </form>

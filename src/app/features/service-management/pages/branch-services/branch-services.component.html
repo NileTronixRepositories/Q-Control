@@ -324,6 +324,7 @@
   <app-leaf-service-segments-drawer
     [open]="segmentsDrawerOpen()"
     [serviceTitle]="selectedSegmentLeafNode()?.arabicName || selectedSegmentLeafNode()?.englishName || ''"
+    [canIssueTicket]="selectedSegmentLeafNode()?.canIssueTicket ?? true"
     [responseData]="assignedSegmentsResponse()"
     [availableSegments]="availableSegmentsList()"
     [loading]="segmentsLoading()"
@@ -337,6 +338,7 @@
     [canUnassign]="segmentPermissionService.canUnassignSegment()"
     (closed)="closeServiceSegments()"
     (refresh)="selectedSegmentLeafNode() && loadAssignedSegments(store.selectedBranchId()!, selectedSegmentLeafNode()!.id)"
+    (retry)="selectedSegmentLeafNode() && loadAssignedSegments(store.selectedBranchId()!, selectedSegmentLeafNode()!.id)"
     (openAddAvailableModal)="loadAvailableSegments()"
     (assignSubmitted)="onAssignSegmentsSubmitted($event)"
     (quotaUpdated)="onUpdateSegmentQuota($event)"

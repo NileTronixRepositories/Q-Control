@@ -80,6 +80,32 @@ export interface ServiceRequestTranslations {
   readonly departmentStepBadge: string;
   readonly subSpecialtyStepBadge: string;
   readonly ticketIssuedStepBadge: string;
+  readonly chooseFlowTitle: string;
+  readonly chooseFlowDescription: string;
+  readonly haveReservationLabel: string;
+  readonly haveReservationDesc: string;
+  readonly newTicketLabel: string;
+  readonly newTicketDesc: string;
+  readonly chooseFlowStepBadge: string;
+  readonly reservationSearchTitle: string;
+  readonly reservationSearchDescription: string;
+  readonly searchReservationBtn: string;
+  readonly searchingReservationsTitle: string;
+  readonly searchingReservationsDescription: string;
+  readonly noReservationsFoundTitle: string;
+  readonly noReservationsFoundDescription: string;
+  readonly reservationsListTitle: string;
+  readonly reservationsListDescription: string;
+  readonly reservationIdLabel: string;
+  readonly reservationDateLabel: string;
+  readonly reservationTimeLabel: string;
+  readonly reservationStatusLabel: string;
+  readonly convertReservationBtn: string;
+  readonly convertingReservationTitle: string;
+  readonly convertingReservationDescription: string;
+  readonly atLeastOneInputRequired: string;
+  readonly editSearchLabel: string;
+  readonly directTicketFallbackLabel: string;
 }
 
 export const SERVICE_REQUEST_LANGUAGES: readonly ServiceRequestLanguage[] = [
@@ -169,6 +195,34 @@ export const SERVICE_REQUEST_TRANSLATIONS: Record<AppLanguage, ServiceRequestTra
     departmentStepBadge: 'الخطوة 2: اختيار القسم / العيادة',
     subSpecialtyStepBadge: 'الخطوة 3: التخصص الفرعي',
     ticketIssuedStepBadge: 'تم إصدار التذكرة بنجاح',
+    chooseFlowTitle: 'هل لديك حجز مسبق؟',
+    chooseFlowDescription:
+      'اختر إذا كان لديك موعد حجز مسجل مسبقاً أو ترغب في إصدار تذكرة فورية جديدة.',
+    haveReservationLabel: 'لدي حجز مسبق',
+    haveReservationDesc: 'البحث عن موعد مسجل مسبقاً وتحويله لتذكرة انتظار',
+    newTicketLabel: 'تذكرة جديدة',
+    newTicketDesc: 'إصدار تذكرة فورية مباشرة لقائمة الانتظار',
+    chooseFlowStepBadge: 'نوع الطلب',
+    reservationSearchTitle: 'البحث عن الحجز المسبق',
+    reservationSearchDescription: 'أدخل بيانات البحث المسجلة بالحجز (رقم الهاتف أو الرقم القومي)',
+    searchReservationBtn: 'بحث عن الحجز',
+    searchingReservationsTitle: 'جاري البحث عن الحجوزات...',
+    searchingReservationsDescription: 'يرجى الانتظار لحين جلب بيانات الحجز المطابقة.',
+    noReservationsFoundTitle: 'لم يتم العثور على أي حجز مطابق',
+    noReservationsFoundDescription:
+      'لم نتمكن من العثور على حجوزات مطابقة للبيانات المدخلة في هذه الخدمة.',
+    reservationsListTitle: 'قائمة الحجوزات المتاحة',
+    reservationsListDescription: 'يرجى اختيار الحجز المطلوب لإصدار تذكرة الانتظار الخاصة به.',
+    reservationIdLabel: 'رقم الحجز',
+    reservationDateLabel: 'تاريخ الحجز',
+    reservationTimeLabel: 'الوقت المحدد',
+    reservationStatusLabel: 'حالة الحجز',
+    convertReservationBtn: 'إصدار تذكرة للحجز المحدد',
+    convertingReservationTitle: 'جاري تحويل الحجز وإصدار التذكرة...',
+    convertingReservationDescription: 'يرجى الانتظار لحظات قليلة.',
+    atLeastOneInputRequired: 'يرجى إدخال بيان واحد على الأقل للبحث',
+    editSearchLabel: 'تعديل بيانات البحث وإعادة المحاولة',
+    directTicketFallbackLabel: 'إصدار تذكرة جديدة مباشرة بدون حجز',
   },
   en: {
     kioskTitle: 'Queue Ticket Service',
@@ -192,7 +246,8 @@ export const SERVICE_REQUEST_TRANSLATIONS: Record<AppLanguage, ServiceRequestTra
     loadingServicesTitle: 'Loading services catalog...',
     loadingServicesDescription: 'Please wait while kiosk data is initialized.',
     errorLoadingTitle: 'Connection Error',
-    errorLoadingDescription: 'An error occurred while loading services from the server. Please try again.',
+    errorLoadingDescription:
+      'An error occurred while loading services from the server. Please try again.',
     retryLabel: 'Retry',
     backLabel: 'Back',
     nextLabel: 'Next',
@@ -213,7 +268,8 @@ export const SERVICE_REQUEST_TRANSLATIONS: Record<AppLanguage, ServiceRequestTra
     counterHintLabel: 'Service area',
     stepCustomerInput: 'Customer Info',
     customerInputTitle: 'Service Details Input',
-    customerInputDescription: 'Please provide the required information below to continue and issue your ticket.',
+    customerInputDescription:
+      'Please provide the required information below to continue and issue your ticket.',
     footerCustomerInputPrompt: 'Enter the required details then press confirm',
     confirmAndIssueTicket: 'Confirm & Issue Ticket',
     fieldRequired: 'This field is required',
@@ -235,5 +291,33 @@ export const SERVICE_REQUEST_TRANSLATIONS: Record<AppLanguage, ServiceRequestTra
     departmentStepBadge: 'Step 2: Select Department',
     subSpecialtyStepBadge: 'Step 3: Sub Specialty',
     ticketIssuedStepBadge: 'Ticket Issued Successfully',
+    chooseFlowTitle: 'Do you have a prior reservation?',
+    chooseFlowDescription:
+      'Choose whether you have a pre-registered reservation or want a new instant ticket.',
+    haveReservationLabel: 'I have a reservation',
+    haveReservationDesc: 'Search for a pre-scheduled appointment and convert to a ticket',
+    newTicketLabel: 'New Ticket',
+    newTicketDesc: 'Issue an instant ticket directly for the waiting queue',
+    chooseFlowStepBadge: 'Flow Type',
+    reservationSearchTitle: 'Search Prior Reservation',
+    reservationSearchDescription: 'Enter your registered lookup details (Phone or National ID)',
+    searchReservationBtn: 'Search Reservation',
+    searchingReservationsTitle: 'Searching for reservations...',
+    searchingReservationsDescription: 'Please wait while matching reservations are retrieved.',
+    noReservationsFoundTitle: 'No matching reservations found',
+    noReservationsFoundDescription:
+      'We could not find any active reservations matching the provided details for this service.',
+    reservationsListTitle: 'Matching Reservations',
+    reservationsListDescription: 'Please select your reservation to convert into a queue ticket.',
+    reservationIdLabel: 'Reservation ID',
+    reservationDateLabel: 'Reservation Date',
+    reservationTimeLabel: 'Scheduled Time',
+    reservationStatusLabel: 'Status',
+    convertReservationBtn: 'Issue Ticket for Selected Reservation',
+    convertingReservationTitle: 'Converting reservation to queue ticket...',
+    convertingReservationDescription: 'Please wait a moment.',
+    atLeastOneInputRequired: 'Please enter at least one field to search',
+    editSearchLabel: 'Edit Search & Try Again',
+    directTicketFallbackLabel: 'Issue a New Direct Ticket Instead',
   },
 };

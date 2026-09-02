@@ -19,5 +19,5 @@ export interface QueueTicket {
   readonly issuedAtIso: string;
   readonly estimatedWaitingMinutes: number;
   readonly counterHint: LocalizedText;
-  readonly qrPayload: string;
+  readonly qrPayload?: string;
 }

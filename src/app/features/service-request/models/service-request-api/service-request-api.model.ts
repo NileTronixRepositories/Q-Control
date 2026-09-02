@@ -52,10 +52,15 @@ export interface BranchServiceNodeDto {
   readonly isTicketIssuable: boolean;
   readonly isClientInputRequired?: boolean;
   readonly customInputs?: readonly ServiceCustomInput[] | null;
+  readonly hasReservation?: boolean | null;
   readonly rangePrefix: string | null;
   readonly rangeStartNumber: number | null;
   readonly rangeEndNumber: number | null;
   readonly children: readonly BranchServiceNodeDto[];
+  readonly logoUrl?: string | null;
+  readonly iconUrl?: string | null;
+  readonly imageUrl?: string | null;
+  readonly imagePath?: string | null;
 }
 
 export interface TicketIssuableServicesResponse {

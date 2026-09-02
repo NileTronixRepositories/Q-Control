@@ -1,10 +1,19 @@
-import { ChangeDetectionStrategy, Component, OnDestroy, computed, inject, signal, effect } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  OnDestroy,
+  computed,
+  inject,
+  signal,
+  effect,
+} from '@angular/core';
 import { Subscription } from 'rxjs';
 
 import { ServiceRequestStep } from '../../enums/service-request-step.enum';
 import { ServiceType } from '../../models/service-type/service-type.model';
 import { Specialty } from '../../models/specialty/specialty.model';
 import { ServiceCustomInput } from '../../../service-management/models/service-management/service-management.model';
+import { KioskReservationSearchItemResponse } from '../../models/kiosk-api/kiosk-api.model';
 import { ServiceRequestStore } from '../../store/service-request.store';
 import { KioskFooterComponent } from '../../components/kiosk-footer/kiosk-footer.component';
 import { KioskHeaderComponent } from '../../components/kiosk-header/kiosk-header.component';
@@ -13,11 +22,14 @@ import { SpecialtyCardComponent } from '../../components/specialty-card/specialt
 import { TicketPreviewComponent } from '../../components/ticket-preview/ticket-preview.component';
 import { KeypadInputComponent } from '../../components/keypad-input/keypad-input.component';
 import { CustomerInputFormComponent } from '../../components/customer-input-form/customer-input-form.component';
+import { KioskFlowChoiceComponent } from '../../components/kiosk-flow-choice/kiosk-flow-choice.component';
+import { KioskReservationListComponent } from '../../components/kiosk-reservation-list/kiosk-reservation-list.component';
 import { SelectionCardViewModel } from '../../shared/selection-card-view.model';
 import { AppLanguage } from '../../../../shared/models/app-language/app-language.model';
 
 @Component({
   selector: 'app-service-request-home',
+  standalone: true,
   imports: [
     KioskHeaderComponent,
     ServiceCardComponent,
@@ -25,6 +37,8 @@ import { AppLanguage } from '../../../../shared/models/app-language/app-language
     TicketPreviewComponent,
     KeypadInputComponent,
     CustomerInputFormComponent,
+    KioskFlowChoiceComponent,
+    KioskReservationListComponent,
     KioskFooterComponent,
   ],
   templateUrl: './service-request-home.component.html',
@@ -36,15 +50,28 @@ export class ServiceRequestHomeComponent implements OnDestroy {
   protected readonly step = ServiceRequestStep;
 
   private ticketSubscription: Subscription | null = null;
+  private searchSubscription: Subscription | null = null;
+  private convertSubscription: Subscription | null = null;
   private autoRestartTimeoutId: ReturnType<typeof setTimeout> | null = null;
 
-  // Step 0 Language selection state & Keypad user input state & forward history tracking
+  // Step state tracking
   protected readonly isLanguageStepActive = signal<boolean>(false);
+  protected readonly isFlowChoiceStepActive = signal<boolean>(false);
+  protected readonly isReservationResultsStepActive = signal<boolean>(false);
+  protected readonly isReservationKeypadSearchActive = signal<boolean>(false);
   protected readonly isUserInputStepActive = signal<boolean>(false);
   protected readonly isCustomerInputStepActive = signal<boolean>(false);
+  protected readonly customerInputMode = signal<'create' | 'search'>('create');
+
   protected readonly activeCustomInputs = signal<readonly ServiceCustomInput[]>([]);
   protected readonly activeServiceTitle = signal<string>('');
+  protected readonly activeTargetNode = signal<ServiceType | Specialty | null>(null);
   protected readonly hasForwardSelection = signal<boolean>(false);
+
+  private cachedSearchParams: {
+    customInputs?: Record<string, string | number>;
+    field?: string;
+  } | null = null;
   private initializedLanguageStep = false;
 
   constructor() {
@@ -98,6 +125,21 @@ export class ServiceRequestHomeComponent implements OnDestroy {
       return this.store.translations().languageStepTitle;
     }
 
+    if (this.isFlowChoiceStepActive()) {
+      return this.store.translations().chooseFlowTitle;
+    }
+
+    if (this.isReservationResultsStepActive()) {
+      return this.store.translations().reservationsListTitle;
+    }
+
+    if (
+      this.isReservationKeypadSearchActive() ||
+      (this.isCustomerInputStepActive() && this.customerInputMode() === 'search')
+    ) {
+      return this.store.translations().reservationSearchTitle;
+    }
+
     if (this.isCustomerInputStepActive()) {
       return this.store.translations().customerInputTitle;
     }
@@ -136,6 +178,21 @@ export class ServiceRequestHomeComponent implements OnDestroy {
 
     if (this.isLanguageStepActive()) {
       return this.store.translations().languageStepDescription;
+    }
+
+    if (this.isFlowChoiceStepActive()) {
+      return this.store.translations().chooseFlowDescription;
+    }
+
+    if (this.isReservationResultsStepActive()) {
+      return this.store.translations().reservationsListDescription;
+    }
+
+    if (
+      this.isReservationKeypadSearchActive() ||
+      (this.isCustomerInputStepActive() && this.customerInputMode() === 'search')
+    ) {
+      return this.store.translations().reservationSearchDescription;
     }
 
     if (this.isCustomerInputStepActive()) {
@@ -180,6 +237,21 @@ export class ServiceRequestHomeComponent implements OnDestroy {
       return translations.languageLabel;
     }
 
+    if (this.isFlowChoiceStepActive()) {
+      return translations.chooseFlowTitle;
+    }
+
+    if (this.isReservationResultsStepActive()) {
+      return translations.reservationsListDescription;
+    }
+
+    if (
+      this.isReservationKeypadSearchActive() ||
+      (this.isCustomerInputStepActive() && this.customerInputMode() === 'search')
+    ) {
+      return translations.reservationSearchDescription;
+    }
+
     if (this.isCustomerInputStepActive()) {
       return translations.footerCustomerInputPrompt;
     }
@@ -202,7 +274,7 @@ export class ServiceRequestHomeComponent implements OnDestroy {
   });
 
   protected readonly canGoBack = computed(() => {
-    if (this.store.loadingTicket()) {
+    if (this.store.loadingTicket() || this.store.searchingReservations()) {
       return false;
     }
 
@@ -210,7 +282,13 @@ export class ServiceRequestHomeComponent implements OnDestroy {
       return false;
     }
 
-    if (this.isCustomerInputStepActive() || this.isUserInputStepActive()) {
+    if (
+      this.isFlowChoiceStepActive() ||
+      this.isCustomerInputStepActive() ||
+      this.isUserInputStepActive() ||
+      this.isReservationKeypadSearchActive() ||
+      this.isReservationResultsStepActive()
+    ) {
       return true;
     }
 
@@ -222,7 +300,7 @@ export class ServiceRequestHomeComponent implements OnDestroy {
   });
 
   protected readonly canGoForward = computed(() => {
-    if (this.store.loadingTicket()) {
+    if (this.store.loadingTicket() || this.store.searchingReservations()) {
       return false;
     }
 
@@ -236,6 +314,10 @@ export class ServiceRequestHomeComponent implements OnDestroy {
   protected readonly currentStepBadgeText = computed(() => {
     if (this.isLanguageStepActive()) {
       return this.store.translations().languageStepBadge;
+    }
+
+    if (this.isFlowChoiceStepActive()) {
+      return this.store.translations().chooseFlowStepBadge;
     }
 
     if (this.isCustomerInputStepActive()) {
@@ -260,34 +342,8 @@ export class ServiceRequestHomeComponent implements OnDestroy {
     }
   });
 
-  protected readonly currentStepCounterText = computed(() => {
-    const showLang = this.store.behavior()?.showLanguagePage === true;
-    const total = showLang ? 4 : 3;
-
-    if (this.isLanguageStepActive()) {
-      return `1 / ${total}`;
-    }
-
-    if (this.isUserInputStepActive()) {
-      return `* / ${total}`;
-    }
-
-    switch (this.store.currentStep()) {
-      case ServiceRequestStep.ServiceType:
-        return showLang ? `2 / ${total}` : `1 / ${total}`;
-      case ServiceRequestStep.Specialty:
-        return showLang ? `3 / ${total}` : `2 / ${total}`;
-      case ServiceRequestStep.SubSpecialty:
-        return showLang ? `4 / ${total}` : `3 / ${total}`;
-      case ServiceRequestStep.Ticket:
-        return '✓';
-      default:
-        return showLang ? `2 / ${total}` : `1 / ${total}`;
-    }
-  });
-
   ngOnDestroy(): void {
-    this.cancelTicketGeneration();
+    this.cancelAllOperations();
   }
 
   protected selectLanguageStep(lang: AppLanguage): void {
@@ -299,7 +355,7 @@ export class ServiceRequestHomeComponent implements OnDestroy {
     const serviceType = this.store.serviceTypes().find((item) => item.id === serviceTypeId);
 
     if (serviceType) {
-      this.cancelTicketGeneration();
+      this.cancelAllOperations();
       this.hasForwardSelection.set(false);
       this.store.selectServiceType(serviceType);
 
@@ -338,41 +394,168 @@ export class ServiceRequestHomeComponent implements OnDestroy {
     }
   }
 
-  protected onUserInputConfirmed(_userInput: string): void {
-    this.isUserInputStepActive.set(false);
-    this.generateTicket();
-  }
-
-  protected onCustomerInputConfirmed(_userInput: Record<string, string | number>): void {
-    this.isCustomerInputStepActive.set(false);
-    this.generateTicket();
-  }
-
   private handleTicketIssuanceTrigger(targetNode: ServiceType | Specialty): void {
-    if (targetNode.isClientInputRequired && targetNode.customInputs && targetNode.customInputs.length > 0) {
-      this.activeCustomInputs.set(targetNode.customInputs);
-      this.activeServiceTitle.set(this.store.resolveText(targetNode.name));
-      this.isCustomerInputStepActive.set(true);
+    this.activeTargetNode.set(targetNode);
+    this.activeCustomInputs.set(targetNode.customInputs ?? []);
+    this.activeServiceTitle.set(this.store.resolveText(targetNode.name));
+    if (targetNode.hasReservation === false) {
+      this.onFlowChoiceSelected('direct');
       return;
     }
+    this.isFlowChoiceStepActive.set(true);
+  }
 
-    if (this.store.behavior()?.alwaysRequireUserInput === true) {
-      this.isUserInputStepActive.set(true);
-    } else {
-      this.generateTicket();
+  protected onFlowChoiceSelected(choice: 'reservation' | 'direct'): void {
+    this.store.setFlowChoice(choice);
+    this.isFlowChoiceStepActive.set(false);
+
+    const targetNode = this.activeTargetNode();
+    if (!targetNode) return;
+
+    if (choice === 'direct') {
+      if (
+        targetNode.isClientInputRequired &&
+        targetNode.customInputs &&
+        targetNode.customInputs.length > 0
+      ) {
+        this.customerInputMode.set('create');
+        this.isCustomerInputStepActive.set(true);
+        return;
+      }
+
+      if (this.store.behavior()?.alwaysRequireUserInput === true) {
+        this.isUserInputStepActive.set(true);
+      } else {
+        this.generateTicket();
+      }
+    } else if (choice === 'reservation') {
+      if (targetNode.customInputs && targetNode.customInputs.length > 0) {
+        this.customerInputMode.set('search');
+        this.isCustomerInputStepActive.set(true);
+      } else {
+        this.isReservationKeypadSearchActive.set(true);
+      }
     }
+  }
+
+  protected onUserInputConfirmed(userInput: string): void {
+    this.isUserInputStepActive.set(false);
+    this.generateTicket(undefined, userInput);
+  }
+
+  protected onCustomerInputConfirmed(userInput: Record<string, string | number>): void {
+    if (this.customerInputMode() === 'search') {
+      this.cachedSearchParams = { customInputs: userInput };
+      this.executeReservationSearch(userInput, undefined);
+    } else {
+      this.isCustomerInputStepActive.set(false);
+      this.generateTicket(userInput, undefined);
+    }
+  }
+
+  protected onReservationKeypadConfirmed(keypadInput: string): void {
+    this.cachedSearchParams = { field: keypadInput };
+    this.executeReservationSearch(undefined, keypadInput);
+  }
+
+  private executeReservationSearch(
+    customInputs?: Record<string, string | number>,
+    field?: string,
+  ): void {
+    if (this.searchSubscription) {
+      this.searchSubscription.unsubscribe();
+    }
+
+    const searchReq = this.store.searchReservations(customInputs, field);
+    if (searchReq) {
+      this.searchSubscription = searchReq.subscribe({
+        next: () => {
+          this.isCustomerInputStepActive.set(false);
+          this.isReservationKeypadSearchActive.set(false);
+          this.isReservationResultsStepActive.set(true);
+        },
+        error: () => {
+          this.isCustomerInputStepActive.set(false);
+          this.isReservationKeypadSearchActive.set(false);
+          this.isReservationResultsStepActive.set(true);
+        },
+      });
+    }
+  }
+
+  protected onReservationSelected(reservation: KioskReservationSearchItemResponse): void {
+    if (this.convertSubscription) {
+      this.convertSubscription.unsubscribe();
+    }
+
+    const convertReq = this.store.convertReservationToTicket(reservation);
+    if (convertReq) {
+      this.convertSubscription = convertReq.subscribe({
+        next: (ticket) => {
+          if (ticket) {
+            this.isReservationResultsStepActive.set(false);
+            this.autoRestartTimeoutId = setTimeout(() => {
+              this.restart();
+            }, 5000);
+          }
+        },
+      });
+    }
+  }
+
+  protected onEditReservationSearch(): void {
+    this.isReservationResultsStepActive.set(false);
+    if (this.activeCustomInputs().length > 0) {
+      this.customerInputMode.set('search');
+      this.isCustomerInputStepActive.set(true);
+    } else {
+      this.isReservationKeypadSearchActive.set(true);
+    }
+  }
+
+  protected onDirectTicketFallback(): void {
+    this.isReservationResultsStepActive.set(false);
+    this.onFlowChoiceSelected('direct');
+  }
+
+  protected onRetryReservationSearch(): void {
+    this.executeReservationSearch(
+      this.cachedSearchParams?.customInputs,
+      this.cachedSearchParams?.field,
+    );
   }
 
   protected goBack(): void {
-    this.cancelTicketGeneration();
+    this.cancelAllOperations();
+
+    if (this.isReservationResultsStepActive()) {
+      this.onEditReservationSearch();
+      return;
+    }
+
+    if (this.isReservationKeypadSearchActive()) {
+      this.isReservationKeypadSearchActive.set(false);
+      this.isFlowChoiceStepActive.set(true);
+      return;
+    }
 
     if (this.isCustomerInputStepActive()) {
       this.isCustomerInputStepActive.set(false);
+      this.isFlowChoiceStepActive.set(true);
       return;
     }
 
     if (this.isUserInputStepActive()) {
       this.isUserInputStepActive.set(false);
+      this.isFlowChoiceStepActive.set(true);
+      return;
+    }
+
+    if (this.isFlowChoiceStepActive()) {
+      this.isFlowChoiceStepActive.set(false);
+      this.store.setFlowChoice(null);
+      this.hasForwardSelection.set(true);
+      this.store.goBack();
       return;
     }
 
@@ -400,12 +583,18 @@ export class ServiceRequestHomeComponent implements OnDestroy {
   }
 
   protected restart(): void {
-    this.cancelTicketGeneration();
+    this.cancelAllOperations();
     this.isLanguageStepActive.set(false);
+    this.isFlowChoiceStepActive.set(false);
+    this.isReservationResultsStepActive.set(false);
+    this.isReservationKeypadSearchActive.set(false);
     this.isUserInputStepActive.set(false);
     this.isCustomerInputStepActive.set(false);
+    this.customerInputMode.set('create');
     this.activeCustomInputs.set([]);
     this.activeServiceTitle.set('');
+    this.activeTargetNode.set(null);
+    this.cachedSearchParams = null;
     this.hasForwardSelection.set(false);
     this.store.restart();
   }
@@ -414,10 +603,13 @@ export class ServiceRequestHomeComponent implements OnDestroy {
     this.store.loadServices();
   }
 
-  private generateTicket(): void {
-    this.cancelTicketGeneration();
+  private generateTicket(
+    customInputData?: Record<string, string | number>,
+    fieldData?: string,
+  ): void {
+    this.cancelAllOperations();
 
-    const ticketRequest = this.store.generateTicket();
+    const ticketRequest = this.store.generateTicket(customInputData, fieldData);
 
     if (ticketRequest) {
       this.ticketSubscription = ticketRequest.subscribe({
@@ -432,10 +624,18 @@ export class ServiceRequestHomeComponent implements OnDestroy {
     }
   }
 
-  private cancelTicketGeneration(): void {
+  private cancelAllOperations(): void {
     if (this.ticketSubscription) {
       this.ticketSubscription.unsubscribe();
       this.ticketSubscription = null;
+    }
+    if (this.searchSubscription) {
+      this.searchSubscription.unsubscribe();
+      this.searchSubscription = null;
+    }
+    if (this.convertSubscription) {
+      this.convertSubscription.unsubscribe();
+      this.convertSubscription = null;
     }
     if (this.autoRestartTimeoutId !== null) {
       clearTimeout(this.autoRestartTimeoutId);
@@ -451,6 +651,7 @@ export class ServiceRequestHomeComponent implements OnDestroy {
       icon: serviceType.icon,
       tone: serviceType.tone,
       meta: this.createWaitingMeta(serviceType.estimatedWaitingMinutes),
+      imageUrl: serviceType.imageUrl,
     };
   }
 
@@ -462,6 +663,7 @@ export class ServiceRequestHomeComponent implements OnDestroy {
       icon: specialty.icon,
       tone: specialty.tone,
       meta: this.createWaitingMeta(specialty.estimatedWaitingMinutes),
+      imageUrl: specialty.imageUrl,
     };
   }
 

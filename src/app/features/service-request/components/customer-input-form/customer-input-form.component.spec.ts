@@ -104,6 +104,19 @@ describe('CustomerInputFormComponent', () => {
     expect(ageControl.valid).toBe(true);
   });
 
+  it('should handle on-screen touch keypad interactions', () => {
+    component.setActiveField('NationalId');
+    component.appendDigit('2');
+    component.appendDigit('9');
+    expect(component.getFieldValue('NationalId')).toBe('29');
+
+    component.backspace();
+    expect(component.getFieldValue('NationalId')).toBe('2');
+
+    component.clearActiveField();
+    expect(component.getFieldValue('NationalId')).toBe('');
+  });
+
   it('should emit confirmed event with properly typed values when valid', () => {
     const emitSpy = vi.fn();
     component.confirmed.subscribe(emitSpy);

@@ -8,12 +8,18 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  AbstractControl,
+  NonNullableFormBuilder,
+  ReactiveFormsModule,
+  ValidationErrors,
+  Validators,
+} from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { NiletronixLoadingStateComponent } from '../../../../shared/components/niletronix-loading-state/niletronix-loading-state.component';
 import { PageHeroComponent } from '../../../../shared/components/page-hero/page-hero.component';
-import { AuthSessionService } from '../../../auth/services/auth-session/auth-session.service';
+import { AuthSessionService } from '@core';
 import { BranchListItem } from '@features/branch-management/models/branch-management/branch-management.model';
 import { BranchConfigurationResponse } from '@features/branch-management/models/branch-configuration/branch-configuration.model';
 import { BranchManagementApiService } from '@features/branch-management/services/branch-management-api/branch-management-api.service';
@@ -66,13 +72,70 @@ export class BranchConfigurationComponent implements OnInit, OnDestroy {
   private messageTimeoutId: ReturnType<typeof setTimeout> | null = null;
 
   readonly configForm = this.formBuilder.group({
-    hours: [0, [Validators.required, Validators.min(0), Validators.max(23)]],
-    minutes: [0, [Validators.required, Validators.min(0), Validators.max(59)]],
-    seconds: [0, [Validators.required, Validators.min(0), Validators.max(59)]],
+    hours: [0, [Validators.required, Validators.min(0), Validators.max(23), this.integerValidator]],
+    minutes: [0, [Validators.required, Validators.min(0), Validators.max(59), this.integerValidator]],
+    seconds: [0, [Validators.required, Validators.min(0), Validators.max(59), this.integerValidator]],
+    maximumTicketCallAttempts: [3, [Validators.required, Validators.min(1), this.positiveIntegerValidator]],
+    ticketNoShowAutoCancellationMinutes: [30, [Validators.required, Validators.min(1), this.positiveIntegerValidator]],
+    ticketArchiveRetentionDays: [30, [Validators.required, Validators.min(1), this.positiveIntegerValidator]],
   });
 
   readonly isConfigured = computed(() => this.configuration()?.isConfigured ?? false);
   readonly rowVersion = computed(() => this.configuration()?.rowVersion ?? null);
+
+  readonly ticketLabels = computed(() =>
+    this.language() === 'ar'
+      ? {
+          generalSectionTitle: 'إعدادات أوقات الظهور (General Configuration)',
+          generalSectionHelp: 'تحديد مهلة ظهور الخدمات على شاشات التذاكر قبل موعدها الرسمي.',
+          title: 'إعدادات التذاكر (Ticket Runtime Configuration)',
+          description:
+            'يتم فرض حدود وقت التشغيل ومحاولات النداء والإلغاء التلقائي والأرشفة بواسطة الخادم الخلفي.',
+          callAttempts: 'الحد الأقصى لمحاولات نداء التذكرة',
+          callAttemptsHelp:
+            'عدد محاولات نداء التذكرة المسموح بها قبل انتقالها إلى حالة عدم الحضور (No-Show).',
+          noShowCancellation: 'مدة الإلغاء التلقائي لتذاكر عدم الحضور',
+          noShowCancellationHelp:
+            'عدد الدقائق التي تظل فيها التذكرة بحالة عدم الحضور قبل إلغائها تلقائياً.',
+          archiveRetention: 'مدة الاحتفاظ بالتذاكر قبل الأرشفة',
+          archiveRetentionHelp:
+            'عدد الأيام التي تظل فيها التذاكر المنتهية في التخزين التشغيلي قبل نقلها إلى الأرشيف.',
+          attemptsUnit: 'محاولة',
+          minutes: 'دقيقة',
+          days: 'يوم',
+          positiveIntegerError: 'يجب إدخال قيم عددية صحيحة موجبة أكبر من الصفر.',
+          timeError: 'يُرجى إدخال قيم صحيحة للوقت (الساعات من 0 إلى 23، والدقائق والثواني من 0 إلى 59).',
+          runtimeSummaryTitle: 'محددات دورة حياة التذاكر',
+          callAttemptsSummary: 'الحد الأقصى للنداء',
+          noShowSummary: 'إلغاء عدم الحضور',
+          retentionSummary: 'النقل للأرشيف بعد',
+        }
+      : {
+          generalSectionTitle: 'General Configuration',
+          generalSectionHelp: 'Defines how early services appear on ticket issuance screens before start.',
+          title: 'Ticket Configuration',
+          description:
+            'Runtime call attempts, no-show auto-cancellation, and archive retention thresholds enforced by backend.',
+          callAttempts: 'Maximum Ticket Call Attempts',
+          callAttemptsHelp:
+            'Maximum call attempts permitted before ticket transitions to No-Show.',
+          noShowCancellation: 'No-Show Auto Cancellation Time',
+          noShowCancellationHelp:
+            'Minutes a No-Show ticket remains before automatic cancellation by the backend.',
+          archiveRetention: 'Ticket Archive Retention',
+          archiveRetentionHelp:
+            'Days completed or cancelled tickets stay in operational storage before archiving.',
+          attemptsUnit: 'Count',
+          minutes: 'Minutes',
+          days: 'Days',
+          positiveIntegerError: 'Values must be positive integers greater than zero.',
+          timeError: 'Please enter valid time values (Hours: 0-23, Minutes & Seconds: 0-59).',
+          runtimeSummaryTitle: 'Ticket Runtime Overview',
+          callAttemptsSummary: 'Max Call Attempts',
+          noShowSummary: 'Auto Cancellation',
+          retentionSummary: 'Archive After',
+        },
+  );
 
   readonly canModify = computed(() => {
     if (this.isConfigured()) {
@@ -113,12 +176,28 @@ export class BranchConfigurationComponent implements OnInit, OnDestroy {
 
   save(): void {
     const branchId = this.selectedBranchId();
-    if (!branchId || !this.canModify() || this.saving() || this.configForm.invalid) {
+    if (!branchId || !this.canModify() || this.saving()) {
       return;
     }
 
-    const { hours, minutes, seconds } = this.configForm.getRawValue();
-    const allowedTime = this.formatTime(hours, minutes, seconds);
+    if (this.configForm.invalid) {
+      this.configForm.markAllAsTouched();
+      return;
+    }
+
+    const {
+      hours,
+      minutes,
+      seconds,
+      maximumTicketCallAttempts,
+      ticketNoShowAutoCancellationMinutes,
+      ticketArchiveRetentionDays,
+    } = this.configForm.getRawValue();
+
+    const allowedTime = this.formatTime(Number(hours), Number(minutes), Number(seconds));
+    const callAttempts = Number(maximumTicketCallAttempts);
+    const noShowMinutes = Number(ticketNoShowAutoCancellationMinutes);
+    const retentionDays = Number(ticketArchiveRetentionDays);
 
     this.saving.set(true);
     this.clearMessage();
@@ -126,10 +205,24 @@ export class BranchConfigurationComponent implements OnInit, OnDestroy {
     const request$ = this.isConfigured()
       ? this.branchConfigurationApiService.updateBranchConfiguration(branchId, {
           allowedTime,
+          maximumTicketCallAttempts: callAttempts,
+          maxCallAttempts: callAttempts,
+          ticketNoShowAutoCancellationMinutes: noShowMinutes,
+          noShowAutoCancellationMinutes: noShowMinutes,
+          noShowReturnStatus: 'Waiting',
+          ticketArchiveRetentionDays: retentionDays,
+          ticketHistoricalUsageHours: retentionDays * 24,
           rowVersion: this.rowVersion() ?? '',
         })
       : this.branchConfigurationApiService.createBranchConfiguration(branchId, {
           allowedTime,
+          maximumTicketCallAttempts: callAttempts,
+          maxCallAttempts: callAttempts,
+          ticketNoShowAutoCancellationMinutes: noShowMinutes,
+          noShowAutoCancellationMinutes: noShowMinutes,
+          noShowReturnStatus: 'Waiting',
+          ticketArchiveRetentionDays: retentionDays,
+          ticketHistoricalUsageHours: retentionDays * 24,
         });
 
     request$.subscribe({
@@ -167,7 +260,11 @@ export class BranchConfigurationComponent implements OnInit, OnDestroy {
     if (session?.branches && session.branches.length > 0) {
       const match = session.branches.find((b) => b.branchId === branchId);
       if (match) {
-        return (this.language() === 'ar' ? match.arabicName : match.englishName) || match.arabicName || match.englishName;
+        return (
+          (this.language() === 'ar' ? match.arabicName : match.englishName) ||
+          match.arabicName ||
+          match.englishName
+        );
       }
     }
     return branchId ? `فرع ${branchId}` : '';
@@ -175,13 +272,17 @@ export class BranchConfigurationComponent implements OnInit, OnDestroy {
 
   private loadBranches(): void {
     const currentSession = this.authSessionService.currentSession();
-    const activeBranchId = currentSession?.activeBranchId ? Number(currentSession.activeBranchId) : null;
+    const activeBranchId = currentSession?.activeBranchId
+      ? Number(currentSession.activeBranchId)
+      : null;
     const isTechAdmin = currentSession?.userType === 'TechnicalAdmin';
 
     if (!isTechAdmin && activeBranchId) {
       const branch = currentSession?.branches?.find((b) => b.branchId === activeBranchId);
       const branchName = branch
-        ? (this.language() === 'ar' ? branch.arabicName : branch.englishName) || branch.arabicName || branch.englishName
+        ? (this.language() === 'ar' ? branch.arabicName : branch.englishName) ||
+          branch.arabicName ||
+          branch.englishName
         : `فرع ${activeBranchId}`;
       const branchOption: BranchOption = { id: activeBranchId, label: branchName };
       this.branches.set([branchOption]);
@@ -210,7 +311,10 @@ export class BranchConfigurationComponent implements OnInit, OnDestroy {
         error: (error: HttpErrorResponse) => {
           this.branchesLoading.set(false);
           if (activeBranchId) {
-            const branchOption: BranchOption = { id: activeBranchId, label: `فرع ${activeBranchId}` };
+            const branchOption: BranchOption = {
+              id: activeBranchId,
+              label: `فرع ${activeBranchId}`,
+            };
             this.branches.set([branchOption]);
             this.selectedBranchId.set(activeBranchId);
             this.loadConfiguration(activeBranchId);
@@ -263,7 +367,38 @@ export class BranchConfigurationComponent implements OnInit, OnDestroy {
   private applyConfiguration(response: BranchConfigurationResponse): void {
     this.configuration.set(response);
     const { hours, minutes, seconds } = this.parseTime(response.allowedTime || '00:00:00');
-    this.configForm.reset({ hours, minutes, seconds });
+
+    const rawAttempts =
+      response.maximumTicketCallAttempts ??
+      response.maxCallAttempts ??
+      (response as any).MaximumTicketCallAttempts ??
+      (response as any).MaxCallAttempts;
+    const callAttempts = rawAttempts !== undefined && rawAttempts !== null ? Number(rawAttempts) : 3;
+
+    const rawNoShow =
+      response.ticketNoShowAutoCancellationMinutes ??
+      response.noShowAutoCancellationMinutes ??
+      (response as any).TicketNoShowAutoCancellationMinutes ??
+      (response as any).NoShowAutoCancellationMinutes;
+    const noShowMinutes = rawNoShow !== undefined && rawNoShow !== null ? Number(rawNoShow) : 30;
+
+    const rawRetention =
+      response.ticketArchiveRetentionDays ??
+      (response.ticketHistoricalUsageHours ? Math.round(response.ticketHistoricalUsageHours / 24) : undefined) ??
+      (response as any).TicketArchiveRetentionDays ??
+      ((response as any).TicketHistoricalUsageHours
+        ? Math.round((response as any).TicketHistoricalUsageHours / 24)
+        : undefined);
+    const retentionDays = rawRetention !== undefined && rawRetention !== null ? Number(rawRetention) : 30;
+
+    this.configForm.reset({
+      hours,
+      minutes,
+      seconds,
+      maximumTicketCallAttempts: !isNaN(callAttempts) && callAttempts > 0 ? callAttempts : 3,
+      ticketNoShowAutoCancellationMinutes: !isNaN(noShowMinutes) && noShowMinutes > 0 ? noShowMinutes : 30,
+      ticketArchiveRetentionDays: !isNaN(retentionDays) && retentionDays > 0 ? retentionDays : 30,
+    });
   }
 
   private formatTime(hours: number, minutes: number, seconds: number): string {
@@ -278,6 +413,30 @@ export class BranchConfigurationComponent implements OnInit, OnDestroy {
       minutes: Math.min(59, Math.max(0, parts[1] ?? 0)),
       seconds: Math.min(59, Math.max(0, parts[2] ?? 0)),
     };
+  }
+
+  private positiveIntegerValidator(control: AbstractControl): ValidationErrors | null {
+    const val = control.value;
+    if (val === null || val === undefined || val === '') {
+      return { required: true };
+    }
+    const num = Number(val);
+    if (!Number.isInteger(num) || num <= 0) {
+      return { positiveInteger: true };
+    }
+    return null;
+  }
+
+  private integerValidator(control: AbstractControl): ValidationErrors | null {
+    const val = control.value;
+    if (val === null || val === undefined || val === '') {
+      return { required: true };
+    }
+    const num = Number(val);
+    if (!Number.isInteger(num) || num < 0) {
+      return { integer: true };
+    }
+    return null;
   }
 
   private handleApiError(error: HttpErrorResponse, currentBranchId: number | null): void {

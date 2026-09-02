@@ -4,8 +4,7 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 import { describe, expect, it, beforeEach, afterEach } from 'vitest';
 
 import { environment } from '../../../../../environments/environment';
-import { AppLanguageStore } from '../../../../shared/store/app-language.store';
-import { AuthSessionService } from '../../../auth/services/auth-session/auth-session.service';
+import { AppLanguageStore, AuthSessionService } from '@core';
 import { BranchConfigurationApiService } from '@features/branch-management/services/branch-configuration-api/branch-configuration-api.service';
 import {
   BranchConfigurationResponse,
@@ -62,6 +61,9 @@ describe('BranchConfigurationApiService', () => {
     const mockResponse: BranchConfigurationResponse = {
       branchId: 1,
       allowedTime: '00:30:00',
+      maximumTicketCallAttempts: 5,
+      ticketNoShowAutoCancellationMinutes: 30,
+      ticketArchiveRetentionDays: 30,
       isConfigured: true,
       rowVersion: 'AAAAAAAAB9E=',
       message: null,
@@ -81,10 +83,18 @@ describe('BranchConfigurationApiService', () => {
   });
 
   it('should call POST /api/branches/{branchId}/configuration when creating configuration', () => {
-    const payload: CreateBranchConfigurationRequest = { allowedTime: '00:30:00' };
+    const payload: CreateBranchConfigurationRequest = {
+      allowedTime: '00:30:00',
+      maximumTicketCallAttempts: 5,
+      ticketNoShowAutoCancellationMinutes: 30,
+      ticketArchiveRetentionDays: 30,
+    };
     const mockResponse: BranchConfigurationResponse = {
       branchId: 1,
       allowedTime: '00:30:00',
+      maximumTicketCallAttempts: 5,
+      ticketNoShowAutoCancellationMinutes: 30,
+      ticketArchiveRetentionDays: 30,
       isConfigured: true,
       rowVersion: 'AAAAAAAAB9E=',
       message: 'Created successfully.',
@@ -105,11 +115,17 @@ describe('BranchConfigurationApiService', () => {
   it('should call PUT /api/branches/{branchId}/configuration with rowVersion in request body when updating', () => {
     const payload: UpdateBranchConfigurationRequest = {
       allowedTime: '00:45:00',
+      maximumTicketCallAttempts: 6,
+      ticketNoShowAutoCancellationMinutes: 45,
+      ticketArchiveRetentionDays: 60,
       rowVersion: 'AAAAAAAAB9E=',
     };
     const mockResponse: BranchConfigurationResponse = {
       branchId: 1,
       allowedTime: '00:45:00',
+      maximumTicketCallAttempts: 6,
+      ticketNoShowAutoCancellationMinutes: 45,
+      ticketArchiveRetentionDays: 60,
       isConfigured: true,
       rowVersion: 'AAAAAAAAB9F=',
       message: 'Updated successfully.',

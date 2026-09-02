@@ -14,6 +14,14 @@
   box-shadow: var(--q-shadow-subtle);
 }
 
+:is(.list-panel, .content-panel, .settings-panel, .form-panel, .card, .tab-pane)
+  :is(.craft-table-wrap, .table-wrap, .table-responsive) {
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
 .craft-table,
 .table {
   width: 100%;

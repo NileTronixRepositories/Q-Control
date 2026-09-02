@@ -3,10 +3,10 @@
 }
 
 .service-schedule-page {
-  padding-bottom: 16px;
+  padding-bottom: 24px;
 }
 
-/* Compact */
+/* ── Compact Filter Toolbar (Hero Filter) */
 .schedule-compact-filters {
   margin-top: 0.5rem;
   padding-top: 0.5rem;
@@ -20,25 +20,25 @@
 
 .compact-filter-field .compact-label {
   font-size: 0.75rem;
-  font-weight: 750;
+  font-weight: 700;
   color: var(--q-text-secondary, #64748b);
   padding-inline-start: 0.5rem;
   transition: color 0.2s ease;
 }
 
 .compact-filter-field:focus-within .compact-label {
-  color: var(--q-primary, #0f7da8);
+  color: var(--q-primary, #0b8aa8);
 }
 
 .custom-compact-select {
   min-height: 38px;
   border-radius: 10px;
   border: 1px solid rgba(226, 232, 240, 0.8);
-  background-color: rgba(255, 255, 255, 0.75);
+  background-color: rgba(255, 255, 255, 0.85);
   font-size: 0.85rem;
-  font-weight: 650;
-  color: var(--q-text-primary, #334155);
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  font-weight: 600;
+  color: var(--q-text-primary, #1e293b);
+  transition: all 0.2s ease;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
   cursor: pointer;
   padding-inline-start: 1rem;
@@ -48,96 +48,152 @@
   background-color: #ffffff;
   border-color: var(--q-border-strong, #cbd5e1);
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
-  transform: translateY(-1px);
 }
 
 .custom-compact-select:focus {
   background-color: #ffffff;
-  border-color: var(--q-primary, #0f7da8);
-  box-shadow: 0 0 0 4px var(--q-primary-soft, rgba(15, 125, 168, 0.15));
-  transform: translateY(-1px);
+  border-color: var(--q-primary, #0b8aa8);
+  box-shadow: 0 0 0 3px rgba(11, 138, 168, 0.15);
 }
 
 .custom-compact-select:disabled {
   background-color: rgba(248, 250, 252, 0.6);
   color: var(--q-text-muted, #94a3b8);
   cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
 }
 
-
+/* ── Main Schedule Card & Panels ─────────────────────────────── */
 .schedule-editor-container {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1.25rem;
 }
 
 .schedule-editor-panel {
-  background: var(--q-surface-default, #ffffff);
-  border: 1px solid var(--q-border-subtle);
-  border-radius: var(--q-radius-lg, 12px);
-  overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
-}
-
-.schedule-form-header {
-  background: var(--q-surface-muted, #f8fafc);
-  border-bottom: 1px solid var(--q-border-subtle);
-  padding: 1rem 1.5rem;
-}
-
-.day-toggle-btn {
-  background: var(--q-surface-default, #ffffff);
-  color: var(--q-text-secondary, #64748b);
+  background: #ffffff;
   border: 1px solid var(--q-border-subtle, #e2e8f0);
-  font-weight: 600;
-  font-size: 0.85rem;
-  padding: 0.35rem 0.75rem;
-  min-width: 65px;
-  border-radius: 50rem;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: var(--q-radius-lg, 16px);
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04);
 }
 
-.day-toggle-btn:hover:not(:disabled) {
-  background: var(--q-primary-soft, rgba(15, 125, 168, 0.08));
-  color: var(--q-primary, #0f7da8);
-  border-color: var(--q-primary, #0f7da8);
-  box-shadow: 0 4px 12px rgba(15, 125, 168, 0.15);
-  transform: translateY(-2px);
+/* ── Unified Single Header */
+.schedule-unified-header {
+  padding: 14px 20px;
+  background: linear-gradient(90deg, #f0f9ff 0%, #ffffff 100%);
+  border-bottom: 1px solid rgba(11, 138, 168, 0.15);
+  min-height: 64px;
 }
 
-.day-toggle-btn.active {
-  background: var(--q-primary, #0f7da8);
-  color: var(--q-primary-contrast, #ffffff);
-  border-color: var(--q-primary, #0f7da8);
-  box-shadow: 0 4px 14px var(--q-primary-soft, rgba(15, 125, 168, 0.35));
-  transform: translateY(-1px);
+.schedule-service-icon {
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  background: linear-gradient(135deg, #0b8aa8 0%, #056579 100%);
+  box-shadow: 0 4px 12px rgba(11, 138, 168, 0.25);
+  color: #ffffff;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
 }
 
-.day-toggle-btn.active:hover:not(:disabled) {
-  background: var(--q-primary-hover, #0c6487);
-  box-shadow: 0 6px 16px var(--q-primary-soft, rgba(15, 125, 168, 0.45));
-  transform: translateY(-2px);
+.schedule-title-area {
+  min-width: 0;
 }
 
-.day-toggle-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+.schedule-eyebrow {
+  color: var(--q-primary, #0b8aa8);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
 }
 
+.schedule-main-title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--q-text-primary, #0f172a);
+}
+
+.code-config-group {
+  user-select: none;
+}
+
+.code-input-field {
+  width: 110px;
+  height: 34px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #0f172a;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  background-color: #ffffff;
+}
+
+.code-input-field:focus {
+  border-color: var(--q-primary, #0b8aa8);
+  box-shadow: 0 0 0 3px rgba(11, 138, 168, 0.15);
+}
+
+/* ── Table Styling */
+.table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.custom-table {
+  width: 100%;
+  min-width: 760px;
+  margin-bottom: 0;
+  font-size: 13px;
+}
+
+.custom-table thead th {
+  background-color: #f8fafc;
+  color: var(--q-text-muted, #475569);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--q-border-subtle, #e2e8f0);
+  white-space: nowrap;
+}
+
+.custom-table tbody tr {
+  transition: background-color 0.15s ease;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.custom-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.custom-table tbody tr:hover {
+  background-color: #f8fafc;
+}
+
+.custom-table td {
+  padding: 12px 16px;
+  vertical-align: middle;
+}
+
+/* ── Time Input Fields ───────────────────────────────────────── */
 .time-input-container {
   position: relative;
   display: flex;
   align-items: center;
   width: 100%;
-  max-width: 160px;
+  max-width: 155px;
 }
 
 .time-input-container i {
   position: absolute;
-  inset-inline-start: 12px;
-  color: var(--q-primary, #0f7da8);
+  inset-inline-start: 10px;
+  color: var(--q-primary, #0b8aa8);
   pointer-events: none;
   font-size: 0.95rem;
   z-index: 2;
@@ -148,18 +204,17 @@
   height: 38px;
   min-height: 38px;
   font-weight: 600;
-  font-size: 0.88rem;
+  font-size: 13px;
   color: var(--q-text-primary, #1e293b);
   background-color: #ffffff;
   border: 1px solid #cbd5e1;
   border-radius: 8px;
-  padding-inline-start: 36px !important;
-  padding-inline-end: 10px !important;
+  padding-inline-start: 32px !important;
+  padding-inline-end: 8px !important;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
-/* Hide duplicate native clock icon in Chrome/Blink browsers */
 .time-field::-webkit-calendar-picker-indicator {
   display: none !important;
   -webkit-appearance: none !important;
@@ -170,91 +225,174 @@
 }
 
 .time-field:focus {
-  border-color: var(--q-primary, #0f7da8);
-  box-shadow: 0 0 0 3px rgba(15, 125, 168, 0.15);
+  border-color: var(--q-primary, #0b8aa8);
+  box-shadow: 0 0 0 3px rgba(11, 138, 168, 0.15);
   outline: none;
 }
 
-.add-rule-action {
-  padding: 0.45rem 1.15rem;
-  border-radius: 8px;
-  background: var(--q-primary, #0f7da8);
-  color: #ffffff;
-  border: none;
-  font-size: 0.85rem;
-  font-weight: 700;
+/* ── Day Toggle Pills ────────────────────────────────────────── */
+.day-toggle-group {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  box-shadow: 0 2px 8px rgba(15, 125, 168, 0.25);
-  transition: all 0.2s ease;
+  gap: 4px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.day-toggle-btn {
+  background: #ffffff;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
+  font-weight: 700;
+  font-size: 12px;
+  padding: 5px 12px;
+  min-width: 62px;
+  border-radius: 9999px;
+  transition: all 0.15s ease;
   cursor: pointer;
 }
 
-.add-rule-action:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 14px rgba(15, 125, 168, 0.35);
-  background: var(--q-primary-hover, #0c6487);
+.day-toggle-btn:hover:not(:disabled) {
+  background: #f1f5f9;
+  color: var(--q-primary, #0b8aa8);
+  border-color: #cbd5e1;
 }
 
-.add-rule-action:active:not(:disabled) {
+.day-toggle-btn.active {
+  background: var(--q-primary, #0b8aa8);
+  color: #ffffff;
+  border-color: var(--q-primary, #0b8aa8);
+  box-shadow: 0 2px 8px rgba(11, 138, 168, 0.25);
+}
+
+.day-toggle-btn.active:hover:not(:disabled) {
+  background: var(--q-primary-hover, #056579);
+  border-color: var(--q-primary-hover, #056579);
+}
+
+.day-toggle-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── Row Action Buttons ──────────────────────────────────────── */
+.btn-icon-danger {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  background: #ffffff;
+  color: #dc2626;
+  transition: all 0.15s ease;
+}
+
+.btn-icon-danger:hover:not(:disabled) {
+  background: #fef2f2;
+  border-color: rgba(239, 68, 68, 0.35);
+  transform: translateY(-1px);
+}
+
+.btn-icon-danger:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.status-badge-compact {
+  width: 30px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.status-badge-compact.valid {
+  background: #ecfdf5;
+  color: #059669;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.status-badge-compact.invalid {
+  background: #fffbeb;
+  color: #d97706;
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+/* ── Card Footer Bar ─────────────────────────────────────────── */
+.schedule-footer {
+  padding: 14px 20px;
+  background: #f8fafc;
+  border-top: 1px solid var(--q-border-subtle, #e2e8f0);
+}
+
+.btn-add-rule {
+  background: linear-gradient(135deg, #0b8aa8 0%, #056579 100%);
+  color: #ffffff;
+  border: none;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 8px 18px;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 2px 8px rgba(11, 138, 168, 0.25);
+  transition: all 0.2s ease;
+}
+
+.btn-add-rule:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(11, 138, 168, 0.35);
+  color: #ffffff;
+}
+
+.btn-add-rule:active:not(:disabled) {
   transform: translateY(0);
 }
 
-.add-rule-action:disabled {
+.btn-add-rule:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
 
+/* ── Empty State Card ────────────────────────────────────────── */
 .schedule-empty-placeholder-card {
-  min-height: 300px;
-  background: var(--q-surface-default, #ffffff);
-  border: 1px dashed var(--q-border-strong, #cbd5e1);
-  border-radius: var(--q-radius-lg, 12px);
+  min-height: 280px;
+  background: #ffffff;
+  border: 1px dashed var(--q-border-subtle, #cbd5e1);
+  border-radius: var(--q-radius-lg, 16px);
   color: var(--q-text-secondary, #64748b);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 1.25rem;
+  gap: 1rem;
   text-align: center;
+  padding: 32px 20px;
 }
 
 .schedule-empty-icon {
-  width: 72px;
-  height: 72px;
+  width: 64px;
+  height: 64px;
   border-radius: 16px;
-  background: var(--q-primary-soft, #e6f2f7);
-  color: var(--q-primary, #0f7da8);
+  background: #f0f9ff;
+  color: var(--q-primary, #0b8aa8);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2.25rem;
+  font-size: 1.75rem;
 }
 
 .schedule-empty-placeholder-card h2 {
-  color: var(--q-text-primary, #334155);
-  font-size: 1.15rem;
+  color: var(--q-text-primary, #0f172a);
+  font-size: 1.1rem;
   font-weight: 700;
   margin-bottom: 0.25rem;
-}
-
-.custom-table tbody tr {
-  transition: all 0.3s ease;
-  position: relative;
-}
-
-.custom-table tbody tr:focus-within {
-  box-shadow: 0 4px 20px rgba(15, 125, 168, 0.15);
-  transform: translateY(-2px);
-  background-color: var(--q-surface-default, #ffffff);
-  z-index: 2;
-  outline: 2px solid var(--q-primary-soft, rgba(15, 125, 168, 0.3));
-}
-
-/* Ensure z-index works properly by maintaining context */
-.custom-table tbody tr:focus-within td {
-  background-color: var(--q-surface-default, #ffffff);
 }
 
 .spin {

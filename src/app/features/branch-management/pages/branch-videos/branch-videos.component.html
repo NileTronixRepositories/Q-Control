@@ -13,7 +13,96 @@
         : 'Manage the unified display video playlist shared across all displays in this branch.'
     "
     icon="bi bi-film"
-  />
+  >
+    <div hero-actions class="d-flex align-items-center gap-2 flex-wrap">
+      @if (isTechnicalAdmin() && branches().length > 1) {
+        <div class="branch-select-wrapper">
+          <div class="branch-icon-badge bi-buildings" aria-hidden="true">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="17"
+              height="17"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <rect width="16" height="20" x="4" y="2" rx="2" ry="2"/>
+              <path d="M9 22v-4h6v4"/>
+              <path d="M8 6h.01"/>
+              <path d="M16 6h.01"/>
+              <path d="M12 6h.01"/>
+              <path d="M12 10h.01"/>
+              <path d="M12 14h.01"/>
+              <path d="M16 10h.01"/>
+              <path d="M16 14h.01"/>
+              <path d="M8 10h.01"/>
+              <path d="M8 14h.01"/>
+            </svg>
+          </div>
+          <label class="visually-hidden" for="branchVideosSelect">{{ isAr() ? 'الفرع' : 'Branch' }}</label>
+          <select
+            id="branchVideosSelect"
+            class="form-select branch-selector-control"
+            [value]="selectedBranchId() ?? ''"
+            [disabled]="branchesLoading()"
+            (change)="onBranchSelect($event)"
+          >
+            <option value="" [selected]="!selectedBranchId()">
+              {{ isAr() ? 'اختر الفرع...' : 'Select Branch...' }}
+            </option>
+            @for (branch of branches(); track branch.branchId) {
+              <option [value]="branch.branchId" [selected]="branch.branchId === selectedBranchId()">
+                {{ isAr() ? branch.arabicName : branch.englishName }}
+              </option>
+            }
+          </select>
+        </div>
+      } @else if (selectedBranchId()) {
+        <div class="branch-select-wrapper static-badge">
+          <div class="branch-icon-badge bi-buildings" aria-hidden="true">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="17"
+              height="17"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <rect width="16" height="20" x="4" y="2" rx="2" ry="2"/>
+              <path d="M9 22v-4h6v4"/>
+              <path d="M8 6h.01"/>
+              <path d="M16 6h.01"/>
+              <path d="M12 6h.01"/>
+              <path d="M12 10h.01"/>
+              <path d="M12 14h.01"/>
+              <path d="M16 10h.01"/>
+              <path d="M16 14h.01"/>
+              <path d="M8 10h.01"/>
+              <path d="M8 14h.01"/>
+            </svg>
+          </div>
+          <span class="fw-bold text-dark px-2 small">{{ selectedBranchLabel() }}</span>
+        </div>
+      }
+
+      <button
+        type="button"
+        class="secondary-action d-inline-flex align-items-center gap-2 branding-refresh-action"
+        [disabled]="!selectedBranchId() || videosLoading()"
+        (click)="selectedBranchId() && loadVideos(selectedBranchId()!)"
+        [attr.title]="isAr() ? 'تحديث' : 'Refresh'"
+      >
+        <i class="bi bi-arrow-clockwise" [class.spin]="videosLoading()" aria-hidden="true"></i>
+        <span>{{ isAr() ? 'تحديث' : 'Refresh' }}</span>
+      </button>
+    </div>
+  </app-page-hero>
 
   <!-- Toast Notification Alert -->
   @if (message(); as currentMessage) {
@@ -38,55 +127,6 @@
       </div>
     </div>
   }
-
-  <!-- Branch Selector Context Bar -->
-  <section class="branding-context" [attr.aria-label]="isAr() ? 'اختيار الفرع' : 'Branch Selector'">
-    <div class="branding-context-copy">
-      <span class="branding-context-icon" aria-hidden="true">
-        <i class="bi bi-buildings"></i>
-      </span>
-      <div>
-        <strong>{{ isAr() ? 'الفرع المحدد' : 'Selected Branch' }}</strong>
-        <span>{{ selectedBranchLabel() || (isAr() ? 'اختر الفرع...' : 'Select Branch...') }}</span>
-      </div>
-    </div>
-
-    <div class="branding-context-actions">
-      @if (isTechnicalAdmin() && branches().length > 1) {
-        <select
-          id="branchVideosSelect"
-          class="form-select branch-selector-control"
-          [value]="selectedBranchId() ?? ''"
-          [disabled]="branchesLoading()"
-          (change)="onBranchSelect($event)"
-        >
-          <option value="" [selected]="!selectedBranchId()">
-            {{ isAr() ? 'اختر الفرع...' : 'Select Branch...' }}
-          </option>
-          @for (branch of branches(); track branch.branchId) {
-            <option [value]="branch.branchId" [selected]="branch.branchId === selectedBranchId()">
-              {{ isAr() ? branch.arabicName : branch.englishName }}
-            </option>
-          }
-        </select>
-      } @else if (selectedBranchId()) {
-        <div class="d-inline-flex align-items-center gap-2 px-3 py-2 bg-light border rounded text-dark fw-bold small">
-          <i class="bi bi-buildings text-primary"></i>
-          <span>{{ selectedBranchLabel() }}</span>
-        </div>
-      }
-      <button
-        type="button"
-        class="secondary-action branding-refresh-action"
-        [disabled]="!selectedBranchId() || videosLoading()"
-        (click)="selectedBranchId() && loadVideos(selectedBranchId()!)"
-        [attr.title]="isAr() ? 'تحديث' : 'Refresh'"
-      >
-        <i class="bi bi-arrow-repeat" aria-hidden="true"></i>
-        {{ isAr() ? 'تحديث' : 'Refresh' }}
-      </button>
-    </div>
-  </section>
 
   @if (branchesLoading()) {
     <app-niletronix-loading-state

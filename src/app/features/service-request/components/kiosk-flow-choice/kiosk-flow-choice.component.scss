@@ -1,0 +1,156 @@
+.kiosk-flow-choice {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  padding: 1.5rem;
+  box-sizing: border-box;
+
+  &__header {
+    max-width: 650px;
+  }
+
+  &__badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 1rem;
+    border-radius: 9999px;
+    background: color-mix(in srgb, var(--kiosk-main-color, #0b8aa8) 12%, #ffffff);
+    color: var(--kiosk-main-color, #0b8aa8);
+    font-size: 0.95rem;
+    font-weight: 800;
+    margin-bottom: 0.75rem;
+  }
+
+  &__title {
+    font-size: clamp(1.6rem, 2.4vw, 2.2rem);
+    font-weight: 900;
+    color: var(--kiosk-main-text-color, #0f172a);
+    margin: 0 0 0.5rem 0;
+  }
+
+  &__description {
+    font-size: 1.05rem;
+    color: var(--kiosk-secondary-color, #64748b);
+    margin: 0;
+    line-height: 1.5;
+    font-weight: 600;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    width: 100%;
+    max-width: 720px;
+    margin-top: 1.5rem;
+
+    @media (min-width: 576px) {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+}
+
+.kiosk-flow-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2.2rem 1.5rem;
+  background: #ffffff;
+  border: 2px solid #e2e8f0;
+  border-radius: 1.5rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  outline: none;
+  min-height: 240px;
+
+  &:hover,
+  &:focus-visible {
+    transform: translateY(-4px);
+    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.08);
+    border-color: var(--kiosk-main-color, #0b8aa8);
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  &__icon-wrapper {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.25rem;
+    transition: transform 0.25s ease;
+  }
+
+  &__icon {
+    font-size: 2.5rem;
+  }
+
+  &__body {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  &__title {
+    font-size: 1.45rem;
+    font-weight: 800;
+    color: var(--kiosk-main-text-color, #0f172a);
+    margin: 0 0 0.5rem 0;
+  }
+
+  &__subtitle {
+    font-size: 0.95rem;
+    color: var(--kiosk-secondary-color, #64748b);
+    margin: 0;
+    line-height: 1.4;
+    font-weight: 600;
+  }
+
+  &__arrow {
+    margin-top: 1.25rem;
+    font-size: 1.5rem;
+    opacity: 0.6;
+    transition:
+      opacity 0.2s,
+      transform 0.2s;
+  }
+
+  &:hover &__arrow {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+
+  /* Specific variants */
+  &--reservation {
+    .kiosk-flow-card__icon-wrapper {
+      background: color-mix(in srgb, var(--kiosk-main-color, #0b8aa8) 12%, #ffffff);
+      color: var(--kiosk-main-color, #0b8aa8);
+    }
+    .kiosk-flow-card__arrow {
+      color: var(--kiosk-main-color, #0b8aa8);
+    }
+  }
+
+  &--direct {
+    .kiosk-flow-card__icon-wrapper {
+      background: #ecfdf5;
+      color: #059669;
+    }
+    .kiosk-flow-card__arrow {
+      color: #059669;
+    }
+  }
+}

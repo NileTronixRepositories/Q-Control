@@ -1,13 +1,12 @@
-import { signal, computed, WritableSignal } from '@angular/core';
+import { signal } from '@angular/core';
 import { TestBed, ComponentFixture } from '@angular/core/testing';
-import { ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
-import { of, throwError, Subject } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { describe, expect, it, beforeEach, vi } from 'vitest';
 
 import { BranchConfigurationComponent } from './branch-configuration.component';
-import { AuthSessionService } from '../../../auth/services/auth-session/auth-session.service';
+import { AuthSessionService } from '@core';
 import { BranchManagementApiService } from '@features/branch-management/services/branch-management-api/branch-management-api.service';
 import { BranchConfigurationApiService } from '@features/branch-management/services/branch-configuration-api/branch-configuration-api.service';
 import { BranchConfigurationPermissionService } from '@features/branch-management/services/branch-configuration-permission/branch-configuration-permission.service';
@@ -91,10 +90,13 @@ describe('BranchConfigurationComponent', () => {
       of({
         branchId: 1,
         allowedTime: '00:30:00',
+        maximumTicketCallAttempts: 5,
+        ticketNoShowAutoCancellationMinutes: 30,
+        ticketArchiveRetentionDays: 30,
         isConfigured: true,
         rowVersion: 'v1',
         message: null,
-      }),
+      } satisfies BranchConfigurationResponse),
     );
 
     await TestBed.configureTestingModule({
@@ -121,103 +123,143 @@ describe('BranchConfigurationComponent', () => {
     component = fixture.componentInstance;
   });
 
-  it('should initialize and load branches and initial branch configuration', () => {
+  it('should initialize and load branches and initial branch configuration including ticket runtime fields', () => {
     fixture.detectChanges();
     expect(mockBranchManagementApi.getBranches).toHaveBeenCalled();
     expect(component.selectedBranchId()).toBe(1);
     expect(mockBranchConfigurationApi.getBranchConfiguration).toHaveBeenCalledWith(1);
-    expect(component.configForm.value).toEqual({ hours: 0, minutes: 30, seconds: 0 });
+    expect(component.configForm.value).toEqual({
+      hours: 0,
+      minutes: 30,
+      seconds: 0,
+      maximumTicketCallAttempts: 5,
+      ticketNoShowAutoCancellationMinutes: 30,
+      ticketArchiveRetentionDays: 30,
+    });
     expect(component.isConfigured()).toBe(true);
     expect(component.rowVersion()).toBe('v1');
   });
 
-  it('Scenario 1: No saved config (isConfigured: false), displays 00:00:00, saving calls POST', () => {
+  it('Scenario 1: No saved config (isConfigured: false), displays default create values, saving calls POST with all 4 parameters', () => {
     mockBranchConfigurationApi.getBranchConfiguration.mockReturnValue(
       of({
         branchId: 1,
         allowedTime: '00:00:00',
+        maximumTicketCallAttempts: 0,
+        ticketNoShowAutoCancellationMinutes: 0,
+        ticketArchiveRetentionDays: 0,
         isConfigured: false,
         rowVersion: null,
         message: null,
-      }),
+      } satisfies BranchConfigurationResponse),
     );
     mockBranchConfigurationApi.createBranchConfiguration.mockReturnValue(
       of({
         branchId: 1,
         allowedTime: '01:00:00',
+        maximumTicketCallAttempts: 5,
+        ticketNoShowAutoCancellationMinutes: 30,
+        ticketArchiveRetentionDays: 30,
         isConfigured: true,
         rowVersion: 'v1-new',
         message: null,
-      }),
+      } satisfies BranchConfigurationResponse),
     );
 
     fixture.detectChanges();
     expect(component.isConfigured()).toBe(false);
-    expect(component.configForm.value).toEqual({ hours: 0, minutes: 0, seconds: 0 });
+    expect(component.configForm.value).toEqual({
+      hours: 0,
+      minutes: 0,
+      seconds: 0,
+      maximumTicketCallAttempts: 3,
+      ticketNoShowAutoCancellationMinutes: 30,
+      ticketArchiveRetentionDays: 30,
+    });
 
-    component.configForm.patchValue({ hours: 1, minutes: 0, seconds: 0 });
+    component.configForm.patchValue({
+      hours: 1,
+      minutes: 0,
+      seconds: 0,
+      maximumTicketCallAttempts: 5,
+      ticketNoShowAutoCancellationMinutes: 30,
+      ticketArchiveRetentionDays: 30,
+    });
     component.save();
 
     expect(mockBranchConfigurationApi.createBranchConfiguration).toHaveBeenCalledWith(1, {
       allowedTime: '01:00:00',
+      maximumTicketCallAttempts: 5,
+      maxCallAttempts: 5,
+      ticketNoShowAutoCancellationMinutes: 30,
+      noShowAutoCancellationMinutes: 30,
+      noShowReturnStatus: 'Waiting',
+      ticketArchiveRetentionDays: 30,
+      ticketHistoricalUsageHours: 720,
     });
     expect(component.isConfigured()).toBe(true);
     expect(component.rowVersion()).toBe('v1-new');
   });
 
-  it('Scenario 2: Existing config (isConfigured: true), saving calls PUT with RowVersion', () => {
+  it('Scenario 2: Existing config (isConfigured: true), saving calls PUT with RowVersion and all ticket settings', () => {
     fixture.detectChanges();
 
     mockBranchConfigurationApi.updateBranchConfiguration.mockReturnValue(
       of({
         branchId: 1,
         allowedTime: '00:45:00',
+        maximumTicketCallAttempts: 6,
+        ticketNoShowAutoCancellationMinutes: 60,
+        ticketArchiveRetentionDays: 45,
         isConfigured: true,
         rowVersion: 'v2',
         message: null,
-      }),
+      } satisfies BranchConfigurationResponse),
     );
 
-    component.configForm.patchValue({ minutes: 45 });
+    component.configForm.patchValue({
+      minutes: 45,
+      maximumTicketCallAttempts: 6,
+      ticketNoShowAutoCancellationMinutes: 60,
+      ticketArchiveRetentionDays: 45,
+    });
     component.save();
 
     expect(mockBranchConfigurationApi.updateBranchConfiguration).toHaveBeenCalledWith(1, {
       allowedTime: '00:45:00',
+      maximumTicketCallAttempts: 6,
+      maxCallAttempts: 6,
+      ticketNoShowAutoCancellationMinutes: 60,
+      noShowAutoCancellationMinutes: 60,
+      noShowReturnStatus: 'Waiting',
+      ticketArchiveRetentionDays: 45,
+      ticketHistoricalUsageHours: 1080,
       rowVersion: 'v1',
     });
     expect(component.rowVersion()).toBe('v2');
   });
 
-  it('Scenario 3: Explicit zero config (isConfigured: true, time 00:00:00), saving calls PUT, not POST', () => {
-    mockBranchConfigurationApi.getBranchConfiguration.mockReturnValue(
-      of({
-        branchId: 1,
-        allowedTime: '00:00:00',
-        isConfigured: true,
-        rowVersion: 'v1-zero',
-        message: null,
-      }),
-    );
+  it('Scenario 3: Validation rejects 0, negative values, and non-integers for ticket settings', () => {
     fixture.detectChanges();
 
-    expect(component.isConfigured()).toBe(true);
-    expect(component.configForm.value).toEqual({ hours: 0, minutes: 0, seconds: 0 });
+    // Set maximumTicketCallAttempts to 0 (invalid)
+    component.configForm.patchValue({ maximumTicketCallAttempts: 0 });
+    expect(component.configForm.controls.maximumTicketCallAttempts.invalid).toBe(true);
+    expect(component.configForm.invalid).toBe(true);
 
-    mockBranchConfigurationApi.updateBranchConfiguration.mockReturnValue(
-      of({
-        branchId: 1,
-        allowedTime: '00:00:00',
-        isConfigured: true,
-        rowVersion: 'v2-zero',
-        message: null,
-      }),
-    );
+    // Set ticketNoShowAutoCancellationMinutes to negative (invalid)
+    component.configForm.patchValue({ maximumTicketCallAttempts: 3, ticketNoShowAutoCancellationMinutes: -5 });
+    expect(component.configForm.controls.ticketNoShowAutoCancellationMinutes.invalid).toBe(true);
+    expect(component.configForm.invalid).toBe(true);
 
+    // Set ticketArchiveRetentionDays to decimal (invalid)
+    component.configForm.patchValue({ ticketNoShowAutoCancellationMinutes: 30, ticketArchiveRetentionDays: 2.5 });
+    expect(component.configForm.controls.ticketArchiveRetentionDays.invalid).toBe(true);
+    expect(component.configForm.invalid).toBe(true);
+
+    // Attempt to save should not trigger API call
     component.save();
-    expect(mockBranchConfigurationApi.updateBranchConfiguration).toHaveBeenCalledWith(1, {
-      allowedTime: '00:00:00',
-      rowVersion: 'v1-zero',
-    });
+    expect(mockBranchConfigurationApi.updateBranchConfiguration).not.toHaveBeenCalled();
     expect(mockBranchConfigurationApi.createBranchConfiguration).not.toHaveBeenCalled();
   });
 
@@ -226,10 +268,13 @@ describe('BranchConfigurationComponent', () => {
       of({
         branchId: 1,
         allowedTime: '00:00:00',
+        maximumTicketCallAttempts: 3,
+        ticketNoShowAutoCancellationMinutes: 30,
+        ticketArchiveRetentionDays: 30,
         isConfigured: false,
         rowVersion: null,
         message: null,
-      }),
+      } satisfies BranchConfigurationResponse),
     );
     fixture.detectChanges();
 
@@ -241,10 +286,13 @@ describe('BranchConfigurationComponent', () => {
       of({
         branchId: 1,
         allowedTime: '00:15:00',
+        maximumTicketCallAttempts: 5,
+        ticketNoShowAutoCancellationMinutes: 20,
+        ticketArchiveRetentionDays: 60,
         isConfigured: true,
         rowVersion: 'v-conflict',
         message: null,
-      }),
+      } satisfies BranchConfigurationResponse),
     );
 
     component.configForm.patchValue({ minutes: 30 });
@@ -254,7 +302,14 @@ describe('BranchConfigurationComponent', () => {
     expect(component.message()?.text).toBe(mockTranslationsSignal().concurrencyConflictMessage);
     expect(component.isConfigured()).toBe(true);
     expect(component.rowVersion()).toBe('v-conflict');
-    expect(component.configForm.value).toEqual({ hours: 0, minutes: 15, seconds: 0 });
+    expect(component.configForm.value).toEqual({
+      hours: 0,
+      minutes: 15,
+      seconds: 0,
+      maximumTicketCallAttempts: 5,
+      ticketNoShowAutoCancellationMinutes: 20,
+      ticketArchiveRetentionDays: 60,
+    });
   });
 
   it('Scenario 5: Concurrency conflict (PUT 409 conflict) displays warning and reloads latest RowVersion', () => {
@@ -268,10 +323,13 @@ describe('BranchConfigurationComponent', () => {
       of({
         branchId: 1,
         allowedTime: '02:00:00',
+        maximumTicketCallAttempts: 4,
+        ticketNoShowAutoCancellationMinutes: 40,
+        ticketArchiveRetentionDays: 50,
         isConfigured: true,
         rowVersion: 'v2-server',
         message: null,
-      }),
+      } satisfies BranchConfigurationResponse),
     );
 
     component.configForm.patchValue({ hours: 1 });
@@ -280,7 +338,14 @@ describe('BranchConfigurationComponent', () => {
     expect(component.message()?.tone).toBe('error');
     expect(component.message()?.text).toBe(mockTranslationsSignal().concurrencyConflictMessage);
     expect(component.rowVersion()).toBe('v2-server');
-    expect(component.configForm.value).toEqual({ hours: 2, minutes: 0, seconds: 0 });
+    expect(component.configForm.value).toEqual({
+      hours: 2,
+      minutes: 0,
+      seconds: 0,
+      maximumTicketCallAttempts: 4,
+      ticketNoShowAutoCancellationMinutes: 40,
+      ticketArchiveRetentionDays: 50,
+    });
   });
 
   it('Scenario 6: BranchAdmin accessing unauthorized branch (403 Forbidden)', () => {

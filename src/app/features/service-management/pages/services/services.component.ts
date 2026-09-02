@@ -1750,10 +1750,36 @@ export class ServicesComponent implements OnInit, OnDestroy {
     this.serviceCodeConflict = false;
     this.nameConflictControl = null;
     this.reloadConflictServiceId.set(null);
-    this.customInputsArray.clear();
 
     const isParent = details.hasChildren;
     const isClientInputRequired = isParent ? false : details.isClientInputRequired;
+
+    this.serviceForm.enable({ emitEvent: false });
+    this.serviceForm.reset(
+      {
+        parentServiceId: details.parentServiceId ?? 0,
+        arabicName: details.arabicName,
+        englishName: details.englishName,
+        arabicUserMessage: details.arabicUserMessage ?? '',
+        englishUserMessage: details.englishUserMessage ?? '',
+        isServiceCodeRequired: details.isServiceCodeRequired,
+        serviceCode: details.serviceCode ?? '',
+        isTicketIssuable: details.isTicketIssuable ? 'true' : 'false',
+        isClientInputRequired,
+        hasReservation: details.hasReservation,
+        orderNo: details.orderNo,
+        priority: details.priority,
+        weight: details.weight,
+        rangePrefix: details.rangePrefix,
+        rangeStartNumber: details.rangeStartNumber,
+        rangeEndNumber: details.rangeEndNumber,
+        waitingDuration: details.waitingDuration,
+        noOfTicketCopies: details.noOfTicketCopies,
+      },
+      { emitEvent: false },
+    );
+
+    this.customInputsArray.clear();
 
     if (
       !isParent &&
@@ -1766,28 +1792,6 @@ export class ServicesComponent implements OnInit, OnDestroy {
         this.customInputsArray.push(createCustomInputFormGroup(input));
       }
     }
-
-    this.serviceForm.enable({ emitEvent: false });
-    this.serviceForm.reset({
-      parentServiceId: details.parentServiceId ?? 0,
-      arabicName: details.arabicName,
-      englishName: details.englishName,
-      arabicUserMessage: details.arabicUserMessage ?? '',
-      englishUserMessage: details.englishUserMessage ?? '',
-      isServiceCodeRequired: details.isServiceCodeRequired,
-      serviceCode: details.serviceCode ?? '',
-      isTicketIssuable: details.isTicketIssuable ? 'true' : 'false',
-      isClientInputRequired,
-      hasReservation: details.hasReservation,
-      orderNo: details.orderNo,
-      priority: details.priority,
-      weight: details.weight,
-      rangePrefix: details.rangePrefix,
-      rangeStartNumber: details.rangeStartNumber,
-      rangeEndNumber: details.rangeEndNumber,
-      waitingDuration: details.waitingDuration,
-      noOfTicketCopies: details.noOfTicketCopies,
-    });
   }
 
   private isServiceFormValid(): boolean {
@@ -2101,10 +2105,7 @@ export class ServicesComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.showMessage(
-      'error',
-      formatApiError(error, this.translations().fallbackError),
-    );
+    this.showMessage('error', formatApiError(error, this.translations().fallbackError));
   }
 
   private isConcurrencyError(error: HttpErrorResponse): boolean {

@@ -8,7 +8,96 @@
     [title]="copy().pageTitle"
     [description]="copy().pageDescription"
     icon="bi bi-vector-pen"
-  />
+  >
+    <div hero-actions class="d-flex align-items-center gap-2 flex-wrap">
+      @if (isTechnicalAdmin() && branches().length > 1) {
+        <div class="branch-select-wrapper">
+          <div class="branch-icon-badge bi-buildings" aria-hidden="true">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="17"
+              height="17"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <rect width="16" height="20" x="4" y="2" rx="2" ry="2"/>
+              <path d="M9 22v-4h6v4"/>
+              <path d="M8 6h.01"/>
+              <path d="M16 6h.01"/>
+              <path d="M12 6h.01"/>
+              <path d="M12 10h.01"/>
+              <path d="M12 14h.01"/>
+              <path d="M16 10h.01"/>
+              <path d="M16 14h.01"/>
+              <path d="M8 10h.01"/>
+              <path d="M8 14h.01"/>
+            </svg>
+          </div>
+          <label class="visually-hidden" for="branchBrandingBranch">{{ copy().branchLabel }}</label>
+          <select
+            id="branchBrandingBranch"
+            class="form-select branch-selector-control"
+            [value]="selectedBranchId() ?? ''"
+            [disabled]="branchesLoading()"
+            (change)="selectBranch($event)"
+          >
+            <option value="" [selected]="!selectedBranchId()">
+              {{ copy().selectBranchPlaceholder }}
+            </option>
+            @for (branch of branches(); track branch.id) {
+              <option [value]="branch.id" [selected]="branch.id === selectedBranchId()">
+                {{ branch.label }}
+              </option>
+            }
+          </select>
+        </div>
+      } @else if (selectedBranchId()) {
+        <div class="branch-select-wrapper static-badge">
+          <div class="branch-icon-badge bi-buildings" aria-hidden="true">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="17"
+              height="17"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <rect width="16" height="20" x="4" y="2" rx="2" ry="2"/>
+              <path d="M9 22v-4h6v4"/>
+              <path d="M8 6h.01"/>
+              <path d="M16 6h.01"/>
+              <path d="M12 6h.01"/>
+              <path d="M12 10h.01"/>
+              <path d="M12 14h.01"/>
+              <path d="M16 10h.01"/>
+              <path d="M16 14h.01"/>
+              <path d="M8 10h.01"/>
+              <path d="M8 14h.01"/>
+            </svg>
+          </div>
+          <span class="fw-bold text-dark px-2 small">{{ selectedBranchLabel() }}</span>
+        </div>
+      }
+
+      <button
+        type="button"
+        class="secondary-action d-inline-flex align-items-center gap-2 branding-refresh-action"
+        [disabled]="!selectedBranchId() || brandingLoading()"
+        [attr.title]="copy().refreshLabel"
+        (click)="refreshSelectedBranch()"
+      >
+        <i class="bi bi-arrow-clockwise" [class.spin]="brandingLoading()" aria-hidden="true"></i>
+        <span>{{ copy().refreshLabel }}</span>
+      </button>
+    </div>
+  </app-page-hero>
 
   @if (message(); as currentMessage) {
     <div class="toast-stack" role="status" aria-live="polite" aria-atomic="true">
@@ -26,65 +115,12 @@
           aria-hidden="true"
         ></i>
         <p>{{ currentMessage.text }}</p>
-        <button
-          type="button"
-          class="toast-close"
-          (click)="clearMessage()"
-          aria-label="Close"
-        >
+        <button type="button" class="toast-close" (click)="clearMessage()" aria-label="Close">
           <i class="bi bi-x-lg" aria-hidden="true"></i>
         </button>
       </div>
     </div>
   }
-
-  <!-- Branch Selector Context Bar -->
-  <section class="branding-context shadow-sm mb-4" [attr.aria-label]="copy().branchLabel">
-    <div class="branding-context-copy">
-      <span class="branding-context-icon" aria-hidden="true">
-        <i class="bi bi-buildings"></i>
-      </span>
-      <div>
-        <strong>{{ copy().branchLabel }}</strong>
-        <span>{{ selectedBranchLabel() || copy().selectBranchPlaceholder }}</span>
-      </div>
-    </div>
-
-    <div class="branding-context-actions d-flex align-items-center gap-2">
-      @if (isTechnicalAdmin() && branches().length > 1) {
-        <label class="visually-hidden" for="branchBrandingBranch">{{ copy().branchLabel }}</label>
-        <select
-          id="branchBrandingBranch"
-          class="form-select branch-selector-control"
-          [value]="selectedBranchId() ?? ''"
-          [disabled]="branchesLoading()"
-          (change)="selectBranch($event)"
-        >
-          <option value="" [selected]="!selectedBranchId()">{{ copy().selectBranchPlaceholder }}</option>
-          @for (branch of branches(); track branch.id) {
-            <option [value]="branch.id" [selected]="branch.id === selectedBranchId()">
-              {{ branch.label }}
-            </option>
-          }
-        </select>
-      } @else if (selectedBranchId()) {
-        <div class="d-inline-flex align-items-center gap-2 px-3 py-2 bg-light border rounded text-dark fw-bold small">
-          <i class="bi bi-buildings text-primary"></i>
-          <span>{{ selectedBranchLabel() }}</span>
-        </div>
-      }
-      <button
-        type="button"
-        class="btn btn-outline-secondary d-inline-flex align-items-center gap-1 branding-refresh-action"
-        [disabled]="!selectedBranchId() || brandingLoading()"
-        [attr.title]="copy().refreshLabel"
-        (click)="refreshSelectedBranch()"
-      >
-        <i class="bi bi-arrow-repeat" [class.spin]="brandingLoading()" aria-hidden="true"></i>
-        <span>{{ copy().refreshLabel }}</span>
-      </button>
-    </div>
-  </section>
 
   @if (!canUpdate()) {
     <p class="permission-note alert alert-warning d-flex align-items-center gap-2" role="status">
@@ -118,7 +154,11 @@
                   [style.--branding-background]="themePickerValue('backgroundColor')"
                 >
                   @if (logoPreviewUrl(); as logoUrl) {
-                    <img [src]="logoUrl" [alt]="copy().logoLabel" (error)="markLogoPreviewFailed()" />
+                    <img
+                      [src]="logoUrl"
+                      [alt]="copy().logoLabel"
+                      (error)="markLogoPreviewFailed()"
+                    />
                   } @else {
                     <div class="branding-logo-empty">
                       <i class="bi bi-file-earmark-image" aria-hidden="true"></i>
@@ -128,9 +168,18 @@
                 </div>
 
                 <div class="branding-preview-swatches" aria-hidden="true">
-                  <span [style.background]="themePickerValue('mainColor')" title="Main Color"></span>
-                  <span [style.background]="themePickerValue('secondaryColor')" title="Secondary Color"></span>
-                  <span [style.background]="themePickerValue('backgroundColor')" title="Background Color"></span>
+                  <span
+                    [style.background]="themePickerValue('mainColor')"
+                    title="Main Color"
+                  ></span>
+                  <span
+                    [style.background]="themePickerValue('secondaryColor')"
+                    title="Secondary Color"
+                  ></span>
+                  <span
+                    [style.background]="themePickerValue('backgroundColor')"
+                    title="Background Color"
+                  ></span>
                 </div>
 
                 <small class="text-muted d-flex align-items-center gap-1">
@@ -140,7 +189,10 @@
 
                 @if (canUpdate()) {
                   <div class="d-flex gap-2">
-                    <label class="btn btn-outline-primary flex-grow-1 d-inline-flex align-items-center justify-content-center gap-1 m-0" for="branchLogoInput">
+                    <label
+                      class="btn btn-outline-primary flex-grow-1 d-inline-flex align-items-center justify-content-center gap-1 m-0"
+                      for="branchLogoInput"
+                    >
                       <i class="bi bi-file-earmark-plus"></i>
                       <span>{{ copy().chooseLogo }}</span>
                     </label>
@@ -159,7 +211,11 @@
                       (click)="uploadLogo()"
                     >
                       @if (logoUploading()) {
-                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                        <span
+                          class="spinner-border spinner-border-sm"
+                          role="status"
+                          aria-hidden="true"
+                        ></span>
                       } @else {
                         <i class="bi bi-cloud-arrow-up-fill"></i>
                       }
@@ -168,7 +224,9 @@
                   </div>
 
                   @if (selectedLogoFile(); as logoFile) {
-                    <p class="branding-selected-file mb-0 small text-truncate fw-semibold text-primary">
+                    <p
+                      class="branding-selected-file mb-0 small text-truncate fw-semibold text-primary"
+                    >
                       {{ copy().selectedFile }}: {{ logoFile.name }}
                     </p>
                   }
@@ -217,7 +275,9 @@
                       />
                     </div>
                     @if (themeControlError('mainColor')) {
-                      <div class="invalid-feedback d-block">{{ themeControlError('mainColor') }}</div>
+                      <div class="invalid-feedback d-block">
+                        {{ themeControlError('mainColor') }}
+                      </div>
                     }
                   </div>
 
@@ -244,7 +304,9 @@
                       />
                     </div>
                     @if (themeControlError('secondaryColor')) {
-                      <div class="invalid-feedback d-block">{{ themeControlError('secondaryColor') }}</div>
+                      <div class="invalid-feedback d-block">
+                        {{ themeControlError('secondaryColor') }}
+                      </div>
                     }
                   </div>
 
@@ -271,7 +333,9 @@
                       />
                     </div>
                     @if (themeControlError('backgroundColor')) {
-                      <div class="invalid-feedback d-block">{{ themeControlError('backgroundColor') }}</div>
+                      <div class="invalid-feedback d-block">
+                        {{ themeControlError('backgroundColor') }}
+                      </div>
                     }
                   </div>
 
@@ -296,7 +360,9 @@
                       />
                     </div>
                     @if (themeControlError('headerColor')) {
-                      <div class="invalid-feedback d-block">{{ themeControlError('headerColor') }}</div>
+                      <div class="invalid-feedback d-block">
+                        {{ themeControlError('headerColor') }}
+                      </div>
                     }
                   </div>
 
@@ -321,7 +387,9 @@
                       />
                     </div>
                     @if (themeControlError('footerColor')) {
-                      <div class="invalid-feedback d-block">{{ themeControlError('footerColor') }}</div>
+                      <div class="invalid-feedback d-block">
+                        {{ themeControlError('footerColor') }}
+                      </div>
                     }
                   </div>
 
@@ -346,7 +414,9 @@
                       />
                     </div>
                     @if (themeControlError('mainTextColor')) {
-                      <div class="invalid-feedback d-block">{{ themeControlError('mainTextColor') }}</div>
+                      <div class="invalid-feedback d-block">
+                        {{ themeControlError('mainTextColor') }}
+                      </div>
                     }
                   </div>
                 </div>
@@ -365,67 +435,115 @@
               <div class="panel-body p-3 p-xl-4">
                 <div class="row g-2">
                   <div class="col-12 col-md-6">
-                    <div class="behavior-switch-box d-flex align-items-center justify-content-between p-2 px-3 border rounded">
+                    <div
+                      class="behavior-switch-box d-flex align-items-center justify-content-between p-2 px-3 border rounded"
+                    >
                       <label class="form-check-label fw-semibold small mb-0" for="bbShowLang">
                         {{ copy().showLanguagePageLabel }}
                       </label>
                       <div class="form-check form-switch m-0">
-                        <input id="bbShowLang" class="form-check-input" type="checkbox" formControlName="showLanguagePage" [disabled]="!canUpdate()" />
+                        <input
+                          id="bbShowLang"
+                          class="form-check-input"
+                          type="checkbox"
+                          formControlName="showLanguagePage"
+                          [disabled]="!canUpdate()"
+                        />
                       </div>
                     </div>
                   </div>
 
                   <div class="col-12 col-md-6">
-                    <div class="behavior-switch-box d-flex align-items-center justify-content-between p-2 px-3 border rounded">
+                    <div
+                      class="behavior-switch-box d-flex align-items-center justify-content-between p-2 px-3 border rounded"
+                    >
                       <label class="form-check-label fw-semibold small mb-0" for="bbDefArabic">
                         {{ copy().defaultLanguageIsArabicLabel }}
                       </label>
                       <div class="form-check form-switch m-0">
-                        <input id="bbDefArabic" class="form-check-input" type="checkbox" formControlName="defaultLanguageIsArabic" [disabled]="!canUpdate()" />
+                        <input
+                          id="bbDefArabic"
+                          class="form-check-input"
+                          type="checkbox"
+                          formControlName="defaultLanguageIsArabic"
+                          [disabled]="!canUpdate()"
+                        />
                       </div>
                     </div>
                   </div>
 
                   <div class="col-12 col-md-6">
-                    <div class="behavior-switch-box d-flex align-items-center justify-content-between p-2 px-3 border rounded">
+                    <div
+                      class="behavior-switch-box d-flex align-items-center justify-content-between p-2 px-3 border rounded"
+                    >
                       <label class="form-check-label fw-semibold small mb-0" for="bbAlwaysInput">
                         {{ copy().alwaysRequireUserInputLabel }}
                       </label>
                       <div class="form-check form-switch m-0">
-                        <input id="bbAlwaysInput" class="form-check-input" type="checkbox" formControlName="alwaysRequireUserInput" [disabled]="!canUpdate()" />
+                        <input
+                          id="bbAlwaysInput"
+                          class="form-check-input"
+                          type="checkbox"
+                          formControlName="alwaysRequireUserInput"
+                          [disabled]="!canUpdate()"
+                        />
                       </div>
                     </div>
                   </div>
 
                   <div class="col-12 col-md-6">
-                    <div class="behavior-switch-box d-flex align-items-center justify-content-between p-2 px-3 border rounded">
+                    <div
+                      class="behavior-switch-box d-flex align-items-center justify-content-between p-2 px-3 border rounded"
+                    >
                       <label class="form-check-label fw-semibold small mb-0" for="bbNavPath">
                         {{ copy().showServiceNavigationPathLabel }}
                       </label>
                       <div class="form-check form-switch m-0">
-                        <input id="bbNavPath" class="form-check-input" type="checkbox" formControlName="showServiceNavigationPath" [disabled]="!canUpdate()" />
+                        <input
+                          id="bbNavPath"
+                          class="form-check-input"
+                          type="checkbox"
+                          formControlName="showServiceNavigationPath"
+                          [disabled]="!canUpdate()"
+                        />
                       </div>
                     </div>
                   </div>
 
                   <div class="col-12 col-md-6">
-                    <div class="behavior-switch-box d-flex align-items-center justify-content-between p-2 px-3 border rounded">
+                    <div
+                      class="behavior-switch-box d-flex align-items-center justify-content-between p-2 px-3 border rounded"
+                    >
                       <label class="form-check-label fw-semibold small mb-0" for="bbOpSel">
                         {{ copy().allowOperatorSelectionLabel }}
                       </label>
                       <div class="form-check form-switch m-0">
-                        <input id="bbOpSel" class="form-check-input" type="checkbox" formControlName="allowOperatorSelection" [disabled]="!canUpdate()" />
+                        <input
+                          id="bbOpSel"
+                          class="form-check-input"
+                          type="checkbox"
+                          formControlName="allowOperatorSelection"
+                          [disabled]="!canUpdate()"
+                        />
                       </div>
                     </div>
                   </div>
 
                   <div class="col-12 col-md-6">
-                    <div class="behavior-switch-box d-flex align-items-center justify-content-between p-2 px-3 border rounded">
+                    <div
+                      class="behavior-switch-box d-flex align-items-center justify-content-between p-2 px-3 border rounded"
+                    >
                       <label class="form-check-label fw-semibold small mb-0" for="bbMoreSrv">
                         {{ copy().allowRequestMoreServicesLabel }}
                       </label>
                       <div class="form-check form-switch m-0">
-                        <input id="bbMoreSrv" class="form-check-input" type="checkbox" formControlName="allowRequestMoreServices" [disabled]="!canUpdate()" />
+                        <input
+                          id="bbMoreSrv"
+                          class="form-check-input"
+                          type="checkbox"
+                          formControlName="allowRequestMoreServices"
+                          [disabled]="!canUpdate()"
+                        />
                       </div>
                     </div>
                   </div>
@@ -908,7 +1026,11 @@
                   [disabled]="!canSaveTheme() || themeSaving()"
                 >
                   @if (themeSaving()) {
-                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                    <span
+                      class="spinner-border spinner-border-sm"
+                      role="status"
+                      aria-hidden="true"
+                    ></span>
                   } @else {
                     <i class="bi bi-cloud-check-fill fs-5"></i>
                   }
@@ -943,7 +1065,11 @@
               (click)="saveAdvertisementOrder()"
             >
               @if (orderSaving()) {
-                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                <span
+                  class="spinner-border spinner-border-sm"
+                  role="status"
+                  aria-hidden="true"
+                ></span>
               } @else {
                 <i class="bi bi-list-check"></i>
               }
@@ -959,7 +1085,9 @@
 
           <!-- Upload Strip -->
           @if (canUpdate()) {
-            <div class="ad-upload-strip p-3 border border-2 border-dashed rounded-3 mb-4 d-flex align-items-center justify-content-between flex-wrap gap-3">
+            <div
+              class="ad-upload-strip p-3 border border-2 border-dashed rounded-3 mb-4 d-flex align-items-center justify-content-between flex-wrap gap-3"
+            >
               <div class="d-flex align-items-center gap-3">
                 <div class="upload-icon-circle">
                   <i class="bi bi-cloud-arrow-up-fill fs-4 text-primary"></i>
@@ -987,7 +1115,11 @@
                   [class.disabled]="advertisementLimitReached() || advertisementsUploading()"
                 >
                   <i class="bi bi-images"></i>
-                  <span>{{ advertisementLimitReached() ? copy().maximumReached : copy().chooseAdvertisements }}</span>
+                  <span>{{
+                    advertisementLimitReached()
+                      ? copy().maximumReached
+                      : copy().chooseAdvertisements
+                  }}</span>
                 </label>
 
                 @if (selectedAdvertisementFiles().length > 0) {
@@ -998,11 +1130,19 @@
                     (click)="uploadAdvertisements()"
                   >
                     @if (advertisementsUploading()) {
-                      <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                      <span
+                        class="spinner-border spinner-border-sm"
+                        role="status"
+                        aria-hidden="true"
+                      ></span>
                     } @else {
                       <i class="bi bi-cloud-plus-fill"></i>
                     }
-                    <span>{{ copy().uploadAdvertisements }} ({{ selectedAdvertisementFiles().length }})</span>
+                    <span
+                      >{{ copy().uploadAdvertisements }} ({{
+                        selectedAdvertisementFiles().length
+                      }})</span
+                    >
                   </button>
                   <button
                     type="button"
@@ -1018,10 +1158,16 @@
             </div>
 
             @if (selectedAdvertisementPreviews().length > 0) {
-              <section class="branding-pending-panel mb-4 p-3 border rounded bg-light" [attr.aria-label]="copy().selectedImages">
+              <section
+                class="branding-pending-panel mb-4 p-3 border rounded bg-light"
+                [attr.aria-label]="copy().selectedImages"
+              >
                 <div class="d-flex align-items-center justify-content-between mb-2">
                   <div class="fw-bold small">
-                    <span>{{ copy().selectedImages }}</span> ({{ selectedAdvertisementPreviews().length }} / {{ remainingAdvertisementSlots() }})
+                    <span>{{ copy().selectedImages }}</span> ({{
+                      selectedAdvertisementPreviews().length
+                    }}
+                    / {{ remainingAdvertisementSlots() }})
                   </div>
                   <button
                     type="button"
@@ -1045,7 +1191,9 @@
             }
 
             @if (advertisementValidationMessage()) {
-              <div class="alert alert-danger py-2 small">{{ advertisementValidationMessage() }}</div>
+              <div class="alert alert-danger py-2 small">
+                {{ advertisementValidationMessage() }}
+              </div>
             }
           }
 
@@ -1065,10 +1213,12 @@
                   [class.ad-inactive]="!advertisement.isActive"
                   [class.ad-dragging]="draggingAdvertisementId() === advertisement.id"
                   [class.ad-drop-before]="
-                    dragOverAdvertisementId() === advertisement.id && dragOverPlacement() === 'before'
+                    dragOverAdvertisementId() === advertisement.id &&
+                    dragOverPlacement() === 'before'
                   "
                   [class.ad-drop-after]="
-                    dragOverAdvertisementId() === advertisement.id && dragOverPlacement() === 'after'
+                    dragOverAdvertisementId() === advertisement.id &&
+                    dragOverPlacement() === 'after'
                   "
                   [attr.draggable]="canUpdate() && !orderSaving() ? 'true' : null"
                   (dragstart)="onAdvertisementDragStart($event, advertisement.id)"
@@ -1079,7 +1229,9 @@
                 >
                   <!-- Image Preview Box (16:9 Aspect Ratio) -->
                   <div class="ad-preview-box position-relative bg-light border-bottom">
-                    <div class="ad-badges-top position-absolute top-0 start-0 end-0 p-2 d-flex align-items-center justify-content-between">
+                    <div
+                      class="ad-badges-top position-absolute top-0 start-0 end-0 p-2 d-flex align-items-center justify-content-between"
+                    >
                       <div class="d-flex align-items-center gap-1">
                         <span
                           class="ad-drag-handle badge bg-dark bg-opacity-75 text-white"
@@ -1110,13 +1262,17 @@
                           (error)="markAdvertisementImageFailed(advertisement.id)"
                         />
                       } @else {
-                        <div class="ad-empty-placeholder d-flex flex-column align-items-center justify-content-center h-100 text-muted p-4">
+                        <div
+                          class="ad-empty-placeholder d-flex flex-column align-items-center justify-content-center h-100 text-muted p-4"
+                        >
                           <i class="bi bi-file-earmark-image fs-1 text-secondary opacity-50"></i>
                           <small>تعذر تحميل الصورة</small>
                         </div>
                       }
                     } @else {
-                      <div class="ad-empty-placeholder d-flex flex-column align-items-center justify-content-center h-100 text-muted p-4">
+                      <div
+                        class="ad-empty-placeholder d-flex flex-column align-items-center justify-content-center h-100 text-muted p-4"
+                      >
                         <i class="bi bi-file-earmark-image fs-1 text-secondary opacity-50"></i>
                         <small>{{ copy().advertisementsSection }}</small>
                       </div>
@@ -1124,7 +1280,9 @@
                   </div>
 
                   <!-- Card Footer Controls -->
-                  <div class="card-footer bg-white p-2 d-flex align-items-center justify-content-between gap-1">
+                  <div
+                    class="card-footer bg-white p-2 d-flex align-items-center justify-content-between gap-1"
+                  >
                     <div class="d-flex align-items-center gap-1 small text-muted">
                       <span class="fw-bold text-dark">{{ index + 1 }}</span>
                       <small>/ {{ advertisements().length }}</small>
@@ -1158,8 +1316,12 @@
                           [class.btn-outline-warning]="advertisement.isActive"
                           [class.btn-outline-success]="!advertisement.isActive"
                           [disabled]="mutatingAdvertisementId() === advertisement.id"
-                          [attr.aria-label]="advertisement.isActive ? copy().deactivate : copy().activate"
-                          [attr.title]="advertisement.isActive ? copy().deactivate : copy().activate"
+                          [attr.aria-label]="
+                            advertisement.isActive ? copy().deactivate : copy().activate
+                          "
+                          [attr.title]="
+                            advertisement.isActive ? copy().deactivate : copy().activate
+                          "
                           (click)="toggleAdvertisementState(advertisement)"
                         >
                           <i

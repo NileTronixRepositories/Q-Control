@@ -75,7 +75,7 @@
         <i class="bi bi-shield-lock-fill fs-4" aria-hidden="true"></i>
       </div>
       <div>
-        <h6 class="mb-1 fw-bold">وضعية المغلقة (القراءة فقط)</h6>
+        <h6 class="mb-1 fw-bold">{{ language() === 'ar' ? 'وضع القراءة فقط' : 'Read-Only Mode' }}</h6>
         <span class="small text-muted">{{ copy().configurationReadOnlyMessage }}</span>
       </div>
     </div>
@@ -92,9 +92,14 @@
       <div class="empty-icon-circle mx-auto mb-3">
         <i class="bi bi-buildings text-primary fs-1"></i>
       </div>
-      <h4 class="fw-bold text-dark mb-2">يرجى اختيار الفرع للبدء في ضبط الأوقات</h4>
+      <h4 class="fw-bold text-dark mb-2">
+        {{ language() === 'ar' ? 'يرجى اختيار الفرع للبدء في ضبط الإعدادات' : 'Please select a branch to configure settings' }}
+      </h4>
       <p class="text-muted max-w-md mx-auto mb-0">
-        قم بتحديد الفرع المراد إعداده من القائمة المنسدلة بالأعلى لعرض وضبط إعدادات مهلة إصدار التذاكر قبل انطلاق مواعيد الخدمات المجدولة.
+        {{ language() === 'ar'
+          ? 'قم بتحديد الفرع المراد إعداده من القائمة بالأعلى لعرض وضبط إعدادات مهلة إصدار التذاكر ومعايير وقت تشغيل التذاكر.'
+          : 'Select a branch from the list above to view and configure ticket issuance lead time and ticket runtime thresholds.'
+        }}
       </p>
     </div>
   }
@@ -102,18 +107,18 @@
   @if (selectedBranchId() && !branchesLoading() && !configLoading()) {
     <form [formGroup]="configForm" (ngSubmit)="save()" class="configuration-workspace mt-3">
       <div class="row g-4">
-        <!-- Main Configuration Deck -->
+        <!-- Main Configuration Column -->
         <div class="col-lg-7 col-xl-8">
           <div class="config-card shadow-sm h-100">
             <!-- Card Header Strip -->
             <div class="config-card-header d-flex align-items-center justify-content-between flex-wrap gap-3">
               <div class="d-flex align-items-center gap-3">
                 <div class="section-icon-box" aria-hidden="true">
-                  <i class="bi bi-stopwatch text-primary fs-5"></i>
+                  <i class="bi bi-sliders text-primary fs-5"></i>
                 </div>
                 <div>
-                  <h4 class="m-0 fw-bold card-title fs-6 text-dark">{{ copy().allowedTimeLabel }}</h4>
-                  <p class="text-muted small m-0 mt-1">{{ copy().allowedTimeHelp }}</p>
+                  <h4 class="m-0 fw-bold card-title fs-6 text-dark">{{ copy().branchConfigurationLabel }}</h4>
+                  <p class="text-muted small m-0 mt-1">{{ copy().branchConfigurationDescription }}</p>
                 </div>
               </div>
 
@@ -132,96 +137,204 @@
               </div>
             </div>
 
-            <!-- Time Input Deck (3 Cards Grid) -->
+            <!-- Card Body with 2 Distinct Sections -->
             <div class="config-card-body p-4">
-              <div class="time-inputs-grid mb-3">
-                <!-- Hours Control Card -->
-                <div class="time-unit-box" [class.disabled]="!canModify() || saving()">
-                  <div class="unit-header">
-                    <span class="unit-icon"><i class="bi bi-hourglass-top"></i></span>
-                    <label for="configHours" class="unit-label">{{ copy().hoursLabel }}</label>
+              <!-- Section 1: General Configuration (Allowed Time) -->
+              <div class="config-section general-config-section">
+                <div class="section-heading mb-3">
+                  <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-stopwatch text-primary"></i>
+                    <h5 class="m-0 fw-bold fs-6 text-dark">{{ copy().allowedTimeLabel }}</h5>
                   </div>
-                  <div class="input-wrapper my-2">
-                    <input
-                      type="number"
-                      id="configHours"
-                      class="time-control font-monospace"
-                      formControlName="hours"
-                      min="0"
-                      max="23"
-                      placeholder="00"
-                      [readonly]="!canModify() || saving()"
-                    />
-                  </div>
-                  <span class="unit-footer-tag">ساعة (0-23)</span>
+                  <p class="text-muted small m-0 mt-1">{{ copy().allowedTimeHelp }}</p>
                 </div>
 
-                <!-- Separator -->
-                <div class="time-separator d-none d-md-flex align-items-center justify-content-center">
-                  <span>:</span>
+                <div class="time-inputs-grid mb-3">
+                  <!-- Hours Control Card -->
+                  <div class="time-unit-box" [class.disabled]="!canModify() || saving()">
+                    <div class="unit-header">
+                      <span class="unit-icon"><i class="bi bi-hourglass-top"></i></span>
+                      <label for="configHours" class="unit-label">{{ copy().hoursLabel }}</label>
+                    </div>
+                    <div class="input-wrapper my-2">
+                      <input
+                        type="number"
+                        id="configHours"
+                        class="time-control font-monospace"
+                        formControlName="hours"
+                        min="0"
+                        max="23"
+                        placeholder="00"
+                        [readonly]="!canModify() || saving()"
+                      />
+                    </div>
+                    <span class="unit-footer-tag">{{ language() === 'ar' ? 'ساعة (0-23)' : 'Hours (0-23)' }}</span>
+                  </div>
+
+                  <!-- Separator -->
+                  <div class="time-separator d-none d-md-flex align-items-center justify-content-center">
+                    <span>:</span>
+                  </div>
+
+                  <!-- Minutes Control Card -->
+                  <div class="time-unit-box" [class.disabled]="!canModify() || saving()">
+                    <div class="unit-header">
+                      <span class="unit-icon"><i class="bi bi-clock"></i></span>
+                      <label for="configMinutes" class="unit-label">{{ copy().minutesLabel }}</label>
+                    </div>
+                    <div class="input-wrapper my-2">
+                      <input
+                        type="number"
+                        id="configMinutes"
+                        class="time-control font-monospace"
+                        formControlName="minutes"
+                        min="0"
+                        max="59"
+                        placeholder="00"
+                        [readonly]="!canModify() || saving()"
+                      />
+                    </div>
+                    <span class="unit-footer-tag">{{ language() === 'ar' ? 'دقيقة (0-59)' : 'Minutes (0-59)' }}</span>
+                  </div>
+
+                  <!-- Separator -->
+                  <div class="time-separator d-none d-md-flex align-items-center justify-content-center">
+                    <span>:</span>
+                  </div>
+
+                  <!-- Seconds Control Card -->
+                  <div class="time-unit-box" [class.disabled]="!canModify() || saving()">
+                    <div class="unit-header">
+                      <span class="unit-icon"><i class="bi bi-stopwatch-fill"></i></span>
+                      <label for="configSeconds" class="unit-label">{{ copy().secondsLabel }}</label>
+                    </div>
+                    <div class="input-wrapper my-2">
+                      <input
+                        type="number"
+                        id="configSeconds"
+                        class="time-control font-monospace"
+                        formControlName="seconds"
+                        min="0"
+                        max="59"
+                        placeholder="00"
+                        [readonly]="!canModify() || saving()"
+                      />
+                    </div>
+                    <span class="unit-footer-tag">{{ language() === 'ar' ? 'ثانية (0-59)' : 'Seconds (0-59)' }}</span>
+                  </div>
                 </div>
 
-                <!-- Minutes Control Card -->
-                <div class="time-unit-box" [class.disabled]="!canModify() || saving()">
-                  <div class="unit-header">
-                    <span class="unit-icon"><i class="bi bi-clock"></i></span>
-                    <label for="configMinutes" class="unit-label">{{ copy().minutesLabel }}</label>
+                @if ((configForm.controls.hours.invalid || configForm.controls.minutes.invalid || configForm.controls.seconds.invalid) && configForm.touched) {
+                  <div class="alert alert-danger custom-error-box p-2 d-flex align-items-center gap-2 my-2" role="alert">
+                    <i class="bi bi-exclamation-circle-fill text-danger" aria-hidden="true"></i>
+                    <span class="small">{{ ticketLabels().timeError }}</span>
                   </div>
-                  <div class="input-wrapper my-2">
-                    <input
-                      type="number"
-                      id="configMinutes"
-                      class="time-control font-monospace"
-                      formControlName="minutes"
-                      min="0"
-                      max="59"
-                      placeholder="00"
-                      [readonly]="!canModify() || saving()"
-                    />
-                  </div>
-                  <span class="unit-footer-tag">دقيقة (0-59)</span>
-                </div>
-
-                <!-- Separator -->
-                <div class="time-separator d-none d-md-flex align-items-center justify-content-center">
-                  <span>:</span>
-                </div>
-
-                <!-- Seconds Control Card -->
-                <div class="time-unit-box" [class.disabled]="!canModify() || saving()">
-                  <div class="unit-header">
-                    <span class="unit-icon"><i class="bi bi-stopwatch-fill"></i></span>
-                    <label for="configSeconds" class="unit-label">{{ copy().secondsLabel }}</label>
-                  </div>
-                  <div class="input-wrapper my-2">
-                    <input
-                      type="number"
-                      id="configSeconds"
-                      class="time-control font-monospace"
-                      formControlName="seconds"
-                      min="0"
-                      max="59"
-                      placeholder="00"
-                      [readonly]="!canModify() || saving()"
-                    />
-                  </div>
-                  <span class="unit-footer-tag">ثانية (0-59)</span>
-                </div>
+                }
               </div>
 
-              @if (configForm.invalid && configForm.touched) {
-                <div class="alert alert-danger custom-error-box p-3 d-flex align-items-center gap-2 mb-0 mt-3" role="alert">
-                  <i class="bi bi-exclamation-circle-fill fs-5 text-danger" aria-hidden="true"></i>
-                  <span class="small fw-medium">يُرجى إدخال قيم صحيحة للوقت (الساعات من 0 إلى 23، والدقائق والثواني من 0 إلى 59).</span>
+              <!-- Section 2: Ticket Configuration (Runtime Thresholds) -->
+              <section class="config-section ticket-settings mt-4 pt-4 border-top" [class.disabled]="!canModify() || saving()" aria-labelledby="ticketSettingsTitle">
+                <div class="ticket-settings-header mb-3">
+                  <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-ticket-perforated-fill text-primary"></i>
+                    <h5 id="ticketSettingsTitle" class="m-0 fw-bold fs-6 text-dark">{{ ticketLabels().title }}</h5>
+                  </div>
+                  <p class="text-muted small m-0 mt-1">{{ ticketLabels().description }}</p>
                 </div>
-              }
+
+                <div class="row g-3">
+                  <!-- Maximum Ticket Call Attempts -->
+                  <div class="col-12 col-md-4">
+                    <div class="ticket-field-card p-3 rounded border h-100 d-flex flex-column justify-content-between">
+                      <div>
+                        <label class="form-label fw-bold text-dark small mb-1" for="maximumTicketCallAttempts">
+                          {{ ticketLabels().callAttempts }}
+                        </label>
+                        <div class="input-group input-group-sm mb-1">
+                          <input
+                            id="maximumTicketCallAttempts"
+                            type="number"
+                            class="form-control fw-bold font-monospace"
+                            formControlName="maximumTicketCallAttempts"
+                            min="1"
+                            step="1"
+                            [readonly]="!canModify() || saving()"
+                          />
+                          <span class="input-group-text bg-light text-muted">{{ ticketLabels().attemptsUnit }}</span>
+                        </div>
+                      </div>
+                      <span class="field-subtext text-muted">{{ ticketLabels().callAttemptsHelp }}</span>
+                    </div>
+                  </div>
+
+                  <!-- No-Show Auto Cancellation Time -->
+                  <div class="col-12 col-md-4">
+                    <div class="ticket-field-card p-3 rounded border h-100 d-flex flex-column justify-content-between">
+                      <div>
+                        <label class="form-label fw-bold text-dark small mb-1" for="ticketNoShowAutoCancellationMinutes">
+                          {{ ticketLabels().noShowCancellation }}
+                        </label>
+                        <div class="input-group input-group-sm mb-1">
+                          <input
+                            id="ticketNoShowAutoCancellationMinutes"
+                            type="number"
+                            class="form-control fw-bold font-monospace"
+                            formControlName="ticketNoShowAutoCancellationMinutes"
+                            min="1"
+                            step="1"
+                            [readonly]="!canModify() || saving()"
+                          />
+                          <span class="input-group-text bg-light text-muted">{{ ticketLabels().minutes }}</span>
+                        </div>
+                      </div>
+                      <span class="field-subtext text-muted">{{ ticketLabels().noShowCancellationHelp }}</span>
+                    </div>
+                  </div>
+
+                  <!-- Ticket Archive Retention Days -->
+                  <div class="col-12 col-md-4">
+                    <div class="ticket-field-card p-3 rounded border h-100 d-flex flex-column justify-content-between">
+                      <div>
+                        <label class="form-label fw-bold text-dark small mb-1" for="ticketArchiveRetentionDays">
+                          {{ ticketLabels().archiveRetention }}
+                        </label>
+                        <div class="input-group input-group-sm mb-1">
+                          <input
+                            id="ticketArchiveRetentionDays"
+                            type="number"
+                            class="form-control fw-bold font-monospace"
+                            formControlName="ticketArchiveRetentionDays"
+                            min="1"
+                            step="1"
+                            [readonly]="!canModify() || saving()"
+                          />
+                          <span class="input-group-text bg-light text-muted">{{ ticketLabels().days }}</span>
+                        </div>
+                      </div>
+                      <span class="field-subtext text-muted">{{ ticketLabels().archiveRetentionHelp }}</span>
+                    </div>
+                  </div>
+                </div>
+
+                @if ((configForm.controls.maximumTicketCallAttempts.invalid || configForm.controls.ticketNoShowAutoCancellationMinutes.invalid || configForm.controls.ticketArchiveRetentionDays.invalid) && configForm.touched) {
+                  <div class="alert alert-danger custom-error-box p-2 d-flex align-items-center gap-2 mt-3 mb-0" role="alert">
+                    <i class="bi bi-exclamation-circle-fill text-danger" aria-hidden="true"></i>
+                    <span class="small">{{ ticketLabels().positiveIntegerError }}</span>
+                  </div>
+                }
+              </section>
             </div>
 
             <!-- Action Footer Bar -->
             <div class="config-card-footer d-flex align-items-center justify-content-between flex-wrap gap-3">
               <div class="footer-hint text-muted d-flex align-items-center gap-2">
                 <i class="bi bi-info-circle-fill text-primary"></i>
-                <span class="small">يجب حفظ التعديلات لتطبيق القواعد زمنياً على الأجهزة الطرفية للفرع.</span>
+                <span class="small">
+                  {{ language() === 'ar'
+                    ? 'يتم تطبيق هذا الترتيب والقواعد زمنياً على الخادم المركزي للفرع بعد الحفظ.'
+                    : 'Changes are enforced on the central branch runtime after saving.'
+                  }}
+                </span>
               </div>
 
               @if (canModify()) {
@@ -248,7 +361,9 @@
             <div>
               <div class="widget-header d-flex align-items-center gap-2 pb-3 border-bottom mb-3">
                 <div class="widget-header-icon"><i class="bi bi-activity text-primary fs-5"></i></div>
-                <h6 class="m-0 text-dark fw-bold fs-7">المحاكاة والأثر التشغيلي</h6>
+                <h6 class="m-0 text-dark fw-bold fs-7">
+                  {{ language() === 'ar' ? 'المحاكاة والأثر التشغيلي' : 'Operational Impact Simulation' }}
+                </h6>
               </div>
 
               <!-- LED/LCD Digital Timer Widget -->
@@ -260,7 +375,9 @@
                   <span class="colon">:</span>
                   <span class="digit">{{ formatUnit(configForm.controls.seconds.value) }}</span>
                 </div>
-                <span class="lcd-subtext text-muted small d-block">[ التوقيت المختار قبل انطلاق الخدمة ]</span>
+                <span class="lcd-subtext text-muted small d-block">
+                  {{ language() === 'ar' ? '[ التوقيت المختار قبل انطلاق الخدمة ]' : '[ Lead Time Window Before Service ]' }}
+                </span>
               </div>
 
               <!-- Operational Impact Card -->
@@ -270,11 +387,44 @@
                     <i class="bi bi-ticket-perforated-fill text-warning fs-5"></i>
                   </div>
                   <div class="flex-grow-1">
-                    <span class="d-block fw-bold text-dark mb-1 fs-7">نافذة شاشة التذاكر:</span>
+                    <span class="d-block fw-bold text-dark mb-1 fs-7">
+                      {{ language() === 'ar' ? 'نافذة شاشة التذاكر:' : 'Ticket Screen Window:' }}
+                    </span>
                     <p class="text-muted small mb-0 lh-base">
-                      ستصبح خدمة إصدار التذاكر متاحة للجمهور على الأجهزة التفاعلية قبل بدء موعدها الرسمي بمدة 
+                      {{ language() === 'ar'
+                        ? 'ستصبح خدمة إصدار التذاكر متاحة للجمهور على الأجهزة التفاعلية قبل بدء موعدها الرسمي بمدة'
+                        : 'Ticket issuance becomes available to clients on kiosks prior to scheduled time by'
+                      }}
                       <span class="duration-badge font-monospace px-2 py-0-5 mx-1 rounded">{{ formattedTotalDuration }}</span>.
                     </p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Ticket Runtime Metrics Overview Card -->
+              <div class="runtime-overview-box p-3 rounded-3 border bg-light mb-3">
+                <span class="d-block fw-bold text-dark small mb-2">
+                  <i class="bi bi-clock-history text-primary me-1"></i>
+                  {{ ticketLabels().runtimeSummaryTitle }}
+                </span>
+                <div class="d-flex flex-column gap-2 small">
+                  <div class="d-flex justify-content-between align-items-center text-muted">
+                    <span>{{ ticketLabels().callAttemptsSummary }}:</span>
+                    <span class="fw-bold text-dark font-monospace">
+                      {{ configForm.controls.maximumTicketCallAttempts.value || 0 }} {{ ticketLabels().attemptsUnit }}
+                    </span>
+                  </div>
+                  <div class="d-flex justify-content-between align-items-center text-muted">
+                    <span>{{ ticketLabels().noShowSummary }}:</span>
+                    <span class="fw-bold text-dark font-monospace">
+                      {{ configForm.controls.ticketNoShowAutoCancellationMinutes.value || 0 }} {{ ticketLabels().minutes }}
+                    </span>
+                  </div>
+                  <div class="d-flex justify-content-between align-items-center text-muted">
+                    <span>{{ ticketLabels().retentionSummary }}:</span>
+                    <span class="fw-bold text-dark font-monospace">
+                      {{ configForm.controls.ticketArchiveRetentionDays.value || 0 }} {{ ticketLabels().days }}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -283,7 +433,12 @@
             <!-- System Behavior Footer Tip -->
             <div class="widget-tips pt-3 mt-3 border-top d-flex align-items-center gap-2 text-muted small">
               <i class="bi bi-shield-check text-success fs-5"></i>
-              <span>يتم تطبيق هذا الترتيب تلقائياً في حسابات التذاكر بالخادم المركزي للفرع.</span>
+              <span>
+                {{ language() === 'ar'
+                  ? 'يتم تطبيق هذا الترتيب تلقائياً في حسابات التذاكر بالخادم المركزي للفرع.'
+                  : 'Enforced automatically during branch ticket runtime processing.'
+                }}
+              </span>
             </div>
           </div>
         </div>
@@ -291,4 +446,3 @@
     </form>
   }
 </div>
-

@@ -2,117 +2,288 @@
   display: block;
 }
 
+/* REAL CLINIC QUEUE THERMAL RECEIPT SLIP */
 .ticket-preview {
   background: #ffffff;
-  border: 1px solid #dbeafe;
-  border-radius: 1.1rem;
-  box-shadow: 0 1rem 2rem rgba(15, 23, 42, 0.1);
+  border: 1px solid #cbd5e1;
+  border-radius: 1rem;
+  box-shadow:
+    0 10px 25px -5px rgba(15, 23, 42, 0.1),
+    0 8px 10px -6px rgba(15, 23, 42, 0.05);
   margin-inline: auto;
-  max-width: 34rem;
-  padding: clamp(0.65rem, 1.2vw, 0.9rem);
+  max-width: 26rem;
+  padding: 1.5rem 1.6rem 1.25rem;
+  position: relative;
   text-align: center;
 }
 
-.ticket-preview__success {
-  align-items: center;
-  color: #16875a;
-  display: inline-flex;
-  font-size: 0.76rem;
+/* 1. Hospital & Clinic Header */
+.ticket-preview__hospital-header {
+  margin-bottom: 0.5rem;
+}
+
+.ticket-preview__hospital-logo-wrapper {
+  margin-bottom: 0.75rem;
+}
+
+.ticket-preview__hospital-logo {
+  max-height: 52px;
+  max-width: 140px;
+  object-fit: contain;
+}
+
+.ticket-preview__hospital-name {
+  color: #0f172a;
+  font-size: 1.35rem;
   font-weight: 900;
-  gap: 0.45rem;
-  margin-bottom: 0.7rem;
+  line-height: 1.3;
+  margin: 0 0 0.25rem 0;
+  letter-spacing: -0.01em;
 }
 
-.ticket-preview__check {
-  align-items: center;
-  animation: success-pop 520ms ease both;
-  background: #dcfce7;
-  border-radius: 999px;
-  display: inline-flex;
-  font-size: 0.9rem;
-  height: 1.7rem;
-  justify-content: center;
-  width: 1.7rem;
+.ticket-preview__clinic-tag {
+  color: #475569;
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin: 0;
 }
 
+/* 2. Thermal Dashed Separator */
+.ticket-preview__divider {
+  border-top: 2px dashed #cbd5e1;
+  margin: 0.85rem 0;
+  width: 100%;
+}
+
+/* 3. Number Block (Big Hero Queue Ticket #) */
 .ticket-preview__number-block {
-  border-block: 1px dashed #bfdbfe;
-  display: grid;
-  gap: 0.3rem;
-  margin-bottom: 0.55rem;
-  padding: 0.45rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.25rem 0;
+  position: relative;
 }
 
-.ticket-preview__number-block span {
+.ticket-preview__number-label {
   color: #64748b;
-  font-size: 0.72rem;
+  font-size: 0.85rem;
   font-weight: 800;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
 }
 
-.ticket-preview__number-block strong {
-  color: #0f3f68;
-  font-size: clamp(2.5rem, 5.6vw, 4.2rem);
-  font-weight: 950;
-  letter-spacing: 0;
-  line-height: 0.95;
+.ticket-preview__number {
+  color: #0f172a;
+  font-family:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
+    monospace;
+  font-size: clamp(2.6rem, 6vw, 3.8rem);
+  font-weight: 900;
+  letter-spacing: 2px;
+  line-height: 1.05;
 }
 
-.ticket-preview__detail {
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 1rem;
-  display: grid;
-  gap: 0.35rem;
-  height: 100%;
-  padding: 0.48rem 0.58rem;
+/* 4. Receipt Body Rows */
+.ticket-preview__receipt-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
   text-align: start;
 }
 
-.ticket-preview__detail span {
+.ticket-preview__row {
+  align-items: baseline;
+  border-bottom: 1px dotted #e2e8f0;
+  display: flex;
+  justify-content: space-between;
+  padding: 0.45rem 0.2rem;
+}
+
+.ticket-preview__row:last-child {
+  border-bottom: none;
+}
+
+.ticket-preview__row-label {
   color: #64748b;
-  font-size: 0.68rem;
-  font-weight: 800;
+  font-size: 0.85rem;
+  font-weight: 700;
+  white-space: nowrap;
 }
 
-.ticket-preview__detail strong {
+.ticket-preview__row-value {
   color: #0f172a;
-  font-size: 0.82rem;
-  font-weight: 900;
-  overflow-wrap: anywhere;
+  font-size: 0.92rem;
+  font-weight: 800;
+  text-align: end;
 }
 
-.ticket-preview__qr {
-  align-items: center;
-  color: #334155;
-  display: inline-flex;
-  flex-direction: column;
-  font-size: 0.8rem;
-  font-weight: 900;
-  gap: 0.4rem;
-  margin-top: 0.5rem;
-}
+.ticket-preview__brand-link {
+  color: inherit;
+  text-decoration: none;
 
-.ticket-preview__qr-grid {
-  background:
-    linear-gradient(90deg, #0f172a 18%, transparent 18% 38%, #0f172a 38% 58%, transparent 58%),
-    linear-gradient(#0f172a 18%, transparent 18% 38%, #0f172a 38% 58%, transparent 58%);
-  background-color: #ffffff;
-  background-size: 0.88rem 0.88rem;
-  border: 0.35rem solid #ffffff;
-  box-shadow: 0 0 0 1px #cbd5e1;
-  display: block;
-  height: 4.2rem;
-  width: 4.2rem;
-}
-
-@keyframes success-pop {
-  0% {
-    opacity: 0;
-    transform: scale(0.72);
+  strong {
+    color: #0284c7;
   }
 
-  100% {
-    opacity: 1;
-    transform: scale(1);
+  &:hover strong {
+    text-decoration: underline;
+  }
+}
+
+/* 6. Footer: Clinic Greeting & NileTronix Brand */
+.ticket-preview__footer {
+  border-top: 2px dashed #cbd5e1;
+  margin-top: 0.85rem;
+  padding-top: 0.85rem;
+}
+
+.ticket-preview__greeting {
+  color: #334155;
+  font-size: 0.85rem;
+  font-weight: 800;
+  margin: 0 0 0.4rem 0;
+}
+
+.ticket-preview__brand {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  justify-content: center;
+}
+
+.ticket-preview__powered {
+  color: #94a3b8;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+/* PRINT MEDIA STYLES FOR THERMAL POS RECEIPT PRINTERS (XP-80C, RONGTA 80mm) */
+@media print {
+  :host {
+    display: block !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    width: 100% !important;
+  }
+
+  .ticket-preview {
+    background: #ffffff !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    color: #000000 !important;
+    font-family:
+      system-ui,
+      -apple-system,
+      'Segoe UI',
+      Tahoma,
+      sans-serif !important;
+    margin: 0 auto !important;
+    max-width: 78mm !important;
+    padding: 1mm 2mm 3mm 2mm !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    width: 100% !important;
+  }
+
+  .ticket-preview__hospital-header {
+    margin-bottom: 2mm !important;
+  }
+
+  .ticket-preview__hospital-logo {
+    filter: grayscale(100%) contrast(150%) !important;
+    max-height: 12mm !important;
+    margin-bottom: 1.5mm !important;
+  }
+
+  .ticket-preview__hospital-name {
+    color: #000000 !important;
+    font-size: 13pt !important;
+    font-weight: 900 !important;
+    margin: 0 0 1mm 0 !important;
+  }
+
+  .ticket-preview__clinic-tag {
+    color: #000000 !important;
+    font-size: 9.5pt !important;
+    font-weight: 800 !important;
+    margin: 0 !important;
+  }
+
+  .ticket-preview__divider {
+    border-top: 1.5pt dashed #000000 !important;
+    margin: 2.5mm 0 !important;
+  }
+
+  .ticket-preview__number-block {
+    border: none !important;
+    margin: 0 !important;
+    padding: 1mm 0 !important;
+  }
+
+  .ticket-preview__number-label {
+    color: #000000 !important;
+    font-size: 9.5pt !important;
+    font-weight: 800 !important;
+  }
+
+  .ticket-preview__number {
+    color: #000000 !important;
+    font-size: 28pt !important;
+    font-weight: 900 !important;
+    letter-spacing: 2px !important;
+    line-height: 1.1 !important;
+  }
+
+  .ticket-preview__receipt-body {
+    gap: 0 !important;
+    margin: 0 !important;
+  }
+
+  .ticket-preview__row {
+    border-bottom: 1pt dotted #000000 !important;
+    color: #000000 !important;
+    padding: 1.5mm 0 !important;
+  }
+
+  .ticket-preview__row-label {
+    color: #000000 !important;
+    font-size: 9.5pt !important;
+    font-weight: 800 !important;
+  }
+
+  .ticket-preview__row-value {
+    color: #000000 !important;
+    font-size: 10pt !important;
+    font-weight: 900 !important;
+  }
+
+  .ticket-preview__footer {
+    border-top: 1.5pt dashed #000000 !important;
+    margin-top: 2.5mm !important;
+    padding-top: 2mm !important;
+  }
+
+  .ticket-preview__greeting {
+    color: #000000 !important;
+    font-size: 9pt !important;
+    font-weight: 900 !important;
+    margin: 0 0 1.5mm 0 !important;
+  }
+
+  .ticket-preview__powered {
+    color: #000000 !important;
+    font-size: 8pt !important;
+    font-weight: 700 !important;
+
+    strong {
+      color: #000000 !important;
+    }
+  }
+
+  .d-print-none {
+    display: none !important;
   }
 }

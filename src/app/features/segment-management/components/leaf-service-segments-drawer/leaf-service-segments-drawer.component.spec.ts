@@ -36,4 +36,16 @@ describe('LeafServiceSegmentsDrawerComponent', () => {
     };
     expect(component.formattedRange).toBe('R-001 → R-100');
   });
+
+  it('renders cannot issue ticket state when canIssueTicket is false', () => {
+    component.open = true;
+    component.canIssueTicket = false;
+    component.responseData = null;
+    component.loading = false;
+    fixture.detectChanges();
+
+    const emptyState = fixture.nativeElement.querySelector('.drawer-empty-state');
+    expect(emptyState).toBeTruthy();
+    expect(emptyState.textContent).toContain('This Service Cannot Issue Tickets');
+  });
 });

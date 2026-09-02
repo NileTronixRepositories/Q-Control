@@ -115,6 +115,7 @@ describe('ServiceRequestService', () => {
               rangeEndNumber: 999,
               isTicketIssuable: true,
               isClientInputRequired: true,
+              hasReservation: true,
               customInputs: [
                 {
                   name: 'NationalID',
@@ -142,6 +143,7 @@ describe('ServiceRequestService', () => {
           rangeEndNumber: 999,
           isTicketIssuable: true,
           isClientInputRequired: false,
+          hasReservation: false,
           customInputs: null,
           children: [],
         },
@@ -155,16 +157,20 @@ describe('ServiceRequestService', () => {
       expect(mapped.serviceTypes[0].isTicketIssuable).toBe(false);
       expect(mapped.serviceTypes[1].name.ar).toBe('معمل التحاليل');
       expect(mapped.serviceTypes[1].isTicketIssuable).toBe(true);
+      expect(mapped.serviceTypes[1].hasReservation).toBe(false);
 
       const specialties = mapped.specialtiesMap.get('100');
       expect(specialties).toBeDefined();
       expect(specialties?.length).toBe(1);
       expect(specialties?.[0].name.ar).toBe('عيادة الباطنة');
+      expect(specialties?.[0].hasReservation).toBe(true);
       expect(specialties?.[0].customInputs?.length).toBe(1);
       expect(specialties?.[0].customInputs?.[0].name).toBe('NationalID');
     });
 
-    const req = httpMock.expectOne((r) => r.url.endsWith('/api/branches/7/ticket-issuable-services'));
+    const req = httpMock.expectOne((r) =>
+      r.url.endsWith('/api/branches/7/ticket-issuable-services'),
+    );
     expect(req.request.method).toBe('GET');
     expect(req.request.headers.get('Accept-Language')).toBe('ar');
     expect(req.request.headers.has('Authorization')).toBe(false);

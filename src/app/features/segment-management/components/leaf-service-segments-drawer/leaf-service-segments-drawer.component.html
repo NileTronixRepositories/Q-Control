@@ -1,31 +1,55 @@
 @if (open) {
   <div class="drawer-backdrop fade show" (click)="closeDrawer()"></div>
   <aside class="drawer-panel shadow-lg d-flex flex-column" role="dialog" aria-modal="true">
-    <header class="drawer-header p-3 bg-light border-bottom d-flex align-items-center justify-content-between">
-      <div class="d-flex align-items-center gap-2">
-        <div class="p-2 bg-primary-subtle text-primary rounded-3 d-flex align-items-center justify-content-center">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
-            <line x1="7" y1="7" x2="7.01" y2="7"/>
+    <header class="drawer-header d-flex align-items-center justify-content-between gap-3">
+      <div class="d-flex align-items-center gap-2.5 flex-grow-1 overflow-hidden">
+        <div class="drawer-header-icon">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path
+              d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"
+            />
+            <line x1="7" y1="7" x2="7.01" y2="7" />
           </svg>
         </div>
-        <div>
-          <span class="text-secondary small d-block fw-semibold">{{ translations.serviceSegmentsTitle || 'شرائح الخدمة' }}</span>
-          <h5 class="m-0 fw-bold text-dark fs-6">{{ serviceTitle }}</h5>
+        <div class="drawer-header-text">
+          <span class="drawer-header-eyebrow d-block">{{
+            translations.serviceSegmentsTitle || 'شرائح الخدمة'
+          }}</span>
+          <h5 class="drawer-header-title" [title]="serviceTitle">{{ serviceTitle }}</h5>
         </div>
       </div>
       <button
         type="button"
-        class="btn-close"
+        class="btn-close flex-shrink-0"
         [title]="translations.close || 'إغلاق'"
         (click)="closeDrawer()"
       ></button>
     </header>
 
-    <div class="drawer-body p-4 flex-grow-1 overflow-auto">
+    <div class="drawer-body">
       @if (errorMessage()) {
         <div class="alert alert-danger d-flex align-items-center gap-2 mb-3 rounded-3" role="alert">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+          >
+            <path
+              d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"
+            />
+          </svg>
           <div class="small fw-semibold">{{ errorMessage() }}</div>
         </div>
       }
@@ -35,60 +59,135 @@
           <div class="spinner-border text-primary" role="status">
             <span class="visually-hidden">{{ translations.loading || 'جاري التحميل...' }}</span>
           </div>
-          <p class="mt-2 text-muted small fw-semibold">{{ translations.loading || 'جاري التحميل...' }}</p>
+          <p class="mt-2 text-muted small fw-semibold">
+            {{ translations.loading || 'جاري التحميل...' }}
+          </p>
+        </div>
+      } @else if (!canIssueTicket) {
+        <!-- Informative State: Service Cannot Issue Tickets -->
+        <div class="drawer-empty-state">
+          <div class="empty-state-icon-box warning">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="32"
+              height="32"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line>
+            </svg>
+          </div>
+          <h5 class="fw-bold text-dark mb-2">
+            {{ translations.cannotIssueTicketTitle || 'هذه الخدمة لا تصدر تذاكر' }}
+          </h5>
+          <p class="text-muted small mx-auto mb-3" style="max-width: 440px; line-height: 1.6">
+            {{
+              translations.cannotIssueTicketDesc ||
+                'تم ضبط هذه الخدمة كخدمة لا تصدر تذاكر، لذلك لا يمكن تخصيص نطاق أرقام أو ربط وإدارة شرائح بها. يمكنك تفعيل خيار إصدار التذاكر من شاشة إعدادات وتعديل الخدمة.'
+            }}
+          </p>
+          <div>
+            <span
+              class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle px-3 py-2 rounded-pill fw-semibold"
+            >
+              <i class="bi bi-info-circle me-1"></i>
+              {{ translations.cannotIssueTicketBadge || 'لا يمكن إصدار تذكرة' }}
+            </span>
+          </div>
         </div>
       } @else if (responseData) {
-        <!-- Summary Cards -->
-        <div class="row g-3 mb-4">
+        <!-- Summary Stats Cards Grid -->
+        <div class="row g-2 g-md-3 mb-4">
           <div class="col-6 col-md-3">
-            <div class="p-3 bg-body-tertiary rounded-3 border text-center">
-              <span class="text-secondary small d-block fw-semibold mb-1">{{ translations.serviceRange || 'نطاق التذاكر' }}</span>
-              <strong class="fs-6 text-dark text-nowrap" dir="ltr" style="display: inline-block;">{{ formattedRange }}</strong>
+            <div class="stat-card stat-card--neutral">
+              <span class="stat-label">{{ translations.serviceRange || 'نطاق التذاكر' }}</span>
+              <strong class="stat-range-text" dir="ltr" [title]="formattedRange">{{
+                formattedRange
+              }}</strong>
             </div>
           </div>
           <div class="col-6 col-md-3">
-            <div class="p-3 bg-body-tertiary rounded-3 border text-center">
-              <span class="text-secondary small d-block fw-semibold mb-1">{{ translations.serviceCapacity || 'إجمالي سعة الخدمة' }}</span>
-              <strong class="fs-5 text-dark">{{ responseData.capacity }}</strong>
+            <div class="stat-card stat-card--neutral">
+              <span class="stat-label">{{
+                translations.serviceCapacity || 'إجمالي سعة الخدمة'
+              }}</span>
+              <strong class="stat-value">{{ responseData.capacity }}</strong>
             </div>
           </div>
           <div class="col-6 col-md-3">
-            <div class="p-3 bg-primary-subtle text-primary rounded-3 border border-primary-subtle text-center">
-              <span class="small d-block fw-semibold mb-1">{{ translations.allocatedQuota || 'الحصة المخصصة' }}</span>
-              <strong class="fs-5">{{ responseData.allocatedNonDefaultQuota }}</strong>
+            <div class="stat-card stat-card--primary">
+              <span class="stat-label">{{ translations.allocatedQuota || 'الحصة المخصصة' }}</span>
+              <strong class="stat-value">{{ responseData.allocatedNonDefaultQuota }}</strong>
             </div>
           </div>
           <div class="col-6 col-md-3">
-            <div class="p-3 bg-success-subtle text-success rounded-3 border border-success-subtle text-center">
-              <span class="small d-block fw-semibold mb-1">{{ translations.remainingQuota || 'الحصة المتبقية' }}</span>
-              <strong class="fs-5">{{ responseData.remainingQuota }}</strong>
+            <div class="stat-card stat-card--success">
+              <span class="stat-label">{{ translations.remainingQuota || 'الحصة المتبقية' }}</span>
+              <strong class="stat-value">{{ responseData.remainingQuota }}</strong>
             </div>
           </div>
         </div>
 
-        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
-          <h6 class="fw-bold m-0 text-dark">{{ translations.serviceSegmentsTitle || 'قائمة الشرائح المربوطة' }}</h6>
+        <!-- Action Bar -->
+        <div class="drawer-action-bar">
+          <h6 class="drawer-section-title">
+            {{
+              translations.assignedSegmentsList ||
+                translations.serviceSegmentsTitle ||
+                'قائمة الشرائح المربوطة'
+            }}
+          </h6>
           @if (canAssign) {
-            <button
-              type="button"
-              class="btn btn-primary btn-sm px-3 py-2 fw-semibold rounded-pill d-inline-flex align-items-center gap-2"
-              (click)="onOpenAddModal()"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/>
+            <button type="button" class="btn-assign-new" (click)="onOpenAddModal()">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="15"
+                height="15"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="8" x2="12" y2="16" />
+                <line x1="8" y1="12" x2="16" y2="12" />
               </svg>
-              {{ translations.assignSegments || 'ربط شرائح جديدة' }}
+              <span>{{ translations.assignSegments || 'ربط شرائح جديدة' }}</span>
             </button>
           }
         </div>
 
         @if (unassignConfirmItem(); as itemToUnassign) {
-          <div class="alert alert-danger border-danger-subtle bg-danger-subtle text-danger mb-3 rounded-3">
+          <div
+            class="alert alert-danger border-danger-subtle bg-danger-subtle text-danger mb-3 rounded-3"
+          >
             <h6 class="fw-bold d-flex align-items-center gap-2 mb-2">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path
+                  d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"
+                />
+              </svg>
               {{ translations.confirmUnassignTitle || 'تأكيد إزالة ربط الشريحة' }}
             </h6>
-            <p class="small mb-3">{{ translations.confirmUnassignMessage || 'هل أنت تأكد من إزالة هذه الشريحة من الخدمة المحددة؟' }}</p>
+            <p class="small mb-3">
+              {{
+                translations.confirmUnassignMessage ||
+                  'هل أنت متأكد من إزالة هذه الشريحة من الخدمة المحددة؟'
+              }}
+            </p>
             <div class="d-flex align-items-center gap-2">
               <button
                 type="button"
@@ -97,7 +196,7 @@
                 (click)="confirmUnassign()"
               >
                 @if (unassigning) {
-                  <span class="spinner-border spinner-border-sm" role="status"></span>
+                  <span class="spinner-border spinner-border-sm me-1" role="status"></span>
                 }
                 {{ translations.unassignSegment || 'إزالة الربط' }}
               </button>
@@ -113,107 +212,211 @@
           </div>
         }
 
-        <div class="table-responsive border rounded-3">
-          <table class="table table-hover align-middle mb-0">
-            <thead class="table-light">
+        <!-- Responsive Table -->
+        <div class="table-responsive drawer-table-wrapper">
+          <table class="table drawer-table align-middle">
+            <thead>
               <tr>
-                <th>{{ translations.arabicName || 'الاسم بالعربية' }}</th>
-                <th>{{ translations.englishName || 'الاسم بالإنجليزية' }}</th>
-                <th>{{ translations.scope || 'النطاق' }}</th>
-                <th>{{ translations.priority || 'الأولوية' }}</th>
-                <th>{{ translations.quota || 'الحصة' }}</th>
-                <th class="text-center" style="width: 110px;">{{ translations.actions || 'الإجراءات' }}</th>
+                <th class="col-ar-name">{{ translations.arabicName || 'الاسم بالعربية' }}</th>
+                <th class="col-en-name">{{ translations.englishName || 'الاسم بالإنجليزية' }}</th>
+                <th class="col-scope">{{ translations.scope || 'النطاق' }}</th>
+                <th class="col-priority">{{ translations.priority || 'الأولوية' }}</th>
+                <th class="col-quota">{{ translations.quota || 'الحصة' }}</th>
+                <th class="col-actions text-center">{{ translations.actions || 'الإجراءات' }}</th>
               </tr>
             </thead>
             <tbody>
               @for (segment of responseData.segments; track segment.branchServiceSegmentId) {
                 <tr [class.table-active]="segment.isSystemDefault">
-                  <td>
-                    <strong class="text-dark">{{ segment.arabicName }}</strong>
+                  <td class="col-ar-name">
+                    <strong class="text-dark d-inline-block align-middle me-1">{{
+                      segment.arabicName
+                    }}</strong>
                     @if (segment.isSystemDefault) {
-                      <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle ms-2">{{ translations.systemDefault || 'افتراضي النظام' }}</span>
+                      <span
+                        class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle badge-custom"
+                        >{{ translations.systemDefault || 'افتراضي النظام' }}</span
+                      >
                     }
                   </td>
-                  <td>{{ segment.englishName }}</td>
-                  <td>
+                  <td class="col-en-name text-muted">{{ segment.englishName }}</td>
+                  <td class="col-scope">
                     @if (segment.scope === 'Global') {
-                      <span class="badge bg-primary-subtle text-primary border border-primary-subtle">{{ translations.scopeGlobal || 'عامة (Global)' }}</span>
+                      <span
+                        class="badge bg-primary-subtle text-primary border border-primary-subtle badge-custom"
+                        >{{ translations.scopeGlobal || 'عامة (Global)' }}</span
+                      >
                     } @else {
-                      <span class="badge bg-info-subtle text-info-emphasis border border-info-subtle">{{ translations.scopeBranchScoped || 'خاصة بالفرع (Branch-Scoped)' }}</span>
+                      <span
+                        class="badge bg-info-subtle text-info-emphasis border border-info-subtle badge-custom"
+                        >{{ translations.scopeBranchScoped || 'خاصة بالفرع (Branch-Scoped)' }}</span
+                      >
                     }
                   </td>
-                  <td>
-                    <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle">
+                  <td class="col-priority">
+                    <span
+                      class="badge bg-secondary-subtle text-secondary border border-secondary-subtle badge-custom"
+                    >
                       {{ translations.priority || 'الأولوية' }}: {{ segment.priority }}
                     </span>
                   </td>
-                  <td>
+                  <td class="col-quota">
                     @if (editingSegmentId() === segment.segmentId) {
-                      <div class="d-flex align-items-center gap-1" style="max-width: 140px;">
+                      <div class="inline-quota-box">
                         <input
                           type="number"
                           min="0"
                           step="1"
-                          class="form-control form-control-sm rounded-2"
+                          class="form-control inline-quota-input"
                           [ngModel]="editQuotaValue()"
                           (ngModelChange)="editQuotaValue.set($event)"
                         />
                         <button
                           type="button"
-                          class="btn btn-sm btn-success p-1 rounded-2"
+                          class="btn-icon-action text-success"
                           [disabled]="updatingQuota"
+                          [title]="translations.save || 'حفظ'"
                           (click)="saveQuota(segment)"
                         >
-                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="14"
+                            height="14"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2.5"
+                            stroke-linecap="round"
+                          >
+                            <polyline points="20 6 9 17 4 12" />
+                          </svg>
                         </button>
                         <button
                           type="button"
-                          class="btn btn-sm btn-light border p-1 rounded-2"
+                          class="btn-icon-action text-secondary"
+                          [title]="translations.cancel || 'إلغاء'"
                           (click)="cancelEditQuota()"
                         >
-                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="14"
+                            height="14"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2.5"
+                            stroke-linecap="round"
+                          >
+                            <line x1="18" y1="6" x2="6" y2="18" />
+                            <line x1="6" y1="6" x2="18" y2="18" />
+                          </svg>
                         </button>
                       </div>
                     } @else {
                       <strong class="fs-6 text-dark">{{ segment.quota }}</strong>
                     }
                   </td>
-                  <td class="text-center">
+                  <td class="col-actions text-center">
                     @if (!segment.isSystemDefault) {
-                      <div class="d-flex align-items-center justify-content-center gap-1">
+                      <div class="d-inline-flex align-items-center justify-content-center gap-1">
                         @if (canUpdateQuota && editingSegmentId() !== segment.segmentId) {
                           <button
                             type="button"
-                            class="btn btn-sm btn-light border text-primary rounded-2 p-1"
+                            class="btn-icon-action text-primary"
                             [title]="translations.editQuota || 'تعديل الحصة'"
                             (click)="startEditQuota(segment)"
                           >
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                              <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="14"
+                              height="14"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="2"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                            >
+                              <path d="M12 20h9" />
+                              <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
                             </svg>
                           </button>
                         }
                         @if (canUnassign) {
                           <button
                             type="button"
-                            class="btn btn-sm btn-light border text-danger rounded-2 p-1"
+                            class="btn-icon-action text-danger"
                             [title]="translations.unassignSegment || 'إزالة الربط'"
                             (click)="promptUnassign(segment)"
                           >
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                              <polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="14"
+                              height="14"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="2"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                            >
+                              <polyline points="3 6 5 6 21 6" />
+                              <path
+                                d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+                              />
                             </svg>
                           </button>
                         }
                       </div>
                     } @else {
-                      <span class="badge bg-light text-secondary border fs-7">{{ translations.protected || 'محمي' }}</span>
+                      <span class="badge bg-light text-secondary border badge-custom">{{
+                        translations.protected || 'محمي'
+                      }}</span>
                     }
                   </td>
                 </tr>
               }
             </tbody>
           </table>
+        </div>
+      } @else {
+        <!-- State: Error / Empty Load State -->
+        <div class="drawer-empty-state">
+          <div class="empty-state-icon-box danger">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="32"
+              height="32"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+          </div>
+          <h5 class="fw-bold text-dark mb-2">
+            {{ translations.loadError || 'تعذر تحميل بيانات الشرائح' }}
+          </h5>
+          <p class="text-muted small mx-auto mb-3" style="max-width: 400px; line-height: 1.6">
+            {{
+              errorMessage() ||
+                translations.emptySegments ||
+                'حدث خطأ أثناء محاولة جلب الشرائح الخاصة بهذه الخدمة.'
+            }}
+          </p>
+          <button
+            type="button"
+            class="btn btn-primary btn-sm px-4 py-2 rounded-pill fw-semibold d-inline-flex align-items-center gap-2"
+            (click)="onRetry()"
+          >
+            <i class="bi bi-arrow-clockwise"></i>
+            <span>{{ translations.retry || 'إعادة المحاولة' }}</span>
+          </button>
         </div>
       }
     </div>

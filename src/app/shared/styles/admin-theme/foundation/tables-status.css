@@ -1,8 +1,9 @@
-﻿/* Tables and status indicators. Bootstrap owns table semantics; this file owns admin theming. */
+/* Tables and status indicators. Bootstrap owns table semantics; this file owns admin theming. */
 body[data-admin-theme] :where(.list-panel, .content-panel, .settings-panel) {
   min-width: 0;
 }
 
+/* Standalone Table Wrapper */
 body[data-admin-theme] :where(.table-wrap, .table-responsive) {
   max-width: 100%;
   overflow-x: auto;
@@ -15,12 +16,31 @@ body[data-admin-theme] :where(.table-wrap, .table-responsive) {
   scrollbar-gutter: stable both-edges;
 }
 
+/* Eliminate nested borders and inner shadows when table is inside any panel */
+body[data-admin-theme] :where(.list-panel, .content-panel, .settings-panel, .form-panel, .card, .tab-pane) :where(.table-wrap, .table-responsive) {
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+/* Seamless Empty State inside tables */
+body[data-admin-theme] :where(table, .table, .custom-table, td) :where(.empty-state, .table-empty-state) {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  padding: 3rem 1rem !important;
+}
+
 body[data-admin-theme] :where(table, .table, .custom-table) {
   width: 100%;
   min-width: var(--q-admin-table-min-width, 760px);
   color: var(--nt-text);
   background: transparent;
   table-layout: auto;
+  border-collapse: separate;
+  border-spacing: 0;
 }
 
 body[data-admin-theme] :where(.table > :not(caption) > * > *, .custom-table > :not(caption) > * > *) {
@@ -34,13 +54,20 @@ body[data-admin-theme] :where(th, .custom-table thead th, .table thead th) {
   color: #536175;
   background: #f8fbfd;
   border-bottom: 1px solid var(--nt-border);
-  font-size: 0.72rem;
-  font-weight: 900;
-  letter-spacing: 0;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
 }
 
 body[data-admin-theme] :where(td, .custom-table tbody td, .table tbody td) {
   font-size: 0.88rem;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
+}
+
+body[data-admin-theme] :where(tbody tr:last-child td, .custom-table tbody tr:last-child td, .table tbody tr:last-child td) {
+  border-bottom: none;
 }
 
 body[data-admin-theme] :where(tbody tr:hover td, .custom-table tbody tr:hover td, .table tbody tr:hover td) {
