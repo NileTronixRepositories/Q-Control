@@ -69,6 +69,13 @@ export interface TicketIssuableServicesResponse {
   readonly services: readonly BranchServiceNodeDto[];
 }
 
+export interface KioskAdvertisementItem {
+  readonly id: number;
+  readonly imageUrl: string;
+  readonly displayOrder: number;
+  readonly isActive: boolean;
+}
+
 export interface MappedServiceRequestData {
   readonly branchId: number;
   readonly branchBranding: TicketIssuanceBranding | null;
@@ -76,4 +83,5 @@ export interface MappedServiceRequestData {
   readonly theme: TicketIssuanceTheme | null;
   readonly serviceTypes: readonly ServiceType[];
   readonly specialtiesMap: ReadonlyMap<string, readonly Specialty[]>;
+  readonly advertisements?: readonly KioskAdvertisementItem[];
 }

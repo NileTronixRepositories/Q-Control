@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, computed, inject, output, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  output,
+  signal,
+} from '@angular/core';
 import { ServiceRequestStore } from '../../store/service-request.store';
 
 @Component({
@@ -17,10 +24,10 @@ export class KeypadInputComponent {
   protected readonly isRtl = computed(() => this.store.direction() === 'rtl');
 
   protected readonly confirmButtonText = computed(() => {
-    return (
-      this.store.keypadButton()?.text ||
-      (this.isRtl() ? 'تأكيد الرقم وإصدار التذكرة' : 'Confirm & Issue Ticket')
-    );
+    if (!this.isRtl()) {
+      return 'Confirm & Issue Ticket';
+    }
+    return this.store.keypadButton()?.text || 'تأكيد الرقم وإصدار التذكرة';
   });
 
   protected appendDigit(digit: string): void {

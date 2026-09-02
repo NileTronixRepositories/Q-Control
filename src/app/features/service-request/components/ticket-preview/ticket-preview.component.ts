@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
 
 import { AppLanguage } from '../../../../shared/models/app-language/app-language.model';
 import { ServiceRequestTranslations } from '../../models/language/language.model';
@@ -15,6 +15,8 @@ export class TicketPreviewComponent {
   readonly language = input.required<AppLanguage>();
   readonly translations = input.required<ServiceRequestTranslations>();
   readonly branchLogoUrl = input<string | null>(null);
+  readonly allowRequestMoreServices = input<boolean>(false);
+  readonly requestMoreServices = output<void>();
 
   protected readonly logoLoadFailed = signal<boolean>(false);
   readonly niletronixUrl = 'https://www.niletronix.com/';

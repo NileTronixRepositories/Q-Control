@@ -18,7 +18,10 @@ export class ServiceCardComponent {
   protected readonly cardClass = computed(() => `service-card tone-${this.card().tone}`);
 
   protected readonly promptText = computed(() => {
-    return this.store.serviceButton()?.text || (this.store.language() === 'ar' ? 'المس الاختيار للمتابعة' : 'Tap to select');
+    if (this.store.language() === 'en') {
+      return 'Tap to select';
+    }
+    return this.store.serviceButton()?.text || 'المس الاختيار للمتابعة';
   });
 
   protected readonly arrowIconClass = computed(() => {

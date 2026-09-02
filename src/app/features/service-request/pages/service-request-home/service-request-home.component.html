@@ -68,7 +68,7 @@
     <!-- MAIN TOUCHSCREEN KIOSK AREA -->
     <main class="service-request-kiosk__main flex-grow-1 min-height-0">
       <div class="row w-100 h-100 m-0 g-4 align-items-stretch">
-        <!-- COL 4 — BRAND LOGO PILLAR (CLEAN FRAMELESS DISPLAY) -->
+        <!-- COL 4 — BRAND LOGO PILLAR -->
         <div class="col-4 h-100 p-0">
           <div class="service-request-branch-logo-box">
             @if (store.logoUrl(); as branchLogo) {
@@ -162,6 +162,15 @@
             } @else if (isLanguageStepActive()) {
               <!-- STEP 0 — DEDICATED LANGUAGE SELECTION STEP -->
               <div class="kiosk-lang-grid">
+                <div class="kiosk-lang-header text-center mb-3">
+                  <h2 class="kiosk-lang-header-title">
+                    {{
+                      store.language() === 'ar' && store.languageButton()?.text
+                        ? store.languageButton()?.text
+                        : store.translations().languageStepTitle
+                    }}
+                  </h2>
+                </div>
                 <button
                   type="button"
                   class="kiosk-lang-card"
@@ -278,6 +287,10 @@
                       [language]="store.language()"
                       [translations]="store.translations()"
                       [branchLogoUrl]="store.logoUrl()"
+                      [allowRequestMoreServices]="
+                        store.behavior()?.allowRequestMoreServices === true
+                      "
+                      (requestMoreServices)="restart()"
                     />
                   }
                 }

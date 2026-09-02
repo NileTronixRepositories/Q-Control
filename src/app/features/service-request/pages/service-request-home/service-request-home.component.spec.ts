@@ -90,6 +90,7 @@ describe('ServiceRequestHomeComponent', () => {
             errorLoadingServices: signal(false).asReadonly(),
             logoUrl: signal<string | null>(null).asReadonly(),
             branchBranding: signal<any>(null).asReadonly(),
+            advertisements: signal<readonly any[]>([]).asReadonly(),
             theme: signal<any>(null).asReadonly(),
             behavior: signal<any>(null).asReadonly(),
             languageButton: signal<any>(null).asReadonly(),
@@ -161,6 +162,7 @@ describe('ServiceRequestHomeComponent', () => {
             | 'errorLoadingServices'
             | 'logoUrl'
             | 'branchBranding'
+            | 'advertisements'
             | 'theme'
             | 'behavior'
             | 'languageButton'

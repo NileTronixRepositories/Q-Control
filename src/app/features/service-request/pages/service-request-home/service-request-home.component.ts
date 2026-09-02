@@ -67,12 +67,14 @@ export class ServiceRequestHomeComponent implements OnDestroy {
   protected readonly activeServiceTitle = signal<string>('');
   protected readonly activeTargetNode = signal<ServiceType | Specialty | null>(null);
   protected readonly hasForwardSelection = signal<boolean>(false);
+  protected readonly currentAdIndex = signal<number>(0);
 
   private cachedSearchParams: {
     customInputs?: Record<string, string | number>;
     field?: string;
   } | null = null;
   private initializedLanguageStep = false;
+  private adRotationIntervalId: ReturnType<typeof setInterval> | null = null;
 
   constructor() {
     effect(() => {
@@ -82,6 +84,21 @@ export class ServiceRequestHomeComponent implements OnDestroy {
         if (behavior.showLanguagePage) {
           this.isLanguageStepActive.set(true);
         }
+      }
+    });
+
+    effect(() => {
+      const ads = this.store.advertisements();
+      if (this.adRotationIntervalId !== null) {
+        clearInterval(this.adRotationIntervalId);
+        this.adRotationIntervalId = null;
+      }
+      if (ads.length > 1) {
+        this.adRotationIntervalId = setInterval(() => {
+          this.currentAdIndex.update((prev) => (prev + 1) % ads.length);
+        }, 5000);
+      } else {
+        this.currentAdIndex.set(0);
       }
     });
   }
@@ -640,6 +657,10 @@ export class ServiceRequestHomeComponent implements OnDestroy {
     if (this.autoRestartTimeoutId !== null) {
       clearTimeout(this.autoRestartTimeoutId);
       this.autoRestartTimeoutId = null;
+    }
+    if (this.adRotationIntervalId !== null) {
+      clearInterval(this.adRotationIntervalId);
+      this.adRotationIntervalId = null;
     }
   }
 

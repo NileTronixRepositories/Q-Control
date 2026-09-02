@@ -147,16 +147,38 @@
 .ticket-preview__brand {
   align-items: center;
   display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 0.35rem;
   justify-content: center;
+  line-height: 1.4;
 }
 
 .ticket-preview__powered {
-  color: #94a3b8;
-  font-size: 0.75rem;
+  color: #64748b;
+  font-size: 0.78rem;
   font-weight: 600;
-  letter-spacing: 0.3px;
+
+  strong {
+    color: #1e293b;
+    font-weight: 800;
+  }
+}
+
+.ticket-preview__brand-sep {
+  color: #94a3b8;
+  font-weight: 700;
+}
+
+.ticket-preview__brand-link {
+  color: var(--kiosk-main-color, #0b8aa8);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
 }
 
 /* PRINT MEDIA STYLES FOR THERMAL POS RECEIPT PRINTERS (XP-80C, RONGTA 80mm) */
@@ -273,10 +295,21 @@
     margin: 0 0 1.5mm 0 !important;
   }
 
-  .ticket-preview__powered {
+  .ticket-preview__brand {
+    align-items: center !important;
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 1mm !important;
+    justify-content: center !important;
+  }
+
+  .ticket-preview__powered,
+  .ticket-preview__brand-sep,
+  .ticket-preview__brand-link {
     color: #000000 !important;
-    font-size: 8pt !important;
+    font-size: 7.5pt !important;
     font-weight: 700 !important;
+    text-decoration: none !important;
 
     strong {
       color: #000000 !important;

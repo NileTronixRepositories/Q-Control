@@ -175,5 +175,11 @@ describe('ServiceRequestService', () => {
     expect(req.request.headers.get('Accept-Language')).toBe('ar');
     expect(req.request.headers.has('Authorization')).toBe(false);
     req.flush(mockApiResponse);
+
+    const adsReq = httpMock.expectOne((r) =>
+      r.url.endsWith('/api/branches/7/advertisements'),
+    );
+    expect(adsReq.request.method).toBe('GET');
+    adsReq.flush([]);
   });
 });

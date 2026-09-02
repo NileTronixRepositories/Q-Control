@@ -79,7 +79,7 @@
   </div>
 
   <!-- 6. Actions: Print Ticket Button (Visible on screen only) -->
-  <div class="ticket-preview__actions mt-3 d-print-none">
+  <div class="ticket-preview__actions mt-3 d-print-none d-flex flex-column gap-2">
     <button
       type="button"
       class="btn btn-primary w-100 py-3 d-flex align-items-center justify-content-center gap-2"
@@ -88,6 +88,17 @@
       <i class="bi bi-printer-fill" aria-hidden="true"></i>
       <span>{{ language() === 'ar' ? 'طباعة التذكرة' : 'Print Ticket' }}</span>
     </button>
+
+    @if (allowRequestMoreServices()) {
+      <button
+        type="button"
+        class="btn btn-outline-secondary w-100 py-3 d-flex align-items-center justify-content-center gap-2"
+        (click)="requestMoreServices.emit()"
+      >
+        <i class="bi bi-plus-circle" aria-hidden="true"></i>
+        <span>{{ language() === 'ar' ? 'طلب خدمة أخرى' : 'Request Another Service' }}</span>
+      </button>
+    }
   </div>
 
   <!-- 9. Hospital Greeting & Thermal Brand Line -->
@@ -99,18 +110,17 @@
           : 'Wishing you good health and wellness'
       }}
     </p>
-    <div class="ticket-preview__brand">
-      <span class="ticket-preview__powered">
-        NILETRONIX · Powered by
-        <a
-          [href]="niletronixUrl"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="ticket-preview__brand-link"
-        >
-          <strong>https://www.niletronix.com/</strong>
-        </a>
-      </span>
+    <div class="ticket-preview__brand" dir="ltr">
+      <span class="ticket-preview__powered">Powered by <strong>NileTronix</strong></span>
+      <span class="ticket-preview__brand-sep">·</span>
+      <a
+        [href]="niletronixUrl"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="ticket-preview__brand-link"
+      >
+        www.niletronix.com
+      </a>
     </div>
   </footer>
 </section>

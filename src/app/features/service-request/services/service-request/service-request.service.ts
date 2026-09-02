@@ -1,13 +1,15 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { map, Observable } from 'rxjs';
+import { catchError, forkJoin, map, Observable, of } from 'rxjs';
 
 import { environment } from '../../../../../environments/environment';
 import { AuthSessionService } from '../../../auth/services/auth-session/auth-session.service';
 import { AppLanguageStore } from '../../../../core/i18n/app-language.store';
+import { BranchAdvertisementResponse } from '../../../branch-management/models/branch-branding/branch-branding.model';
 import { LocalizedText } from '../../models/language/language.model';
 import {
   BranchServiceNodeDto,
+  KioskAdvertisementItem,
   MappedServiceRequestData,
   TicketIssuableServicesResponse,
 } from '../../models/service-request-api/service-request-api.model';
@@ -36,10 +38,23 @@ export class ServiceRequestService {
     .replace(/\/$/, '');
 
   loadBranchServices(branchId: number): Observable<MappedServiceRequestData> {
-    const url = `${this.branchesEndpoint}/${branchId}/ticket-issuable-services`;
-    return this.httpClient
-      .get<TicketIssuableServicesResponse>(url, { headers: this.createPublicHeaders() })
-      .pipe(map((response) => this.mapApiResponse(response)));
+    const servicesUrl = `${this.branchesEndpoint}/${branchId}/ticket-issuable-services`;
+    const adsUrl = `${this.branchesEndpoint}/${branchId}/advertisements`;
+
+    return forkJoin({
+      servicesResponse: this.httpClient.get<TicketIssuableServicesResponse>(servicesUrl, {
+        headers: this.createPublicHeaders(),
+      }),
+      adsResponse: this.httpClient
+        .get<readonly BranchAdvertisementResponse[]>(adsUrl, {
+          headers: this.createPublicHeaders(),
+        })
+        .pipe(catchError(() => of([] as readonly BranchAdvertisementResponse[]))),
+    }).pipe(
+      map(({ servicesResponse, adsResponse }) =>
+        this.mapApiResponse(servicesResponse, adsResponse),
+      ),
+    );
   }
 
   private createPublicHeaders(): HttpHeaders {
@@ -49,7 +64,10 @@ export class ServiceRequestService {
     });
   }
 
-  private mapApiResponse(response: TicketIssuableServicesResponse): MappedServiceRequestData {
+  private mapApiResponse(
+    response: TicketIssuableServicesResponse,
+    advertisements: readonly BranchAdvertisementResponse[] = [],
+  ): MappedServiceRequestData {
     const serviceTypes: ServiceType[] = [];
     const specialtiesMap = new Map<string, readonly Specialty[]>();
 
@@ -66,6 +84,16 @@ export class ServiceRequestService {
     const resolvedLogo = this.resolveMediaUrl(branchBranding?.logoUrl ?? null);
     const theme = branchBranding?.theme ?? null;
 
+    const mappedAds: KioskAdvertisementItem[] = (advertisements ?? [])
+      .filter((ad) => ad.isActive)
+      .sort((a, b) => a.displayOrder - b.displayOrder)
+      .map((ad) => ({
+        id: ad.id,
+        imageUrl: this.resolveMediaUrl(ad.imageUrl) ?? ad.imageUrl,
+        displayOrder: ad.displayOrder,
+        isActive: ad.isActive,
+      }));
+
     return {
       branchId: response.branchId,
       branchBranding: branchBranding ? { ...branchBranding, logoUrl: resolvedLogo } : null,
@@ -73,6 +101,7 @@ export class ServiceRequestService {
       theme,
       serviceTypes,
       specialtiesMap,
+      advertisements: mappedAds,
     };
   }
 

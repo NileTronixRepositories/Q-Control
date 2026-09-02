@@ -18,7 +18,10 @@ import {
   SERVICE_REQUEST_LANGUAGES,
   SERVICE_REQUEST_TRANSLATIONS,
 } from '../models/language/language.model';
-import { TicketIssuanceBranding } from '../models/service-request-api/service-request-api.model';
+import {
+  KioskAdvertisementItem,
+  TicketIssuanceBranding,
+} from '../models/service-request-api/service-request-api.model';
 import { ServiceType } from '../models/service-type/service-type.model';
 import { Specialty } from '../models/specialty/specialty.model';
 import { QueueTicket, ServiceRequestSelection } from '../models/ticket/ticket.model';
@@ -40,10 +43,14 @@ export class ServiceRequestStore {
   private readonly selectedSpecialtySignal = signal<Specialty | null>(null);
   private readonly selectedSubSpecialtySignal = signal<Specialty | null>(null);
   private readonly kioskFlowChoiceSignal = signal<'reservation' | 'direct' | null>(null);
-  private readonly reservationSearchResultsSignal = signal<readonly KioskReservationSearchItemResponse[]>([]);
+  private readonly reservationSearchResultsSignal = signal<
+    readonly KioskReservationSearchItemResponse[]
+  >([]);
   private readonly searchingReservationsSignal = signal(false);
   private readonly searchAttemptedSignal = signal(false);
-  private readonly selectedReservationSignal = signal<KioskReservationSearchItemResponse | null>(null);
+  private readonly selectedReservationSignal = signal<KioskReservationSearchItemResponse | null>(
+    null,
+  );
   private readonly convertingReservationSignal = signal(false);
   private readonly ticketSignal = signal<QueueTicket | null>(null);
   private readonly loadingTicketSignal = signal(false);
@@ -55,6 +62,7 @@ export class ServiceRequestStore {
   );
   private readonly logoUrlSignal = signal<string | null>(null);
   private readonly branchBrandingSignal = signal<TicketIssuanceBranding | null>(null);
+  private readonly advertisementsSignal = signal<readonly KioskAdvertisementItem[]>([]);
   private readonly loadingServicesSignal = signal(false);
   private readonly errorLoadingServicesSignal = signal(false);
 
@@ -77,6 +85,7 @@ export class ServiceRequestStore {
   readonly errorMessage = this.errorMessageSignal.asReadonly();
   readonly logoUrl = this.logoUrlSignal.asReadonly();
   readonly branchBranding = this.branchBrandingSignal.asReadonly();
+  readonly advertisements = this.advertisementsSignal.asReadonly();
   readonly theme = computed(() => this.branchBrandingSignal()?.theme ?? null);
   readonly behavior = computed(() => this.branchBrandingSignal()?.behavior ?? null);
   readonly languageButton = computed(() => this.branchBrandingSignal()?.languageButton ?? null);
@@ -185,6 +194,7 @@ export class ServiceRequestStore {
           this.specialtiesMapSignal.set(data.specialtiesMap);
           this.logoUrlSignal.set(data.logoUrl);
           this.branchBrandingSignal.set(data.branchBranding);
+          this.advertisementsSignal.set(data.advertisements ?? []);
 
           if (data.branchBranding?.behavior) {
             const isArabic = data.branchBranding.behavior.defaultLanguageIsArabic;
@@ -264,7 +274,8 @@ export class ServiceRequestStore {
           const matchingInput = targetNode.customInputs?.find(
             (ci) => ci.name === key || String(ci.customInputId) === key || String(ci.order) === key,
           );
-          const inputId = (matchingInput?.customInputId ?? matchingInput?.order ?? Number(key)) || 1;
+          const inputId =
+            (matchingInput?.customInputId ?? matchingInput?.order ?? Number(key)) || 1;
           customInputs.push({
             serviceCustomInputId: inputId,
             value: String(val).trim(),
@@ -316,23 +327,25 @@ export class ServiceRequestStore {
     this.errorMessageSignal.set(null);
     this.selectedReservationSignal.set(reservation);
 
-    return this.kioskApiService.convertReservationToTicket(targetBranchId, reservation.reservationId).pipe(
-      map((response) => this.mapKioskTicketToQueueTicket(response, selection)),
-      tap((ticket) => {
-        this.ticketSignal.set(ticket);
-        this.errorMessageSignal.set(null);
-      }),
-      catchError((err: unknown) => {
-        console.error('Failed to convert reservation to ticket:', err);
-        this.ticketSignal.set(null);
-        this.errorMessageSignal.set(this.formatErrorMessage(err));
-        return throwError(() => err);
-      }),
-      finalize(() => {
-        this.convertingReservationSignal.set(false);
-        this.loadingTicketSignal.set(false);
-      }),
-    );
+    return this.kioskApiService
+      .convertReservationToTicket(targetBranchId, reservation.reservationId)
+      .pipe(
+        map((response) => this.mapKioskTicketToQueueTicket(response, selection)),
+        tap((ticket) => {
+          this.ticketSignal.set(ticket);
+          this.errorMessageSignal.set(null);
+        }),
+        catchError((err: unknown) => {
+          console.error('Failed to convert reservation to ticket:', err);
+          this.ticketSignal.set(null);
+          this.errorMessageSignal.set(this.formatErrorMessage(err));
+          return throwError(() => err);
+        }),
+        finalize(() => {
+          this.convertingReservationSignal.set(false);
+          this.loadingTicketSignal.set(false);
+        }),
+      );
   }
 
   generateTicket(
@@ -356,7 +369,8 @@ export class ServiceRequestStore {
           const matchingInput = targetNode.customInputs?.find(
             (ci) => ci.name === key || String(ci.customInputId) === key || String(ci.order) === key,
           );
-          const inputId = (matchingInput?.customInputId ?? matchingInput?.order ?? Number(key)) || 1;
+          const inputId =
+            (matchingInput?.customInputId ?? matchingInput?.order ?? Number(key)) || 1;
           customInputs.push({
             serviceCustomInputId: inputId,
             value: String(val).trim(),
