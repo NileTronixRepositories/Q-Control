@@ -48,6 +48,7 @@ import { AppLanguage } from '../../../../shared/models/app-language/app-language
 export class ServiceRequestHomeComponent implements OnDestroy {
   protected readonly store = inject(ServiceRequestStore);
   protected readonly step = ServiceRequestStep;
+  protected readonly qControlLogoUrl = '/images/service-request/logo-qcontrol.png';
 
   private ticketSubscription: Subscription | null = null;
   private searchSubscription: Subscription | null = null;
