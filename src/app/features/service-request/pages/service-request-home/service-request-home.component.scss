@@ -447,86 +447,38 @@
   }
 }
 
+.runtime-ticket-preview {
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 1rem;
+  overflow: auto;
+  padding: 1rem;
+}
+.kiosk-runtime-print-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.7rem 1.2rem;
+  color: #fff;
+  background: var(--kiosk-main-color, #0b8aa8);
+  border: 0;
+  border-radius: 0.65rem;
+  font-weight: 700;
+}
+.runtime-ticket-print {
+  display: none;
+}
+
 @media print {
   @page {
     margin: 0;
     size: auto;
   }
-
-  html,
-  body {
-    background: #ffffff !important;
-    color: #000000 !important;
-    height: auto !important;
-    margin: 0 !important;
-    min-height: 0 !important;
-    overflow: visible !important;
-    padding: 0 !important;
-    width: 100% !important;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
+  .service-request-kiosk > :not(.runtime-ticket-print) {
+    display: none;
   }
-
-  .service-request-kiosk {
-    background: #ffffff !important;
-    display: block !important;
-    height: auto !important;
-    min-height: 0 !important;
-    overflow: visible !important;
-    padding: 0 !important;
-  }
-
-  .service-request-kiosk__shell {
-    display: block !important;
-    height: auto !important;
-    margin: 0 !important;
-    max-width: 100% !important;
-    padding: 0 !important;
-  }
-
-  .service-request-kiosk__main {
-    display: block !important;
-    height: auto !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    width: 100% !important;
-  }
-
-  .service-request-panel {
-    display: block !important;
-    height: auto !important;
-    margin: 0 auto !important;
-    max-width: 80mm !important;
-    overflow: visible !important;
-    padding: 0 !important;
-    width: 100% !important;
-  }
-
-  /* Completely hide surrounding kiosk elements on print */
-  app-service-request-kiosk-header,
-  app-service-request-kiosk-footer,
-  .service-request-branch-logo-box,
-  .kiosk-floating-nav-start,
-  .kiosk-floating-nav-end,
-  .kiosk-circular-btn,
-  .service-request-step-indicator,
-  .kiosk-panel-header,
-  .d-print-none,
-  .col-12.col-lg-4 {
-    display: none !important;
-    visibility: hidden !important;
-    height: 0 !important;
-    width: 0 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    overflow: hidden !important;
-  }
-
-  .col-12.col-lg-8 {
-    display: block !important;
-    flex: 0 0 100% !important;
-    max-width: 100% !important;
-    padding: 0 !important;
-    width: 100% !important;
+  .service-request-kiosk > .runtime-ticket-print {
+    display: block;
   }
 }

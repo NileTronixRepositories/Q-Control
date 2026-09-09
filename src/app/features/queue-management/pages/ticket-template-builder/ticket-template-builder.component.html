@@ -1,0 +1,624 @@
+<main class="ticket-designer" [attr.dir]="isArabic() ? 'rtl' : 'ltr'">
+  <app-page-hero
+    [eyebrow]="isArabic() ? 'إدارة طوابير الانتظار' : 'Queue management'"
+    [title]="isArabic() ? 'تصميم تذكرة الفرع' : 'Branch ticket designer'"
+    [description]="
+      isArabic()
+        ? 'حدّد المقاس والموضع وتنسيق الطباعة لكل عنصر على ورق التذكرة الحرارية بوحدة الملليمتر.'
+        : 'Configure the physical dimensions, placement, and typography of every ticket element on thermal paper.'
+    "
+    icon="bi-ticket-perforated"
+  >
+    <div hero-actions class="hero-actions">
+      <span class="branch-chip" [attr.title]="branchName()">
+        <i class="bi bi-building" aria-hidden="true"></i>
+        <span>{{ branchName() }}</span>
+      </span>
+
+      <button
+        type="button"
+        class="btn btn-outline-secondary btn-action"
+        [disabled]="mode() === 'loading' || saving()"
+        (click)="resetToDefaultLayout()"
+        [attr.title]="isArabic() ? 'استعادة التخطيط الافتراضي المتوازن' : 'Reset to default layout'"
+      >
+        <i class="bi bi-magic" aria-hidden="true"></i>
+        <span>{{ isArabic() ? 'التخطيط الافتراضي' : 'Default layout' }}</span>
+      </button>
+
+      <button
+        type="button"
+        class="btn btn-outline-secondary btn-action"
+        [disabled]="mode() === 'loading' || saving()"
+        (click)="reload()"
+      >
+        <i class="bi bi-arrow-clockwise" aria-hidden="true"></i>
+        <span>{{ isArabic() ? 'إعادة تحميل' : 'Reload' }}</span>
+      </button>
+
+      <button
+        type="button"
+        class="btn btn-primary btn-action"
+        [disabled]="!canSave() || hasErrors() || saving()"
+        (click)="save()"
+      >
+        @if (saving()) {
+          <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+        } @else {
+          <i class="bi bi-floppy" aria-hidden="true"></i>
+        }
+        <span class="btn-text text-white">
+          {{
+            mode() === 'create'
+              ? isArabic()
+                ? 'تهيئة الإعداد'
+                : 'Initialize configuration'
+              : isArabic()
+                ? 'حفظ التغييرات'
+                : 'Save changes'
+          }}
+        </span>
+      </button>
+    </div>
+  </app-page-hero>
+
+  @if (notice(); as message) {
+    <div
+      class="designer-notice"
+      [class.notice-success]="message.tone === 'success'"
+      [class.notice-danger]="message.tone === 'danger'"
+      [class.notice-warning]="message.tone === 'warning'"
+      [class.notice-info]="message.tone === 'info'"
+      role="status"
+    >
+      <div class="notice-icon">
+        <i
+          class="bi"
+          [class.bi-check-circle-fill]="message.tone === 'success'"
+          [class.bi-exclamation-triangle-fill]="
+            message.tone === 'danger' || message.tone === 'warning'
+          "
+          [class.bi-info-circle-fill]="message.tone === 'info'"
+          aria-hidden="true"
+        ></i>
+      </div>
+      <span class="notice-text">{{ message.text }}</span>
+      @if (message.tone === 'warning' && mode() === 'edit') {
+        <button type="button" class="btn btn-sm btn-outline-secondary" (click)="reload()">
+          {{ isArabic() ? 'تحميل الأحدث' : 'Reload latest' }}
+        </button>
+      }
+    </div>
+  }
+
+  @if (mode() === 'loading') {
+    <section class="loading-state" aria-live="polite">
+      <div class="spinner-grow text-primary" role="status"></div>
+      <p>
+        {{ isArabic() ? 'جارٍ تحميل إعدادات تذكرة الفرع...' : 'Loading ticket configuration...' }}
+      </p>
+    </section>
+  } @else if (mode() !== 'error') {
+    <!-- Dimensions & Workspace Toolbar -->
+    <section class="dimensions-bar" [class.invalid-section]="validation().has('dimensions')">
+      <div class="dimensions-left">
+        <div class="dimensions-summary">
+          <div class="summary-icon">
+            <i class="bi bi-rulers" aria-hidden="true"></i>
+          </div>
+          <div class="summary-content">
+            <small>{{ isArabic() ? 'مقاس الورق الحراري' : 'Thermal paper size' }}</small>
+            <strong
+              >{{ draft().ticketWidthMm }} × {{ draft().ticketHeightMm }}
+              <span class="unit-tag">mm</span></strong
+            >
+          </div>
+        </div>
+
+        <div class="presets-group">
+          <span class="presets-label">{{ isArabic() ? 'نماذج قياسية:' : 'Presets:' }}</span>
+          <div class="preset-pills">
+            @for (preset of presets; track preset.labelEn) {
+              <button
+                type="button"
+                class="preset-pill"
+                [class.active]="
+                  draft().ticketWidthMm === preset.widthMm &&
+                  draft().ticketHeightMm === preset.heightMm
+                "
+                [disabled]="!canSave()"
+                (click)="applyPreset(preset)"
+              >
+                {{ isArabic() ? preset.labelAr : preset.labelEn }}
+              </button>
+            }
+          </div>
+        </div>
+      </div>
+
+      <div class="dimensions-controls">
+        <label class="dimension-field">
+          <span class="field-caption">{{ isArabic() ? 'العرض' : 'Width' }}</span>
+          <span class="unit-input">
+            <input
+              type="number"
+              min="10"
+              max="200"
+              step="0.5"
+              [value]="draft().ticketWidthMm"
+              [disabled]="!canSave()"
+              (input)="updateDimension('ticketWidthMm', $event)"
+              [attr.aria-label]="isArabic() ? 'عرض التذكرة بالملليمتر' : 'Ticket width in mm'"
+            />
+            <span class="unit-suffix">mm</span>
+          </span>
+        </label>
+
+        <label class="dimension-field">
+          <span class="field-caption">{{ isArabic() ? 'الارتفاع' : 'Height' }}</span>
+          <span class="unit-input">
+            <input
+              type="number"
+              min="20"
+              max="400"
+              step="0.5"
+              [value]="draft().ticketHeightMm"
+              [disabled]="!canSave()"
+              (input)="updateDimension('ticketHeightMm', $event)"
+              [attr.aria-label]="isArabic() ? 'ارتفاع التذكرة بالملليمتر' : 'Ticket height in mm'"
+            />
+            <span class="unit-suffix">mm</span>
+          </span>
+        </label>
+
+        <button
+          type="button"
+          class="btn-grid-toggle"
+          [class.active]="showGrid()"
+          (click)="toggleGrid()"
+          [attr.title]="isArabic() ? 'إظهار / إخفاء شبكة المحاذاة' : 'Toggle alignment grid'"
+        >
+          <i class="bi bi-grid-3x3" aria-hidden="true"></i>
+          <span>{{ isArabic() ? 'الشبكة' : 'Grid' }}</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- 3-Column Designer Workspace -->
+    <div class="designer-grid">
+      <!-- 1. Elements Registry Panel -->
+      <aside class="panel elements-panel" aria-labelledby="elements-title">
+        <header class="panel-header">
+          <div class="panel-header-title">
+            <i class="bi bi-card-checklist text-primary" aria-hidden="true"></i>
+            <h2 id="elements-title">{{ isArabic() ? 'عناصر التذكرة' : 'Ticket elements' }}</h2>
+          </div>
+          <span class="panel-meta-badge" [class.badge-full]="activeElementsCount() === 8">
+            {{ activeElementsCount() }}/8 {{ isArabic() ? 'مفعل' : 'Active' }}
+          </span>
+        </header>
+
+        <div class="element-list">
+          @for (element of draft().elements; track element.elementType) {
+            <div
+              class="element-row"
+              [class.selected]="selectedType() === element.elementType"
+              [class.has-error]="!!errorFor(element.elementType)"
+              [class.is-disabled]="!element.isVisible"
+            >
+              <button
+                type="button"
+                class="element-select"
+                (click)="select(element.elementType)"
+                [attr.aria-pressed]="selectedType() === element.elementType"
+              >
+                <span class="element-icon" [class.icon-active]="element.isVisible">
+                  <i
+                    class="bi"
+                    [class]="'bi ' + meta[element.elementType].icon"
+                    aria-hidden="true"
+                  ></i>
+                </span>
+                <span class="element-meta-wrap">
+                  <span class="element-title">{{ label(element.elementType) }}</span>
+                  <span class="element-coords">
+                    @if (element.isVisible) {
+                      {{ element.widthMm ?? 0 }} × {{ element.heightMm ?? 0 }} mm
+                    } @else {
+                      <span class="text-muted">{{ isArabic() ? 'مخفي' : 'Hidden' }}</span>
+                    }
+                  </span>
+                </span>
+              </button>
+
+              <label
+                class="visibility-switch"
+                [attr.title]="
+                  isArabic()
+                    ? element.isVisible
+                      ? 'إخفاء العنصر'
+                      : 'إظهار العنصر'
+                    : element.isVisible
+                      ? 'Hide element'
+                      : 'Show element'
+                "
+              >
+                <input
+                  type="checkbox"
+                  [checked]="element.isVisible"
+                  [disabled]="!canSave()"
+                  (change)="toggleVisible(element.elementType)"
+                />
+                <span class="switch-slider" aria-hidden="true"></span>
+                <span class="visually-hidden">
+                  {{ isArabic() ? 'تبديل ظهور العنصر' : 'Toggle visibility' }}
+                </span>
+              </label>
+            </div>
+          }
+        </div>
+      </aside>
+
+      <!-- 2. Live Canvas Preview -->
+      <section class="canvas-panel" aria-labelledby="preview-title">
+        <header class="canvas-header">
+          <div class="canvas-header-title">
+            <i class="bi bi-eye text-primary" aria-hidden="true"></i>
+            <h2 id="preview-title">{{ isArabic() ? 'المعاينة الحية' : 'Live preview' }}</h2>
+          </div>
+          <div class="canvas-header-actions">
+            <span class="canvas-hint">
+              <i class="bi bi-arrows-move" aria-hidden="true"></i>
+              {{
+                isArabic()
+                  ? 'اسحب لتحريك العناصر أو الزاوية لتغيير الحجم'
+                  : 'Drag to reposition, corner to resize'
+              }}
+            </span>
+          </div>
+        </header>
+
+        <div class="canvas-workspace">
+          <!-- Thermal Ticket Simulated Paper -->
+          <div class="ticket-paper-container">
+            <div
+              class="ticket-canvas"
+              [class.with-grid]="showGrid()"
+              [style.aspect-ratio]="draft().ticketWidthMm + ' / ' + draft().ticketHeightMm"
+              (pointermove)="movePointer($event)"
+              (pointerup)="endPointer()"
+              (pointercancel)="endPointer()"
+            >
+              <!-- Ticket Perforated Edge Top -->
+              <div class="perforated-edge-top" aria-hidden="true"></div>
+
+              @for (element of draft().elements; track element.elementType) {
+                @if (element.isVisible) {
+                  <div
+                    class="canvas-element"
+                    [class.selected]="selectedType() === element.elementType"
+                    [class.invalid]="!!errorFor(element.elementType)"
+                    [style]="canvasElementStyle(element)"
+                    (click)="select(element.elementType)"
+                    (pointerdown)="startPointer($event, element, 'move')"
+                    [attr.title]="errorFor(element.elementType) || label(element.elementType)"
+                  >
+                    @if (element.elementType === 'BranchLogo') {
+                      @if (logoUrl()) {
+                        <img [src]="logoUrl()" alt="Branch Logo" draggable="false" />
+                      } @else {
+                        <div class="logo-placeholder">
+                          <i class="bi bi-image" aria-hidden="true"></i>
+                          <span>{{ isArabic() ? 'شعار الفرع' : 'Branch logo' }}</span>
+                        </div>
+                      }
+                    } @else {
+                      <span class="preview-text">{{ previewText(element) }}</span>
+                    }
+
+                    @if (selectedType() === element.elementType) {
+                      <div class="element-indicator" aria-hidden="true">
+                        {{ element.xMm ?? 0 }}, {{ element.yMm ?? 0 }} mm
+                      </div>
+                      @if (canSave()) {
+                        <button
+                          type="button"
+                          class="resize-handle"
+                          (pointerdown)="startPointer($event, element, 'resize')"
+                          [attr.aria-label]="isArabic() ? 'تغيير الحجم' : 'Resize element'"
+                        ></button>
+                      }
+                    }
+                  </div>
+                }
+              }
+
+              <!-- Ticket Perforated Edge Bottom -->
+              <div class="perforated-edge-bottom" aria-hidden="true"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="canvas-footer">
+          <i class="bi bi-info-circle" aria-hidden="true"></i>
+          <span>
+            {{
+              isArabic()
+                ? 'المحتوى الظاهر تجريبي لأغراض التصميم. النصوص والبيانات الفعلية تُولد من النظام آليًا عند حجز التذكرة.'
+                : 'Preview content is simulated for layout purposes. Actual runtime values are populated by the server at issuance.'
+            }}
+          </span>
+        </div>
+      </section>
+
+      <!-- 3. Element Properties Inspector -->
+      <aside class="panel properties-panel" aria-labelledby="properties-title">
+        <header class="panel-header">
+          <div class="panel-header-title">
+            <i class="bi bi-sliders2 text-primary" aria-hidden="true"></i>
+            <h2 id="properties-title">{{ isArabic() ? 'خصائص العنصر' : 'Element properties' }}</h2>
+          </div>
+        </header>
+
+        @if (selectedElement(); as element) {
+          <!-- Selected Element Summary Card -->
+          <div class="selected-summary-card">
+            <div class="summary-top">
+              <span class="selected-icon">
+                <i
+                  class="bi"
+                  [class]="'bi ' + meta[element.elementType].icon"
+                  aria-hidden="true"
+                ></i>
+              </span>
+              <div class="selected-info">
+                <h3 class="selected-name">{{ label(element.elementType) }}</h3>
+                <span class="selected-type-badge">{{ element.elementType }}</span>
+              </div>
+            </div>
+
+            <label class="visible-toggle-row">
+              <span class="toggle-caption">
+                <i class="bi bi-printer" aria-hidden="true"></i>
+                {{ isArabic() ? 'إظهار في الطباعة' : 'Visible in print' }}
+              </span>
+              <input
+                type="checkbox"
+                class="form-check-input"
+                [checked]="element.isVisible"
+                [disabled]="!canSave()"
+                (change)="toggleVisible(element.elementType)"
+              />
+            </label>
+          </div>
+
+          <!-- Position & Dimensions Card -->
+          <div class="inspector-card">
+            <div class="inspector-card-header">
+              <span class="card-heading">
+                <i class="bi bi-arrows-fullscreen" aria-hidden="true"></i>
+                {{ isArabic() ? 'الموضع والأبعاد' : 'Position & Size' }}
+              </span>
+              <button
+                type="button"
+                class="btn-tool"
+                (click)="centerSelectedElement()"
+                [disabled]="!canSave() || !element.isVisible"
+                [attr.title]="
+                  isArabic()
+                    ? 'توسيط العنصر أفقيًا في منتصف التذكرة'
+                    : 'Center horizontally on ticket'
+                "
+              >
+                <i class="bi bi-align-center" aria-hidden="true"></i>
+                <span>{{ isArabic() ? 'توسيط أفقي' : 'Center' }}</span>
+              </button>
+            </div>
+
+            <div class="property-grid">
+              <label class="prop-label">
+                <span class="prop-name">X ({{ isArabic() ? 'المسافة من اليسار' : 'Left' }})</span>
+                <span class="unit-input">
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.5"
+                    [value]="element.xMm ?? ''"
+                    [disabled]="!canSave() || !element.isVisible"
+                    (input)="updateNumber('xMm', $event)"
+                  />
+                  <span class="unit-suffix">mm</span>
+                </span>
+              </label>
+
+              <label class="prop-label">
+                <span class="prop-name">Y ({{ isArabic() ? 'المسافة من الأعلى' : 'Top' }})</span>
+                <span class="unit-input">
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.5"
+                    [value]="element.yMm ?? ''"
+                    [disabled]="!canSave() || !element.isVisible"
+                    (input)="updateNumber('yMm', $event)"
+                  />
+                  <span class="unit-suffix">mm</span>
+                </span>
+              </label>
+
+              <label class="prop-label">
+                <span class="prop-name">{{ isArabic() ? 'العرض' : 'Width' }}</span>
+                <span class="unit-input">
+                  <input
+                    type="number"
+                    min="1"
+                    step="0.5"
+                    [value]="element.widthMm ?? ''"
+                    [disabled]="!canSave() || !element.isVisible"
+                    (input)="updateNumber('widthMm', $event)"
+                  />
+                  <span class="unit-suffix">mm</span>
+                </span>
+              </label>
+
+              <label class="prop-label">
+                <span class="prop-name">{{ isArabic() ? 'الارتفاع' : 'Height' }}</span>
+                <span class="unit-input">
+                  <input
+                    type="number"
+                    min="1"
+                    step="0.5"
+                    [value]="element.heightMm ?? ''"
+                    [disabled]="!canSave() || !element.isVisible"
+                    (input)="updateNumber('heightMm', $event)"
+                  />
+                  <span class="unit-suffix">mm</span>
+                </span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Typography Inspector (for text elements) -->
+          @if (meta[element.elementType].kind === 'text') {
+            <div class="inspector-card">
+              <div class="inspector-card-header">
+                <span class="card-heading">
+                  <i class="bi bi-fonts" aria-hidden="true"></i>
+                  {{ isArabic() ? 'تنسيق الخط والطباعة' : 'Typography & Style' }}
+                </span>
+              </div>
+
+              <div class="typography-controls">
+                <label class="prop-label">
+                  <span class="prop-name">{{ isArabic() ? 'حجم الخط' : 'Font size' }}</span>
+                  <span class="unit-input">
+                    <input
+                      type="number"
+                      min="6"
+                      max="72"
+                      step="1"
+                      [value]="element.fontSizePt ?? ''"
+                      [disabled]="!canSave() || !element.isVisible"
+                      (input)="updateNumber('fontSizePt', $event)"
+                    />
+                    <span class="unit-suffix">pt</span>
+                  </span>
+                </label>
+
+                <!-- Font Weight Segmented -->
+                <div class="prop-group">
+                  <span class="prop-name">{{ isArabic() ? 'سُمك الخط' : 'Font weight' }}</span>
+                  <div class="segmented-control">
+                    <button
+                      type="button"
+                      class="segmented-btn"
+                      [class.active]="element.fontWeight === 'Normal'"
+                      [disabled]="!canSave() || !element.isVisible"
+                      (click)="setFontWeight('Normal')"
+                    >
+                      <span>{{ isArabic() ? 'عادي' : 'Normal' }}</span>
+                    </button>
+                    <button
+                      type="button"
+                      class="segmented-btn"
+                      [class.active]="element.fontWeight === 'Bold'"
+                      [disabled]="!canSave() || !element.isVisible"
+                      (click)="setFontWeight('Bold')"
+                    >
+                      <strong [style.font-weight]="'700'">{{
+                        isArabic() ? 'عريض' : 'Bold'
+                      }}</strong>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Text Align Segmented -->
+                <div class="prop-group">
+                  <span class="prop-name">{{ isArabic() ? 'محاذاة النص' : 'Alignment' }}</span>
+                  <div class="segmented-control alignment-group">
+                    <button
+                      type="button"
+                      class="segmented-btn icon-btn"
+                      [class.active]="element.textAlign === 'Right'"
+                      [disabled]="!canSave() || !element.isVisible"
+                      (click)="setTextAlign('Right')"
+                      [attr.title]="isArabic() ? 'محاذاة لليمين' : 'Align right'"
+                    >
+                      <i class="bi bi-text-right" aria-hidden="true"></i>
+                    </button>
+                    <button
+                      type="button"
+                      class="segmented-btn icon-btn"
+                      [class.active]="element.textAlign === 'Center'"
+                      [disabled]="!canSave() || !element.isVisible"
+                      (click)="setTextAlign('Center')"
+                      [attr.title]="isArabic() ? 'توسيط' : 'Align center'"
+                    >
+                      <i class="bi bi-text-center" aria-hidden="true"></i>
+                    </button>
+                    <button
+                      type="button"
+                      class="segmented-btn icon-btn"
+                      [class.active]="element.textAlign === 'Left'"
+                      [disabled]="!canSave() || !element.isVisible"
+                      (click)="setTextAlign('Left')"
+                      [attr.title]="isArabic() ? 'محاذاة لليسار' : 'Align left'"
+                    >
+                      <i class="bi bi-text-left" aria-hidden="true"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Language Segmented -->
+                <div class="prop-group">
+                  <span class="prop-name">{{ isArabic() ? 'لغة الطباعة' : 'Print language' }}</span>
+                  <div class="segmented-control">
+                    <button
+                      type="button"
+                      class="segmented-btn"
+                      [class.active]="element.language === 'Ar'"
+                      [disabled]="!canSave() || !element.isVisible"
+                      (click)="setLanguage('Ar')"
+                    >
+                      <span>العربية</span>
+                    </button>
+                    <button
+                      type="button"
+                      class="segmented-btn"
+                      [class.active]="element.language === 'En'"
+                      [disabled]="!canSave() || !element.isVisible"
+                      (click)="setLanguage('En')"
+                    >
+                      <span>English</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          }
+
+          @if (errorFor(element.elementType); as error) {
+            <div class="element-error-card" role="alert">
+              <i class="bi bi-exclamation-octagon-fill" aria-hidden="true"></i>
+              <div class="error-text-wrap">
+                <strong>{{ isArabic() ? 'تنبيه موضع العنصر:' : 'Placement issue:' }}</strong>
+                <span>{{ error }}</span>
+              </div>
+            </div>
+          }
+        } @else {
+          <div class="empty-selection">
+            <i class="bi bi-cursor text-muted" aria-hidden="true"></i>
+            <p>
+              {{
+                isArabic()
+                  ? 'اختر عنصراً من القائمة أو المعاينة لتعديل خصائصه'
+                  : 'Select an element to inspect and edit its properties'
+              }}
+            </p>
+          </div>
+        }
+      </aside>
+    </div>
+  }
+</main>

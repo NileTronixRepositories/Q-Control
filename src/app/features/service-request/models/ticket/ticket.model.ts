@@ -2,6 +2,7 @@ import { AppLanguage } from '../../../../core/i18n/app-language.model';
 import { LocalizedText } from '../language/language.model';
 import { ServiceType } from '../service-type/service-type.model';
 import { Specialty } from '../specialty/specialty.model';
+import { PhysicalTicketPrintModel } from '@shared/models/ticket-print/ticket-print.model';
 
 export interface ServiceRequestSelection {
   readonly language: AppLanguage;
@@ -20,4 +21,5 @@ export interface QueueTicket {
   readonly estimatedWaitingMinutes: number;
   readonly counterHint: LocalizedText;
   readonly qrPayload?: string;
+  readonly print?: PhysicalTicketPrintModel | null;
 }

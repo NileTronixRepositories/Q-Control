@@ -143,6 +143,7 @@ describe('AdminShellComponent', () => {
     expect(text).toContain('Service Locations');
     expect(text).toContain('Terminals');
     expect(text).toContain('Displays');
+    expect(text).toContain('Branch Ticket Design');
     expect(text).toContain('Main Branch');
   });
 
@@ -294,7 +295,13 @@ function createSession(
 ): AuthenticatedSession {
   const permissions =
     token === 'valid-token'
-      ? ['WaitingAreas.ViewAll', 'Windows.ViewAll', 'Terminals.ViewAll', 'Displays.ViewAll']
+      ? [
+          'WaitingAreas.ViewAll',
+          'Windows.ViewAll',
+          'Terminals.ViewAll',
+          'Displays.ViewAll',
+          'TicketConfigurations.View',
+        ]
       : [];
   const payload = btoa(JSON.stringify({ permissions }))
     .replace(/\+/g, '-')

@@ -1,3 +1,5 @@
+import { TicketPrintModel } from '../ticket-template/ticket-template.model';
+
 export type TicketStatus =
   | 'Waiting'
   | 'Called'
@@ -77,6 +79,7 @@ export interface TicketDetails extends TicketListItem {
   readonly isArchived: boolean;
   readonly history?: readonly HistoryEvent[] | null;
   readonly callAttempts?: readonly unknown[] | null;
+  readonly print?: TicketPrintModel | null;
 }
 
 export interface ReservationListItem {

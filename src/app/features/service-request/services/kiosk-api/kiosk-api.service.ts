@@ -1,6 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 
 import { environment } from '../../../../../environments/environment';
 import { AppLanguageStore, AuthSessionService } from '@core';
@@ -23,15 +23,16 @@ export class KioskApiService {
   private readonly branchesEndpoint = new URL(BRANCHES_PATH, environment.apiBaseUrl)
     .toString()
     .replace(/\/$/, '');
+  private readonly mediaOrigin = new URL(environment.apiBaseUrl).origin;
 
   createTicket(
     branchId: number,
     request: CreateKioskTicketRequest,
   ): Observable<KioskTicketResponse> {
     const url = `${this.branchesEndpoint}/${branchId}/kiosk/tickets`;
-    return this.httpClient.post<KioskTicketResponse>(url, request, {
-      headers: this.createHeaders(),
-    });
+    return this.httpClient
+      .post<KioskTicketResponse>(url, request, { headers: this.createHeaders() })
+      .pipe(map((ticket) => this.resolvePrintMedia(ticket)));
   }
 
   searchReservations(
@@ -49,9 +50,28 @@ export class KioskApiService {
     reservationId: number,
   ): Observable<KioskTicketResponse> {
     const url = `${this.branchesEndpoint}/${branchId}/kiosk/reservations/${reservationId}/ticket`;
-    return this.httpClient.post<KioskTicketResponse>(url, null, {
-      headers: this.createHeaders(),
-    });
+    return this.httpClient
+      .post<KioskTicketResponse>(url, null, { headers: this.createHeaders() })
+      .pipe(map((ticket) => this.resolvePrintMedia(ticket)));
+  }
+
+  private resolvePrintMedia(ticket: KioskTicketResponse): KioskTicketResponse {
+    if (!ticket.print) return ticket;
+    return {
+      ...ticket,
+      print: {
+        ...ticket.print,
+        elements: ticket.print.elements.map((element) => ({
+          ...element,
+          imageUrl: this.resolveMediaUrl(element.imageUrl),
+        })),
+      },
+    };
+  }
+
+  private resolveMediaUrl(path: string | null): string | null {
+    if (!path || path.startsWith('http://') || path.startsWith('https://')) return path;
+    return new URL(path.startsWith('/') ? path : `/${path}`, this.mediaOrigin).toString();
   }
 
   private createHeaders(): HttpHeaders {

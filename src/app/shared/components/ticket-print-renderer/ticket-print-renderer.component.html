@@ -1,0 +1,25 @@
+<section
+  class="ticket-print-surface"
+  [style.width.mm]="model().ticketWidthMm"
+  [style.height.mm]="model().ticketHeightMm"
+  aria-label="Ticket print layout"
+>
+  @for (element of visibleElements(); track element.elementType) {
+    <div class="print-element" [style]="boxStyle(element)">
+      @if (element.elementType === 'BranchLogo') {
+        @if (element.imageUrl) {
+          <img [src]="element.imageUrl" alt="" />
+        }
+      } @else {
+        <div
+          class="print-text"
+          [class.multiline]="element.elementType === 'CustomInputsOrField'"
+          [class.trim-overflow]="element.overflowBehavior === 'TrimWithEllipsis'"
+          [style]="textStyle(element)"
+        >
+          {{ element.text }}
+        </div>
+      }
+    </div>
+  }
+</section>

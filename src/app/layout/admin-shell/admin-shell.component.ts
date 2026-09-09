@@ -81,6 +81,14 @@ export class AdminShellComponent {
       });
     }
 
+    if (this.hasPermission('TicketConfigurations.View')) {
+      items.push({
+        label: translations.ticketTemplateLabel,
+        route: '/admin/ticket-template',
+        icon: 'bi-ticket-detailed',
+      });
+    }
+
     if (this.canShow(['WaitingAreas.ViewAll'])) {
       items.push({
         label: translations.waitingAreasLabel,
@@ -504,6 +512,11 @@ export class AdminShellComponent {
 
     const permissions = resolveJwtPermissions(session.token);
     return requiredPermissions.some((permission) => permissions.has(permission));
+  }
+
+  private hasPermission(permission: string): boolean {
+    const token = this.authSessionService.currentSession()?.token;
+    return token ? resolveJwtPermissions(token).has(permission) : false;
   }
 
   private canShowScheduleNavigation(): boolean {

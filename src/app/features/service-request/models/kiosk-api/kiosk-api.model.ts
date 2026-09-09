@@ -1,3 +1,5 @@
+import { PhysicalTicketPrintModel } from '@shared/models/ticket-print/ticket-print.model';
+
 export interface KioskCustomInputValue {
   readonly serviceCustomInputId: number;
   readonly value: string;
@@ -47,4 +49,5 @@ export interface KioskTicketResponse {
   readonly waitingAheadCount?: number | null;
   readonly estimatedWaitMinutes?: number | null;
   readonly rowVersion?: string;
+  readonly print?: PhysicalTicketPrintModel | null;
 }

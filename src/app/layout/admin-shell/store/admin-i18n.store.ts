@@ -32,6 +32,7 @@ interface TechnicalAdminTranslations {
   readonly displayVideosLabel: string;
   readonly displayConfigurationLabel: string;
   readonly branchConfigurationLabel: string;
+  readonly ticketTemplateLabel: string;
   readonly branchConfigurationDescription: string;
   readonly allowedTimeLabel: string;
   readonly allowedTimeHelp: string;
@@ -161,6 +162,7 @@ const TECHNICAL_ADMIN_TRANSLATIONS: Record<AppLanguage, TechnicalAdminTranslatio
     displayVideosLabel: 'فيديوهات الشاشات',
     displayConfigurationLabel: 'إعدادات شاشة العرض',
     branchConfigurationLabel: 'إعدادات أوقات الفرع',
+    ticketTemplateLabel: 'تصميم تذكرة الفرع',
     branchConfigurationDescription:
       'إعداد المدة المسموح بها لظهور الخدمات في شاشة إصدار التذاكر قبل موعد بدايتها.',
     allowedTimeLabel: 'المدة المسموح بها قبل بداية الخدمة',
@@ -347,6 +349,7 @@ const TECHNICAL_ADMIN_TRANSLATIONS: Record<AppLanguage, TechnicalAdminTranslatio
     displayVideosLabel: 'Display Videos',
     displayConfigurationLabel: 'Display Configuration',
     branchConfigurationLabel: 'Branch Configuration',
+    ticketTemplateLabel: 'Branch Ticket Design',
     branchConfigurationDescription:
       'Configure how early services appear on the ticket issuance screen before their scheduled start time.',
     allowedTimeLabel: 'Allowed Time Before Service Start',

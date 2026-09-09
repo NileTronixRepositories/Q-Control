@@ -40,6 +40,7 @@ import { SegmentApiService } from '../../../segment-management/services/segment-
 
 import { PageHeroComponent } from '../../../../shared/components/page-hero/page-hero.component';
 import { NiletronixLoadingStateComponent } from '../../../../shared/components/niletronix-loading-state/niletronix-loading-state.component';
+import { TicketPrintRendererComponent } from '@shared/components/ticket-print-renderer/ticket-print-renderer.component';
 
 export type OperationsTab = 'tickets' | 'reservations' | 'archive';
 export type ArchiveSubTab = 'archived-tickets' | 'archived-reservations';
@@ -80,6 +81,7 @@ export interface DynamicCustomInputItem {
     PageHeroComponent,
     NiletronixLoadingStateComponent,
     HistoryTimelineComponent,
+    TicketPrintRendererComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './ticket-reservation-operations.component.html',
@@ -953,6 +955,7 @@ export class TicketReservationOperationsComponent {
           this.showConfirmModal.set(false);
           this.selectedReservation.set(null);
           this.selectedTicket.set(ticket);
+          this.createdTicketSuccess.set(ticket);
           this.setAlert(
             'success',
             this.isRtl()
@@ -971,6 +974,10 @@ export class TicketReservationOperationsComponent {
   }
 
   // --- Status & Time Formatting Helpers ---
+  protected printIssuedTicket(): void {
+    window.print();
+  }
+
   protected formatDate(utcString: string | null | undefined): string {
     if (!utcString) return '—';
     try {

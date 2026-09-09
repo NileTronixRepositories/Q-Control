@@ -963,114 +963,155 @@
             ></button>
           </header>
 
-          <form (ngSubmit)="submitCreateTicket()">
-            <div class="modal-body-custom">
-              <!-- Service Selection -->
-              <div class="mb-3">
-                <label
-                  for="createTicketService"
-                  class="form-label small fw-semibold text-dark mb-1"
-                >
-                  {{ isRtl() ? 'الخدمة المطلوبة' : 'Target Service' }}
-                  <span class="text-danger">*</span>
-                </label>
-                <select
-                  id="createTicketService"
-                  class="form-select modal-form-control"
-                  [ngModel]="createServiceId()"
-                  (ngModelChange)="onServiceSelected($event)"
-                  name="serviceId"
-                  required
-                >
-                  <option [ngValue]="null" disabled>
-                    {{ isRtl() ? '-- اختر الخدمة --' : '-- Select Service --' }}
-                  </option>
-                  @for (srv of issuableServices(); track srv.id) {
-                    <option [ngValue]="srv.id">
-                      {{ isRtl() ? srv.fullPathAr || srv.nameAr : srv.fullPathEn || srv.nameEn }}
-                    </option>
-                  }
-                </select>
-              </div>
-
-              <!-- Segment Selection -->
-              <div class="mb-3">
-                <label
-                  for="createTicketSegment"
-                  class="form-label small fw-semibold text-dark mb-1"
-                >
-                  {{ isRtl() ? 'الشريحة المستهدفة' : 'Target Segment' }}
-                  <span class="text-danger">*</span>
-                </label>
-                <select
-                  id="createTicketSegment"
-                  class="form-select modal-form-control"
-                  [ngModel]="createSegmentId()"
-                  (ngModelChange)="createSegmentId.set($event)"
-                  name="segmentId"
-                  required
-                >
-                  <option [ngValue]="null" disabled>
-                    {{ isRtl() ? '-- اختر الشريحة --' : '-- Select Segment --' }}
-                  </option>
-                  @for (
-                    seg of serviceSegmentsLookup().length > 0
-                      ? serviceSegmentsLookup()
-                      : segmentsLookup();
-                    track seg.id
-                  ) {
-                    <option [ngValue]="seg.id">{{ isRtl() ? seg.nameAr : seg.nameEn }}</option>
-                  }
-                </select>
-              </div>
-
-              <!-- Dynamic Custom Inputs Fields -->
-              @if (createCustomInputs().length > 0) {
-                <div class="mt-4 pt-3 border-top">
-                  <h6 class="fw-bold small text-secondary mb-3">
-                    <i class="bi bi-input-cursor-text me-1"></i>
-                    {{ isRtl() ? 'الحقول المطلوبة للخدمة' : 'Required Custom Inputs' }}
-                  </h6>
-
-                  @for (field of createCustomInputs(); track field.serviceCustomInputId) {
-                    <div class="mb-3">
-                      <label
-                        [for]="'dyn_' + field.serviceCustomInputId"
-                        class="form-label small fw-semibold text-dark mb-1"
-                      >
-                        {{ isRtl() ? field.labelAr : field.labelEn }}
-                      </label>
-                      <input
-                        [id]="'dyn_' + field.serviceCustomInputId"
-                        [type]="
-                          field.type === 'Number' || field.type === 'Integer' ? 'number' : 'text'
-                        "
-                        class="form-control modal-form-control"
-                        [(ngModel)]="field.value"
-                        [name]="'dyn_' + field.serviceCustomInputId"
-                      />
-                    </div>
-                  }
+          @if (createdTicketSuccess(); as issued) {
+            <div class="issued-ticket-result">
+              <div class="issued-ticket-status">
+                <i class="bi bi-check-circle-fill" aria-hidden="true"></i>
+                <div>
+                  <strong>{{
+                    isRtl() ? 'تم إصدار التذكرة بنجاح' : 'Ticket issued successfully'
+                  }}</strong>
+                  <span
+                    >{{ isRtl() ? 'رقم التذكرة' : 'Ticket number' }}:
+                    {{ issued.ticketNumber }}</span
+                  >
                 </div>
+              </div>
+              @if (issued.print; as printModel) {
+                <div class="issued-ticket-preview">
+                  <app-ticket-print-renderer [model]="printModel" />
+                </div>
+              } @else {
+                <p class="print-unavailable">
+                  <i class="bi bi-printer" aria-hidden="true"></i>
+                  {{
+                    isRtl()
+                      ? 'تم الإصدار، لكن لا يوجد تصميم طباعة مهيأ لهذا الفرع.'
+                      : 'The ticket was issued, but no print layout is configured for this branch.'
+                  }}
+                </p>
               }
             </div>
-
             <footer class="modal-footer-custom">
               <button type="button" class="secondary-action" (click)="closeAllModals()">
-                <span>{{ isRtl() ? 'إلغاء' : 'Cancel' }}</span>
+                {{ isRtl() ? 'إغلاق' : 'Close' }}
               </button>
-              <button
-                type="submit"
-                class="primary-action"
-                [disabled]="!createServiceId() || !createSegmentId() || actionLoading()"
-              >
-                @if (actionLoading()) {
-                  <span class="spinner-border spinner-border-sm me-1" role="status"></span>
-                }
-                <span>{{ isRtl() ? 'إصدار التذكرة' : 'Issue Ticket' }}</span>
-              </button>
+              @if (issued.print) {
+                <button type="button" class="primary-action" (click)="printIssuedTicket()">
+                  <i class="bi bi-printer" aria-hidden="true"></i>{{ isRtl() ? 'طباعة' : 'Print' }}
+                </button>
+              }
             </footer>
-          </form>
+          } @else {
+            <form (ngSubmit)="submitCreateTicket()">
+              <div class="modal-body-custom">
+                <!-- Service Selection -->
+                <div class="mb-3">
+                  <label
+                    for="createTicketService"
+                    class="form-label small fw-semibold text-dark mb-1"
+                  >
+                    {{ isRtl() ? 'الخدمة المطلوبة' : 'Target Service' }}
+                    <span class="text-danger">*</span>
+                  </label>
+                  <select
+                    id="createTicketService"
+                    class="form-select modal-form-control"
+                    [ngModel]="createServiceId()"
+                    (ngModelChange)="onServiceSelected($event)"
+                    name="serviceId"
+                    required
+                  >
+                    <option [ngValue]="null" disabled>
+                      {{ isRtl() ? '-- اختر الخدمة --' : '-- Select Service --' }}
+                    </option>
+                    @for (srv of issuableServices(); track srv.id) {
+                      <option [ngValue]="srv.id">
+                        {{ isRtl() ? srv.fullPathAr || srv.nameAr : srv.fullPathEn || srv.nameEn }}
+                      </option>
+                    }
+                  </select>
+                </div>
+
+                <!-- Segment Selection -->
+                <div class="mb-3">
+                  <label
+                    for="createTicketSegment"
+                    class="form-label small fw-semibold text-dark mb-1"
+                  >
+                    {{ isRtl() ? 'الشريحة المستهدفة' : 'Target Segment' }}
+                    <span class="text-danger">*</span>
+                  </label>
+                  <select
+                    id="createTicketSegment"
+                    class="form-select modal-form-control"
+                    [ngModel]="createSegmentId()"
+                    (ngModelChange)="createSegmentId.set($event)"
+                    name="segmentId"
+                    required
+                  >
+                    <option [ngValue]="null" disabled>
+                      {{ isRtl() ? '-- اختر الشريحة --' : '-- Select Segment --' }}
+                    </option>
+                    @for (
+                      seg of serviceSegmentsLookup().length > 0
+                        ? serviceSegmentsLookup()
+                        : segmentsLookup();
+                      track seg.id
+                    ) {
+                      <option [ngValue]="seg.id">{{ isRtl() ? seg.nameAr : seg.nameEn }}</option>
+                    }
+                  </select>
+                </div>
+
+                <!-- Dynamic Custom Inputs Fields -->
+                @if (createCustomInputs().length > 0) {
+                  <div class="mt-4 pt-3 border-top">
+                    <h6 class="fw-bold small text-secondary mb-3">
+                      <i class="bi bi-input-cursor-text me-1"></i>
+                      {{ isRtl() ? 'الحقول المطلوبة للخدمة' : 'Required Custom Inputs' }}
+                    </h6>
+
+                    @for (field of createCustomInputs(); track field.serviceCustomInputId) {
+                      <div class="mb-3">
+                        <label
+                          [for]="'dyn_' + field.serviceCustomInputId"
+                          class="form-label small fw-semibold text-dark mb-1"
+                        >
+                          {{ isRtl() ? field.labelAr : field.labelEn }}
+                        </label>
+                        <input
+                          [id]="'dyn_' + field.serviceCustomInputId"
+                          [type]="
+                            field.type === 'Number' || field.type === 'Integer' ? 'number' : 'text'
+                          "
+                          class="form-control modal-form-control"
+                          [(ngModel)]="field.value"
+                          [name]="'dyn_' + field.serviceCustomInputId"
+                        />
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+
+              <footer class="modal-footer-custom">
+                <button type="button" class="secondary-action" (click)="closeAllModals()">
+                  <span>{{ isRtl() ? 'إلغاء' : 'Cancel' }}</span>
+                </button>
+                <button
+                  type="submit"
+                  class="primary-action"
+                  [disabled]="!createServiceId() || !createSegmentId() || actionLoading()"
+                >
+                  @if (actionLoading()) {
+                    <span class="spinner-border spinner-border-sm me-1" role="status"></span>
+                  }
+                  <span>{{ isRtl() ? 'إصدار التذكرة' : 'Issue Ticket' }}</span>
+                </button>
+              </footer>
+            </form>
+          }
         </div>
       </div>
     </div>
@@ -1543,6 +1584,12 @@
           </footer>
         </div>
       </div>
+    </div>
+  }
+
+  @if (createdTicketSuccess()?.print; as printModel) {
+    <div class="issued-ticket-print" aria-hidden="true">
+      <app-ticket-print-renderer [model]="printModel" />
     </div>
   }
 </section>

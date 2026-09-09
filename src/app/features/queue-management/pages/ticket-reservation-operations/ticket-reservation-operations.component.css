@@ -592,3 +592,61 @@
     max-height: 90vh;
   }
 }
+
+.issued-ticket-result {
+  display: grid;
+  gap: 18px;
+  padding: 20px;
+}
+.issued-ticket-status {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  color: #166534;
+  background: #ecfdf3;
+  border-radius: 0.65rem;
+}
+.issued-ticket-status > i {
+  font-size: 1.5rem;
+}
+.issued-ticket-status > div {
+  display: grid;
+  gap: 2px;
+}
+.issued-ticket-status span {
+  font-size: 0.8rem;
+}
+.issued-ticket-preview {
+  max-height: 55vh;
+  overflow: auto;
+  display: grid;
+  place-content: start center;
+  padding: 18px;
+  background: #e7edef;
+}
+.issued-ticket-preview app-ticket-print-renderer {
+  box-shadow: 0 14px 30px -18px rgba(15, 23, 42, 0.55);
+}
+.print-unavailable {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 12px;
+  color: #475569;
+  background: #f8fafc;
+  border-radius: 0.65rem;
+}
+.issued-ticket-print {
+  display: none;
+}
+
+@media print {
+  .queue-operations-page > :not(.issued-ticket-print) {
+    display: none;
+  }
+  .queue-operations-page > .issued-ticket-print {
+    display: block;
+  }
+}

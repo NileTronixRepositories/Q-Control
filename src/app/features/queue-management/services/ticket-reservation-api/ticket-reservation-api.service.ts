@@ -1,8 +1,8 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 
-import { AppLanguageStore, AuthSessionService } from '@core'; 
+import { AppLanguageStore, AuthSessionService } from '@core';
 import { environment } from '../../../../../environments/environment';
 import {
   CancelRequest,
@@ -25,6 +25,7 @@ export class TicketReservationApiService {
   private readonly auth = inject(AuthSessionService);
   private readonly language = inject(AppLanguageStore);
   private readonly branchesUrl = new URL('api/branches', environment.apiBaseUrl).toString();
+  private readonly mediaOrigin = new URL(environment.apiBaseUrl).origin;
 
   getTickets(
     branchId: number,
@@ -49,9 +50,11 @@ export class TicketReservationApiService {
     );
   }
   createTicket(branchId: number, request: CreateTicketRequest): Observable<TicketDetails> {
-    return this.http.post<TicketDetails>(`${this.branchesUrl}/${branchId}/tickets`, request, {
-      headers: this.headers(),
-    });
+    return this.http
+      .post<TicketDetails>(`${this.branchesUrl}/${branchId}/tickets`, request, {
+        headers: this.headers(),
+      })
+      .pipe(map((ticket) => this.resolvePrintMedia(ticket)));
   }
   cancelTicket(branchId: number, id: number, request: CancelRequest): Observable<TicketDetails> {
     return this.http.post<TicketDetails>(
@@ -137,11 +140,30 @@ export class TicketReservationApiService {
     );
   }
   convertReservation(branchId: number, id: number): Observable<TicketDetails> {
-    return this.http.post<TicketDetails>(
-      `${this.branchesUrl}/${branchId}/reservations/${id}/ticket`,
-      null,
-      { headers: this.headers() },
-    );
+    return this.http
+      .post<TicketDetails>(`${this.branchesUrl}/${branchId}/reservations/${id}/ticket`, null, {
+        headers: this.headers(),
+      })
+      .pipe(map((ticket) => this.resolvePrintMedia(ticket)));
+  }
+
+  private resolvePrintMedia(ticket: TicketDetails): TicketDetails {
+    if (!ticket.print) return ticket;
+    return {
+      ...ticket,
+      print: {
+        ...ticket.print,
+        elements: ticket.print.elements.map((element) => ({
+          ...element,
+          imageUrl: this.resolveMediaUrl(element.imageUrl),
+        })),
+      },
+    };
+  }
+
+  private resolveMediaUrl(path: string | null): string | null {
+    if (!path || path.startsWith('http://') || path.startsWith('https://')) return path;
+    return new URL(path.startsWith('/') ? path : `/${path}`, this.mediaOrigin).toString();
   }
 
   private headers(): HttpHeaders {

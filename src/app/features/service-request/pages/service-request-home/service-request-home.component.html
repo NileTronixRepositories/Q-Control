@@ -282,16 +282,30 @@
 
                 @case (step.Ticket) {
                   @if (store.ticket(); as ticket) {
-                    <app-service-request-ticket-preview
-                      [ticket]="ticket"
-                      [language]="store.language()"
-                      [translations]="store.translations()"
-                      [branchLogoUrl]="store.logoUrl()"
-                      [allowRequestMoreServices]="
-                        store.behavior()?.allowRequestMoreServices === true
-                      "
-                      (requestMoreServices)="restart()"
-                    />
+                    @if (ticket.print; as printModel) {
+                      <div class="runtime-ticket-preview">
+                        <app-ticket-print-renderer [model]="printModel" />
+                        <button
+                          type="button"
+                          class="kiosk-runtime-print-button"
+                          (click)="printTicket()"
+                        >
+                          <i class="bi bi-printer-fill" aria-hidden="true"></i>
+                          {{ store.language() === 'ar' ? 'طباعة التذكرة' : 'Print Ticket' }}
+                        </button>
+                      </div>
+                    } @else {
+                      <app-service-request-ticket-preview
+                        [ticket]="ticket"
+                        [language]="store.language()"
+                        [translations]="store.translations()"
+                        [branchLogoUrl]="store.logoUrl()"
+                        [allowRequestMoreServices]="
+                          store.behavior()?.allowRequestMoreServices === true
+                        "
+                        (requestMoreServices)="restart()"
+                      />
+                    }
                   }
                 }
               }
@@ -336,4 +350,9 @@
   </div>
 
   <app-service-request-kiosk-footer [caption]="footerCaption()" />
+  @if (store.ticket()?.print; as printModel) {
+    <div class="runtime-ticket-print" aria-hidden="true">
+      <app-ticket-print-renderer [model]="printModel" />
+    </div>
+  }
 </section>

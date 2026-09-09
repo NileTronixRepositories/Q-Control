@@ -513,6 +513,7 @@ export class ServiceRequestStore {
       issuedAtIso,
       estimatedWaitingMinutes,
       counterHint,
+      print: response.print ?? null,
       qrPayload: JSON.stringify({
         id: response.id,
         ticketNumber: response.ticketNumber,

@@ -1,0 +1,48 @@
+:host {
+  display: block;
+  width: max-content;
+}
+.ticket-print-surface {
+  position: relative;
+  overflow: hidden;
+  box-sizing: content-box;
+  background: #fff;
+  color: #000;
+  font-family: Arial, sans-serif;
+}
+.print-element {
+  position: absolute;
+  overflow: hidden;
+}
+.print-element img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.print-text {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  line-height: 1.25;
+  white-space: nowrap;
+}
+.print-text.multiline {
+  white-space: pre-wrap;
+}
+.print-text.trim-overflow:not(.multiline) {
+  text-overflow: ellipsis;
+}
+.print-text.trim-overflow.multiline {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+}
+@media print {
+  :host {
+    margin: 0;
+  }
+  .ticket-print-surface {
+    break-inside: avoid;
+    print-color-adjust: exact;
+  }
+}

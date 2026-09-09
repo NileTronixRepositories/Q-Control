@@ -26,6 +26,7 @@ import { KioskFlowChoiceComponent } from '../../components/kiosk-flow-choice/kio
 import { KioskReservationListComponent } from '../../components/kiosk-reservation-list/kiosk-reservation-list.component';
 import { SelectionCardViewModel } from '../../shared/selection-card-view.model';
 import { AppLanguage } from '../../../../shared/models/app-language/app-language.model';
+import { TicketPrintRendererComponent } from '@shared/components/ticket-print-renderer/ticket-print-renderer.component';
 
 @Component({
   selector: 'app-service-request-home',
@@ -40,6 +41,7 @@ import { AppLanguage } from '../../../../shared/models/app-language/app-language
     KioskFlowChoiceComponent,
     KioskReservationListComponent,
     KioskFooterComponent,
+    TicketPrintRendererComponent,
   ],
   templateUrl: './service-request-home.component.html',
   styleUrl: './service-request-home.component.scss',
@@ -619,6 +621,10 @@ export class ServiceRequestHomeComponent implements OnDestroy {
 
   protected retryLoading(): void {
     this.store.loadServices();
+  }
+
+  protected printTicket(): void {
+    window.print();
   }
 
   private generateTicket(
