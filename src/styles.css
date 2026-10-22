@@ -7,34 +7,11 @@
 @import 'tailwindcss/utilities.css' layer(utilities);
 
 /* ==========================================================================
-   1. DESIGN TOKENS (Single Source of Truth)
+   Q-CONTROL ENTERPRISE UNIFIED STYLES (Clean 3-File Architecture)
    ========================================================================== */
-@import './app/shared/styles/tokens/index.css';
+@import './app/shared/styles/tokens.css';
+@import './app/shared/styles/layout.css';
+@import './app/shared/styles/components.css';
 
-/* ==========================================================================
-   2. BASE LAYER (Reset, Normalization, Global Typography)
-   ========================================================================== */
-@import './app/shared/styles/base/reset.css';
-@import './app/shared/styles/base/typography.css';
-
-/* ==========================================================================
-   3. CRAFT UI COMPONENT SYSTEM (Clean, Borderless, Tactile Components)
-   ========================================================================== */
-@import './app/shared/styles/craft/surfaces.css';
-@import './app/shared/styles/craft/buttons.css';
-@import './app/shared/styles/craft/forms.css';
-@import './app/shared/styles/craft/tables.css';
-@import './app/shared/styles/craft/badges.css';
-@import './app/shared/styles/craft/dialogs.css';
-
-/* ==========================================================================
-   4. UTILITIES & MOTION
-   ========================================================================== */
-@import './app/shared/styles/utilities/animations.css';
-@import './app/shared/styles/utilities/layout.css';
-
-/* ==========================================================================
-   5. FEATURE SPECIFIC & DIALOG SYSTEM
-   ========================================================================== */
+/* Feature-specific brand animations */
 @import './app/features/auth/pages/login/login-brand-animation.css';
-@import './app/shared/styles/dialog-system.css';

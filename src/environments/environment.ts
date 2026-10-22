@@ -1,4 +1,9 @@
-﻿export const environment = {
+export interface Environment {
+  production: boolean;
+  apiBaseUrl: string;
+}
+
+export const environment: Environment = {
   production: true,
-  apiBaseUrl: 'http://192.168.1.6:8040/',
-} as const;
+  apiBaseUrl: 'http://192.168.1.10:8040/',
+};

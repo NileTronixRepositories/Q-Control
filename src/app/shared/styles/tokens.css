@@ -1,0 +1,242 @@
+/**
+ * ============================================================================
+ * Q-CONTROL ENTERPRISE DESIGN TOKENS (Single Source of Truth)
+ * Canonical Niletronix Primary (#0b8aa8), Accent (#f22745), & System Scales
+ * ============================================================================
+ */
+
+:root {
+  /* ==========================================================================
+     1. NILETRONIX BRAND PALETTE (Canonical Nile Cyan #0b8aa8)
+     ========================================================================== */
+  --q-color-primary-50: #f0f9fb;
+  --q-color-primary-100: #dcf1f6;
+  --q-color-primary-200: #bae3ed;
+  --q-color-primary-300: #88cde0;
+  --q-color-primary-400: #46b0cc;
+  --q-color-primary-500: #0b8aa8; /* Canonical Niletronix Primary */
+  --q-color-primary-600: #086e86;
+  --q-color-primary-700: #075b6f;
+  --q-color-primary-800: #074b5c;
+  --q-color-primary-900: #0a3f4e;
+  --q-color-primary-950: #042934;
+
+  /* ==========================================================================
+     2. NEUTRALS & SLATE PALETTE (Ink, Slate, Light Surfaces)
+     ========================================================================== */
+  --q-color-slate-50: #f8fafc; /* App Canvas Background */
+  --q-color-slate-100: #f1f5f9; /* Muted Soft Wash */
+  --q-color-slate-200: #e2e8f0; /* Subtle Hairline Dividers */
+  --q-color-slate-300: #cbd5e1; /* Inactive Borders / Glyphs */
+  --q-color-slate-400: #94a3b8; /* Secondary Icons / Captions */
+  --q-color-slate-500: #64748b; /* Muted Descriptive Text */
+  --q-color-slate-600: #475569; /* Secondary Headings */
+  --q-color-slate-700: #334155; /* High-Contrast Body Text */
+  --q-color-slate-800: #1e293b; /* Deep Text / Accents */
+  --q-color-slate-900: #0f172a; /* Core Ink / Display Titles */
+
+  /* ==========================================================================
+     3. SEMANTIC STATUS & LIVING ACCENTS
+     ========================================================================== */
+  /* Canonical Brand Accent & Danger (Niletronix Coral/Red #f22745) */
+  --q-color-accent-50: #fff0f3;
+  --q-color-accent-100: #ffe2e6;
+  --q-color-accent-500: #f22745;
+  --q-color-accent-600: #d71b37;
+  --q-color-accent-700: #b5132d;
+
+  --q-color-danger-50: #fff0f3;
+  --q-color-danger-100: #ffe2e6;
+  --q-color-danger-500: #f22745;
+  --q-color-danger-600: #d71b37;
+  --q-color-danger-700: #b5132d;
+
+  /* Success & Live Online Status */
+  --q-color-success-50: #ecfdf5;
+  --q-color-success-100: #d1fae5;
+  --q-color-success-500: #10b981;
+  --q-color-success-600: #059669;
+  --q-color-success-700: #047857;
+
+  /* Warning / Pending */
+  --q-color-warning-50: #fffbeb;
+  --q-color-warning-100: #fef3c7;
+  --q-color-warning-500: #f59e0b;
+  --q-color-warning-600: #d97706;
+  --q-color-warning-700: #b45309;
+
+  /* Info */
+  --q-color-info-50: #eff6ff;
+  --q-color-info-100: #dbeafe;
+  --q-color-info-500: #3b82f6;
+  --q-color-info-600: #2563eb;
+  --q-color-info-700: #1d4ed8;
+
+  /* ==========================================================================
+     4. SEMANTIC ROLES (Unified Source of Truth)
+     ========================================================================== */
+  --q-bg-app: var(--q-color-slate-50);
+  --q-bg-surface: #ffffff;
+  --q-bg-surface-subtle: var(--q-color-slate-100);
+  --q-bg-surface-elevated: #ffffff;
+
+  --q-text-primary: var(--q-color-slate-900);
+  --q-text-secondary: var(--q-color-slate-700);
+  --q-text-muted: var(--q-color-slate-500);
+  --q-text-subtle: var(--q-color-slate-400);
+
+  /* Primary Brand Roles */
+  --q-primary: #0b8aa8;
+  --q-primary-rgb: 11, 138, 168;
+  --q-primary-hover: #086e86;
+  --q-primary-active: #065b6f;
+  --q-primary-soft: #eaf6f9;
+  --q-primary-border: rgba(11, 138, 168, 0.22);
+
+  /* Accent & Danger Roles */
+  --q-accent: #f22745;
+  --q-accent-rgb: 242, 39, 69;
+  --q-accent-hover: #d71b37;
+  --q-accent-soft: #fff0f3;
+  --q-danger: var(--q-accent);
+  --q-danger-soft: var(--q-accent-soft);
+
+  --q-border-subtle: rgba(226, 232, 240, 0.8);
+  --q-border-default: var(--q-color-slate-200);
+  --q-border-strong: var(--q-color-slate-300);
+
+  --q-status-online: var(--q-color-success-500);
+  --q-status-warning: var(--q-color-warning-500);
+  --q-status-danger: var(--q-color-danger-500);
+
+  /* ==========================================================================
+     5. SPACING SCALE (4px Base Grid)
+     ========================================================================== */
+  --q-space-1: 4px;
+  --q-space-2: 8px;
+  --q-space-3: 12px;
+  --q-space-4: 16px;
+  --q-space-5: 20px;
+  --q-space-6: 24px;
+  --q-space-8: 32px;
+  --q-space-10: 40px;
+  --q-space-12: 48px;
+
+  /* Component Dimensions */
+  --q-control-height-sm: 30px;
+  --q-control-height-md: 36px;
+  --q-control-height-lg: 42px;
+  --q-control-height: var(--q-control-height-md);
+
+  --q-header-height: 56px;
+  --q-sidebar-width: 260px;
+  --q-sidebar-width-collapsed: 72px;
+
+  /* ==========================================================================
+     6. SQUIRCLE BORDER RADIUS
+     ========================================================================== */
+  --q-radius-xs: 4px;
+  --q-radius-sm: 6px;
+  --q-radius-md: 8px; /* Core Control Radius */
+  --q-radius-lg: 12px; /* Card / Panel Radius */
+  --q-radius-xl: 16px; /* Dialog / Modal Radius */
+  --q-radius-2xl: 20px;
+  --q-radius-full: 9999px;
+
+  /* ==========================================================================
+     7. CRAFT SOFT ELEVATION (Diffused, Borderless Depth)
+     ========================================================================== */
+  --q-shadow-subtle: 0 1px 2px 0 rgba(15, 23, 42, 0.04);
+  --q-shadow-sm: 0 1px 3px 0 rgba(15, 23, 42, 0.06), 0 1px 2px -1px rgba(15, 23, 42, 0.04);
+  --q-shadow-card: 0 4px 16px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.03);
+  --q-shadow-float: 0 10px 25px -3px rgba(15, 23, 42, 0.08), 0 4px 10px -2px rgba(15, 23, 42, 0.04);
+  --q-shadow-dialog: 0 20px 40px -12px rgba(15, 23, 42, 0.16);
+
+  /* Focused Rings */
+  --q-ring-primary: 0 0 0 2px rgba(11, 138, 168, 0.22);
+  --q-ring-danger: 0 0 0 2px rgba(242, 39, 69, 0.22);
+
+  /* Transitions */
+  --q-transition-snappy: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  --q-transition-smooth: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* ==========================================================================
+     8. TYPOGRAPHY SCALE
+     ========================================================================== */
+  --q-font-family-arabic:
+    'Cairo', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --q-font-family-latin:
+    system-ui, -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, sans-serif;
+  --q-font-family: var(--q-font-family-arabic);
+  --q-font-family-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  --q-font-weight-regular: 400;
+  --q-font-weight-medium: 500;
+  --q-font-weight-semibold: 600;
+  --q-font-weight-bold: 700;
+  --q-font-weight-extrabold: 800;
+
+  --q-text-2xs: 10px;
+  --q-text-xs: 11.5px;
+  --q-text-sm: 13px;
+  --q-text-base: 14px;
+  --q-text-md: 15px;
+  --q-text-lg: 17px;
+  --q-text-xl: 20px;
+  --q-text-2xl: 24px;
+  --q-text-3xl: 28px;
+  --q-text-4xl: 34px;
+
+  --q-leading-none: 1;
+  --q-leading-tight: 1.2;
+  --q-leading-snug: 1.35;
+  --q-leading-normal: 1.5;
+  --q-leading-relaxed: 1.65;
+
+  --q-tracking-tight: -0.02em;
+  --q-tracking-normal: 0em;
+  --q-tracking-wide: 0.025em;
+
+  /* ==========================================================================
+     9. BACKWARD COMPATIBILITY ALIASES (Legacy --nt-* & Admin Aliases)
+     ========================================================================== */
+  --nt-primary: var(--q-primary);
+  --nt-primary-dark: var(--q-primary-hover);
+  --nt-primary-hover: var(--q-primary-hover);
+  --nt-primary-soft: var(--q-primary-soft);
+  --nt-accent: var(--q-accent);
+  --nt-accent-soft: var(--q-accent-soft);
+  --nt-danger: var(--q-danger);
+  --nt-text: var(--q-text-primary);
+  --nt-text-heading: var(--q-text-primary);
+  --nt-muted: var(--q-text-muted);
+  --nt-subtle: var(--q-text-subtle);
+  --nt-bg: var(--q-bg-app);
+  --nt-card: var(--q-bg-surface);
+  --nt-border: var(--q-border-subtle);
+  --nt-radius: var(--q-radius-lg);
+  --nt-radius-sm: var(--q-radius-sm);
+  --nt-radius-md: var(--q-radius-md);
+  --nt-radius-lg: var(--q-radius-lg);
+  --nt-focus: var(--q-ring-primary);
+  --nt-sidebar-width: var(--q-sidebar-width);
+  --nt-sidebar-collapsed-width: var(--q-sidebar-width-collapsed);
+
+  --primary-color: var(--q-primary);
+  --primary-hover: var(--q-primary-hover);
+  --primary-soft: var(--q-primary-soft);
+  --primary-border: var(--q-primary-border);
+  --accent-color: var(--q-accent);
+  --accent-soft: var(--q-accent-soft);
+  --danger-color: var(--q-danger);
+
+  --q-bg-base: var(--q-bg-app);
+  --q-surface-card: var(--q-bg-surface);
+  --q-surface-muted: var(--q-bg-surface-subtle);
+  --q-text-heading: var(--q-text-primary);
+  --q-shadow-premium: var(--q-shadow-card);
+  --q-shadow-md: var(--q-shadow-card);
+  --q-shadow-soft: var(--q-shadow-subtle);
+  --q-focus-ring: var(--q-ring-primary);
+  --q-focus-visible-ring: var(--q-ring-primary);
+}

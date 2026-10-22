@@ -69,10 +69,10 @@
     [attr.lang]="language()"
     [attr.aria-hidden]="usesMobileOverlay() && !sidebarExpanded()"
   >
-    <div class="sidebar-header d-flex flex-shrink-0 align-items-start justify-content-between">
+    <div class="sidebar-header d-flex flex-shrink-0 align-items-center justify-content-between">
       @if (sidebarExpanded()) {
         <div class="logo-container d-flex flex-grow-1 align-items-center">
-          <img src="/images/nile.png" alt="" class="sidebar-logo d-block" />
+          <img src="/images/nile.png" alt="Niletronix" class="sidebar-logo d-block" />
         </div>
       }
       <button
@@ -80,11 +80,18 @@
         type="button"
         class="sidebar-toggle d-inline-flex flex-shrink-0 align-items-center justify-content-center"
         [attr.aria-label]="sidebarExpanded() ? closeSidebarLabel() : openSidebarLabel()"
+        [title]="sidebarExpanded() ? closeSidebarLabel() : openSidebarLabel()"
         (click)="toggleSidebar()"
       >
         <i
           class="bi toggle-icon d-inline-flex align-items-center justify-content-center lh-1"
-          [class.bi-x-lg]="sidebarExpanded()"
+          [class.bi-x-lg]="usesMobileOverlay() && sidebarExpanded()"
+          [class.bi-layout-sidebar-inset-reverse]="
+            !usesMobileOverlay() && sidebarExpanded() && direction() === 'ltr'
+          "
+          [class.bi-layout-sidebar-inset]="
+            !usesMobileOverlay() && sidebarExpanded() && direction() === 'rtl'
+          "
           [class.bi-list]="!sidebarExpanded()"
         ></i>
       </button>
@@ -136,7 +143,7 @@
                   <button
                     type="button"
                     class="sidebar-link sidebar-nested-toggle position-relative d-flex align-items-center overflow-hidden text-decoration-none"
-                    [class.sidebar-link-active]="child.expanded"
+                    [class.sidebar-nested-open]="child.expanded"
                     [title]="child.label"
                     [attr.aria-expanded]="child.expanded"
                     [attr.dir]="direction()"

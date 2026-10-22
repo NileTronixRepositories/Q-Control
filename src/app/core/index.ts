@@ -23,3 +23,8 @@ export * from './authorization/guards/admin-permission.guard';
 // i18n
 export * from './i18n/app-language.model';
 export * from './i18n/app-language.store';
+
+// Runtime Config
+export * from './config/app-config.model';
+export * from './config/app-config.token';
+export * from './config/app-config.service';

@@ -1,0 +1,346 @@
+/**
+ * ============================================================================
+ * Q-CONTROL ENTERPRISE: LAYOUT & SHELL ARCHITECTURE
+ * Unified Reset, Typography Hierarchy, Admin Shell, Sidebar & Navigation
+ * ============================================================================
+ */
+
+/* ── 1. Modern Reset & Base Normalization ─────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  min-height: 100%;
+  width: 100%;
+  -webkit-text-size-adjust: 100%;
+  tab-size: 4;
+}
+
+body {
+  font-family: var(--q-font-family);
+  font-size: var(--q-text-sm);
+  font-weight: var(--q-font-weight-regular);
+  line-height: var(--q-leading-normal);
+  color: var(--q-text-secondary);
+  background-color: var(--q-bg-app);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+img,
+svg,
+video,
+canvas,
+audio,
+iframe,
+embed,
+object {
+  display: inline-block;
+  max-width: 100%;
+  vertical-align: middle;
+}
+
+ul,
+ol {
+  list-style: none;
+}
+
+button,
+input,
+optgroup,
+select,
+textarea {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  background: transparent;
+  border: none;
+}
+
+a {
+  color: inherit;
+  text-decoration: inherit;
+}
+
+/* Custom Unified Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--q-color-slate-300);
+  border-radius: var(--q-radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--q-color-slate-400);
+}
+
+/* ── 2. Global Typography Hierarchy ────────────────────────────────────────── */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.h1,
+.h2,
+.h3,
+.h4,
+.h5,
+.h6 {
+  color: var(--q-text-primary);
+  font-weight: var(--q-font-weight-extrabold);
+  line-height: var(--q-leading-snug);
+  letter-spacing: var(--q-tracking-tight);
+}
+
+h1,
+.h1 {
+  font-size: var(--q-text-3xl);
+}
+h2,
+.h2 {
+  font-size: var(--q-text-2xl);
+}
+h3,
+.h3 {
+  font-size: var(--q-text-xl);
+}
+h4,
+.h4 {
+  font-size: var(--q-text-lg);
+}
+h5,
+.h5 {
+  font-size: var(--q-text-base);
+  font-weight: var(--q-font-weight-bold);
+}
+h6,
+.h6 {
+  font-size: var(--q-text-sm);
+  font-weight: var(--q-font-weight-bold);
+}
+
+p {
+  color: var(--q-text-secondary);
+  font-size: var(--q-text-sm);
+  line-height: var(--q-leading-normal);
+}
+
+small,
+.text-muted,
+.text-subtle {
+  font-size: var(--q-text-xs);
+  color: var(--q-text-muted);
+}
+
+/* ── 3. Layout Utility Helpers ─────────────────────────────────────────────── */
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.gap-1 {
+  gap: var(--q-space-1);
+}
+.gap-2 {
+  gap: var(--q-space-2);
+}
+.gap-3 {
+  gap: var(--q-space-3);
+}
+.gap-4 {
+  gap: var(--q-space-4);
+}
+
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── 4. Admin Shell & Navigation Chrome ───────────────────────────────────── */
+body .app-shell {
+  --sidebar-width: var(--q-sidebar-width, 260px) !important;
+  --sidebar-collapsed-width: var(--q-sidebar-width-collapsed, 72px) !important;
+  --sidebar-bg: var(--q-bg-surface, #ffffff);
+  --sidebar-border: var(--q-border-subtle, #e2e8f0);
+  --sidebar-text: var(--q-text-primary, #0f172a);
+  --sidebar-muted: var(--q-text-muted, #64748b);
+  --sidebar-active: var(--q-primary, #0b8aa8);
+  --sidebar-hover: var(--q-primary-soft, #eaf6f9);
+  --sidebar-hover-text: var(--q-primary-hover, #086f92);
+  --sidebar-accent: var(--q-primary, #0b8aa8);
+  --sidebar-danger: var(--q-danger, #f22745);
+  background: transparent !important;
+}
+
+body .app-shell .sidebar {
+  background: #f8fafc !important;
+  border-inline-end: 1.5px solid #e2e8f0 !important;
+  box-shadow: 4px 0 20px rgba(15, 23, 42, 0.04);
+}
+
+body .app-shell-rtl .sidebar {
+  border-inline-end: 1.5px solid #e2e8f0 !important;
+  box-shadow: -4px 0 20px rgba(15, 23, 42, 0.04);
+}
+
+body .app-shell .sidebar-link {
+  background: transparent;
+  border: 1px solid transparent;
+  box-shadow: none;
+}
+
+body .app-shell .sidebar-link:hover {
+  background: rgba(11, 138, 168, 0.08);
+  color: var(--q-primary, #0b8aa8);
+  border-color: transparent;
+  transition: all 0.18s ease;
+}
+
+body .app-shell .sidebar-link-active {
+  background: linear-gradient(135deg, #0b8aa8 0%, #086f92 100%) !important;
+  border-color: rgba(11, 138, 168, 0.4) !important;
+  box-shadow: 0 4px 14px rgba(11, 138, 168, 0.28) !important;
+  color: #ffffff !important;
+  transition: all 0.18s ease;
+}
+
+body .app-shell .sidebar-link-active::before {
+  display: none !important;
+}
+
+body .app-shell .sidebar-link-active .child-icon {
+  color: #ffffff !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+body .app-shell .sidebar-link-active .child-dot {
+  background: #ffffff !important;
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.6);
+}
+
+body .app-shell .sidebar-link-active .link-text,
+body .app-shell .sidebar-link-active .link-text strong {
+  color: #ffffff !important;
+  font-weight: 750 !important;
+}
+
+body .app-shell.sidebar-collapsed .sidebar-link-active {
+  background: linear-gradient(135deg, #0b8aa8 0%, #086f92 100%) !important;
+  border-color: rgba(11, 138, 168, 0.4) !important;
+}
+
+/* ── 5. Admin Toolbar & Filter Chrome ─────────────────────────────────────── */
+body[data-admin-theme] {
+  --admin-control-height: 40px;
+  --admin-control-radius: 10px;
+  --admin-icon-offset: 14px;
+  --admin-icon-padding: 42px;
+  --admin-action-size: 34px;
+  --admin-action-radius: 8px;
+}
+
+body[data-admin-theme] .filter-field {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+}
+
+body[data-admin-theme] .filter-field > span {
+  display: flex;
+  align-items: center;
+  min-height: 1rem;
+  color: var(--q-text-secondary);
+  font-size: var(--q-text-xs);
+  font-weight: 700;
+  line-height: 1.25;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+body[data-admin-theme] .filter-field .form-control,
+body[data-admin-theme] .filter-field .form-select {
+  min-height: var(--admin-control-height);
+  border-radius: var(--admin-control-radius);
+  padding-inline-start: 0.85rem;
+  background-color: var(--q-bg-surface);
+  border-color: var(--q-border-subtle);
+  color: var(--q-text-primary);
+  font-size: var(--q-text-sm);
+  box-shadow: none;
+  transition: all 0.2s ease;
+}
+
+body[data-admin-theme] .filter-field:has(.filter-icon) .form-control,
+body[data-admin-theme] .filter-field:has(.filter-icon) .form-select {
+  padding-inline-start: var(--admin-icon-padding);
+}
+
+/* ── 6. Workspace Page Layout ─────────────────────────────────────────────── */
+body .workspace {
+  background: transparent !important;
+}
+
+body .workspace-content {
+  padding: 14px 18px !important;
+}
+
+body[data-admin-theme='niletronix-admin'] .workspace,
+body[data-admin-theme='niletronix-admin'] .main-content {
+  background: var(--q-bg-app) !important;
+}
+
+body :where(.page-header, .page-hero) {
+  position: relative;
+  overflow: hidden;
+  align-items: center;
+  color: var(--q-text-primary);
+}
+
+body :where(.page-header .eyebrow, .page-hero .eyebrow, .eyebrow) {
+  margin-block: 0 8px !important;
+  color: var(--q-primary) !important;
+  font-size: 0.72rem !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.05em !important;
+  text-transform: uppercase;
+}
+
+body :where(.page-header h1, .page-hero h1, .page-hero h2, .page-hero h3) {
+  max-width: 760px;
+  margin-block: 0 8px !important;
+  color: var(--q-text-primary) !important;
+}
