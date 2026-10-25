@@ -1149,8 +1149,14 @@ export class ServicesComponent implements OnInit, OnDestroy {
       : this.translations().branchScopedScope;
   }
 
-  private detailText(key: string, label: string, value: string | number): ServiceDetailItem {
-    return { key, label, value, kind: 'text', tone: 'neutral' };
+  private detailText(
+    key: string,
+    label: string,
+    value: string | number | null | undefined,
+  ): ServiceDetailItem {
+    const displayValue =
+      value !== null && value !== undefined && String(value).trim().length > 0 ? value : '-';
+    return { key, label, value: displayValue, kind: 'text', tone: 'neutral' };
   }
 
   private detailBoolean(key: string, label: string, value: boolean): ServiceDetailItem {

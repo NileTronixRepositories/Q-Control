@@ -189,27 +189,31 @@ small,
 body .app-shell {
   --sidebar-width: var(--q-sidebar-width, 260px) !important;
   --sidebar-collapsed-width: var(--q-sidebar-width-collapsed, 72px) !important;
-  --sidebar-bg: var(--q-bg-surface, #ffffff);
-  --sidebar-border: var(--q-border-subtle, #e2e8f0);
-  --sidebar-text: var(--q-text-primary, #0f172a);
-  --sidebar-muted: var(--q-text-muted, #64748b);
+  --sidebar-bg: var(--q-bg-sidebar, #0b1727);
+  --sidebar-border: rgba(255, 255, 255, 0.08);
+  --sidebar-text: #e2e8f0;
+  --sidebar-muted: #94a3b8;
   --sidebar-active: var(--q-primary, #0b8aa8);
-  --sidebar-hover: var(--q-primary-soft, #eaf6f9);
-  --sidebar-hover-text: var(--q-primary-hover, #086f92);
+  --sidebar-hover: rgba(255, 255, 255, 0.08);
+  --sidebar-hover-text: #ffffff;
   --sidebar-accent: var(--q-primary, #0b8aa8);
   --sidebar-danger: var(--q-danger, #f22745);
-  background: transparent !important;
+  background-color: var(--q-bg-app, #f1f5f9) !important;
+  background-image:
+    radial-gradient(at 0% 0%, rgba(11, 138, 168, 0.035) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(11, 138, 168, 0.02) 0px, transparent 40%) !important;
+  background-attachment: fixed !important;
 }
 
 body .app-shell .sidebar {
-  background: #f8fafc !important;
-  border-inline-end: 1.5px solid #e2e8f0 !important;
-  box-shadow: 4px 0 20px rgba(15, 23, 42, 0.04);
+  background: var(--q-bg-sidebar, #0b1727) !important;
+  border-inline-end: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.18);
 }
 
 body .app-shell-rtl .sidebar {
-  border-inline-end: 1.5px solid #e2e8f0 !important;
-  box-shadow: -4px 0 20px rgba(15, 23, 42, 0.04);
+  border-inline-end: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: -4px 0 24px rgba(0, 0, 0, 0.18);
 }
 
 body .app-shell .sidebar-link {
@@ -219,10 +223,14 @@ body .app-shell .sidebar-link {
 }
 
 body .app-shell .sidebar-link:hover {
-  background: rgba(11, 138, 168, 0.08);
-  color: var(--q-primary, #0b8aa8);
+  background: rgba(255, 255, 255, 0.07);
+  color: #ffffff;
   border-color: transparent;
   transition: all 0.18s ease;
+}
+
+body .app-shell .sidebar-link:hover .child-icon {
+  color: #38bdf8;
 }
 
 body .app-shell .sidebar-link-active {

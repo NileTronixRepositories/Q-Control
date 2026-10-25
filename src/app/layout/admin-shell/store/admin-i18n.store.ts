@@ -327,7 +327,7 @@ const TECHNICAL_ADMIN_TRANSLATIONS: Record<AppLanguage, TechnicalAdminTranslatio
     accountActionsLabel: 'Account actions',
     topbarEyebrow: 'Operations Dashboard',
     topbarTitle: 'Technical Admin',
-    languageButtonLabel: 'Arabic',
+    languageButtonLabel: 'العربية',
     logoutLabel: 'Logout',
     currentUserLabel: 'Current user',
     technicalAdminRoleLabel: 'Technical Admin',

@@ -6,7 +6,9 @@
   background: var(--q-surface-default, #ffffff);
   border: 1px solid rgba(11, 138, 168, 0.15);
   border-radius: var(--q-radius-lg, 16px);
-  box-shadow: 0 10px 30px -8px rgba(15, 23, 42, 0.06), 0 4px 10px -2px rgba(11, 138, 168, 0.04);
+  box-shadow:
+    0 10px 30px -8px rgba(15, 23, 42, 0.06),
+    0 4px 10px -2px rgba(11, 138, 168, 0.04);
   min-height: 380px;
   overflow: hidden;
   transition: var(--q-transition-base, all 0.2s ease);
@@ -104,11 +106,11 @@
   align-items: center;
   justify-content: space-between;
   background: #ffffff;
-  border-bottom: 1px solid var(--q-border-subtle, #e2e8f0);
+  border-bottom: 1px solid #e2e8f0;
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  padding: 10px 14px;
+  padding: 12px 16px;
 }
 
 .svc-tree-toolbar-actions {
@@ -125,23 +127,23 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
 }
 
 .svc-tree-filter {
   align-items: center;
   background: #ffffff;
-  border: 1px solid var(--q-border-subtle, #e2e8f0);
-  border-radius: 6px;
-  color: var(--q-text-secondary, #334155);
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  color: #334155;
   cursor: pointer;
   display: inline-flex;
   font-size: 12px;
   font-weight: 600;
-  gap: 4px;
+  gap: 6px;
   margin: 0;
-  height: 36px;
-  padding: 0 10px;
+  height: 38px;
+  padding: 0 12px;
   transition: all 0.15s ease;
   user-select: none;
 }
@@ -153,13 +155,14 @@
 
 .svc-tree-filter:hover {
   background: #f8fafc;
-  border-color: #cbd5e1;
+  border-color: #94a3b8;
 }
 
 .svc-tree-filter--active {
   background: #e8f5f8;
-  border-color: var(--q-primary, #087fa7);
-  color: var(--q-primary, #087fa7);
+  border-color: #0b8aa8;
+  color: #086f92;
+  box-shadow: 0 1px 3px rgba(11, 138, 168, 0.15);
 }
 
 .svc-tree-filter-input {
@@ -207,27 +210,31 @@
 
 .search-input-wrapper svg {
   position: absolute;
-  inset-inline-start: 10px;
-  color: var(--q-primary, #087fa7);
+  inset-inline-start: 12px;
+  color: #0b8aa8;
   pointer-events: none;
   z-index: 2;
+  width: 16px;
+  height: 16px;
 }
 
 .svc-tree-search-input {
-  padding-inline-start: 32px !important;
-  padding-inline-end: 28px !important;
-  height: 36px;
-  font-size: 0.85rem;
-  border-radius: 6px;
-  border: 1px solid var(--q-border-subtle, #e2e8f0);
-  background: #f8fafc;
+  padding-inline-start: 40px !important;
+  padding-inline-end: 32px !important;
+  height: 38px;
+  font-size: 0.88rem;
+  font-weight: 500;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: #1e293b;
   transition: all 0.15s ease;
 }
 
 .svc-tree-search-input:focus {
   background: #ffffff;
-  border-color: var(--q-primary, #087fa7);
-  box-shadow: 0 0 0 0.2rem rgba(8, 127, 167, 0.15);
+  border-color: #0b8aa8;
+  box-shadow: 0 0 0 3px rgba(11, 138, 168, 0.15);
 }
 
 .svc-tree-search-clear {
@@ -275,23 +282,25 @@
   --tree-guide-start: calc(var(--tree-offset) - 4px);
   align-items: center;
   background: #ffffff;
-  border: 1px solid rgba(11, 138, 168, 0.12);
+  border: 1px solid #e2e8f0;
   border-radius: 10px;
   cursor: pointer;
   display: grid;
-  gap: 10px;
+  gap: 12px;
   grid-template-columns: var(--tree-toggle-size) minmax(0, 1fr) auto;
-  min-height: 56px;
-  padding: 8px 12px;
-  padding-inline-start: calc(var(--tree-offset) + 12px);
+  min-height: 58px;
+  padding: 10px 14px;
+  padding-inline-start: calc(var(--tree-offset) + 14px);
   position: relative;
-  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.03);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .svc-tree-node--filtered {
   border-color: var(--q-primary, #0b8aa8);
-  box-shadow: 0 0 0 1px #bae6fd, 0 6px 16px rgba(11, 138, 168, 0.15);
+  box-shadow:
+    0 0 0 1px #bae6fd,
+    0 6px 16px rgba(11, 138, 168, 0.15);
 }
 
 .svc-tree-node--workflow-leaf {
@@ -337,10 +346,10 @@
 
 .svc-tree-node:hover,
 .svc-tree-node--selected {
-  background: linear-gradient(135deg, #f0f9ff 0%, #e0f6f8 100%);
+  background: #f8fdff;
   border-color: var(--q-primary, #0b8aa8);
-  box-shadow: 0 6px 18px rgba(11, 138, 168, 0.12);
-  transform: translateX(-2px);
+  box-shadow: 0 4px 14px rgba(11, 138, 168, 0.12);
+  transform: translateY(-1px);
 }
 
 .svc-tree-panel--drop-target {
@@ -349,7 +358,9 @@
 
 .svc-tree-panel--drop-active {
   border-color: var(--q-primary, #0b8aa8);
-  box-shadow: 0 0 0 3px rgba(11, 138, 168, 0.25), 0 10px 24px rgba(15, 23, 42, 0.08);
+  box-shadow:
+    0 0 0 3px rgba(11, 138, 168, 0.25),
+    0 10px 24px rgba(15, 23, 42, 0.08);
 }
 
 .svc-tree-node--draggable {
@@ -361,14 +372,19 @@
 }
 
 .svc-tree-toggle {
-  background: #ffffff;
+  background: #f8fafc;
   color: var(--q-primary, #0b8aa8);
   height: var(--tree-toggle-size);
   min-height: var(--tree-toggle-size);
   padding: 0;
   width: var(--tree-toggle-size);
   border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   z-index: 1;
+  transition: all 0.15s ease;
 }
 
 .svc-tree-toggle--enabled {
@@ -412,7 +428,7 @@
 
 .svc-tree-name {
   color: var(--q-text-primary, #0f172a);
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 700;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -422,7 +438,7 @@
 .svc-tree-code {
   background: #ecfeff;
   border: 1px solid #a5f3fc;
-  border-radius: 4px;
+  border-radius: 6px;
   color: #0e7490;
   flex: 0 1 auto;
   font-size: 11px;
@@ -436,11 +452,11 @@
 }
 
 .svc-tree-order {
-  color: var(--q-text-muted, #64748b);
+  color: #475569;
   background: #f1f5f9;
   border: 1px solid #e2e8f0;
-  border-radius: 4px;
-  padding: 2px 6px;
+  border-radius: 6px;
+  padding: 2px 7px;
   flex: 0 0 auto;
   font-size: 11px;
   font-weight: 600;
@@ -450,18 +466,18 @@
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 5px;
-  margin-top: 5px;
+  gap: 6px;
+  margin-top: 6px;
 }
 
 .svc-tree-chip {
-  border-radius: 4px;
+  border-radius: 6px;
   display: inline-flex;
   align-items: center;
-  font-size: 11px;
+  font-size: 11.5px;
   font-weight: 600;
   line-height: 1.3;
-  padding: 2px 7px;
+  padding: 2.5px 8px;
   border: 1px solid transparent;
 }
 
@@ -480,15 +496,15 @@
 }
 
 .svc-tree-chip--active {
-  background: #f0fdf4;
-  color: #16a34a;
-  border-color: #dcfce7;
+  background: #ecfdf5;
+  color: #047857;
+  border-color: #a7f3d0;
 }
 
 .svc-tree-chip--inactive {
   background: #fef2f2;
-  color: #dc2626;
-  border-color: #fee2e2;
+  color: #b91c1c;
+  border-color: #fecaca;
 }
 
 .svc-tree-chip--deleted {
@@ -505,32 +521,41 @@
 
 .svc-tree-chip--children {
   background: #fffbeb;
-  color: #d97706;
-  border-color: #fef3c7;
+  color: #b45309;
+  border-color: #fde68a;
 }
 
 .svc-tree-actions {
   background: #f8fafc;
   border: 1px solid #e2e8f0;
-  border-radius: 6px;
-  gap: 3px;
-  padding: 3px;
+  border-radius: 8px;
+  gap: 4px;
+  padding: 4px;
+  display: inline-flex;
+  align-items: center;
 }
 
 .svc-tree-action-btn {
   background: #ffffff;
-  border-color: #cbd5e1;
-  color: var(--q-primary, #087fa7);
-  height: 28px;
-  min-height: 28px;
+  border: 1px solid #cbd5e1;
+  color: #086f92;
+  height: 30px;
+  min-height: 30px;
   padding: 0;
-  width: 28px;
-  border-radius: 4px;
+  width: 30px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  transition: all 0.15s ease;
 }
 
 .svc-tree-action-btn:hover:not(:disabled) {
-  background: #e8f5f8;
-  border-color: var(--q-primary, #087fa7);
+  background: #0b8aa8;
+  border-color: #0b8aa8;
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(11, 138, 168, 0.25);
 }
 
 /* Eye-Catching Manage Workflows Button Pill */

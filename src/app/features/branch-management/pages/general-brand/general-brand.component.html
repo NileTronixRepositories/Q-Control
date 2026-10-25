@@ -83,8 +83,8 @@
                   <small class="text-muted">
                     {{
                       isConfigured()
-                        ? 'الألوان الأساسية للثيم العام وشاشات التذاكر'
-                        : 'تحديد ألوان الهوية البصرية الرئيسية'
+                        ? copy().themeColorsSubtitleConfigured
+                        : copy().themeColorsSubtitleNew
                     }}
                   </small>
                 </div>
@@ -285,7 +285,7 @@
                 <span class="panel-icon"><i class="bi bi-sliders2-vertical"></i></span>
                 <div>
                   <h5 class="panel-title m-0">{{ copy().behaviorSection }}</h5>
-                  <small class="text-muted">تحديد سلوك التفاعل وتدفق الشاشات عند طلب الخدمة</small>
+                  <small class="text-muted">{{ copy().behaviorSubtitle }}</small>
                 </div>
               </div>
             </div>
@@ -304,9 +304,7 @@
                       >
                         {{ copy().showLanguagePageLabel }}
                       </label>
-                      <small class="text-muted" style="font-size: 0.75rem"
-                        >عرض شاشة اختيار اللغة قبل قائمة الخدمات</small
-                      >
+                      <small class="text-muted">{{ copy().showLanguagePageSubtitle }}</small>
                     </div>
                     <div class="form-check form-switch m-0">
                       <input
@@ -331,9 +329,7 @@
                       >
                         {{ copy().defaultLanguageIsArabicLabel }}
                       </label>
-                      <small class="text-muted" style="font-size: 0.75rem"
-                        >اعتماد اللغة العربية كلغة أولى افتراضية</small
-                      >
+                      <small class="text-muted">{{ copy().defaultLanguageIsArabicSubtitle }}</small>
                     </div>
                     <div class="form-check form-switch m-0">
                       <input
@@ -358,9 +354,7 @@
                       >
                         {{ copy().alwaysRequireUserInputLabel }}
                       </label>
-                      <small class="text-muted" style="font-size: 0.75rem"
-                        >إلزام العميل بإدخال بياناته قبل قطع التذكرة</small
-                      >
+                      <small class="text-muted">{{ copy().alwaysRequireUserInputSubtitle }}</small>
                     </div>
                     <div class="form-check form-switch m-0">
                       <input
@@ -385,9 +379,9 @@
                       >
                         {{ copy().showServiceNavigationPathLabel }}
                       </label>
-                      <small class="text-muted" style="font-size: 0.75rem"
-                        >عرض مسار التسلسل الهرمي للخدمات الفرعية</small
-                      >
+                      <small class="text-muted">{{
+                        copy().showServiceNavigationPathSubtitle
+                      }}</small>
                     </div>
                     <div class="form-check form-switch m-0">
                       <input
@@ -412,9 +406,7 @@
                       >
                         {{ copy().allowOperatorSelectionLabel }}
                       </label>
-                      <small class="text-muted" style="font-size: 0.75rem"
-                        >إتاحة اختيار الموظف أو مقدم الخدمة يدوياً</small
-                      >
+                      <small class="text-muted">{{ copy().allowOperatorSelectionSubtitle }}</small>
                     </div>
                     <div class="form-check form-switch m-0">
                       <input
@@ -439,9 +431,9 @@
                       >
                         {{ copy().allowRequestMoreServicesLabel }}
                       </label>
-                      <small class="text-muted" style="font-size: 0.75rem"
-                        >السماح بطلب أكثر من خدمة لنفس العميل</small
-                      >
+                      <small class="text-muted">{{
+                        copy().allowRequestMoreServicesSubtitle
+                      }}</small>
                     </div>
                     <div class="form-check form-switch m-0">
                       <input
@@ -468,7 +460,7 @@
                 <span class="panel-icon"><i class="bi bi-translate"></i></span>
                 <div>
                   <h5 class="panel-title m-0">{{ copy().languageButtonSection }}</h5>
-                  <small class="text-muted">تخصيص ألوان وأبعاد زر تغيير اللغة</small>
+                  <small class="text-muted">{{ copy().languageButtonSubtitle }}</small>
                 </div>
               </div>
             </div>
@@ -566,7 +558,7 @@
                     class="form-control"
                     id="gbLangText"
                     formControlName="languageButtonText"
-                    placeholder="اختيار اللغة"
+                    [placeholder]="copy().languageButtonTextPlaceholder"
                     maxlength="200"
                     [class.is-invalid]="isThemeControlInvalid('languageButtonText')"
                   />
@@ -586,7 +578,7 @@
                 <span class="panel-icon"><i class="bi bi-calculator-fill"></i></span>
                 <div>
                   <h5 class="panel-title m-0">{{ copy().keypadButtonSection }}</h5>
-                  <small class="text-muted">تخصيص ألوان وأبعاد أزرار إدخال الأرقام</small>
+                  <small class="text-muted">{{ copy().keypadButtonSubtitle }}</small>
                 </div>
               </div>
             </div>
@@ -686,7 +678,7 @@
                     class="form-control"
                     id="gbKeypadText"
                     formControlName="keypadButtonText"
-                    placeholder="تأكيد"
+                    [placeholder]="copy().keypadButtonTextPlaceholder"
                     maxlength="200"
                     [class.is-invalid]="isThemeControlInvalid('keypadButtonText')"
                   />
@@ -706,7 +698,7 @@
                 <span class="panel-icon"><i class="bi bi-grid-3x3-gap-fill"></i></span>
                 <div>
                   <h5 class="panel-title m-0">{{ copy().serviceButtonSection }}</h5>
-                  <small class="text-muted">تخصيص ألوان وأبعاد أزرار الخدمات</small>
+                  <small class="text-muted">{{ copy().serviceButtonSubtitle }}</small>
                 </div>
               </div>
             </div>
@@ -841,7 +833,7 @@
                     class="form-control"
                     id="gbSrvText"
                     formControlName="serviceButtonText"
-                    placeholder="اختيار الخدمة"
+                    [placeholder]="copy().serviceButtonTextPlaceholder"
                     maxlength="200"
                     [class.is-invalid]="isThemeControlInvalid('serviceButtonText')"
                   />
@@ -861,7 +853,7 @@
                 <span class="panel-icon"><i class="bi bi-arrow-left-square-fill"></i></span>
                 <div>
                   <h5 class="panel-title m-0">{{ copy().footerButtonSection }}</h5>
-                  <small class="text-muted">تخصيص أزرار أسفل الشاشة مثل زر الرجوع</small>
+                  <small class="text-muted">{{ copy().footerButtonSubtitle }}</small>
                 </div>
               </div>
             </div>
@@ -961,7 +953,7 @@
                     class="form-control"
                     id="gbFooterText"
                     formControlName="footerButtonText"
-                    placeholder="رجوع"
+                    [placeholder]="copy().footerButtonTextPlaceholder"
                     maxlength="200"
                     [class.is-invalid]="isThemeControlInvalid('footerButtonText')"
                   />
@@ -981,13 +973,13 @@
                 <div class="save-status-pill status-unsaved">
                   <span class="status-pulse-dot warning"></span>
                   <i class="bi bi-exclamation-triangle-fill text-warning"></i>
-                  <span class="fw-semibold">توجد تعديلات غير محفوظة</span>
+                  <span class="fw-semibold">{{ copy().unsavedChanges }}</span>
                 </div>
               } @else {
                 <div class="save-status-pill status-saved">
                   <span class="status-pulse-dot success"></span>
                   <i class="bi bi-check-circle-fill text-success"></i>
-                  <span class="fw-semibold">جميع الإعدادات محفوظة ومحدثة</span>
+                  <span class="fw-semibold">{{ copy().allSaved }}</span>
                 </div>
               }
             </div>

@@ -78,6 +78,25 @@ interface GeneralBrandPageTranslations {
   readonly genericError: string;
   readonly brandSaved: string;
   readonly close: string;
+  readonly themeColorsSubtitleConfigured: string;
+  readonly themeColorsSubtitleNew: string;
+  readonly behaviorSubtitle: string;
+  readonly showLanguagePageSubtitle: string;
+  readonly defaultLanguageIsArabicSubtitle: string;
+  readonly alwaysRequireUserInputSubtitle: string;
+  readonly showServiceNavigationPathSubtitle: string;
+  readonly allowOperatorSelectionSubtitle: string;
+  readonly allowRequestMoreServicesSubtitle: string;
+  readonly languageButtonSubtitle: string;
+  readonly keypadButtonSubtitle: string;
+  readonly serviceButtonSubtitle: string;
+  readonly footerButtonSubtitle: string;
+  readonly languageButtonTextPlaceholder: string;
+  readonly keypadButtonTextPlaceholder: string;
+  readonly serviceButtonTextPlaceholder: string;
+  readonly footerButtonTextPlaceholder: string;
+  readonly unsavedChanges: string;
+  readonly allSaved: string;
 }
 
 const HEX_COLOR_PATTERN = /^#[0-9A-Fa-f]{6}$/;
@@ -130,6 +149,25 @@ const PAGE_TRANSLATIONS: Record<AppLanguage, GeneralBrandPageTranslations> = {
     genericError: 'حدث خطأ غير متوقع.',
     brandSaved: 'تم حفظ إعدادات الهوية البصرية العامة بنجاح.',
     close: 'إغلاق',
+    themeColorsSubtitleConfigured: 'الألوان الأساسية للثيم العام وشاشات التذاكر',
+    themeColorsSubtitleNew: 'تحديد ألوان الهوية البصرية الرئيسية',
+    behaviorSubtitle: 'تحديد سلوك التفاعل وتدفق الشاشات عند طلب الخدمة',
+    showLanguagePageSubtitle: 'عرض شاشة اختيار اللغة قبل قائمة الخدمات',
+    defaultLanguageIsArabicSubtitle: 'اعتماد اللغة العربية كلغة أولى افتراضية',
+    alwaysRequireUserInputSubtitle: 'إلزام العميل بإدخال بياناته قبل قطع التذكرة',
+    showServiceNavigationPathSubtitle: 'عرض مسار التسلسل الهرمي للخدمات الفرعية',
+    allowOperatorSelectionSubtitle: 'إتاحة اختيار الموظف أو مقدم الخدمة يدوياً',
+    allowRequestMoreServicesSubtitle: 'السماح بطلب أكثر من خدمة لنفس العميل',
+    languageButtonSubtitle: 'تخصيص ألوان وأبعاد زر تغيير اللغة',
+    keypadButtonSubtitle: 'تخصيص ألوان وأبعاد أزرار إدخال الأرقام',
+    serviceButtonSubtitle: 'تخصيص ألوان وأبعاد أزرار الخدمات',
+    footerButtonSubtitle: 'تخصيص أزرار أسفل الشاشة مثل زر الرجوع',
+    languageButtonTextPlaceholder: 'اختيار اللغة',
+    keypadButtonTextPlaceholder: 'تأكيد',
+    serviceButtonTextPlaceholder: 'اختيار الخدمة',
+    footerButtonTextPlaceholder: 'رجوع',
+    unsavedChanges: 'توجد تعديلات غير محفوظة',
+    allSaved: 'جميع الإعدادات محفوظة ومحدثة',
   },
   en: {
     pageEyebrow: 'System Administration',
@@ -178,6 +216,25 @@ const PAGE_TRANSLATIONS: Record<AppLanguage, GeneralBrandPageTranslations> = {
     genericError: 'Unexpected error occurred.',
     brandSaved: 'General Brand settings saved successfully.',
     close: 'Close',
+    themeColorsSubtitleConfigured: 'Core colors for general theme and ticketing screens',
+    themeColorsSubtitleNew: 'Define primary visual identity colors',
+    behaviorSubtitle: 'Define user interaction and screen flow during service request',
+    showLanguagePageSubtitle: 'Display language selection page before services list',
+    defaultLanguageIsArabicSubtitle: 'Set Arabic as the primary default language',
+    alwaysRequireUserInputSubtitle: 'Require customer data entry before issuing a ticket',
+    showServiceNavigationPathSubtitle: 'Display breadcrumb navigation hierarchy for sub-services',
+    allowOperatorSelectionSubtitle: 'Enable manual selection of staff or counter',
+    allowRequestMoreServicesSubtitle: 'Allow customer to request multiple services',
+    languageButtonSubtitle: 'Customize colors and dimensions for language button',
+    keypadButtonSubtitle: 'Customize colors and dimensions for numeric keypad',
+    serviceButtonSubtitle: 'Customize colors and dimensions for service items',
+    footerButtonSubtitle: 'Customize bottom screen controls such as back button',
+    languageButtonTextPlaceholder: 'Select Language',
+    keypadButtonTextPlaceholder: 'Confirm',
+    serviceButtonTextPlaceholder: 'Select Service',
+    footerButtonTextPlaceholder: 'Back',
+    unsavedChanges: 'Unsaved changes pending',
+    allSaved: 'All settings are saved and up to date',
   },
 };
 

@@ -1,5 +1,13 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  OnDestroy,
+  OnInit,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
@@ -108,6 +116,18 @@ interface BranchEditorTranslations {
   readonly fallbackSuccess: string;
   readonly fallbackError: string;
   readonly emptyValue: string;
+  readonly searchPlaceholder: string;
+  readonly createSubtitle: string;
+  readonly editSubtitle: string;
+  readonly detailsSubtitle: string;
+  readonly basicInfoAndStatus: string;
+  readonly systemAudit: string;
+  readonly basicBranchInfo: string;
+  readonly arabicNamePlaceholder: string;
+  readonly governoratePlaceholder: string;
+  readonly cityPlaceholder: string;
+  readonly areaPlaceholder: string;
+  readonly addressPlaceholder: string;
 }
 
 const BRANCH_EDITOR_TRANSLATIONS: Record<AppLanguage, BranchEditorTranslations> = {
@@ -152,6 +172,18 @@ const BRANCH_EDITOR_TRANSLATIONS: Record<AppLanguage, BranchEditorTranslations> 
     fallbackSuccess: 'تم تنفيذ العملية بنجاح.',
     fallbackError: 'حدث خطأ غير متوقع.',
     emptyValue: '-',
+    searchPlaceholder: 'البحث باسم الفرع، الـ IP، أو المحافظة...',
+    createSubtitle: 'إضافة فرع جديد وتحديد بيانات الاتصال والموقع',
+    editSubtitle: 'تعديل بيانات وإعدادات الفرع والموقع الجغرافي',
+    detailsSubtitle: 'عرض تفاصيل الفرع وحالته وبيانات النظام',
+    basicInfoAndStatus: 'البيانات الأساسية والحالة',
+    systemAudit: 'سجل النظام والتعديلات',
+    basicBranchInfo: 'بيانات الفرع الأساسية',
+    arabicNamePlaceholder: 'مثال: فرع القاهرة الرئيسي',
+    governoratePlaceholder: 'مثال: القاهرة',
+    cityPlaceholder: 'مثال: مدينة نصر',
+    areaPlaceholder: 'مثال: المنطقة السادسة',
+    addressPlaceholder: 'مثال: شارع عباس العقاد، مبنى رقم 14، الدور الثاني',
   },
   en: {
     addBranch: 'Add Branch',
@@ -194,6 +226,18 @@ const BRANCH_EDITOR_TRANSLATIONS: Record<AppLanguage, BranchEditorTranslations> 
     fallbackSuccess: 'Operation completed successfully.',
     fallbackError: 'Unexpected error occurred.',
     emptyValue: '-',
+    searchPlaceholder: 'Search by branch name, IP, or governorate...',
+    createSubtitle: 'Add a new branch and set contact details and location',
+    editSubtitle: 'Edit branch data, settings, and geographic location',
+    detailsSubtitle: 'View branch details, operational status, and system audit',
+    basicInfoAndStatus: 'Basic Information & Status',
+    systemAudit: 'System Audit & History',
+    basicBranchInfo: 'Basic Branch Details',
+    arabicNamePlaceholder: 'e.g. Cairo Main Branch',
+    governoratePlaceholder: 'e.g. Cairo',
+    cityPlaceholder: 'e.g. Nasr City',
+    areaPlaceholder: 'e.g. District 6',
+    addressPlaceholder: 'e.g. Abbas El Akkad St, Building 14, 2nd Floor',
   },
 };
 
@@ -234,8 +278,12 @@ export class LegacyPageComponent implements OnInit, OnDestroy {
   private toastTimeoutId: ReturnType<typeof setTimeout> | null = null;
 
   protected readonly translations = this.i18nStore.translations;
-  protected readonly branchEditorTranslations = computed(() => BRANCH_EDITOR_TRANSLATIONS[this.i18nStore.language()]);
-  protected readonly branchAdminTranslations = computed(() => BRANCH_ADMINS_TRANSLATIONS[this.i18nStore.language()]);
+  protected readonly branchEditorTranslations = computed(
+    () => BRANCH_EDITOR_TRANSLATIONS[this.i18nStore.language()],
+  );
+  protected readonly branchAdminTranslations = computed(
+    () => BRANCH_ADMINS_TRANSLATIONS[this.i18nStore.language()],
+  );
   protected readonly branchSearchText = signal('');
   protected readonly branchOrderSort = signal<BranchOrderSort>('Newest');
   protected readonly branchStatusFilter = signal<boolean | null>(null);
@@ -287,8 +335,16 @@ export class LegacyPageComponent implements OnInit, OnDestroy {
     return [
       { label: translations.totalBranchesLabel, value: String(meta.totalItems), tone: 'default' },
       { label: translations.pageSizeLabel, value: String(meta.pageSize), tone: 'default' },
-      { label: this.branchEditorTranslations().active, value: String(activeCount), tone: 'success' },
-      { label: this.branchEditorTranslations().inactive, value: String(inactiveCount), tone: 'warning' },
+      {
+        label: this.branchEditorTranslations().active,
+        value: String(activeCount),
+        tone: 'success',
+      },
+      {
+        label: this.branchEditorTranslations().inactive,
+        value: String(inactiveCount),
+        tone: 'warning',
+      },
     ];
   });
 
@@ -480,7 +536,9 @@ export class LegacyPageComponent implements OnInit, OnDestroy {
   }
 
   protected permanentlyDeleteBranch(branch: BranchEditorRow): void {
-    if (!window.confirm(`${this.branchEditorTranslations().permanentDelete}: ${branch.englishName}?`)) {
+    if (
+      !window.confirm(`${this.branchEditorTranslations().permanentDelete}: ${branch.englishName}?`)
+    ) {
       return;
     }
 
@@ -568,7 +626,10 @@ export class LegacyPageComponent implements OnInit, OnDestroy {
       });
   }
 
-  private openBranchDetails(branchId: number, mode: Extract<BranchPanelMode, 'edit' | 'view'>): void {
+  private openBranchDetails(
+    branchId: number,
+    mode: Extract<BranchPanelMode, 'edit' | 'view'>,
+  ): void {
     const requestId = ++this.branchPanelRequestId;
 
     this.branchPanelLoading.set(true);
@@ -633,18 +694,20 @@ export class LegacyPageComponent implements OnInit, OnDestroy {
 
     this.branchSaving.set(true);
 
-    this.branchManagementApiService.updateBranch(branchId, this.createUpdateBranchRequest()).subscribe({
-      next: () => {
-        this.showBranchMessage('success', this.branchEditorTranslations().fallbackSuccess);
-        this.closeBranchPanel();
-        this.loadBranches(this.branchTableMeta().currentPage);
-      },
-      error: (error: HttpErrorResponse) => {
-        this.handleBranchApiError(error);
-        this.branchSaving.set(false);
-      },
-      complete: () => this.branchSaving.set(false),
-    });
+    this.branchManagementApiService
+      .updateBranch(branchId, this.createUpdateBranchRequest())
+      .subscribe({
+        next: () => {
+          this.showBranchMessage('success', this.branchEditorTranslations().fallbackSuccess);
+          this.closeBranchPanel();
+          this.loadBranches(this.branchTableMeta().currentPage);
+        },
+        error: (error: HttpErrorResponse) => {
+          this.handleBranchApiError(error);
+          this.branchSaving.set(false);
+        },
+        complete: () => this.branchSaving.set(false),
+      });
   }
 
   private fillBranchForm(details: BranchDetails): void {
@@ -693,7 +756,8 @@ export class LegacyPageComponent implements OnInit, OnDestroy {
   }
 
   private isValidIpAddress(value: string): boolean {
-    const ipv4Pattern = /^(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}$/;
+    const ipv4Pattern =
+      /^(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}$/;
     const ipv6Pattern = /^([0-9a-fA-F]{0,4}:){2,7}[0-9a-fA-F]{0,4}$/;
     return ipv4Pattern.test(value) || ipv6Pattern.test(value);
   }
@@ -731,7 +795,8 @@ export class LegacyPageComponent implements OnInit, OnDestroy {
 
     const preferredName = this.i18nStore.language() === 'ar' ? user.nameAr : user.nameEn;
     const fallbackName = this.i18nStore.language() === 'ar' ? user.nameEn : user.nameAr;
-    const fallbackUserName = user.userName.trim().length > 0 ? user.userName : user.applicationUserId;
+    const fallbackUserName =
+      user.userName.trim().length > 0 ? user.userName : user.applicationUserId;
     return this.withFallback(preferredName ?? fallbackName ?? fallbackUserName);
   }
 
@@ -763,7 +828,9 @@ export class LegacyPageComponent implements OnInit, OnDestroy {
   }
 
   protected branchStatusLabel(branch: BranchEditorRow): string {
-    return branch.isActive ? this.branchEditorTranslations().active : this.branchEditorTranslations().inactive;
+    return branch.isActive
+      ? this.branchEditorTranslations().active
+      : this.branchEditorTranslations().inactive;
   }
 
   protected branchOperationalLabel(branch: BranchEditorRow): string {
@@ -781,19 +848,24 @@ export class LegacyPageComponent implements OnInit, OnDestroy {
     action: 'deactivate' | 'reactivate' | 'permanent',
   ): void {
     this.deletingBranchId.set(branch.id);
-    const request = action === 'deactivate'
-      ? this.branchManagementApiService.deactivateBranch(branch.id, branch.rowVersion)
-      : action === 'reactivate'
-        ? this.branchManagementApiService.reactivateBranch(branch.id, branch.rowVersion)
-        : this.branchManagementApiService.permanentlyDeleteBranch(branch.id, branch.rowVersion);
+    const request =
+      action === 'deactivate'
+        ? this.branchManagementApiService.deactivateBranch(branch.id, branch.rowVersion)
+        : action === 'reactivate'
+          ? this.branchManagementApiService.reactivateBranch(branch.id, branch.rowVersion)
+          : this.branchManagementApiService.permanentlyDeleteBranch(branch.id, branch.rowVersion);
 
     request.subscribe({
       next: (response) => {
-        this.showBranchMessage('success', response.message || this.branchEditorTranslations().fallbackSuccess);
+        this.showBranchMessage(
+          'success',
+          response.message || this.branchEditorTranslations().fallbackSuccess,
+        );
         const meta = this.branchTableMeta();
-        const nextPage = action === 'permanent' && this.branches().length === 1 && meta.currentPage > 1
-          ? meta.currentPage - 1
-          : meta.currentPage;
+        const nextPage =
+          action === 'permanent' && this.branches().length === 1 && meta.currentPage > 1
+            ? meta.currentPage - 1
+            : meta.currentPage;
         this.loadBranches(nextPage, true);
       },
       error: (error: HttpErrorResponse) => this.handleBranchApiError(error),
@@ -818,10 +890,13 @@ export class LegacyPageComponent implements OnInit, OnDestroy {
 
     this.branchMessage.set({ tone, text });
 
-    this.toastTimeoutId = setTimeout(() => {
-      this.branchMessage.set(null);
-      this.toastTimeoutId = null;
-    }, tone === 'error' ? 6500 : 4200);
+    this.toastTimeoutId = setTimeout(
+      () => {
+        this.branchMessage.set(null);
+        this.toastTimeoutId = null;
+      },
+      tone === 'error' ? 6500 : 4200,
+    );
   }
 
   private extractApiMessage(error: HttpErrorResponse): string {
