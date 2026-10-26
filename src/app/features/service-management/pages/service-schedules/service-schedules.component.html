@@ -10,6 +10,17 @@
     icon="bi bi-calendar-week-fill"
   >
     <div hero-actions class="d-flex align-items-center flex-wrap gap-2">
+      @if (scope()) {
+        <button
+          type="button"
+          class="secondary-action d-inline-flex align-items-center gap-2"
+          (click)="goToWorkflows()"
+          [title]="language() === 'ar' ? 'الانتقال لمسارات عمليات هذه الخدمة' : 'Go to service workflows'"
+        >
+          <i class="bi bi-diagram-3 text-primary" aria-hidden="true"></i>
+          <span>{{ language() === 'ar' ? 'مسار العمليات' : 'Workflows' }}</span>
+        </button>
+      }
       @if (hasRouteScope()) {
         <button type="button" class="secondary-action" (click)="backToBranchServices()">
           <i class="bi bi-arrow-left" aria-hidden="true"></i>

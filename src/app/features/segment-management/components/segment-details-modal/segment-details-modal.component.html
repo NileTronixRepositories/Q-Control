@@ -1,121 +1,237 @@
-@if (open && details) {
-  <div class="modal-backdrop fade show"></div>
-  <div class="modal d-block" tabindex="-1" role="dialog" aria-modal="true" [attr.dir]="'auto'">
-    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-      <div class="modal-content shadow-lg border-0">
-        <header class="modal-header editor-panel-header d-flex justify-content-between align-items-center">
-          <h5 class="modal-title fw-bold text-dark d-flex align-items-center gap-2 m-0 fs-6">
-            <!-- Modern Info Eye SVG -->
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary">
-              <circle cx="12" cy="12" r="10"/>
-              <line x1="12" y1="16" x2="12" y2="12"/>
-              <line x1="12" y1="8" x2="12.01" y2="8"/>
-            </svg>
-            {{ translations.viewDetails }} — {{ details.arabicName }} / {{ details.englishName }}
-          </h5>
-          <button
-            type="button"
-            class="btn-close m-0"
-            [attr.aria-label]="translations.close"
-            (click)="closeModal()"
-          ></button>
-        </header>
+@if (details) {
+  <app-modal
+    [isOpen]="open && !!details"
+    [title]="modalTitle"
+    [subtitle]="modalSubtitle"
+    [size]="'lg'"
+    icon="bi bi-info-circle-fill"
+    [direction]="direction"
+    [closeLabel]="translations.close"
+    (closed)="closeModal()"
+  >
+    <!-- Card 1: Core Segment Data -->
+    <div class="q-dialog-card mb-3">
+      <div class="q-dialog-card-header mb-3">
+        <span class="q-dialog-card-icon q-dialog-card-icon--teal">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M2 2a1 1 0 0 1 1-1h4.586a1 1 0 0 1 .707.293l7 7a1 1 0 0 1 0 1.414l-4.586 4.586a1 1 0 0 1-1.414 0l-7-7A1 1 0 0 1 2 6.586V2zm3.5 4a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/>
+          </svg>
+        </span>
+        <div>
+          <h4 class="q-dialog-card-title">{{ translations.arabicName }} / {{ translations.englishName }}</h4>
+          <p class="q-dialog-card-subtitle">{{ modalSubtitle }}</p>
+        </div>
+      </div>
 
-        <div class="modal-body p-4 dialog-content">
-          <dl class="details-list">
-            <div class="details-group">
-              <dt>{{ translations.arabicName }}</dt>
-              <dd><strong>{{ details.arabicName }}</strong></dd>
-            </div>
-
-            <div class="details-group">
-              <dt>{{ translations.englishName }}</dt>
-              <dd dir="ltr"><strong>{{ details.englishName }}</strong></dd>
-            </div>
-
-            <div class="details-group">
-              <dt>{{ translations.priority }}</dt>
-              <dd dir="ltr">
-                <span class="seg-badge seg-badge-priority">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
-                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-                  </svg>
-                  {{ translations.priority }} {{ details.priority }}
-                </span>
-              </dd>
-            </div>
-
-            <div class="details-group">
-              <dt>{{ translations.scope }}</dt>
-              <dd class="d-flex flex-wrap gap-2 align-items-center">
-                @if (details.scope === 'Global') {
-                  <span class="seg-badge seg-badge-global">{{ translations.scopeGlobal }}</span>
-                } @else {
-                  <span class="seg-badge seg-badge-branch">{{ translations.scopeBranchScoped }}</span>
-                }
-                @if (details.isSystemDefault) {
-                  <span class="seg-badge seg-badge-system">{{ translations.systemDefault }}</span>
-                }
-              </dd>
-            </div>
-
-            <div class="details-group">
-              <dt>{{ translations.ownerBranch }}</dt>
-              <dd>
-                <strong>
-                  {{ details.ownerBranchArabicName || details.ownerBranchEnglishName || '—' }}
-                </strong>
-              </dd>
-            </div>
-
-            <div class="details-group">
-              <dt>{{ translations.assignedLeafServicesCount }}</dt>
-              <dd>
-                <strong class="text-primary fs-5">{{ details.assignedLeafServicesCount }}</strong>
-              </dd>
-            </div>
-
-            <div class="details-group details-group-full">
-              <dt>{{ translations.pendingGlobalizationRequest }}</dt>
-              <dd>
-                @if (details.pendingGlobalizationRequestId) {
-                  <div class="d-flex align-items-center flex-wrap gap-2">
-                    <span class="badge bg-warning text-dark px-2 py-1">Pending (#{{ details.pendingGlobalizationRequestId }})</span>
-                    @if (canViewRequest) {
-                      <button
-                        type="button"
-                        class="secondary-action"
-                        style="min-height: 32px; padding: 4px 12px; font-size: 0.75rem;"
-                        (click)="onOpenRequest(details.pendingGlobalizationRequestId)"
-                      >
-                        {{ translations.viewPendingRequest }}
-                      </button>
-                    }
-                  </div>
-                } @else {
-                  <span class="text-muted">None</span>
-                }
-              </dd>
-            </div>
-
-            <div class="details-group">
-              <dt>{{ translations.createdOn }}</dt>
-              <dd dir="ltr">{{ details.createdOnUtc | date:'medium' }}</dd>
-            </div>
-
-            <div class="details-group">
-              <dt>{{ translations.modifiedOn }}</dt>
-              <dd dir="ltr">{{ details.modifiedOnUtc ? (details.modifiedOnUtc | date:'medium') : '—' }}</dd>
-            </div>
-          </dl>
+      <div class="row g-3">
+        <div class="col-12 col-md-6">
+          <div class="q-detail-item">
+            <span class="q-detail-label">
+              <span class="q-field-icon-badge q-field-icon-badge--teal">
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
+                  <text x="3" y="12" font-size="11" font-weight="bold">ع</text>
+                </svg>
+              </span>
+              <span>{{ translations.arabicName }}</span>
+            </span>
+            <span class="q-detail-value">{{ details.arabicName }}</span>
+          </div>
         </div>
 
-        <footer class="modal-footer form-actions bg-light border-top">
-          <button type="button" class="secondary-action" (click)="closeModal()">
-            {{ translations.close }}
-          </button>
-        </footer>
+        <div class="col-12 col-md-6">
+          <div class="q-detail-item">
+            <span class="q-detail-label">
+              <span class="q-field-icon-badge q-field-icon-badge--sky">
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
+                  <text x="2" y="12" font-size="10" font-family="sans-serif" font-weight="bold">En</text>
+                </svg>
+              </span>
+              <span>{{ translations.englishName }}</span>
+            </span>
+            <span class="q-detail-value" dir="ltr">{{ details.englishName }}</span>
+          </div>
+        </div>
+
+        <div class="col-12 col-md-6">
+          <div class="q-detail-item">
+            <span class="q-detail-label">
+              <span class="q-field-icon-badge q-field-icon-badge--amber">
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
+                  <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                </svg>
+              </span>
+              <span>{{ translations.priority }}</span>
+            </span>
+            <div class="q-detail-value">
+              <span class="q-badge-pill q-badge-pill--amber">
+                {{ translations.priority }}: {{ details.priority }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 col-md-6">
+          <div class="q-detail-item">
+            <span class="q-detail-label">
+              <span class="q-field-icon-badge q-field-icon-badge--cyan">
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="8" cy="8" r="7"/>
+                  <path d="M1 8h14M8 1a11.5 11.5 0 0 1 0 14 11.5 11.5 0 0 1 0-14"/>
+                </svg>
+              </span>
+              <span>{{ translations.scope }}</span>
+            </span>
+            <div class="q-detail-value d-flex flex-wrap gap-2 align-items-center">
+              @if (details.scope === 'Global') {
+                <span class="q-badge-pill q-badge-pill--cyan">
+                  {{ translations.scopeGlobal }}
+                </span>
+              } @else {
+                <span class="q-badge-pill q-badge-pill--teal">
+                  {{ translations.scopeBranchScoped }}
+                </span>
+              }
+              @if (details.isSystemDefault) {
+                <span class="q-badge-pill q-badge-pill--amber">
+                  {{ translations.systemDefault }}
+                </span>
+              }
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 col-md-6">
+          <div class="q-detail-item">
+            <span class="q-detail-label">
+              <span class="q-field-icon-badge q-field-icon-badge--indigo">
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
+                  <path d="M3 2.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 .5.5v11a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5v-11zM4 3v10h8V3H4z"/>
+                </svg>
+              </span>
+              <span>{{ translations.ownerBranch }}</span>
+            </span>
+            <span class="q-detail-value">
+              {{ details.ownerBranchArabicName || details.ownerBranchEnglishName || '—' }}
+            </span>
+          </div>
+        </div>
+
+        <div class="col-12 col-md-6">
+          <div class="q-detail-item">
+            <span class="q-detail-label">
+              <span class="q-field-icon-badge q-field-icon-badge--emerald">
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
+                  <path d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1H7zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+                </svg>
+              </span>
+              <span>{{ translations.assignedLeafServicesCount }}</span>
+            </span>
+            <div class="q-detail-value">
+              <span class="q-badge-pill q-badge-pill--emerald">{{ details.assignedLeafServicesCount }}</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
+
+    <!-- Card 2: System & Globalization Audit -->
+    <div class="q-dialog-card mb-3">
+      <div class="q-dialog-card-header mb-3">
+        <span class="q-dialog-card-icon q-dialog-card-icon--cyan">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="8" cy="8" r="7"/>
+            <polyline points="8 3.5 8 8 11 11"/>
+          </svg>
+        </span>
+        <div>
+          <h4 class="q-dialog-card-title">{{ translations.createdOn }} / {{ translations.modifiedOn }}</h4>
+          <p class="q-dialog-card-subtitle">{{ translations.pendingGlobalizationRequest }}</p>
+        </div>
+      </div>
+
+      <div class="row g-3">
+        <div class="col-12">
+          <div class="q-detail-item">
+            <span class="q-detail-label">
+              <span class="q-field-icon-badge q-field-icon-badge--amber">
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="8" cy="8" r="7"/>
+                  <line x1="8" y1="5" x2="8" y2="8"/>
+                  <line x1="8" y1="11" x2="8.01" y2="11"/>
+                </svg>
+              </span>
+              <span>{{ translations.pendingGlobalizationRequest }}</span>
+            </span>
+            <div class="q-detail-value">
+              @if (details.pendingGlobalizationRequestId) {
+                <div class="d-flex align-items-center flex-wrap gap-2">
+                  <span class="q-badge-pill q-badge-pill--amber">
+                    {{ translations.pending }} (#{{ details.pendingGlobalizationRequestId }})
+                  </span>
+                  @if (canViewRequest) {
+                    <button
+                      type="button"
+                      class="q-btn q-btn--secondary py-1 px-2"
+                      style="min-height: 28px; font-size: 11.5px;"
+                      (click)="onOpenRequest(details.pendingGlobalizationRequestId)"
+                    >
+                      <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H9M14 2v5M14 2L7 9"/>
+                      </svg>
+                      {{ translations.viewPendingRequest }}
+                    </button>
+                  }
+                </div>
+              } @else {
+                <span class="text-muted small">{{ translations.none }}</span>
+              }
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 col-md-6">
+          <div class="q-detail-item">
+            <span class="q-detail-label">
+              <span class="q-field-icon-badge q-field-icon-badge--teal">
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="2" y="3" width="12" height="11" rx="2"/>
+                  <line x1="2" y1="6" x2="14" y2="6"/>
+                </svg>
+              </span>
+              <span>{{ translations.createdOn }}</span>
+            </span>
+            <span class="q-detail-value small text-secondary" dir="ltr">
+              {{ details.createdOnUtc | date:'yyyy-MM-dd HH:mm' }}
+            </span>
+          </div>
+        </div>
+
+        <div class="col-12 col-md-6">
+          <div class="q-detail-item">
+            <span class="q-detail-label">
+              <span class="q-field-icon-badge q-field-icon-badge--sky">
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="8" cy="8" r="7"/>
+                  <polyline points="8 4 8 8 11 10"/>
+                </svg>
+              </span>
+              <span>{{ translations.modifiedOn }}</span>
+            </span>
+            <span class="q-detail-value small text-secondary" dir="ltr">
+              {{ details.modifiedOnUtc ? (details.modifiedOnUtc | date:'yyyy-MM-dd HH:mm') : '—' }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div modal-footer class="d-flex align-items-center gap-2">
+      <button type="button" class="q-btn q-btn--secondary" (click)="closeModal()">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 4L4 12M4 4l8 8"/>
+        </svg>
+        <span>{{ translations.close }}</span>
+      </button>
+    </div>
+  </app-modal>
 }

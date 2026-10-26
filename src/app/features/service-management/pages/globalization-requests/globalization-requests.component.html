@@ -1,327 +1,676 @@
-<section class="admin-responsive-page container-fluid d-grid gap-3 p-lg-4 w-100" [attr.dir]="direction()" [attr.lang]="language()">
-<app-page-hero [eyebrow]="translations().eyebrow" [title]="translations().title" [description]="translations().description" icon="bi bi-patch-check-fill" />
-@if (store.message(); as message) { <div class="position-fixed end-0 top-0 d-flex align-items-start gap-3 rounded-3 border p-3 shadow-lg" [class]="messageClasses(message.tone)" role="status" >
-<i class="mt-1" [class]="messageIcon(message.tone)" aria-hidden="true"></i>
-<p class="m-0 flex-grow-1 lh-lg">{{ message.text }}</p>
-<button type="button" class="d-grid flex-shrink-0 rounded-3 text-muted" [attr.aria-label]="translations().close" (click)="store.message.set(null)" >
-<i class="bi bi-x-lg" aria-hidden="true"></i>
-</button>
-</div> }
-@if (store.decisionState(); as decision) { <div class="position-fixed top-0 bottom-0 start-0 end-0 d-grid align-items-end p-2" >
-<section class="w-100 overflow-hidden rounded-top-3 border border-white bg-white rounded-3" role="dialog" aria-modal="true" >
-<header class="d-flex align-items-center gap-3 border-light" >
-<span class="d-grid control-square-lg flex-shrink-0 rounded-3 text-white shadow-lg" [class.bg-success]="decision.action === 'approve'" [class.bg-danger]="decision.action === 'reject'" >
-<i [class]="decision.action === 'approve' ? 'bi bi-check2-circle' : 'bi bi-slash-circle'" aria-hidden="true" ></i>
-</span>
-<div>
-<h2 class="fw-bolder text-dark"> {{ decision.action === 'approve' ? translations().confirmApproveTitle : translations().rejectTitle }}
-</h2>
-<p class="mb-0 mt-1 fw-bold text-muted">{{ decision.serviceName }}</p>
-</div>
-</header>
-<div class="d-block">
-@if (decision.action === 'approve') { <div class="rounded-3 border border-success-subtle bg-success-subtle p-3 lh-lg text-success" >
-<i class="bi bi-info-circle-fill me-1" aria-hidden="true"></i> {{ translations().confirmApproveBody }}
-</div> }
-@else { <p class="mb-0 lh-lg text-secondary"> {{ translations().rejectHint }}
-</p>
-<textarea class="form-control mt-3 w-100 rounded-3 border border-secondary-subtle bg-light p-3" maxlength="1000" [placeholder]="translations().rejectPlaceholder" [value]="rejectionReason()" (input)="rejectionReason.set($any($event.target).value)" ></textarea>
-<small class="mt-1 d-block text-end fw-bold text-muted" >{{ rejectionReason().length }} / 1000</small > }
-</div>
-<footer class="d-flex flex-wrap justify-content-end gap-2 border-light p-3" >
-<button type="button" class="min-h-control rounded-3 border border-secondary-subtle bg-white px-4 fw-bold text-secondary" [disabled]="store.mutating()" (click)="store.closeDecision()" > {{ translations().cancel }}
-</button>
-<button type="button" class="d-inline-flex min-h-control align-items-center gap-2 rounded-3 px-4 fw-bold text-white shadow-lg" [class.bg-success]="decision.action === 'approve'" [class.bg-danger]="decision.action === 'reject'" [disabled]="store.mutating()" (click)="confirmDecision()" >
-<i [class]="decision.action === 'approve' ? 'bi bi-check-lg' : 'bi bi-x-lg'" aria-hidden="true" ></i> {{ decision.action === 'approve' ? translations().approve : translations().reject }}
-</button>
-</footer>
-</section>
-</div> }
-<form class="d-flex flex-wrap align-items-end gap-3 rounded-3 border border-info-subtle p-3 shadow-sm p-3" (submit)="submitSearch($event)" >
-<label class="d-grid flex-grow-1 gap-1 w-100">
-<span class="d-flex align-items-center gap-1 fw-bold text-secondary" ><i class="bi bi-search text-primary" aria-hidden="true"></i >{{ translations().search }}</span >
-<div class="search-input-wrapper"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input class="form-control control-height w-100 rounded-3 border border-secondary-subtle bg-white ps-4" type="search" maxlength="200" [value]="store.searchText()" (input)="updateSearch($event)" /></div>
-</label>
-<label class="d-grid flex-grow-1 gap-1">
-<span class="d-flex align-items-center gap-1 fw-bold text-secondary" ><i class="bi bi-activity text-primary" aria-hidden="true"></i >{{ translations().status }}</span >
-<select class="form-select control-height w-100 rounded-3 border border-secondary-subtle bg-white px-3" data-testid="status-filter" [value]="store.status() ?? ''" (change)="updateStatus($event)" >
-<option value="">{{ translations().allStatuses }}</option>
-<option value="Pending">{{ translations().pending }}</option>
-<option value="Approved">{{ translations().approved }}</option>
-<option value="Rejected">{{ translations().rejected }}</option>
-</select>
-</label>
-<label class="d-grid flex-grow-1 gap-1">
-<span class="d-flex align-items-center gap-1 fw-bold text-secondary" ><i class="bi bi-diagram-3 text-primary" aria-hidden="true"></i >{{ translations().requestType }}</span >
-<select class="form-select control-height w-100 rounded-3 border border-secondary-subtle bg-white px-3" [value]="store.requestType() ?? ''" (change)="updateType($event)" >
-<option value="">{{ translations().allTypes }}</option>
-<option value="BranchServiceTree">{{ translations().branchServiceTree }}</option>
-<option value="LeafUnderGlobalParent">{{ translations().leafUnderGlobalParent }}</option>
-</select>
-</label>
-<label class="d-grid flex-grow-1 gap-1">
-<span class="d-flex align-items-center gap-1 fw-bold text-secondary" ><i class="bi bi-building text-primary" aria-hidden="true"></i >{{ translations().branch }}</span >
-<select class="form-select control-height w-100 rounded-3 border border-secondary-subtle bg-white px-3" [value]="store.branchId() ?? ''" (change)="updateBranch($event)" >
-<option value="">{{ translations().allBranches }}</option>
-@for (branch of branches(); track branch.branchId) { <option [value]="branch.branchId">{{ branchName(branch) }}</option> }
-</select>
-</label>
-<label class="d-grid flex-grow-1 gap-1">
-<span class="d-flex align-items-center gap-1 fw-bold text-secondary" ><i class="bi bi-sort-down text-primary" aria-hidden="true"></i >{{ translations().order }}</span >
-<select class="form-select control-height w-100 rounded-3 border border-secondary-subtle bg-white px-3" [value]="store.orderSort()" (change)="updateOrder($event)" >
-<option value="Newest">{{ translations().newest }}</option>
-<option value="Oldest">{{ translations().oldest }}</option>
-</select>
-</label>
-<label class="d-grid flex-grow-1 gap-1">
-<span class="d-flex align-items-center gap-1 fw-bold text-secondary" ><i class="bi bi-list-ol text-primary" aria-hidden="true"></i >{{ translations().pageSize }}</span >
-<select class="form-select control-height w-100 rounded-3 border border-secondary-subtle bg-white px-3" [value]="store.pageSize()" (change)="updatePageSize($event)" >
-<option>10</option>
-<option>25</option>
-<option>50</option>
-<option>100</option>
-</select>
-</label>
-<button type="submit" class="primary-action flex-shrink-0 text-nowrap">
-<i class="bi bi-search" aria-hidden="true"></i>{{ translations().search }}
-</button>
-</form>
-<section class="overflow-hidden rounded-3 border border-secondary-subtle bg-white" >
-@if (store.loading()) { <app-niletronix-loading-state [title]="translations().loading" variant="panel" size="lg" /> }
-@else if (store.page().data.length === 0) { <div class="d-grid py-4 text-center">
-<div>
-<span class="mx-auto d-grid rounded-3 bg-light fs-3 text-muted" ><i class="bi bi-inbox" aria-hidden="true"></i ></span>
-<p class="mb-0 mt-3 fw-bold text-muted">{{ translations().empty }}</p>
-</div>
-</div> }
-@else { <div data-testid="requests-desktop" class="d-none d-lg-block overflow-x-auto">
-<table class="table table-sm align-middle mb-0 w-100">
-<thead class="text-white">
-<tr>
-<th class="p-3 text-start fw-bold">{{ translations().requestId }}</th>
-<th class="p-3 text-start fw-bold">{{ translations().service }}</th>
-<th class="p-3 text-start fw-bold">{{ translations().requestType }}</th>
-<th class="p-3 text-start fw-bold">{{ translations().branch }}</th>
-<th class="p-3 text-start fw-bold">{{ translations().parentService }}</th>
-<th class="p-3 text-start fw-bold">{{ translations().servicesCount }}</th>
-<th class="p-3 text-start fw-bold">{{ translations().status }}</th>
-<th class="p-3 text-start fw-bold">{{ translations().requestedOn }}</th>
-<th class="p-3 text-start fw-bold">{{ translations().reviewedOn }}</th>
-<th class="p-3 text-center fw-bold">{{ translations().actions }}</th>
-</tr>
-</thead>
-<tbody class="divide-y divide-slate-100">
-@for (item of store.page().data; track item.requestId; let even = $even) { <tr class="group">
-<td class="p-3">
-<span class="d-inline-flex rounded-3 bg-dark px-2 py-1 fw-bolder text-white" >#{{ item.requestId }}</span >
-</td>
-<td class="p-3">
-<div class="d-flex align-items-center gap-2">
-<span class="d-grid control-square-sm flex-shrink-0 rounded-3 bg-info-subtle text-primary" ><i class="bi bi-grid-1x2-fill" aria-hidden="true"></i></span ><strong class="fw-bold text-dark">{{ serviceName(item) }}</strong>
-</div>
-</td>
-<td class="p-3">
-<span class="d-inline-flex align-items-center gap-1 rounded-pill bg-primary-subtle px-2 py-1 fw-bold text-primary" ><i class="bi bi-diagram-3" aria-hidden="true"></i >{{ typeLabel(item.requestType) }}</span >
-</td>
-<td class="p-3">
-<span class="d-inline-flex align-items-center gap-1 fw-bold text-secondary" ><i class="bi bi-building text-primary" aria-hidden="true"></i >{{ branchName(item) }}</span >
-</td>
-<td class="p-3 text-secondary">{{ parentName(item) }}</td>
-<td class="p-3">
-<span class="d-grid rounded-pill bg-info-subtle fw-bolder text-primary" >{{ item.servicesCount }}</span >
-</td>
-<td class="p-3">
-<span class="d-inline-flex align-items-center gap-1 rounded-pill px-2 py-1 fw-bold" [class]="statusClasses(item.status)" [attr.data-status]="item.status" ><i [class]="statusIcon(item.status)" aria-hidden="true"></i >{{ statusLabel(item.status) }}</span >
-</td>
-<td class="p-3 text-secondary">
-<span class="d-inline-flex align-items-center gap-1" ><i class="bi bi-calendar3 text-muted" aria-hidden="true"></i >{{ formatDate(item.requestedOnUtc) }}</span >
-</td>
-<td class="p-3 text-secondary">
-<span class="d-inline-flex align-items-center gap-1" ><i class="bi bi-calendar-check text-muted" aria-hidden="true"></i >{{ formatDate(item.reviewedOnUtc) }}</span >
-</td>
-<td class="p-3">
-<div class="d-flex justify-content-center gap-2">
-@if (canViewDetails()) { <button type="button" class="secondary-action compact-action" (click)="openDetails(item.requestId)" >
-<i class="bi bi-eye" aria-hidden="true"></i>{{ translations().view }}
-</button> }
-@if (canStartDecision(item.status, 'approve')) { <button type="button" data-action="approve" class="primary-action compact-action success-primary" (click)="requestDecision(item, 'approve')" >
-<i class="bi bi-check-lg" aria-hidden="true"></i >{{ translations().approve }}
-</button> }
-@if (canStartDecision(item.status, 'reject')) { <button type="button" data-action="reject" class="primary-action compact-action danger-primary" (click)="requestDecision(item, 'reject')" >
-<i class="bi bi-x-lg" aria-hidden="true"></i>{{ translations().reject }}
-</button> }
-</div>
-</td>
-</tr> }
-</tbody>
-</table>
-</div>
-<div data-testid="requests-mobile" class="d-grid d-lg-none gap-3">
-@for (item of store.page().data; track item.requestId) { <article class="overflow-hidden rounded-3 border border-secondary-subtle bg-white shadow-sm">
-<header class="d-flex align-items-start justify-content-between gap-3 border-light p-3" >
-<div class="d-flex align-items-center gap-2">
-<span class="d-grid control-square flex-shrink-0 rounded-3 bg-info-subtle text-primary" ><i class="bi bi-grid-1x2-fill" aria-hidden="true"></i ></span>
-<div class="d-block">
-<strong class="d-block text-truncate fw-bolder text-dark">{{ serviceName(item) }}</strong ><span class="mt-1 d-inline-block rounded-3 bg-dark px-2 py-1 fw-bolder text-white" >#{{ item.requestId }}</span >
-</div>
-</div>
-<span class="d-inline-flex flex-shrink-0 align-items-center gap-1 rounded-pill px-2 py-1 fw-bold" [class]="statusClasses(item.status)" [attr.data-status]="item.status" ><i [class]="statusIcon(item.status)" aria-hidden="true"></i >{{ statusLabel(item.status) }}</span >
-</header>
-<dl class="d-grid row row-cols-1 row-cols-md-2 gap-3">
-<div class="col-span-2 rounded-3 bg-primary-subtle p-2">
-<dt class="fw-bold text-primary">{{ translations().requestType }}</dt>
-<dd class="mb-0 mt-1 fw-bold text-primary"> {{ typeLabel(item.requestType) }}
-</dd>
-</div>
-<div>
-<dt class="fw-bold text-muted">{{ translations().branch }}</dt>
-<dd class="mb-0 mt-1 fw-bold text-secondary">{{ branchName(item) }}</dd>
-</div>
-<div>
-<dt class="fw-bold text-muted">{{ translations().parentService }}</dt>
-<dd class="mb-0 mt-1 fw-bold text-secondary">{{ parentName(item) }}</dd>
-</div>
-<div>
-<dt class="fw-bold text-muted">{{ translations().servicesCount }}</dt>
-<dd class="mb-0 mt-1 fw-bolder text-primary">{{ item.servicesCount }}</dd>
-</div>
-<div>
-<dt class="fw-bold text-muted">{{ translations().requestedOn }}</dt>
-<dd class="mb-0 mt-1 fw-bold lh-lg text-secondary"> {{ formatDate(item.requestedOnUtc) }}
-</dd>
-</div>
-<div class="col-span-2">
-<dt class="fw-bold text-muted">{{ translations().reviewedOn }}</dt>
-<dd class="mb-0 mt-1 fw-bold text-secondary"> {{ formatDate(item.reviewedOnUtc) }}
-</dd>
-</div>
-</dl>
-<footer class="d-flex flex-wrap gap-2 border-light bg-light p-3">
-@if (canViewDetails()) { <button type="button" class="secondary-action flex-grow-1" (click)="openDetails(item.requestId)" >
-<i class="bi bi-eye" aria-hidden="true"></i>{{ translations().view }}
-</button> }
-@if (canStartDecision(item.status, 'approve')) { <button type="button" data-action="approve" class="primary-action success-primary flex-grow-1" (click)="requestDecision(item, 'approve')" >
-<i class="bi bi-check-lg" aria-hidden="true"></i>{{ translations().approve }}
-</button> }
-@if (canStartDecision(item.status, 'reject')) { <button type="button" data-action="reject" class="primary-action danger-primary flex-grow-1" (click)="requestDecision(item, 'reject')" >
-<i class="bi bi-x-lg" aria-hidden="true"></i>{{ translations().reject }}
-</button> }
-</footer>
-</article> }
-</div> }
-<footer class="d-flex flex-wrap align-items-center justify-content-between gap-3 border-info-subtle p-3" >
-<span class="d-inline-flex align-items-center gap-2 rounded-pill bg-white px-3 py-1 fw-bold text-secondary shadow-sm" ><i class="bi bi-layers text-primary" aria-hidden="true"></i>{{ translations().total }}: <strong class="text-primary">{{ store.page().totalItems }}</strong></span >
-<div class="d-flex align-items-center gap-1 rounded-3 bg-white p-2 shadow-sm" >
-<button type="button" class="d-inline-flex control-square-sm align-items-center gap-1 rounded-3 px-2 fw-bold text-secondary" [disabled]="!store.hasPreviousPage()" (click)="loadRequests(store.page().currentPage - 1)" >
-<i class="bi bi-chevron-right" aria-hidden="true"></i ><span class="d-none d-sm-inline">{{ translations().previous }}</span>
-</button>
-<strong class="d-grid rounded-3 px-3 py-2 text-white shadow-sm" >{{ store.page().currentPage }} / {{ store.totalPages() }}</strong >
-<button type="button" class="d-inline-flex control-square-sm align-items-center gap-1 rounded-3 px-2 fw-bold text-secondary" [disabled]="!store.hasNextPage()" (click)="loadRequests(store.page().currentPage + 1)" >
-<span class="d-none d-sm-inline">{{ translations().next }}</span ><i class="bi bi-chevron-left" aria-hidden="true"></i>
-</button>
-</div>
-</footer>
-</section>
-@if (store.detailsOpen()) { <button type="button" class="position-fixed top-0 bottom-0 start-0 end-0" [attr.aria-label]="translations().close" (click)="store.closeDetails()" ></button>
-<aside class="position-fixed top-0 bottom-0 end-0 d-flex w-100 flex-column overflow-hidden border-start border-white bg-white" role="dialog" aria-modal="true" >
-<header class="position-relative d-flex align-items-start justify-content-between gap-3 overflow-hidden border-info-subtle p-3" >
-<div class="position-absolute rounded-pill" ></div>
-<div class="position-relative d-flex align-items-center gap-3">
-<span class="d-grid control-square-lg flex-shrink-0 rounded-3 text-white shadow-lg" ><i class="bi bi-file-earmark-check-fill" aria-hidden="true"></i ></span>
-<div>
-<p class="mb-1 fw-bolder text-uppercase text-primary"> {{ translations().eyebrow }}
-</p>
-<h2 class="fw-bolder text-dark"> {{ translations().requestDetails }}
-</h2>
-</div>
-</div>
-<button type="button" class="icon-action flex-shrink-0 shadow-sm" [attr.aria-label]="translations().close" [disabled]="store.mutating()" (click)="store.closeDetails()" >
-<i class="bi bi-x-lg" aria-hidden="true"></i>
-</button>
-</header>
-<div class="flex-grow-1 overflow-y-auto p-3">
-@if (store.detailsLoading()) { <app-niletronix-loading-state [title]="translations().loading" variant="panel" size="lg" /> }
-@else if (store.selectedDetails(); as details) { <dl class="d-grid gap-3 row row-cols-1 row-cols-md-2">
-<div class="rounded-3 border border-secondary-subtle bg-white p-3 shadow-sm">
-<dt class="fw-bold text-muted">{{ translations().requestId }}</dt>
-<dd class="mb-0 mt-1">
-<span class="d-inline-flex rounded-3 bg-dark px-2 py-1 fw-bolder text-white" >#{{ details.requestId }}</span >
-</dd>
-</div>
-<div class="rounded-3 border border-secondary-subtle bg-white p-3 shadow-sm">
-<dt class="fw-bold text-muted">{{ translations().status }}</dt>
-<dd class="mb-0 mt-2">
-<span class="d-inline-flex align-items-center gap-1 rounded-pill px-2 py-1 fw-bold" [class]="statusClasses(details.status)" ><i [class]="statusIcon(details.status)" aria-hidden="true"></i >{{ statusLabel(details.status) }}</span >
-</dd>
-</div>
-<div class="rounded-3 border border-primary-subtle p-3">
-<dt class="fw-bold text-primary"> {{ translations().requestType }}
-</dt>
-<dd class="mb-0 mt-1 fw-bolder lh-lg text-primary"> {{ typeLabel(details.requestType) }}
-</dd>
-</div>
-<div class="rounded-3 border border-info-subtle bg-info-subtle p-3">
-<dt class="fw-bold text-primary">{{ translations().branch }}</dt>
-<dd class="mb-0 mt-1 fw-bolder text-primary"> {{ language() === 'ar' ? details.branchArabicName : details.branchEnglishName }}
-</dd>
-</div>
-<div class="rounded-3 border border-secondary-subtle bg-white p-3 shadow-sm">
-<dt class="d-flex align-items-center gap-1 fw-bold text-muted">
-<i class="bi bi-calendar3" aria-hidden="true"></i>{{ translations().requestedOn }}
-</dt>
-<dd class="mb-0 mt-1 fw-bold lh-lg text-secondary"> {{ formatDate(details.requestedOnUtc) }}
-</dd>
-</div>
-<div class="rounded-3 border border-secondary-subtle bg-white p-3 shadow-sm">
-<dt class="d-flex align-items-center gap-1 fw-bold text-muted">
-<i class="bi bi-calendar-check" aria-hidden="true"></i >{{ translations().reviewedOn }}
-</dt>
-<dd class="mb-0 mt-1 fw-bold lh-lg text-secondary"> {{ formatDate(details.reviewedOnUtc) }}
-</dd>
-</div>
-@if (details.rejectionReason) { <div class="rounded-3 border border-danger-subtle bg-danger-subtle p-3 col-12">
-<dt class="d-flex align-items-center gap-1 fw-bold text-danger">
-<i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i >{{ translations().rejectionReason }}
-</dt>
-<dd class="mb-0 mt-1 lh-lg text-danger"> {{ details.rejectionReason }}
-</dd>
-</div> }
-</dl>
-@if (details.parentService; as parent) { <section class="mt-4 overflow-hidden rounded-3 border border-primary-subtle bg-white shadow-sm" >
-<header class="d-flex align-items-center gap-2 border-primary-subtle bg-primary-subtle px-4 py-3 text-primary" >
-<i class="bi bi-diagram-2-fill" aria-hidden="true"></i>
-<h3 class="m-0 fw-bolder">{{ translations().parentSummary }}</h3>
-</header>
-<p class="m-0 p-3 fw-bold text-dark">{{ parentDetailsName(parent) }}</p>
-</section> }
-<div class="mb-3 mt-5 d-flex align-items-center gap-2">
-<span class="d-grid control-square-sm rounded-3 bg-info-subtle text-primary" ><i class="bi bi-diagram-3-fill" aria-hidden="true"></i ></span>
-<h3 class="m-0 fw-bolder text-dark">{{ translations().serviceTree }}</h3>
-</div>
-<div class="d-flex flex-column gap-2">
-@for (entry of flatDetailsNodes(); track entry.node.serviceId) { <article class="position-relative rounded-3 border border-secondary-subtle bg-white p-3 shadow-sm" [style.margin-inline-start.px]="entry.depth * 18" >
-@if (entry.depth > 0) { <span class="position-absolute top-50 translate-middle-y bg-info" aria-hidden="true" ></span> }
-<div class="d-flex align-items-start gap-2">
-<span class="d-grid control-square-sm flex-shrink-0 rounded-3 bg-light text-muted" ><i class="bi bi-box-fill" aria-hidden="true"></i ></span>
-<div class="flex-grow-1">
-<strong class="d-block fw-bold text-dark">{{ nodeName(entry.node) }}</strong>
-<div class="mt-2 d-flex flex-wrap gap-1">
-<span class="rounded-pill px-2 py-1 fw-bold" [class]="nodeScopeClasses(entry.node)" >{{ nodeScopeLabel(entry.node) }}</span >
-<span class="rounded-pill px-2 py-1 fw-bold" [class]="nodeStateClasses(entry.node)" >{{ nodeStateLabel(entry.node) }}</span >
-</div>
-</div>
-</div>
-</article> }
-</div> }
-</div>
-@if (store.selectedDetails(); as details) {
-@if (details.status === 'Pending') { <footer class="d-flex flex-wrap justify-content-end gap-2 border-secondary-subtle bg-white p-3" >
-@if (canReject()) { <button type="button" class="primary-action danger-primary flex-grow-1 flex-lg-grow-0" (click)="requestDetailsDecision('reject')" >
-<i class="bi bi-x-lg" aria-hidden="true"></i>{{ translations().reject }}
-</button> }
-@if (canApprove()) { <button type="button" class="primary-action success-primary flex-grow-1 flex-lg-grow-0" (click)="requestDetailsDecision('approve')" >
-<i class="bi bi-check-lg" aria-hidden="true"></i>{{ translations().approve }}
-</button> }
-</footer> } }
-</aside> }
+<section
+  class="admin-responsive-page container-fluid d-grid gap-3 p-3 p-lg-4 w-100"
+  [attr.dir]="direction()"
+  [attr.lang]="language()"
+>
+  <app-page-hero
+    [eyebrow]="translations().eyebrow"
+    [title]="translations().title"
+    [description]="translations().description"
+    icon="bi bi-patch-check-fill"
+  />
+
+  @if (store.message(); as message) {
+    <div
+      class="glob-toast"
+      [class.bg-success-subtle]="message.tone === 'success'"
+      [class.text-success]="message.tone === 'success'"
+      [class.border-success-subtle]="message.tone === 'success'"
+      [class.bg-danger-subtle]="message.tone === 'error'"
+      [class.text-danger]="message.tone === 'error'"
+      [class.border-danger-subtle]="message.tone === 'error'"
+      [class.bg-info-subtle]="message.tone === 'info'"
+      [class.text-primary]="message.tone === 'info'"
+      [class.border-info-subtle]="message.tone === 'info'"
+      role="status"
+    >
+      <i [class]="messageIcon(message.tone)" aria-hidden="true"></i>
+      <p class="m-0 flex-grow-1">{{ message.text }}</p>
+      <button
+        type="button"
+        class="glob-toast-close"
+        [attr.aria-label]="translations().close"
+        (click)="store.message.set(null)"
+      >
+        <i class="bi bi-x-lg" aria-hidden="true"></i>
+      </button>
+    </div>
+  }
+
+  <!-- DECISION CONFIRMATION MODAL -->
+  @if (store.decisionState(); as decision) {
+    <div class="glob-decision-backdrop" role="dialog" aria-modal="true">
+      <section class="glob-decision-dialog">
+        <header class="glob-decision-header">
+          <span
+            class="glob-decision-icon"
+            [class.glob-decision-icon--approve]="decision.action === 'approve'"
+            [class.glob-decision-icon--reject]="decision.action === 'reject'"
+          >
+            <i
+              [class]="decision.action === 'approve' ? 'bi bi-check2-circle' : 'bi bi-slash-circle'"
+              aria-hidden="true"
+            ></i>
+          </span>
+          <div>
+            <h2 class="fs-6 fw-bold text-dark m-0">
+              {{
+                decision.action === 'approve'
+                  ? translations().confirmApproveTitle
+                  : translations().rejectTitle
+              }}
+            </h2>
+            <p class="mb-0 mt-1 fs-7 fw-semibold text-muted">{{ decision.serviceName }}</p>
+          </div>
+        </header>
+
+        <div class="glob-decision-body">
+          @if (decision.action === 'approve') {
+            <div
+              class="rounded-3 border border-success-subtle bg-success-subtle p-3 text-success fs-7"
+            >
+              <i class="bi bi-info-circle-fill me-1" aria-hidden="true"></i>
+              {{ translations().confirmApproveBody }}
+            </div>
+          } @else {
+            <p class="mb-2 fs-7 text-secondary">
+              {{ translations().rejectHint }}
+            </p>
+            <textarea
+              class="form-control rounded-3 p-3 fs-7"
+              rows="3"
+              maxlength="1000"
+              [placeholder]="translations().rejectPlaceholder"
+              [value]="rejectionReason()"
+              (input)="rejectionReason.set($any($event.target).value)"
+            ></textarea>
+            <small class="mt-1 d-block text-end fw-bold text-muted fs-8">
+              {{ rejectionReason().length }} / 1000
+            </small>
+          }
+        </div>
+
+        <footer class="glob-decision-footer">
+          <button
+            type="button"
+            class="glob-page-btn"
+            [disabled]="store.mutating()"
+            (click)="store.closeDecision()"
+          >
+            {{ translations().cancel }}
+          </button>
+          <button
+            type="button"
+            [class]="
+              decision.action === 'approve' ? 'glob-action-btn-approve' : 'glob-action-btn-reject'
+            "
+            [disabled]="store.mutating()"
+            (click)="confirmDecision()"
+          >
+            <i
+              [class]="decision.action === 'approve' ? 'bi bi-check-lg' : 'bi bi-x-lg'"
+              aria-hidden="true"
+            ></i>
+            {{ decision.action === 'approve' ? translations().approve : translations().reject }}
+          </button>
+        </footer>
+      </section>
+    </div>
+  }
+
+  <!-- FILTER PANEL -->
+  <form class="glob-filter-card" (submit)="submitSearch($event)">
+    <div class="glob-filter-grid">
+      <div class="glob-filter-row-top">
+        <label class="glob-filter-field">
+          <span class="glob-filter-label">
+            <i class="bi bi-search" aria-hidden="true"></i>
+            {{ translations().search }}
+          </span>
+          <div class="glob-search-wrapper">
+            <svg
+              class="glob-search-icon"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <input
+              class="form-control glob-search-input"
+              type="search"
+              maxlength="200"
+              [placeholder]="
+                language() === 'ar'
+                  ? 'البحث باسم الخدمة أو الفرع...'
+                  : 'Search by service or branch name...'
+              "
+              [value]="store.searchText()"
+              (input)="updateSearch($event)"
+            />
+          </div>
+        </label>
+      </div>
+
+      <div class="glob-filter-row-bottom">
+        <label class="glob-filter-field">
+          <span class="glob-filter-label">
+            <i class="bi bi-activity" aria-hidden="true"></i>
+            {{ translations().status }}
+          </span>
+          <select
+            class="form-select glob-select"
+            data-testid="status-filter"
+            [value]="store.status() ?? ''"
+            (change)="updateStatus($event)"
+          >
+            <option value="">{{ translations().allStatuses }}</option>
+            <option value="Pending">{{ translations().pending }}</option>
+            <option value="Approved">{{ translations().approved }}</option>
+            <option value="Rejected">{{ translations().rejected }}</option>
+          </select>
+        </label>
+
+        <label class="glob-filter-field">
+          <span class="glob-filter-label">
+            <i class="bi bi-diagram-3" aria-hidden="true"></i>
+            {{ translations().requestType }}
+          </span>
+          <select
+            class="form-select glob-select"
+            [value]="store.requestType() ?? ''"
+            (change)="updateType($event)"
+          >
+            <option value="">{{ translations().allTypes }}</option>
+            <option value="BranchServiceTree">{{ translations().branchServiceTree }}</option>
+            <option value="LeafUnderGlobalParent">
+              {{ translations().leafUnderGlobalParent }}
+            </option>
+          </select>
+        </label>
+
+        <label class="glob-filter-field">
+          <span class="glob-filter-label">
+            <i class="bi bi-building" aria-hidden="true"></i>
+            {{ translations().branch }}
+          </span>
+          <select
+            class="form-select glob-select"
+            [value]="store.branchId() ?? ''"
+            (change)="updateBranch($event)"
+          >
+            <option value="">{{ translations().allBranches }}</option>
+            @for (branch of branches(); track branch.branchId) {
+              <option [value]="branch.branchId">{{ branchName(branch) }}</option>
+            }
+          </select>
+        </label>
+
+        <label class="glob-filter-field">
+          <span class="glob-filter-label">
+            <i class="bi bi-sort-down" aria-hidden="true"></i>
+            {{ translations().order }}
+          </span>
+          <select
+            class="form-select glob-select"
+            [value]="store.orderSort()"
+            (change)="updateOrder($event)"
+          >
+            <option value="Newest">{{ translations().newest }}</option>
+            <option value="Oldest">{{ translations().oldest }}</option>
+          </select>
+        </label>
+
+        <label class="glob-filter-field">
+          <span class="glob-filter-label">
+            <i class="bi bi-list-ol" aria-hidden="true"></i>
+            {{ translations().pageSize }}
+          </span>
+          <select
+            class="form-select glob-select"
+            [value]="store.pageSize()"
+            (change)="updatePageSize($event)"
+          >
+            <option>10</option>
+            <option>25</option>
+            <option>50</option>
+            <option>100</option>
+          </select>
+        </label>
+
+        <button type="submit" class="glob-btn-search">
+          <i class="bi bi-search" aria-hidden="true"></i>
+          {{ translations().search }}
+        </button>
+      </div>
+    </div>
+  </form>
+
+  <!-- TABLE CONTAINER -->
+  <section class="glob-table-card">
+    @if (store.loading()) {
+      <app-niletronix-loading-state [title]="translations().loading" variant="panel" size="lg" />
+    } @else if (store.page().data.length === 0) {
+      <div class="py-5 text-center">
+        <div
+          class="d-inline-flex align-items-center justify-content-center rounded-circle bg-light p-3 text-muted mb-3"
+          style="width: 56px; height: 56px"
+        >
+          <i class="bi bi-inbox fs-3" aria-hidden="true"></i>
+        </div>
+        <p class="mb-0 fw-bold text-muted fs-6">{{ translations().empty }}</p>
+      </div>
+    } @else {
+      <!-- Desktop Table -->
+      <div data-testid="requests-desktop" class="d-none d-lg-block overflow-x-auto">
+        <table class="glob-table">
+          <thead>
+            <tr>
+              <th class="text-start">{{ translations().requestId }}</th>
+              <th class="text-start">{{ translations().service }}</th>
+              <th class="text-start">{{ translations().requestType }}</th>
+              <th class="text-start">{{ translations().branch }}</th>
+              <th class="text-start">{{ translations().parentService }}</th>
+              <th class="text-center">{{ translations().servicesCount }}</th>
+              <th class="text-center">{{ translations().status }}</th>
+              <th class="text-start">{{ translations().requestedOn }}</th>
+              <th class="text-start">{{ translations().reviewedOn }}</th>
+              <th class="text-center">{{ translations().actions }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of store.page().data; track item.requestId) {
+              <tr>
+                <td>
+                  <span class="glob-id-pill">#{{ item.requestId }}</span>
+                </td>
+                <td>
+                  <div class="d-flex align-items-center gap-2">
+                    <span class="glob-service-icon">
+                      <i class="bi bi-grid-1x2-fill" aria-hidden="true"></i>
+                    </span>
+                    <strong class="fw-bold text-dark">{{ serviceName(item) }}</strong>
+                  </div>
+                </td>
+                <td>
+                  <span class="glob-type-chip">
+                    <i class="bi bi-diagram-3" aria-hidden="true"></i>
+                    {{ typeLabel(item.requestType) }}
+                  </span>
+                </td>
+                <td>
+                  <span class="glob-branch-chip">
+                    <i class="bi bi-building" aria-hidden="true"></i>
+                    {{ branchName(item) }}
+                  </span>
+                </td>
+                <td>
+                  <span class="text-secondary fw-semibold">{{ parentName(item) }}</span>
+                </td>
+                <td class="text-center">
+                  <span class="glob-count-badge">{{ item.servicesCount }}</span>
+                </td>
+                <td class="text-center">
+                  <span
+                    class="glob-status-pill"
+                    [class]="statusClasses(item.status)"
+                    [attr.data-status]="item.status"
+                  >
+                    <i [class]="statusIcon(item.status)" aria-hidden="true"></i>
+                    {{ statusLabel(item.status) }}
+                  </span>
+                </td>
+                <td>
+                  <span class="glob-date-cell">
+                    <i class="bi bi-calendar3" aria-hidden="true"></i>
+                    {{ formatDate(item.requestedOnUtc) }}
+                  </span>
+                </td>
+                <td>
+                  <span class="glob-date-cell">
+                    <i class="bi bi-calendar-check" aria-hidden="true"></i>
+                    {{ formatDate(item.reviewedOnUtc) }}
+                  </span>
+                </td>
+                <td>
+                  <div class="d-flex align-items-center justify-content-center gap-2">
+                    @if (canViewDetails()) {
+                      <button
+                        type="button"
+                        class="glob-action-btn-view"
+                        (click)="openDetails(item.requestId)"
+                      >
+                        <i class="bi bi-eye" aria-hidden="true"></i>
+                        {{ translations().view }}
+                      </button>
+                    }
+                    @if (canStartDecision(item.status, 'approve')) {
+                      <button
+                        type="button"
+                        data-action="approve"
+                        class="glob-action-btn-approve"
+                        (click)="requestDecision(item, 'approve')"
+                      >
+                        <i class="bi bi-check-lg" aria-hidden="true"></i>
+                        {{ translations().approve }}
+                      </button>
+                    }
+                    @if (canStartDecision(item.status, 'reject')) {
+                      <button
+                        type="button"
+                        data-action="reject"
+                        class="glob-action-btn-reject"
+                        (click)="requestDecision(item, 'reject')"
+                      >
+                        <i class="bi bi-x-lg" aria-hidden="true"></i>
+                        {{ translations().reject }}
+                      </button>
+                    }
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Mobile Cards View -->
+      <div data-testid="requests-mobile" class="d-grid d-lg-none gap-3 p-3">
+        @for (item of store.page().data; track item.requestId) {
+          <article class="p-3 border rounded-3 bg-white shadow-sm">
+            <header class="d-flex align-items-start justify-content-between gap-3 mb-2">
+              <div class="d-flex align-items-center gap-2">
+                <span class="glob-service-icon">
+                  <i class="bi bi-grid-1x2-fill" aria-hidden="true"></i>
+                </span>
+                <div>
+                  <strong class="d-block text-truncate fw-bolder text-dark">{{
+                    serviceName(item)
+                  }}</strong>
+                  <span class="glob-id-pill mt-1">#{{ item.requestId }}</span>
+                </div>
+              </div>
+              <span
+                class="glob-status-pill"
+                [class]="statusClasses(item.status)"
+                [attr.data-status]="item.status"
+              >
+                <i [class]="statusIcon(item.status)" aria-hidden="true"></i>
+                {{ statusLabel(item.status) }}
+              </span>
+            </header>
+            <div class="d-grid gap-2 mb-3 fs-7">
+              <div class="d-flex justify-content-between">
+                <span class="text-muted">{{ translations().branch }}:</span>
+                <span class="fw-bold text-dark">{{ branchName(item) }}</span>
+              </div>
+              <div class="d-flex justify-content-between">
+                <span class="text-muted">{{ translations().requestType }}:</span>
+                <span class="glob-type-chip">{{ typeLabel(item.requestType) }}</span>
+              </div>
+              <div class="d-flex justify-content-between">
+                <span class="text-muted">{{ translations().parentService }}:</span>
+                <span class="text-dark">{{ parentName(item) }}</span>
+              </div>
+              <div class="d-flex justify-content-between">
+                <span class="text-muted">{{ translations().requestedOn }}:</span>
+                <span class="text-secondary">{{ formatDate(item.requestedOnUtc) }}</span>
+              </div>
+            </div>
+            <footer class="d-flex flex-wrap gap-2 pt-2 border-top">
+              @if (canViewDetails()) {
+                <button
+                  type="button"
+                  class="glob-action-btn-view flex-grow-1"
+                  (click)="openDetails(item.requestId)"
+                >
+                  <i class="bi bi-eye" aria-hidden="true"></i> {{ translations().view }}
+                </button>
+              }
+              @if (canStartDecision(item.status, 'approve')) {
+                <button
+                  type="button"
+                  data-action="approve"
+                  class="glob-action-btn-approve flex-grow-1"
+                  (click)="requestDecision(item, 'approve')"
+                >
+                  <i class="bi bi-check-lg" aria-hidden="true"></i> {{ translations().approve }}
+                </button>
+              }
+              @if (canStartDecision(item.status, 'reject')) {
+                <button
+                  type="button"
+                  data-action="reject"
+                  class="glob-action-btn-reject flex-grow-1"
+                  (click)="requestDecision(item, 'reject')"
+                >
+                  <i class="bi bi-x-lg" aria-hidden="true"></i> {{ translations().reject }}
+                </button>
+              }
+            </footer>
+          </article>
+        }
+      </div>
+    }
+
+    <!-- Pagination Footer -->
+    <footer class="glob-pagination-bar">
+      <span class="glob-total-pill">
+        <i class="bi bi-layers text-primary me-1" aria-hidden="true"></i>
+        {{ translations().total }}:
+        <strong class="text-primary">{{ store.page().totalItems }}</strong>
+      </span>
+      <div class="d-flex align-items-center gap-2">
+        <button
+          type="button"
+          class="glob-page-btn"
+          [disabled]="!store.hasPreviousPage()"
+          (click)="loadRequests(store.page().currentPage - 1)"
+        >
+          <i
+            class="bi"
+            [class.bi-chevron-right]="direction() === 'rtl'"
+            [class.bi-chevron-left]="direction() === 'ltr'"
+            aria-hidden="true"
+          ></i>
+          <span class="d-none d-sm-inline">{{ translations().previous }}</span>
+        </button>
+        <span class="glob-page-indicator">
+          {{ store.page().currentPage }} / {{ store.totalPages() }}
+        </span>
+        <button
+          type="button"
+          class="glob-page-btn"
+          [disabled]="!store.hasNextPage()"
+          (click)="loadRequests(store.page().currentPage + 1)"
+        >
+          <span class="d-none d-sm-inline">{{ translations().next }}</span>
+          <i
+            class="bi"
+            [class.bi-chevron-left]="direction() === 'rtl'"
+            [class.bi-chevron-right]="direction() === 'ltr'"
+            aria-hidden="true"
+          ></i>
+        </button>
+      </div>
+    </footer>
+  </section>
+
+  <!-- DETAILS SLIDE-OVER DRAWER (SLIDE-OVER PANEL) -->
+  @if (store.detailsOpen()) {
+    <button
+      type="button"
+      class="glob-drawer-backdrop"
+      [attr.aria-label]="translations().close"
+      (click)="store.closeDetails()"
+    ></button>
+
+    <aside class="glob-drawer" role="dialog" aria-modal="true">
+      <header class="glob-drawer-header">
+        <div class="glob-drawer-header-left">
+          <span class="glob-drawer-header-icon">
+            <i class="bi bi-file-earmark-check-fill" aria-hidden="true"></i>
+          </span>
+          <div>
+            <p class="mb-0 fs-8 fw-bold text-uppercase text-primary">
+              {{ translations().eyebrow }}
+            </p>
+            <h2 class="fs-6 fw-bold text-dark m-0">{{ translations().requestDetails }}</h2>
+          </div>
+        </div>
+        <button
+          type="button"
+          class="glob-drawer-close"
+          [attr.aria-label]="translations().close"
+          [disabled]="store.mutating()"
+          (click)="store.closeDetails()"
+        >
+          <i class="bi bi-x-lg" aria-hidden="true"></i>
+        </button>
+      </header>
+
+      <div class="glob-drawer-body">
+        @if (store.detailsLoading()) {
+          <app-niletronix-loading-state
+            [title]="translations().loading"
+            variant="panel"
+            size="lg"
+          />
+        } @else if (store.selectedDetails(); as details) {
+          <!-- Details Bento Grid -->
+          <div class="glob-details-grid">
+            <div class="glob-detail-card">
+              <span class="glob-detail-label">{{ translations().requestId }}</span>
+              <span class="glob-detail-value">
+                <span class="glob-id-pill">#{{ details.requestId }}</span>
+              </span>
+            </div>
+
+            <div class="glob-detail-card">
+              <span class="glob-detail-label">{{ translations().status }}</span>
+              <span class="glob-detail-value">
+                <span class="glob-status-pill" [class]="statusClasses(details.status)">
+                  <i [class]="statusIcon(details.status)" aria-hidden="true"></i>
+                  {{ statusLabel(details.status) }}
+                </span>
+              </span>
+            </div>
+
+            <div class="glob-detail-card glob-detail-card--highlight">
+              <span class="glob-detail-label">{{ translations().requestType }}</span>
+              <span class="glob-detail-value">{{ typeLabel(details.requestType) }}</span>
+            </div>
+
+            <div class="glob-detail-card glob-detail-card--highlight">
+              <span class="glob-detail-label">{{ translations().branch }}</span>
+              <span class="glob-detail-value">
+                {{ language() === 'ar' ? details.branchArabicName : details.branchEnglishName }}
+              </span>
+            </div>
+
+            <div class="glob-detail-card">
+              <span class="glob-detail-label">{{ translations().requestedOn }}</span>
+              <span class="glob-detail-value fs-7">{{ formatDate(details.requestedOnUtc) }}</span>
+            </div>
+
+            <div class="glob-detail-card">
+              <span class="glob-detail-label">{{ translations().reviewedOn }}</span>
+              <span class="glob-detail-value fs-7">{{ formatDate(details.reviewedOnUtc) }}</span>
+            </div>
+
+            @if (details.rejectionReason) {
+              <div class="glob-detail-card glob-detail-card--alert">
+                <span class="glob-detail-label">
+                  <i class="bi bi-exclamation-circle-fill me-1" aria-hidden="true"></i>
+                  {{ translations().rejectionReason }}
+                </span>
+                <span class="glob-detail-value">{{ details.rejectionReason }}</span>
+              </div>
+            }
+          </div>
+
+          <!-- Parent Service Box -->
+          @if (details.parentService; as parent) {
+            <section class="glob-parent-box">
+              <header class="glob-parent-header">
+                <i class="bi bi-diagram-2-fill" aria-hidden="true"></i>
+                <span>{{ translations().parentSummary }}</span>
+              </header>
+              <div class="glob-parent-content">
+                {{ parentDetailsName(parent) }}
+              </div>
+            </section>
+          }
+
+          <!-- Service Tree in Request -->
+          <div class="glob-tree-box">
+            <h3 class="glob-tree-title">
+              <i class="bi bi-diagram-3-fill text-primary" aria-hidden="true"></i>
+              {{ translations().serviceTree }}
+            </h3>
+
+            <div class="d-flex flex-column gap-2">
+              @for (entry of flatDetailsNodes(); track entry.node.serviceId) {
+                <article
+                  class="glob-tree-node-card"
+                  [style.margin-inline-start.px]="entry.depth * 20"
+                >
+                  <div class="d-flex align-items-start gap-2">
+                    <span class="glob-service-icon">
+                      <i class="bi bi-box-fill" aria-hidden="true"></i>
+                    </span>
+                    <div class="flex-grow-1 min-w-0">
+                      <strong class="d-block text-dark fw-bold text-truncate">{{
+                        nodeName(entry.node)
+                      }}</strong>
+                      <div class="mt-2 d-flex flex-wrap gap-2">
+                        <span class="glob-type-chip">{{ nodeScopeLabel(entry.node) }}</span>
+                        <span class="glob-status-pill fs-8" [class]="nodeStateClasses(entry.node)">
+                          {{ nodeStateLabel(entry.node) }}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </article>
+              }
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Drawer Actions Footer -->
+      @if (store.selectedDetails(); as details) {
+        @if (details.status === 'Pending') {
+          <footer class="glob-drawer-footer">
+            @if (canReject()) {
+              <button
+                type="button"
+                class="glob-action-btn-reject"
+                (click)="requestDetailsDecision('reject')"
+              >
+                <i class="bi bi-x-lg" aria-hidden="true"></i>
+                {{ translations().reject }}
+              </button>
+            }
+            @if (canApprove()) {
+              <button
+                type="button"
+                class="glob-action-btn-approve"
+                (click)="requestDetailsDecision('approve')"
+              >
+                <i class="bi bi-check-lg" aria-hidden="true"></i>
+                {{ translations().approve }}
+              </button>
+            }
+          </footer>
+        }
+      }
+    </aside>
+  }
 </section>

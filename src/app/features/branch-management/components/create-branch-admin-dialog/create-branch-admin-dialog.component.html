@@ -11,9 +11,19 @@
     <header class="q-dialog-header">
       <div class="d-flex align-items-center gap-3">
         <span class="q-dialog-icon">
-          <i class="bi bi-person-plus-fill" aria-hidden="true"></i>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <line x1="19" x2="19" y1="8" y2="14"/>
+            <line x1="22" x2="16" y1="11" y2="11"/>
+          </svg>
         </span>
-        <h2 class="q-dialog-title mb-0">{{ copy().createBranchAdminTitle }}</h2>
+        <div>
+          <h2 class="q-dialog-title mb-0">{{ copy().createBranchAdminTitle }}</h2>
+          @if (branchLabel()) {
+            <p class="q-dialog-subtitle mb-0 text-primary fw-semibold">{{ branchLabel() }}</p>
+          }
+        </div>
       </div>
       <button
         type="button"
@@ -21,17 +31,32 @@
         [attr.aria-label]="copy().close"
         (click)="closeDialog()"
       >
-        <i class="bi bi-x-lg" aria-hidden="true"></i>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M18 6 6 18M6 6l12 12"/>
+        </svg>
       </button>
     </header>
 
     <div class="q-dialog-body">
       @if (formMessage()) {
-        <div class="q-alert q-alert--danger mb-4" role="status">
-          <i class="bi bi-exclamation-triangle flex-shrink-0" aria-hidden="true"></i>
+        <div class="alert alert-danger py-2 px-3 d-flex align-items-center gap-2 mb-3 small rounded-3" role="status">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0" aria-hidden="true">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" x2="12" y1="8" y2="12"/>
+            <line x1="12" x2="12.01" y1="16" y2="16"/>
+          </svg>
           <p class="mb-0">{{ formMessage() }}</p>
         </div>
       }
+
+      <div class="alert alert-info py-2 px-3 d-flex align-items-center gap-2 mb-3 small rounded-3" role="note">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0 text-primary" aria-hidden="true">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" x2="12" y1="16" y2="12"/>
+          <line x1="12" x2="12.01" y1="8" y2="8"/>
+        </svg>
+        <p class="mb-0 text-dark">{{ copy().branchAdminHandoffNote }}</p>
+      </div>
 
       <form
         class="q-node-grid"
@@ -41,19 +66,16 @@
         novalidate
         id="branchAdminForm"
       >
-        @if (branchLabel()) {
-          <div class="q-dialog-subtitle fw-bold text-primary mb-2" style="grid-column: 1 / -1;">
-            {{ branchLabel() }}
-          </div>
-        }
-
-        <div class="q-alert q-alert--info mb-3" style="grid-column: 1 / -1;" role="note">
-          <i class="bi bi-info-circle flex-shrink-0" aria-hidden="true"></i>
-          <p class="mb-0">{{ copy().branchAdminHandoffNote }}</p>
-        </div>
-
         <label class="q-field">
-          <span class="q-field-label">{{ copy().branchAdminUserName }}</span>
+          <span class="q-field-label">
+            <span class="q-field-icon-badge q-field-icon-badge--sky">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
+            </span>
+            <span>{{ copy().branchAdminUserName }}</span>
+          </span>
           <input
             class="form-control"
             [class.is-invalid]="hasControlError('userName')"
@@ -63,12 +85,27 @@
             autocomplete="username"
           />
           @if (controlErrorMessage('userName')) {
-            <span class="q-field-error">{{ controlErrorMessage('userName') }}</span>
+            <span class="q-field-error">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" x2="12" y1="8" y2="12"/>
+                <line x1="12" x2="12.01" y1="16" y2="16"/>
+              </svg>
+              {{ controlErrorMessage('userName') }}
+            </span>
           }
         </label>
 
         <label class="q-field">
-          <span class="q-field-label">{{ copy().branchAdminEmail }}</span>
+          <span class="q-field-label">
+            <span class="q-field-icon-badge q-field-icon-badge--cyan">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect width="20" height="16" x="2" y="4" rx="2"/>
+                <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+              </svg>
+            </span>
+            <span>{{ copy().branchAdminEmail }}</span>
+          </span>
           <input
             class="form-control"
             [class.is-invalid]="hasControlError('email')"
@@ -76,14 +113,29 @@
             maxlength="200"
             formControlName="email"
             autocomplete="email"
+            dir="ltr"
           />
           @if (controlErrorMessage('email')) {
-            <span class="q-field-error">{{ controlErrorMessage('email') }}</span>
+            <span class="q-field-error">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" x2="12" y1="8" y2="12"/>
+                <line x1="12" x2="12.01" y1="16" y2="16"/>
+              </svg>
+              {{ controlErrorMessage('email') }}
+            </span>
           }
         </label>
 
         <label class="q-field">
-          <span class="q-field-label">{{ copy().branchAdminPhone }}</span>
+          <span class="q-field-label">
+            <span class="q-field-icon-badge q-field-icon-badge--emerald">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+              </svg>
+            </span>
+            <span>{{ copy().branchAdminPhone }}</span>
+          </span>
           <input
             class="form-control"
             [class.is-invalid]="hasControlError('phoneNumber')"
@@ -91,42 +143,95 @@
             maxlength="30"
             formControlName="phoneNumber"
             autocomplete="tel"
+            dir="ltr"
           />
           @if (controlErrorMessage('phoneNumber')) {
-            <span class="q-field-error">{{ controlErrorMessage('phoneNumber') }}</span>
+            <span class="q-field-error">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" x2="12" y1="8" y2="12"/>
+                <line x1="12" x2="12.01" y1="16" y2="16"/>
+              </svg>
+              {{ controlErrorMessage('phoneNumber') }}
+            </span>
           }
         </label>
 
         <label class="q-field">
-          <span class="q-field-label">{{ copy().branchAdminNameAr }}</span>
+          <span class="q-field-label">
+            <span class="q-field-icon-badge q-field-icon-badge--teal">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="m5 8 6 6"/>
+                <path d="m4 14 6-6 2-3"/>
+                <path d="M2 5h12"/>
+                <path d="M7 2h1"/>
+                <path d="m22 22-5-10-5 10"/>
+                <path d="M14 18h6"/>
+              </svg>
+            </span>
+            <span>{{ copy().branchAdminNameAr }}</span>
+          </span>
           <input
             class="form-control"
             [class.is-invalid]="hasControlError('nameAr')"
             type="text"
             maxlength="200"
             formControlName="nameAr"
+            dir="rtl"
           />
           @if (controlErrorMessage('nameAr')) {
-            <span class="q-field-error">{{ controlErrorMessage('nameAr') }}</span>
+            <span class="q-field-error">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" x2="12" y1="8" y2="12"/>
+                <line x1="12" x2="12.01" y1="16" y2="16"/>
+              </svg>
+              {{ controlErrorMessage('nameAr') }}
+            </span>
           }
         </label>
 
         <label class="q-field">
-          <span class="q-field-label">{{ copy().branchAdminNameEn }}</span>
+          <span class="q-field-label">
+            <span class="q-field-icon-badge q-field-icon-badge--sky">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <polyline points="4 7 4 4 20 4 20 7"/>
+                <line x1="9" x2="15" y1="20" y2="20"/>
+                <line x1="12" x2="12" y1="4" y2="20"/>
+              </svg>
+            </span>
+            <span>{{ copy().branchAdminNameEn }}</span>
+          </span>
           <input
             class="form-control"
             [class.is-invalid]="hasControlError('nameEn')"
             type="text"
             maxlength="200"
             formControlName="nameEn"
+            dir="ltr"
           />
           @if (controlErrorMessage('nameEn')) {
-            <span class="q-field-error">{{ controlErrorMessage('nameEn') }}</span>
+            <span class="q-field-error">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" x2="12" y1="8" y2="12"/>
+                <line x1="12" x2="12.01" y1="16" y2="16"/>
+              </svg>
+              {{ controlErrorMessage('nameEn') }}
+            </span>
           }
         </label>
 
         <label class="q-field">
-          <span class="q-field-label">{{ copy().branchAdminTemporaryPassword }}</span>
+          <span class="q-field-label">
+            <span class="q-field-icon-badge q-field-icon-badge--amber">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+              </svg>
+            </span>
+            <span>{{ copy().branchAdminTemporaryPassword }}</span>
+          </span>
           <input
             class="form-control"
             [class.is-invalid]="hasControlError('temporaryPassword')"
@@ -134,14 +239,31 @@
             maxlength="120"
             formControlName="temporaryPassword"
             autocomplete="new-password"
+            dir="ltr"
           />
           @if (controlErrorMessage('temporaryPassword')) {
-            <span class="q-field-error">{{ controlErrorMessage('temporaryPassword') }}</span>
+            <span class="q-field-error">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" x2="12" y1="8" y2="12"/>
+                <line x1="12" x2="12.01" y1="16" y2="16"/>
+              </svg>
+              {{ controlErrorMessage('temporaryPassword') }}
+            </span>
           }
         </label>
 
         <label class="q-field">
-          <span class="q-field-label">{{ copy().branchAdminConfirmTemporaryPassword }}</span>
+          <span class="q-field-label">
+            <span class="q-field-icon-badge q-field-icon-badge--violet">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                <path d="m10 16 1.5 1.5 3-3"/>
+              </svg>
+            </span>
+            <span>{{ copy().branchAdminConfirmTemporaryPassword }}</span>
+          </span>
           <input
             class="form-control"
             [class.is-invalid]="hasControlError('confirmTemporaryPassword')"
@@ -149,9 +271,17 @@
             maxlength="120"
             formControlName="confirmTemporaryPassword"
             autocomplete="new-password"
+            dir="ltr"
           />
           @if (controlErrorMessage('confirmTemporaryPassword')) {
-            <span class="q-field-error">{{ controlErrorMessage('confirmTemporaryPassword') }}</span>
+            <span class="q-field-error">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" x2="12" y1="8" y2="12"/>
+                <line x1="12" x2="12.01" y1="16" y2="16"/>
+              </svg>
+              {{ controlErrorMessage('confirmTemporaryPassword') }}
+            </span>
           }
         </label>
       </form>
@@ -163,7 +293,10 @@
         class="q-btn q-btn--secondary"
         (click)="closeDialog()"
       >
-        {{ copy().cancel }}
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M18 6 6 18M6 6l12 12"/>
+        </svg>
+        <span>{{ copy().cancel }}</span>
       </button>
       <button
         type="submit"
@@ -172,11 +305,14 @@
         [disabled]="store.isSubmitting()"
       >
         @if (store.isSubmitting()) {
-          <i class="bi bi-arrow-repeat animate-spin" aria-hidden="true"></i>
+          <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+          <span>{{ copy().save }}</span>
         } @else {
-          <i class="bi bi-check2-circle" aria-hidden="true"></i>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          <span>{{ copy().save }}</span>
         }
-        <span>{{ copy().save }}</span>
       </button>
     </footer>
   </aside>

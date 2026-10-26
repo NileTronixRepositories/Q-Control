@@ -1,12 +1,13 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { AppModalComponent } from '@shared';
 import { CreateGlobalSegmentRequest, Segment, UpdateSegmentRequest } from '../../models/segment/segment.model';
 import { SegmentTranslations } from '../../i18n/segment.translations';
 
 @Component({
   selector: 'app-segment-form-modal',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, AppModalComponent],
   templateUrl: './segment-form-modal.component.html',
   styleUrl: './segment-form-modal.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -18,6 +19,7 @@ export class SegmentFormModalComponent {
   @Input() translations!: SegmentTranslations;
   @Input() isTechnicalAdmin = false;
   @Input() saving = false;
+  @Input() direction: 'rtl' | 'ltr' = 'rtl';
 
   @Output() closed = new EventEmitter<void>();
   @Output() submitted = new EventEmitter<CreateGlobalSegmentRequest | UpdateSegmentRequest>();
@@ -69,23 +71,23 @@ export class SegmentFormModalComponent {
     const p = Number(this.priority());
 
     if (!ar) {
-      this.errorMessage.set(this.translations.arabicName + ' is required.');
+      this.errorMessage.set(`${this.translations.arabicName}: ${this.translations.nameRequired}`);
       return;
     }
     if (ar.length > 100) {
-      this.errorMessage.set(this.translations.arabicName + ' cannot exceed 100 characters.');
+      this.errorMessage.set(`${this.translations.arabicName}: ${this.translations.nameMaxLength}`);
       return;
     }
     if (!en) {
-      this.errorMessage.set(this.translations.englishName + ' is required.');
+      this.errorMessage.set(`${this.translations.englishName}: ${this.translations.nameRequired}`);
       return;
     }
     if (en.length > 100) {
-      this.errorMessage.set(this.translations.englishName + ' cannot exceed 100 characters.');
+      this.errorMessage.set(`${this.translations.englishName}: ${this.translations.nameMaxLength}`);
       return;
     }
     if (isNaN(p) || p < 0) {
-      this.errorMessage.set(this.translations.priority + ' must be an integer >= 0.');
+      this.errorMessage.set(`${this.translations.priority}: ${this.translations.priorityNonNegative}`);
       return;
     }
 

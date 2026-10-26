@@ -58,6 +58,8 @@ const ACTIVE_STATUS_CLASSES = 'svc-tree-chip--active';
 const INACTIVE_STATUS_CLASSES = 'svc-tree-chip--inactive';
 const DELETED_STATUS_CLASSES = 'svc-tree-chip--deleted';
 const INFO_STATUS_CLASSES = 'svc-tree-chip--info';
+const TICKET_YES_CLASSES = 'svc-tree-chip--ticket-yes';
+const TICKET_NO_CLASSES = 'svc-tree-chip--ticket-no';
 
 @Component({
   selector: 'app-service-hierarchy-tree',
@@ -89,6 +91,7 @@ export class ServiceHierarchyTreeComponent {
   readonly direction = input<AppDirection>('ltr');
   readonly loading = input.required<boolean>();
   readonly showSearch = input(false);
+  readonly showFilters = input(true);
   readonly searchText = input('');
   readonly searchLabel = input('');
   readonly searchPlaceholder = input('');
@@ -413,7 +416,7 @@ export class ServiceHierarchyTreeComponent {
       }`,
       operationalLabel: node.effectiveIsActive ? translations.active : translations.operationallyDisabled,
       showOperationalBadge: node.isActive !== node.effectiveIsActive && !node.isDeleted,
-      ticketClassList: `${BADGE_BASE_CLASSES} ${node.canIssueTicket ? INFO_STATUS_CLASSES : INACTIVE_STATUS_CLASSES}`,
+      ticketClassList: `${BADGE_BASE_CLASSES} ${node.canIssueTicket ? TICKET_YES_CLASSES : TICKET_NO_CLASSES}`,
       ticketLabel: node.canIssueTicket ? translations.canIssueTicket : translations.cannotIssueTicket,
       scopeLabel: node.scope === 'Global' ? translations.globalScope : translations.branchScopedScope,
       ownerLabel: node.scope === 'BranchScoped' ? this.ownerLabel(node) : null,

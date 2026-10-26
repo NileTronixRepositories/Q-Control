@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
-import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 
@@ -17,7 +16,6 @@ import { SegmentApiService } from '../../services/segment-api/segment-api.servic
   selector: 'app-branch-segment-requests-page',
   standalone: true,
   imports: [
-    DatePipe,
     FormsModule,
     PageHeroComponent,
     GlobalizationRequestDetailsModalComponent,
@@ -96,6 +94,33 @@ export class BranchSegmentRequestsComponent implements OnInit {
     this.selectedStatus.set(val);
     this.currentPage.set(1);
     this.loadRequests();
+  }
+
+  resetFilters(): void {
+    this.searchText.set('');
+    this.selectedStatus.set('');
+    this.currentPage.set(1);
+    this.loadRequests();
+  }
+
+  getRequestId(req: SegmentGlobalizationRequest): number | string {
+    return req.id ?? req.requestId ?? req.globalizationRequestId ?? '—';
+  }
+
+  formatDate(dateStr: string | null | undefined): string {
+    if (!dateStr) return '—';
+    try {
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) return String(dateStr);
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      const hours = String(d.getHours()).padStart(2, '0');
+      const mins = String(d.getMinutes()).padStart(2, '0');
+      return `${y}/${m}/${day} ${hours}:${mins}`;
+    } catch {
+      return String(dateStr);
+    }
   }
 
   onPageChange(newPage: number): void {

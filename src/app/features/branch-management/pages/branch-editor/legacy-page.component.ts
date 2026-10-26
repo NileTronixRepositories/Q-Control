@@ -15,6 +15,10 @@ import { AppLanguage, AuthSessionService } from '@core';
 import { MobileRecordCardComponent } from '../../../../shared/components/mobile-record-card/mobile-record-card.component';
 import { NiletronixLoadingStateComponent } from '../../../../shared/components/niletronix-loading-state/niletronix-loading-state.component';
 import { PageHeroComponent } from '../../../../shared/components/page-hero/page-hero.component';
+import {
+  MapLocationPickerComponent,
+  MapLocationCoords,
+} from '../../../../shared/components/map-location-picker';
 import { CreateBranchAdminDialogComponent } from '@features/branch-management/components/create-branch-admin-dialog/create-branch-admin-dialog.component';
 import { BRANCH_ADMINS_TRANSLATIONS } from '@features/branch-management/i18n/branch-admins.translations';
 import {
@@ -128,6 +132,8 @@ interface BranchEditorTranslations {
   readonly cityPlaceholder: string;
   readonly areaPlaceholder: string;
   readonly addressPlaceholder: string;
+  readonly pickFromMap: string;
+  readonly mapHelperText: string;
 }
 
 const BRANCH_EDITOR_TRANSLATIONS: Record<AppLanguage, BranchEditorTranslations> = {
@@ -184,6 +190,8 @@ const BRANCH_EDITOR_TRANSLATIONS: Record<AppLanguage, BranchEditorTranslations> 
     cityPlaceholder: 'مثال: مدينة نصر',
     areaPlaceholder: 'مثال: المنطقة السادسة',
     addressPlaceholder: 'مثال: شارع عباس العقاد، مبنى رقم 14، الدور الثاني',
+    pickFromMap: 'تحديد الموقع من الخريطة',
+    mapHelperText: 'انقر في أي مكان على الخريطة أو اسحب العلامة لتحديد خط الطول والعرض تلقائياً.',
   },
   en: {
     addBranch: 'Add Branch',
@@ -238,6 +246,9 @@ const BRANCH_EDITOR_TRANSLATIONS: Record<AppLanguage, BranchEditorTranslations> 
     cityPlaceholder: 'e.g. Nasr City',
     areaPlaceholder: 'e.g. District 6',
     addressPlaceholder: 'e.g. Abbas El Akkad St, Building 14, 2nd Floor',
+    pickFromMap: 'Select Location from Map',
+    mapHelperText:
+      'Click anywhere on the map or drag the pin to set latitude and longitude automatically.',
   },
 };
 
@@ -258,6 +269,7 @@ const EMPTY_BRANCH_TABLE_META: BranchTableMeta = {
     MobileRecordCardComponent,
     PageHeroComponent,
     NiletronixLoadingStateComponent,
+    MapLocationPickerComponent,
   ],
   templateUrl: './legacy-page.component.html',
   styleUrl: './legacy-page.component.css',
@@ -433,6 +445,41 @@ export class LegacyPageComponent implements OnInit, OnDestroy {
       longitude: '',
       latitude: '',
     });
+  }
+
+  protected onMapLocationChange(coords: MapLocationCoords): void {
+    const patch: Partial<{
+      latitude: string;
+      longitude: string;
+      governorate: string;
+      city: string;
+      address: string;
+    }> = {
+      latitude: coords.latitude.toString(),
+      longitude: coords.longitude.toString(),
+    };
+
+    if (this.branchPanelMode() === 'create') {
+      const currentGov = this.branchForm.controls.governorate.value?.trim();
+      const currentCity = this.branchForm.controls.city.value?.trim();
+      const currentAddr = this.branchForm.controls.address.value?.trim();
+
+      if (!currentGov && coords.governorate) {
+        patch.governorate = coords.governorate;
+      }
+      if (!currentCity && coords.city) {
+        patch.city = coords.city;
+      }
+      if (!currentAddr && coords.address) {
+        patch.address = coords.address;
+      }
+    }
+
+    this.branchForm.patchValue(patch);
+    this.branchForm.controls.latitude.markAsTouched();
+    this.branchForm.controls.latitude.markAsDirty();
+    this.branchForm.controls.longitude.markAsTouched();
+    this.branchForm.controls.longitude.markAsDirty();
   }
 
   protected selectBranchContext(branch: BranchEditorRow): void {

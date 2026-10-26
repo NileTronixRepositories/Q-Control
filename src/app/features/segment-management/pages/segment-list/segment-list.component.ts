@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
-import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 
@@ -29,7 +28,6 @@ import { SegmentPermissionService } from '../../services/segment-permission/segm
   selector: 'app-segment-list-page',
   standalone: true,
   imports: [
-    DatePipe,
     FormsModule,
     PageHeroComponent,
     SegmentFormModalComponent,
@@ -157,6 +155,15 @@ export class SegmentListComponent implements OnInit {
     this.loadSegments();
   }
 
+  resetFilters(): void {
+    this.searchText.set('');
+    this.selectedScope.set('');
+    this.selectedOwnerBranchId.set(null);
+    this.selectedPriority.set(null);
+    this.currentPage.set(1);
+    this.loadSegments();
+  }
+
   onPageChange(newPage: number): void {
     if (newPage >= 1 && newPage <= this.totalPages) {
       this.currentPage.set(newPage);
@@ -166,6 +173,20 @@ export class SegmentListComponent implements OnInit {
 
   get totalPages(): number {
     return Math.ceil(this.totalItems() / this.pageSize()) || 1;
+  }
+
+  formatDate(dateStr: string | null | undefined): string {
+    if (!dateStr) return '—';
+    try {
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) return String(dateStr);
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${y}/${m}/${day}`;
+    } catch {
+      return String(dateStr);
+    }
   }
 
   openCreateGlobalModal(): void {

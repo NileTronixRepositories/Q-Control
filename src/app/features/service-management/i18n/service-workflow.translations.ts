@@ -115,12 +115,39 @@ export interface ServiceWorkflowTranslations {
   readonly noSelectionOptions: string;
   readonly serviceCannotIssueTicket: string;
   readonly selectedServiceNotFound: string;
+  readonly eyebrow: string;
+  readonly heroDescription: string;
+  readonly schedule: string;
+  readonly goToSchedule: string;
+  readonly sequenceTitle: string;
+  readonly firstStep: string;
+  readonly finalStep: string;
+  readonly intermediateStep: string;
+  readonly stepOrderLabel: string;
+  readonly selectServiceBannerTitle: string;
+  readonly selectServiceBannerDesc: string;
+  readonly servicesReady: string;
+  readonly noAutoAppliedWorkflow: string;
+  readonly totalCount: string;
+  readonly eligibleServices: string;
+  readonly searchServicesPlaceholder: string;
+  readonly noEligibleServices: string;
+  readonly otherServices: string;
+  readonly pickServiceTitle: string;
+  readonly pickServiceHint: string;
+  readonly addFirstWorkflow: string;
+  readonly emptyWorkflowsHint: string;
+  readonly workflowFor: string;
+  readonly workflowNameOptional: string;
+  readonly minimumStepsHint: string;
+  readonly addStepsHint: string;
 }
 
 export const SERVICE_WORKFLOW_TRANSLATIONS: Record<AppLanguage, ServiceWorkflowTranslations> = {
   ar: {
     title: 'إدارة مسارات الخدمات',
-    description: 'إنشاء وتعديل مسارات تلقائية مرتبة بين الخدمات لاستخدامها لاحقًا في إصدار التذاكر.',
+    description:
+      'إنشاء وتعديل مسارات تلقائية مرتبة بين الخدمات لاستخدامها لاحقًا في إصدار التذاكر.',
     branch: 'الفرع',
     selectBranch: 'اختر الفرع',
     selectBranchFirst: 'اختر فرعًا لعرض شجرة الخدمات المؤهلة',
@@ -140,11 +167,14 @@ export const SERVICE_WORKFLOW_TRANSLATIONS: Record<AppLanguage, ServiceWorkflowT
     setDefault: 'تعيين كافتراضي',
     confirmSetDefaultTitle: 'تعيين المسار الافتراضي',
     confirmSetDefaultBody: 'هل تريد تعيين هذا المسار كافتراضي؟ سيفقد المسار الافتراضي الحالي صفته.',
-    defaultCannotDeactivate: 'لا يمكن تعطيل المسار الافتراضي. عيّن مسارًا نشطًا آخر كافتراضي أولًا.',
+    defaultCannotDeactivate:
+      'لا يمكن تعطيل المسار الافتراضي. عيّن مسارًا نشطًا آخر كافتراضي أولًا.',
     ineligibleOwnerService: 'هذه الخدمة غير مؤهلة لإدارة المسارات.',
     searchCandidates: 'البحث في الخدمات المتاحة',
-    candidateSearchPlaceholder: '\u0627\u0628\u062d\u062b \u0628\u0627\u0633\u0645 \u0627\u0644\u062e\u062f\u0645\u0629 \u0623\u0648 \u0643\u0648\u062f \u0627\u0644\u062e\u062f\u0645\u0629',
-    candidateSearchHelp: '\u0627\u0644\u0628\u062d\u062b \u064a\u062f\u0639\u0645 \u0627\u0633\u0645 \u0627\u0644\u062e\u062f\u0645\u0629 \u0648\u0643\u0648\u062f \u0627\u0644\u062e\u062f\u0645\u0629.',
+    candidateSearchPlaceholder:
+      '\u0627\u0628\u062d\u062b \u0628\u0627\u0633\u0645 \u0627\u0644\u062e\u062f\u0645\u0629 \u0623\u0648 \u0643\u0648\u062f \u0627\u0644\u062e\u062f\u0645\u0629',
+    candidateSearchHelp:
+      '\u0627\u0644\u0628\u062d\u062b \u064a\u062f\u0639\u0645 \u0627\u0633\u0645 \u0627\u0644\u062e\u062f\u0645\u0629 \u0648\u0643\u0648\u062f \u0627\u0644\u062e\u062f\u0645\u0629.',
     allParents: 'كل الخدمات الرئيسية',
     createWorkflow: 'إضافة مسار',
     editWorkflow: 'تعديل المسار',
@@ -201,8 +231,10 @@ export const SERVICE_WORKFLOW_TRANSLATIONS: Record<AppLanguage, ServiceWorkflowT
     concurrencyError: 'تم تعديل المسار بواسطة مستخدم آخر. برجاء التحديث والمحاولة مرة أخرى.',
     confirmDeactivateTitle: 'تعطيل المسار',
     confirmReactivateTitle: 'إعادة تفعيل المسار',
-    confirmDeactivateBody: 'سيتم إيقاف استخدام هذا المسار في قرارات التذاكر الجديدة لاحقًا بدون حذف تعريفه أو خطواته.',
-    confirmReactivateBody: 'سيتم إعادة إتاحة هذا المسار للاستخدام. قد يرفض النظام العملية إذا كانت إحدى الخدمات غير نشطة أو محذوفة.',
+    confirmDeactivateBody:
+      'سيتم إيقاف استخدام هذا المسار في قرارات التذاكر الجديدة لاحقًا بدون حذف تعريفه أو خطواته.',
+    confirmReactivateBody:
+      'سيتم إعادة إتاحة هذا المسار للاستخدام. قد يرفض النظام العملية إذا كانت إحدى الخدمات غير نشطة أو محذوفة.',
     noCandidates: 'لا توجد خدمات متاحة مطابقة.',
     duplicateAllowed: 'يمكن تكرار نفس الخدمة أكثر من مرة داخل المسار.',
     differentParentsAllowed: 'يمكن اختيار خدمات من أكثر من خدمة رئيسية.',
@@ -215,10 +247,12 @@ export const SERVICE_WORKFLOW_TRANSLATIONS: Record<AppLanguage, ServiceWorkflowT
     dropWorkflowStepHint: 'أفلت خطوة من مسار مقترح هنا لإضافتها.',
     dragCandidateServiceHint: 'اسحب الخدمة لإضافتها إلى المسار.',
     dropWorkflowBuilderHint: 'أفلت الخدمة هنا لإضافتها أو أفلت خطوة لإعادة ترتيب المسار.',
-    noSuggestedWorkflows: 'لا توجد مسارات محفوظة تحتوي "{{ serviceName }}" كخطوة. الخدمة نفسها موجودة ويمكنك بدء مسار جديد بها.',
+    noSuggestedWorkflows:
+      'لا توجد مسارات محفوظة تحتوي "{{ serviceName }}" كخطوة. الخدمة نفسها موجودة ويمكنك بدء مسار جديد بها.',
     useWorkflow: 'استخدام هذا المسار',
     startNewWorkflow: 'ابدأ مسار جديد بهذه الخدمة',
-    workflowStartsBeforeAnchor: 'هذا المسار يبدأ قبل الخدمة المختارة. سيتم تضمين الخطوات السابقة أيضًا.',
+    workflowStartsBeforeAnchor:
+      'هذا المسار يبدأ قبل الخدمة المختارة. سيتم تضمين الخطوات السابقة أيضًا.',
     invalidStep: 'هذه الخدمة غير صالحة للتشغيل حاليًا.',
     matchedService: 'الخدمة المختارة',
     serviceSelection: 'اختيار الخدمة',
@@ -233,13 +267,45 @@ export const SERVICE_WORKFLOW_TRANSLATIONS: Record<AppLanguage, ServiceWorkflowT
     noSelectionOptions: 'لا توجد خدمات متاحة تحت هذا الاختيار.',
     serviceCannotIssueTicket: 'هذه الخدمة غير متاحة لإصدار تذكرة.',
     selectedServiceNotFound: 'الخدمة المختارة غير موجودة.',
-  },  en: {
+    eyebrow: 'إدارة مسارات العمليات',
+    heroDescription:
+      'قم باختيار الفرع والخدمة لإنشاء وتتبع مسارات الخدمة وخطوات التنفيذ بكل سهولة.',
+    schedule: 'جدول المواعيد',
+    goToSchedule: 'الانتقال لجدول مواعيد هذه الخدمة',
+    sequenceTitle: 'تسلسل خطوات المسار',
+    firstStep: 'الخطوة الأولى',
+    finalStep: 'الجهة النهائية',
+    intermediateStep: 'خطوة وسيطة',
+    stepOrderLabel: 'ترتيب الخطوة',
+    selectServiceBannerTitle: 'اختر الخدمة لإدارة مسار العمليات',
+    selectServiceBannerDesc:
+      'انقر على أي خدمة أو على زر "إدارة المسارات" لعرض أو إنشاء مسارات تنفيذ خاصة بها.',
+    servicesReady: 'خدمة جاهزة للمسارات',
+    noAutoAppliedWorkflow: 'لا يوجد مسار تلقائي',
+    totalCount: 'مسار',
+    eligibleServices: 'الخدمات المتاحة للمسارات',
+    searchServicesPlaceholder: 'ابحث عن خدمة...',
+    noEligibleServices: 'لا توجد خدمات مطابقة.',
+    otherServices: 'خدمات أخرى',
+    pickServiceTitle: 'اختر خدمة لعرض مساراتها',
+    pickServiceHint: 'اختر أي خدمة من القائمة لعرض مساراتها أو إضافة مسار جديد لها.',
+    addFirstWorkflow: 'إضافة أول مسار',
+    emptyWorkflowsHint:
+      'لم تتم إضافة أي مسارات لهذه الخدمة بعد. أضف مسارًا لتحديد تسلسل الخدمات التلقائي.',
+    workflowFor: 'للخدمة',
+    workflowNameOptional: 'اسم المسار (اختياري)',
+    minimumStepsHint: 'الحد الأدنى خطوتان',
+    addStepsHint: 'اضغط على أي خدمة بالأسفل لإضافتها كخطوة.',
+  },
+  en: {
     title: 'Service Workflows',
-    description: 'Create and manage ordered automatic service paths for future ticket workflow decisions.',
+    description:
+      'Create and manage ordered automatic service paths for future ticket workflow decisions.',
     branch: 'Branch',
     selectBranch: 'Select branch',
     selectBranchFirst: 'Select a branch to view eligible leaf services.',
-    invalidWorkflowScope: 'The selected branch or leaf service is not available for workflow management.',
+    invalidWorkflowScope:
+      'The selected branch or leaf service is not available for workflow management.',
     backToWorkflowSelection: 'Back to service selection',
     backToBranchServices: 'Back to Branch Services',
     changeWorkflowScope: 'Change branch or service',
@@ -254,8 +320,10 @@ export const SERVICE_WORKFLOW_TRANSLATIONS: Record<AppLanguage, ServiceWorkflowT
     defaultWorkflow: 'Default',
     setDefault: 'Set as Default',
     confirmSetDefaultTitle: 'Set Default Workflow',
-    confirmSetDefaultBody: 'Set this workflow as default? The current default workflow will become non-default.',
-    defaultCannotDeactivate: 'The default workflow cannot be deactivated. Set another active workflow as default first.',
+    confirmSetDefaultBody:
+      'Set this workflow as default? The current default workflow will become non-default.',
+    defaultCannotDeactivate:
+      'The default workflow cannot be deactivated. Set another active workflow as default first.',
     ineligibleOwnerService: 'This service is not eligible for workflow management.',
     searchCandidates: 'Search available services',
     candidateSearchPlaceholder: 'Search by service name or service code',
@@ -316,8 +384,10 @@ export const SERVICE_WORKFLOW_TRANSLATIONS: Record<AppLanguage, ServiceWorkflowT
     concurrencyError: 'This workflow was updated by another user. Please refresh and try again.',
     confirmDeactivateTitle: 'Deactivate Workflow',
     confirmReactivateTitle: 'Reactivate Workflow',
-    confirmDeactivateBody: 'This will stop the workflow from being used for future ticket decisions without deleting its definition or steps.',
-    confirmReactivateBody: 'This will make the workflow available again. The backend may reject it if a step service is inactive or deleted.',
+    confirmDeactivateBody:
+      'This will stop the workflow from being used for future ticket decisions without deleting its definition or steps.',
+    confirmReactivateBody:
+      'This will make the workflow available again. The backend may reject it if a step service is inactive or deleted.',
     noCandidates: 'No matching candidate services found.',
     duplicateAllowed: 'The same service can appear more than once in a workflow.',
     differentParentsAllowed: 'Services from different parents are allowed.',
@@ -330,14 +400,17 @@ export const SERVICE_WORKFLOW_TRANSLATIONS: Record<AppLanguage, ServiceWorkflowT
     dropWorkflowStepHint: 'Drop a suggested workflow step here to add it.',
     dragCandidateServiceHint: 'Drag this service into the workflow path.',
     dropWorkflowBuilderHint: 'Drop a service here to add it, or drop a step to reorder the path.',
-    noSuggestedWorkflows: 'No saved workflows contain "{{ serviceName }}" as a step. The service exists and can start a new workflow.',
+    noSuggestedWorkflows:
+      'No saved workflows contain "{{ serviceName }}" as a step. The service exists and can start a new workflow.',
     useWorkflow: 'Use this workflow',
     startNewWorkflow: 'Start new workflow with this service',
-    workflowStartsBeforeAnchor: 'This workflow starts before the selected service. Previous steps will also be included.',
+    workflowStartsBeforeAnchor:
+      'This workflow starts before the selected service. Previous steps will also be included.',
     invalidStep: 'This service is not currently valid for execution.',
     matchedService: 'Selected service',
     serviceSelection: 'Service Selection',
-    serviceSelectionHint: 'Select through the current level until you reach a service that can be added to the workflow.',
+    serviceSelectionHint:
+      'Select through the current level until you reach a service that can be added to the workflow.',
     selectedPath: 'Selected path',
     currentWorkflowPath: 'Current workflow path',
     noWorkflowSteps: 'Select at least two services to build the workflow.',
@@ -348,6 +421,33 @@ export const SERVICE_WORKFLOW_TRANSLATIONS: Record<AppLanguage, ServiceWorkflowT
     noSelectionOptions: 'No services available under this selection.',
     serviceCannotIssueTicket: 'This service cannot issue tickets.',
     selectedServiceNotFound: 'Selected service was not found.',
+    eyebrow: 'Workflow Operations',
+    heroDescription: 'Select a branch and service to create and configure workflows effortlessly.',
+    schedule: 'Schedule',
+    goToSchedule: 'Go to service schedule',
+    sequenceTitle: 'Workflow Step Sequence',
+    firstStep: 'Start Step',
+    finalStep: 'Final Step',
+    intermediateStep: 'Intermediate Step',
+    stepOrderLabel: 'Step Order',
+    selectServiceBannerTitle: 'Select a Service for Workflow Setup',
+    selectServiceBannerDesc:
+      'Click any service or "Manage Workflows" button to configure execution steps.',
+    servicesReady: 'Services ready',
+    noAutoAppliedWorkflow: 'No auto-applied workflow',
+    totalCount: 'Workflows',
+    eligibleServices: 'Workflow-ready services',
+    searchServicesPlaceholder: 'Search services...',
+    noEligibleServices: 'No matching services.',
+    otherServices: 'Other services',
+    pickServiceTitle: 'Select a service to view its workflows',
+    pickServiceHint: 'Pick any service from the list to view its workflows or add a new one.',
+    addFirstWorkflow: 'Add first workflow',
+    emptyWorkflowsHint:
+      'No workflows configured for this service yet. Add one to define the automatic service sequence.',
+    workflowFor: 'for',
+    workflowNameOptional: 'Workflow name (optional)',
+    minimumStepsHint: 'Minimum two steps',
+    addStepsHint: 'Click any service below to add it as a step.',
   },
 };
-

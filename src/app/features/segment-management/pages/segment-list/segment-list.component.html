@@ -1,289 +1,360 @@
 <section
-  class="admin-responsive-page segment-management-page container-fluid"
+  class="admin-responsive-page segment-management-page container-fluid py-3"
   [attr.dir]="direction()"
   [attr.lang]="language()"
 >
+  <!-- Page Hero -->
   <app-page-hero
     [eyebrow]="language() === 'ar' ? 'إدارة النظم والشرائح' : 'System & Segment Administration'"
     [title]="translations().title"
     [description]="translations().description"
     icon="bi bi-tags-fill"
   >
-    <div hero-actions class="d-flex align-items-center gap-2">
+    <div hero-actions class="d-flex align-items-center flex-wrap gap-2">
       @if (permissionService.canCreateGlobalSegment()) {
         <button
           type="button"
-          class="primary-action"
+          class="branch-services-primary-btn"
           (click)="openCreateGlobalModal()"
         >
-          <!-- Globe SVG Icon -->
-          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <circle cx="12" cy="12" r="10"/>
-            <line x1="2" y1="12" x2="22" y2="12"/>
-            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-          </svg>
-          {{ translations().createGlobalSegment }}
+          <i class="bi bi-globe2"></i>
+          <span>{{ translations().createGlobalSegment }}</span>
         </button>
       }
       @if (permissionService.canCreateBranchScopedSegment()) {
         <button
           type="button"
-          class="secondary-action"
+          class="branch-services-secondary-btn"
           (click)="openCreateBranchModal()"
         >
-          <!-- Building + Plus SVG Icon -->
-          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-            <polyline points="9 22 9 12 15 12 15 22"/>
-            <line x1="19" y1="5" x2="19" y2="1"/>
-            <line x1="17" y1="3" x2="21" y2="3"/>
-          </svg>
-          {{ translations().createBranchSegment }}
+          <i class="bi bi-building-add"></i>
+          <span>{{ translations().createBranchSegment }}</span>
         </button>
       }
     </div>
+  </app-page-hero>
 
-    <!-- Filters in hero -->
-    <div hero-filters class="w-100">
-      <div class="row g-3 align-items-end">
-        <div class="col-12 col-lg-4">
-          <label class="filter-field w-100">
-            <span>{{ translations().searchPlaceholder }}</span>
-            <div class="search-input-wrapper">
-              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-              </svg>
-              <input
-                type="search"
-                class="form-control"
-                [placeholder]="translations().searchPlaceholder"
-                [ngModel]="searchText()"
-                (ngModelChange)="onSearch($event)"
-              />
-            </div>
-          </label>
+  <!-- Filter & Search Toolbar Card -->
+  <div class="segment-filter-card mb-4">
+    <div class="row g-2 align-items-center">
+      <!-- Search Input -->
+      <div class="col-12 col-lg-4">
+        <div class="search-input-group">
+          <i class="bi bi-search search-icon"></i>
+          <input
+            type="search"
+            class="form-control form-control-niletronix search-field"
+            [placeholder]="translations().searchPlaceholder"
+            [ngModel]="searchText()"
+            (ngModelChange)="onSearch($event)"
+          />
+          @if (searchText()) {
+            <button
+              type="button"
+              class="clear-search-btn"
+              (click)="onSearch('')"
+              aria-label="Clear search"
+            >
+              <i class="bi bi-x-circle-fill"></i>
+            </button>
+          }
         </div>
+      </div>
 
-        <div class="col-12 col-md-4 col-lg-3">
-          <label class="filter-field">
-            <span>{{ translations().allScopes }}</span>
-            <select class="form-select" (change)="onScopeFilter($event)">
-              <option value="">{{ translations().allScopes }}</option>
-              <option value="Global">{{ translations().scopeGlobal }}</option>
-              <option value="BranchScoped">{{ translations().scopeBranchScoped }}</option>
+      <!-- Scope Filter -->
+      <div class="col-12 col-sm-6 col-lg-3">
+        <div class="select-input-group">
+          <i class="bi bi-funnel select-icon"></i>
+          <select
+            class="form-select form-control-niletronix select-field"
+            [ngModel]="selectedScope()"
+            (change)="onScopeFilter($event)"
+          >
+            <option value="">{{ translations().allScopes }}</option>
+            <option value="Global">{{ translations().scopeGlobal }}</option>
+            <option value="BranchScoped">{{ translations().scopeBranchScoped }}</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Branch Filter (Technical Admin only) -->
+      @if (isTechnicalAdmin()) {
+        <div class="col-12 col-sm-6 col-lg-3">
+          <div class="select-input-group">
+            <i class="bi bi-building select-icon"></i>
+            <select
+              class="form-select form-control-niletronix select-field"
+              [ngModel]="selectedOwnerBranchId() || ''"
+              (change)="onBranchFilter($event)"
+            >
+              <option value="">{{ translations().allBranches }}</option>
+              @for (branch of branches(); track branch.branchId) {
+                <option [value]="branch.branchId">
+                  {{ branch.arabicName || branch.englishName }} (#{{ branch.branchId }})
+                </option>
+              }
             </select>
-          </label>
-        </div>
-
-        @if (isTechnicalAdmin()) {
-          <div class="col-12 col-md-4 col-lg-3">
-            <label class="filter-field">
-              <span>{{ translations().allBranches }}</span>
-              <select class="form-select" (change)="onBranchFilter($event)">
-                <option value="">{{ translations().allBranches }}</option>
-                @for (branch of branches(); track branch.branchId) {
-                  <option [value]="branch.branchId">
-                    {{ branch.arabicName || branch.englishName }} (#{{ branch.branchId }})
-                  </option>
-                }
-              </select>
-            </label>
           </div>
-        }
+        </div>
+      }
 
-        <div class="col-12 col-md-4 col-lg-2">
-          <label class="filter-field">
-            <span>{{ translations().filterPriority }}</span>
-            <input
-              type="number"
-              min="0"
-              class="form-control"
-              [placeholder]="translations().filterPriority"
-              (input)="onPriorityFilter($any($event.target).value)"
-            />
-          </label>
+      <!-- Priority Filter -->
+      <div class="col-12 col-sm-6 col-lg-2">
+        <div class="priority-input-group">
+          <i class="bi bi-sort-numeric-down priority-icon"></i>
+          <input
+            type="number"
+            min="0"
+            class="form-control form-control-niletronix priority-field"
+            [placeholder]="translations().filterPriority"
+            [ngModel]="selectedPriority()"
+            (input)="onPriorityFilter($any($event.target).value)"
+          />
         </div>
       </div>
     </div>
-  </app-page-hero>
+  </div>
 
   <!-- Toast Notification -->
   @if (toastMessage(); as msg) {
-    <div class="toast-stack" role="status" aria-live="polite" aria-atomic="true">
+    <div class="toast-stack mb-3" role="status" aria-live="polite" aria-atomic="true">
       <div
         class="toast-item"
         [class.toast-success]="msg.tone === 'success'"
         [class.toast-error]="msg.tone === 'error'"
         [class.toast-info]="msg.tone === 'info'"
       >
-        <svg class="toast-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-          @if (msg.tone === 'success') {
-            <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm-1 15l-5-5 1.41-1.41L11 14.17l7.59-7.59L20 8z"/>
-          } @else if (msg.tone === 'error') {
-            <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm1 15h-2v-2h2zm0-4h-2V7h2z"/>
-          } @else {
-            <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm1 15h-2v-6h2zm0-8h-2V7h2z"/>
-          }
-        </svg>
-        <p>{{ msg.text }}</p>
-        <button type="button" class="toast-close" (click)="clearToast()" [attr.aria-label]="'Close'">
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
-            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-          </svg>
+        <i
+          class="bi me-2"
+          [class.bi-check-circle-fill]="msg.tone === 'success'"
+          [class.bi-exclamation-triangle-fill]="msg.tone === 'error'"
+          [class.bi-info-circle-fill]="msg.tone === 'info'"
+        ></i>
+        <p class="m-0 flex-grow-1">{{ msg.text }}</p>
+        <button
+          type="button"
+          class="toast-close"
+          (click)="clearToast()"
+          [attr.aria-label]="translations().close"
+        >
+          <i class="bi bi-x-lg"></i>
         </button>
       </div>
     </div>
   }
 
-  <!-- Segments Table -->
-  <div class="table-responsive table-wrap">
-    <table class="custom-table table table-sm table-hover align-middle mb-0">
-      <thead>
-        <tr>
-          <th scope="col">{{ translations().arabicName }}</th>
-          <th scope="col">{{ translations().englishName }}</th>
-          <th scope="col">{{ translations().priority }}</th>
-          <th scope="col">{{ translations().scope }}</th>
-          <th scope="col">{{ translations().ownerBranch }}</th>
-          <th scope="col">{{ translations().createdOn }}</th>
-          <th scope="col" class="admin-actions-column text-center">{{ translations().actions }}</th>
-        </tr>
-      </thead>
-      <tbody>
-        @if (loading()) {
+  <!-- Segments Table Panel Card -->
+  <div class="segment-panel-card">
+    <!-- Panel Header -->
+    <div class="segment-panel-header d-flex align-items-center justify-content-between flex-wrap gap-2">
+      <div class="d-flex align-items-center gap-2">
+        <span class="panel-header-icon">
+          <i class="bi bi-tags-fill"></i>
+        </span>
+        <h5 class="panel-title m-0 fw-bold">{{ translations().title }}</h5>
+        <span class="total-count-pill">
+          {{ totalItems() }} {{ translations().itemsCount }}
+        </span>
+      </div>
+
+      <div class="d-flex align-items-center gap-2">
+        <button
+          type="button"
+          class="btn-panel-refresh"
+          [title]="translations().refresh"
+          [disabled]="loading()"
+          (click)="loadSegments()"
+        >
+          <i class="bi bi-arrow-clockwise" [class.spin-refresh]="loading()"></i>
+          <span class="d-none d-sm-inline">{{ translations().refresh }}</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Table Content -->
+    <div class="table-responsive">
+      <table class="table segment-table align-middle mb-0">
+        <thead>
           <tr>
-            <td colspan="7" class="text-center py-5">
-              <div class="admin-list-empty d-flex flex-column align-items-center justify-content-center gap-2 py-4 border-0 bg-transparent">
-                <div class="spinner-border" style="color: var(--q-primary); width: 1.75rem; height: 1.75rem;" role="status">
-                  <span class="visually-hidden">{{ translations().loading }}</span>
-                </div>
-                <p class="mb-0 small" style="color: var(--q-text-muted);">{{ translations().loading }}</p>
-              </div>
-            </td>
+            <th scope="col">{{ translations().arabicName }}</th>
+            <th scope="col">{{ translations().englishName }}</th>
+            <th scope="col" class="text-center">{{ translations().priority }}</th>
+            <th scope="col">{{ translations().scope }}</th>
+            <th scope="col">{{ translations().ownerBranch }}</th>
+            <th scope="col" class="text-center">{{ translations().createdOn }}</th>
+            <th scope="col" class="text-center actions-column">{{ translations().actions }}</th>
           </tr>
-        } @else if (segments().length === 0) {
-          <tr>
-            <td colspan="7">
-              <div class="admin-list-empty d-flex flex-column align-items-center justify-content-center gap-2 p-5">
-                <div class="admin-list-empty-icon d-flex align-items-center justify-content-center">
-                  <!-- Tag/Segments empty icon -->
-                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
-                    <line x1="7" y1="7" x2="7.01" y2="7"/>
-                  </svg>
+        </thead>
+        <tbody>
+          @if (loading()) {
+            <tr>
+              <td colspan="7" class="text-center py-5">
+                <div class="loading-state d-flex flex-column align-items-center justify-content-center gap-2 py-4">
+                  <div class="spinner-border niletronix-spinner" role="status">
+                    <span class="visually-hidden">{{ translations().loading }}</span>
+                  </div>
+                  <p class="mb-0 text-muted small fw-semibold">{{ translations().loading }}</p>
                 </div>
-                <h2>{{ translations().emptySegments }}</h2>
-                <p>{{ language() === 'ar' ? 'لا توجد شرائح تطابق معايير البحث الحالية.' : 'No segments match the current filters.' }}</p>
-              </div>
-            </td>
-          </tr>
-        } @else {
-          @for (seg of segments(); track seg.id) {
-            <tr [class.seg-system-default]="seg.isSystemDefault">
-              <td>
-                <strong>{{ seg.arabicName }}</strong>
-                @if (seg.isSystemDefault) {
-                  <span class="seg-badge seg-badge-system ms-2">{{ translations().systemDefault }}</span>
-                }
               </td>
-              <td dir="ltr">{{ seg.englishName }}</td>
-              <td class="admin-number-cell" dir="ltr">
-                <span class="seg-badge seg-badge-priority">
-                  <!-- Priority icon -->
-                  <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-                  </svg>
-                  {{ seg.priority }}
-                </span>
-              </td>
-              <td>
-                @if (seg.scope === 'Global') {
-                  <span class="seg-badge seg-badge-global">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
-                      <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/>
-                      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-                    </svg>
-                    {{ translations().scopeGlobal }}
-                  </span>
-                } @else {
-                  <span class="seg-badge seg-badge-branch">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
-                      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-                      <polyline points="9 22 9 12 15 12 15 22"/>
-                    </svg>
-                    {{ translations().scopeBranchScoped }}
-                  </span>
-                }
-              </td>
-              <td>
-                {{ seg.ownerBranchArabicName || seg.ownerBranchEnglishName || '—' }}
-              </td>
-              <td class="admin-technical-cell" dir="ltr">{{ seg.createdOnUtc | date:'shortDate' }}</td>
-              <td class="admin-actions-column text-center">
-                <div class="d-inline-flex align-items-center gap-1">
-                  @if (permissionService.canViewSegmentDetails()) {
+            </tr>
+          } @else if (segments().length === 0) {
+            <tr>
+              <td colspan="7">
+                <div class="empty-state d-flex flex-column align-items-center justify-content-center py-5 px-3 text-center">
+                  <div class="empty-state-icon mb-3">
+                    <i class="bi bi-tags"></i>
+                  </div>
+                  <h6 class="fw-bold mb-1">{{ translations().emptySegments }}</h6>
+                  <p class="text-muted small mb-3">
+                    {{ language() === 'ar' ? 'لا توجد شرائح تطابق معايير البحث الحالية.' : 'No segments match the current filters.' }}
+                  </p>
+                  @if (searchText() || selectedScope() || selectedOwnerBranchId() || selectedPriority() !== null) {
                     <button
                       type="button"
-                      class="icon-action"
-                      [title]="translations().viewDetails"
-                      (click)="openDetails(seg)"
+                      class="branch-services-secondary-btn"
+                      (click)="resetFilters()"
                     >
-                      <!-- Eye SVG -->
-                      <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                        <circle cx="12" cy="12" r="3"/>
-                      </svg>
-                    </button>
-                  }
-                  @if (canEditSegment(seg)) {
-                    <button
-                      type="button"
-                      class="icon-action"
-                      [title]="translations().editSegment"
-                      (click)="openEditModal(seg)"
-                    >
-                      <!-- Pen/Edit SVG -->
-                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-                      </svg>
+                      <i class="bi bi-arrow-counterclockwise"></i>
+                      <span>{{ language() === 'ar' ? 'إعادة ضبط الفلاتر' : 'Reset Filters' }}</span>
                     </button>
                   }
                 </div>
               </td>
             </tr>
-          }
-        }
-      </tbody>
-    </table>
-
-    <!-- Pagination Bar -->
-    @if (totalItems() > pageSize()) {
-      <div class="pagination-bar d-flex align-items-center justify-content-between px-3 py-2">
-        <span class="small">
-          @if (language() === 'ar') {
-            صفحة {{ currentPage() }} من {{ totalPages }} ({{ totalItems() }} عنصر)
           } @else {
-            Page {{ currentPage() }} of {{ totalPages }} &middot; {{ totalItems() }} items
+            @for (seg of segments(); track seg.id) {
+              <tr [class.seg-system-default-row]="seg.isSystemDefault">
+                <!-- Arabic Name -->
+                <td>
+                  <div class="d-flex align-items-center gap-2">
+                    <span class="segment-name-ar fw-bold text-dark">{{ seg.arabicName }}</span>
+                    @if (seg.isSystemDefault) {
+                      <span class="seg-badge seg-badge-system">
+                        <i class="bi bi-shield-lock-fill"></i>
+                        {{ translations().systemDefault }}
+                      </span>
+                    }
+                  </div>
+                </td>
+
+                <!-- English Name -->
+                <td dir="ltr">
+                  <span class="segment-name-en text-secondary fw-semibold">{{ seg.englishName }}</span>
+                </td>
+
+                <!-- Priority -->
+                <td class="text-center" dir="ltr">
+                  <span class="seg-badge seg-badge-priority">
+                    <i class="bi bi-star-fill"></i>
+                    <span>{{ seg.priority }}</span>
+                  </span>
+                </td>
+
+                <!-- Scope -->
+                <td>
+                  @if (seg.scope === 'Global') {
+                    <span class="seg-badge seg-badge-global">
+                      <i class="bi bi-globe2"></i>
+                      <span>{{ translations().scopeGlobal }}</span>
+                    </span>
+                  } @else {
+                    <span class="seg-badge seg-badge-branch">
+                      <i class="bi bi-building"></i>
+                      <span>{{ translations().scopeBranchScoped }}</span>
+                    </span>
+                  }
+                </td>
+
+                <!-- Owner Branch -->
+                <td>
+                  <span class="text-secondary small fw-medium">
+                    {{ seg.ownerBranchArabicName || seg.ownerBranchEnglishName || '—' }}
+                  </span>
+                </td>
+
+                <!-- Created Date -->
+                <td class="text-center text-secondary small" dir="ltr">
+                  {{ formatDate(seg.createdOnUtc) }}
+                </td>
+
+                <!-- Actions -->
+                <td class="text-center actions-column">
+                  <div class="d-inline-flex align-items-center gap-1">
+                    @if (permissionService.canViewSegmentDetails()) {
+                      <button
+                        type="button"
+                        class="btn-action-icon btn-action-view"
+                        [title]="translations().viewDetails"
+                        (click)="openDetails(seg)"
+                      >
+                        <i class="bi bi-eye"></i>
+                      </button>
+                    }
+                    @if (canEditSegment(seg)) {
+                      <button
+                        type="button"
+                        class="btn-action-icon btn-action-edit"
+                        [title]="translations().editSegment"
+                        (click)="openEditModal(seg)"
+                      >
+                        <i class="bi bi-pencil-square"></i>
+                      </button>
+                    }
+                  </div>
+                </td>
+              </tr>
+            }
           }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination Footer -->
+    @if (totalItems() > pageSize()) {
+      <div class="segment-panel-footer d-flex align-items-center justify-content-between px-3 py-3 border-top">
+        <span class="pagination-info small text-secondary">
+          {{ translations().pageLabel }} {{ currentPage() }} {{ translations().ofLabel }} {{ totalPages }}
+          <span class="text-muted">({{ totalItems() }} {{ translations().itemsCount }})</span>
         </span>
-        <nav [attr.aria-label]="language() === 'ar' ? 'تنقل الصفحات' : 'Pagination'">
-          <ul class="pagination pagination-sm m-0 gap-1">
+
+        <nav [attr.aria-label]="translations().pageLabel">
+          <ul class="pagination pagination-sm m-0 gap-1 align-items-center">
+            <!-- Previous Button -->
             <li class="page-item" [class.disabled]="currentPage() === 1">
-              <button type="button" class="page-link" (click)="onPageChange(currentPage() - 1)">
-                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
-                  <polyline [attr.points]="direction() === 'rtl' ? '9 18 15 12 9 6' : '15 18 9 12 15 6'"/>
-                </svg>
+              <button
+                type="button"
+                class="page-link niletronix-page-link"
+                [disabled]="currentPage() === 1"
+                (click)="onPageChange(currentPage() - 1)"
+                [attr.aria-label]="translations().prevPage"
+              >
+                <i
+                  class="bi"
+                  [class.bi-chevron-right]="direction() === 'rtl'"
+                  [class.bi-chevron-left]="direction() === 'ltr'"
+                ></i>
               </button>
             </li>
+
+            <!-- Current Page Indicator -->
             <li class="page-item active">
-              <span class="page-link">{{ currentPage() }}</span>
+              <span class="page-link niletronix-page-link-active">{{ currentPage() }}</span>
             </li>
+
+            <!-- Next Button -->
             <li class="page-item" [class.disabled]="currentPage() === totalPages">
-              <button type="button" class="page-link" (click)="onPageChange(currentPage() + 1)">
-                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
-                  <polyline [attr.points]="direction() === 'rtl' ? '15 18 9 12 15 6' : '9 18 15 12 9 6'"/>
-                </svg>
+              <button
+                type="button"
+                class="page-link niletronix-page-link"
+                [disabled]="currentPage() === totalPages"
+                (click)="onPageChange(currentPage() + 1)"
+                [attr.aria-label]="translations().nextPage"
+              >
+                <i
+                  class="bi"
+                  [class.bi-chevron-left]="direction() === 'rtl'"
+                  [class.bi-chevron-right]="direction() === 'ltr'"
+                ></i>
               </button>
             </li>
           </ul>
@@ -292,6 +363,7 @@
     }
   </div>
 
+  <!-- Modals -->
   <app-segment-form-modal
     [open]="formModalOpen()"
     [mode]="formModalMode()"
@@ -299,6 +371,7 @@
     [translations]="translations()"
     [isTechnicalAdmin]="isTechnicalAdmin()"
     [saving]="saving()"
+    [direction]="direction()"
     (closed)="closeFormModal()"
     (submitted)="onFormSubmitted($event)"
   />
@@ -308,6 +381,8 @@
     [details]="segmentDetails()"
     [translations]="translations()"
     [canViewRequest]="permissionService.canViewGlobalizationRequestDetails()"
+    [direction]="direction()"
+    [language]="language()"
     (closed)="closeDetailsModal()"
     (openRequest)="openRequestFromDetails($event)"
   />
@@ -319,6 +394,8 @@
     [canApprove]="permissionService.canApproveGlobalizationRequest()"
     [canReject]="permissionService.canRejectGlobalizationRequest()"
     [processing]="requestProcessing()"
+    [direction]="direction()"
+    [language]="language()"
     (closed)="closeGlobalizationRequestModal()"
     (approved)="onApproveRequest($event)"
     (rejected)="onRejectRequest($event)"

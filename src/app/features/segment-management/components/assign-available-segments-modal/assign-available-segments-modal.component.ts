@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { AppModalComponent } from '../../../../shared/components/app-modal';
 import { AssignSegmentItem, AvailableSegmentItem } from '../../models/segment/segment.model';
 import { SegmentTranslations } from '../../i18n/segment.translations';
 
@@ -12,7 +13,7 @@ interface SelectableSegmentState {
 @Component({
   selector: 'app-assign-available-segments-modal',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, AppModalComponent],
   templateUrl: './assign-available-segments-modal.component.html',
   styleUrl: './assign-available-segments-modal.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -24,6 +25,7 @@ export class AssignAvailableSegmentsModalComponent {
   @Input() loading = false;
   @Input() assigning = false;
   @Input() translations!: SegmentTranslations;
+  @Input() direction: 'rtl' | 'ltr' = 'rtl';
 
   @Output() closed = new EventEmitter<void>();
   @Output() assigned = new EventEmitter<AssignSegmentItem[]>();

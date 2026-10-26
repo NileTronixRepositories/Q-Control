@@ -31,6 +31,74 @@
   box-shadow: 0 14px 30px -6px rgba(11, 138, 168, 0.08);
 }
 
+.branch-toolbar-inner {
+  min-height: 44px;
+}
+
+.branch-toolbar-stats {
+  padding-inline-start: 14px;
+  border-inline-start: 2px solid #e2e8f0;
+}
+
+.branch-stat-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 14px;
+  border-radius: 50rem;
+  background: #f0f9ff;
+  border: 1px solid #bae6fd;
+  color: var(--q-primary, #0b8aa8);
+  font-size: 12px;
+  font-weight: 700;
+  box-shadow: 0 1px 3px rgba(11, 138, 168, 0.05);
+  transition: all 0.2s ease;
+}
+
+.branch-stat-pill:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(11, 138, 168, 0.12);
+}
+
+.branch-stat-pill i {
+  font-size: 14px;
+  color: var(--q-primary, #0b8aa8);
+}
+
+.branch-stat-pill .stat-count {
+  font-weight: 800;
+  font-size: 13.5px;
+  color: #0369a1;
+}
+
+.branch-stat-pill .stat-label {
+  color: #0f172a;
+  font-weight: 600;
+}
+
+.branch-stat-pill--subtle {
+  background: #ecfdf5;
+  border-color: #a7f3d0;
+  color: #047857;
+}
+
+.branch-stat-pill--subtle i {
+  color: #059669;
+}
+
+.branch-stat-pill--subtle .stat-count {
+  color: #065f46;
+}
+
+.spin-refresh {
+  animation: spinClockwise 0.8s linear infinite;
+}
+
+@keyframes spinClockwise {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
 .toolbar-label {
   color: var(--q-primary, #0b8aa8);
   font-size: 11px;
@@ -40,7 +108,7 @@
 }
 
 .branch-services-field {
-  min-width: min(380px, 100%);
+  min-width: min(340px, 100%);
 }
 
 .branch-select-dropdown {

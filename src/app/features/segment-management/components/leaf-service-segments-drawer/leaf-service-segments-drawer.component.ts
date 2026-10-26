@@ -28,6 +28,7 @@ export class LeafServiceSegmentsDrawerComponent {
   @Input() updatingQuota = false;
   @Input() unassigning = false;
   @Input() translations!: SegmentTranslations;
+  @Input() direction: 'rtl' | 'ltr' = 'rtl';
   @Input() canIssueTicket = true;
   @Input() canAssign = false;
   @Input() canUpdateQuota = false;

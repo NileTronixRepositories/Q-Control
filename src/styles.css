@@ -1,5 +1,6 @@
 /* Bootstrap CSS */
 @import 'bootstrap/dist/css/bootstrap.min.css';
+@import 'leaflet/dist/leaflet.css';
 
 /* CSS Layers for specificity control */
 @layer theme, base, components, utilities;

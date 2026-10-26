@@ -1,5 +1,14 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { ChangeDetectionStrategy, Component, DestroyRef, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  OnDestroy,
+  OnInit,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { finalize, Observable } from 'rxjs';
@@ -38,6 +47,7 @@ interface FlatRequestServiceNode {
   imports: [PageHeroComponent, NiletronixLoadingStateComponent],
   providers: [ServiceGlobalizationStore],
   templateUrl: './globalization-requests.component.html',
+  styleUrl: './globalization-requests.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GlobalizationRequestsComponent implements OnInit, OnDestroy {
@@ -53,7 +63,9 @@ export class GlobalizationRequestsComponent implements OnInit, OnDestroy {
   protected readonly store = inject(ServiceGlobalizationStore);
   protected readonly language = this.i18nStore.language;
   protected readonly direction = this.i18nStore.direction;
-  protected readonly translations = computed(() => SERVICE_GLOBALIZATION_TRANSLATIONS[this.language()]);
+  protected readonly translations = computed(
+    () => SERVICE_GLOBALIZATION_TRANSLATIONS[this.language()],
+  );
   protected readonly branches = signal<readonly BranchListItem[]>([]);
   protected readonly branchesLoading = signal(false);
   protected readonly rejectionReason = signal('');
@@ -78,10 +90,7 @@ export class GlobalizationRequestsComponent implements OnInit, OnDestroy {
     if (this.toastTimeoutId) clearTimeout(this.toastTimeoutId);
   }
 
-  protected loadRequests(
-    pageNumber = this.store.page().currentPage,
-    force = false,
-  ): void {
+  protected loadRequests(pageNumber = this.store.page().currentPage, force = false): void {
     if (this.store.loading() && !force) return;
     const requestId = ++this.listRequestId;
     this.store.loading.set(true);
@@ -145,12 +154,16 @@ export class GlobalizationRequestsComponent implements OnInit, OnDestroy {
   }
 
   protected updateOrder(event: Event): void {
-    this.store.orderSort.set((event.target as HTMLSelectElement).value === 'Oldest' ? 'Oldest' : 'Newest');
+    this.store.orderSort.set(
+      (event.target as HTMLSelectElement).value === 'Oldest' ? 'Oldest' : 'Newest',
+    );
     this.loadRequests(1);
   }
 
   protected updatePageSize(event: Event): void {
-    this.store.pageSize.set(Math.min(100, Math.max(1, Number((event.target as HTMLSelectElement).value) || 10)));
+    this.store.pageSize.set(
+      Math.min(100, Math.max(1, Number((event.target as HTMLSelectElement).value) || 10)),
+    );
     this.loadRequests(1);
   }
 
@@ -160,7 +173,10 @@ export class GlobalizationRequestsComponent implements OnInit, OnDestroy {
     this.loadDetails(requestId);
   }
 
-  protected requestDecision(item: ServiceGlobalizationRequestListItem, action: ServiceGlobalizationDecisionAction): void {
+  protected requestDecision(
+    item: ServiceGlobalizationRequestListItem,
+    action: ServiceGlobalizationDecisionAction,
+  ): void {
     const details = this.store.selectedDetails();
     const rowVersion = details?.requestId === item.requestId ? details.rowVersion : item.rowVersion;
     if (!this.canStartDecision(item.status, action)) return;
@@ -205,25 +221,28 @@ export class GlobalizationRequestsComponent implements OnInit, OnDestroy {
         takeUntilDestroyed(this.destroyRef),
       )
       .subscribe({
-      next: (response) => {
-        this.store.decisionState.set(null);
-        this.store.applyDecisionResponse(response);
-        this.showMessage('success', response.message);
-        if (response.status === 'Approved') {
-          this.invalidationService.invalidateAfterApproval(response.branchId);
-        } else {
-          this.invalidationService.invalidateAfterRejection(response.branchId);
-        }
-        this.loadRequests(this.store.page().currentPage, true);
-        if (this.store.detailsOpen()) {
-          this.loadDetails(response.requestId, true);
-        }
-      },
-      error: (error: HttpErrorResponse) => this.handleMutationError(error, state.requestId),
-    });
+        next: (response) => {
+          this.store.decisionState.set(null);
+          this.store.applyDecisionResponse(response);
+          this.showMessage('success', response.message);
+          if (response.status === 'Approved') {
+            this.invalidationService.invalidateAfterApproval(response.branchId);
+          } else {
+            this.invalidationService.invalidateAfterRejection(response.branchId);
+          }
+          this.loadRequests(this.store.page().currentPage, true);
+          if (this.store.detailsOpen()) {
+            this.loadDetails(response.requestId, true);
+          }
+        },
+        error: (error: HttpErrorResponse) => this.handleMutationError(error, state.requestId),
+      });
   }
 
-  protected canStartDecision(status: ServiceGlobalizationRequestStatus, action: ServiceGlobalizationDecisionAction): boolean {
+  protected canStartDecision(
+    status: ServiceGlobalizationRequestStatus,
+    action: ServiceGlobalizationDecisionAction,
+  ): boolean {
     return status === 'Pending' && (action === 'approve' ? this.canApprove() : this.canReject());
   }
 
@@ -233,13 +252,18 @@ export class GlobalizationRequestsComponent implements OnInit, OnDestroy {
 
   protected branchName(item: ServiceGlobalizationRequestListItem | BranchListItem): string {
     return this.language() === 'ar'
-      ? ('branchArabicName' in item ? item.branchArabicName : item.arabicName)
-      : ('branchEnglishName' in item ? item.branchEnglishName : item.englishName);
+      ? 'branchArabicName' in item
+        ? item.branchArabicName
+        : item.arabicName
+      : 'branchEnglishName' in item
+        ? item.branchEnglishName
+        : item.englishName;
   }
 
   protected parentName(item: ServiceGlobalizationRequestListItem): string {
     return (
-      (this.language() === 'ar' ? item.parentServiceArabicName : item.parentServiceEnglishName) || '-'
+      (this.language() === 'ar' ? item.parentServiceArabicName : item.parentServiceEnglishName) ||
+      '-'
     );
   }
 
@@ -247,19 +271,26 @@ export class GlobalizationRequestsComponent implements OnInit, OnDestroy {
     return this.language() === 'ar' ? node.arabicName : node.englishName;
   }
 
-  protected parentDetailsName(parent: { readonly arabicName: string; readonly englishName: string }): string {
+  protected parentDetailsName(parent: {
+    readonly arabicName: string;
+    readonly englishName: string;
+  }): string {
     return this.language() === 'ar' ? parent.arabicName : parent.englishName;
   }
 
   protected statusLabel(status: ServiceGlobalizationRequestStatus): string {
     const translations = this.translations();
-    return status === 'Pending' ? translations.pending : status === 'Approved' ? translations.approved : translations.rejected;
+    return status === 'Pending'
+      ? translations.pending
+      : status === 'Approved'
+        ? translations.approved
+        : translations.rejected;
   }
 
   protected statusClasses(status: ServiceGlobalizationRequestStatus): string {
-    if (status === 'Approved') return 'bg-success-subtle text-success border border-success-subtle';
-    if (status === 'Rejected') return 'bg-danger-subtle text-danger border border-danger-subtle';
-    return 'bg-warning-subtle text-warning-emphasis border border-warning-subtle';
+    if (status === 'Approved') return 'glob-status-approved';
+    if (status === 'Rejected') return 'glob-status-rejected';
+    return 'glob-status-pending';
   }
 
   protected statusIcon(status: ServiceGlobalizationRequestStatus): string {
@@ -349,7 +380,13 @@ export class GlobalizationRequestsComponent implements OnInit, OnDestroy {
   private loadBranches(): void {
     this.branchesLoading.set(true);
     this.branchApiService
-      .getBranches({ searchText: '', orderSort: 'Newest', pageNumber: 1, pageSize: 100, isActive: null })
+      .getBranches({
+        searchText: '',
+        orderSort: 'Newest',
+        pageNumber: 1,
+        pageSize: 100,
+        isActive: null,
+      })
       .pipe(
         finalize(() => this.branchesLoading.set(false)),
         takeUntilDestroyed(this.destroyRef),
@@ -389,11 +426,15 @@ export class GlobalizationRequestsComponent implements OnInit, OnDestroy {
       void this.router.navigateByUrl('/auth/login');
       return;
     }
-    const fallback = error.status === 403 ? this.translations().accessDenied : this.translations().fallbackError;
+    const fallback =
+      error.status === 403 ? this.translations().accessDenied : this.translations().fallbackError;
     this.showMessage('error', formatApiError(error, fallback));
   }
 
-  private flattenNodes(nodes: readonly ServiceGlobalizationRequestServiceNode[], depth = 0): readonly FlatRequestServiceNode[] {
+  private flattenNodes(
+    nodes: readonly ServiceGlobalizationRequestServiceNode[],
+    depth = 0,
+  ): readonly FlatRequestServiceNode[] {
     return nodes.flatMap((node) => [
       { node, depth },
       ...this.flattenNodes(node.children, depth + 1),
@@ -403,8 +444,9 @@ export class GlobalizationRequestsComponent implements OnInit, OnDestroy {
   private showMessage(tone: 'success' | 'error' | 'info', text: string): void {
     if (this.toastTimeoutId) clearTimeout(this.toastTimeoutId);
     this.store.message.set({ tone, text });
-    this.toastTimeoutId = setTimeout(() => this.store.message.set(null), tone === 'error' ? 6500 : 4200);
+    this.toastTimeoutId = setTimeout(
+      () => this.store.message.set(null),
+      tone === 'error' ? 6500 : 4200,
+    );
   }
 }
-
-

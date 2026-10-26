@@ -286,6 +286,24 @@ export class ServiceSchedulesComponent implements OnInit, OnDestroy, ServiceSche
     void this.router.navigateByUrl('/admin/services/branch-services');
   }
 
+  protected goToWorkflows(): void {
+    if (!this.canDeactivatePendingChanges()) {
+      return;
+    }
+    const currentScope = this.scope();
+    if (currentScope) {
+      void this.router.navigate([
+        '/admin/services/branches',
+        currentScope.branchId,
+        'services',
+        currentScope.leafServiceId,
+        'workflows',
+      ]);
+    } else {
+      void this.router.navigateByUrl('/admin/services/workflows');
+    }
+  }
+
   protected selectBranch(event: Event): void {
     const branchId = this.readPositiveInt((event.target as HTMLSelectElement).value);
 

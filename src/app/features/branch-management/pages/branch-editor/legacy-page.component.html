@@ -536,7 +536,7 @@
       @if (branchPanelMode() !== 'closed') {
         <div class="q-dialog-backdrop" (click)="closeBranchPanel()" aria-hidden="true"></div>
         <aside
-          class="q-dialog branch-dialog"
+          class="q-dialog q-dialog--lg branch-dialog"
           role="dialog"
           aria-modal="true"
           [attr.aria-label]="branchFormTitle()"
@@ -544,7 +544,25 @@
           <header class="q-dialog-header">
             <div class="d-flex align-items-center gap-3">
               <span class="q-dialog-icon">
-                <i class="bi bi-building" aria-hidden="true"></i>
+                <svg
+                  width="22"
+                  height="22"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z" />
+                  <path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2" />
+                  <path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2" />
+                  <path d="M10 6h4" />
+                  <path d="M10 10h4" />
+                  <path d="M10 14h4" />
+                  <path d="M10 18h4" />
+                </svg>
               </span>
               <div>
                 <h2 class="q-dialog-title mb-0">{{ branchFormTitle() }}</h2>
@@ -565,7 +583,19 @@
               [attr.aria-label]="branchEditorTranslations().close"
               (click)="closeBranchPanel()"
             >
-              <i class="bi bi-x-lg" aria-hidden="true"></i>
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M18 6 6 18M6 6l12 12" />
+              </svg>
             </button>
           </header>
 
@@ -580,471 +610,1272 @@
 
             @if (branchPanelMode() === 'view' && selectedBranchDetails(); as details) {
               <div class="q-detail-sections">
-                <!-- Group 1: General & Status Info -->
-                <section class="q-detail-section">
-                  <h3 class="q-detail-section-title">
-                    <i class="bi bi-info-circle-fill" aria-hidden="true"></i>
-                    {{ branchEditorTranslations().basicInfoAndStatus }}
-                  </h3>
-                  <div class="q-detail-grid q-detail-grid--3col">
-                    <div class="q-detail-item">
-                      <span class="q-detail-label">
-                        <i class="bi bi-translate" aria-hidden="true"></i>
-                        {{ translations().arabicNameLabel }}
-                      </span>
-                      <span class="q-detail-value">{{ detailValue(details.arabicName) }}</span>
-                    </div>
-                    <div class="q-detail-item">
-                      <span class="q-detail-label">
-                        <i class="bi bi-type" aria-hidden="true"></i>
-                        {{ translations().englishNameLabel }}
-                      </span>
-                      <span class="q-detail-value">{{ detailValue(details.englishName) }}</span>
-                    </div>
-                    <div class="q-detail-item">
-                      <span class="q-detail-label">
-                        <i class="bi bi-hdd-network" aria-hidden="true"></i>
-                        {{ translations().ipAddressLabel }}
-                      </span>
-                      <span class="q-detail-value font-monospace" dir="ltr">{{
-                        detailValue(details.ipAddress)
-                      }}</span>
-                    </div>
-                    <div class="q-detail-item">
-                      <span class="q-detail-label">
-                        <i class="bi bi-key-fill" aria-hidden="true"></i>
-                        {{ branchEditorTranslations().license }}
-                      </span>
-                      <span class="q-detail-value">{{ detailValue(details.license) }}</span>
-                    </div>
-                    <div class="q-detail-item">
-                      <span class="q-detail-label">
-                        <i class="bi bi-toggle-on" aria-hidden="true"></i>
-                        {{ branchEditorTranslations().status }}
-                      </span>
+                <!-- Group 1: General & Status Info Card -->
+                <div class="branch-form-card mb-3">
+                  <div class="branch-form-card-header">
+                    <div
+                      class="d-flex align-items-center justify-content-between flex-wrap gap-2 w-100"
+                    >
+                      <div class="d-flex align-items-center gap-2">
+                        <span class="branch-form-card-icon branch-form-card-icon--teal">
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <rect width="18" height="18" x="3" y="3" rx="2"/>
+                            <path d="M3 9h18"/>
+                            <path d="M9 21V9"/>
+                          </svg>
+                        </span>
+                        <div>
+                          <h4 class="branch-form-card-title mb-0">
+                            {{ branchEditorTranslations().basicInfoAndStatus }}
+                          </h4>
+                          <span class="branch-form-card-subtitle">{{
+                            direction() === 'rtl'
+                              ? 'البيانات الأساسية والحالة التشغيلية للفرع'
+                              : 'Basic details and operational status'
+                          }}</span>
+                        </div>
+                      </div>
                       <span
                         class="q-detail-pill"
                         [class.q-detail-pill--active]="details.isActive"
                         [class.q-detail-pill--inactive]="!details.isActive"
                       >
-                        <i
-                          class="bi"
-                          [class.bi-check-circle-fill]="details.isActive"
-                          [class.bi-x-circle-fill]="!details.isActive"
-                          aria-hidden="true"
-                        ></i>
-                        {{
-                          details.isActive
-                            ? branchEditorTranslations().active
-                            : branchEditorTranslations().inactive
-                        }}
-                      </span>
-                    </div>
-                    <div class="q-detail-item">
-                      <span class="q-detail-label">
-                        <i class="bi bi-activity" aria-hidden="true"></i>
-                        {{ branchEditorTranslations().operationalStatus }}
-                      </span>
-                      <span
-                        class="q-detail-pill"
-                        [class.q-detail-pill--active]="details.effectiveIsActive"
-                        [class.q-detail-pill--inactive]="!details.effectiveIsActive"
-                      >
-                        <i
-                          class="bi"
-                          [class.bi-check-circle-fill]="details.effectiveIsActive"
-                          [class.bi-x-circle-fill]="!details.effectiveIsActive"
-                          aria-hidden="true"
-                        ></i>
-                        {{
-                          details.effectiveIsActive
-                            ? branchEditorTranslations().operationalAvailable
-                            : branchEditorTranslations().operationalUnavailable
-                        }}
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                          @if (details.isActive) {
+                            <polyline points="20 6 9 17 4 12"/>
+                          } @else {
+                            <line x1="18" y1="6" x2="6" y2="18"/>
+                            <line x1="6" y1="6" x2="18" y2="18"/>
+                          }
+                        </svg>
+                        <span>{{ details.isActive ? branchEditorTranslations().active : branchEditorTranslations().inactive }}</span>
                       </span>
                     </div>
                   </div>
-                </section>
 
-                <!-- Group 2: Location Info -->
-                <section class="q-detail-section">
-                  <h3 class="q-detail-section-title">
-                    <i class="bi bi-geo-alt-fill" aria-hidden="true"></i>
-                    {{ branchEditorTranslations().location }}
-                  </h3>
-                  <div class="q-detail-grid q-detail-grid--3col">
-                    <div class="q-detail-item">
-                      <span class="q-detail-label">
-                        <i class="bi bi-map" aria-hidden="true"></i>
-                        {{ translations().governorateLabel }}
-                      </span>
-                      <span class="q-detail-value">{{
-                        detailValue(details.location?.governorate)
-                      }}</span>
-                    </div>
-                    <div class="q-detail-item">
-                      <span class="q-detail-label">
-                        <i class="bi bi-building" aria-hidden="true"></i>
-                        {{ translations().cityLabel }}
-                      </span>
-                      <span class="q-detail-value">{{ detailValue(details.location?.city) }}</span>
-                    </div>
-                    <div class="q-detail-item">
-                      <span class="q-detail-label">
-                        <i class="bi bi-compass" aria-hidden="true"></i>
-                        {{ branchEditorTranslations().area }}
-                      </span>
-                      <span class="q-detail-value">{{ detailValue(details.location?.area) }}</span>
-                    </div>
-                    <div class="q-detail-item q-detail-item--span-2">
-                      <span class="q-detail-label">
-                        <i class="bi bi-signpost-2" aria-hidden="true"></i>
-                        {{ branchEditorTranslations().address }}
-                      </span>
-                      <span class="q-detail-value">{{
-                        detailValue(details.location?.address)
-                      }}</span>
-                    </div>
-                    <div class="q-detail-item">
-                      <span class="q-detail-label">
-                        <i class="bi bi-geo" aria-hidden="true"></i>
-                        {{ branchEditorTranslations().longitude }} /
-                        {{ branchEditorTranslations().latitude }}
-                      </span>
-                      <span class="q-detail-value font-monospace" dir="ltr">
-                        {{ detailValue(details.location?.longitude) }},
-                        {{ detailValue(details.location?.latitude) }}
-                      </span>
-                    </div>
-                  </div>
-                </section>
+                  <div class="branch-form-card-body">
+                    <div class="q-detail-grid q-detail-grid--3col">
+                      <div class="q-detail-item">
+                        <span class="q-detail-label">
+                          <span class="q-field-icon-badge q-field-icon-badge--teal">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                              <path d="m5 8 6 6"/>
+                              <path d="m4 14 6-6 2-3"/>
+                              <path d="M2 5h12"/>
+                              <path d="M7 2h1"/>
+                              <path d="m22 22-5-10-5 10"/>
+                              <path d="M14 18h6"/>
+                            </svg>
+                          </span>
+                          <span>{{ translations().arabicNameLabel }}</span>
+                        </span>
+                        <span class="q-detail-value">{{ detailValue(details.arabicName) }}</span>
+                      </div>
 
-                <!-- Group 3: System Audit -->
-                <section class="q-detail-section">
-                  <h3 class="q-detail-section-title">
-                    <i class="bi bi-shield-check" aria-hidden="true"></i>
-                    {{ branchEditorTranslations().systemAudit }}
-                  </h3>
-                  <div class="q-detail-grid q-detail-grid--4col">
-                    <div class="q-detail-item">
-                      <span class="q-detail-label">
-                        <i class="bi bi-person-plus" aria-hidden="true"></i>
-                        {{ translations().createdByLabel }}
-                      </span>
-                      <span class="q-detail-value">{{ userName(details.createdBy) }}</span>
-                    </div>
-                    <div class="q-detail-item">
-                      <span class="q-detail-label">
-                        <i class="bi bi-calendar-check" aria-hidden="true"></i>
-                        {{ branchEditorTranslations().createdOn }}
-                      </span>
-                      <span class="q-detail-value">{{
-                        formatNullableDate(details.createdOnUtc)
-                      }}</span>
-                    </div>
-                    <div class="q-detail-item">
-                      <span class="q-detail-label">
-                        <i class="bi bi-person-gear" aria-hidden="true"></i>
-                        {{ branchEditorTranslations().lastModifiedBy }}
-                      </span>
-                      <span class="q-detail-value">{{ userName(details.lastModifiedBy) }}</span>
-                    </div>
-                    <div class="q-detail-item">
-                      <span class="q-detail-label">
-                        <i class="bi bi-clock-history" aria-hidden="true"></i>
-                        {{ branchEditorTranslations().modifiedOn }}
-                      </span>
-                      <span class="q-detail-value">{{
-                        formatNullableDate(details.modifiedOnUtc)
-                      }}</span>
+                      <div class="q-detail-item">
+                        <span class="q-detail-label">
+                          <span class="q-field-icon-badge q-field-icon-badge--sky">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                              <polyline points="4 7 4 4 20 4 20 7"/>
+                              <line x1="9" x2="15" y1="20" y2="20"/>
+                              <line x1="12" x2="12" y1="4" y2="20"/>
+                            </svg>
+                          </span>
+                          <span>{{ translations().englishNameLabel }}</span>
+                        </span>
+                        <span class="q-detail-value" dir="ltr">{{ detailValue(details.englishName) }}</span>
+                      </div>
+
+                      <div class="q-detail-item">
+                        <span class="q-detail-label">
+                          <span class="q-field-icon-badge q-field-icon-badge--cyan">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                              <rect width="20" height="8" x="2" y="2" rx="2" ry="2"/>
+                              <rect width="20" height="8" x="2" y="14" rx="2" ry="2"/>
+                              <line x1="6" x2="6.01" y1="6" y2="6"/>
+                              <line x1="6" x2="6.01" y1="18" y2="18"/>
+                            </svg>
+                          </span>
+                          <span>{{ translations().ipAddressLabel }}</span>
+                        </span>
+                        <span class="q-detail-value font-monospace" dir="ltr">{{ detailValue(details.ipAddress) }}</span>
+                      </div>
+
+                      <div class="q-detail-item">
+                        <span class="q-detail-label">
+                          <span class="q-field-icon-badge q-field-icon-badge--amber">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                              <path d="m15.5 7.5 2.3 2.3a1 1 0 0 0 1.4 0l2.1-2.1a1 1 0 0 0 0-1.4L19 4"/>
+                              <path d="m21 2-9.6 9.6"/>
+                              <circle cx="7.5" cy="15.5" r="5.5"/>
+                            </svg>
+                          </span>
+                          <span>{{ branchEditorTranslations().license }}</span>
+                        </span>
+                        <span class="q-detail-value font-monospace">{{ detailValue(details.license) }}</span>
+                      </div>
+
+                      <div class="q-detail-item">
+                        <span class="q-detail-label">
+                          <span class="q-field-icon-badge q-field-icon-badge--teal">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                              <rect width="20" height="12" x="2" y="6" rx="6" ry="6"/>
+                              <circle cx="16" cy="12" r="2"/>
+                            </svg>
+                          </span>
+                          <span>{{ branchEditorTranslations().status }}</span>
+                        </span>
+                        <div class="q-detail-value">
+                          <span
+                            class="q-detail-pill"
+                            [class.q-detail-pill--active]="details.isActive"
+                            [class.q-detail-pill--inactive]="!details.isActive"
+                          >
+                            {{ details.isActive ? branchEditorTranslations().active : branchEditorTranslations().inactive }}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div class="q-detail-item">
+                        <span class="q-detail-label">
+                          <span class="q-field-icon-badge q-field-icon-badge--emerald">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                            </svg>
+                          </span>
+                          <span>{{ branchEditorTranslations().operationalStatus }}</span>
+                        </span>
+                        <div class="q-detail-value">
+                          <span
+                            class="q-detail-pill"
+                            [class.q-detail-pill--active]="details.effectiveIsActive"
+                            [class.q-detail-pill--inactive]="!details.effectiveIsActive"
+                          >
+                            {{ details.effectiveIsActive ? branchEditorTranslations().operationalAvailable : branchEditorTranslations().operationalUnavailable }}
+                          </span>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </section>
+                </div>
+
+                <!-- Group 2: Location Card -->
+                <div class="branch-form-card mb-3">
+                  <div class="branch-form-card-header">
+                    <div
+                      class="d-flex align-items-center justify-content-between flex-wrap gap-2 w-100"
+                    >
+                      <div class="d-flex align-items-center gap-2">
+                        <span class="branch-form-card-icon branch-form-card-icon--cyan">
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
+                            <circle cx="12" cy="10" r="3"/>
+                          </svg>
+                        </span>
+                        <div>
+                          <h4 class="branch-form-card-title mb-0">
+                            {{ branchEditorTranslations().location }}
+                          </h4>
+                          <span class="branch-form-card-subtitle">{{
+                            direction() === 'rtl'
+                              ? 'العنوان الجغرافي والإحداثيات الدقيقة للفرع'
+                              : 'Geographical address and GPS coordinates'
+                          }}</span>
+                        </div>
+                      </div>
+                      <span class="branch-badge-pill branch-badge-pill--cyan">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                          <polygon points="3 11 22 2 13 21 11 13 3 11"/>
+                        </svg>
+                        <span>{{ direction() === 'rtl' ? 'تحديد دقيق بالخريطة' : 'Map Pinpoint' }}</span>
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="branch-form-card-body">
+                    <div class="q-detail-grid q-detail-grid--3col">
+                      <div class="q-detail-item">
+                        <span class="q-detail-label">
+                          <span class="q-field-icon-badge q-field-icon-badge--emerald">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                              <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/>
+                              <line x1="9" x2="9" y1="3" y2="18"/>
+                              <line x1="15" x2="15" y1="6" y2="21"/>
+                            </svg>
+                          </span>
+                          <span>{{ translations().governorateLabel }}</span>
+                        </span>
+                        <span class="q-detail-value">{{ detailValue(details.location?.governorate) }}</span>
+                      </div>
+
+                      <div class="q-detail-item">
+                        <span class="q-detail-label">
+                          <span class="q-field-icon-badge q-field-icon-badge--blue">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                              <rect width="16" height="20" x="4" y="2" rx="2" ry="2"/>
+                              <path d="M9 22v-4h6v4"/>
+                              <path d="M8 6h.01"/>
+                              <path d="M16 6h.01"/>
+                              <path d="M12 6h.01"/>
+                              <path d="M12 10h.01"/>
+                              <path d="M12 14h.01"/>
+                              <path d="M16 10h.01"/>
+                              <path d="M16 14h.01"/>
+                              <path d="M8 10h.01"/>
+                              <path d="M8 14h.01"/>
+                            </svg>
+                          </span>
+                          <span>{{ translations().cityLabel }}</span>
+                        </span>
+                        <span class="q-detail-value">{{ detailValue(details.location?.city) }}</span>
+                      </div>
+
+                      <div class="q-detail-item">
+                        <span class="q-detail-label">
+                          <span class="q-field-icon-badge q-field-icon-badge--violet">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                              <circle cx="12" cy="12" r="10"/>
+                              <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>
+                            </svg>
+                          </span>
+                          <span>{{ branchEditorTranslations().area }}</span>
+                        </span>
+                        <span class="q-detail-value">{{ detailValue(details.location?.area) }}</span>
+                      </div>
+
+                      <div class="q-detail-item q-detail-item--span-2">
+                        <span class="q-detail-label">
+                          <span class="q-field-icon-badge q-field-icon-badge--rose">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                              <path d="M18 6H5a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h13l4-3.5L18 6Z"/>
+                              <path d="M12 13v8"/>
+                              <path d="M12 3v3"/>
+                            </svg>
+                          </span>
+                          <span>{{ branchEditorTranslations().address }}</span>
+                        </span>
+                        <span class="q-detail-value">{{ detailValue(details.location?.address) }}</span>
+                      </div>
+
+                      <div class="q-detail-item">
+                        <span class="q-detail-label">
+                          <span class="q-field-icon-badge q-field-icon-badge--indigo">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                              <circle cx="12" cy="12" r="10"/>
+                              <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/>
+                            </svg>
+                          </span>
+                          <span>{{ branchEditorTranslations().longitude }} / {{ branchEditorTranslations().latitude }}</span>
+                        </span>
+                        <span class="q-detail-value font-monospace" dir="ltr">
+                          {{ detailValue(details.location?.longitude) }}, {{ detailValue(details.location?.latitude) }}
+                        </span>
+                      </div>
+                    </div>
+
+                    @if (details.location?.latitude && details.location?.longitude) {
+                      <div class="branch-map-picker-card mt-3">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                          <span class="q-field-label fw-bold m-0 d-flex align-items-center gap-2">
+                            <span class="q-field-icon-badge q-field-icon-badge--teal">
+                              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/>
+                                <line x1="9" x2="9" y1="3" y2="18"/>
+                                <line x1="15" x2="15" y1="6" y2="21"/>
+                              </svg>
+                            </span>
+                            <span>{{ direction() === 'rtl' ? 'موقع الفرع على الخريطة' : 'Branch Map Location' }}</span>
+                          </span>
+                          <a
+                            [href]="'https://www.google.com/maps?q=' + details.location?.latitude + ',' + details.location?.longitude"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="branch-badge-pill branch-badge-pill--teal text-decoration-none"
+                          >
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                              <polyline points="15 3 21 3 21 9"/>
+                              <line x1="10" x2="21" y1="14" y2="3"/>
+                            </svg>
+                            <span>{{ direction() === 'rtl' ? 'فتح في خرائط جوجل' : 'Open in Google Maps' }}</span>
+                          </a>
+                        </div>
+                        <app-map-location-picker
+                          [latitude]="details.location?.latitude"
+                          [longitude]="details.location?.longitude"
+                          [readOnly]="true"
+                          [direction]="direction()"
+                          height="200px"
+                        />
+                      </div>
+                    }
+                  </div>
+                </div>
+
+                <!-- Group 3: System Audit Card -->
+                <div class="branch-form-card">
+                  <div class="branch-form-card-header">
+                    <div class="d-flex align-items-center gap-2">
+                      <span class="branch-form-card-icon branch-form-card-icon--teal">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                          <path d="m9 12 2 2 4-4"/>
+                        </svg>
+                      </span>
+                      <div>
+                        <h4 class="branch-form-card-title mb-0">
+                          {{ branchEditorTranslations().systemAudit }}
+                        </h4>
+                        <span class="branch-form-card-subtitle">{{
+                          direction() === 'rtl'
+                            ? 'سجل إنشاء وتحديث بيانات الفرع في النظام'
+                            : 'System audit and modification history'
+                        }}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="branch-form-card-body">
+                    <div class="q-detail-grid q-detail-grid--4col">
+                      <div class="q-detail-item">
+                        <span class="q-detail-label">
+                          <span class="q-field-icon-badge q-field-icon-badge--sky">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                              <circle cx="9" cy="7" r="4"/>
+                              <line x1="19" x2="19" y1="8" y2="14"/>
+                              <line x1="22" x2="16" y1="11" y2="11"/>
+                            </svg>
+                          </span>
+                          <span>{{ translations().createdByLabel }}</span>
+                        </span>
+                        <span class="q-detail-value">{{ userName(details.createdBy) }}</span>
+                      </div>
+
+                      <div class="q-detail-item">
+                        <span class="q-detail-label">
+                          <span class="q-field-icon-badge q-field-icon-badge--teal">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                              <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
+                              <line x1="16" x2="16" y1="2" y2="6"/>
+                              <line x1="8" x2="8" y1="2" y2="6"/>
+                              <line x1="3" x2="21" y1="10" y2="10"/>
+                            </svg>
+                          </span>
+                          <span>{{ branchEditorTranslations().createdOn }}</span>
+                        </span>
+                        <span class="q-detail-value">{{ formatNullableDate(details.createdOnUtc) }}</span>
+                      </div>
+
+                      <div class="q-detail-item">
+                        <span class="q-detail-label">
+                          <span class="q-field-icon-badge q-field-icon-badge--amber">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                              <circle cx="9" cy="7" r="4"/>
+                              <circle cx="19" cy="11" r="2"/>
+                              <path d="m19 8 1 1-1 1"/>
+                            </svg>
+                          </span>
+                          <span>{{ branchEditorTranslations().lastModifiedBy }}</span>
+                        </span>
+                        <span class="q-detail-value">{{ userName(details.lastModifiedBy) }}</span>
+                      </div>
+
+                      <div class="q-detail-item">
+                        <span class="q-detail-label">
+                          <span class="q-field-icon-badge q-field-icon-badge--violet">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                              <circle cx="12" cy="12" r="10"/>
+                              <polyline points="12 6 12 12 16 14"/>
+                            </svg>
+                          </span>
+                          <span>{{ branchEditorTranslations().modifiedOn }}</span>
+                        </span>
+                        <span class="q-detail-value">{{ formatNullableDate(details.modifiedOnUtc) }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             }
 
             @if (branchPanelMode() === 'create' || branchPanelMode() === 'edit') {
-              <form id="branchForm" [formGroup]="branchForm" (ngSubmit)="saveBranch()" novalidate>
-                <div class="branch-form-section">
-                  <span class="branch-form-section-icon">
-                    <i class="bi bi-info-circle-fill" aria-hidden="true"></i>
-                  </span>
-                  <span class="branch-form-section-title">{{
-                    branchEditorTranslations().basicBranchInfo
-                  }}</span>
-                  <span class="branch-form-section-line"></span>
+              <form
+                id="branchForm"
+                [formGroup]="branchForm"
+                (ngSubmit)="saveBranch()"
+                novalidate
+                class="branch-editor-form"
+              >
+                <!-- Group 1: Basic Identity & Network Info -->
+                <div class="branch-form-card mb-3">
+                  <div class="branch-form-card-header">
+                    <div
+                      class="d-flex align-items-center justify-content-between flex-wrap gap-2 w-100"
+                    >
+                      <div class="d-flex align-items-center gap-2">
+                        <span class="branch-form-card-icon branch-form-card-icon--teal">
+                          <svg
+                            width="18"
+                            height="18"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            aria-hidden="true"
+                          >
+                            <rect width="18" height="18" x="3" y="3" rx="2" />
+                            <path d="M3 9h18" />
+                            <path d="M9 21V9" />
+                          </svg>
+                        </span>
+                        <div>
+                          <h4 class="branch-form-card-title mb-0">
+                            {{ branchEditorTranslations().basicBranchInfo }}
+                          </h4>
+                          <span class="branch-form-card-subtitle">{{
+                            direction() === 'rtl'
+                              ? 'البيانات الأساسية ومعلومات الاتصال بالشبكة'
+                              : 'Basic identity and network connection info'
+                          }}</span>
+                        </div>
+                      </div>
+                      <span class="branch-badge-pill branch-badge-pill--teal">
+                        <svg
+                          width="13"
+                          height="13"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2.4"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          aria-hidden="true"
+                        >
+                          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                          <path d="m9 12 2 2 4-4" />
+                        </svg>
+                        <span>{{
+                          direction() === 'rtl' ? 'بيانات مطلوبة' : 'Required Fields'
+                        }}</span>
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="branch-form-card-body">
+                    <div class="row g-3">
+                      <div class="col-12 col-md-6">
+                        <label class="q-field">
+                          <span class="q-field-label">
+                            <span class="q-field-icon-badge q-field-icon-badge--teal">
+                              <svg
+                                width="14"
+                                height="14"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2.2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                aria-hidden="true"
+                              >
+                                <path d="m5 8 6 6" />
+                                <path d="m4 14 6-6 2-3" />
+                                <path d="M2 5h12" />
+                                <path d="M7 2h1" />
+                                <path d="m22 22-5-10-5 10" />
+                                <path d="M14 18h6" />
+                              </svg>
+                            </span>
+                            <span>{{ translations().arabicNameLabel }}</span>
+                            <span class="q-field-required">*</span>
+                          </span>
+                          <input
+                            class="form-control"
+                            [class.is-invalid]="hasBranchControlError('arabicName')"
+                            type="text"
+                            maxlength="100"
+                            formControlName="arabicName"
+                            [placeholder]="branchEditorTranslations().arabicNamePlaceholder"
+                            dir="rtl"
+                          />
+                          @if (hasBranchControlValidationError('arabicName', 'required')) {
+                            <span class="q-field-error">
+                              <svg
+                                width="12"
+                                height="12"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2.5"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                aria-hidden="true"
+                              >
+                                <circle cx="12" cy="12" r="10" />
+                                <line x1="12" x2="12" y1="8" y2="12" />
+                                <line x1="12" x2="12.01" y1="16" y2="16" />
+                              </svg>
+                              {{ branchEditorTranslations().requiredField }}
+                            </span>
+                          } @else if (hasBranchControlValidationError('arabicName', 'maxlength')) {
+                            <span class="q-field-error">
+                              <svg
+                                width="12"
+                                height="12"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2.5"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                aria-hidden="true"
+                              >
+                                <circle cx="12" cy="12" r="10" />
+                                <line x1="12" x2="12" y1="8" y2="12" />
+                                <line x1="12" x2="12.01" y1="16" y2="16" />
+                              </svg>
+                              {{ branchEditorTranslations().max100 }}
+                            </span>
+                          }
+                        </label>
+                      </div>
+                      <div class="col-12 col-md-6">
+                        <label class="q-field">
+                          <span class="q-field-label">
+                            <span class="q-field-icon-badge q-field-icon-badge--sky">
+                              <svg
+                                width="14"
+                                height="14"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2.2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                aria-hidden="true"
+                              >
+                                <polyline points="4 7 4 4 20 4 20 7" />
+                                <line x1="9" x2="15" y1="20" y2="20" />
+                                <line x1="12" x2="12" y1="4" y2="20" />
+                              </svg>
+                            </span>
+                            <span>{{ translations().englishNameLabel }}</span>
+                            <span class="q-field-required">*</span>
+                          </span>
+                          <input
+                            class="form-control"
+                            [class.is-invalid]="hasBranchControlError('englishName')"
+                            type="text"
+                            maxlength="100"
+                            formControlName="englishName"
+                            placeholder="e.g. Cairo Main Branch"
+                            dir="ltr"
+                          />
+                          @if (hasBranchControlValidationError('englishName', 'required')) {
+                            <span class="q-field-error">
+                              <svg
+                                width="12"
+                                height="12"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2.5"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                aria-hidden="true"
+                              >
+                                <circle cx="12" cy="12" r="10" />
+                                <line x1="12" x2="12" y1="8" y2="12" />
+                                <line x1="12" x2="12.01" y1="16" y2="16" />
+                              </svg>
+                              {{ branchEditorTranslations().requiredField }}
+                            </span>
+                          } @else if (hasBranchControlValidationError('englishName', 'maxlength')) {
+                            <span class="q-field-error">
+                              <svg
+                                width="12"
+                                height="12"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2.5"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                aria-hidden="true"
+                              >
+                                <circle cx="12" cy="12" r="10" />
+                                <line x1="12" x2="12" y1="8" y2="12" />
+                                <line x1="12" x2="12.01" y1="16" y2="16" />
+                              </svg>
+                              {{ branchEditorTranslations().max100 }}
+                            </span>
+                          }
+                        </label>
+                      </div>
+                      <div class="col-12 col-md-6">
+                        <label class="q-field">
+                          <span class="q-field-label">
+                            <span class="q-field-icon-badge q-field-icon-badge--cyan">
+                              <svg
+                                width="14"
+                                height="14"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2.2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                aria-hidden="true"
+                              >
+                                <rect width="20" height="8" x="2" y="2" rx="2" ry="2" />
+                                <rect width="20" height="8" x="2" y="14" rx="2" ry="2" />
+                                <line x1="6" x2="6.01" y1="6" y2="6" />
+                                <line x1="6" x2="6.01" y1="18" y2="18" />
+                              </svg>
+                            </span>
+                            <span>{{ translations().ipAddressLabel }}</span>
+                            <span class="q-field-required">*</span>
+                          </span>
+                          <input
+                            class="form-control font-monospace"
+                            [class.is-invalid]="
+                              hasBranchControlError('ipAddress') || isIpAddressInvalid()
+                            "
+                            type="text"
+                            maxlength="45"
+                            formControlName="ipAddress"
+                            placeholder="192.168.1.100"
+                            dir="ltr"
+                          />
+                          @if (hasBranchControlValidationError('ipAddress', 'required')) {
+                            <span class="q-field-error">
+                              <svg
+                                width="12"
+                                height="12"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2.5"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                aria-hidden="true"
+                              >
+                                <circle cx="12" cy="12" r="10" />
+                                <line x1="12" x2="12" y1="8" y2="12" />
+                                <line x1="12" x2="12.01" y1="16" y2="16" />
+                              </svg>
+                              {{ branchEditorTranslations().requiredField }}
+                            </span>
+                          } @else if (isIpAddressInvalid()) {
+                            <span class="q-field-error">
+                              <svg
+                                width="12"
+                                height="12"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2.5"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                aria-hidden="true"
+                              >
+                                <circle cx="12" cy="12" r="10" />
+                                <line x1="12" x2="12" y1="8" y2="12" />
+                                <line x1="12" x2="12.01" y1="16" y2="16" />
+                              </svg>
+                              {{ branchEditorTranslations().invalidIp }}
+                            </span>
+                          }
+                        </label>
+                      </div>
+                      <div class="col-12 col-md-6">
+                        <label class="q-field">
+                          <span class="q-field-label">
+                            <span class="q-field-icon-badge q-field-icon-badge--amber">
+                              <svg
+                                width="14"
+                                height="14"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2.2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                aria-hidden="true"
+                              >
+                                <path
+                                  d="m15.5 7.5 2.3 2.3a1 1 0 0 0 1.4 0l2.1-2.1a1 1 0 0 0 0-1.4L19 4"
+                                />
+                                <path d="m21 2-9.6 9.6" />
+                                <circle cx="7.5" cy="15.5" r="5.5" />
+                              </svg>
+                            </span>
+                            <span>{{ branchEditorTranslations().license }}</span>
+                          </span>
+                          <input
+                            class="form-control"
+                            type="text"
+                            formControlName="license"
+                            [placeholder]="branchEditorTranslations().license"
+                          />
+                        </label>
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
-                <div class="row g-3">
-                  <div class="col-12 col-md-6">
-                    <label class="q-field">
-                      <span class="q-field-label">
-                        {{ translations().arabicNameLabel }}
-                        <span class="q-field-required">*</span>
+                <!-- Group 2: Geographical Location Card -->
+                <div class="branch-form-card">
+                  <div class="branch-form-card-header">
+                    <div
+                      class="d-flex align-items-center justify-content-between flex-wrap gap-2 w-100"
+                    >
+                      <div class="d-flex align-items-center gap-2">
+                        <span class="branch-form-card-icon branch-form-card-icon--cyan">
+                          <svg
+                            width="18"
+                            height="18"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            aria-hidden="true"
+                          >
+                            <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
+                            <circle cx="12" cy="10" r="3" />
+                          </svg>
+                        </span>
+                        <div>
+                          <h4 class="branch-form-card-title mb-0">
+                            {{ branchEditorTranslations().location }}
+                          </h4>
+                          <span class="branch-form-card-subtitle">{{
+                            direction() === 'rtl'
+                              ? 'العنوان الجغرافي والإحداثيات الدقيقة للفرع'
+                              : 'Geographical address and GPS coordinates'
+                          }}</span>
+                        </div>
+                      </div>
+                      <span class="branch-badge-pill branch-badge-pill--cyan">
+                        <svg
+                          width="13"
+                          height="13"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2.4"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          aria-hidden="true"
+                        >
+                          <polygon points="3 11 22 2 13 21 11 13 3 11" />
+                        </svg>
+                        <span>{{
+                          direction() === 'rtl' ? 'تحديد دقيق بالخريطة' : 'Map Pinpoint'
+                        }}</span>
                       </span>
-                      <input
-                        class="form-control"
-                        [class.is-invalid]="hasBranchControlError('arabicName')"
-                        type="text"
-                        maxlength="100"
-                        formControlName="arabicName"
-                        [placeholder]="branchEditorTranslations().arabicNamePlaceholder"
-                        dir="rtl"
-                      />
-                      @if (hasBranchControlValidationError('arabicName', 'required')) {
-                        <span class="q-field-error">
-                          <i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>
-                          {{ branchEditorTranslations().requiredField }}
-                        </span>
-                      } @else if (hasBranchControlValidationError('arabicName', 'maxlength')) {
-                        <span class="q-field-error">
-                          <i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>
-                          {{ branchEditorTranslations().max100 }}
-                        </span>
-                      }
-                    </label>
+                    </div>
                   </div>
-                  <div class="col-12 col-md-6">
-                    <label class="q-field">
-                      <span class="q-field-label">
-                        {{ translations().englishNameLabel }}
-                        <span class="q-field-required">*</span>
-                      </span>
-                      <input
-                        class="form-control"
-                        [class.is-invalid]="hasBranchControlError('englishName')"
-                        type="text"
-                        maxlength="100"
-                        formControlName="englishName"
-                        placeholder="e.g. Cairo Main Branch"
-                        dir="ltr"
-                      />
-                      @if (hasBranchControlValidationError('englishName', 'required')) {
-                        <span class="q-field-error">
-                          <i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>
-                          {{ branchEditorTranslations().requiredField }}
-                        </span>
-                      } @else if (hasBranchControlValidationError('englishName', 'maxlength')) {
-                        <span class="q-field-error">
-                          <i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>
-                          {{ branchEditorTranslations().max100 }}
-                        </span>
-                      }
-                    </label>
-                  </div>
-                  <div class="col-12 col-md-6">
-                    <label class="q-field">
-                      <span class="q-field-label">
-                        {{ translations().ipAddressLabel }}
-                        <span class="q-field-required">*</span>
-                      </span>
-                      <input
-                        class="form-control"
-                        [class.is-invalid]="
-                          hasBranchControlError('ipAddress') || isIpAddressInvalid()
-                        "
-                        type="text"
-                        maxlength="45"
-                        formControlName="ipAddress"
-                        placeholder="192.168.1.100"
-                        dir="ltr"
-                      />
-                      @if (hasBranchControlValidationError('ipAddress', 'required')) {
-                        <span class="q-field-error">
-                          <i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>
-                          {{ branchEditorTranslations().requiredField }}
-                        </span>
-                      } @else if (isIpAddressInvalid()) {
-                        <span class="q-field-error">
-                          <i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>
-                          {{ branchEditorTranslations().invalidIp }}
-                        </span>
-                      }
-                    </label>
-                  </div>
-                  <div class="col-12 col-md-6">
-                    <label class="q-field">
-                      <span class="q-field-label">
-                        {{ branchEditorTranslations().license }}
-                      </span>
-                      <input
-                        class="form-control"
-                        type="text"
-                        formControlName="license"
-                        [placeholder]="branchEditorTranslations().license"
-                      />
-                    </label>
-                  </div>
-                </div>
 
-                <div class="branch-form-section">
-                  <span class="branch-form-section-icon">
-                    <i class="bi bi-geo-alt-fill" aria-hidden="true"></i>
-                  </span>
-                  <span class="branch-form-section-title">{{
-                    branchEditorTranslations().location
-                  }}</span>
-                  <span class="branch-form-section-line"></span>
-                </div>
+                  <div class="branch-form-card-body">
+                    <div class="row g-3">
+                      <div class="col-12 col-md-4">
+                        <label class="q-field">
+                          <span class="q-field-label">
+                            <span class="q-field-icon-badge q-field-icon-badge--emerald">
+                              <svg
+                                width="14"
+                                height="14"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2.2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                aria-hidden="true"
+                              >
+                                <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21" />
+                                <line x1="9" x2="9" y1="3" y2="18" />
+                                <line x1="15" x2="15" y1="6" y2="21" />
+                              </svg>
+                            </span>
+                            <span>{{ translations().governorateLabel }}</span>
+                            <span class="q-field-required">*</span>
+                          </span>
+                          <input
+                            class="form-control"
+                            [class.is-invalid]="hasBranchControlError('governorate')"
+                            type="text"
+                            maxlength="100"
+                            formControlName="governorate"
+                            [placeholder]="branchEditorTranslations().governoratePlaceholder"
+                          />
+                          @if (hasBranchControlValidationError('governorate', 'required')) {
+                            <span class="q-field-error">
+                              <svg
+                                width="12"
+                                height="12"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2.5"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                aria-hidden="true"
+                              >
+                                <circle cx="12" cy="12" r="10" />
+                                <line x1="12" x2="12" y1="8" y2="12" />
+                                <line x1="12" x2="12.01" y1="16" y2="16" />
+                              </svg>
+                              {{ branchEditorTranslations().requiredField }}
+                            </span>
+                          } @else if (hasBranchControlValidationError('governorate', 'maxlength')) {
+                            <span class="q-field-error">
+                              <svg
+                                width="12"
+                                height="12"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2.5"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                aria-hidden="true"
+                              >
+                                <circle cx="12" cy="12" r="10" />
+                                <line x1="12" x2="12" y1="8" y2="12" />
+                                <line x1="12" x2="12.01" y1="16" y2="16" />
+                              </svg>
+                              {{ branchEditorTranslations().max100 }}
+                            </span>
+                          }
+                        </label>
+                      </div>
+                      <div class="col-12 col-md-4">
+                        <label class="q-field">
+                          <span class="q-field-label">
+                            <span class="q-field-icon-badge q-field-icon-badge--blue">
+                              <svg
+                                width="14"
+                                height="14"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2.2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                aria-hidden="true"
+                              >
+                                <rect width="16" height="20" x="4" y="2" rx="2" ry="2" />
+                                <path d="M9 22v-4h6v4" />
+                                <path d="M8 6h.01" />
+                                <path d="M16 6h.01" />
+                                <path d="M12 6h.01" />
+                                <path d="M12 10h.01" />
+                                <path d="M12 14h.01" />
+                                <path d="M16 10h.01" />
+                                <path d="M16 14h.01" />
+                                <path d="M8 10h.01" />
+                                <path d="M8 14h.01" />
+                              </svg>
+                            </span>
+                            <span>{{ translations().cityLabel }}</span>
+                            <span class="q-field-required">*</span>
+                          </span>
+                          <input
+                            class="form-control"
+                            [class.is-invalid]="hasBranchControlError('city')"
+                            type="text"
+                            maxlength="100"
+                            formControlName="city"
+                            [placeholder]="branchEditorTranslations().cityPlaceholder"
+                          />
+                          @if (hasBranchControlValidationError('city', 'required')) {
+                            <span class="q-field-error">
+                              <svg
+                                width="12"
+                                height="12"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2.5"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                aria-hidden="true"
+                              >
+                                <circle cx="12" cy="12" r="10" />
+                                <line x1="12" x2="12" y1="8" y2="12" />
+                                <line x1="12" x2="12.01" y1="16" y2="16" />
+                              </svg>
+                              {{ branchEditorTranslations().requiredField }}
+                            </span>
+                          } @else if (hasBranchControlValidationError('city', 'maxlength')) {
+                            <span class="q-field-error">
+                              <svg
+                                width="12"
+                                height="12"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2.5"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                aria-hidden="true"
+                              >
+                                <circle cx="12" cy="12" r="10" />
+                                <line x1="12" x2="12" y1="8" y2="12" />
+                                <line x1="12" x2="12.01" y1="16" y2="16" />
+                              </svg>
+                              {{ branchEditorTranslations().max100 }}
+                            </span>
+                          }
+                        </label>
+                      </div>
+                      <div class="col-12 col-md-4">
+                        <label class="q-field">
+                          <span class="q-field-label">
+                            <span class="q-field-icon-badge q-field-icon-badge--violet">
+                              <svg
+                                width="14"
+                                height="14"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2.2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                aria-hidden="true"
+                              >
+                                <circle cx="12" cy="12" r="10" />
+                                <polygon
+                                  points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"
+                                />
+                              </svg>
+                            </span>
+                            <span>{{ branchEditorTranslations().area }}</span>
+                            <span class="q-field-required">*</span>
+                          </span>
+                          <input
+                            class="form-control"
+                            [class.is-invalid]="hasBranchControlError('area')"
+                            type="text"
+                            maxlength="100"
+                            formControlName="area"
+                            [placeholder]="branchEditorTranslations().areaPlaceholder"
+                          />
+                          @if (hasBranchControlValidationError('area', 'required')) {
+                            <span class="q-field-error">
+                              <svg
+                                width="12"
+                                height="12"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2.5"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                aria-hidden="true"
+                              >
+                                <circle cx="12" cy="12" r="10" />
+                                <line x1="12" x2="12" y1="8" y2="12" />
+                                <line x1="12" x2="12.01" y1="16" y2="16" />
+                              </svg>
+                              {{ branchEditorTranslations().requiredField }}
+                            </span>
+                          } @else if (hasBranchControlValidationError('area', 'maxlength')) {
+                            <span class="q-field-error">
+                              <svg
+                                width="12"
+                                height="12"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2.5"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                aria-hidden="true"
+                              >
+                                <circle cx="12" cy="12" r="10" />
+                                <line x1="12" x2="12" y1="8" y2="12" />
+                                <line x1="12" x2="12.01" y1="16" y2="16" />
+                              </svg>
+                              {{ branchEditorTranslations().max100 }}
+                            </span>
+                          }
+                        </label>
+                      </div>
+                      <div class="col-12">
+                        <label class="q-field">
+                          <span class="q-field-label">
+                            <span class="q-field-icon-badge q-field-icon-badge--rose">
+                              <svg
+                                width="14"
+                                height="14"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2.2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                aria-hidden="true"
+                              >
+                                <path d="M18 6H5a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h13l4-3.5L18 6Z" />
+                                <path d="M12 13v8" />
+                                <path d="M12 3v3" />
+                              </svg>
+                            </span>
+                            <span>{{ branchEditorTranslations().address }}</span>
+                            <span class="q-field-required">*</span>
+                          </span>
+                          <input
+                            class="form-control"
+                            [class.is-invalid]="hasBranchControlError('address')"
+                            type="text"
+                            maxlength="500"
+                            formControlName="address"
+                            [placeholder]="branchEditorTranslations().addressPlaceholder"
+                          />
+                          @if (hasBranchControlValidationError('address', 'required')) {
+                            <span class="q-field-error">
+                              <svg
+                                width="12"
+                                height="12"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2.5"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                aria-hidden="true"
+                              >
+                                <circle cx="12" cy="12" r="10" />
+                                <line x1="12" x2="12" y1="8" y2="12" />
+                                <line x1="12" x2="12.01" y1="16" y2="16" />
+                              </svg>
+                              {{ branchEditorTranslations().requiredField }}
+                            </span>
+                          } @else if (hasBranchControlValidationError('address', 'maxlength')) {
+                            <span class="q-field-error">
+                              <svg
+                                width="12"
+                                height="12"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2.5"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                aria-hidden="true"
+                              >
+                                <circle cx="12" cy="12" r="10" />
+                                <line x1="12" x2="12" y1="8" y2="12" />
+                                <line x1="12" x2="12.01" y1="16" y2="16" />
+                              </svg>
+                              {{ branchEditorTranslations().max500 }}
+                            </span>
+                          }
+                        </label>
+                      </div>
 
-                <div class="row g-3">
-                  <div class="col-12 col-md-4">
-                    <label class="q-field">
-                      <span class="q-field-label">
-                        {{ translations().governorateLabel }}
-                        <span class="q-field-required">*</span>
-                      </span>
-                      <input
-                        class="form-control"
-                        [class.is-invalid]="hasBranchControlError('governorate')"
-                        type="text"
-                        maxlength="100"
-                        formControlName="governorate"
-                        [placeholder]="branchEditorTranslations().governoratePlaceholder"
-                      />
-                      @if (hasBranchControlValidationError('governorate', 'required')) {
-                        <span class="q-field-error">
-                          <i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>
-                          {{ branchEditorTranslations().requiredField }}
-                        </span>
-                      } @else if (hasBranchControlValidationError('governorate', 'maxlength')) {
-                        <span class="q-field-error">
-                          <i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>
-                          {{ branchEditorTranslations().max100 }}
-                        </span>
-                      }
-                    </label>
-                  </div>
-                  <div class="col-12 col-md-4">
-                    <label class="q-field">
-                      <span class="q-field-label">
-                        {{ translations().cityLabel }}
-                        <span class="q-field-required">*</span>
-                      </span>
-                      <input
-                        class="form-control"
-                        [class.is-invalid]="hasBranchControlError('city')"
-                        type="text"
-                        maxlength="100"
-                        formControlName="city"
-                        [placeholder]="branchEditorTranslations().cityPlaceholder"
-                      />
-                      @if (hasBranchControlValidationError('city', 'required')) {
-                        <span class="q-field-error">
-                          <i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>
-                          {{ branchEditorTranslations().requiredField }}
-                        </span>
-                      } @else if (hasBranchControlValidationError('city', 'maxlength')) {
-                        <span class="q-field-error">
-                          <i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>
-                          {{ branchEditorTranslations().max100 }}
-                        </span>
-                      }
-                    </label>
-                  </div>
-                  <div class="col-12 col-md-4">
-                    <label class="q-field">
-                      <span class="q-field-label">
-                        {{ branchEditorTranslations().area }}
-                        <span class="q-field-required">*</span>
-                      </span>
-                      <input
-                        class="form-control"
-                        [class.is-invalid]="hasBranchControlError('area')"
-                        type="text"
-                        maxlength="100"
-                        formControlName="area"
-                        [placeholder]="branchEditorTranslations().areaPlaceholder"
-                      />
-                      @if (hasBranchControlValidationError('area', 'required')) {
-                        <span class="q-field-error">
-                          <i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>
-                          {{ branchEditorTranslations().requiredField }}
-                        </span>
-                      } @else if (hasBranchControlValidationError('area', 'maxlength')) {
-                        <span class="q-field-error">
-                          <i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>
-                          {{ branchEditorTranslations().max100 }}
-                        </span>
-                      }
-                    </label>
-                  </div>
-                  <div class="col-12">
-                    <label class="q-field">
-                      <span class="q-field-label">
-                        {{ branchEditorTranslations().address }}
-                        <span class="q-field-required">*</span>
-                      </span>
-                      <input
-                        class="form-control"
-                        [class.is-invalid]="hasBranchControlError('address')"
-                        type="text"
-                        maxlength="500"
-                        formControlName="address"
-                        [placeholder]="branchEditorTranslations().addressPlaceholder"
-                      />
-                      @if (hasBranchControlValidationError('address', 'required')) {
-                        <span class="q-field-error">
-                          <i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>
-                          {{ branchEditorTranslations().requiredField }}
-                        </span>
-                      } @else if (hasBranchControlValidationError('address', 'maxlength')) {
-                        <span class="q-field-error">
-                          <i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>
-                          {{ branchEditorTranslations().max500 }}
-                        </span>
-                      }
-                    </label>
-                  </div>
-                  <div class="col-12 col-md-6">
-                    <label class="q-field">
-                      <span class="q-field-label">
-                        {{ branchEditorTranslations().longitude }}
-                        <span class="q-field-required">*</span>
-                      </span>
-                      <input
-                        class="form-control"
-                        [class.is-invalid]="hasBranchControlError('longitude')"
-                        type="number"
-                        min="-180"
-                        max="180"
-                        step="any"
-                        formControlName="longitude"
-                        placeholder="31.3301"
-                        dir="ltr"
-                      />
-                      @if (hasBranchControlValidationError('longitude', 'required')) {
-                        <span class="q-field-error">
-                          <i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>
-                          {{ branchEditorTranslations().requiredField }}
-                        </span>
-                      }
-                    </label>
-                  </div>
-                  <div class="col-12 col-md-6">
-                    <label class="q-field">
-                      <span class="q-field-label">
-                        {{ branchEditorTranslations().latitude }}
-                        <span class="q-field-required">*</span>
-                      </span>
-                      <input
-                        class="form-control"
-                        [class.is-invalid]="hasBranchControlError('latitude')"
-                        type="number"
-                        min="-90"
-                        max="90"
-                        step="any"
-                        formControlName="latitude"
-                        placeholder="30.0561"
-                        dir="ltr"
-                      />
-                      @if (hasBranchControlValidationError('latitude', 'required')) {
-                        <span class="q-field-error">
-                          <i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>
-                          {{ branchEditorTranslations().requiredField }}
-                        </span>
-                      }
-                    </label>
+                      <!-- Interactive Map Location Picker -->
+                      <div class="col-12">
+                        <div class="branch-map-picker-card">
+                          <div
+                            class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2"
+                          >
+                            <span
+                              class="q-field-label fw-bold d-flex align-items-center gap-2 m-0 text-dark"
+                            >
+                              <span class="q-field-icon-badge q-field-icon-badge--teal">
+                                <svg
+                                  width="14"
+                                  height="14"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  stroke-width="2.2"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  aria-hidden="true"
+                                >
+                                  <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21" />
+                                  <line x1="9" x2="9" y1="3" y2="18" />
+                                  <line x1="15" x2="15" y1="6" y2="21" />
+                                </svg>
+                              </span>
+                              <span>{{ branchEditorTranslations().pickFromMap }}</span>
+                            </span>
+                            <span class="text-muted small">
+                              {{ branchEditorTranslations().mapHelperText }}
+                            </span>
+                          </div>
+                          <app-map-location-picker
+                            [latitude]="branchForm.controls.latitude.value"
+                            [longitude]="branchForm.controls.longitude.value"
+                            [direction]="direction()"
+                            height="220px"
+                            (locationChange)="onMapLocationChange($event)"
+                          />
+                        </div>
+                      </div>
+
+                      <div class="col-12 col-md-6">
+                        <label class="q-field">
+                          <span
+                            class="q-field-label d-flex align-items-center justify-content-between"
+                          >
+                            <span class="d-inline-flex align-items-center gap-1.5">
+                              <span class="q-field-icon-badge q-field-icon-badge--indigo">
+                                <svg
+                                  width="14"
+                                  height="14"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  stroke-width="2.2"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  aria-hidden="true"
+                                >
+                                  <circle cx="12" cy="12" r="10" />
+                                  <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
+                                </svg>
+                              </span>
+                              <span>{{ branchEditorTranslations().longitude }}</span>
+                              <span class="q-field-required">*</span>
+                            </span>
+                            <span class="q-field-auto-tag">
+                              <svg
+                                width="12"
+                                height="12"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2.5"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                aria-hidden="true"
+                              >
+                                <polygon points="3 11 22 2 13 21 11 13 3 11" />
+                              </svg>
+                              {{ direction() === 'rtl' ? 'تلقائي من الخريطة' : 'Auto from map' }}
+                            </span>
+                          </span>
+                          <input
+                            class="form-control font-monospace"
+                            [class.is-invalid]="hasBranchControlError('longitude')"
+                            type="number"
+                            min="-180"
+                            max="180"
+                            step="any"
+                            formControlName="longitude"
+                            placeholder="31.3301"
+                            dir="ltr"
+                          />
+                          @if (hasBranchControlValidationError('longitude', 'required')) {
+                            <span class="q-field-error">
+                              <svg
+                                width="12"
+                                height="12"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2.5"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                aria-hidden="true"
+                              >
+                                <circle cx="12" cy="12" r="10" />
+                                <line x1="12" x2="12" y1="8" y2="12" />
+                                <line x1="12" x2="12.01" y1="16" y2="16" />
+                              </svg>
+                              {{ branchEditorTranslations().requiredField }}
+                            </span>
+                          }
+                        </label>
+                      </div>
+                      <div class="col-12 col-md-6">
+                        <label class="q-field">
+                          <span
+                            class="q-field-label d-flex align-items-center justify-content-between"
+                          >
+                            <span class="d-inline-flex align-items-center gap-1.5">
+                              <span class="q-field-icon-badge q-field-icon-badge--teal">
+                                <svg
+                                  width="14"
+                                  height="14"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  stroke-width="2.2"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  aria-hidden="true"
+                                >
+                                  <circle cx="12" cy="12" r="10" />
+                                  <path d="M2 12h20" />
+                                </svg>
+                              </span>
+                              <span>{{ branchEditorTranslations().latitude }}</span>
+                              <span class="q-field-required">*</span>
+                            </span>
+                            <span class="q-field-auto-tag">
+                              <svg
+                                width="12"
+                                height="12"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2.5"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                aria-hidden="true"
+                              >
+                                <polygon points="3 11 22 2 13 21 11 13 3 11" />
+                              </svg>
+                              {{ direction() === 'rtl' ? 'تلقائي من الخريطة' : 'Auto from map' }}
+                            </span>
+                          </span>
+                          <input
+                            class="form-control font-monospace"
+                            [class.is-invalid]="hasBranchControlError('latitude')"
+                            type="number"
+                            min="-90"
+                            max="90"
+                            step="any"
+                            formControlName="latitude"
+                            placeholder="30.0561"
+                            dir="ltr"
+                          />
+                          @if (hasBranchControlValidationError('latitude', 'required')) {
+                            <span class="q-field-error">
+                              <svg
+                                width="12"
+                                height="12"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2.5"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                aria-hidden="true"
+                              >
+                                <circle cx="12" cy="12" r="10" />
+                                <line x1="12" x2="12" y1="8" y2="12" />
+                                <line x1="12" x2="12.01" y1="16" y2="16" />
+                              </svg>
+                              {{ branchEditorTranslations().requiredField }}
+                            </span>
+                          }
+                        </label>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </form>
@@ -1054,7 +1885,19 @@
           @if (branchPanelMode() === 'create' || branchPanelMode() === 'edit') {
             <footer class="q-dialog-footer">
               <button type="button" class="q-btn q-btn--secondary" (click)="closeBranchPanel()">
-                <i class="bi bi-x-lg" aria-hidden="true"></i>
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M18 6 6 18M6 6l12 12" />
+                </svg>
                 <span>{{ branchEditorTranslations().cancel }}</span>
               </button>
               <button
@@ -1071,9 +1914,62 @@
                   ></span>
                   <span>{{ translations().loadingLabel }}</span>
                 } @else {
-                  <i class="bi bi-check2" aria-hidden="true"></i>
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
                   <span>{{ branchEditorTranslations().save }}</span>
                 }
+              </button>
+            </footer>
+          }
+
+          @if (branchPanelMode() === 'view' && selectedBranchDetails(); as details) {
+            <footer class="q-dialog-footer">
+              <button type="button" class="q-btn q-btn--secondary" (click)="closeBranchPanel()">
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M18 6 6 18M6 6l12 12" />
+                </svg>
+                <span>{{ branchEditorTranslations().close }}</span>
+              </button>
+              <button
+                type="button"
+                class="q-btn q-btn--primary"
+                (click)="openEditBranch(details.branchId)"
+              >
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
+                </svg>
+                <span>{{ branchEditorTranslations().edit }}</span>
               </button>
             </footer>
           }

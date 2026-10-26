@@ -1,0 +1,186 @@
+<div class="map-location-picker" [attr.dir]="direction">
+  <!-- Top Map Action Toolbar -->
+  @if (!readOnly) {
+    <div class="map-toolbar d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
+      <!-- Search Input -->
+      <div class="map-search-group flex-grow-1">
+        <svg
+          class="search-icon"
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <circle cx="11" cy="11" r="8" />
+          <line x1="21" x2="16.65" y1="21" y2="16.65" />
+        </svg>
+        <input
+          type="text"
+          class="form-control form-control-sm map-search-input"
+          [placeholder]="placeholderSearch"
+          [ngModel]="searchQuery()"
+          (ngModelChange)="searchQuery.set($event)"
+          (keydown.enter)="searchLocation()"
+          [disabled]="isSearching()"
+        />
+        <button
+          type="button"
+          class="btn btn-sm btn-map-search"
+          [disabled]="isSearching() || !searchQuery().trim()"
+          (click)="searchLocation()"
+          title="بحث عن الموقع"
+        >
+          @if (isSearching()) {
+            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+          } @else {
+            <span>{{ direction === 'rtl' ? 'بحث' : 'Search' }}</span>
+          }
+        </button>
+      </div>
+
+      <!-- Locate Me (GPS) Button -->
+      <button
+        type="button"
+        class="btn btn-sm btn-locate-me d-inline-flex align-items-center gap-1.5"
+        [disabled]="isLocating()"
+        (click)="locateCurrentPosition()"
+        [title]="direction === 'rtl' ? 'تحديد موقعي الحالي بالـ GPS' : 'Use Current Location'"
+      >
+        @if (isLocating()) {
+          <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+        } @else {
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="var(--q-primary, #0b8aa8)"
+            stroke-width="2.2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <circle cx="12" cy="12" r="10" />
+            <line x1="22" x2="18" y1="12" y2="12" />
+            <line x1="6" x2="2" y1="12" y2="12" />
+            <line x1="12" x2="12" y1="6" y2="2" />
+            <line x1="12" x2="12" y1="22" y2="18" />
+          </svg>
+        }
+        <span class="d-none d-sm-inline">{{
+          direction === 'rtl' ? 'موقعي الحالي' : 'My Location'
+        }}</span>
+      </button>
+    </div>
+  }
+
+  <!-- Error Alert -->
+  @if (searchError()) {
+    <div
+      class="alert alert-warning py-1.5 px-3 d-flex align-items-center gap-2 mb-2 small rounded-3"
+      role="alert"
+    >
+      <svg
+        width="15"
+        height="15"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="#d97706"
+        stroke-width="2.2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        class="flex-shrink-0"
+        aria-hidden="true"
+      >
+        <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
+        <line x1="12" x2="12" y1="9" y2="13" />
+        <line x1="12" x2="12.01" y1="17" y2="17" />
+      </svg>
+      <span class="flex-grow-1">{{ searchError() }}</span>
+      <button
+        type="button"
+        class="btn-close btn-close-sm"
+        (click)="searchError.set(null)"
+        aria-label="Close"
+      ></button>
+    </div>
+  }
+
+  <!-- Interactive Map Canvas Container -->
+  <div class="map-wrapper position-relative">
+    <div #mapContainer class="leaflet-map-container" [style.height]="height"></div>
+
+    <!-- Active Coordinates Floating Badge -->
+    @if (currentLat() !== null && currentLng() !== null) {
+      <div class="map-coords-badge" dir="ltr">
+        <svg
+          width="13"
+          height="13"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="#059669"
+          stroke-width="2.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+          <polyline points="22 4 12 14.01 9 11.01" />
+        </svg>
+        <span class="coords-text">{{ currentLat() }}, {{ currentLng() }}</span>
+      </div>
+    }
+  </div>
+
+  <!-- Bottom Helper Bar -->
+  @if (!readOnly && helperText) {
+    <div
+      class="map-helper-bar d-flex align-items-center justify-content-between flex-wrap gap-2 mt-1.5 px-1"
+    >
+      <span class="helper-text small text-secondary d-flex align-items-center gap-1.5">
+        <svg
+          width="13"
+          height="13"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="var(--q-primary, #0b8aa8)"
+          stroke-width="2.2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <circle cx="12" cy="12" r="10" />
+          <line x1="12" x2="12" y1="16" y2="12" />
+          <line x1="12" x2="12.01" y1="8" y2="8" />
+        </svg>
+        <span>{{ helperText }}</span>
+      </span>
+      @if (currentLat() !== null && currentLng() !== null) {
+        <span
+          class="badge bg-light text-dark border px-2 py-1 small d-inline-flex align-items-center gap-1"
+        >
+          <svg
+            width="12"
+            height="12"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="var(--q-primary, #0b8aa8)"
+            stroke-width="2.2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
+            <circle cx="12" cy="10" r="3" />
+          </svg>
+          {{ direction === 'rtl' ? 'تم اختيار النقطة بنجاح' : 'Location selected' }}
+        </span>
+      }
+    </div>
+  }
+</div>

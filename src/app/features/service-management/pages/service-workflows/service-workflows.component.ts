@@ -25,7 +25,6 @@ import { BranchListItem } from '@features/branch-management/public-api';
 import { BranchManagementApiService } from '@features/branch-management/public-api';
 import { AdminI18nStore } from '@layout/admin-shell/store/admin-i18n.store';
 import { formatApiError } from '@shared/utils/api-error-message.util';
-import { ServiceHierarchyTreeComponent } from '../../components/service-hierarchy-tree/service-hierarchy-tree.component';
 import { SERVICE_MANAGEMENT_TRANSLATIONS } from '../../i18n/service-management.translations';
 import { SERVICE_WORKFLOW_TRANSLATIONS } from '../../i18n/service-workflow.translations';
 import { ServiceTreeNode } from '../../models/service-management/service-management.model';
@@ -58,10 +57,16 @@ interface WorkflowParentOption {
   readonly englishName: string;
 }
 
+interface EligibleServiceGroup {
+  readonly parentId: number | null;
+  readonly parentName: string;
+  readonly services: ServiceTreeNode[];
+}
+
 @Component({
   selector: 'app-service-workflows',
   standalone: true,
-  imports: [ReactiveFormsModule, PageHeroComponent, ServiceHierarchyTreeComponent, NiletronixLoadingStateComponent],
+  imports: [ReactiveFormsModule, PageHeroComponent, NiletronixLoadingStateComponent],
   providers: [ServiceWorkflowStore],
   templateUrl: './service-workflows.component.html',
   styleUrl: './service-workflows.component.css',
@@ -128,6 +133,37 @@ export class ServiceWorkflowsComponent implements OnInit, OnDestroy {
     };
     collect(tree);
     return result;
+  });
+
+  /** Local, display-only filter for the eligible services sidebar. */
+  readonly serviceListSearch = signal('');
+  readonly eligibleServiceGroups = computed<readonly EligibleServiceGroup[]>(() => {
+    const search = this.serviceListSearch().trim().toLowerCase();
+    const groups = new Map<number | null, EligibleServiceGroup>();
+    const matches = (node: ServiceTreeNode): boolean =>
+      !search ||
+      (node.arabicName ?? '').toLowerCase().includes(search) ||
+      (node.englishName ?? '').toLowerCase().includes(search);
+    const walk = (nodes: readonly ServiceTreeNode[], parent: ServiceTreeNode | null): void => {
+      for (const node of nodes) {
+        if (this.canManageWorkflowFor(node) && matches(node)) {
+          const key = parent?.id ?? null;
+          let group = groups.get(key);
+          if (!group) {
+            group = {
+              parentId: key,
+              parentName: parent ? this.serviceName(parent) : this.translations().otherServices,
+              services: [],
+            };
+            groups.set(key, group);
+          }
+          group.services.push(node);
+        }
+        if (node.children.length > 0) walk(node.children, node);
+      }
+    };
+    walk(this.store.branchTree(), null);
+    return [...groups.values()];
   });
 
   readonly workflowForm = this.formBuilder.group({
@@ -280,6 +316,17 @@ export class ServiceWorkflowsComponent implements OnInit, OnDestroy {
     }
   }
 
+  updateServiceListSearch(event: Event): void {
+    this.serviceListSearch.set(this.normalizeSearchText(this.readInputValue(event)));
+  }
+
+  pickService(node: ServiceTreeNode, pane: HTMLElement): void {
+    this.openNodeWorkflows(node);
+    if (typeof window !== 'undefined' && window.matchMedia('(max-width: 991.98px)').matches) {
+      pane.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
   openNodeWorkflows(node: ServiceTreeNode): void {
     const branchId = this.store.selectedBranchId();
     if (!branchId || !this.canManageWorkflowFor(node)) {
@@ -309,6 +356,18 @@ export class ServiceWorkflowsComponent implements OnInit, OnDestroy {
     } else {
       void this.router.navigateByUrl('/admin/services/branch-services');
     }
+  }
+
+  goToServiceSchedule(): void {
+    const scope = this.store.scope();
+    if (!scope) return;
+    void this.router.navigate([
+      '/admin/services/branches',
+      scope.branchId,
+      'services',
+      scope.leafServiceId,
+      'schedule',
+    ]);
   }
 
   switchService(event: Event): void {

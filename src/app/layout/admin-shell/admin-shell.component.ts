@@ -73,7 +73,14 @@ export class AdminShellComponent {
     const translations = this.translations();
     const items: AppNavigationItem[] = [];
 
-    if (this.canShow(['Tickets.View', 'Reservations.View', 'Tickets.ViewArchive', 'Reservations.ViewArchive'])) {
+    if (
+      this.canShow([
+        'Tickets.View',
+        'Reservations.View',
+        'Tickets.ViewArchive',
+        'Reservations.ViewArchive',
+      ])
+    ) {
       items.push({
         label: this.i18nStore.language() === 'ar' ? 'تشغيل التذاكر والحجوزات' : 'Queue Operations',
         route: '/admin/queue-operations',
@@ -342,6 +349,28 @@ export class AdminShellComponent {
     }
 
     if (
+      this.canShow(['Services.ViewCentralTree']) &&
+      this.servicePermissionService.canViewCentralTree()
+    ) {
+      serviceNavChildren.push({
+        label: translations.centralServiceTreeLabel,
+        route: '/admin/services/central-tree',
+        icon: 'bi-diagram-3-fill',
+      });
+    }
+
+    if (
+      this.canShow(['ServiceGlobalizationRequests.ViewAll']) &&
+      this.servicePermissionService.canViewGlobalizationRequests()
+    ) {
+      serviceNavChildren.push({
+        label: translations.globalizationRequestsLabel,
+        route: '/admin/services/globalization-requests',
+        icon: 'bi-patch-check',
+      });
+    }
+
+    if (
       this.canShow(['BranchServices.View']) &&
       this.servicePermissionService.canViewBranchServices()
     ) {
@@ -351,6 +380,7 @@ export class AdminShellComponent {
         icon: 'bi-diagram-2',
       });
     }
+
     if (
       this.canShow(['ServiceWorkflows.ViewAll']) &&
       this.servicePermissionService.canViewWorkflows()
@@ -367,28 +397,6 @@ export class AdminShellComponent {
         label: translations.serviceSchedulesLabel,
         route: '/admin/services/schedules',
         icon: 'bi-calendar-week',
-      });
-    }
-
-    if (
-      this.canShow(['ServiceGlobalizationRequests.ViewAll']) &&
-      this.servicePermissionService.canViewGlobalizationRequests()
-    ) {
-      serviceNavChildren.push({
-        label: translations.globalizationRequestsLabel,
-        route: '/admin/services/globalization-requests',
-        icon: 'bi-patch-check',
-      });
-    }
-
-    if (
-      this.canShow(['Services.ViewCentralTree']) &&
-      this.servicePermissionService.canViewCentralTree()
-    ) {
-      serviceNavChildren.push({
-        label: translations.centralServiceTreeLabel,
-        route: '/admin/services/central-tree',
-        icon: 'bi-diagram-3-fill',
       });
     }
 

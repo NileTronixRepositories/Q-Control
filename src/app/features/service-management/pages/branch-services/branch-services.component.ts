@@ -335,6 +335,41 @@ export class BranchServicesComponent implements OnInit, OnDestroy {
     const count = this.store.pendingGlobalizationRequestsCount();
     return count > 99 ? '99+' : count > 0 ? String(count) : null;
   });
+
+  protected readonly branchServicesCount = computed(() => {
+    const tree = this.store.branchTree();
+    let count = 0;
+    const countNodes = (nodes: readonly ServiceTreeNode[]) => {
+      for (const node of nodes) {
+        if (!node.isDeleted) {
+          count++;
+        }
+        if (node.children?.length) {
+          countNodes(node.children);
+        }
+      }
+    };
+    countNodes(tree);
+    return count;
+  });
+
+  protected readonly branchLeafServicesCount = computed(() => {
+    const tree = this.store.branchTree();
+    let count = 0;
+    const countLeaves = (nodes: readonly ServiceTreeNode[]) => {
+      for (const node of nodes) {
+        if (!node.isDeleted && (!node.children || node.children.length === 0)) {
+          count++;
+        }
+        if (node.children?.length) {
+          countLeaves(node.children);
+        }
+      }
+    };
+    countLeaves(tree);
+    return count;
+  });
+
   protected readonly isBranchAdmin = computed(
     () => this.authSessionService.currentSession()?.userType === 'BranchAdmin',
   );

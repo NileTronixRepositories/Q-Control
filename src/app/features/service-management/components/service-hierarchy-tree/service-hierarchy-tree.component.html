@@ -1,5 +1,5 @@
 <section
-  class="svc-tree"
+  class="svc-tree svc-tree-panel"
   [attr.dir]="direction()"
   [attr.lang]="language()"
 >
@@ -29,33 +29,35 @@
         </div>
       </div>
 
-      <div class="svc-tree-filters">
-        <label class="svc-tree-filter" [class.svc-tree-filter--active]="includeInactive()">
-          <input
-            type="checkbox"
-            class="svc-tree-filter-input"
-            [checked]="includeInactive()"
-            (change)="includeInactiveChange.emit($any($event.target).checked)"
-          />
-          @if (includeInactive()) {
-            <i class="bi bi-check2"></i>
-          }
-          <span class="svc-tree-filter-label">{{ translations().includeInactive }}</span>
-        </label>
+      @if (showFilters()) {
+        <div class="svc-tree-filters">
+          <label class="svc-tree-filter" [class.svc-tree-filter--active]="includeInactive()">
+            <input
+              type="checkbox"
+              class="svc-tree-filter-input"
+              [checked]="includeInactive()"
+              (change)="includeInactiveChange.emit($any($event.target).checked)"
+            />
+            @if (includeInactive()) {
+              <i class="bi bi-check2"></i>
+            }
+            <span class="svc-tree-filter-label">{{ translations().includeInactive }}</span>
+          </label>
 
-        <label class="svc-tree-filter" [class.svc-tree-filter--active]="includeDeleted()">
-          <input
-            type="checkbox"
-            class="svc-tree-filter-input"
-            [checked]="includeDeleted()"
-            (change)="includeDeletedChange.emit($any($event.target).checked)"
-          />
-          @if (includeDeleted()) {
-            <i class="bi bi-check2"></i>
-          }
-          <span class="svc-tree-filter-label">{{ translations().includeDeleted }}</span>
-        </label>
-      </div>
+          <label class="svc-tree-filter" [class.svc-tree-filter--active]="includeDeleted()">
+            <input
+              type="checkbox"
+              class="svc-tree-filter-input"
+              [checked]="includeDeleted()"
+              (change)="includeDeletedChange.emit($any($event.target).checked)"
+            />
+            @if (includeDeleted()) {
+              <i class="bi bi-check2"></i>
+            }
+            <span class="svc-tree-filter-label">{{ translations().includeDeleted }}</span>
+          </label>
+        </div>
+      }
     </div>
   }
 
@@ -72,7 +74,8 @@
   }
 
   @if (flatNodes().length > 0) {
-    <div class="svc-tree-list" role="tree" [attr.aria-label]="translations().serviceHierarchy">
+    <div class="svc-tree-body">
+      <div class="svc-tree-list" role="tree" [attr.aria-label]="translations().serviceHierarchy">
       @for (entry of flatNodes(); track entry.node.id) {
         <article
           [class]="entry.rowClassList"
@@ -145,12 +148,41 @@
           </div>
 
           <div class="svc-tree-actions">
+            @if (entry.canManageWorkflow) {
+              <button
+                type="button"
+                class="svc-tree-action-btn svc-tree-workflow-btn"
+                [title]="manageWorkflowsLabel() || (language() === 'ar' ? 'مسارات العمل' : 'Manage Workflows')"
+                [attr.aria-label]="manageWorkflowsLabel() || (language() === 'ar' ? 'مسارات العمل' : 'Manage Workflows')"
+                (click)="requestManageWorkflows(entry.node, $event)"
+              >
+                <i class="bi bi-signpost-split" aria-hidden="true"></i>
+                <span class="svc-tree-btn-text">{{ manageWorkflowsLabel() || (language() === 'ar' ? 'مسارات العمل' : 'Workflows') }}</span>
+              </button>
+            }
+            @if (entry.canManageSchedule) {
+              <button
+                type="button"
+                class="svc-tree-action-btn svc-tree-schedule-btn"
+                [title]="manageScheduleLabel() || (language() === 'ar' ? 'جدول المواعيد' : 'Manage Schedule')"
+                [attr.aria-label]="manageScheduleLabel() || (language() === 'ar' ? 'جدول المواعيد' : 'Manage Schedule')"
+                (click)="requestManageSchedule(entry.node, $event)"
+              >
+                <i class="bi bi-calendar-week" aria-hidden="true"></i>
+                <span class="svc-tree-btn-text">{{ manageScheduleLabel() || (language() === 'ar' ? 'جدول المواعيد' : 'Schedule') }}</span>
+              </button>
+            }
+
+            @if ((entry.canManageWorkflow || entry.canManageSchedule) && (entry.canManageSegments || entry.canManageMedia || entry.canUnassign || (canCreate() && canCreateChildFor()(entry.node)) || (canUpdate() && entry.node.canEditDefinition && !entry.node.isDeleted) || entry.canDelete || entry.canRestore || entry.canPermanentDelete)) {
+              <div class="svc-tree-actions-separator" aria-hidden="true"></div>
+            }
+
             @if (entry.canManageSegments) {
               <button
                 type="button"
-                class="svc-tree-action-btn"
-                [title]="manageSegmentsLabel() || 'Segments'"
-                [attr.aria-label]="manageSegmentsLabel() || 'Segments'"
+                class="svc-tree-action-btn svc-tree-aux-btn"
+                [title]="manageSegmentsLabel() || (language() === 'ar' ? 'الشرائح' : 'Segments')"
+                [attr.aria-label]="manageSegmentsLabel() || (language() === 'ar' ? 'الشرائح' : 'Segments')"
                 (click)="requestManageSegments(entry.node, $event)"
               >
                 <i class="bi bi-tags-fill" aria-hidden="true"></i>
@@ -159,34 +191,12 @@
             @if (entry.canManageMedia) {
               <button
                 type="button"
-                class="svc-tree-action-btn"
-                [title]="manageMediaLabel()"
-                [attr.aria-label]="manageMediaLabel()"
+                class="svc-tree-action-btn svc-tree-aux-btn"
+                [title]="manageMediaLabel() || (language() === 'ar' ? 'وسائط الخدمة' : 'Service Media')"
+                [attr.aria-label]="manageMediaLabel() || (language() === 'ar' ? 'وسائط الخدمة' : 'Service Media')"
                 (click)="requestManageMedia(entry.node, $event)"
               >
                 <i class="bi bi-images" aria-hidden="true"></i>
-              </button>
-            }
-            @if (entry.canManageWorkflow) {
-              <button
-                type="button"
-                class="svc-tree-action-btn"
-                [title]="manageWorkflowsLabel()"
-                [attr.aria-label]="manageWorkflowsLabel()"
-                (click)="requestManageWorkflows(entry.node, $event)"
-              >
-                <i class="bi bi-signpost-split" aria-hidden="true"></i>
-              </button>
-            }
-            @if (entry.canManageSchedule) {
-              <button
-                type="button"
-                class="svc-tree-action-btn"
-                [title]="manageScheduleLabel()"
-                [attr.aria-label]="manageScheduleLabel()"
-                (click)="requestManageSchedule(entry.node, $event)"
-              >
-                <i class="bi bi-calendar-week" aria-hidden="true"></i>
               </button>
             }
             @if (entry.canUnassign) {
@@ -194,8 +204,8 @@
                 type="button"
                 class="svc-tree-action-btn svc-tree-action-btn--danger"
                 [disabled]="actionsDisabled() || unassigning()"
-                [title]="unassignLabel()"
-                [attr.aria-label]="unassignLabel()"
+                [title]="unassignLabel() || (language() === 'ar' ? 'إلغاء التسكين من الفرع' : 'Unassign')"
+                [attr.aria-label]="unassignLabel() || (language() === 'ar' ? 'إلغاء التسكين من الفرع' : 'Unassign')"
                 (click)="requestUnassign(entry.node, $event)"
               >
                 <i class="bi bi-node-minus" aria-hidden="true"></i>
@@ -262,19 +272,22 @@
           </div>
         </article>
       }
+      </div>
     </div>
   } @else if (!loading()) {
-    <div class="svc-tree-empty">
-      <div class="svc-tree-empty-icon">
-        <i class="bi bi-diagram-3" aria-hidden="true"></i>
+    <div class="svc-tree-body">
+      <div class="svc-tree-empty">
+        <div class="svc-tree-empty-icon">
+          <i class="bi bi-diagram-3" aria-hidden="true"></i>
+        </div>
+        <h3>{{ normalizedSearchText() ? translations().noSearchResults : translations().noTreeItems }}</h3>
+        @if (canCreate()) {
+          <button type="button" class="svc-tree-primary-btn" (click)="createRoot.emit()">
+            <i class="bi bi-plus-lg" aria-hidden="true"></i>
+            <span>{{ translations().addRootService }}</span>
+          </button>
+        }
       </div>
-      <h3>{{ normalizedSearchText() ? translations().noSearchResults : translations().noTreeItems }}</h3>
-      @if (canCreate()) {
-        <button type="button" class="svc-tree-primary-btn" (click)="createRoot.emit()">
-          <i class="bi bi-plus-lg" aria-hidden="true"></i>
-          <span>{{ translations().addRootService }}</span>
-        </button>
-      }
     </div>
   }
 </section>

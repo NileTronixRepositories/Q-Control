@@ -1,0 +1,67 @@
+@if (isOpen()) {
+  <div
+    class="modal-backdrop-custom q-dialog-backdrop"
+    [attr.dir]="direction()"
+    role="dialog"
+    aria-modal="true"
+    (click)="onBackdropClick($event)"
+  >
+    <div
+      class="modal-container q-dialog modal-size-{{ size() }}"
+      [class.modal-loading]="loading()"
+    >
+      <!-- Modal Header -->
+      <header class="modal-header q-dialog-header d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center gap-3 overflow-hidden me-2">
+          @if (icon()) {
+            <span class="modal-icon-badge q-dialog-icon flex-shrink-0">
+              <i [class]="icon()"></i>
+            </span>
+          }
+          <div class="d-flex flex-column text-truncate">
+            <h5 class="modal-title q-dialog-title m-0 fw-bold text-truncate">{{ title() }}</h5>
+            @if (subtitle()) {
+              <small class="modal-subtitle q-dialog-subtitle text-muted text-truncate">{{ subtitle() }}</small>
+            }
+          </div>
+        </div>
+
+        <div class="d-flex align-items-center gap-2 flex-shrink-0">
+          <ng-content select="[modal-header-actions]"></ng-content>
+          @if (showCloseButton()) {
+            <button
+              type="button"
+              class="modal-close-btn q-dialog-close"
+              [attr.aria-label]="closeLabel()"
+              (click)="closeModal()"
+            >
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 4L4 12M4 4l8 8"/>
+              </svg>
+            </button>
+          }
+        </div>
+      </header>
+
+      <!-- Modal Body -->
+      <div class="modal-body q-dialog-body">
+        <ng-content select="[modal-body]"></ng-content>
+        <ng-content></ng-content>
+      </div>
+
+      <!-- Modal Footer -->
+      <footer class="modal-footer q-dialog-footer">
+        <ng-content select="[modal-footer]"></ng-content>
+      </footer>
+
+      <!-- Optional Loading Overlay -->
+      @if (loading()) {
+        <div class="modal-loading-overlay">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+}

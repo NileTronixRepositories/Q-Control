@@ -4,6 +4,8 @@
 
 // Shared Components
 export * from './components/app-breadcrumb/app-breadcrumb.component';
+export * from './components/app-modal/app-modal.component';
+export * from './components/map-location-picker';
 export * from './components/language-header/language-header.component';
 export * from './components/mobile-record-card/mobile-record-card.component';
 export * from './components/niletronix-loading-state/niletronix-loading-state.component';

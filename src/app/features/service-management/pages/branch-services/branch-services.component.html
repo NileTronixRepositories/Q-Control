@@ -81,47 +81,76 @@
       <p class="empty-subtitle">{{ serviceTranslations().noPermissionHint }}</p>
     </section>
   } @else {
-    <section
-      class="branch-services-toolbar d-flex align-items-end justify-content-between flex-wrap gap-3"
-    >
-      @if (isBranchAdmin()) {
-        <div class="branch-services-active-branch d-flex align-items-center gap-3">
-          <div class="branch-badge-icon">
-            <i class="bi bi-building-check"></i>
-          </div>
-          <div class="d-flex flex-column">
-            <span class="toolbar-label">{{ translations().activeBranch }}</span>
-            <strong class="branch-name">{{ store.selectedBranchLabel() }}</strong>
-          </div>
-        </div>
-      } @else {
-        <div class="branch-services-field d-flex flex-column gap-1 m-0">
-          <span class="toolbar-label">{{ translations().branchSelector }}</span>
-          <div class="d-flex align-items-center gap-2">
-            <div class="branch-badge-icon" [title]="translations().branchSelector">
-              <i class="bi bi-geo-alt-fill"></i>
+    <section class="branch-services-toolbar">
+      <div class="branch-toolbar-inner d-flex align-items-center justify-content-between flex-wrap gap-3">
+        <div class="d-flex align-items-center flex-wrap gap-3">
+          @if (isBranchAdmin()) {
+            <div class="branch-services-active-branch d-flex align-items-center gap-3">
+              <div class="branch-badge-icon">
+                <i class="bi bi-building-check"></i>
+              </div>
+              <div class="d-flex flex-column">
+                <span class="toolbar-label">{{ translations().activeBranch }}</span>
+                <strong class="branch-name">{{ store.selectedBranchLabel() }}</strong>
+              </div>
             </div>
-            <select
-              class="form-select branch-select-dropdown"
-              [disabled]="store.branchesLoading()"
-              (change)="onBranchChange($event)"
-            >
-              <option value="">{{ translations().selectBranch }}</option>
-              @for (branch of branches(); track branch.branchId) {
-                <option [value]="branch.branchId">{{ branchName(branch) }}</option>
+          } @else {
+            <div class="branch-services-field d-flex flex-column gap-1 m-0">
+              <span class="toolbar-label">{{ translations().branchSelector }}</span>
+              <div class="d-flex align-items-center gap-2">
+                <div class="branch-badge-icon" [title]="translations().branchSelector">
+                  <i class="bi bi-geo-alt-fill"></i>
+                </div>
+                <select
+                  class="form-select branch-select-dropdown"
+                  [disabled]="store.branchesLoading()"
+                  (change)="onBranchChange($event)"
+                >
+                  <option value="">{{ translations().selectBranch }}</option>
+                  @for (branch of branches(); track branch.branchId) {
+                    <option [value]="branch.branchId">{{ branchName(branch) }}</option>
+                  }
+                </select>
+              </div>
+            </div>
+          }
+
+          @if (store.hasSelectedBranch()) {
+            <div class="branch-toolbar-stats d-flex align-items-center flex-wrap gap-2">
+              <div
+                class="branch-stat-pill"
+                [title]="language() === 'ar' ? 'إجمالي الخدمات المسكنة والمفعلة بالفرع' : 'Total active assigned services'"
+              >
+                <i class="bi bi-diagram-3-fill" aria-hidden="true"></i>
+                <span class="stat-count">{{ branchServicesCount() }}</span>
+                <span class="stat-label">{{ language() === 'ar' ? 'خدمة مفعّلة' : 'Active Services' }}</span>
+              </div>
+              @if (branchLeafServicesCount(); as leafCount) {
+                <div
+                  class="branch-stat-pill branch-stat-pill--subtle"
+                  [title]="language() === 'ar' ? 'عيادات / خدمات طرفية قابلة للحجز والتشغيل' : 'Bookable leaf services'"
+                >
+                  <i class="bi bi-check2-circle" aria-hidden="true"></i>
+                  <span class="stat-count">{{ leafCount }}</span>
+                  <span class="stat-label">{{ language() === 'ar' ? 'خدمة طرفية / عيادة' : 'Bookable Services' }}</span>
+                </div>
               }
-            </select>
-          </div>
+            </div>
+          }
         </div>
-      }
-      <button
-        type="button"
-        class="branch-services-secondary-btn d-inline-flex align-items-center justify-content-center gap-2"
-        [disabled]="!store.hasSelectedBranch()"
-        (click)="refresh()"
-      >
-        <i class="bi bi-arrow-clockwise" aria-hidden="true"></i> {{ translations().refresh }}
-      </button>
+
+        <div class="d-flex align-items-center gap-2">
+          <button
+            type="button"
+            class="branch-services-secondary-btn d-inline-flex align-items-center justify-content-center gap-2"
+            [disabled]="!store.hasSelectedBranch() || store.branchTreeLoading()"
+            (click)="refresh()"
+          >
+            <i class="bi bi-arrow-clockwise" [class.spin-refresh]="store.branchTreeLoading()" aria-hidden="true"></i>
+            <span>{{ translations().refresh }}</span>
+          </button>
+        </div>
+      </div>
     </section>
     @if (!store.hasSelectedBranch()) {
       <section class="branch-services-empty">
@@ -297,18 +326,14 @@
           <i class="bi bi-x-lg" aria-hidden="true"></i>
         </button>
       </header>
-      @defer (on interaction; prefetch on idle) {
-        <app-service-media-manager
-          [service]="details"
-          [translations]="serviceTranslations()"
-          [canManage]="canManageLoadedMedia(details)"
-          (message)="handleMediaMessage($event)"
-          (serviceChange)="handleMediaServiceChange($event)"
-          (mediaChanged)="handleMediaChanged()"
-        />
-      } @placeholder {
-        <app-niletronix-loading-state [title]="serviceTranslations().loading" variant="panel" />
-      }
+      <app-service-media-manager
+        [service]="details"
+        [translations]="serviceTranslations()"
+        [canManage]="canManageLoadedMedia(details)"
+        (message)="handleMediaMessage($event)"
+        (serviceChange)="handleMediaServiceChange($event)"
+        (mediaChanged)="handleMediaChanged()"
+      />
     </aside>
   } @else if (mediaLoading()) {
     <div class="branch-services-media-backdrop"></div>
@@ -336,6 +361,7 @@
     [canAssign]="segmentPermissionService.canAssignBranchServiceSegments()"
     [canUpdateQuota]="segmentPermissionService.canUpdateSegmentQuota()"
     [canUnassign]="segmentPermissionService.canUnassignSegment()"
+    [direction]="direction()"
     (closed)="closeServiceSegments()"
     (refresh)="selectedSegmentLeafNode() && loadAssignedSegments(store.selectedBranchId()!, selectedSegmentLeafNode()!.id)"
     (retry)="selectedSegmentLeafNode() && loadAssignedSegments(store.selectedBranchId()!, selectedSegmentLeafNode()!.id)"

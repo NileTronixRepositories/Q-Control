@@ -9,29 +9,648 @@
     [description]="translations().centralTreeDescription"
     icon="bi bi-diagram-2-fill"
   />
+
   @if (error()) {
-    <p class="rounded-3 border border-danger-subtle bg-danger-subtle p-3 text-danger">
+    <p class="rounded-3 border border-danger-subtle bg-danger-subtle p-3 text-danger mb-0">
       {{ error() }}
     </p>
   }
-  <app-service-hierarchy-tree
-    [nodes]="nodes()"
-    [expandedNodeIds]="expandedIds()"
-    [selectedServiceId]="null"
-    [translations]="serviceTranslations()"
-    [language]="language()"
-    [direction]="direction()"
-    [loading]="loading()"
-    [includeInactive]="includeInactive()"
-    [includeDeleted]="includeDeleted()"
-    [canCreate]="false"
-    [canViewDetails]="false"
-    [canUpdate]="false"
-    [canDelete]="false"
-    [canRestore]="false"
-    (refresh)="loadTree()"
-    (includeInactiveChange)="updateFilter('inactive', $event)"
-    (includeDeletedChange)="isTechnicalAdmin() && updateFilter('deleted', $event)"
-    (toggleNode)="toggleNode($event)"
-  />
+
+  <!-- Executive Summary Metrics -->
+  <div class="row g-3">
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="stat-card stat-card--neutral">
+        <span class="stat-label">{{ treeActionsTranslations().totalServices }}</span>
+        <span class="stat-value">{{ metrics().total }}</span>
+      </div>
+    </div>
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="stat-card stat-card--primary">
+        <span class="stat-label">{{ treeActionsTranslations().rootCategories }}</span>
+        <span class="stat-value">{{ metrics().rootCategories }}</span>
+      </div>
+    </div>
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="stat-card stat-card--success">
+        <span class="stat-label">{{ treeActionsTranslations().bookableServices }}</span>
+        <span class="stat-value">{{ metrics().bookableLeaves }}</span>
+      </div>
+    </div>
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="stat-card stat-card--neutral">
+        <span class="stat-label">{{ treeActionsTranslations().activeServices }}</span>
+        <span class="stat-value">{{ metrics().active }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Central Tree Toolbar -->
+  <div class="central-tree-toolbar">
+    <div class="d-flex align-items-center gap-2 flex-wrap">
+      <button
+        type="button"
+        class="tree-control-btn"
+        (click)="expandAll()"
+        [title]="treeActionsTranslations().expandAll"
+      >
+        <svg
+          width="15"
+          height="15"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <polyline points="7 13 12 18 17 13"></polyline>
+          <polyline points="7 6 12 11 17 6"></polyline>
+        </svg>
+        <span>{{ treeActionsTranslations().expandAll }}</span>
+      </button>
+      <button
+        type="button"
+        class="tree-control-btn"
+        (click)="collapseAll()"
+        [title]="treeActionsTranslations().collapseAll"
+      >
+        <svg
+          width="15"
+          height="15"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <polyline points="17 11 12 6 7 11"></polyline>
+          <polyline points="17 18 12 13 7 18"></polyline>
+        </svg>
+        <span>{{ treeActionsTranslations().collapseAll }}</span>
+      </button>
+    </div>
+
+    <div class="d-flex align-items-center gap-2">
+      <button
+        type="button"
+        class="tree-control-btn"
+        (click)="loadTree(true)"
+        [disabled]="loading()"
+        [title]="treeActionsTranslations().refresh"
+      >
+        <svg
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" />
+        </svg>
+        <span>{{ treeActionsTranslations().refresh }}</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Master-Detail Layout: Tree + Side Details Column -->
+  <div class="row g-3 align-items-start">
+    <!-- Master Column: Hierarchy Tree (col-12 col-lg-8) -->
+    <div class="col-12 col-lg-8">
+      <app-service-hierarchy-tree
+        [nodes]="filteredNodes()"
+        [expandedNodeIds]="expandedIds()"
+        [selectedServiceId]="selectedNode()?.id ?? null"
+        [translations]="serviceTranslations()"
+        [language]="language()"
+        [direction]="direction()"
+        [loading]="loading()"
+        [showSearch]="true"
+        [searchText]="searchText()"
+        [searchPlaceholder]="
+          treeActionsTranslations().serviceCode + ', ' + serviceTranslations().arabicName + '...'
+        "
+        [searchLabel]="serviceTranslations().treeSearchLabel"
+        [searchHelp]="serviceTranslations().treeSearchHelp"
+        [includeInactive]="includeInactive()"
+        [includeDeleted]="includeDeleted()"
+        [canCreate]="false"
+        [canViewDetails]="false"
+        [canUpdate]="false"
+        [canDelete]="false"
+        [canRestore]="false"
+        (refresh)="loadTree()"
+        (searchTextChange)="onSearchChange($event)"
+        (includeInactiveChange)="updateFilter('inactive', $event)"
+        (includeDeletedChange)="isTechnicalAdmin() && updateFilter('deleted', $event)"
+        (toggleNode)="toggleNode($event)"
+        (selectNode)="onNodeSelected($event)"
+      />
+    </div>
+
+    <!-- Detail Column: Side Card (col-12 col-lg-4) -->
+    <aside class="col-12 col-lg-4">
+      <div class="service-side-details-panel sticky-lg-top">
+        @if (selectedNode(); as node) {
+          <article class="side-details-card">
+            <!-- ── Top Header & Identity ──────────────────────────── -->
+            <header
+              class="side-details-header d-flex align-items-start justify-content-between gap-2 pb-3 border-bottom border-light-subtle"
+            >
+              <div class="d-flex align-items-start gap-2.5 overflow-hidden">
+                <span class="service-icon-circle flex-shrink-0 mt-0.5">
+                  @if (node.children && node.children.length > 0) {
+                    <svg
+                      width="22"
+                      height="22"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path
+                        d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"
+                      />
+                    </svg>
+                  } @else {
+                    <svg
+                      width="22"
+                      height="22"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                      <line x1="16" y1="2" x2="16" y2="6" />
+                      <line x1="8" y1="2" x2="8" y2="6" />
+                      <line x1="3" y1="10" x2="21" y2="10" />
+                      <path d="M12 14v4M10 16h4" />
+                    </svg>
+                  }
+                </span>
+                <div class="d-flex flex-column text-truncate">
+                  <!-- Parent Service Breadcrumb if present -->
+                  @if (
+                    selectedServiceDetails()?.parentServiceNameAr ||
+                    selectedServiceDetails()?.parentServiceNameEn
+                  ) {
+                    <span class="service-parent-breadcrumb text-truncate">
+                      <svg
+                        width="12"
+                        height="12"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="me-1"
+                      >
+                        <polyline points="15 18 9 12 15 6"></polyline>
+                      </svg>
+                      {{
+                        language() === 'ar'
+                          ? selectedServiceDetails()?.parentServiceNameAr ||
+                            selectedServiceDetails()?.parentServiceNameEn
+                          : selectedServiceDetails()?.parentServiceNameEn ||
+                            selectedServiceDetails()?.parentServiceNameAr
+                      }}
+                    </span>
+                  }
+                  <h5 class="side-service-title m-0 fw-bold text-dark text-truncate">
+                    {{ language() === 'ar' ? node.arabicName : node.englishName }}
+                  </h5>
+                  <span class="side-service-subtitle text-muted text-truncate">
+                    {{ language() === 'ar' ? node.englishName : node.arabicName }}
+                  </span>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                class="side-details-close-btn"
+                (click)="closeDetails()"
+                [title]="treeActionsTranslations().close"
+                [attr.aria-label]="treeActionsTranslations().close"
+              >
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+            </header>
+
+            <div class="side-details-body d-flex flex-column gap-3 pt-3">
+              <!-- ── Quick Badges Bar ─────────────────────────────── -->
+              <div class="d-flex align-items-center flex-wrap gap-1.5">
+                <!-- Active / Deleted status -->
+                <span
+                  class="q-badge"
+                  [class.q-badge--success]="node.isActive && !node.isDeleted"
+                  [class.q-badge--danger]="node.isDeleted"
+                  [class.q-badge--neutral]="!node.isActive && !node.isDeleted"
+                >
+                  <span
+                    class="badge-dot"
+                    [class.badge-dot--success]="node.isActive && !node.isDeleted"
+                    [class.badge-dot--danger]="node.isDeleted"
+                  ></span>
+                  {{
+                    node.isDeleted
+                      ? treeActionsTranslations().deleted
+                      : node.isActive
+                        ? treeActionsTranslations().active
+                        : treeActionsTranslations().inactive
+                  }}
+                </span>
+
+                <!-- Scope Badge -->
+                <span class="q-badge q-badge--scope">
+                  <svg
+                    width="12"
+                    height="12"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="2" y1="12" x2="22" y2="12" />
+                    <path
+                      d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"
+                    />
+                  </svg>
+                  {{
+                    node.scope === 'Global'
+                      ? treeActionsTranslations().globalScope
+                      : treeActionsTranslations().branchScoped
+                  }}
+                </span>
+
+                <!-- Reservation Badge -->
+                @if (selectedServiceDetails()?.hasReservation) {
+                  <span class="q-badge q-badge--amber">
+                    <svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                      <line x1="16" y1="2" x2="16" y2="6" />
+                      <line x1="8" y1="2" x2="8" y2="6" />
+                      <line x1="3" y1="10" x2="21" y2="10" />
+                    </svg>
+                    {{ treeActionsTranslations().reservation }}
+                  </span>
+                }
+
+                <!-- Code or ID Badge -->
+                @if (node.serviceCode) {
+                  <span class="q-badge q-badge--code">#{{ node.serviceCode }}</span>
+                } @else {
+                  <span class="q-badge q-badge--code">ID: {{ node.id }}</span>
+                }
+              </div>
+
+              <!-- ── Section 1: معلمات الطابور والتذاكر ────────────── -->
+              <div class="details-section-card">
+                <div class="section-card-header">
+                  <svg
+                    width="15"
+                    height="15"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path
+                      d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"
+                    />
+                    <path d="M13 5v2" />
+                    <path d="M13 17v2" />
+                    <path d="M13 11v2" />
+                  </svg>
+                  <span>{{
+                    language() === 'ar' ? 'إعدادات الطابور والتذاكر' : 'Queue & Ticket Settings'
+                  }}</span>
+                </div>
+
+                <div class="row g-2">
+                  <!-- Prefix & Number Range -->
+                  <div class="col-6">
+                    <div class="bento-field-box">
+                      <span class="bento-field-label">{{
+                        treeActionsTranslations().ticketPrefix
+                      }}</span>
+                      <div class="d-flex align-items-baseline gap-1 flex-wrap">
+                        <span class="bento-highlight-val text-primary fw-bold">
+                          {{ selectedServiceDetails()?.rangePrefix || node.serviceCode || '—' }}
+                        </span>
+                        @if (
+                          selectedServiceDetails()?.rangeStartNumber !== undefined &&
+                          selectedServiceDetails()?.rangeEndNumber !== undefined
+                        ) {
+                          <span class="bento-sub-text">
+                            ({{ selectedServiceDetails()?.rangeStartNumber }} -
+                            {{ selectedServiceDetails()?.rangeEndNumber }})
+                          </span>
+                        }
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Waiting Duration -->
+                  <div class="col-6">
+                    <div class="bento-field-box">
+                      <span class="bento-field-label">{{
+                        treeActionsTranslations().waitingDuration
+                      }}</span>
+                      <div class="d-flex align-items-center gap-1.5">
+                        <svg
+                          width="13"
+                          height="13"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          class="text-muted"
+                        >
+                          <circle cx="12" cy="12" r="10" />
+                          <polyline points="12 6 12 12 16 14" />
+                        </svg>
+                        <span class="bento-field-val fw-bold">
+                          {{ selectedServiceDetails()?.waitingDuration ?? 0 }}
+                          {{ treeActionsTranslations().minutes }}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Ticket Copies -->
+                  <div class="col-6">
+                    <div class="bento-field-box">
+                      <span class="bento-field-label">{{
+                        treeActionsTranslations().ticketCopies
+                      }}</span>
+                      <div class="d-flex align-items-center gap-1.5">
+                        <svg
+                          width="13"
+                          height="13"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          class="text-muted"
+                        >
+                          <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                        </svg>
+                        <span class="bento-field-val fw-bold">
+                          {{ selectedServiceDetails()?.noOfTicketCopies ?? 1 }}
+                          {{
+                            (selectedServiceDetails()?.noOfTicketCopies ?? 1) > 1
+                              ? treeActionsTranslations().copies
+                              : treeActionsTranslations().copy
+                          }}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Priority & Order -->
+                  <div class="col-6">
+                    <div class="bento-field-box">
+                      <span class="bento-field-label"
+                        >{{ treeActionsTranslations().priority }} /
+                        {{ treeActionsTranslations().orderNo }}</span
+                      >
+                      <span class="bento-field-val fw-bold text-dark">
+                        {{ selectedServiceDetails()?.priority ?? node.orderNo }}
+                        <span class="text-muted fw-normal">|</span> #{{ node.orderNo }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- ── Section 2: رسالة التوجيه للعميل (User Message) ── -->
+              @if (
+                selectedServiceDetails()?.arabicUserMessage ||
+                selectedServiceDetails()?.englishUserMessage
+              ) {
+                <div class="customer-instruction-box">
+                  <div class="customer-instruction-header">
+                    <svg
+                      width="15"
+                      height="15"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                    </svg>
+                    <span>{{ treeActionsTranslations().customerMessage }}</span>
+                  </div>
+                  <p class="customer-instruction-text mb-0">
+                    {{
+                      language() === 'ar'
+                        ? selectedServiceDetails()?.arabicUserMessage ||
+                          selectedServiceDetails()?.englishUserMessage
+                        : selectedServiceDetails()?.englishUserMessage ||
+                          selectedServiceDetails()?.arabicUserMessage
+                    }}
+                  </p>
+                </div>
+              }
+
+              <!-- ── Section 3: الخصائص والمعلمات الفنية ─────────────── -->
+              <div class="details-section-card">
+                <div class="section-card-header">
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <circle cx="12" cy="12" r="3" />
+                    <path
+                      d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"
+                    />
+                  </svg>
+                  <span>{{
+                    language() === 'ar' ? 'الخصائص الفنية والهيكلية' : 'Technical Attributes'
+                  }}</span>
+                </div>
+
+                <div class="row g-2">
+                  <!-- Node Type -->
+                  <div class="col-6">
+                    <div class="bento-field-box">
+                      <span class="bento-field-label">{{
+                        treeActionsTranslations().hasChildren
+                      }}</span>
+                      <span class="bento-field-val fw-semibold">
+                        {{
+                          node.children && node.children.length > 0
+                            ? treeActionsTranslations().categoryNode
+                            : treeActionsTranslations().leafNode
+                        }}
+                      </span>
+                    </div>
+                  </div>
+
+                  <!-- Ticket Issuing -->
+                  <div class="col-6">
+                    <div class="bento-field-box">
+                      <span class="bento-field-label">{{
+                        treeActionsTranslations().ticketIssuing
+                      }}</span>
+                      <span
+                        class="bento-field-val fw-semibold"
+                        [class.text-success]="node.canIssueTicket"
+                        [class.text-muted]="!node.canIssueTicket"
+                      >
+                        {{
+                          node.canIssueTicket
+                            ? treeActionsTranslations().allowed
+                            : treeActionsTranslations().notAllowed
+                        }}
+                      </span>
+                    </div>
+                  </div>
+
+                  <!-- Client Input Required -->
+                  <div class="col-6">
+                    <div class="bento-field-box">
+                      <span class="bento-field-label">{{
+                        treeActionsTranslations().clientInput
+                      }}</span>
+                      <span class="bento-field-val fw-semibold">
+                        {{
+                          selectedServiceDetails()?.isClientInputRequired
+                            ? treeActionsTranslations().required
+                            : treeActionsTranslations().notRequired
+                        }}
+                      </span>
+                    </div>
+                  </div>
+
+                  <!-- Owner Branch or Service ID -->
+                  @if (node.scope === 'BranchScoped') {
+                    <div class="col-6">
+                      <div class="bento-field-box">
+                        <span class="bento-field-label">{{
+                          treeActionsTranslations().ownerBranch
+                        }}</span>
+                        <span class="bento-field-val fw-semibold text-truncate">
+                          {{
+                            language() === 'ar'
+                              ? node.ownerBranchArabicName || '—'
+                              : node.ownerBranchEnglishName || '—'
+                          }}
+                        </span>
+                      </div>
+                    </div>
+                  } @else {
+                    <div class="col-6">
+                      <div class="bento-field-box">
+                        <span class="bento-field-label">{{
+                          treeActionsTranslations().serviceId
+                        }}</span>
+                        <span class="bento-field-val fw-bold text-muted">#{{ node.id }}</span>
+                      </div>
+                    </div>
+                  }
+                </div>
+              </div>
+
+              <!-- Loading spinner for details if still fetching -->
+              @if (detailsLoading()) {
+                <div class="text-center py-2 text-muted">
+                  <div
+                    class="spinner-border spinner-border-sm text-primary me-2"
+                    role="status"
+                  ></div>
+                  <small>{{
+                    language() === 'ar'
+                      ? 'جارٍ تحميل البيانات الإضافية...'
+                      : 'Loading extended details...'
+                  }}</small>
+                </div>
+              }
+            </div>
+          </article>
+        } @else {
+          <!-- Empty Guidance State in the Side Column -->
+          <article class="side-details-card side-details-empty text-center py-5 px-3">
+            <div class="side-details-empty-icon mb-3">
+              <svg
+                width="32"
+                height="32"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#94a3b8"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path
+                  d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"
+                />
+                <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+                <line x1="12" y1="22.08" x2="12" y2="12" />
+              </svg>
+            </div>
+            <h6 class="fw-bold text-dark mb-1">
+              {{ language() === 'ar' ? 'معاينة تفاصيل الخدمة' : 'Service Details Preview' }}
+            </h6>
+            <p class="text-muted small mb-0">
+              {{
+                language() === 'ar'
+                  ? 'انقر على أي خدمة في الشجرة لاستعراض تفاصيلها ومعلماتها هنا مباشرة.'
+                  : 'Click on any service in the tree to view its details and parameters here directly.'
+              }}
+            </p>
+          </article>
+        }
+      </div>
+    </aside>
+  </div>
 </section>
