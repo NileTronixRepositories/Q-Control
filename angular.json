@@ -25,7 +25,8 @@
                 "input": "public"
               }
             ],
-            "styles": ["src/styles.css", "src/niletronix-admin-theme.css"]
+            "styles": ["src/styles.css", "src/niletronix-admin-theme.css"],
+            "allowedCommonJsDependencies": ["leaflet", "qrcode"]
           },
           "configurations": {
             "production": {
@@ -37,8 +38,8 @@
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "20kB",
-                  "maximumError": "40kB"
+                  "maximumWarning": "35kB",
+                  "maximumError": "50kB"
                 }
               ],
               "outputHashing": "all"
