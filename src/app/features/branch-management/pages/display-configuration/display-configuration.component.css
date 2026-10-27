@@ -294,7 +294,6 @@
 
 /* Unified toast notifications inherited from components.css */
 
-
 .spin {
   animation: spin 0.8s linear infinite;
 }
@@ -305,5 +304,32 @@
   }
   100% {
     transform: rotate(360deg);
+  }
+}
+
+/* ─── Responsive Media Queries ───────────────────────────────────────── */
+@media (max-width: 767.98px) {
+  .display-configuration-page {
+    padding-bottom: 5rem;
+  }
+
+  .sticky-save-bar {
+    flex-direction: column !important;
+    gap: 12px !important;
+    align-items: stretch !important;
+    padding: 12px 14px !important;
+  }
+
+  .sticky-save-bar .primary-action {
+    width: 100% !important;
+  }
+
+  .branch-select-wrapper {
+    width: 100% !important;
+  }
+
+  .branch-selector-control {
+    max-width: none !important;
+    flex: 1 !important;
   }
 }

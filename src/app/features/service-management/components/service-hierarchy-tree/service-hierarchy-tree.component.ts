@@ -1,7 +1,10 @@
 import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
 
 import { NiletronixLoadingStateComponent } from '../../../../shared/components/niletronix-loading-state/niletronix-loading-state.component';
-import { AppDirection, AppLanguage } from '../../../../shared/models/app-language/app-language.model';
+import {
+  AppDirection,
+  AppLanguage,
+} from '../../../../shared/models/app-language/app-language.model';
 import { ServiceManagementTranslations } from '../../i18n/service-management.translations';
 import { ServiceTreeNode } from '../../models/service-management/service-management.model';
 
@@ -68,12 +71,17 @@ const TICKET_NO_CLASSES = 'svc-tree-chip--ticket-no';
   templateUrl: './service-hierarchy-tree.component.html',
   styleUrl: './service-hierarchy-tree.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: {
+    '[class.svc-tree-host--drop-target]': 'dropTarget()',
+    '(dragover)': 'onDropTargetDragOver($event)',
+    '(dragleave)': 'onDropTargetDragLeave($event)',
+    '(drop)': 'onDropTargetDrop($event)',
+  },
 })
 export class ServiceHierarchyTreeComponent {
   private static nextSearchControlId = 0;
 
-  protected readonly searchInputId =
-    `svc-tree-search-${++ServiceHierarchyTreeComponent.nextSearchControlId}`;
+  protected readonly searchInputId = `svc-tree-search-${++ServiceHierarchyTreeComponent.nextSearchControlId}`;
   protected readonly searchHelpId = `${this.searchInputId}-help`;
   protected readonly loadingSkeletonRows: readonly ServiceHierarchyLoadingRow[] = [
     { indent: 0, nameWidth: 42, chipWidths: [18, 14, 12] },
@@ -145,7 +153,10 @@ export class ServiceHierarchyTreeComponent {
   readonly deleteNode = output<ServiceTreeNode>();
   readonly restoreNode = output<ServiceTreeNode>();
   readonly permanentDeleteNode = output<ServiceTreeNode>();
-  readonly leafSelectionChange = output<{ readonly node: ServiceTreeNode; readonly selected: boolean }>();
+  readonly leafSelectionChange = output<{
+    readonly node: ServiceTreeNode;
+    readonly selected: boolean;
+  }>();
   readonly leafDragStarted = output<ServiceTreeNode>();
   readonly leafDragEnded = output<void>();
   readonly leafDropped = output<number>();
@@ -226,7 +237,6 @@ export class ServiceHierarchyTreeComponent {
 
     this.manageSchedule.emit(node);
   }
-
 
   public requestManageMedia(node: ServiceTreeNode, event: MouseEvent): void {
     event.stopPropagation();
@@ -368,7 +378,6 @@ export class ServiceHierarchyTreeComponent {
     this.permanentDeleteNode.emit(node);
   }
 
-
   private flattenNodes(
     nodes: readonly ServiceTreeNode[],
     expandedIds: ReadonlySet<number>,
@@ -382,7 +391,10 @@ export class ServiceHierarchyTreeComponent {
       if (node.children.length === 0 || !isExpanded) {
         return [current];
       }
-      return [current, ...this.flattenNodes(node.children, expandedIds, selectedServiceId, depth + 1)];
+      return [
+        current,
+        ...this.flattenNodes(node.children, expandedIds, selectedServiceId, depth + 1),
+      ];
     });
   }
 
@@ -395,7 +407,8 @@ export class ServiceHierarchyTreeComponent {
     const translations = this.translations();
     const hasChildren = node.children.length > 0;
     const collapsedIconClass = this.direction() === 'rtl' ? 'bi-chevron-left' : 'bi-chevron-right';
-    const isWorkflowLeaf = !hasChildren && this.canManageWorkflows() && this.canManageWorkflowNode()(node);
+    const isWorkflowLeaf =
+      !hasChildren && this.canManageWorkflows() && this.canManageWorkflowNode()(node);
 
     return {
       node,
@@ -414,11 +427,16 @@ export class ServiceHierarchyTreeComponent {
       operationalClassList: `${BADGE_BASE_CLASSES} ${
         node.effectiveIsActive ? ACTIVE_STATUS_CLASSES : INACTIVE_STATUS_CLASSES
       }`,
-      operationalLabel: node.effectiveIsActive ? translations.active : translations.operationallyDisabled,
+      operationalLabel: node.effectiveIsActive
+        ? translations.active
+        : translations.operationallyDisabled,
       showOperationalBadge: node.isActive !== node.effectiveIsActive && !node.isDeleted,
       ticketClassList: `${BADGE_BASE_CLASSES} ${node.canIssueTicket ? TICKET_YES_CLASSES : TICKET_NO_CLASSES}`,
-      ticketLabel: node.canIssueTicket ? translations.canIssueTicket : translations.cannotIssueTicket,
-      scopeLabel: node.scope === 'Global' ? translations.globalScope : translations.branchScopedScope,
+      ticketLabel: node.canIssueTicket
+        ? translations.canIssueTicket
+        : translations.cannotIssueTicket,
+      scopeLabel:
+        node.scope === 'Global' ? translations.globalScope : translations.branchScopedScope,
       ownerLabel: node.scope === 'BranchScoped' ? this.ownerLabel(node) : null,
       assignedLabel: this.assignmentLabel(node),
       ownedLabel: node.isOwnedByCurrentBranch ? translations.ownedByCurrentBranch : null,
@@ -428,11 +446,10 @@ export class ServiceHierarchyTreeComponent {
       canUnassign: this.isUnassignableLeaf(node),
       canDelete: this.canDelete() && !node.isDeleted && this.canDeleteNode()(node),
       canRestore: this.canRestore() && node.isDeleted && this.canRestoreNode()(node),
-      canPermanentDelete: this.canPermanentDelete() && node.isDeleted && this.canPermanentDeleteNode()(node),
-      canManageWorkflow:
-        this.canManageWorkflows() && this.canManageWorkflowNode()(node),
-      canManageSchedule:
-        this.canManageSchedules() && this.canManageScheduleNode()(node),
+      canPermanentDelete:
+        this.canPermanentDelete() && node.isDeleted && this.canPermanentDeleteNode()(node),
+      canManageWorkflow: this.canManageWorkflows() && this.canManageWorkflowNode()(node),
+      canManageSchedule: this.canManageSchedules() && this.canManageScheduleNode()(node),
       canManageMedia: this.canManageMedia() && this.canManageMediaNode()(node),
       canManageSegments: this.canManageSegments() && this.canManageSegmentsNode()(node),
     };
@@ -481,7 +498,8 @@ export class ServiceHierarchyTreeComponent {
   }
 
   private ownerLabel(node: ServiceTreeNode): string | null {
-    const value = this.language() === 'ar' ? node.ownerBranchArabicName : node.ownerBranchEnglishName;
+    const value =
+      this.language() === 'ar' ? node.ownerBranchArabicName : node.ownerBranchEnglishName;
     return value?.trim() || null;
   }
 
@@ -508,10 +526,7 @@ export class ServiceHierarchyTreeComponent {
     return node.isActive ? ACTIVE_STATUS_CLASSES : INACTIVE_STATUS_CLASSES;
   }
 
-  private statusLabel(
-    node: ServiceTreeNode,
-    translations: ServiceManagementTranslations,
-  ): string {
+  private statusLabel(node: ServiceTreeNode, translations: ServiceManagementTranslations): string {
     if (node.isDeleted) {
       return translations.deleted;
     }

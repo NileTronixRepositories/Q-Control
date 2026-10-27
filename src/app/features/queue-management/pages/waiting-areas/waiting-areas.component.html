@@ -7,107 +7,109 @@
     [eyebrow]="translations().branch"
     [title]="translations().title"
     [description]="translations().description"
-    icon="fa-solid fa-chair"
+    icon="bi bi-couch"
     iconVariant="emerald"
   >
     <button hero-actions type="button" class="primary-action" (click)="openCreate()">
-      <i class="fa-solid fa-plus" aria-hidden="true"></i>
+      <i class="bi bi-plus-lg" aria-hidden="true"></i>
       <span class="text-white">{{ translations().addButton }}</span>
     </button>
     <div hero-filters class="w-100">
-      <div class="row g-3 align-items-end" data-testid="waiting-areas-filters">
-        <div class="col-12 col-xl-4">
-          <label class="filter-field w-100">
-            <span class="d-flex align-items-center gap-2">
-              <span class="q-field-icon-badge q-field-icon-badge--indigo">
-                <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+      <div class="queue-filters-wrapper">
+        <div class="row g-3 align-items-end" data-testid="waiting-areas-filters">
+          <div class="col-12 col-xl-4">
+            <label class="filter-field w-100">
+              <span class="d-flex align-items-center gap-2">
+                <span class="q-field-icon-badge q-field-icon-badge--indigo">
+                  <i class="bi bi-search" aria-hidden="true"></i>
+                </span>
+                {{ translations().searchPlaceholder }}
               </span>
-              {{ translations().searchPlaceholder }}
-            </span>
-            <div class="search-input-wrapper">
-              <i class="fa-solid fa-magnifying-glass search-icon" aria-hidden="true"></i>
-              <input
-                class="form-control"
-                type="search"
-                [value]="search()"
-                [placeholder]="translations().searchPlaceholder"
-                (input)="updateSearch($event)"
-              />
-            </div>
-          </label>
-        </div>
-        <div class="col-12 col-md-6 col-xl-3">
-          <label class="filter-field">
-            <span class="d-flex align-items-center gap-2">
-              <span class="q-field-icon-badge q-field-icon-badge--violet">
-                <i class="fa-solid fa-building" aria-hidden="true"></i>
+              <div class="search-input-wrapper">
+                <i class="bi bi-search search-icon" aria-hidden="true"></i>
+                <input
+                  class="form-control"
+                  type="search"
+                  [value]="search()"
+                  [placeholder]="translations().searchPlaceholder"
+                  (input)="updateSearch($event)"
+                />
+              </div>
+            </label>
+          </div>
+          <div class="col-12 col-md-6 col-xl-3">
+            <label class="filter-field">
+              <span class="d-flex align-items-center gap-2">
+                <span class="q-field-icon-badge q-field-icon-badge--violet">
+                  <i class="bi bi-building" aria-hidden="true"></i>
+                </span>
+                {{ translations().branchFilter }}
               </span>
-              {{ translations().branchFilter }}
-            </span>
-            <select
-              data-testid="waiting-areas-branch-filter"
-              class="form-select"
-              [value]="selectedBranchId() ?? ''"
-              [disabled]="isBranchContextLocked()"
-              (change)="updateBranchFilter($event)"
+              <select
+                data-testid="waiting-areas-branch-filter"
+                class="form-select"
+                [value]="selectedBranchId() ?? ''"
+                [disabled]="isBranchContextLocked()"
+                (change)="updateBranchFilter($event)"
+              >
+                <option value="">{{ translations().allBranches }}</option>
+                @for (branch of branchOptions(); track branch.id) {
+                  <option [value]="branch.id">{{ optionName(branch) }}</option>
+                }
+              </select>
+            </label>
+          </div>
+          <div class="col-12 col-md-6 col-xl-2">
+            <label class="filter-field">
+              <span class="d-flex align-items-center gap-2">
+                <span class="q-field-icon-badge q-field-icon-badge--emerald">
+                  <i class="bi bi-toggle-on" aria-hidden="true"></i>
+                </span>
+                {{ translations().status }}
+              </span>
+              <select
+                class="form-select"
+                [value]="statusFilter() === null ? '' : statusFilter()"
+                (change)="updateStatusFilter($event)"
+              >
+                <option value="">{{ translations().allStatuses }}</option>
+                <option value="true">{{ translations().active }}</option>
+                <option value="false">{{ translations().inactive }}</option>
+              </select>
+            </label>
+          </div>
+          <div class="col-12 col-sm-6 col-md-4 col-xl-1">
+            <label class="filter-field">
+              <span class="d-flex align-items-center gap-2">
+                <span class="q-field-icon-badge q-field-icon-badge--amber">
+                  <i class="bi bi-list-ol" aria-hidden="true"></i>
+                </span>
+                {{ translations().pageSize }}
+              </span>
+              <select class="form-select" [value]="pageSize()" (change)="updatePageSize($event)">
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+              </select>
+            </label>
+          </div>
+          <div class="col-12 col-sm-6 col-md-4 col-xl-2 d-grid">
+            <button
+              type="button"
+              class="btn secondary-action w-100"
+              [disabled]="loading()"
+              (click)="refresh()"
             >
-              <option value="">{{ translations().allBranches }}</option>
-              @for (branch of branchOptions(); track branch.id) {
-                <option [value]="branch.id">{{ optionName(branch) }}</option>
-              }
-            </select>
-          </label>
-        </div>
-        <div class="col-12 col-md-6 col-xl-2">
-          <label class="filter-field">
-            <span class="d-flex align-items-center gap-2">
-              <span class="q-field-icon-badge q-field-icon-badge--emerald">
-                <i class="fa-solid fa-toggle-on" aria-hidden="true"></i>
-              </span>
-              {{ translations().status }}
-            </span>
-            <select
-              class="form-select"
-              [value]="statusFilter() === null ? '' : statusFilter()"
-              (change)="updateStatusFilter($event)"
-            >
-              <option value="">{{ translations().allStatuses }}</option>
-              <option value="true">{{ translations().active }}</option>
-              <option value="false">{{ translations().inactive }}</option>
-            </select>
-          </label>
-        </div>
-        <div class="col-12 col-sm-6 col-md-4 col-xl-1">
-          <label class="filter-field">
-            <span class="d-flex align-items-center gap-2">
-              <span class="q-field-icon-badge q-field-icon-badge--amber">
-                <i class="fa-solid fa-list-ol" aria-hidden="true"></i>
-              </span>
-              {{ translations().pageSize }}
-            </span>
-            <select class="form-select" [value]="pageSize()" (change)="updatePageSize($event)">
-              <option value="10">10</option>
-              <option value="25">25</option>
-              <option value="50">50</option>
-              <option value="100">100</option>
-            </select>
-          </label>
-        </div>
-        <div class="col-12 col-sm-6 col-md-4 col-xl-2 d-grid">
-          <button
-            type="button"
-            class="btn secondary-action w-100"
-            [disabled]="loading()"
-            (click)="refresh()"
-          >
-            <i
-              class="fa-solid fa-arrows-rotate"
-              style="color: #059669"
-              [class.spin]="loading()"
-              aria-hidden="true"
-            ></i>
-            <span>{{ translations().refresh }}</span>
-          </button>
+              <i
+                class="bi bi-arrow-clockwise"
+                style="color: #059669"
+                [class.spin]="loading()"
+                aria-hidden="true"
+              ></i>
+              <span>{{ translations().refresh }}</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -201,7 +203,7 @@
                         [title]="translations().view"
                         (click)="openView(item.id)"
                       >
-                        <i class="fa-solid fa-eye" aria-hidden="true"></i>
+                        <i class="bi bi-eye" aria-hidden="true"></i>
                       </button>
                       <button
                         type="button"
@@ -210,7 +212,7 @@
                         [title]="translations().edit"
                         (click)="openEdit(item.id)"
                       >
-                        <i class="bi bi-pencil" aria-hidden="true"></i>
+                        <i class="bi bi-pencil-square" aria-hidden="true"></i>
                       </button>
                       @if (item.isActive) {
                         <button
@@ -221,7 +223,7 @@
                           [disabled]="deletingId() === item.id"
                           (click)="deactivateWaitingArea(item)"
                         >
-                          <i class="fa-solid fa-power-off" aria-hidden="true"></i>
+                          <i class="bi bi-power" aria-hidden="true"></i>
                         </button>
                       } @else {
                         <button
@@ -232,7 +234,7 @@
                           [disabled]="deletingId() === item.id"
                           (click)="reactivateWaitingArea(item)"
                         >
-                          <i class="fa-solid fa-rotate-left" aria-hidden="true"></i>
+                          <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
                         </button>
                         <button
                           type="button"
@@ -242,7 +244,7 @@
                           [disabled]="deletingId() === item.id"
                           (click)="permanentlyDeleteWaitingArea(item)"
                         >
-                          <i class="fa-solid fa-trash-can" aria-hidden="true"></i>
+                          <i class="bi bi-trash3" aria-hidden="true"></i>
                         </button>
                       }
                     </div>
@@ -258,7 +260,7 @@
             <app-mobile-record-card
               [eyebrow]="translations().number"
               [title]="textOrFallback(item.descriptiveName)"
-              icon="fa-solid fa-chair"
+              icon="bi bi-couch"
               [recordId]="item.number"
             >
               <span
@@ -301,7 +303,7 @@
                 [title]="translations().view"
                 (click)="openView(item.id)"
               >
-                <i class="fa-solid fa-eye" aria-hidden="true"></i>
+                <i class="bi bi-eye" aria-hidden="true"></i>
               </button>
               <button
                 record-actions
@@ -311,7 +313,7 @@
                 [title]="translations().edit"
                 (click)="openEdit(item.id)"
               >
-                <i class="fa-solid fa-pen-to-square" aria-hidden="true"></i>
+                <i class="bi bi-pencil" aria-hidden="true"></i>
               </button>
               @if (item.isActive) {
                 <button
@@ -323,7 +325,7 @@
                   [disabled]="deletingId() === item.id"
                   (click)="deactivateWaitingArea(item)"
                 >
-                  <i class="fa-solid fa-power-off" aria-hidden="true"></i>
+                  <i class="bi bi-power" aria-hidden="true"></i>
                 </button>
               } @else {
                 <ng-container record-actions>
@@ -335,7 +337,7 @@
                     [disabled]="deletingId() === item.id"
                     (click)="reactivateWaitingArea(item)"
                   >
-                    <i class="fa-solid fa-rotate-left" aria-hidden="true"></i>
+                    <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
                   </button>
                   <button
                     type="button"
@@ -345,7 +347,7 @@
                     [disabled]="deletingId() === item.id"
                     (click)="permanentlyDeleteWaitingArea(item)"
                   >
-                    <i class="fa-solid fa-trash-can" aria-hidden="true"></i>
+                    <i class="bi bi-trash3" aria-hidden="true"></i>
                   </button>
                 </ng-container>
               }
@@ -353,17 +355,14 @@
           }
         </div>
       } @else if (!loading()) {
-        <div class="admin-list-empty d-flex align-items-center gap-3 p-3" role="status">
-          <span
-            class="admin-list-empty-icon d-inline-flex align-items-center justify-content-center flex-shrink-0"
-            aria-hidden="true"
-          >
-            <i class="fa-solid fa-chair"></i>
-          </span>
-          <div class="d-grid gap-1">
-            <h2>{{ translations().emptyTitle }}</h2>
-            <p>{{ translations().emptyDescription }}</p>
+        <div class="empty-state-craft text-center py-5" role="status">
+          <div class="empty-icon-pulse mb-3">
+            <span class="empty-icon-box">
+              <i class="bi bi-couch"></i>
+            </span>
           </div>
+          <h3 class="empty-title mb-2">{{ translations().emptyTitle }}</h3>
+          <p class="empty-subtitle mb-0">{{ translations().emptyDescription }}</p>
         </div>
       }
 

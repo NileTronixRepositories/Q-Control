@@ -1,12 +1,14 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   OnDestroy,
   computed,
   inject,
   signal,
   effect,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Subscription } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 
@@ -79,13 +81,15 @@ export class ServiceRequestHomeComponent implements OnDestroy {
     field?: string;
   } | null = null;
   private initializedLanguageStep = false;
+  private readonly destroyRef = inject(DestroyRef);
   private readonly route = inject(ActivatedRoute);
 
   constructor() {
-    const qBranchId = Number(this.route.snapshot.queryParams['branchId']);
-    if (Number.isInteger(qBranchId) && qBranchId > 0) {
-      this.store.loadServices(qBranchId);
-    }
+    this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
+      const qBranchId = Number(params['branchId']);
+      const targetId = Number.isInteger(qBranchId) && qBranchId > 0 ? qBranchId : undefined;
+      this.store.loadServices(targetId);
+    });
 
     effect(() => {
       const behavior = this.store.behavior();

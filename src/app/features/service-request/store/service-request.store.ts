@@ -1,6 +1,15 @@
 import { computed, DestroyRef, inject, Injectable, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { catchError, finalize, interval, map, Observable, tap, throwError } from 'rxjs';
+import {
+  catchError,
+  finalize,
+  interval,
+  map,
+  Observable,
+  Subscription,
+  tap,
+  throwError,
+} from 'rxjs';
 
 import { AppLanguage } from '../../../shared/models/app-language/app-language.model';
 import { AppLanguageStore } from '../../../shared/store/app-language.store';
@@ -162,17 +171,16 @@ export class ServiceRequestStore {
     }));
   });
 
-  constructor() {
-    this.loadServices();
+  private loadServicesSubscription: Subscription | null = null;
+  private currentBranchId: number | null = null;
 
+  constructor() {
     interval(REFRESH_INTERVAL_MS)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
-        this.loadServices(undefined, true);
+        this.loadServices(this.currentBranchId ?? undefined, true);
       });
   }
-
-  private currentBranchId: number | null = null;
 
   loadServices(branchId?: number, silent = false): void {
     if (branchId !== undefined) {
@@ -180,18 +188,26 @@ export class ServiceRequestStore {
     }
     const targetBranchId =
       this.currentBranchId ?? this.authSessionService.activeSession()?.activeBranchId ?? 1;
+
+    // Cancel any previous in-flight branch loading request to prevent race conditions
+    if (this.loadServicesSubscription) {
+      this.loadServicesSubscription.unsubscribe();
+      this.loadServicesSubscription = null;
+    }
+
     if (!silent) {
       this.loadingServicesSignal.set(true);
       this.errorLoadingServicesSignal.set(false);
     }
 
-    this.serviceRequestService
+    this.loadServicesSubscription = this.serviceRequestService
       .loadBranchServices(targetBranchId)
       .pipe(
         finalize(() => {
           if (!silent) {
             this.loadingServicesSignal.set(false);
           }
+          this.loadServicesSubscription = null;
         }),
       )
       .subscribe({
@@ -270,7 +286,8 @@ export class ServiceRequestStore {
     }
 
     const targetNode = selection.subSpecialty ?? selection.specialty ?? selection.serviceType;
-    const targetBranchId = this.authSessionService.activeSession()?.activeBranchId ?? 1;
+    const targetBranchId =
+      this.currentBranchId ?? this.authSessionService.activeSession()?.activeBranchId ?? 1;
     const serviceId = Number(targetNode.id);
 
     const customInputs: KioskCustomInputValue[] = [];
@@ -365,7 +382,8 @@ export class ServiceRequestStore {
     }
 
     const targetNode = selection.subSpecialty ?? selection.specialty ?? selection.serviceType;
-    const targetBranchId = this.authSessionService.activeSession()?.activeBranchId ?? 1;
+    const targetBranchId =
+      this.currentBranchId ?? this.authSessionService.activeSession()?.activeBranchId ?? 1;
     const serviceId = Number(targetNode.id);
 
     const customInputs: KioskCustomInputValue[] = [];

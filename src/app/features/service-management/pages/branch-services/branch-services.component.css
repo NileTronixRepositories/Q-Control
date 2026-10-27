@@ -12,13 +12,19 @@
 /* ============================================
    TOOLBAR & CONTAINER CARDS
    ============================================ */
+.queue-filters-wrapper {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  border-radius: 12px;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05);
+}
+
 .branch-services-toolbar,
 .branch-services-empty,
 .branch-services-active-branch {
-  background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
-  border: 1px solid rgba(11, 138, 168, 0.15);
   border-radius: var(--q-radius-md, 12px);
-  box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.05), 0 4px 10px -2px rgba(11, 138, 168, 0.04);
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -507,3 +513,44 @@
 .pending-requests-badge {
   box-shadow: 0 2px 6px rgba(225, 29, 72, 0.4);
 }
+
+/* ============================================
+   RESPONSIVE MEDIA QUERIES (MOBILE & TABLET)
+   ============================================ */
+@media (max-width: 767.98px) {
+  .branch-services-toolbar {
+    padding: 10px 12px;
+  }
+
+  .branch-toolbar-inner {
+    flex-direction: column;
+    align-items: stretch !important;
+    gap: 12px;
+  }
+
+  .branch-toolbar-inner > div {
+    width: 100%;
+  }
+
+  .branch-toolbar-stats {
+    padding-inline-start: 0;
+    border-inline-start: none;
+    border-top: 1px solid #e2e8f0;
+    padding-top: 10px;
+    width: 100%;
+  }
+
+  .branch-services-field {
+    width: 100%;
+  }
+
+  .branch-services-field .d-flex {
+    width: 100%;
+  }
+
+  .branch-select-dropdown {
+    flex: 1;
+    min-width: 0;
+  }
+}
+

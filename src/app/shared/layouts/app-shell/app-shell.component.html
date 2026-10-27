@@ -1,5 +1,5 @@
 <main
-  class="app-shell d-flex min-vh-100 w-100"
+  class="app-shell d-flex flex-column flex-md-row min-vh-100 w-100"
   [class.sidebar-expanded]="sidebarExpanded()"
   [class.sidebar-collapsed]="!sidebarExpanded()"
   [class.is-mobile]="isMobile()"
@@ -64,7 +64,7 @@
 
   <aside
     id="application-sidebar"
-    class="sidebar position-sticky top-0 d-flex flex-column overflow-x-hidden overflow-y-auto"
+    class="sidebar d-flex flex-column overflow-x-hidden overflow-y-auto"
     [attr.dir]="direction()"
     [attr.lang]="language()"
     [attr.aria-hidden]="usesMobileOverlay() && !sidebarExpanded()"

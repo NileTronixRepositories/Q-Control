@@ -12,14 +12,14 @@
         ? 'إدارة قائمة الفيديوهات الموحدة المشتركة بين جميع شاشات العرض التابعة للفرع.'
         : 'Manage the unified display video playlist shared across all displays in this branch.'
     "
-    icon="fa-solid fa-film"
+    icon="bi bi-film"
     iconVariant="teal"
   >
     <div hero-actions class="d-flex align-items-center gap-2 flex-wrap">
       @if (isTechnicalAdmin() && branches().length > 1) {
         <div class="branch-select-wrapper">
           <span class="q-field-icon-badge q-field-icon-badge--violet">
-            <i class="fa-solid fa-building" aria-hidden="true"></i>
+            <i class="bi bi-building" aria-hidden="true"></i>
           </span>
           <label class="visually-hidden" for="branchVideosSelect">{{
             isAr() ? 'الفرع' : 'Branch'
@@ -44,7 +44,7 @@
       } @else if (selectedBranchId()) {
         <div class="branch-select-wrapper static-badge">
           <span class="q-field-icon-badge q-field-icon-badge--violet">
-            <i class="fa-solid fa-building" aria-hidden="true"></i>
+            <i class="bi bi-building" aria-hidden="true"></i>
           </span>
           <span class="fw-bold text-dark px-2 small">{{ selectedBranchLabel() }}</span>
         </div>
@@ -58,7 +58,7 @@
         [attr.title]="isAr() ? 'تحديث' : 'Refresh'"
       >
         <i
-          class="fa-solid fa-arrows-rotate"
+          class="bi bi-arrow-clockwise"
           style="color: #059669"
           [class.spin]="videosLoading()"
           aria-hidden="true"
@@ -72,7 +72,7 @@
           class="primary-action d-inline-flex align-items-center gap-2"
           (click)="openUploadModal()"
         >
-          <i class="fa-solid fa-cloud-arrow-up"></i>
+          <i class="bi bi-cloud-arrow-up"></i>
           <span class="text-white">{{ isAr() ? 'رفع فيديو جديد' : 'Upload Video' }}</span>
         </button>
       }
@@ -123,7 +123,7 @@
             [class.secondary-action]="activeFilter() !== 'all'"
             (click)="setFilter('all')"
           >
-            <i class="fa-solid fa-layer-group"></i>
+            <i class="bi bi-layers"></i>
             <span>{{ isAr() ? 'الكل' : 'All' }} ({{ videos().length }})</span>
           </button>
           <button
@@ -132,7 +132,7 @@
             [class.secondary-action]="activeFilter() !== 'active'"
             (click)="setFilter('active')"
           >
-            <i class="fa-solid fa-circle-check" style="color: #10b981"></i>
+            <i class="bi bi-check-circle-fill" style="color: #10b981"></i>
             <span>{{ isAr() ? 'المفعلة' : 'Active' }}</span>
           </button>
           <button
@@ -141,7 +141,7 @@
             [class.secondary-action]="activeFilter() !== 'inactive'"
             (click)="setFilter('inactive')"
           >
-            <i class="fa-solid fa-circle-pause" style="color: #64748b"></i>
+            <i class="bi bi-pause-circle-fill" style="color: #64748b"></i>
             <span>{{ isAr() ? 'غير المفعلة' : 'Inactive' }}</span>
           </button>
         </div>
@@ -153,7 +153,7 @@
             (click)="openPlaylistPreview()"
             [attr.title]="isAr() ? 'معاينة قائمة التشغيل الكاملة' : 'Preview Full Playlist'"
           >
-            <i class="fa-solid fa-circle-play" style="color: var(--q-primary, #0b8aa8)"></i>
+            <i class="bi bi-play-circle-fill" style="color: var(--q-primary, #0b8aa8)"></i>
             <span>{{ isAr() ? 'معاينة قائمة التشغيل' : 'Preview Playlist' }}</span>
           </button>
 
@@ -166,9 +166,9 @@
               isAr() ? 'فتح شاشة العرض الرئيسية في نافذة جديدة' : 'Open Main Display in new tab'
             "
           >
-            <i class="fa-solid fa-tv" style="color: var(--q-primary, #0b8aa8)"></i>
+            <i class="bi bi-tv" style="color: var(--q-primary, #0b8aa8)"></i>
             <span>{{ isAr() ? 'معاينة شاشة العرض' : 'Display Preview' }}</span>
-            <i class="fa-solid fa-arrow-up-right-from-square small text-muted"></i>
+            <i class="bi bi-box-arrow-up-right small text-muted"></i>
           </a>
         </div>
       </div>
@@ -182,34 +182,32 @@
             size="sm"
           />
         } @else if (filteredVideos().length === 0) {
-          <div class="admin-list-empty d-flex align-items-center gap-3 p-4" role="status">
-            <span
-              class="admin-list-empty-icon d-inline-flex align-items-center justify-content-center flex-shrink-0"
-              aria-hidden="true"
-            >
-              <i class="fa-solid fa-film"></i>
-            </span>
-            <div>
-              <h5 class="fw-bold mb-1">
-                {{ isAr() ? 'لا توجد فيديوهات حالياً' : 'No Display Videos Found' }}
-              </h5>
-              <p class="text-muted small mb-0">
-                {{
-                  isAr()
-                    ? 'قم برفع فيديوهات لتعرض على جميع شاشات العرض التابعة لهذا الفرع.'
-                    : 'Upload videos to display across all screens in this branch.'
-                }}
-              </p>
+          <div class="empty-state-craft text-center py-5" role="status">
+            <div class="empty-icon-pulse mb-3">
+              <div class="empty-icon-box">
+                <i class="bi bi-film"></i>
+              </div>
             </div>
+            <h5 class="fw-bold text-dark mb-1">
+              {{ isAr() ? 'لا توجد فيديوهات حالياً' : 'No Display Videos Found' }}
+            </h5>
+            <p class="text-muted small mb-3">
+              {{
+                isAr()
+                  ? 'قم برفع فيديوهات لتعرض على جميع شاشات العرض التابعة لهذا الفرع.'
+                  : 'Upload videos to display across all screens in this branch.'
+              }}
+            </p>
             @if (canUpdate()) {
-              <button type="button" class="primary-action ms-auto" (click)="openUploadModal()">
-                <i class="fa-solid fa-cloud-arrow-up"></i>
+              <button type="button" class="primary-action d-inline-flex align-items-center gap-2" (click)="openUploadModal()">
+                <i class="bi bi-cloud-arrow-up"></i>
                 <span class="text-white">{{ isAr() ? 'رفع فيديو الآن' : 'Upload Video Now' }}</span>
               </button>
             }
           </div>
         } @else {
-          <div class="table-responsive table-wrap">
+          <!-- Desktop Table View (>= 768px) -->
+          <div class="table-responsive table-wrap d-none d-md-block">
             <table
               class="admin-data-table table table-sm table-hover align-middle custom-table mb-0"
             >
@@ -246,7 +244,7 @@
                               (click)="moveVideo(idx, 'up')"
                               [attr.title]="isAr() ? 'تقديم الترتيب' : 'Move Up'"
                             >
-                              <i class="fa-solid fa-chevron-up"></i>
+                              <i class="bi bi-chevron-up"></i>
                             </button>
                             <button
                               type="button"
@@ -255,7 +253,7 @@
                               (click)="moveVideo(idx, 'down')"
                               [attr.title]="isAr() ? 'تأخير الترتيب' : 'Move Down'"
                             >
-                              <i class="fa-solid fa-chevron-down"></i>
+                              <i class="bi bi-chevron-down"></i>
                             </button>
                           </div>
                         }
@@ -266,7 +264,7 @@
                     <td>
                       <div class="d-flex align-items-center gap-2">
                         <span class="q-field-icon-badge q-field-icon-badge--sky flex-shrink-0">
-                          <i class="fa-solid fa-file-video"></i>
+                          <i class="bi bi-file-earmark-play"></i>
                         </span>
                         <span
                           class="fw-semibold text-dark text-break"
@@ -281,17 +279,17 @@
                     <td class="text-center">
                       @if (video.processingStatus === 'Processing') {
                         <span class="q-detail-pill q-detail-pill--warning">
-                          <i class="fa-solid fa-spinner fa-spin"></i>
+                          <i class="spinner-border spinner-border-sm"></i>
                           {{ isAr() ? 'جاري المعالجة...' : 'Processing' }}
                         </span>
                       } @else if (video.processingStatus === 'Ready') {
                         <span class="q-detail-pill q-detail-pill--active">
-                          <i class="fa-solid fa-circle-check"></i>
+                          <i class="bi bi-check-circle-fill"></i>
                           {{ isAr() ? 'جاهز للعرض' : 'Ready' }}
                         </span>
                       } @else if (video.processingStatus === 'Failed') {
                         <span class="q-detail-pill q-detail-pill--danger">
-                          <i class="fa-solid fa-triangle-exclamation"></i>
+                          <i class="bi bi-exclamation-triangle-fill"></i>
                           {{ isAr() ? 'فشلت المعالجة' : 'Failed' }}
                         </span>
                       }
@@ -325,7 +323,7 @@
                             [attr.title]="isAr() ? 'معاينة الفيديو' : 'Preview Video'"
                           >
                             <i
-                              class="fa-solid fa-play"
+                              class="bi bi-play-fill"
                               style="color: var(--q-primary, #0b8aa8)"
                             ></i>
                           </button>
@@ -342,7 +340,7 @@
                               [attr.aria-label]="isAr() ? 'إلغاء التفعيل' : 'Deactivate'"
                               [attr.title]="isAr() ? 'إلغاء التفعيل' : 'Deactivate'"
                             >
-                              <i class="fa-solid fa-power-off"></i>
+                              <i class="bi bi-power"></i>
                             </button>
                           } @else {
                             <button
@@ -353,7 +351,7 @@
                               [attr.aria-label]="isAr() ? 'تفعيل' : 'Reactivate'"
                               [attr.title]="isAr() ? 'تفعيل' : 'Reactivate'"
                             >
-                              <i class="fa-solid fa-rotate-left"></i>
+                              <i class="bi bi-arrow-counterclockwise"></i>
                             </button>
                           }
 
@@ -374,7 +372,7 @@
                                   : 'Delete Permanently'
                             "
                           >
-                            <i class="fa-solid fa-trash-can"></i>
+                            <i class="bi bi-trash"></i>
                           </button>
                         }
                       </div>
@@ -383,6 +381,126 @@
                 }
               </tbody>
             </table>
+          </div>
+
+          <!-- Mobile Cards View (< 768px) -->
+          <div class="video-mobile-cards d-grid d-md-none gap-3 p-3">
+            @for (video of filteredVideos(); track video.id; let idx = $index) {
+              <div class="video-mobile-card p-3 rounded-3 border bg-white shadow-sm" [class.opacity-75]="!video.isActive">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                  <div class="d-flex align-items-center gap-2">
+                    <span class="q-order-badge">{{ video.displayOrder }}</span>
+                    @if (canUpdate()) {
+                      <div class="d-inline-flex gap-1">
+                        <button
+                          type="button"
+                          class="btn btn-sm btn-outline-secondary p-1 lh-1"
+                          [disabled]="idx === 0 || isSubmitting()"
+                          (click)="moveVideo(idx, 'up')"
+                          [attr.title]="isAr() ? 'تقديم الترتيب' : 'Move Up'"
+                        >
+                          <i class="bi bi-chevron-up"></i>
+                        </button>
+                        <button
+                          type="button"
+                          class="btn btn-sm btn-outline-secondary p-1 lh-1"
+                          [disabled]="idx === filteredVideos().length - 1 || isSubmitting()"
+                          (click)="moveVideo(idx, 'down')"
+                          [attr.title]="isAr() ? 'تأخير الترتيب' : 'Move Down'"
+                        >
+                          <i class="bi bi-chevron-down"></i>
+                        </button>
+                      </div>
+                    }
+                  </div>
+                  <div class="d-flex align-items-center gap-2">
+                    @if (video.isActive) {
+                      <span class="q-detail-pill q-detail-pill--active">
+                        <span class="q-detail-pill__dot"></span>
+                        {{ isAr() ? 'مفعل' : 'Active' }}
+                      </span>
+                    } @else {
+                      <span class="q-detail-pill q-detail-pill--inactive">
+                        <span class="q-detail-pill__dot"></span>
+                        {{ isAr() ? 'غير مفعل' : 'Inactive' }}
+                      </span>
+                    }
+                  </div>
+                </div>
+
+                <div class="d-flex align-items-start gap-2 mb-2">
+                  <span class="q-field-icon-badge q-field-icon-badge--sky flex-shrink-0 mt-1">
+                    <i class="bi bi-file-earmark-play"></i>
+                  </span>
+                  <div class="min-w-0 flex-grow-1">
+                    <div class="fw-bold text-dark text-break small">{{ video.originalFileName }}</div>
+                    <div class="mt-1">
+                      @if (video.processingStatus === 'Processing') {
+                        <span class="q-detail-pill q-detail-pill--warning">
+                          <span class="spinner-border spinner-border-sm"></span>
+                          {{ isAr() ? 'جاري المعالجة...' : 'Processing' }}
+                        </span>
+                      } @else if (video.processingStatus === 'Ready') {
+                        <span class="q-detail-pill q-detail-pill--active">
+                          <i class="bi bi-check-circle-fill"></i>
+                          {{ isAr() ? 'جاهز للعرض' : 'Ready' }}
+                        </span>
+                      } @else if (video.processingStatus === 'Failed') {
+                        <span class="q-detail-pill q-detail-pill--danger">
+                          <i class="bi bi-exclamation-triangle-fill"></i>
+                          {{ isAr() ? 'فشلت المعالجة' : 'Failed' }}
+                        </span>
+                      }
+                    </div>
+                  </div>
+                </div>
+
+                <div class="d-flex align-items-center justify-content-end gap-2 pt-2 border-top mt-2">
+                  @if (video.processingStatus === 'Ready' && video.streamUrl) {
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-1"
+                      (click)="openSinglePreview(video)"
+                    >
+                      <i class="bi bi-play-fill"></i>
+                      <span>{{ isAr() ? 'معاينة' : 'Preview' }}</span>
+                    </button>
+                  }
+                  @if (canUpdate()) {
+                    @if (video.isActive) {
+                      <button
+                        type="button"
+                        class="btn btn-sm btn-outline-warning d-inline-flex align-items-center gap-1"
+                        [disabled]="isSubmitting()"
+                        (click)="toggleActive(video)"
+                      >
+                        <i class="bi bi-power"></i>
+                        <span>{{ isAr() ? 'إلغاء التفعيل' : 'Deactivate' }}</span>
+                      </button>
+                    } @else {
+                      <button
+                        type="button"
+                        class="btn btn-sm btn-outline-success d-inline-flex align-items-center gap-1"
+                        [disabled]="isSubmitting()"
+                        (click)="toggleActive(video)"
+                      >
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                        <span>{{ isAr() ? 'تفعيل' : 'Reactivate' }}</span>
+                      </button>
+                    }
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-outline-danger d-inline-flex align-items-center gap-1"
+                      [disabled]="video.isActive || isSubmitting()"
+                      (click)="confirmDelete(video)"
+                    >
+                      <i class="bi bi-trash"></i>
+                      <span>{{ isAr() ? 'حذف' : 'Delete' }}</span>
+                    </button>
+                  }
+                </div>
+              </div>
+            }
           </div>
         }
       </article>

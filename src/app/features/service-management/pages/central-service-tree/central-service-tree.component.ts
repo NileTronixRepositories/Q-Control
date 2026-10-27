@@ -3,6 +3,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   DestroyRef,
+  HostListener,
   OnInit,
   computed,
   effect,
@@ -179,7 +180,8 @@ export class CentralServiceTreeComponent implements OnInit {
   protected readonly filteredNodes = computed(() => filterTree(this.nodes(), this.searchText()));
   protected readonly metrics = computed(() => countTreeMetrics(this.nodes()));
 
-  // Selected Service side panel
+  // Selected Service in tree vs Active Preview
+  protected readonly selectedServiceId = signal<number | null>(null);
   protected readonly selectedNode = signal<ServiceTreeNode | null>(null);
   protected readonly selectedServiceDetails = signal<ServiceDetails | null>(null);
   protected readonly detailsLoading = signal(false);
@@ -309,6 +311,11 @@ export class CentralServiceTreeComponent implements OnInit {
   }
 
   protected onNodeSelected(node: ServiceTreeNode): void {
+    this.selectedServiceId.set(node.id);
+  }
+
+  protected openPreview(node: ServiceTreeNode): void {
+    this.selectedServiceId.set(node.id);
     this.selectedNode.set(node);
     this.selectedServiceDetails.set(null);
     this.detailsLoading.set(true);
@@ -328,5 +335,12 @@ export class CentralServiceTreeComponent implements OnInit {
   protected closeDetails(): void {
     this.selectedNode.set(null);
     this.selectedServiceDetails.set(null);
+  }
+
+  @HostListener('document:keydown.escape')
+  protected onEscapePressed(): void {
+    if (this.selectedNode()) {
+      this.closeDetails();
+    }
   }
 }

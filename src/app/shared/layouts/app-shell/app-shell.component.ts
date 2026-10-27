@@ -17,7 +17,6 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
 
 import { AppBreadcrumbComponent } from '../../components/app-breadcrumb/app-breadcrumb.component';
 
-
 import { AppDirection, AppLanguage } from '../../models/app-language/app-language.model';
 import { AppBreadcrumbItem } from '../../models/breadcrumb/breadcrumb.model';
 import { AppNavigationItem } from '../../models/navigation/navigation.model';
@@ -72,13 +71,21 @@ export class AppShellComponent implements OnInit, OnDestroy, OnChanges {
   protected readonly usesMobileOverlay = computed(
     () => this.isMobile() && this.mobileNavigationMode() === 'overlay',
   );
-  protected readonly hasContextNavigation = computed(() => this.contextNavigationItems().length > 0);
+  protected readonly hasContextNavigation = computed(
+    () => this.contextNavigationItems().length > 0,
+  );
   protected readonly logoutIconClass = computed(() =>
     this.direction() === 'rtl' ? 'bi bi-box-arrow-left' : 'bi bi-box-arrow-right',
   );
-  protected readonly trimmedCurrentUserDisplayName = computed(() => this.currentUserDisplayName().trim());
-  protected readonly trimmedCurrentUserRoleLabel = computed(() => this.currentUserRoleLabel().trim());
-  protected readonly hasCurrentUser = computed(() => this.trimmedCurrentUserDisplayName().length > 0);
+  protected readonly trimmedCurrentUserDisplayName = computed(() =>
+    this.currentUserDisplayName().trim(),
+  );
+  protected readonly trimmedCurrentUserRoleLabel = computed(() =>
+    this.currentUserRoleLabel().trim(),
+  );
+  protected readonly hasCurrentUser = computed(
+    () => this.trimmedCurrentUserDisplayName().length > 0,
+  );
   protected readonly showsWorkspaceUser = computed(
     () => this.hasCurrentUser() && !(this.isMobile() && this.usesMobileOverlay()),
   );
@@ -87,17 +94,28 @@ export class AppShellComponent implements OnInit, OnDestroy, OnChanges {
   );
 
   private readonly mobileMenuButton = viewChild<ElementRef<HTMLButtonElement>>('mobileMenuButton');
-  private readonly sidebarToggleButton = viewChild<ElementRef<HTMLButtonElement>>('sidebarToggleButton');
-  private readonly contextReopenButton = viewChild<ElementRef<HTMLButtonElement>>('contextReopenButton');
-  private readonly contextCloseButton = viewChild<ElementRef<HTMLButtonElement>>('contextCloseButton');
+  private readonly sidebarToggleButton =
+    viewChild<ElementRef<HTMLButtonElement>>('sidebarToggleButton');
+  private readonly contextReopenButton =
+    viewChild<ElementRef<HTMLButtonElement>>('contextReopenButton');
+  private readonly contextCloseButton =
+    viewChild<ElementRef<HTMLButtonElement>>('contextCloseButton');
   private desktopSidebarExpanded = true;
   private bodyOverflowBeforeNavigation = '';
   private bodyScrollLocked = false;
 
   ngOnInit(): void {
+    const width = typeof window !== 'undefined' ? window.innerWidth : 1200;
+    if (width >= 768 && width < 1024) {
+      this.sidebarExpanded.set(false);
+      this.desktopSidebarExpanded = false;
+    }
     this.checkBreakpoint();
     if (this.hasContextNavigation()) {
       this.contextSidebarOpen.set(true);
+      if (width < 1024) {
+        this.sidebarExpanded.set(false);
+      }
       this.syncBodyScroll();
     }
   }
@@ -113,6 +131,9 @@ export class AppShellComponent implements OnInit, OnDestroy, OnChanges {
       return;
     }
 
+    if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+      this.sidebarExpanded.set(false);
+    }
     this.contextSidebarOpen.set(true);
     this.syncBodyScroll();
   }
@@ -139,20 +160,30 @@ export class AppShellComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   private checkBreakpoint(): void {
-    const mobile = window.innerWidth <= 767.98;
+    const width = typeof window !== 'undefined' ? window.innerWidth : 1200;
+    const mobile = width <= 767.98;
+    const tablet = width >= 768 && width < 1024;
     const wasMobile = this.isMobile();
 
-    if (mobile !== wasMobile) {
-      if (mobile) {
+    if (mobile) {
+      if (!wasMobile) {
         this.desktopSidebarExpanded = this.sidebarExpanded();
+      }
+      this.sidebarExpanded.set(false);
+    } else if (tablet) {
+      if (this.hasContextNavigation() && this.contextSidebarOpen()) {
         this.sidebarExpanded.set(false);
-      } else {
+      } else if (wasMobile) {
+        this.sidebarExpanded.set(false);
+      }
+    } else {
+      if (wasMobile) {
         this.sidebarExpanded.set(this.desktopSidebarExpanded);
       }
     }
 
     this.isMobile.set(mobile);
-    this.usesContextOverlay.set(window.innerWidth < 1200);
+    this.usesContextOverlay.set(width < 1200);
     this.syncBodyScroll();
   }
 
@@ -161,6 +192,9 @@ export class AppShellComponent implements OnInit, OnDestroy, OnChanges {
     this.sidebarExpanded.set(expanded);
     if (!this.isMobile()) {
       this.desktopSidebarExpanded = expanded;
+    }
+    if (expanded && this.usesContextOverlay() && this.contextSidebarOpen()) {
+      this.contextSidebarOpen.set(false);
     }
     this.syncBodyScroll();
     this.focusNavigationControl(expanded);
@@ -219,7 +253,7 @@ export class AppShellComponent implements OnInit, OnDestroy, OnChanges {
       return;
     }
 
-    if (this.usesMobileOverlay()) {
+    if (this.usesMobileOverlay() || (typeof window !== 'undefined' && window.innerWidth < 1024)) {
       this.sidebarExpanded.set(false);
     }
     this.contextSidebarOpen.set(true);
@@ -258,6 +292,3 @@ export class AppShellComponent implements OnInit, OnDestroy, OnChanges {
     this.logout.emit();
   }
 }
-
-
-

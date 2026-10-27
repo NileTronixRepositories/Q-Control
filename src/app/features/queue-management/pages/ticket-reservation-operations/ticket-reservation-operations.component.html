@@ -16,7 +16,8 @@
         ? 'متابعة وإدارة دورة حياة التذاكر الفورية والحجوزات المجدولة وسجل العمليات والأرشيف.'
         : 'Manage live ticket queues, scheduled reservations, workflow journeys, and operational archives.'
     "
-    icon="fa-solid fa-ticket"
+    icon="bi bi-ticket-perforated-fill"
+    iconVariant="teal"
   >
     <!-- Hero Actions -->
     <div hero-actions class="d-flex flex-wrap align-items-center gap-2">
@@ -27,7 +28,7 @@
         (click)="loadData()"
         [title]="isRtl() ? 'تحديث البيانات' : 'Refresh queue'"
       >
-        <i class="fa-solid fa-arrows-rotate" style="color: #059669;" [class.spin]="loading()" aria-hidden="true"></i>
+        <i class="bi bi-arrow-clockwise" style="color: #059669;" [class.spin]="loading()" aria-hidden="true"></i>
         <span>{{ isRtl() ? 'تحديث' : 'Refresh' }}</span>
       </button>
 
@@ -37,20 +38,9 @@
         (click)="resetFilters()"
         [title]="isRtl() ? 'إعادة ضبط الفلاتر' : 'Reset filters'"
       >
-        <i class="fa-solid fa-arrow-rotate-left" style="color: #d97706;" aria-hidden="true"></i>
+        <i class="bi bi-arrow-counterclockwise" style="color: #d97706;" aria-hidden="true"></i>
         <span>{{ isRtl() ? 'إعادة ضبط' : 'Reset' }}</span>
       </button>
-
-      <!-- @if (activeTab() === 'tickets' && canCreateTicket()) {
-        <button
-          type="button"
-          class="primary-action d-inline-flex align-items-center gap-2"
-          (click)="openCreateTicketModal()"
-        >
-          <i class="fa-solid fa-plus" aria-hidden="true"></i>
-          <span class="text-white">{{ isRtl() ? 'إصدار تذكرة جديدة' : 'Issue Ticket' }}</span>
-        </button>
-      } -->
 
       @if (activeTab() === 'reservations' && canCreateReservation()) {
         <button
@@ -58,14 +48,14 @@
           class="primary-action d-inline-flex align-items-center gap-2"
           (click)="openCreateReservationModal()"
         >
-          <i class="fa-solid fa-calendar-plus" aria-hidden="true"></i>
+          <i class="bi bi-calendar-plus" aria-hidden="true"></i>
           <span class="text-white">{{ isRtl() ? 'حجز جديد' : 'New Reservation' }}</span>
         </button>
       }
     </div>
 
-    <!-- Hero Filters Toolbar -->
-    <div hero-filters class="w-100">
+    <!-- Hero Filters Toolbar (Framed & Elevated) -->
+    <div hero-filters class="w-100 queue-filters-wrapper">
       <div class="row g-3 align-items-end" data-testid="queue-filters">
         <!-- Ticket Search -->
         @if (
@@ -73,15 +63,15 @@
           (activeTab() === 'archive' && archiveSubTab() === 'archived-tickets')
         ) {
           <div class="col-12 col-sm-6 col-lg-3">
-            <label class="filter-field w-100">
+            <label class="filter-field w-100 mb-0">
               <span class="d-flex align-items-center gap-2">
                 <span class="q-field-icon-badge q-field-icon-badge--indigo">
-                  <i class="fa-solid fa-hashtag"></i>
+                  <i class="bi bi-hash"></i>
                 </span>
                 <span>{{ isRtl() ? 'رقم التذكرة' : 'Ticket Number' }}</span>
               </span>
               <div class="search-input-wrapper">
-                <i class="fa-solid fa-magnifying-glass search-icon" aria-hidden="true"></i>
+                <i class="bi bi-search search-icon" aria-hidden="true"></i>
                 <input
                   id="searchTicketNumber"
                   type="search"
@@ -107,10 +97,10 @@
             (activeTab() === 'archive' && archiveSubTab() === 'archived-reservations')
           "
         >
-          <label class="filter-field w-100">
+          <label class="filter-field w-100 mb-0">
             <span class="d-flex align-items-center gap-2">
               <span class="q-field-icon-badge q-field-icon-badge--emerald">
-                <i class="fa-solid fa-chart-line"></i>
+                <i class="bi bi-activity"></i>
               </span>
               <span>{{ isRtl() ? 'الحالة' : 'Status' }}</span>
             </span>
@@ -139,10 +129,10 @@
 
         <!-- Service Filter -->
         <div class="col-6 col-sm-6 col-lg-3">
-          <label class="filter-field w-100">
+          <label class="filter-field w-100 mb-0">
             <span class="d-flex align-items-center gap-2">
               <span class="q-field-icon-badge q-field-icon-badge--violet">
-                <i class="fa-solid fa-layer-group"></i>
+                <i class="bi bi-gear-wide-connected"></i>
               </span>
               <span>{{ isRtl() ? 'الخدمة' : 'Service' }}</span>
             </span>
@@ -174,10 +164,10 @@
             (activeTab() === 'archive' && archiveSubTab() === 'archived-reservations')
           "
         >
-          <label class="filter-field w-100">
+          <label class="filter-field w-100 mb-0">
             <span class="d-flex align-items-center gap-2">
               <span class="q-field-icon-badge q-field-icon-badge--amber">
-                <i class="fa-solid fa-users"></i>
+                <i class="bi bi-people-fill"></i>
               </span>
               <span>{{ isRtl() ? 'الشريحة' : 'Segment' }}</span>
             </span>
@@ -207,10 +197,10 @@
             (activeTab() === 'archive' && archiveSubTab() === 'archived-reservations')
           "
         >
-          <label class="filter-field w-100">
+          <label class="filter-field w-100 mb-0">
             <span class="d-flex align-items-center gap-2">
               <span class="q-field-icon-badge q-field-icon-badge--rose">
-                <i class="fa-solid fa-calendar-days"></i>
+                <i class="bi bi-calendar-event"></i>
               </span>
               <span>{{ isRtl() ? 'تاريخ العمل' : 'Business Date' }}</span>
             </span>
@@ -229,7 +219,7 @@
 
   <!-- Alert Notifications Banner -->
   @if (alertMessage(); as alert) {
-    <div class="toast-stack mb-2" role="status" aria-live="polite" aria-atomic="true">
+    <div class="toast-stack mb-3" role="status" aria-live="polite" aria-atomic="true">
       <div
         class="toast-item"
         [class.toast-success]="alert.tone === 'success'"
@@ -237,10 +227,10 @@
         [class.toast-info]="alert.tone === 'info' || alert.tone === 'warning'"
       >
         <i
-          class="fa-solid"
-          [class.fa-circle-check]="alert.tone === 'success'"
-          [class.fa-circle-xmark]="alert.tone === 'danger'"
-          [class.fa-circle-info]="alert.tone === 'info' || alert.tone === 'warning'"
+          class="bi"
+          [class.bi-check-circle-fill]="alert.tone === 'success'"
+          [class.bi-x-octagon-fill]="alert.tone === 'danger'"
+          [class.bi-info-circle-fill]="alert.tone === 'info' || alert.tone === 'warning'"
           aria-hidden="true"
         ></i>
         <p class="mb-0">{{ alert.text }}</p>
@@ -250,30 +240,31 @@
           [attr.aria-label]="isRtl() ? 'إغلاق' : 'Close'"
           (click)="alertMessage.set(null)"
         >
-          <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+          <i class="bi bi-x-lg" aria-hidden="true"></i>
         </button>
       </div>
     </div>
   }
 
-  <!-- Main Navigation Tabs (Segmented Button Pills matching Theme) -->
+  <!-- Main Navigation Tabs (Segmented Button Pills matching Niletronix Theme) -->
   <div
-    class="tabs d-flex flex-wrap align-items-center justify-content-between gap-3 mb-2"
+    class="q-operations-tabs-bar d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3"
     data-testid="queue-operations-tabs"
   >
-    <div class="d-flex flex-wrap align-items-center gap-2">
+    <div class="q-segmented-tabs" role="tablist">
       @if (canViewTickets()) {
         <button
           type="button"
-          class="tab-btn"
-          [class.primary-action]="activeTab() === 'tickets'"
-          [class.secondary-action]="activeTab() !== 'tickets'"
+          role="tab"
+          class="q-segment-tab"
+          [class.active]="activeTab() === 'tickets'"
+          [attr.aria-selected]="activeTab() === 'tickets'"
           (click)="switchTab('tickets')"
         >
-          <i class="fa-solid fa-ticket" aria-hidden="true"></i>
+          <i class="bi bi-ticket-perforated-fill" aria-hidden="true"></i>
           <span>{{ isRtl() ? 'التذاكر الحالية' : 'Live Tickets' }}</span>
           @if (ticketPage().totalItems > 0) {
-            <span class="tab-count-badge">{{ ticketPage().totalItems }}</span>
+            <span class="tab-count-pill">{{ ticketPage().totalItems }}</span>
           }
         </button>
       }
@@ -281,15 +272,16 @@
       @if (canViewReservations()) {
         <button
           type="button"
-          class="tab-btn"
-          [class.primary-action]="activeTab() === 'reservations'"
-          [class.secondary-action]="activeTab() !== 'reservations'"
+          role="tab"
+          class="q-segment-tab"
+          [class.active]="activeTab() === 'reservations'"
+          [attr.aria-selected]="activeTab() === 'reservations'"
           (click)="switchTab('reservations')"
         >
-          <i class="fa-solid fa-calendar-check" aria-hidden="true"></i>
+          <i class="bi bi-calendar-check-fill" aria-hidden="true"></i>
           <span>{{ isRtl() ? 'الحجوزات' : 'Reservations' }}</span>
           @if (reservationPage().totalItems > 0) {
-            <span class="tab-count-badge">{{ reservationPage().totalItems }}</span>
+            <span class="tab-count-pill">{{ reservationPage().totalItems }}</span>
           }
         </button>
       }
@@ -297,12 +289,13 @@
       @if (canViewTicketArchive() || canViewReservationArchive()) {
         <button
           type="button"
-          class="tab-btn"
-          [class.primary-action]="activeTab() === 'archive'"
-          [class.secondary-action]="activeTab() !== 'archive'"
+          role="tab"
+          class="q-segment-tab"
+          [class.active]="activeTab() === 'archive'"
+          [attr.aria-selected]="activeTab() === 'archive'"
           (click)="switchTab('archive')"
         >
-          <i class="fa-solid fa-box-archive" aria-hidden="true"></i>
+          <i class="bi bi-archive-fill" aria-hidden="true"></i>
           <span>{{ isRtl() ? 'الأرشيف' : 'Archive' }}</span>
         </button>
       }
@@ -310,26 +303,26 @@
 
     <!-- Archive Sub-Tabs Switcher -->
     @if (activeTab() === 'archive') {
-      <div class="archive-subnav">
+      <div class="q-archive-subtabs" role="tablist">
         @if (canViewTicketArchive()) {
           <button
             type="button"
-            class="sub-tab-btn"
+            class="q-subtab-btn"
             [class.active]="archiveSubTab() === 'archived-tickets'"
             (click)="switchArchiveSubTab('archived-tickets')"
           >
-            <i class="fa-solid fa-ticket-simple" aria-hidden="true"></i>
+            <i class="bi bi-ticket-perforated" aria-hidden="true"></i>
             <span>{{ isRtl() ? 'أرشيف التذاكر' : 'Archived Tickets' }}</span>
           </button>
         }
         @if (canViewReservationArchive()) {
           <button
             type="button"
-            class="sub-tab-btn"
+            class="q-subtab-btn"
             [class.active]="archiveSubTab() === 'archived-reservations'"
             (click)="switchArchiveSubTab('archived-reservations')"
           >
-            <i class="fa-solid fa-calendar-days" aria-hidden="true"></i>
+            <i class="bi bi-calendar-event" aria-hidden="true"></i>
             <span>{{ isRtl() ? 'أرشيف الحجوزات' : 'Archived Reservations' }}</span>
           </button>
         }
@@ -353,8 +346,8 @@
           </div>
         }
 
-        <!-- Data Table Container -->
-        <div class="table-responsive table-wrap">
+        <!-- Data Table Container (Desktop & Tablets >= 768px) -->
+        <div class="table-responsive table-wrap d-none d-md-block">
           <table class="admin-data-table table table-sm table-hover align-middle custom-table mb-0">
             <thead>
               <tr>
@@ -482,14 +475,17 @@
                 @if (reservationPage().data.length === 0 && !loading()) {
                   <tr>
                     <td colspan="6" class="p-0 border-0">
-                      <div class="table-empty-state text-center">
-                        <div class="empty-icon-badge">
-                          <i class="bi bi-calendar-x" aria-hidden="true"></i>
+                      <div class="empty-state-craft text-center py-5">
+                        <div class="empty-icon-wrapper mb-3">
+                          <div class="empty-icon-pulse"></div>
+                          <div class="empty-icon-box">
+                            <i class="bi bi-calendar-x" aria-hidden="true"></i>
+                          </div>
                         </div>
-                        <h3 class="h6 fw-bold text-dark mb-1">
+                        <h3 class="empty-title mb-1">
                           {{ isRtl() ? 'لا توجد حجوزات مطابقة' : 'No Reservations Found' }}
                         </h3>
-                        <p class="text-muted small mb-0">
+                        <p class="empty-subtitle mx-auto">
                           {{
                             isRtl()
                               ? 'لا توجد حجوزات مطابقة لمعايير الفلترة المحددة في هذا الفرع.'
@@ -537,14 +533,17 @@
                 @if (ticketPage().data.length === 0 && !loading()) {
                   <tr>
                     <td colspan="7" class="p-0 border-0">
-                      <div class="table-empty-state text-center">
-                        <div class="empty-icon-badge">
-                          <i class="bi bi-ticket-perforated" aria-hidden="true"></i>
+                      <div class="empty-state-craft text-center py-5">
+                        <div class="empty-icon-wrapper mb-3">
+                          <div class="empty-icon-pulse"></div>
+                          <div class="empty-icon-box">
+                            <i class="bi bi-ticket-perforated" aria-hidden="true"></i>
+                          </div>
                         </div>
-                        <h3 class="h6 fw-bold text-dark mb-1">
+                        <h3 class="empty-title mb-1">
                           {{ isRtl() ? 'لا توجد تذاكر مطابقة' : 'No Tickets Found' }}
                         </h3>
-                        <p class="text-muted small mb-0">
+                        <p class="empty-subtitle mx-auto">
                           {{
                             isRtl()
                               ? 'لا توجد تذاكر تطابق معايير الفلترة المحددة في هذا الفرع.'
@@ -560,9 +559,154 @@
           </table>
         </div>
 
+        <!-- Mobile Cards View (Smartphones < 768px) -->
+        <div class="d-grid gap-2 d-md-none p-3">
+          @if (
+            activeTab() === 'reservations' ||
+            (activeTab() === 'archive' && archiveSubTab() === 'archived-reservations')
+          ) {
+            @for (res of reservationPage().data; track res.id) {
+              <app-mobile-record-card
+                [eyebrow]="isRtl() ? 'حجز موعد مجدول' : 'Scheduled Reservation'"
+                [title]="'#' + res.id"
+                icon="bi bi-calendar-check-fill"
+              >
+                <div record-badges>
+                  <span
+                    class="badge status-pill"
+                    [ngClass]="'status-' + res.status.toLowerCase()"
+                  >
+                    <span class="status-dot" aria-hidden="true"></span>
+                    <span>{{ getStatusLabel(res.status) }}</span>
+                  </span>
+                  @if (activeTab() === 'archive') {
+                    <span class="badge bg-secondary-subtle text-secondary border px-2 py-1 small">
+                      {{ isRtl() ? 'مؤرشف' : 'ARCHIVED' }}
+                    </span>
+                  }
+                </div>
+
+                <div record-fields>
+                  <dt class="small fw-bold text-muted text-uppercase">{{ isRtl() ? 'الخدمة' : 'Service' }}</dt>
+                  <dd class="mb-0 mt-1 fw-bold">{{ getServiceName(res.serviceId) }}</dd>
+                </div>
+                <div record-fields>
+                  <dt class="small fw-bold text-muted text-uppercase">{{ isRtl() ? 'الشريحة' : 'Segment' }}</dt>
+                  <dd class="mb-0 mt-1 fw-bold">{{ getSegmentName(res.segmentId) }}</dd>
+                </div>
+                <div record-fields>
+                  <dt class="small fw-bold text-muted text-uppercase">{{ isRtl() ? 'الموعد المحدد' : 'Scheduled Time' }}</dt>
+                  <dd class="mb-0 mt-1 font-monospace small">{{ formatDate(res.scheduledOnUtc) }}</dd>
+                </div>
+
+                <button
+                  record-actions
+                  type="button"
+                  class="btn secondary-action w-100 d-inline-flex align-items-center justify-content-center gap-2"
+                  (click)="openReservation(res)"
+                >
+                  <i class="bi bi-eye" aria-hidden="true"></i>
+                  <span>{{ isRtl() ? 'عرض التفاصيل' : 'View Details' }}</span>
+                </button>
+              </app-mobile-record-card>
+            }
+            @if (reservationPage().data.length === 0 && !loading()) {
+              <div class="empty-state-craft text-center py-4">
+                <div class="empty-icon-wrapper mb-3">
+                  <div class="empty-icon-pulse"></div>
+                  <div class="empty-icon-box">
+                    <i class="bi bi-calendar-x" aria-hidden="true"></i>
+                  </div>
+                </div>
+                <h3 class="empty-title mb-1">
+                  {{ isRtl() ? 'لا توجد حجوزات مطابقة' : 'No Reservations Found' }}
+                </h3>
+                <p class="empty-subtitle mx-auto">
+                  {{
+                    isRtl()
+                      ? 'لا توجد حجوزات مطابقة لمعايير الفلترة المحددة في هذا الفرع.'
+                      : 'No reservations match the specified filters.'
+                  }}
+                </p>
+              </div>
+            }
+          } @else {
+            @for (t of ticketPage().data; track t.id) {
+              <app-mobile-record-card
+                [eyebrow]="isRtl() ? 'تذكرة فورية' : 'Live Ticket'"
+                [title]="t.ticketNumber"
+                icon="bi bi-ticket-perforated-fill"
+                [recordId]="'#' + t.id"
+              >
+                <div record-badges>
+                  <span
+                    class="badge status-pill"
+                    [ngClass]="'status-' + t.status.toLowerCase()"
+                  >
+                    <span class="status-dot" aria-hidden="true"></span>
+                    <span>{{ getStatusLabel(t.status) }}</span>
+                  </span>
+                  @if (activeTab() === 'archive') {
+                    <span class="badge bg-secondary-subtle text-secondary border px-2 py-1 small">
+                      {{ isRtl() ? 'مؤرشف' : 'ARCHIVED' }}
+                    </span>
+                  }
+                </div>
+
+                <div record-fields>
+                  <dt class="small fw-bold text-muted text-uppercase">{{ isRtl() ? 'الخدمة الحالية' : 'Current Service' }}</dt>
+                  <dd class="mb-0 mt-1 fw-bold">{{ getServiceName(t.currentServiceId) }}</dd>
+                </div>
+                <div record-fields>
+                  <dt class="small fw-bold text-muted text-uppercase">{{ isRtl() ? 'الشريحة' : 'Segment' }}</dt>
+                  <dd class="mb-0 mt-1 fw-bold">{{ getSegmentName(t.segmentId) }}</dd>
+                </div>
+                <div record-fields>
+                  <dt class="small fw-bold text-muted text-uppercase">{{ isRtl() ? 'تاريخ العمل' : 'Business Date' }}</dt>
+                  <dd class="mb-0 mt-1 font-monospace">{{ t.businessDate }}</dd>
+                </div>
+                <div record-fields>
+                  <dt class="small fw-bold text-muted text-uppercase">{{ isRtl() ? 'وقت الدخول' : 'Queue Entry' }}</dt>
+                  <dd class="mb-0 mt-1 font-monospace small">{{ formatDate(t.currentQueueEnteredOnUtc) }}</dd>
+                </div>
+
+                <button
+                  record-actions
+                  type="button"
+                  class="btn secondary-action w-100 d-inline-flex align-items-center justify-content-center gap-2"
+                  (click)="openTicket(t)"
+                >
+                  <i class="bi bi-eye" aria-hidden="true"></i>
+                  <span>{{ isRtl() ? 'عرض التفاصيل' : 'View Details' }}</span>
+                </button>
+              </app-mobile-record-card>
+            }
+            @if (ticketPage().data.length === 0 && !loading()) {
+              <div class="empty-state-craft text-center py-4">
+                <div class="empty-icon-wrapper mb-3">
+                  <div class="empty-icon-pulse"></div>
+                  <div class="empty-icon-box">
+                    <i class="bi bi-ticket-perforated" aria-hidden="true"></i>
+                  </div>
+                </div>
+                <h3 class="empty-title mb-1">
+                  {{ isRtl() ? 'لا توجد تذاكر مطابقة' : 'No Tickets Found' }}
+                </h3>
+                <p class="empty-subtitle mx-auto">
+                  {{
+                    isRtl()
+                      ? 'لا توجد تذاكر تطابق معايير الفلترة المحددة في هذا الفرع.'
+                      : 'No tickets match the specified filters.'
+                  }}
+                </p>
+              </div>
+            }
+          }
+        </div>
+
         <!-- Pagination Controls Footer -->
-        <div class="pagination-footer">
-          <span class="text-muted small">
+        <footer class="pagination-bar d-flex flex-column flex-md-row align-items-center justify-content-between gap-2">
+          <span class="admin-pagination-total">
             {{ isRtl() ? 'إجمالي السجلات:' : 'Total Records:' }}
             <strong>{{
               activeTab() === 'reservations' ||
@@ -572,22 +716,22 @@
             }}</strong>
           </span>
 
-          <div class="d-flex align-items-center gap-2">
+          <div class="pagination-actions d-flex flex-wrap align-items-center justify-content-center gap-2">
             <button
               type="button"
-              class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-1"
+              class="btn secondary-action compact-action"
               [disabled]="pageNumber() === 1 || loading()"
               (click)="previousPage()"
             >
-              <i class="bi" [ngClass]="isRtl() ? 'bi-chevron-right' : 'bi-chevron-left'"></i>
+              <i class="bi" [class.bi-chevron-right]="isRtl()" [class.bi-chevron-left]="!isRtl()" aria-hidden="true"></i>
               <span>{{ isRtl() ? 'السابق' : 'Previous' }}</span>
             </button>
-            <span class="badge bg-light text-dark border px-2 py-1 small">
+            <span class="page-indicator">
               {{ isRtl() ? 'صفحة' : 'Page' }} {{ pageNumber() }}
             </span>
             <button
               type="button"
-              class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-1"
+              class="btn secondary-action compact-action"
               [disabled]="
                 loading() ||
                 (activeTab() === 'reservations' ||
@@ -598,10 +742,10 @@
               (click)="nextPage()"
             >
               <span>{{ isRtl() ? 'التالي' : 'Next' }}</span>
-              <i class="bi" [ngClass]="isRtl() ? 'bi-chevron-left' : 'bi-chevron-right'"></i>
+              <i class="bi" [class.bi-chevron-left]="isRtl()" [class.bi-chevron-right]="!isRtl()" aria-hidden="true"></i>
             </button>
           </div>
-        </div>
+        </footer>
       </div>
     </section>
 

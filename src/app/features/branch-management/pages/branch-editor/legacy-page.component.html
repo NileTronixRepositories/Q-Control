@@ -84,60 +84,62 @@
           </button>
         </div>
 
-        <div class="branch-api-filters row g-3 align-items-end mb-3">
-          <label class="col-12 col-md-5 col-lg-5 col-xl-5 d-flex flex-column gap-1">
-            <span class="filter-label">{{ translations().searchLabel }}</span>
-            <div class="search-input-wrapper">
-              <i class="bi bi-search search-icon" aria-hidden="true"></i>
-              <input
-                class="form-control"
-                type="search"
-                [value]="branchSearchText()"
-                [placeholder]="branchEditorTranslations().searchPlaceholder"
-                [attr.aria-label]="translations().searchLabel"
-                (change)="updateBranchSearch($event)"
-              />
-            </div>
-          </label>
-          <label class="col-6 col-md-2 col-lg-2 col-xl-2 d-flex flex-column gap-1">
-            <span class="filter-label">{{ translations().sortLabel }}</span>
-            <select
-              class="form-select"
-              [value]="branchOrderSort()"
-              [attr.aria-label]="translations().sortLabel"
-              (change)="updateBranchOrderSort($event)"
-            >
-              <option value="Newest">{{ translations().newestLabel }}</option>
-              <option value="Oldest">{{ translations().oldestLabel }}</option>
-            </select>
-          </label>
-          <label class="col-6 col-md-3 col-lg-3 col-xl-3 d-flex flex-column gap-1">
-            <span class="filter-label">{{ branchEditorTranslations().status }}</span>
-            <select
-              class="form-select"
-              [value]="branchStatusFilter() === null ? '' : branchStatusFilter()"
-              [attr.aria-label]="branchEditorTranslations().status"
-              (change)="updateBranchStatusFilter($event)"
-            >
-              <option value="">{{ branchEditorTranslations().allStatuses }}</option>
-              <option value="true">{{ branchEditorTranslations().active }}</option>
-              <option value="false">{{ branchEditorTranslations().inactive }}</option>
-            </select>
-          </label>
-          <label class="col-12 col-md-2 col-lg-2 col-xl-2 d-flex flex-column gap-1">
-            <span class="filter-label">{{ translations().pageSizeLabel }}</span>
-            <select
-              class="form-select"
-              [value]="branchPageSize()"
-              [attr.aria-label]="translations().pageSizeLabel"
-              (change)="updateBranchPageSize($event)"
-            >
-              <option value="10">10</option>
-              <option value="25">25</option>
-              <option value="50">50</option>
-              <option value="100">100</option>
-            </select>
-          </label>
+        <div class="queue-filters-wrapper mb-3">
+          <div class="branch-api-filters row g-2 g-md-3 align-items-end">
+            <label class="col-12 col-md-5 col-xl-4 d-flex flex-column gap-1">
+              <span class="filter-label">{{ translations().searchLabel }}</span>
+              <div class="search-input-wrapper">
+                <i class="bi bi-search search-icon" aria-hidden="true"></i>
+                <input
+                  class="form-control"
+                  type="search"
+                  [value]="branchSearchText()"
+                  [placeholder]="branchEditorTranslations().searchPlaceholder"
+                  [attr.aria-label]="translations().searchLabel"
+                  (change)="updateBranchSearch($event)"
+                />
+              </div>
+            </label>
+            <label class="col-4 col-md-2 col-xl-2 d-flex flex-column gap-1">
+              <span class="filter-label">{{ translations().sortLabel }}</span>
+              <select
+                class="form-select"
+                [value]="branchOrderSort()"
+                [attr.aria-label]="translations().sortLabel"
+                (change)="updateBranchOrderSort($event)"
+              >
+                <option value="Newest">{{ translations().newestLabel }}</option>
+                <option value="Oldest">{{ translations().oldestLabel }}</option>
+              </select>
+            </label>
+            <label class="col-4 col-md-3 col-xl-3 d-flex flex-column gap-1">
+              <span class="filter-label">{{ branchEditorTranslations().status }}</span>
+              <select
+                class="form-select"
+                [value]="branchStatusFilter() === null ? '' : branchStatusFilter()"
+                [attr.aria-label]="branchEditorTranslations().status"
+                (change)="updateBranchStatusFilter($event)"
+              >
+                <option value="">{{ branchEditorTranslations().allStatuses }}</option>
+                <option value="true">{{ branchEditorTranslations().active }}</option>
+                <option value="false">{{ branchEditorTranslations().inactive }}</option>
+              </select>
+            </label>
+            <label class="col-4 col-md-2 col-xl-3 d-flex flex-column gap-1">
+              <span class="filter-label">{{ translations().pageSizeLabel }}</span>
+              <select
+                class="form-select"
+                [value]="branchPageSize()"
+                [attr.aria-label]="translations().pageSizeLabel"
+                (change)="updateBranchPageSize($event)"
+              >
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+              </select>
+            </label>
+          </div>
         </div>
 
         @if (branchTableError()) {
@@ -188,166 +190,166 @@
                 }
               } @else {
                 @for (branch of branches(); track branch.id) {
-                <tr
-                  class="branch-selectable-row"
-                  [class.branch-context-selected]="selectedContextBranchId() === branch.id"
-                  [attr.role]="canSelectBranchContext() ? 'link' : null"
-                  [attr.tabindex]="canSelectBranchContext() ? 0 : null"
-                  [attr.aria-label]="language() === 'ar' ? branch.arabicName : branch.englishName"
-                  (click)="selectBranchContext(branch)"
-                  (keydown.enter)="selectBranchContext(branch)"
-                  (keydown.space)="$event.preventDefault(); selectBranchContext(branch)"
-                >
-                  <td>
-                    <span class="branch-code-badge">BR-{{ branch.id }}</span>
-                  </td>
-                  <td>
-                    <span class="branch-primary-name">{{ branch.arabicName }}</span>
-                  </td>
-                  <td>
-                    <span class="branch-secondary-name">{{ branch.englishName }}</span>
-                  </td>
-                  <td>
-                    <span class="branch-ip-badge" dir="ltr">
-                      <i class="bi bi-hdd-network text-muted" aria-hidden="true"></i>
-                      {{ branch.ipAddress }}
-                    </span>
-                  </td>
-                  <td>
-                    <span class="branch-location-text">{{ branch.governorate }}</span>
-                  </td>
-                  <td>
-                    <span class="branch-location-text">{{ branch.city }}</span>
-                  </td>
-                  <td>
-                    <span
-                      class="status-pill"
-                      [class.status-active]="branch.isActive"
-                      [class.status-inactive]="!branch.isActive"
-                    >
-                      <i
-                        class="bi"
-                        [class.bi-check-circle-fill]="branch.isActive"
-                        [class.bi-x-circle-fill]="!branch.isActive"
-                        aria-hidden="true"
-                      ></i>
-                      {{ branchStatusLabel(branch) }}
-                    </span>
-                  </td>
-                  <td>
-                    <span
-                      class="status-pill status-pill--operational"
-                      [class.status-active]="branch.effectiveIsActive"
-                      [class.status-inactive]="!branch.effectiveIsActive"
-                    >
-                      <i
-                        class="bi"
-                        [class.bi-check-circle-fill]="branch.effectiveIsActive"
-                        [class.bi-x-circle-fill]="!branch.effectiveIsActive"
-                        aria-hidden="true"
-                      ></i>
-                      {{ branchOperationalLabel(branch) }}
-                    </span>
-                    @if (showBranchOperationalWarning(branch)) {
-                      <small class="d-block text-warning fw-bold mt-1">
-                        <i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>
-                        {{ branchEditorTranslations().operationalUnavailable }}
-                      </small>
-                    }
-                  </td>
-                  <td>
-                    <span class="branch-creator-text">
-                      <i class="bi bi-person text-muted" aria-hidden="true"></i>
-                      {{ branch.createdBy }}
-                    </span>
-                  </td>
-                  <td>
-                    <div class="action-group justify-content-center">
-                      <button
-                        type="button"
-                        class="icon-action icon-action--view"
-                        [title]="branchEditorTranslations().view"
-                        [attr.aria-label]="branchEditorTranslations().view"
-                        (click)="$event.stopPropagation(); openViewBranch(branch.id)"
+                  <tr
+                    class="branch-selectable-row"
+                    [class.branch-context-selected]="selectedContextBranchId() === branch.id"
+                    [attr.role]="canSelectBranchContext() ? 'link' : null"
+                    [attr.tabindex]="canSelectBranchContext() ? 0 : null"
+                    [attr.aria-label]="language() === 'ar' ? branch.arabicName : branch.englishName"
+                    (click)="selectBranchContext(branch)"
+                    (keydown.enter)="selectBranchContext(branch)"
+                    (keydown.space)="$event.preventDefault(); selectBranchContext(branch)"
+                  >
+                    <td>
+                      <span class="branch-code-badge">BR-{{ branch.id }}</span>
+                    </td>
+                    <td>
+                      <span class="branch-primary-name">{{ branch.arabicName }}</span>
+                    </td>
+                    <td>
+                      <span class="branch-secondary-name">{{ branch.englishName }}</span>
+                    </td>
+                    <td>
+                      <span class="branch-ip-badge" dir="ltr">
+                        <i class="bi bi-hdd-network text-muted" aria-hidden="true"></i>
+                        {{ branch.ipAddress }}
+                      </span>
+                    </td>
+                    <td>
+                      <span class="branch-location-text">{{ branch.governorate }}</span>
+                    </td>
+                    <td>
+                      <span class="branch-location-text">{{ branch.city }}</span>
+                    </td>
+                    <td>
+                      <span
+                        class="status-pill"
+                        [class.status-active]="branch.isActive"
+                        [class.status-inactive]="!branch.isActive"
                       >
-                        <i class="bi bi-eye" aria-hidden="true"></i>
-                      </button>
-                      <button
-                        type="button"
-                        class="icon-action icon-action--edit"
-                        [title]="branchEditorTranslations().edit"
-                        [attr.aria-label]="branchEditorTranslations().edit"
-                        (click)="$event.stopPropagation(); openEditBranch(branch.id)"
+                        <i
+                          class="bi"
+                          [class.bi-check-circle-fill]="branch.isActive"
+                          [class.bi-x-circle-fill]="!branch.isActive"
+                          aria-hidden="true"
+                        ></i>
+                        {{ branchStatusLabel(branch) }}
+                      </span>
+                    </td>
+                    <td>
+                      <span
+                        class="status-pill status-pill--operational"
+                        [class.status-active]="branch.effectiveIsActive"
+                        [class.status-inactive]="!branch.effectiveIsActive"
                       >
-                        <i class="bi bi-pencil-square" aria-hidden="true"></i>
-                      </button>
-                      <button
-                        type="button"
-                        class="icon-action icon-action--branding"
-                        [title]="branchEditorTranslations().branding"
-                        [attr.aria-label]="branchEditorTranslations().branding"
-                        (click)="$event.stopPropagation(); openBranchBranding(branch.id)"
-                      >
-                        <i class="bi bi-brush" aria-hidden="true"></i>
-                      </button>
-                      <button
-                        type="button"
-                        class="icon-action icon-action--videos"
-                        [title]="branchEditorTranslations().displayVideos"
-                        [attr.aria-label]="branchEditorTranslations().displayVideos"
-                        (click)="$event.stopPropagation(); openDisplayVideos(branch.id)"
-                      >
-                        <i class="bi bi-film" aria-hidden="true"></i>
-                      </button>
-                      @if (canCreateBranchAdmin() && branch.isActive) {
-                        <button
-                          type="button"
-                          class="icon-action icon-action--admin"
-                          [title]="branchAdminTranslations().addBranchAdmin"
-                          [attr.aria-label]="branchAdminTranslations().addBranchAdmin"
-                          (click)="$event.stopPropagation(); openCreateBranchAdmin(branch)"
-                        >
-                          <i class="bi bi-person-plus" aria-hidden="true"></i>
-                        </button>
+                        <i
+                          class="bi"
+                          [class.bi-check-circle-fill]="branch.effectiveIsActive"
+                          [class.bi-x-circle-fill]="!branch.effectiveIsActive"
+                          aria-hidden="true"
+                        ></i>
+                        {{ branchOperationalLabel(branch) }}
+                      </span>
+                      @if (showBranchOperationalWarning(branch)) {
+                        <small class="d-block text-warning fw-bold mt-1">
+                          <i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>
+                          {{ branchEditorTranslations().operationalUnavailable }}
+                        </small>
                       }
-                      @if (branch.isActive) {
+                    </td>
+                    <td>
+                      <span class="branch-creator-text">
+                        <i class="bi bi-person text-muted" aria-hidden="true"></i>
+                        {{ branch.createdBy }}
+                      </span>
+                    </td>
+                    <td>
+                      <div class="action-group justify-content-center">
                         <button
                           type="button"
-                          class="icon-action icon-action--warning"
-                          [disabled]="deletingBranchId() === branch.id"
-                          [title]="branchEditorTranslations().deactivate"
-                          [attr.aria-label]="branchEditorTranslations().deactivate"
-                          (click)="$event.stopPropagation(); deactivateBranch(branch)"
+                          class="icon-action icon-action--view"
+                          [title]="branchEditorTranslations().view"
+                          [attr.aria-label]="branchEditorTranslations().view"
+                          (click)="$event.stopPropagation(); openViewBranch(branch.id)"
                         >
-                          <i class="bi bi-pause-circle" aria-hidden="true"></i>
-                        </button>
-                      } @else {
-                        <button
-                          type="button"
-                          class="icon-action icon-action--success"
-                          [disabled]="deletingBranchId() === branch.id"
-                          [title]="branchEditorTranslations().reactivate"
-                          [attr.aria-label]="branchEditorTranslations().reactivate"
-                          (click)="$event.stopPropagation(); reactivateBranch(branch)"
-                        >
-                          <i class="bi bi-play-circle" aria-hidden="true"></i>
+                          <i class="bi bi-eye" aria-hidden="true"></i>
                         </button>
                         <button
                           type="button"
-                          class="icon-action icon-action--danger"
-                          [disabled]="deletingBranchId() === branch.id"
-                          [title]="branchEditorTranslations().permanentDelete"
-                          [attr.aria-label]="branchEditorTranslations().permanentDelete"
-                          (click)="$event.stopPropagation(); permanentlyDeleteBranch(branch)"
+                          class="icon-action icon-action--edit"
+                          [title]="branchEditorTranslations().edit"
+                          [attr.aria-label]="branchEditorTranslations().edit"
+                          (click)="$event.stopPropagation(); openEditBranch(branch.id)"
                         >
-                          <i class="bi bi-trash3" aria-hidden="true"></i>
+                          <i class="bi bi-pencil-square" aria-hidden="true"></i>
                         </button>
-                      }
-                    </div>
-                  </td>
-                </tr>
+                        <button
+                          type="button"
+                          class="icon-action icon-action--branding"
+                          [title]="branchEditorTranslations().branding"
+                          [attr.aria-label]="branchEditorTranslations().branding"
+                          (click)="$event.stopPropagation(); openBranchBranding(branch.id)"
+                        >
+                          <i class="bi bi-brush" aria-hidden="true"></i>
+                        </button>
+                        <button
+                          type="button"
+                          class="icon-action icon-action--videos"
+                          [title]="branchEditorTranslations().displayVideos"
+                          [attr.aria-label]="branchEditorTranslations().displayVideos"
+                          (click)="$event.stopPropagation(); openDisplayVideos(branch.id)"
+                        >
+                          <i class="bi bi-film" aria-hidden="true"></i>
+                        </button>
+                        @if (canCreateBranchAdmin() && branch.isActive) {
+                          <button
+                            type="button"
+                            class="icon-action icon-action--admin"
+                            [title]="branchAdminTranslations().addBranchAdmin"
+                            [attr.aria-label]="branchAdminTranslations().addBranchAdmin"
+                            (click)="$event.stopPropagation(); openCreateBranchAdmin(branch)"
+                          >
+                            <i class="bi bi-person-plus" aria-hidden="true"></i>
+                          </button>
+                        }
+                        @if (branch.isActive) {
+                          <button
+                            type="button"
+                            class="icon-action icon-action--warning"
+                            [disabled]="deletingBranchId() === branch.id"
+                            [title]="branchEditorTranslations().deactivate"
+                            [attr.aria-label]="branchEditorTranslations().deactivate"
+                            (click)="$event.stopPropagation(); deactivateBranch(branch)"
+                          >
+                            <i class="bi bi-pause-circle" aria-hidden="true"></i>
+                          </button>
+                        } @else {
+                          <button
+                            type="button"
+                            class="icon-action icon-action--success"
+                            [disabled]="deletingBranchId() === branch.id"
+                            [title]="branchEditorTranslations().reactivate"
+                            [attr.aria-label]="branchEditorTranslations().reactivate"
+                            (click)="$event.stopPropagation(); reactivateBranch(branch)"
+                          >
+                            <i class="bi bi-play-circle" aria-hidden="true"></i>
+                          </button>
+                          <button
+                            type="button"
+                            class="icon-action icon-action--danger"
+                            [disabled]="deletingBranchId() === branch.id"
+                            [title]="branchEditorTranslations().permanentDelete"
+                            [attr.aria-label]="branchEditorTranslations().permanentDelete"
+                            (click)="$event.stopPropagation(); permanentlyDeleteBranch(branch)"
+                          >
+                            <i class="bi bi-trash3" aria-hidden="true"></i>
+                          </button>
+                        }
+                      </div>
+                    </td>
+                  </tr>
+                }
               }
-            }
             </tbody>
           </table>
         </div>
@@ -362,10 +364,18 @@
                 </div>
                 <div class="skeleton-shimmer skeleton-bar skeleton-bar--title mt-2"></div>
                 <div class="row g-2 mt-2">
-                  <div class="col-6"><div class="skeleton-shimmer skeleton-bar skeleton-bar--text"></div></div>
-                  <div class="col-6"><div class="skeleton-shimmer skeleton-bar skeleton-bar--text"></div></div>
-                  <div class="col-6"><div class="skeleton-shimmer skeleton-bar skeleton-bar--text-sm"></div></div>
-                  <div class="col-6"><div class="skeleton-shimmer skeleton-bar skeleton-bar--creator"></div></div>
+                  <div class="col-6">
+                    <div class="skeleton-shimmer skeleton-bar skeleton-bar--text"></div>
+                  </div>
+                  <div class="col-6">
+                    <div class="skeleton-shimmer skeleton-bar skeleton-bar--text"></div>
+                  </div>
+                  <div class="col-6">
+                    <div class="skeleton-shimmer skeleton-bar skeleton-bar--text-sm"></div>
+                  </div>
+                  <div class="col-6">
+                    <div class="skeleton-shimmer skeleton-bar skeleton-bar--creator"></div>
+                  </div>
                 </div>
                 <div class="d-flex gap-2 mt-2 pt-2 border-top">
                   <div class="skeleton-shimmer skeleton-action-btn"></div>
@@ -377,161 +387,161 @@
           } @else {
             @for (branch of branches(); track branch.id) {
               <app-mobile-record-card
-              class="branch-selectable-card"
-              [class.branch-context-selected]="selectedContextBranchId() === branch.id"
-              [attr.role]="canSelectBranchContext() ? 'link' : null"
-              [attr.tabindex]="canSelectBranchContext() ? 0 : null"
-              [attr.aria-label]="language() === 'ar' ? branch.arabicName : branch.englishName"
-              eyebrow="BR-{{ branch.id }}"
-              [title]="branch.arabicName"
-              icon="bi bi-building-fill"
-              (click)="selectBranchContext(branch)"
-              (keydown.enter)="selectBranchContext(branch)"
-              (keydown.space)="$event.preventDefault(); selectBranchContext(branch)"
-            >
-              <span
-                record-badges
-                class="status-pill"
-                [class.status-active]="branch.isActive"
-                [class.status-inactive]="!branch.isActive"
-                >{{ branchStatusLabel(branch) }}</span
+                class="branch-selectable-card"
+                [class.branch-context-selected]="selectedContextBranchId() === branch.id"
+                [attr.role]="canSelectBranchContext() ? 'link' : null"
+                [attr.tabindex]="canSelectBranchContext() ? 0 : null"
+                [attr.aria-label]="language() === 'ar' ? branch.arabicName : branch.englishName"
+                eyebrow="BR-{{ branch.id }}"
+                [title]="branch.arabicName"
+                icon="bi bi-building-fill"
+                (click)="selectBranchContext(branch)"
+                (keydown.enter)="selectBranchContext(branch)"
+                (keydown.space)="$event.preventDefault(); selectBranchContext(branch)"
               >
-              <span
-                record-badges
-                class="status-pill"
-                [class.status-active]="branch.effectiveIsActive"
-                [class.status-inactive]="!branch.effectiveIsActive"
-                >{{ branchOperationalLabel(branch) }}</span
-              >
-              <div record-fields>
-                <dt class="small fw-bold text-muted text-uppercase">
-                  {{ translations().englishNameLabel }}
-                </dt>
-                <dd class="mb-0 mt-1 text-break fw-bold">
-                  {{ branch.englishName }}
-                </dd>
-              </div>
-              <div record-fields>
-                <dt class="small fw-bold text-muted text-uppercase">
-                  {{ translations().ipAddressLabel }}
-                </dt>
-                <dd class="mb-0 mt-1 text-break fw-bold" dir="ltr">
-                  {{ branch.ipAddress }}
-                </dd>
-              </div>
-              <div record-fields>
-                <dt class="small fw-bold text-muted text-uppercase">
-                  {{ translations().governorateLabel }}
-                </dt>
-                <dd class="mb-0 mt-1 text-break fw-bold">
-                  {{ branch.governorate }}
-                </dd>
-              </div>
-              <div record-fields>
-                <dt class="small fw-bold text-muted text-uppercase">
-                  {{ translations().cityLabel }}
-                </dt>
-                <dd class="mb-0 mt-1 text-break fw-bold">{{ branch.city }}</dd>
-              </div>
-              <div record-fields class="record-field-wide">
-                <dt class="small fw-bold text-muted text-uppercase">
-                  {{ translations().createdByLabel }}
-                </dt>
-                <dd class="mb-0 mt-1 text-break fw-bold">
-                  {{ branch.createdBy }}
-                </dd>
-              </div>
-              <button
-                record-actions
-                type="button"
-                class="icon-action"
-                [title]="branchEditorTranslations().view"
-                [attr.aria-label]="branchEditorTranslations().view"
-                (click)="$event.stopPropagation(); openViewBranch(branch.id)"
-              >
-                <i class="bi bi-eye" aria-hidden="true"></i>
-              </button>
-              <button
-                record-actions
-                type="button"
-                class="icon-action"
-                [title]="branchEditorTranslations().edit"
-                [attr.aria-label]="branchEditorTranslations().edit"
-                (click)="$event.stopPropagation(); openEditBranch(branch.id)"
-              >
-                <i class="bi bi-pencil-square" aria-hidden="true"></i>
-              </button>
-              <button
-                record-actions
-                type="button"
-                class="icon-action"
-                [title]="branchEditorTranslations().branding"
-                [attr.aria-label]="branchEditorTranslations().branding"
-                (click)="$event.stopPropagation(); openBranchBranding(branch.id)"
-              >
-                <i class="bi bi-brush" aria-hidden="true"></i>
-              </button>
-              <button
-                record-actions
-                type="button"
-                class="icon-action"
-                [title]="branchEditorTranslations().displayVideos"
-                [attr.aria-label]="branchEditorTranslations().displayVideos"
-                (click)="$event.stopPropagation(); openDisplayVideos(branch.id)"
-              >
-                <i class="bi bi-film" aria-hidden="true"></i>
-              </button>
-              @if (canCreateBranchAdmin() && branch.isActive) {
+                <span
+                  record-badges
+                  class="status-pill"
+                  [class.status-active]="branch.isActive"
+                  [class.status-inactive]="!branch.isActive"
+                  >{{ branchStatusLabel(branch) }}</span
+                >
+                <span
+                  record-badges
+                  class="status-pill"
+                  [class.status-active]="branch.effectiveIsActive"
+                  [class.status-inactive]="!branch.effectiveIsActive"
+                  >{{ branchOperationalLabel(branch) }}</span
+                >
+                <div record-fields>
+                  <dt class="small fw-bold text-muted text-uppercase">
+                    {{ translations().englishNameLabel }}
+                  </dt>
+                  <dd class="mb-0 mt-1 text-break fw-bold">
+                    {{ branch.englishName }}
+                  </dd>
+                </div>
+                <div record-fields>
+                  <dt class="small fw-bold text-muted text-uppercase">
+                    {{ translations().ipAddressLabel }}
+                  </dt>
+                  <dd class="mb-0 mt-1 text-break fw-bold" dir="ltr">
+                    {{ branch.ipAddress }}
+                  </dd>
+                </div>
+                <div record-fields>
+                  <dt class="small fw-bold text-muted text-uppercase">
+                    {{ translations().governorateLabel }}
+                  </dt>
+                  <dd class="mb-0 mt-1 text-break fw-bold">
+                    {{ branch.governorate }}
+                  </dd>
+                </div>
+                <div record-fields>
+                  <dt class="small fw-bold text-muted text-uppercase">
+                    {{ translations().cityLabel }}
+                  </dt>
+                  <dd class="mb-0 mt-1 text-break fw-bold">{{ branch.city }}</dd>
+                </div>
+                <div record-fields class="record-field-wide">
+                  <dt class="small fw-bold text-muted text-uppercase">
+                    {{ translations().createdByLabel }}
+                  </dt>
+                  <dd class="mb-0 mt-1 text-break fw-bold">
+                    {{ branch.createdBy }}
+                  </dd>
+                </div>
                 <button
                   record-actions
                   type="button"
-                  class="icon-action success-action"
-                  [title]="branchAdminTranslations().addBranchAdmin"
-                  [attr.aria-label]="branchAdminTranslations().addBranchAdmin"
-                  (click)="$event.stopPropagation(); openCreateBranchAdmin(branch)"
+                  class="icon-action"
+                  [title]="branchEditorTranslations().view"
+                  [attr.aria-label]="branchEditorTranslations().view"
+                  (click)="$event.stopPropagation(); openViewBranch(branch.id)"
                 >
-                  <i class="bi bi-person-plus" aria-hidden="true"></i>
+                  <i class="bi bi-eye" aria-hidden="true"></i>
                 </button>
-              }
-              @if (branch.isActive) {
                 <button
                   record-actions
                   type="button"
-                  class="icon-action warning-action"
-                  [disabled]="deletingBranchId() === branch.id"
-                  [title]="branchEditorTranslations().deactivate"
-                  [attr.aria-label]="branchEditorTranslations().deactivate"
-                  (click)="$event.stopPropagation(); deactivateBranch(branch)"
+                  class="icon-action"
+                  [title]="branchEditorTranslations().edit"
+                  [attr.aria-label]="branchEditorTranslations().edit"
+                  (click)="$event.stopPropagation(); openEditBranch(branch.id)"
                 >
-                  <i class="bi bi-pause-circle" aria-hidden="true"></i>
+                  <i class="bi bi-pencil-square" aria-hidden="true"></i>
                 </button>
-              } @else {
-                <ng-container record-actions>
+                <button
+                  record-actions
+                  type="button"
+                  class="icon-action"
+                  [title]="branchEditorTranslations().branding"
+                  [attr.aria-label]="branchEditorTranslations().branding"
+                  (click)="$event.stopPropagation(); openBranchBranding(branch.id)"
+                >
+                  <i class="bi bi-brush" aria-hidden="true"></i>
+                </button>
+                <button
+                  record-actions
+                  type="button"
+                  class="icon-action"
+                  [title]="branchEditorTranslations().displayVideos"
+                  [attr.aria-label]="branchEditorTranslations().displayVideos"
+                  (click)="$event.stopPropagation(); openDisplayVideos(branch.id)"
+                >
+                  <i class="bi bi-film" aria-hidden="true"></i>
+                </button>
+                @if (canCreateBranchAdmin() && branch.isActive) {
                   <button
+                    record-actions
                     type="button"
                     class="icon-action success-action"
-                    [disabled]="deletingBranchId() === branch.id"
-                    [title]="branchEditorTranslations().reactivate"
-                    [attr.aria-label]="branchEditorTranslations().reactivate"
-                    (click)="$event.stopPropagation(); reactivateBranch(branch)"
+                    [title]="branchAdminTranslations().addBranchAdmin"
+                    [attr.aria-label]="branchAdminTranslations().addBranchAdmin"
+                    (click)="$event.stopPropagation(); openCreateBranchAdmin(branch)"
                   >
-                    <i class="bi bi-play-circle" aria-hidden="true"></i>
+                    <i class="bi bi-person-plus" aria-hidden="true"></i>
                   </button>
+                }
+                @if (branch.isActive) {
                   <button
+                    record-actions
                     type="button"
-                    class="icon-action danger-action"
+                    class="icon-action warning-action"
                     [disabled]="deletingBranchId() === branch.id"
-                    [title]="branchEditorTranslations().permanentDelete"
-                    [attr.aria-label]="branchEditorTranslations().permanentDelete"
-                    (click)="$event.stopPropagation(); permanentlyDeleteBranch(branch)"
+                    [title]="branchEditorTranslations().deactivate"
+                    [attr.aria-label]="branchEditorTranslations().deactivate"
+                    (click)="$event.stopPropagation(); deactivateBranch(branch)"
                   >
-                    <i class="bi bi-trash3" aria-hidden="true"></i>
+                    <i class="bi bi-pause-circle" aria-hidden="true"></i>
                   </button>
-                </ng-container>
-              }
-            </app-mobile-record-card>
+                } @else {
+                  <ng-container record-actions>
+                    <button
+                      type="button"
+                      class="icon-action success-action"
+                      [disabled]="deletingBranchId() === branch.id"
+                      [title]="branchEditorTranslations().reactivate"
+                      [attr.aria-label]="branchEditorTranslations().reactivate"
+                      (click)="$event.stopPropagation(); reactivateBranch(branch)"
+                    >
+                      <i class="bi bi-play-circle" aria-hidden="true"></i>
+                    </button>
+                    <button
+                      type="button"
+                      class="icon-action danger-action"
+                      [disabled]="deletingBranchId() === branch.id"
+                      [title]="branchEditorTranslations().permanentDelete"
+                      [attr.aria-label]="branchEditorTranslations().permanentDelete"
+                      (click)="$event.stopPropagation(); permanentlyDeleteBranch(branch)"
+                    >
+                      <i class="bi bi-trash3" aria-hidden="true"></i>
+                    </button>
+                  </ng-container>
+                }
+              </app-mobile-record-card>
+            }
           }
-        }
         </div>
 
         @if (branches().length === 0 && !branchTableLoading()) {
@@ -553,7 +563,12 @@
               [disabled]="!branchTableMeta().hasPreviousPage || branchTableLoading()"
               (click)="previousBranchPage()"
             >
-              <i class="bi me-1" [class.bi-chevron-right]="direction() === 'rtl'" [class.bi-chevron-left]="direction() !== 'rtl'" aria-hidden="true"></i>
+              <i
+                class="bi me-1"
+                [class.bi-chevron-right]="direction() === 'rtl'"
+                [class.bi-chevron-left]="direction() !== 'rtl'"
+                aria-hidden="true"
+              ></i>
               {{ translations().previousLabel }}
             </button>
             <span class="page-indicator">
@@ -566,7 +581,12 @@
               (click)="nextBranchPage()"
             >
               {{ translations().nextLabel }}
-              <i class="bi ms-1" [class.bi-chevron-left]="direction() === 'rtl'" [class.bi-chevron-right]="direction() !== 'rtl'" aria-hidden="true"></i>
+              <i
+                class="bi ms-1"
+                [class.bi-chevron-left]="direction() === 'rtl'"
+                [class.bi-chevron-right]="direction() !== 'rtl'"
+                aria-hidden="true"
+              ></i>
             </button>
           </div>
         </div>
@@ -641,10 +661,19 @@
           <div class="q-dialog-body">
             @if (branchPanelLoading()) {
               <div class="p-3 d-flex flex-column gap-3" aria-hidden="true">
-                <div class="skeleton-shimmer skeleton-bar" style="width: 45%; height: 18px;"></div>
-                <div class="skeleton-shimmer skeleton-bar" style="width: 100%; height: 38px; border-radius: 6px;"></div>
-                <div class="skeleton-shimmer skeleton-bar" style="width: 100%; height: 38px; border-radius: 6px;"></div>
-                <div class="skeleton-shimmer skeleton-bar" style="width: 75%; height: 38px; border-radius: 6px;"></div>
+                <div class="skeleton-shimmer skeleton-bar" style="width: 45%; height: 18px"></div>
+                <div
+                  class="skeleton-shimmer skeleton-bar"
+                  style="width: 100%; height: 38px; border-radius: 6px"
+                ></div>
+                <div
+                  class="skeleton-shimmer skeleton-bar"
+                  style="width: 100%; height: 38px; border-radius: 6px"
+                ></div>
+                <div
+                  class="skeleton-shimmer skeleton-bar"
+                  style="width: 75%; height: 38px; border-radius: 6px"
+                ></div>
               </div>
             }
 
@@ -658,10 +687,20 @@
                     >
                       <div class="d-flex align-items-center gap-2">
                         <span class="branch-form-card-icon branch-form-card-icon--teal">
-                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <rect width="18" height="18" x="3" y="3" rx="2"/>
-                            <path d="M3 9h18"/>
-                            <path d="M9 21V9"/>
+                          <svg
+                            width="18"
+                            height="18"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            aria-hidden="true"
+                          >
+                            <rect width="18" height="18" x="3" y="3" rx="2" />
+                            <path d="M3 9h18" />
+                            <path d="M9 21V9" />
                           </svg>
                         </span>
                         <div>
@@ -680,15 +719,29 @@
                         [class.q-detail-pill--active]="details.isActive"
                         [class.q-detail-pill--inactive]="!details.isActive"
                       >
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <svg
+                          width="12"
+                          height="12"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2.5"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          aria-hidden="true"
+                        >
                           @if (details.isActive) {
-                            <polyline points="20 6 9 17 4 12"/>
+                            <polyline points="20 6 9 17 4 12" />
                           } @else {
-                            <line x1="18" y1="6" x2="6" y2="18"/>
-                            <line x1="6" y1="6" x2="18" y2="18"/>
+                            <line x1="18" y1="6" x2="6" y2="18" />
+                            <line x1="6" y1="6" x2="18" y2="18" />
                           }
                         </svg>
-                        <span>{{ details.isActive ? branchEditorTranslations().active : branchEditorTranslations().inactive }}</span>
+                        <span>{{
+                          details.isActive
+                            ? branchEditorTranslations().active
+                            : branchEditorTranslations().inactive
+                        }}</span>
                       </span>
                     </div>
                   </div>
@@ -698,13 +751,23 @@
                       <div class="q-detail-item">
                         <span class="q-detail-label">
                           <span class="q-field-icon-badge q-field-icon-badge--teal">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                              <path d="m5 8 6 6"/>
-                              <path d="m4 14 6-6 2-3"/>
-                              <path d="M2 5h12"/>
-                              <path d="M7 2h1"/>
-                              <path d="m22 22-5-10-5 10"/>
-                              <path d="M14 18h6"/>
+                            <svg
+                              width="13"
+                              height="13"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="2.2"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              aria-hidden="true"
+                            >
+                              <path d="m5 8 6 6" />
+                              <path d="m4 14 6-6 2-3" />
+                              <path d="M2 5h12" />
+                              <path d="M7 2h1" />
+                              <path d="m22 22-5-10-5 10" />
+                              <path d="M14 18h6" />
                             </svg>
                           </span>
                           <span>{{ translations().arabicNameLabel }}</span>
@@ -715,52 +778,100 @@
                       <div class="q-detail-item">
                         <span class="q-detail-label">
                           <span class="q-field-icon-badge q-field-icon-badge--sky">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                              <polyline points="4 7 4 4 20 4 20 7"/>
-                              <line x1="9" x2="15" y1="20" y2="20"/>
-                              <line x1="12" x2="12" y1="4" y2="20"/>
+                            <svg
+                              width="13"
+                              height="13"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="2.2"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              aria-hidden="true"
+                            >
+                              <polyline points="4 7 4 4 20 4 20 7" />
+                              <line x1="9" x2="15" y1="20" y2="20" />
+                              <line x1="12" x2="12" y1="4" y2="20" />
                             </svg>
                           </span>
                           <span>{{ translations().englishNameLabel }}</span>
                         </span>
-                        <span class="q-detail-value" dir="ltr">{{ detailValue(details.englishName) }}</span>
+                        <span class="q-detail-value" dir="ltr">{{
+                          detailValue(details.englishName)
+                        }}</span>
                       </div>
 
                       <div class="q-detail-item">
                         <span class="q-detail-label">
                           <span class="q-field-icon-badge q-field-icon-badge--cyan">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                              <rect width="20" height="8" x="2" y="2" rx="2" ry="2"/>
-                              <rect width="20" height="8" x="2" y="14" rx="2" ry="2"/>
-                              <line x1="6" x2="6.01" y1="6" y2="6"/>
-                              <line x1="6" x2="6.01" y1="18" y2="18"/>
+                            <svg
+                              width="13"
+                              height="13"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="2.2"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              aria-hidden="true"
+                            >
+                              <rect width="20" height="8" x="2" y="2" rx="2" ry="2" />
+                              <rect width="20" height="8" x="2" y="14" rx="2" ry="2" />
+                              <line x1="6" x2="6.01" y1="6" y2="6" />
+                              <line x1="6" x2="6.01" y1="18" y2="18" />
                             </svg>
                           </span>
                           <span>{{ translations().ipAddressLabel }}</span>
                         </span>
-                        <span class="q-detail-value font-monospace" dir="ltr">{{ detailValue(details.ipAddress) }}</span>
+                        <span class="q-detail-value font-monospace" dir="ltr">{{
+                          detailValue(details.ipAddress)
+                        }}</span>
                       </div>
 
                       <div class="q-detail-item">
                         <span class="q-detail-label">
                           <span class="q-field-icon-badge q-field-icon-badge--amber">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                              <path d="m15.5 7.5 2.3 2.3a1 1 0 0 0 1.4 0l2.1-2.1a1 1 0 0 0 0-1.4L19 4"/>
-                              <path d="m21 2-9.6 9.6"/>
-                              <circle cx="7.5" cy="15.5" r="5.5"/>
+                            <svg
+                              width="13"
+                              height="13"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="2.2"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              aria-hidden="true"
+                            >
+                              <path
+                                d="m15.5 7.5 2.3 2.3a1 1 0 0 0 1.4 0l2.1-2.1a1 1 0 0 0 0-1.4L19 4"
+                              />
+                              <path d="m21 2-9.6 9.6" />
+                              <circle cx="7.5" cy="15.5" r="5.5" />
                             </svg>
                           </span>
                           <span>{{ branchEditorTranslations().license }}</span>
                         </span>
-                        <span class="q-detail-value font-monospace">{{ detailValue(details.license) }}</span>
+                        <span class="q-detail-value font-monospace">{{
+                          detailValue(details.license)
+                        }}</span>
                       </div>
 
                       <div class="q-detail-item">
                         <span class="q-detail-label">
                           <span class="q-field-icon-badge q-field-icon-badge--teal">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                              <rect width="20" height="12" x="2" y="6" rx="6" ry="6"/>
-                              <circle cx="16" cy="12" r="2"/>
+                            <svg
+                              width="13"
+                              height="13"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="2.2"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              aria-hidden="true"
+                            >
+                              <rect width="20" height="12" x="2" y="6" rx="6" ry="6" />
+                              <circle cx="16" cy="12" r="2" />
                             </svg>
                           </span>
                           <span>{{ branchEditorTranslations().status }}</span>
@@ -771,7 +882,11 @@
                             [class.q-detail-pill--active]="details.isActive"
                             [class.q-detail-pill--inactive]="!details.isActive"
                           >
-                            {{ details.isActive ? branchEditorTranslations().active : branchEditorTranslations().inactive }}
+                            {{
+                              details.isActive
+                                ? branchEditorTranslations().active
+                                : branchEditorTranslations().inactive
+                            }}
                           </span>
                         </div>
                       </div>
@@ -779,8 +894,18 @@
                       <div class="q-detail-item">
                         <span class="q-detail-label">
                           <span class="q-field-icon-badge q-field-icon-badge--emerald">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                            <svg
+                              width="13"
+                              height="13"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="2.2"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              aria-hidden="true"
+                            >
+                              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
                             </svg>
                           </span>
                           <span>{{ branchEditorTranslations().operationalStatus }}</span>
@@ -791,7 +916,11 @@
                             [class.q-detail-pill--active]="details.effectiveIsActive"
                             [class.q-detail-pill--inactive]="!details.effectiveIsActive"
                           >
-                            {{ details.effectiveIsActive ? branchEditorTranslations().operationalAvailable : branchEditorTranslations().operationalUnavailable }}
+                            {{
+                              details.effectiveIsActive
+                                ? branchEditorTranslations().operationalAvailable
+                                : branchEditorTranslations().operationalUnavailable
+                            }}
                           </span>
                         </div>
                       </div>
@@ -807,9 +936,19 @@
                     >
                       <div class="d-flex align-items-center gap-2">
                         <span class="branch-form-card-icon branch-form-card-icon--cyan">
-                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
-                            <circle cx="12" cy="10" r="3"/>
+                          <svg
+                            width="18"
+                            height="18"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            aria-hidden="true"
+                          >
+                            <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
+                            <circle cx="12" cy="10" r="3" />
                           </svg>
                         </span>
                         <div>
@@ -824,10 +963,22 @@
                         </div>
                       </div>
                       <span class="branch-badge-pill branch-badge-pill--cyan">
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                          <polygon points="3 11 22 2 13 21 11 13 3 11"/>
+                        <svg
+                          width="13"
+                          height="13"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2.4"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          aria-hidden="true"
+                        >
+                          <polygon points="3 11 22 2 13 21 11 13 3 11" />
                         </svg>
-                        <span>{{ direction() === 'rtl' ? 'تحديد دقيق بالخريطة' : 'Map Pinpoint' }}</span>
+                        <span>{{
+                          direction() === 'rtl' ? 'تحديد دقيق بالخريطة' : 'Map Pinpoint'
+                        }}</span>
                       </span>
                     </div>
                   </div>
@@ -837,117 +988,216 @@
                       <div class="q-detail-item">
                         <span class="q-detail-label">
                           <span class="q-field-icon-badge q-field-icon-badge--emerald">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                              <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/>
-                              <line x1="9" x2="9" y1="3" y2="18"/>
-                              <line x1="15" x2="15" y1="6" y2="21"/>
+                            <svg
+                              width="13"
+                              height="13"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="2.2"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              aria-hidden="true"
+                            >
+                              <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21" />
+                              <line x1="9" x2="9" y1="3" y2="18" />
+                              <line x1="15" x2="15" y1="6" y2="21" />
                             </svg>
                           </span>
                           <span>{{ translations().governorateLabel }}</span>
                         </span>
-                        <span class="q-detail-value">{{ detailValue(details.location?.governorate) }}</span>
+                        <span class="q-detail-value">{{
+                          detailValue(details.location?.governorate)
+                        }}</span>
                       </div>
 
                       <div class="q-detail-item">
                         <span class="q-detail-label">
                           <span class="q-field-icon-badge q-field-icon-badge--blue">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                              <rect width="16" height="20" x="4" y="2" rx="2" ry="2"/>
-                              <path d="M9 22v-4h6v4"/>
-                              <path d="M8 6h.01"/>
-                              <path d="M16 6h.01"/>
-                              <path d="M12 6h.01"/>
-                              <path d="M12 10h.01"/>
-                              <path d="M12 14h.01"/>
-                              <path d="M16 10h.01"/>
-                              <path d="M16 14h.01"/>
-                              <path d="M8 10h.01"/>
-                              <path d="M8 14h.01"/>
+                            <svg
+                              width="13"
+                              height="13"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="2.2"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              aria-hidden="true"
+                            >
+                              <rect width="16" height="20" x="4" y="2" rx="2" ry="2" />
+                              <path d="M9 22v-4h6v4" />
+                              <path d="M8 6h.01" />
+                              <path d="M16 6h.01" />
+                              <path d="M12 6h.01" />
+                              <path d="M12 10h.01" />
+                              <path d="M12 14h.01" />
+                              <path d="M16 10h.01" />
+                              <path d="M16 14h.01" />
+                              <path d="M8 10h.01" />
+                              <path d="M8 14h.01" />
                             </svg>
                           </span>
                           <span>{{ translations().cityLabel }}</span>
                         </span>
-                        <span class="q-detail-value">{{ detailValue(details.location?.city) }}</span>
+                        <span class="q-detail-value">{{
+                          detailValue(details.location?.city)
+                        }}</span>
                       </div>
 
                       <div class="q-detail-item">
                         <span class="q-detail-label">
                           <span class="q-field-icon-badge q-field-icon-badge--violet">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                              <circle cx="12" cy="12" r="10"/>
-                              <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>
+                            <svg
+                              width="13"
+                              height="13"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="2.2"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              aria-hidden="true"
+                            >
+                              <circle cx="12" cy="12" r="10" />
+                              <polygon
+                                points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"
+                              />
                             </svg>
                           </span>
                           <span>{{ branchEditorTranslations().area }}</span>
                         </span>
-                        <span class="q-detail-value">{{ detailValue(details.location?.area) }}</span>
+                        <span class="q-detail-value">{{
+                          detailValue(details.location?.area)
+                        }}</span>
                       </div>
 
                       <div class="q-detail-item q-detail-item--span-2">
                         <span class="q-detail-label">
                           <span class="q-field-icon-badge q-field-icon-badge--rose">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                              <path d="M18 6H5a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h13l4-3.5L18 6Z"/>
-                              <path d="M12 13v8"/>
-                              <path d="M12 3v3"/>
+                            <svg
+                              width="13"
+                              height="13"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="2.2"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              aria-hidden="true"
+                            >
+                              <path d="M18 6H5a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h13l4-3.5L18 6Z" />
+                              <path d="M12 13v8" />
+                              <path d="M12 3v3" />
                             </svg>
                           </span>
                           <span>{{ branchEditorTranslations().address }}</span>
                         </span>
-                        <span class="q-detail-value">{{ detailValue(details.location?.address) }}</span>
+                        <span class="q-detail-value">{{
+                          detailValue(details.location?.address)
+                        }}</span>
                       </div>
 
                       <div class="q-detail-item">
                         <span class="q-detail-label">
                           <span class="q-field-icon-badge q-field-icon-badge--indigo">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                              <circle cx="12" cy="12" r="10"/>
-                              <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/>
+                            <svg
+                              width="13"
+                              height="13"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="2.2"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              aria-hidden="true"
+                            >
+                              <circle cx="12" cy="12" r="10" />
+                              <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
                             </svg>
                           </span>
-                          <span>{{ branchEditorTranslations().longitude }} / {{ branchEditorTranslations().latitude }}</span>
+                          <span
+                            >{{ branchEditorTranslations().longitude }} /
+                            {{ branchEditorTranslations().latitude }}</span
+                          >
                         </span>
                         <span class="q-detail-value font-monospace" dir="ltr">
-                          {{ detailValue(details.location?.longitude) }}, {{ detailValue(details.location?.latitude) }}
+                          {{ detailValue(details.location?.longitude) }},
+                          {{ detailValue(details.location?.latitude) }}
                         </span>
                       </div>
                     </div>
 
-                    @if (details.location?.latitude && details.location?.longitude) {
-                      <div class="branch-map-picker-card mt-3">
-                        <div class="d-flex align-items-center justify-content-between mb-2">
-                          <span class="q-field-label fw-bold m-0 d-flex align-items-center gap-2">
-                            <span class="q-field-icon-badge q-field-icon-badge--teal">
-                              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/>
-                                <line x1="9" x2="9" y1="3" y2="18"/>
-                                <line x1="15" x2="15" y1="6" y2="21"/>
-                              </svg>
+                    @if (details.location; as loc) {
+                      @if (loc.latitude && loc.longitude) {
+                        <div class="branch-map-picker-card mt-3">
+                          <div class="d-flex align-items-center justify-content-between mb-2">
+                            <span class="q-field-label fw-bold m-0 d-flex align-items-center gap-2">
+                              <span class="q-field-icon-badge q-field-icon-badge--teal">
+                                <svg
+                                  width="13"
+                                  height="13"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  stroke-width="2.2"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  aria-hidden="true"
+                                >
+                                  <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21" />
+                                  <line x1="9" x2="9" y1="3" y2="18" />
+                                  <line x1="15" x2="15" y1="6" y2="21" />
+                                </svg>
+                              </span>
+                              <span>{{
+                                direction() === 'rtl'
+                                  ? 'موقع الفرع على الخريطة'
+                                  : 'Branch Map Location'
+                              }}</span>
                             </span>
-                            <span>{{ direction() === 'rtl' ? 'موقع الفرع على الخريطة' : 'Branch Map Location' }}</span>
-                          </span>
-                          <a
-                            [href]="'https://www.google.com/maps?q=' + details.location?.latitude + ',' + details.location?.longitude"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            class="branch-badge-pill branch-badge-pill--teal text-decoration-none"
-                          >
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
-                              <polyline points="15 3 21 3 21 9"/>
-                              <line x1="10" x2="21" y1="14" y2="3"/>
-                            </svg>
-                            <span>{{ direction() === 'rtl' ? 'فتح في خرائط جوجل' : 'Open in Google Maps' }}</span>
-                          </a>
+                            <a
+                              [href]="
+                                'https://www.google.com/maps?q=' +
+                                loc.latitude +
+                                ',' +
+                                loc.longitude
+                              "
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              class="branch-badge-pill branch-badge-pill--teal text-decoration-none"
+                            >
+                              <svg
+                                width="12"
+                                height="12"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2.2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                aria-hidden="true"
+                              >
+                                <path
+                                  d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"
+                                />
+                                <polyline points="15 3 21 3 21 9" />
+                                <line x1="10" x2="21" y1="14" y2="3" />
+                              </svg>
+                              <span>{{
+                                direction() === 'rtl' ? 'فتح في خرائط جوجل' : 'Open in Google Maps'
+                              }}</span>
+                            </a>
+                          </div>
+                          <app-map-location-picker
+                            [latitude]="loc.latitude"
+                            [longitude]="loc.longitude"
+                            [readOnly]="true"
+                            [direction]="direction()"
+                            height="200px"
+                          />
                         </div>
-                        <app-map-location-picker
-                          [latitude]="details.location?.latitude"
-                          [longitude]="details.location?.longitude"
-                          [readOnly]="true"
-                          [direction]="direction()"
-                          height="200px"
-                        />
-                      </div>
+                      }
                     }
                   </div>
                 </div>
@@ -957,9 +1207,19 @@
                   <div class="branch-form-card-header">
                     <div class="d-flex align-items-center gap-2">
                       <span class="branch-form-card-icon branch-form-card-icon--teal">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                          <path d="m9 12 2 2 4-4"/>
+                        <svg
+                          width="18"
+                          height="18"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          aria-hidden="true"
+                        >
+                          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                          <path d="m9 12 2 2 4-4" />
                         </svg>
                       </span>
                       <div>
@@ -980,11 +1240,21 @@
                       <div class="q-detail-item">
                         <span class="q-detail-label">
                           <span class="q-field-icon-badge q-field-icon-badge--sky">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-                              <circle cx="9" cy="7" r="4"/>
-                              <line x1="19" x2="19" y1="8" y2="14"/>
-                              <line x1="22" x2="16" y1="11" y2="11"/>
+                            <svg
+                              width="13"
+                              height="13"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="2.2"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              aria-hidden="true"
+                            >
+                              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                              <circle cx="9" cy="7" r="4" />
+                              <line x1="19" x2="19" y1="8" y2="14" />
+                              <line x1="22" x2="16" y1="11" y2="11" />
                             </svg>
                           </span>
                           <span>{{ translations().createdByLabel }}</span>
@@ -995,26 +1265,48 @@
                       <div class="q-detail-item">
                         <span class="q-detail-label">
                           <span class="q-field-icon-badge q-field-icon-badge--teal">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                              <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
-                              <line x1="16" x2="16" y1="2" y2="6"/>
-                              <line x1="8" x2="8" y1="2" y2="6"/>
-                              <line x1="3" x2="21" y1="10" y2="10"/>
+                            <svg
+                              width="13"
+                              height="13"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="2.2"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              aria-hidden="true"
+                            >
+                              <rect width="18" height="18" x="3" y="4" rx="2" ry="2" />
+                              <line x1="16" x2="16" y1="2" y2="6" />
+                              <line x1="8" x2="8" y1="2" y2="6" />
+                              <line x1="3" x2="21" y1="10" y2="10" />
                             </svg>
                           </span>
                           <span>{{ branchEditorTranslations().createdOn }}</span>
                         </span>
-                        <span class="q-detail-value">{{ formatNullableDate(details.createdOnUtc) }}</span>
+                        <span class="q-detail-value">{{
+                          formatNullableDate(details.createdOnUtc)
+                        }}</span>
                       </div>
 
                       <div class="q-detail-item">
                         <span class="q-detail-label">
                           <span class="q-field-icon-badge q-field-icon-badge--amber">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-                              <circle cx="9" cy="7" r="4"/>
-                              <circle cx="19" cy="11" r="2"/>
-                              <path d="m19 8 1 1-1 1"/>
+                            <svg
+                              width="13"
+                              height="13"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="2.2"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              aria-hidden="true"
+                            >
+                              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                              <circle cx="9" cy="7" r="4" />
+                              <circle cx="19" cy="11" r="2" />
+                              <path d="m19 8 1 1-1 1" />
                             </svg>
                           </span>
                           <span>{{ branchEditorTranslations().lastModifiedBy }}</span>
@@ -1025,14 +1317,26 @@
                       <div class="q-detail-item">
                         <span class="q-detail-label">
                           <span class="q-field-icon-badge q-field-icon-badge--violet">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                              <circle cx="12" cy="12" r="10"/>
-                              <polyline points="12 6 12 12 16 14"/>
+                            <svg
+                              width="13"
+                              height="13"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="2.2"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              aria-hidden="true"
+                            >
+                              <circle cx="12" cy="12" r="10" />
+                              <polyline points="12 6 12 12 16 14" />
                             </svg>
                           </span>
                           <span>{{ branchEditorTranslations().modifiedOn }}</span>
                         </span>
-                        <span class="q-detail-value">{{ formatNullableDate(details.modifiedOnUtc) }}</span>
+                        <span class="q-detail-value">{{
+                          formatNullableDate(details.modifiedOnUtc)
+                        }}</span>
                       </div>
                     </div>
                   </div>

@@ -11,14 +11,14 @@
         ? 'إدارة ألوان ونصوص شاشة العرض الخاصة بالفرع ورسائل الشريط المتحرك.'
         : 'Manage display colors, texts, and ticker messages for the branch.'
     "
-    icon="fa-solid fa-tv"
+    icon="bi bi-tv"
     iconVariant="teal"
   >
     <div hero-actions class="d-flex align-items-center gap-2 hero-controls flex-wrap">
       @if (isTechnicalAdmin() && branches().length > 1) {
         <div class="branch-select-wrapper">
           <span class="q-field-icon-badge q-field-icon-badge--violet">
-            <i class="fa-solid fa-building" aria-hidden="true"></i>
+            <i class="bi bi-building" aria-hidden="true"></i>
           </span>
           <label class="visually-hidden" for="displayConfigBranch">{{ copy().branchLabel }}</label>
           <select
@@ -39,7 +39,7 @@
       } @else if (selectedBranchId()) {
         <div class="branch-select-wrapper static-badge">
           <span class="q-field-icon-badge q-field-icon-badge--violet">
-            <i class="fa-solid fa-building" aria-hidden="true"></i>
+            <i class="bi bi-building" aria-hidden="true"></i>
           </span>
           <span class="fw-bold text-dark px-2 small">{{ selectedBranchLabel() }}</span>
         </div>
@@ -51,7 +51,7 @@
         [attr.title]="copy().refreshLabel"
         (click)="refresh()"
       >
-        <i class="fa-solid fa-arrows-rotate" style="color: #059669;" [class.spin]="configLoading()" aria-hidden="true"></i>
+        <i class="bi bi-arrow-clockwise" style="color: #059669;" [class.spin]="configLoading()" aria-hidden="true"></i>
         <span>{{ copy().refreshLabel }}</span>
       </button>
     </div>
@@ -88,7 +88,7 @@
       role="alert"
     >
       <div class="alert-icon-wrap bg-warning-subtle text-warning-emphasis">
-        <i class="fa-solid fa-shield-halved fs-4" aria-hidden="true"></i>
+        <i class="bi bi-shield-lock fs-4" aria-hidden="true"></i>
       </div>
       <div>
         <h6 class="mb-1 fw-bold">
@@ -110,7 +110,7 @@
   @if (!selectedBranchId() && !branchesLoading()) {
     <div class="empty-branch-placeholder card shadow-sm border-0 my-4 p-5 text-center">
       <div class="empty-icon-circle mx-auto mb-3">
-        <i class="fa-solid fa-tv text-primary fs-1"></i>
+        <i class="bi bi-tv text-primary fs-1"></i>
       </div>
       <h4 class="fw-bold text-dark mb-2">
         {{
@@ -146,7 +146,7 @@
             </span>
           } @else {
             <span class="q-detail-pill q-detail-pill--info">
-              <i class="fa-solid fa-plus-circle" aria-hidden="true"></i>
+              <i class="bi bi-plus-circle-fill" aria-hidden="true"></i>
               <span>{{
                 language() === 'ar'
                   ? 'وضع الإنشاء (إعدادات جديدة)'
@@ -156,7 +156,7 @@
           }
         </div>
         <span class="text-muted small fw-medium d-inline-flex align-items-center gap-2">
-          <i class="fa-solid fa-circle-info text-primary"></i>
+          <i class="bi bi-info-circle-fill text-primary"></i>
           <span>{{
             language() === 'ar'
               ? 'يتم تطبيق الإعدادات على جميع شاشات هذا الفرع'
@@ -171,7 +171,7 @@
           <div class="card config-panel h-100 shadow-sm">
             <div class="panel-header d-flex align-items-center gap-2">
               <span class="q-field-icon-badge q-field-icon-badge--sky">
-                <i class="fa-solid fa-palette"></i>
+                <i class="bi bi-palette"></i>
               </span>
               <h5 class="panel-title m-0">
                 {{ language() === 'ar' ? 'الشاشة والترويسة' : 'Display & Header' }}
@@ -183,7 +183,7 @@
                 <div class="col-sm-6">
                   <label class="form-label d-flex align-items-center gap-2" for="displayBackgroundColor">
                     <span class="q-field-icon-badge q-field-icon-badge--teal">
-                      <i class="fa-solid fa-fill-drip"></i>
+                      <i class="bi bi-paint-bucket"></i>
                     </span>
                     <span>{{ language() === 'ar' ? 'لون خلفية الشاشة' : 'Display Background' }}</span>
                   </label>
@@ -210,7 +210,7 @@
                 <div class="col-sm-6">
                   <label class="form-label d-flex align-items-center gap-2" for="headerBackgroundColor">
                     <span class="q-field-icon-badge q-field-icon-badge--indigo">
-                      <i class="fa-solid fa-heading"></i>
+                      <i class="bi bi-type-h1"></i>
                     </span>
                     <span>{{ language() === 'ar' ? 'لون خلفية الترويسة' : 'Header Background' }}</span>
                   </label>
@@ -237,7 +237,7 @@
                 <div class="col-12">
                   <label class="form-label d-flex align-items-center gap-2" for="mainTitleAr">
                     <span class="q-field-icon-badge q-field-icon-badge--sky">
-                      <i class="fa-solid fa-font"></i>
+                      <i class="bi bi-fonts"></i>
                     </span>
                     <span>{{ language() === 'ar' ? 'العنوان الرئيسي (عربي)' : 'Main Title (Arabic)' }}</span>
                   </label>
@@ -256,7 +256,7 @@
                 <div class="col-12">
                   <label class="form-label d-flex align-items-center gap-2" for="mainTitleEn">
                     <span class="q-field-icon-badge q-field-icon-badge--sky">
-                      <i class="fa-solid fa-font"></i>
+                      <i class="bi bi-fonts"></i>
                     </span>
                     <span>{{ language() === 'ar' ? 'العنوان الرئيسي (إنجليزي)' : 'Main Title (English)' }}</span>
                   </label>
@@ -275,7 +275,7 @@
                 <div class="col-sm-6">
                   <label class="form-label d-flex align-items-center gap-2" for="mainTitleTextColor">
                     <span class="q-field-icon-badge q-field-icon-badge--amber">
-                      <i class="fa-solid fa-paint-roller"></i>
+                      <i class="bi bi-brush"></i>
                     </span>
                     <span>{{ language() === 'ar' ? 'لون نص العنوان' : 'Title Text Color' }}</span>
                   </label>
@@ -301,7 +301,7 @@
                 <div class="col-sm-6">
                   <label class="form-label d-flex align-items-center gap-2" for="mainTitleFontSize">
                     <span class="q-field-icon-badge q-field-icon-badge--violet">
-                      <i class="fa-solid fa-text-height"></i>
+                      <i class="bi bi-textarea-resize"></i>
                     </span>
                     <span>{{ language() === 'ar' ? 'حجم خط العنوان (px)' : 'Title Font Size (px)' }}</span>
                   </label>
@@ -325,7 +325,7 @@
           <div class="card config-panel h-100 shadow-sm">
             <div class="panel-header d-flex align-items-center gap-2">
               <span class="q-field-icon-badge q-field-icon-badge--amber">
-                <i class="fa-solid fa-clock"></i>
+                <i class="bi bi-clock"></i>
               </span>
               <h5 class="panel-title m-0">
                 {{ language() === 'ar' ? 'شريط التيكر والساعة' : 'Ticker & Clock' }}
@@ -337,7 +337,7 @@
                 <div class="col-sm-6">
                   <label class="form-label d-flex align-items-center gap-2" for="tickerBackgroundColor">
                     <span class="q-field-icon-badge q-field-icon-badge--indigo">
-                      <i class="fa-solid fa-bars-staggered"></i>
+                      <i class="bi bi-list-stars"></i>
                     </span>
                     <span>{{ language() === 'ar' ? 'خلفية شريط التيكر' : 'Ticker Background' }}</span>
                   </label>
@@ -363,7 +363,7 @@
                 <div class="col-sm-6">
                   <label class="form-label d-flex align-items-center gap-2" for="tickerTextColor">
                     <span class="q-field-icon-badge q-field-icon-badge--sky">
-                      <i class="fa-solid fa-font"></i>
+                      <i class="bi bi-fonts"></i>
                     </span>
                     <span>{{ language() === 'ar' ? 'لون نص التيكر' : 'Ticker Text Color' }}</span>
                   </label>
@@ -389,7 +389,7 @@
                 <div class="col-sm-6">
                   <label class="form-label d-flex align-items-center gap-2" for="tickerFontSize">
                     <span class="q-field-icon-badge q-field-icon-badge--violet">
-                      <i class="fa-solid fa-text-height"></i>
+                      <i class="bi bi-textarea-resize"></i>
                     </span>
                     <span>{{ language() === 'ar' ? 'حجم خط التيكر (px)' : 'Ticker Font Size (px)' }}</span>
                   </label>
@@ -416,7 +416,7 @@
                     />
                     <label class="form-check-label fw-semibold d-inline-flex align-items-center gap-2" for="showClock">
                       <span class="q-field-icon-badge q-field-icon-badge--amber">
-                        <i class="fa-solid fa-clock"></i>
+                        <i class="bi bi-clock"></i>
                       </span>
                       <span>{{ language() === 'ar' ? 'إظهار الساعة بالشريط' : 'Show Clock in Ticker' }}</span>
                     </label>
@@ -427,7 +427,7 @@
                 <div class="col-sm-6">
                   <label class="form-label d-flex align-items-center gap-2" for="clockBackgroundColor">
                     <span class="q-field-icon-badge q-field-icon-badge--teal">
-                      <i class="fa-solid fa-fill-drip"></i>
+                      <i class="bi bi-paint-bucket"></i>
                     </span>
                     <span>{{ language() === 'ar' ? 'لون خلفية الساعة' : 'Clock Background' }}</span>
                   </label>
@@ -453,7 +453,7 @@
                 <div class="col-sm-6">
                   <label class="form-label d-flex align-items-center gap-2" for="clockTextColor">
                     <span class="q-field-icon-badge q-field-icon-badge--sky">
-                      <i class="fa-solid fa-clock-rotate-left"></i>
+                      <i class="bi bi-clock-history"></i>
                     </span>
                     <span>{{ language() === 'ar' ? 'لون نص الساعة' : 'Clock Text Color' }}</span>
                   </label>
@@ -484,7 +484,7 @@
           <div class="card config-panel shadow-sm">
             <div class="panel-header d-flex align-items-center gap-2">
               <span class="q-field-icon-badge q-field-icon-badge--indigo">
-                <i class="fa-solid fa-table-cells"></i>
+                <i class="bi bi-grid-3x3"></i>
               </span>
               <h5 class="panel-title m-0">
                 {{
@@ -498,7 +498,7 @@
               <!-- Subheading: Column Titles -->
               <h6 class="section-subtitle mb-3 d-flex align-items-center gap-2">
                 <span class="q-field-icon-badge q-field-icon-badge--sky">
-                  <i class="fa-solid fa-table-columns"></i>
+                  <i class="bi bi-layout-three-columns"></i>
                 </span>
                 <span>{{
                   language() === 'ar' ? 'عناوين الأعمدة في شاشة العرض' : 'Display Column Titles'
@@ -509,7 +509,7 @@
                 <div class="col-md-4 col-sm-6">
                   <label class="form-label d-flex align-items-center gap-2" for="ticketColumnTitleAr">
                     <span class="q-field-icon-badge q-field-icon-badge--sky">
-                      <i class="fa-solid fa-ticket"></i>
+                      <i class="bi bi-ticket-detailed"></i>
                     </span>
                     <span>{{ language() === 'ar' ? 'عمود التذكرة (عربي)' : 'Ticket (Arabic)' }}</span>
                   </label>
@@ -526,7 +526,7 @@
                 <div class="col-md-4 col-sm-6">
                   <label class="form-label d-flex align-items-center gap-2" for="serviceColumnTitleAr">
                     <span class="q-field-icon-badge q-field-icon-badge--teal">
-                      <i class="fa-solid fa-briefcase"></i>
+                      <i class="bi bi-briefcase"></i>
                     </span>
                     <span>{{ language() === 'ar' ? 'عمود الخدمة (عربي)' : 'Service (Arabic)' }}</span>
                   </label>
@@ -543,7 +543,7 @@
                 <div class="col-md-4 col-sm-6">
                   <label class="form-label d-flex align-items-center gap-2" for="windowColumnTitleAr">
                     <span class="q-field-icon-badge q-field-icon-badge--violet">
-                      <i class="fa-solid fa-window-maximize"></i>
+                      <i class="bi bi-window"></i>
                     </span>
                     <span>{{ language() === 'ar' ? 'عمود الشباك (عربي)' : 'Window (Arabic)' }}</span>
                   </label>
@@ -561,7 +561,7 @@
                 <div class="col-md-4 col-sm-6">
                   <label class="form-label d-flex align-items-center gap-2" for="ticketColumnTitleEn">
                     <span class="q-field-icon-badge q-field-icon-badge--sky">
-                      <i class="fa-solid fa-ticket"></i>
+                      <i class="bi bi-ticket-detailed"></i>
                     </span>
                     <span>{{ language() === 'ar' ? 'عمود التذكرة (إنجليزي)' : 'Ticket (English)' }}</span>
                   </label>
@@ -578,7 +578,7 @@
                 <div class="col-md-4 col-sm-6">
                   <label class="form-label d-flex align-items-center gap-2" for="serviceColumnTitleEn">
                     <span class="q-field-icon-badge q-field-icon-badge--teal">
-                      <i class="fa-solid fa-briefcase"></i>
+                      <i class="bi bi-briefcase"></i>
                     </span>
                     <span>{{ language() === 'ar' ? 'عمود الخدمة (إنجليزي)' : 'Service (English)' }}</span>
                   </label>
@@ -595,7 +595,7 @@
                 <div class="col-md-4 col-sm-6">
                   <label class="form-label d-flex align-items-center gap-2" for="windowColumnTitleEn">
                     <span class="q-field-icon-badge q-field-icon-badge--violet">
-                      <i class="fa-solid fa-window-maximize"></i>
+                      <i class="bi bi-window"></i>
                     </span>
                     <span>{{ language() === 'ar' ? 'عمود الشباك (إنجليزي)' : 'Window (English)' }}</span>
                   </label>
@@ -614,7 +614,7 @@
               <!-- Subheading: Table Colors -->
               <h6 class="section-subtitle mb-3 d-flex align-items-center gap-2 pt-3 border-top">
                 <span class="q-field-icon-badge q-field-icon-badge--teal">
-                  <i class="fa-solid fa-paint-roller"></i>
+                  <i class="bi bi-brush"></i>
                 </span>
                 <span>{{
                   language() === 'ar'
@@ -626,7 +626,7 @@
                 <div class="col-lg-4 col-sm-6">
                   <label class="form-label d-flex align-items-center gap-2" for="tableHeaderBackgroundColor">
                     <span class="q-field-icon-badge q-field-icon-badge--indigo">
-                      <i class="fa-solid fa-table-columns"></i>
+                      <i class="bi bi-layout-three-columns"></i>
                     </span>
                     <span>{{ language() === 'ar' ? 'خلفية ترويسة الجدول' : 'Header Background' }}</span>
                   </label>
@@ -651,7 +651,7 @@
                 <div class="col-lg-4 col-sm-6">
                   <label class="form-label d-flex align-items-center gap-2" for="tableHeaderTextColor">
                     <span class="q-field-icon-badge q-field-icon-badge--sky">
-                      <i class="fa-solid fa-font"></i>
+                      <i class="bi bi-fonts"></i>
                     </span>
                     <span>{{ language() === 'ar' ? 'نص ترويسة الجدول' : 'Header Text' }}</span>
                   </label>
@@ -676,7 +676,7 @@
                 <div class="col-lg-4 col-sm-6">
                   <label class="form-label d-flex align-items-center gap-2" for="tableRowBackgroundColor">
                     <span class="q-field-icon-badge q-field-icon-badge--teal">
-                      <i class="fa-solid fa-table-cells-large"></i>
+                      <i class="bi bi-grid"></i>
                     </span>
                     <span>{{ language() === 'ar' ? 'خلفية صفوف الجدول' : 'Row Background' }}</span>
                   </label>
@@ -701,7 +701,7 @@
                 <div class="col-lg-4 col-sm-6">
                   <label class="form-label d-flex align-items-center gap-2" for="tableRowTextColor">
                     <span class="q-field-icon-badge q-field-icon-badge--sky">
-                      <i class="fa-solid fa-font"></i>
+                      <i class="bi bi-fonts"></i>
                     </span>
                     <span>{{ language() === 'ar' ? 'نص صفوف الجدول' : 'Row Text' }}</span>
                   </label>
@@ -726,7 +726,7 @@
                 <div class="col-lg-4 col-sm-6">
                   <label class="form-label d-flex align-items-center gap-2" for="ticketNumberBackgroundColor">
                     <span class="q-field-icon-badge q-field-icon-badge--amber">
-                      <i class="fa-solid fa-ticket"></i>
+                      <i class="bi bi-ticket-detailed"></i>
                     </span>
                     <span>{{ language() === 'ar' ? 'خلفية بادج التذكرة' : 'Ticket Badge Background' }}</span>
                   </label>
@@ -751,7 +751,7 @@
                 <div class="col-lg-4 col-sm-6">
                   <label class="form-label d-flex align-items-center gap-2" for="ticketNumberTextColor">
                     <span class="q-field-icon-badge q-field-icon-badge--rose">
-                      <i class="fa-solid fa-font"></i>
+                      <i class="bi bi-fonts"></i>
                     </span>
                     <span>{{ language() === 'ar' ? 'نص بادج التذكرة' : 'Ticket Badge Text' }}</span>
                   </label>
@@ -785,7 +785,7 @@
             >
               <div class="d-flex align-items-center gap-2">
                 <span class="q-field-icon-badge q-field-icon-badge--violet">
-                  <i class="fa-solid fa-bullhorn"></i>
+                  <i class="bi bi-megaphone"></i>
                 </span>
                 <h5 class="panel-title m-0">
                   {{
@@ -804,7 +804,7 @@
                     messageSaving() || showAddMessageForm() || editingMessageId() !== null
                   "
                 >
-                  <i class="fa-solid fa-plus"></i>
+                  <i class="bi bi-plus-lg"></i>
                   <span class="text-white">{{ language() === 'ar' ? 'إضافة رسالة' : 'Add Message' }}</span>
                 </button>
               }
@@ -827,9 +827,9 @@
                     <h6 class="m-0 fw-bold text-primary d-flex align-items-center gap-2">
                       <span class="q-field-icon-badge q-field-icon-badge--sky">
                         <i
-                          class="fa-solid"
-                          [class.fa-plus-circle]="showAddMessageForm()"
-                          [class.fa-pen-to-square]="editingMessageId() !== null"
+                          class="bi"
+                          [class.bi-plus-circle-fill]="showAddMessageForm()"
+                          [class.bi-pencil-square]="editingMessageId() !== null"
                         ></i>
                       </span>
                       <span>
@@ -849,7 +849,7 @@
                     <div class="col-md-5">
                       <label class="form-label small d-flex align-items-center gap-1" for="msgTextAr">
                         <span class="q-field-icon-badge q-field-icon-badge--sky" style="width: 20px; height: 20px; font-size: 0.65rem;">
-                          <i class="fa-solid fa-font"></i>
+                          <i class="bi bi-fonts"></i>
                         </span>
                         <span>{{ language() === 'ar' ? 'النص العربي' : 'Arabic Text' }}</span>
                       </label>
@@ -865,7 +865,7 @@
                     <div class="col-md-5">
                       <label class="form-label small d-flex align-items-center gap-1" for="msgTextEn">
                         <span class="q-field-icon-badge q-field-icon-badge--sky" style="width: 20px; height: 20px; font-size: 0.65rem;">
-                          <i class="fa-solid fa-font"></i>
+                          <i class="bi bi-fonts"></i>
                         </span>
                         <span>{{ language() === 'ar' ? 'النص الإنجليزي' : 'English Text' }}</span>
                       </label>
@@ -881,7 +881,7 @@
                     <div class="col-md-2">
                       <label class="form-label small d-flex align-items-center gap-1" for="msgOrder">
                         <span class="q-field-icon-badge q-field-icon-badge--amber" style="width: 20px; height: 20px; font-size: 0.65rem;">
-                          <i class="fa-solid fa-list-ol"></i>
+                          <i class="bi bi-list-ol"></i>
                         </span>
                         <span>{{ language() === 'ar' ? 'الترتيب' : 'Order' }}</span>
                       </label>
@@ -944,7 +944,7 @@
               @if (!messagesLoading() && messages().length === 0 && !showAddMessageForm()) {
                 <div class="admin-list-empty d-flex align-items-center gap-3 p-4 my-2" role="status">
                   <span class="admin-list-empty-icon d-inline-flex align-items-center justify-content-center flex-shrink-0" aria-hidden="true">
-                    <i class="fa-solid fa-comment-dots"></i>
+                    <i class="bi bi-chat-dots"></i>
                   </span>
                   <div>
                     <h6 class="fw-bold mb-1">{{ language() === 'ar' ? 'لا توجد رسائل تيكر حالياً' : 'No Ticker Messages' }}</h6>
@@ -997,7 +997,7 @@
                             <div class="d-flex align-items-center justify-content-center gap-1">
                               @if (canUpdate() && editingMessageId() === null) {
                                 <i
-                                  class="fa-solid fa-grip-vertical text-muted drag-handle"
+                                  class="bi bi-grip-vertical text-muted drag-handle"
                                   title="اسحب لإعادة الترتيب"
                                 ></i>
                               }
@@ -1040,7 +1040,7 @@
                                   [attr.aria-label]="language() === 'ar' ? 'تعديل' : 'Edit'"
                                   [title]="language() === 'ar' ? 'تعديل' : 'Edit'"
                                 >
-                                  <i class="fa-solid fa-pen-to-square"></i>
+                                  <i class="bi bi-pencil-square"></i>
                                 </button>
                                 @if (msg.isActive) {
                                   <button
@@ -1051,7 +1051,7 @@
                                     [attr.aria-label]="language() === 'ar' ? 'إيقاف' : 'Deactivate'"
                                     [title]="language() === 'ar' ? 'إيقاف' : 'Deactivate'"
                                   >
-                                    <i class="fa-solid fa-power-off"></i>
+                                    <i class="bi bi-power"></i>
                                   </button>
                                 } @else {
                                   <button
@@ -1062,7 +1062,7 @@
                                     [attr.aria-label]="language() === 'ar' ? 'تفعيل' : 'Reactivate'"
                                     [title]="language() === 'ar' ? 'تفعيل' : 'Reactivate'"
                                   >
-                                    <i class="fa-solid fa-rotate-left"></i>
+                                    <i class="bi bi-arrow-counterclockwise"></i>
                                   </button>
                                 }
                               </div>
@@ -1085,14 +1085,14 @@
               <div class="d-flex align-items-center gap-2">
                 @if (configForm.dirty) {
                   <div class="q-detail-pill q-detail-pill--warning">
-                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <i class="bi bi-exclamation-triangle-fill"></i>
                     <span class="fw-semibold">{{
                       language() === 'ar' ? 'توجد تعديلات غير محفوظة' : 'Unsaved Changes'
                     }}</span>
                   </div>
                 } @else {
                   <div class="q-detail-pill q-detail-pill--active">
-                    <i class="fa-solid fa-circle-check"></i>
+                    <i class="bi bi-check-circle-fill"></i>
                     <span class="fw-semibold">{{
                       language() === 'ar' ? 'جميع الإعدادات محفوظة ومحدثة' : 'All Settings Saved'
                     }}</span>
@@ -1111,7 +1111,7 @@
                     aria-hidden="true"
                   ></span>
                 } @else {
-                  <i class="fa-solid fa-cloud-arrow-up"></i>
+                  <i class="bi bi-cloud-arrow-up"></i>
                 }
                 <span class="text-white">{{ copy().saveConfigurationLabel }}</span>
               </button>

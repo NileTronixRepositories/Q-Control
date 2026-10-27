@@ -15,7 +15,9 @@
           type="button"
           class="secondary-action d-inline-flex align-items-center gap-2"
           (click)="goToWorkflows()"
-          [title]="language() === 'ar' ? 'الانتقال لمسارات عمليات هذه الخدمة' : 'Go to service workflows'"
+          [title]="
+            language() === 'ar' ? 'الانتقال لمسارات عمليات هذه الخدمة' : 'Go to service workflows'
+          "
         >
           <i class="bi bi-diagram-3 text-primary" aria-hidden="true"></i>
           <span>{{ language() === 'ar' ? 'مسار العمليات' : 'Workflows' }}</span>
@@ -29,11 +31,11 @@
       }
     </div>
 
-    <div hero-filters class="w-100 schedule-compact-filters mt-1">
+    <div hero-filters class="queue-filters-wrapper w-100 schedule-compact-filters mt-1">
       @if (!hasRouteScope()) {
         <div class="row g-2 align-items-end">
           @if (!isBranchAdmin()) {
-            <div class="col-12 col-sm-6 col-lg-3 flex-grow-1">
+            <div class="col-12 col-sm-6 col-xl-3 flex-grow-1">
               <label class="compact-filter-field w-100">
                 <span class="compact-label">{{ translations().branch }}</span>
                 <select
@@ -55,7 +57,7 @@
 
           @if (selectedBranchId() && scheduleTree().length > 0) {
             @for (level of serviceSelectLevels(); track level.index) {
-              <div class="col-12 col-sm-6 col-lg-3 flex-grow-1">
+              <div class="col-12 col-sm-6 col-xl-3 flex-grow-1">
                 <label class="compact-filter-field w-100">
                   <span class="compact-label">{{ translations().service }}</span>
                   <select
@@ -165,21 +167,22 @@
           }
 
           <!-- Single Unified Header: Scope & Status + Code Config + Action Buttons -->
-          <header
-            class="schedule-unified-header d-flex align-items-center justify-content-between flex-wrap gap-3"
-          >
-            <!-- Start: Service Icon, Title, Branch & Operational Status -->
-            <div class="d-flex align-items-center gap-3 flex-wrap">
-              <div class="schedule-service-icon">
-                <i class="bi bi-calendar-check" aria-hidden="true"></i>
+          <header class="schedule-unified-header">
+            <!-- Main: Service Icon, Title, Branch & Operational Status -->
+            <div class="schedule-header-main">
+              <div class="d-flex align-items-center gap-3 min-w-0">
+                <div class="schedule-service-icon">
+                  <i class="bi bi-calendar-check" aria-hidden="true"></i>
+                </div>
+                <div class="schedule-title-area">
+                  <span class="schedule-eyebrow d-block">{{
+                    translations().service || 'الخدمة'
+                  }}</span>
+                  <h4 class="schedule-main-title">{{ currentScope.serviceName }}</h4>
+                </div>
               </div>
-              <div class="schedule-title-area">
-                <span class="schedule-eyebrow d-block">{{
-                  translations().service || 'الخدمة'
-                }}</span>
-                <h4 class="schedule-main-title">{{ currentScope.serviceName }}</h4>
-              </div>
-              <div class="d-flex align-items-center gap-2">
+
+              <div class="d-flex align-items-center gap-2 flex-wrap">
                 <span
                   class="badge bg-light text-secondary border px-3 py-1.5 rounded-pill fw-semibold"
                 >
@@ -214,8 +217,8 @@
               </div>
             </div>
 
-            <!-- End: Slot Code Configuration & Action Buttons -->
-            <div class="d-flex align-items-center gap-3 flex-wrap">
+            <!-- Controls: Slot Code Configuration & Action Buttons -->
+            <div class="schedule-header-controls">
               <div class="code-config-group d-flex align-items-center gap-2">
                 <label
                   class="form-check-label d-inline-flex align-items-center gap-2 mb-0 fw-bold small text-dark cursor-pointer"
@@ -244,7 +247,7 @@
                 }
               </div>
 
-              <div class="d-flex align-items-center gap-2">
+              <div class="d-flex align-items-center gap-2 ms-auto">
                 @if (scheduleForm.dirty && !saving()) {
                   <button type="button" class="secondary-action" (click)="resetInlineChanges()">
                     <i class="bi bi-x-lg" aria-hidden="true"></i>
@@ -267,8 +270,8 @@
             </div>
           </header>
 
-          <!-- Schedule Rules Table -->
-          <div class="table-responsive table-wrap">
+          <!-- Schedule Rules Desktop Table -->
+          <div class="table-responsive table-wrap d-none d-md-block">
             <table class="table align-middle custom-table mb-0">
               <thead>
                 <tr>
@@ -374,6 +377,106 @@
             </table>
           </div>
 
+          <!-- Schedule Rules Mobile Cards -->
+          <div class="schedule-mobile-rules d-grid d-md-none gap-3 p-3">
+            @for (rule of rules(); track $index; let ruleIndex = $index) {
+              <article class="schedule-mobile-rule-card p-3 rounded-3 border bg-white shadow-sm">
+                <header
+                  class="d-flex align-items-center justify-content-between mb-2 pb-2 border-bottom"
+                >
+                  <div class="d-flex align-items-center gap-2">
+                    <span class="badge bg-light text-dark border">#{{ ruleIndex + 1 }}</span>
+                    <span
+                      class="status-badge-compact"
+                      [class.valid]="rule.valid"
+                      [class.invalid]="!rule.valid"
+                    >
+                      @if (rule.valid) {
+                        <i class="bi bi-check-lg" aria-hidden="true"></i>
+                      } @else {
+                        <i class="bi bi-exclamation-lg" aria-hidden="true"></i>
+                      }
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    class="btn-icon-danger"
+                    [disabled]="inlineControlsDisabled()"
+                    (click)="removeRule(ruleIndex)"
+                    [title]="language() === 'ar' ? 'حذف' : 'Delete'"
+                  >
+                    <i class="bi bi-trash" aria-hidden="true"></i>
+                  </button>
+                </header>
+
+                <div class="row g-2 mb-3">
+                  <div class="col-6">
+                    <label class="form-label small fw-bold mb-1">{{
+                      translations().startTime
+                    }}</label>
+                    <div class="time-input-container">
+                      <i class="bi bi-clock"></i>
+                      <input
+                        #mobileStartTimePicker
+                        class="form-control time-field"
+                        type="time"
+                        [readonly]="inlineControlsDisabled()"
+                        [formControl]="rule.controls.startTime"
+                        (click)="openNativeTimePicker(mobileStartTimePicker)"
+                      />
+                    </div>
+                    @if (ruleControlError(ruleIndex, 'startTime'); as error) {
+                      <small class="text-danger d-block mt-1 fw-bold">{{ error }}</small>
+                    }
+                  </div>
+                  <div class="col-6">
+                    <label class="form-label small fw-bold mb-1">{{
+                      translations().endTime
+                    }}</label>
+                    <div class="time-input-container">
+                      <i class="bi bi-clock-history"></i>
+                      <input
+                        #mobileEndTimePicker
+                        class="form-control time-field"
+                        type="time"
+                        [readonly]="inlineControlsDisabled()"
+                        [formControl]="rule.controls.endTime"
+                        (click)="openNativeTimePicker(mobileEndTimePicker)"
+                      />
+                    </div>
+                    @if (ruleControlError(ruleIndex, 'endTime'); as error) {
+                      <small class="text-danger d-block mt-1 fw-bold">{{ error }}</small>
+                    }
+                  </div>
+                </div>
+
+                <div class="day-selection-mobile">
+                  <label class="form-label small fw-bold mb-1.5 d-block">{{
+                    translations().day
+                  }}</label>
+                  <div class="day-toggle-group w-100 justify-content-start">
+                    @for (day of days; track day) {
+                      <button
+                        type="button"
+                        class="day-toggle-btn"
+                        [class.active]="rule.controls.day.value === day"
+                        [disabled]="inlineControlsDisabled()"
+                        (click)="
+                          rule.controls.day.setValue(day);
+                          scheduleForm.markAsDirty();
+                          scheduleForm.updateValueAndValidity()
+                        "
+                        [title]="dayLabel(day)"
+                      >
+                        {{ dayLabel(day) }}
+                      </button>
+                    }
+                  </div>
+                </div>
+              </article>
+            }
+          </div>
+
           @if (formError(); as error) {
             <div
               class="p-3 bg-danger-subtle text-danger border-top d-flex align-items-center gap-2"
@@ -404,12 +507,15 @@
         </form>
       } @else {
         <section class="schedule-empty-placeholder-card mt-3">
-          <span class="schedule-empty-icon">
-            <i class="bi bi-calendar-week" aria-hidden="true"></i>
-          </span>
-          <div class="empty-placeholder-content">
-            <h2>{{ translations().weeklySchedule }}</h2>
-            <p>
+          <div class="empty-icon-wrapper mb-3">
+            <div class="empty-icon-pulse"></div>
+            <div class="empty-icon-box schedule-empty-icon">
+              <i class="bi bi-calendar-week" aria-hidden="true"></i>
+            </div>
+          </div>
+          <div class="empty-placeholder-content text-center">
+            <h2 class="empty-title">{{ translations().weeklySchedule }}</h2>
+            <p class="empty-subtitle">
               {{
                 selectedBranchId()
                   ? translations().selectServiceFirst

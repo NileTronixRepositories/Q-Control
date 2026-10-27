@@ -3,6 +3,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   DestroyRef,
+  HostListener,
   OnDestroy,
   OnInit,
   computed,
@@ -287,10 +288,21 @@ export class GlobalizationRequestsComponent implements OnInit, OnDestroy {
         : translations.rejected;
   }
 
+  @HostListener('document:keydown.escape')
+  protected onEscapeKey(): void {
+    if (this.store.decisionState()) {
+      this.store.closeDecision();
+      return;
+    }
+    if (this.store.detailsOpen()) {
+      this.store.closeDetails();
+    }
+  }
+
   protected statusClasses(status: ServiceGlobalizationRequestStatus): string {
-    if (status === 'Approved') return 'glob-status-approved';
-    if (status === 'Rejected') return 'glob-status-rejected';
-    return 'glob-status-pending';
+    if (status === 'Approved') return 'glob-status-approved bg-success-subtle text-success';
+    if (status === 'Rejected') return 'glob-status-rejected bg-danger-subtle text-danger';
+    return 'glob-status-pending bg-warning-subtle text-warning-emphasis';
   }
 
   protected statusIcon(status: ServiceGlobalizationRequestStatus): string {

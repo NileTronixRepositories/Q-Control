@@ -16,7 +16,9 @@ interface ChangeInitialPasswordCopy {
   readonly title: string;
   readonly description: string;
   readonly newPasswordLabel: string;
+  readonly newPasswordPlaceholder: string;
   readonly confirmPasswordLabel: string;
+  readonly confirmPasswordPlaceholder: string;
   readonly required: string;
   readonly minLength: string;
   readonly mismatch: string;
@@ -25,38 +27,53 @@ interface ChangeInitialPasswordCopy {
   readonly logout: string;
   readonly success: string;
   readonly fallbackError: string;
+  readonly welcomeEyebrow: string;
+  readonly welcomeHeading: string;
+  readonly welcomeDescription: string;
 }
 
 const COPY: Record<AppLanguage, ChangeInitialPasswordCopy> = {
   ar: {
-    eyebrow: '\u0623\u0648\u0644 \u062a\u0633\u062c\u064a\u0644 \u062f\u062e\u0648\u0644',
-    title: '\u062a\u063a\u064a\u064a\u0631 \u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631 \u0627\u0644\u0645\u0624\u0642\u062a\u0629',
-    description: '\u0623\u062f\u062e\u0644 \u0643\u0644\u0645\u0629 \u0645\u0631\u0648\u0631 \u062c\u062f\u064a\u062f\u0629 \u0644\u062a\u0641\u0639\u064a\u0644 \u062d\u0633\u0627\u0628\u0643.',
-    newPasswordLabel: '\u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631 \u0627\u0644\u062c\u062f\u064a\u062f\u0629',
-    confirmPasswordLabel: '\u062a\u0623\u0643\u064a\u062f \u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631',
-    required: '\u0647\u0630\u0627 \u0627\u0644\u062d\u0642\u0644 \u0645\u0637\u0644\u0648\u0628.',
-    minLength: '\u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631 \u064a\u062c\u0628 \u0623\u0644\u0627 \u062a\u0642\u0644 \u0639\u0646 6 \u0623\u062d\u0631\u0641.',
-    mismatch: '\u0643\u0644\u0645\u062a\u0627 \u0627\u0644\u0645\u0631\u0648\u0631 \u063a\u064a\u0631 \u0645\u062a\u0637\u0627\u0628\u0642\u062a\u064a\u0646.',
-    submit: '\u062a\u063a\u064a\u064a\u0631 \u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631',
-    submitting: '\u062c\u0627\u0631\u064a \u0627\u0644\u062a\u063a\u064a\u064a\u0631...',
-    logout: '\u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u062e\u0631\u0648\u062c',
-    success: '\u062a\u0645 \u062a\u063a\u064a\u064a\u0631 \u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631 \u0628\u0646\u062c\u0627\u062d.',
-    fallbackError: '\u062a\u0639\u0630\u0631 \u062a\u063a\u064a\u064a\u0631 \u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631.',
+    welcomeEyebrow: 'أمان الحساب',
+    welcomeHeading: 'تأمين وصولك إلى لوحة التحكم المركزية.',
+    welcomeDescription:
+      'لحماية بيانات المرضى والعمليات التشغيلية، يرجى تعيين كلمة مرور قوية وخاصة بك للمتابعة.',
+    eyebrow: 'أول تسجيل دخول',
+    title: 'تغيير كلمة المرور المؤقتة',
+    description: 'أدخل كلمة مرور جديدة ومؤكدة لتفعيل حسابك والمتابعة إلى لوحة التحكم.',
+    newPasswordLabel: 'كلمة المرور الجديدة',
+    newPasswordPlaceholder: 'أدخل كلمة المرور الجديدة',
+    confirmPasswordLabel: 'تأكيد كلمة المرور',
+    confirmPasswordPlaceholder: 'أعد إدخال كلمة المرور للتأكيد',
+    required: 'هذا الحقل مطلوب.',
+    minLength: 'كلمة المرور يجب ألا تقل عن 6 أحرف.',
+    mismatch: 'كلمتا المرور غير متطابقتين.',
+    submit: 'تأكيد وحفظ كلمة المرور',
+    submitting: 'جارٍ الحفظ والتفعيل...',
+    logout: 'تسجيل الخروج',
+    success: 'تم تغيير كلمة المرور بنجاح. جارٍ التحويل...',
+    fallbackError: 'تعذر تغيير كلمة المرور. يرجى المحاولة مرة أخرى.',
   },
   en: {
+    welcomeEyebrow: 'Account Security',
+    welcomeHeading: 'Securing your access to the central dashboard.',
+    welcomeDescription:
+      'To safeguard patient records and hospital operations, please set a strong private password to continue.',
     eyebrow: 'First login',
     title: 'Change temporary password',
-    description: 'Enter a new password to activate your account.',
+    description: 'Enter and confirm a new password to activate your account and proceed.',
     newPasswordLabel: 'New password',
+    newPasswordPlaceholder: 'Enter your new password',
     confirmPasswordLabel: 'Confirm new password',
+    confirmPasswordPlaceholder: 'Re-enter your password to confirm',
     required: 'This field is required.',
     minLength: 'Password must be at least 6 characters.',
     mismatch: 'Passwords do not match.',
-    submit: 'Change password',
-    submitting: 'Changing password...',
+    submit: 'Confirm and save password',
+    submitting: 'Saving and activating...',
     logout: 'Logout',
-    success: 'Password changed successfully.',
-    fallbackError: 'Password could not be changed.',
+    success: 'Password changed successfully. Redirecting...',
+    fallbackError: 'Password could not be changed. Please try again.',
   },
 };
 
@@ -81,6 +98,7 @@ export class ChangeInitialPasswordComponent {
   protected readonly backendMessage = signal('');
   protected readonly newPasswordVisible = signal(false);
   protected readonly confirmPasswordVisible = signal(false);
+  protected readonly toastDismissed = signal(false);
 
   private readonly routeProtectionEffect = effect(() => {
     const session = this.authSessionService.currentSession();
@@ -115,6 +133,21 @@ export class ChangeInitialPasswordComponent {
     return '';
   });
 
+  protected readonly formFeedback = computed(() => {
+    if (this.toastDismissed()) {
+      return '';
+    }
+    return this.formMessage();
+  });
+
+  protected dismissToast(): void {
+    this.toastDismissed.set(true);
+  }
+
+  protected setLanguage(language: AppLanguage): void {
+    this.i18nStore.setLanguage(language);
+  }
+
   protected toggleNewPasswordVisibility(): void {
     this.newPasswordVisible.update((isVisible) => !isVisible);
   }
@@ -129,6 +162,7 @@ export class ChangeInitialPasswordComponent {
   }
 
   protected submitPassword(): void {
+    this.toastDismissed.set(false);
     this.backendMessage.set('');
 
     if (!this.isPasswordFormValid()) {

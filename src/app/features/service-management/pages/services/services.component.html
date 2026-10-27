@@ -7,7 +7,7 @@
     [eyebrow]="translations().title"
     [title]="translations().title"
     [description]="translations().description"
-    icon="fa-solid fa-layer-group"
+    icon="bi bi-layers"
     iconVariant="teal"
   >
     @if (canCreateGlobal() && canViewAll()) {
@@ -17,18 +17,18 @@
         class="primary-action d-inline-flex align-items-center justify-content-center gap-2"
         (click)="openCreateRoot()"
       >
-        <i class="fa-solid fa-plus" aria-hidden="true"></i> {{ translations().addRootService }}
+        <i class="bi bi-plus-lg" aria-hidden="true"></i> {{ translations().addRootService }}
       </button>
     }
 
     @if (canUseCatalog()) {
-      <div hero-filters class="w-100" [attr.inert]="isWriteDrawerOpen() ? '' : null">
+      <div hero-filters class="queue-filters-wrapper w-100" [attr.inert]="isWriteDrawerOpen() ? '' : null">
         <div class="row g-3 align-items-end">
           <div class="col-12 col-md-4 col-lg-3">
             <label class="filter-field d-flex flex-column gap-1">
               <span class="d-flex align-items-center gap-2 fw-bold small text-dark">
                 <span class="q-field-icon-badge q-field-icon-badge--teal">
-                  <i class="fa-solid fa-filter"></i>
+                  <i class="bi bi-funnel"></i>
                 </span>
                 <span>{{ translations().scopeFilter }}</span>
               </span>
@@ -47,7 +47,7 @@
             <label class="filter-field d-flex flex-column gap-1">
               <span class="d-flex align-items-center gap-2 fw-bold small text-dark">
                 <span class="q-field-icon-badge q-field-icon-badge--violet">
-                  <i class="fa-solid fa-building"></i>
+                  <i class="bi bi-building"></i>
                 </span>
                 <span>{{ translations().ownerBranchFilter }}</span>
               </span>
@@ -66,7 +66,7 @@
               <label class="filter-field d-flex flex-column gap-1">
                 <span class="d-flex align-items-center gap-2 fw-bold small text-dark">
                   <span class="q-field-icon-badge q-field-icon-badge--sky">
-                    <i class="fa-solid fa-code-branch"></i>
+                    <i class="bi bi-diagram-3"></i>
                   </span>
                   <span>{{ translations().assignedFilter }}</span>
                 </span>
@@ -167,7 +167,7 @@
                     </span>
                   }
                   <span class="q-detail-pill q-detail-pill--neutral" role="listitem">
-                    <i class="fa-solid fa-diagram-project text-muted small" aria-hidden="true"></i>
+                    <i class="bi bi-diagram-3 text-muted small" aria-hidden="true"></i>
                     <span>{{ scopeLabel(details.scope) }}</span>
                   </span>
                   <span
@@ -177,7 +177,7 @@
                     role="listitem"
                   >
                     <i
-                      [class]="details.isTicketIssuable ? 'fa-solid fa-ticket text-teal small' : 'fa-solid fa-ticket text-muted small'"
+                      [class]="details.isTicketIssuable ? 'bi bi-ticket-perforated text-teal small' : 'bi bi-ticket-perforated text-muted small'"
                       aria-hidden="true"
                     ></i>
                     <span>
@@ -261,7 +261,7 @@
                                   [class.is-neutral]="item.tone === 'neutral'"
                                 >
                                   <i
-                                    [class]="item.tone === 'positive' ? 'fa-solid fa-circle-check text-success' : item.tone === 'negative' ? 'fa-solid fa-circle-xmark text-danger' : 'fa-solid fa-minus text-muted'"
+                                    [class]="item.tone === 'positive' ? 'bi bi-check-circle-fill text-success' : item.tone === 'negative' ? 'bi bi-x-circle-fill text-danger' : 'bi bi-dash text-muted'"
                                     aria-hidden="true"
                                   ></i>
                                   <span>{{ item.value }}</span>

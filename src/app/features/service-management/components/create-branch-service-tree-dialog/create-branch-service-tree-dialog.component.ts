@@ -63,6 +63,8 @@ export class CreateBranchServiceTreeDialogComponent {
   readonly mode = input<CreateBranchServiceTreeMode>('root');
   readonly parentLabel = input<string | null>(null);
   readonly leafOnly = input(false);
+  readonly direction = input<string>('rtl');
+  readonly language = input<string>('ar');
 
   readonly closed = output<void>();
   readonly created = output<CreateBranchServiceTreeRequest>();

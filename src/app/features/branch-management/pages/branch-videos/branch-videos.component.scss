@@ -133,3 +133,29 @@
 
 /* Unified toast notifications inherited from components.css */
 
+/* ─── Mobile Cards Responsive ────────────────────────── */
+.video-mobile-card {
+  transition:
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+
+  &:hover {
+    border-color: var(--q-primary, #0b8aa8);
+    box-shadow: 0 4px 12px rgba(11, 138, 168, 0.08) !important;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .branch-videos-page {
+    padding-bottom: 5rem;
+  }
+
+  .branch-select-wrapper {
+    width: 100%;
+
+    .branch-selector-control {
+      max-width: none;
+      flex: 1;
+    }
+  }
+}

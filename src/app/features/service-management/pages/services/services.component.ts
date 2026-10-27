@@ -233,19 +233,19 @@ export class ServicesComponent implements OnInit, OnDestroy {
       {
         key: 'basic',
         title: translations.basicInfo,
-        icon: 'fa-solid fa-circle-info',
+        icon: 'bi bi-info-circle',
         badgeVariant: 'sky',
         items: [
-          this.detailText('arabicName', translations.arabicName, details.arabicName, 'fa-solid fa-language', 'sky'),
-          this.detailText('englishName', translations.englishName, details.englishName, 'fa-solid fa-font', 'violet'),
-          this.detailText('scope', translations.scope, this.scopeLabel(details.scope), 'fa-solid fa-diagram-project', 'teal'),
+          this.detailText('arabicName', translations.arabicName, details.arabicName, 'bi bi-translate', 'sky'),
+          this.detailText('englishName', translations.englishName, details.englishName, 'bi bi-fonts', 'violet'),
+          this.detailText('scope', translations.scope, this.scopeLabel(details.scope), 'bi bi-diagram-3', 'teal'),
           ...(details.scope === 'BranchScoped' || details.ownerBranchId
             ? [
                 this.detailText(
                   'ownerBranch',
                   translations.ownerBranch,
                   this.ownerBranchLabel(details),
-                  'fa-solid fa-building',
+                  'bi bi-building',
                   'amber',
                 ),
               ]
@@ -254,7 +254,7 @@ export class ServicesComponent implements OnInit, OnDestroy {
             'serviceCodeRequired',
             translations.serviceCodeRequired,
             details.isServiceCodeRequired,
-            'fa-solid fa-barcode',
+            'bi bi-upc-scan',
             'indigo',
           ),
           ...(details.isServiceCodeRequired || details.serviceCode
@@ -263,7 +263,7 @@ export class ServicesComponent implements OnInit, OnDestroy {
                   'serviceCode',
                   translations.serviceCode,
                   this.formatText(details.serviceCode),
-                  'fa-solid fa-qrcode',
+                  'bi bi-qr-code',
                   'sky',
                 ),
               ]
@@ -274,7 +274,7 @@ export class ServicesComponent implements OnInit, OnDestroy {
                   'arabicUserMessage',
                   translations.arabicUserMessage,
                   details.arabicUserMessage,
-                  'fa-solid fa-comment-dots',
+                  'bi bi-chat-dots',
                   'teal',
                 ),
               ]
@@ -285,7 +285,7 @@ export class ServicesComponent implements OnInit, OnDestroy {
                   'englishUserMessage',
                   translations.englishUserMessage,
                   details.englishUserMessage,
-                  'fa-solid fa-comment-dots',
+                  'bi bi-chat-dots',
                   'violet',
                 ),
               ]
@@ -295,7 +295,7 @@ export class ServicesComponent implements OnInit, OnDestroy {
       {
         key: 'behavior',
         title: translations.ticketBehavior,
-        icon: 'fa-solid fa-ticket',
+        icon: 'bi bi-ticket-perforated',
         badgeVariant: 'teal',
         items: [
           this.detailStatus(
@@ -303,7 +303,7 @@ export class ServicesComponent implements OnInit, OnDestroy {
             translations.status,
             this.statusLabel(details),
             details.isActive && !details.isDeleted,
-            'fa-solid fa-circle-check',
+            'bi bi-check-circle',
             'emerald',
           ),
           ...(!details.effectiveIsActive
@@ -313,7 +313,7 @@ export class ServicesComponent implements OnInit, OnDestroy {
                   translations.effectiveActive,
                   this.effectiveStatusLabel(details),
                   false,
-                  'fa-solid fa-shield-halved',
+                  'bi bi-shield-check',
                   'amber',
                 ),
               ]
@@ -322,21 +322,21 @@ export class ServicesComponent implements OnInit, OnDestroy {
             'ticketIssuable',
             translations.ticketIssuable,
             details.isTicketIssuable,
-            'fa-solid fa-ticket',
+            'bi bi-ticket-perforated',
             'sky',
           ),
           this.detailBoolean(
             'clientInputRequired',
             translations.clientInputRequired,
             details.isClientInputRequired,
-            'fa-solid fa-keyboard',
+            'bi bi-keyboard',
             'amber',
           ),
           this.detailBoolean(
             'hasReservation',
             translations.hasReservation,
             details.hasReservation,
-            'fa-solid fa-calendar-check',
+            'bi bi-calendar2-check',
             'violet',
           ),
         ],
@@ -344,35 +344,35 @@ export class ServicesComponent implements OnInit, OnDestroy {
       {
         key: 'numbers',
         title: translations.ticketNumbers,
-        icon: 'fa-solid fa-arrow-down-1-9',
+        icon: 'bi bi-sort-numeric-down',
         badgeVariant: 'indigo',
         items: [
           this.detailText(
             'rangePrefix',
             translations.rangePrefix,
             this.formatText(details.rangePrefix),
-            'fa-solid fa-signature',
+            'bi bi-pen',
             'indigo',
           ),
           this.detailText(
             'rangeStartNumber',
             translations.rangeStartNumber,
             details.rangeStartNumber,
-            'fa-solid fa-play',
+            'bi bi-play-circle',
             'teal',
           ),
           this.detailText(
             'rangeEndNumber',
             translations.rangeEndNumber,
             details.rangeEndNumber,
-            'fa-solid fa-stop',
+            'bi bi-stop-circle',
             'rose',
           ),
           this.detailText(
             'noOfTicketCopies',
             translations.noOfTicketCopies,
             details.noOfTicketCopies,
-            'fa-solid fa-copy',
+            'bi bi-copy',
             'sky',
           ),
           this.detailText(
@@ -383,12 +383,12 @@ export class ServicesComponent implements OnInit, OnDestroy {
               : isArabic
                 ? '0 دقيقة'
                 : '0 min',
-            'fa-solid fa-clock',
+            'bi bi-clock',
             'amber',
           ),
-          this.detailText('priority', translations.priority, details.priority ?? 0, 'fa-solid fa-arrow-up-wide-short', 'violet'),
-          this.detailText('weight', translations.weight, details.weight ?? 0, 'fa-solid fa-weight-hanging', 'sky'),
-          this.detailText('orderNo', translations.orderNo, details.orderNo ?? 0, 'fa-solid fa-list-ol', 'teal'),
+          this.detailText('priority', translations.priority, details.priority ?? 0, 'bi bi-sort-up', 'violet'),
+          this.detailText('weight', translations.weight, details.weight ?? 0, 'bi bi-speedometer2', 'sky'),
+          this.detailText('orderNo', translations.orderNo, details.orderNo ?? 0, 'bi bi-list-ol', 'teal'),
         ],
       },
       ...(details.isClientInputRequired && details.customInputs && details.customInputs.length > 0
@@ -396,14 +396,14 @@ export class ServicesComponent implements OnInit, OnDestroy {
             {
               key: 'customInputs',
               title: translations.customInputDetails,
-              icon: 'fa-solid fa-pen-to-square',
+              icon: 'bi bi-pencil-square',
               badgeVariant: 'amber',
               items: details.customInputs.map((input, idx) =>
                 this.detailText(
                   `customInput_${idx}`,
                   `${input.order}. ${isArabic ? input.labelAr || input.name : input.labelEn || input.name} (${input.type})`,
                   input.isRequired ? translations.customInputRequired : translations.no,
-                  'fa-solid fa-pen-to-square',
+                  'bi bi-pencil-square',
                   'amber',
                 ),
               ),

@@ -1,20 +1,22 @@
-.app-shell.mobile-navigation-overlay :where(
-  .admin-responsive-page,
-  .branch-page,
-  .waiting-areas-page,
-  .window-management-page,
-  .display-management-page,
-  .terminal-management-page,
-  .service-management-page,
-  .branch-services-page,
-  .workflow-page
-) {
+.app-shell.mobile-navigation-overlay
+  :where(
+    .admin-responsive-page,
+    .branch-page,
+    .waiting-areas-page,
+    .window-management-page,
+    .display-management-page,
+    .terminal-management-page,
+    .service-management-page,
+    .branch-services-page,
+    .workflow-page
+  ) {
   min-width: 0;
   overflow-x: clip;
 }
 
 @media (min-width: 768px) and (max-width: 1199.98px) {
-  .app-shell.mobile-navigation-overlay :where(.svc-workspace, .svc-form-row-support, .svc-form-row-metrics) {
+  .app-shell.mobile-navigation-overlay
+    :where(.svc-workspace, .svc-form-row-support, .svc-form-row-metrics) {
     grid-template-columns: minmax(0, 1fr) !important;
   }
 }
@@ -83,6 +85,8 @@
 
   .app-shell.mobile-navigation-overlay .sidebar,
   .app-shell.mobile-navigation-overlay.sidebar-collapsed .sidebar {
+    position: fixed !important;
+    inset-block: 0;
     inset-inline-start: 0;
     z-index: 1200;
     width: min(88vw, var(--sidebar-width));
@@ -92,7 +96,10 @@
     visibility: hidden;
     opacity: 0;
     transform: translateX(-105%);
-    transition: transform 220ms ease, opacity 180ms ease, visibility 220ms;
+    transition:
+      transform 220ms ease,
+      opacity 180ms ease,
+      visibility 220ms;
   }
 
   .app-shell.app-shell-rtl.mobile-navigation-overlay .sidebar,
@@ -127,65 +134,68 @@
     padding: 0 !important;
   }
 
-  .app-shell.mobile-navigation-overlay :where(
-    .admin-responsive-page,
-    .branch-page,
-    .waiting-areas-page,
-    .window-management-page,
-    .display-management-page,
-    .terminal-management-page,
-    .service-management-page,
-    .branch-services-page,
-    .workflow-page
-  ) {
+  .app-shell.mobile-navigation-overlay
+    :where(
+      .admin-responsive-page,
+      .branch-page,
+      .waiting-areas-page,
+      .window-management-page,
+      .display-management-page,
+      .terminal-management-page,
+      .service-management-page,
+      .branch-services-page,
+      .workflow-page
+    ) {
     width: 100%;
     max-width: 100%;
     gap: 12px !important;
     padding: 12px !important;
   }
 
-  .app-shell.mobile-navigation-overlay :where(
-    .details-list,
-    .editor-form,
-    .svc-workspace,
-    .svc-branch-assignment-workspace,
-    .svc-details-grid,
-    .svc-form-grid,
-    .workflow-grid
-  ) {
+  .app-shell.mobile-navigation-overlay
+    :where(
+      .details-list,
+      .editor-form,
+      .svc-workspace,
+      .svc-branch-assignment-workspace,
+      .svc-details-grid,
+      .svc-form-grid,
+      .workflow-grid
+    ) {
     grid-template-columns: minmax(0, 1fr) !important;
   }
 
-  .app-shell.mobile-navigation-overlay :where(
-    .branch-services-field,
-    .branch-services-active-branch
-  ) {
+  .app-shell.mobile-navigation-overlay
+    :where(.branch-services-field, .branch-services-active-branch) {
     width: 100% !important;
     min-width: 0 !important;
     max-width: 100% !important;
   }
 
-  .app-shell.mobile-navigation-overlay :where(
-    .pagination-bar,
-    .pagination-actions,
-    .pager-actions,
-    .branch-services-toolbar,
-    .branch-services-actions,
-    .form-actions,
-    .dialog-actions
-  ) {
+  .app-shell.mobile-navigation-overlay
+    :where(
+      .pagination-bar,
+      .pagination-actions,
+      .pager-actions,
+      .branch-services-toolbar,
+      .branch-services-actions,
+      .form-actions,
+      .dialog-actions
+    ) {
     align-items: stretch !important;
     flex-direction: column !important;
     width: 100%;
   }
 
-  .app-shell.mobile-navigation-overlay :where(
-    .pagination-actions,
-    .pager-actions,
-    .form-actions,
-    .dialog-actions,
-    .branch-services-actions
-  ) > :where(button, .btn) {
+  .app-shell.mobile-navigation-overlay
+    :where(
+      .pagination-actions,
+      .pager-actions,
+      .form-actions,
+      .dialog-actions,
+      .branch-services-actions
+    )
+    > :where(button, .btn) {
     width: 100% !important;
     min-width: 0 !important;
     min-height: 44px !important;
@@ -196,15 +206,16 @@
     padding: 14px !important;
   }
 
-  .app-shell.mobile-navigation-overlay :where(
-    .app-popup-wide,
-    .waiting-area-editor-panel,
-    .window-editor-panel:not(.window-confirm-panel),
-    .display-editor-panel:not(.display-confirm-panel),
-    .terminal-editor-panel:not(.terminal-confirm-panel),
-    .branch-services-dialog,
-    .branch-tree-dialog
-  ) {
+  .app-shell.mobile-navigation-overlay
+    :where(
+      .app-popup-wide,
+      .waiting-area-editor-panel,
+      .window-editor-panel:not(.window-confirm-panel),
+      .display-editor-panel:not(.display-confirm-panel),
+      .terminal-editor-panel:not(.terminal-confirm-panel),
+      .branch-services-dialog,
+      .branch-tree-dialog
+    ) {
     inset: 0 !important;
     width: 100dvw !important;
     max-width: 100dvw !important;
@@ -214,13 +225,14 @@
     transform: none !important;
   }
 
-  .app-shell.mobile-navigation-overlay :where(
-    .window-confirm-panel,
-    .display-confirm-panel,
-    .terminal-confirm-panel,
-    .svc-dialog,
-    .workflow-confirm-panel
-  ) {
+  .app-shell.mobile-navigation-overlay
+    :where(
+      .window-confirm-panel,
+      .display-confirm-panel,
+      .terminal-confirm-panel,
+      .svc-dialog,
+      .workflow-confirm-panel
+    ) {
     top: auto !important;
     right: auto !important;
     bottom: max(8px, env(safe-area-inset-bottom)) !important;
@@ -233,44 +245,55 @@
     transform: translateX(-50%) !important;
   }
 
-  .app-shell.mobile-navigation-overlay :where(
-    .app-popup-wide,
-    .waiting-area-editor-panel,
-    .window-editor-panel:not(.window-confirm-panel),
-    .display-editor-panel:not(.display-confirm-panel),
-    .terminal-editor-panel:not(.terminal-confirm-panel),
-    .branch-services-dialog,
-    .branch-tree-dialog
-  ) > :where(form, .details-list, .dialog-content, .branch-services-dialog-body, .branch-tree-body) {
+  .app-shell.mobile-navigation-overlay
+    :where(
+      .app-popup-wide,
+      .waiting-area-editor-panel,
+      .window-editor-panel:not(.window-confirm-panel),
+      .display-editor-panel:not(.display-confirm-panel),
+      .terminal-editor-panel:not(.terminal-confirm-panel),
+      .branch-services-dialog,
+      .branch-tree-dialog
+    )
+    > :where(
+      form,
+      .details-list,
+      .dialog-content,
+      .branch-services-dialog-body,
+      .branch-tree-body
+    ) {
     min-height: 0;
     overflow-y: auto;
     overscroll-behavior: contain;
   }
 
-  .app-shell.mobile-navigation-overlay :where(
-    .editor-panel-header,
-    .panel-header,
-    .window-editor-panel-header,
-    .display-editor-panel-header,
-    .terminal-editor-panel-header,
-    .branch-services-dialog-header,
-    .branch-tree-header
-  ) {
+  .app-shell.mobile-navigation-overlay
+    :where(
+      .editor-panel-header,
+      .panel-header,
+      .window-editor-panel-header,
+      .display-editor-panel-header,
+      .terminal-editor-panel-header,
+      .branch-services-dialog-header,
+      .branch-tree-header
+    ) {
     flex: 0 0 auto;
     position: sticky;
     top: 0;
     z-index: 3;
   }
 
-  .app-shell.mobile-navigation-overlay :where(
-    .app-popup-wide,
-    .waiting-area-editor-panel,
-    .window-editor-panel:not(.window-confirm-panel),
-    .display-editor-panel:not(.display-confirm-panel),
-    .terminal-editor-panel:not(.terminal-confirm-panel),
-    .branch-services-dialog,
-    .branch-tree-dialog
-  ) :where(.editor-actions, .form-actions, .branch-services-dialog-actions, .branch-tree-actions) {
+  .app-shell.mobile-navigation-overlay
+    :where(
+      .app-popup-wide,
+      .waiting-area-editor-panel,
+      .window-editor-panel:not(.window-confirm-panel),
+      .display-editor-panel:not(.display-confirm-panel),
+      .terminal-editor-panel:not(.terminal-confirm-panel),
+      .branch-services-dialog,
+      .branch-tree-dialog
+    )
+    :where(.editor-actions, .form-actions, .branch-services-dialog-actions, .branch-tree-actions) {
     position: sticky;
     bottom: 0;
     z-index: 3;

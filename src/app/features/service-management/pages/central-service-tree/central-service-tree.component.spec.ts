@@ -38,10 +38,23 @@ const rootNode: ServiceTreeNode = {
 
 describe('CentralServiceTreeComponent', () => {
   let fixture: ComponentFixture<CentralServiceTreeComponent>;
-  let api: { readonly getCentralServiceTree: ReturnType<typeof vi.fn> };
+  let api: {
+    readonly getCentralServiceTree: ReturnType<typeof vi.fn>;
+    readonly getServiceDetails: ReturnType<typeof vi.fn>;
+  };
 
   beforeEach(async () => {
-    api = { getCentralServiceTree: vi.fn(() => of([rootNode])) };
+    api = {
+      getCentralServiceTree: vi.fn(() => of([rootNode])),
+      getServiceDetails: vi.fn(() =>
+        of({
+          id: 9,
+          serviceCode: 'SRV-1',
+          arabicName: 'الخدمات',
+          englishName: 'Services',
+        }),
+      ),
+    };
     await TestBed.configureTestingModule({
       imports: [CentralServiceTreeComponent],
       providers: [
@@ -85,5 +98,27 @@ describe('CentralServiceTreeComponent', () => {
       includeInactive: false,
       includeDeleted: true,
     });
+  });
+
+  it('does not open preview when selecting a node in the tree', () => {
+    const tree = fixture.debugElement.query(By.directive(ServiceHierarchyTreeComponent))
+      .componentInstance as ServiceHierarchyTreeComponent;
+    tree.selectNode.emit(rootNode);
+    fixture.detectChanges();
+
+    expect(fixture.componentInstance['selectedServiceId']()).toBe(9);
+    expect(fixture.componentInstance['selectedNode']()).toBeNull();
+    expect(api.getServiceDetails).not.toHaveBeenCalled();
+  });
+
+  it('opens preview and loads details when clicking viewNode (preview button)', () => {
+    const tree = fixture.debugElement.query(By.directive(ServiceHierarchyTreeComponent))
+      .componentInstance as ServiceHierarchyTreeComponent;
+    tree.viewNode.emit(rootNode);
+    fixture.detectChanges();
+
+    expect(fixture.componentInstance['selectedServiceId']()).toBe(9);
+    expect(fixture.componentInstance['selectedNode']()).toEqual(rootNode);
+    expect(api.getServiceDetails).toHaveBeenCalledWith(9);
   });
 });

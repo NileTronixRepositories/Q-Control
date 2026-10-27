@@ -81,7 +81,7 @@
       <p class="empty-subtitle">{{ serviceTranslations().noPermissionHint }}</p>
     </section>
   } @else {
-    <section class="branch-services-toolbar">
+    <section class="branch-services-toolbar queue-filters-wrapper">
       <div class="branch-toolbar-inner d-flex align-items-center justify-content-between flex-wrap gap-3">
         <div class="d-flex align-items-center flex-wrap gap-3">
           @if (isBranchAdmin()) {
@@ -284,6 +284,8 @@
     [parentLabel]="store.createSubtreeParent()?.label ?? null"
     [leafOnly]="store.createSubtreeParent()?.scope === 'Global'"
     [translations]="translations()"
+    [direction]="direction()"
+    [language]="language()"
     (closed)="store.closeCreateTreeDialog()"
     (created)="createBranchTree($event)"
   />

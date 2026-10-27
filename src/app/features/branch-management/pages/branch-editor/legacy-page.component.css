@@ -186,15 +186,40 @@
 
 /* ── Custom Data Table ───────────────────────────────────────────────────── */
 .table-wrap {
+  width: 100%;
+  max-width: 100%;
   border: 1px solid var(--q-border-subtle, #e2e8f0);
   border-radius: 12px;
-  overflow: hidden;
+  overflow-x: auto !important;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
   background: #ffffff;
   box-shadow: 0 2px 8px -2px rgba(15, 23, 42, 0.05);
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 #f8fafc;
+}
+
+.table-wrap::-webkit-scrollbar {
+  height: 8px;
+}
+
+.table-wrap::-webkit-scrollbar-track {
+  background: #f8fafc;
+  border-radius: 0 0 12px 12px;
+}
+
+.table-wrap::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+.table-wrap::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
 }
 
 .custom-table {
   width: 100%;
+  min-width: 1100px;
   margin: 0;
   border-collapse: separate;
   border-spacing: 0;
@@ -203,9 +228,9 @@
 .custom-table thead th {
   background: #f8fafc;
   color: #475569;
-  font-size: 12.5px;
+  font-size: 12px;
   font-weight: 800;
-  padding: 14px 18px;
+  padding: 12px 14px;
   border-bottom: 2px solid #e2e8f0;
   white-space: nowrap;
   letter-spacing: -0.01em;
@@ -217,12 +242,30 @@
 }
 
 .custom-table tbody td {
-  padding: 14px 18px;
+  padding: 12px 14px;
   font-size: 13px;
   color: #1e293b;
   border-bottom: 1px solid #f1f5f9;
   vertical-align: middle;
   white-space: nowrap;
+}
+
+.custom-table th:last-child,
+.custom-table td:last-child {
+  min-width: 240px;
+  text-align: center;
+  background-color: inherit;
+}
+
+.custom-table thead th:last-child {
+  background-color: #f8fafc;
+}
+
+@media (max-width: 1400px) {
+  .custom-table thead th,
+  .custom-table tbody td {
+    padding: 10px 12px;
+  }
 }
 
 .custom-table tbody tr:last-child td {
@@ -352,9 +395,12 @@
 
 /* ── Action Buttons ──────────────────────────────────────────────────────── */
 .action-group {
-  display: flex;
+  display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 5px;
+  flex-wrap: nowrap;
+  white-space: nowrap;
 }
 
 .action-group .icon-action {
@@ -784,5 +830,50 @@
   background: rgba(11, 138, 168, 0.08);
   padding: 2px 8px;
   border-radius: 6px;
+}
+
+/* ─── Elevated Filter Wrapper & Mobile Responsiveness ──────────────────── */
+.queue-filters-wrapper {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--q-border-subtle, #cbd5e1);
+  border-radius: var(--q-radius-lg, 12px);
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05);
+  padding: 16px 20px;
+}
+
+@media (max-width: 991.98px) {
+  .content-panel {
+    padding: 14px 16px;
+  }
+
+  .panel-header {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .queue-filters-wrapper {
+    padding: 12px 14px;
+  }
+
+  .custom-table thead th,
+  .custom-table tbody td {
+    padding: 10px 12px;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .branch-page {
+    padding-bottom: 5rem;
+  }
+
+  .queue-filters-wrapper {
+    padding: 10px 12px;
+  }
+
+  .panel-header h2 {
+    font-size: 1rem;
+  }
 }
 

@@ -22,6 +22,8 @@
 }
 
 .sidebar {
+  position: sticky;
+  top: 0;
   z-index: 100;
   flex: 0 0 var(--sidebar-width);
   width: var(--sidebar-width);
@@ -50,6 +52,7 @@
   flex: 1 1 0;
   width: 0;
   min-width: 0;
+  overflow-x: clip;
 }
 
 .workspace-content {
@@ -591,7 +594,11 @@
 }
 
 .sidebar-nested-link.sidebar-link-active {
-  background: linear-gradient(135deg, rgba(11, 138, 168, 0.4) 0%, rgba(8, 111, 146, 0.3) 100%) !important;
+  background: linear-gradient(
+    135deg,
+    rgba(11, 138, 168, 0.4) 0%,
+    rgba(8, 111, 146, 0.3) 100%
+  ) !important;
   border: 1px solid rgba(56, 189, 248, 0.35) !important;
   color: #38bdf8 !important;
   font-weight: 750 !important;
@@ -1057,6 +1064,18 @@
   }
 }
 
+@media (max-width: 767.98px) {
+  .context-sidebar {
+    inset-inline-start: 0 !important;
+    width: min(88vw, 320px);
+  }
+
+  .context-sidebar-backdrop {
+    inset: 0 !important;
+    inset-inline-start: 0 !important;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .context-sidebar,
   .context-reopen-button,
@@ -1085,41 +1104,96 @@
 @media (max-width: 991.98px) {
   .app-shell {
     --sidebar-width: var(--nt-sidebar-width-md, 250px);
-    --workspace-header-padding-x: 18px;
+    --workspace-header-padding-x: 14px;
+  }
+
+  .workspace-header {
+    padding: 8px 14px;
+    gap: 8px;
+    flex-wrap: wrap;
+    min-height: auto;
+  }
+
+  .workspace-breadcrumb {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .workspace-header-actions {
+    flex-shrink: 0;
+    gap: 8px;
+  }
+
+  .workspace-user {
+    max-width: min(180px, 30vw);
+    padding: 3px 6px;
+  }
+
+  .workspace-user-copy strong {
+    font-size: 11.5px;
+  }
+
+  .workspace-user-copy small {
+    display: none;
   }
 
   .workspace-content {
-    padding: 16px 18px;
+    padding: 14px 16px;
   }
 }
 
 @media (max-width: 767.98px) {
   .app-shell {
     --workspace-header-padding-x: 18px;
-    display: block;
+    display: flex !important;
+    flex-direction: column !important;
     min-height: 100dvh;
-    overflow: visible;
+    overflow-x: clip;
+    width: 100% !important;
   }
 
   .sidebar {
-    position: fixed;
+    position: fixed !important;
     inset-block: 0;
     inset-inline-start: 0;
-    z-index: 1100;
-    width: var(--sidebar-width);
+    z-index: 1200;
+    width: min(88vw, var(--sidebar-width)) !important;
+    max-width: 320px;
     height: 100dvh;
-    flex-basis: auto;
+    flex-basis: auto !important;
+    transform: translateX(-105%);
+    transition:
+      transform 220ms ease,
+      opacity 180ms ease,
+      visibility 220ms;
+  }
+
+  .app-shell-rtl .sidebar {
+    transform: translateX(105%);
+  }
+
+  .app-shell.sidebar-expanded .sidebar {
+    visibility: visible;
+    opacity: 1;
+    transform: translateX(0);
   }
 
   .app-shell.sidebar-collapsed .sidebar {
-    width: var(--sidebar-collapsed-width);
-    flex-basis: auto;
+    width: min(88vw, var(--sidebar-width)) !important;
+    flex-basis: auto !important;
   }
 
   .workspace {
-    width: 100%;
+    width: 100% !important;
+    max-width: 100% !important;
     min-height: 100dvh;
-    padding-inline-start: var(--sidebar-collapsed-width);
+    padding-inline-start: 0 !important;
+    margin-inline-start: 0 !important;
+    flex: 1 1 auto !important;
+  }
+
+  .app-shell.mobile-navigation-overlay .workspace {
+    padding-inline-start: 0 !important;
   }
 
   .workspace-content {
@@ -1127,17 +1201,28 @@
   }
 
   .workspace-header {
-    min-height: 52px;
+    min-height: auto;
     flex-wrap: wrap;
-    padding-block: 8px;
+    padding: 8px 12px;
+    gap: 8px;
   }
 
   .workspace-breadcrumb {
-    flex-basis: 100%;
+    flex: 1 1 100%;
+    order: 2;
+  }
+
+  .workspace-header-actions {
+    flex: 1 1 100%;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    order: 1;
+    gap: 8px;
   }
 
   .workspace-user {
-    width: 100%;
+    width: auto;
     max-width: none;
   }
 

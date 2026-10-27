@@ -55,7 +55,17 @@
   line-height: 1.25;
 }
 
-/* ── Filter Field in Hero ─────────────────────────────────────────────── */
+/* ── Filter Wrapper & Fields in Hero ─────────────────────────────────── */
+.queue-filters-wrapper {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  border-radius: 12px;
+  padding: 14px 16px;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05);
+}
+
 .filter-field {
   display: flex;
   flex-direction: column;
@@ -426,3 +436,33 @@ textarea.svc-input,
 .toast-close:hover {
   opacity: 1;
 }
+
+/* ============================================
+   RESPONSIVE LAYOUT (MOBILE & TABLET)
+   ============================================ */
+@media (max-width: 767.98px) {
+  .queue-filters-wrapper {
+    padding: 12px;
+  }
+
+  .panel-header {
+    padding: 12px 14px;
+    flex-wrap: wrap;
+  }
+
+  .svc-panel-header {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 8px;
+    padding: 12px 14px;
+  }
+
+  .svc-panel-body {
+    padding: 12px;
+  }
+
+  .empty-subtitle {
+    font-size: 0.82rem;
+  }
+}
+

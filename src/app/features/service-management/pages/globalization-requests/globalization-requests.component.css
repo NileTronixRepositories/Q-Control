@@ -44,14 +44,19 @@
 }
 
 /* ==========================================================================
-   FILTER PANEL
+   FILTER PANEL & HERO WRAPPER
    ========================================================================== */
-.glob-filter-card {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
+.queue-filters-wrapper {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(226, 232, 240, 0.9);
   border-radius: 14px;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05);
+}
+
+.glob-filter-card {
   padding: 18px 20px;
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
 }
 
 .glob-filter-grid {
@@ -66,9 +71,31 @@
 
 .glob-filter-row-bottom {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 12px;
   align-items: flex-end;
+}
+
+@media (max-width: 1280px) {
+  .glob-filter-row-bottom {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 767.98px) {
+  .glob-filter-row-bottom {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .glob-btn-search {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 480px) {
+  .glob-filter-row-bottom {
+    grid-template-columns: 1fr;
+  }
 }
 
 .glob-filter-field {
@@ -180,8 +207,31 @@
   box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
 }
 
+.glob-table-card .overflow-x-auto {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 #f8fafc;
+}
+
+.glob-table-card .overflow-x-auto::-webkit-scrollbar {
+  height: 6px;
+}
+
+.glob-table-card .overflow-x-auto::-webkit-scrollbar-track {
+  background: #f8fafc;
+}
+
+.glob-table-card .overflow-x-auto::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.glob-table-card .overflow-x-auto::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
 .glob-table {
   width: 100%;
+  min-width: 1220px;
   margin-bottom: 0;
   border-collapse: separate;
   border-spacing: 0;
@@ -193,7 +243,7 @@
 }
 
 .glob-table th {
-  padding: 14px 16px;
+  padding: 12px 14px;
   font-size: 11.5px;
   font-weight: 750;
   color: #475569;
@@ -204,11 +254,12 @@
 }
 
 .glob-table td {
-  padding: 14px 16px;
+  padding: 12px 14px;
   font-size: 13px;
   color: #334155;
   border-bottom: 1px solid #f1f5f9;
   vertical-align: middle;
+  white-space: nowrap;
 }
 
 .glob-table tr:hover td {
@@ -229,6 +280,7 @@
   border-radius: 6px;
   display: inline-flex;
   align-items: center;
+  white-space: nowrap;
 }
 
 .glob-service-icon {
@@ -248,13 +300,14 @@
   background: #f0f9ff;
   color: #0284c7;
   border: 1px solid #bae6fd;
-  border-radius: 999px;
-  font-size: 11px;
+  border-radius: 20px;
+  font-size: 11.5px;
   font-weight: 700;
-  padding: 3px 10px;
+  padding: 4px 12px;
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
+  white-space: nowrap;
 }
 
 .glob-branch-chip {
@@ -264,6 +317,7 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  white-space: nowrap;
 }
 
 .glob-branch-chip i {
@@ -281,16 +335,18 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  white-space: nowrap;
 }
 
 .glob-status-pill {
-  border-radius: 999px;
+  border-radius: 20px;
   font-size: 11.5px;
   font-weight: 700;
-  padding: 3px 10px;
+  padding: 4px 12px;
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
+  white-space: nowrap;
 }
 
 .glob-status-approved {
@@ -339,6 +395,7 @@
   align-items: center;
   gap: 6px;
   cursor: pointer;
+  white-space: nowrap;
   transition: all 0.15s ease;
 }
 
@@ -361,6 +418,7 @@
   align-items: center;
   gap: 4px;
   cursor: pointer;
+  white-space: nowrap;
   box-shadow: 0 2px 6px rgba(16, 185, 129, 0.25);
   transition: all 0.15s ease;
 }
@@ -382,6 +440,7 @@
   align-items: center;
   gap: 4px;
   cursor: pointer;
+  white-space: nowrap;
   transition: all 0.15s ease;
 }
 
@@ -453,14 +512,14 @@
 }
 
 /* ==========================================================================
-   DETAILS SLIDE-OVER DRAWER (SOLVES IMAGE 2)
+   DETAILS SLIDE-OVER DRAWER
    ========================================================================== */
 .glob-drawer-backdrop {
   position: fixed;
   inset: 0;
   background: rgba(15, 23, 42, 0.45);
   backdrop-filter: blur(4px);
-  z-index: 1040;
+  z-index: 1240;
   border: none;
   cursor: pointer;
   animation: globFadeIn 0.2s ease-out;
@@ -474,12 +533,16 @@
   width: 100%;
   max-width: 580px;
   background: #ffffff;
-  z-index: 1050;
+  z-index: 1250;
   box-shadow: -8px 0 32px rgba(15, 23, 42, 0.18);
   display: flex;
   flex-direction: column;
   overflow: hidden;
   animation: globSlideIn 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[dir='rtl'] .glob-drawer {
+  box-shadow: 8px 0 32px rgba(15, 23, 42, 0.18);
 }
 
 .glob-drawer-header {
@@ -777,5 +840,91 @@
   to {
     transform: scale(1);
     opacity: 1;
+  }
+}
+
+/* ==========================================================================
+   CRAFT EMPTY STATE & PULSE
+   ========================================================================== */
+.empty-state-craft {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.empty-icon-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.empty-icon-pulse {
+  position: absolute;
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  background: rgba(11, 138, 168, 0.15);
+  animation: pulseRing 2.5s infinite cubic-bezier(0.45, 0, 0.55, 1);
+}
+
+@keyframes pulseRing {
+  0% {
+    transform: scale(0.85);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 0.3;
+  }
+  100% {
+    transform: scale(0.85);
+    opacity: 0.8;
+  }
+}
+
+.empty-icon-box {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #0b8aa8 0%, #086f92 100%);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  box-shadow: 0 8px 20px rgba(11, 138, 168, 0.28);
+  position: relative;
+  z-index: 1;
+}
+
+.empty-title {
+  color: #0f172a;
+  font-size: 1.1rem;
+  font-weight: 800;
+  margin: 12px 0 6px;
+}
+
+/* ==========================================================================
+   RESPONSIVE MEDIA QUERIES (MOBILE & TABLET)
+   ========================================================================== */
+@media (max-width: 767.98px) {
+  .glob-filter-card {
+    padding: 12px 14px;
+  }
+
+  .glob-pagination-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .glob-total-pill {
+    text-align: center;
+  }
+
+  .glob-pagination-bar > div {
+    justify-content: center;
   }
 }

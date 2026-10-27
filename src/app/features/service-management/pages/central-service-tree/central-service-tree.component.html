@@ -7,7 +7,7 @@
     [eyebrow]="translations().eyebrow"
     [title]="translations().centralTreeTitle"
     [description]="translations().centralTreeDescription"
-    icon="fa-solid fa-sitemap"
+    icon="bi bi-diagram-3-fill"
     iconVariant="teal"
   />
 
@@ -18,55 +18,63 @@
   }
 
   <!-- Executive Summary Metrics -->
-  <div class="row g-3">
-    <div class="col-12 col-sm-6 col-xl-3">
+  <div class="row g-2 g-md-3">
+    <div class="col-6 col-md-6 col-lg-3">
       <div class="stat-card stat-card--sky">
-        <div class="d-flex flex-column">
-          <span class="stat-label">{{ treeActionsTranslations().totalServices }}</span>
+        <div class="d-flex flex-column min-w-0">
+          <span class="stat-label text-truncate">{{
+            treeActionsTranslations().totalServices
+          }}</span>
           <span class="stat-value">{{ metrics().total }}</span>
         </div>
-        <span class="q-field-icon-badge q-field-icon-badge--sky stat-icon-badge">
-          <i class="fa-solid fa-layer-group"></i>
+        <span class="q-field-icon-badge q-field-icon-badge--sky stat-icon-badge flex-shrink-0">
+          <i class="bi bi-layers"></i>
         </span>
       </div>
     </div>
-    <div class="col-12 col-sm-6 col-xl-3">
+    <div class="col-6 col-md-6 col-lg-3">
       <div class="stat-card stat-card--violet">
-        <div class="d-flex flex-column">
-          <span class="stat-label">{{ treeActionsTranslations().rootCategories }}</span>
+        <div class="d-flex flex-column min-w-0">
+          <span class="stat-label text-truncate">{{
+            treeActionsTranslations().rootCategories
+          }}</span>
           <span class="stat-value">{{ metrics().rootCategories }}</span>
         </div>
-        <span class="q-field-icon-badge q-field-icon-badge--violet stat-icon-badge">
-          <i class="fa-solid fa-folder-tree"></i>
+        <span class="q-field-icon-badge q-field-icon-badge--violet stat-icon-badge flex-shrink-0">
+          <i class="bi bi-folder2"></i>
         </span>
       </div>
     </div>
-    <div class="col-12 col-sm-6 col-xl-3">
+    <div class="col-6 col-md-6 col-lg-3">
       <div class="stat-card stat-card--teal">
-        <div class="d-flex flex-column">
-          <span class="stat-label">{{ treeActionsTranslations().bookableServices }}</span>
+        <div class="d-flex flex-column min-w-0">
+          <span class="stat-label text-truncate">{{
+            treeActionsTranslations().bookableServices
+          }}</span>
           <span class="stat-value">{{ metrics().bookableLeaves }}</span>
         </div>
-        <span class="q-field-icon-badge q-field-icon-badge--teal stat-icon-badge">
-          <i class="fa-solid fa-ticket"></i>
+        <span class="q-field-icon-badge q-field-icon-badge--teal stat-icon-badge flex-shrink-0">
+          <i class="bi bi-ticket-perforated"></i>
         </span>
       </div>
     </div>
-    <div class="col-12 col-sm-6 col-xl-3">
+    <div class="col-6 col-md-6 col-lg-3">
       <div class="stat-card stat-card--emerald">
-        <div class="d-flex flex-column">
-          <span class="stat-label">{{ treeActionsTranslations().activeServices }}</span>
+        <div class="d-flex flex-column min-w-0">
+          <span class="stat-label text-truncate">{{
+            treeActionsTranslations().activeServices
+          }}</span>
           <span class="stat-value">{{ metrics().active }}</span>
         </div>
-        <span class="q-field-icon-badge q-field-icon-badge--emerald stat-icon-badge">
-          <i class="fa-solid fa-circle-check"></i>
+        <span class="q-field-icon-badge q-field-icon-badge--emerald stat-icon-badge flex-shrink-0">
+          <i class="bi bi-check-circle"></i>
         </span>
       </div>
     </div>
   </div>
 
   <!-- Central Tree Toolbar -->
-  <div class="central-tree-toolbar">
+  <div class="central-tree-toolbar queue-filters-wrapper">
     <div class="d-flex align-items-center gap-2 flex-wrap">
       <button
         type="button"
@@ -74,7 +82,7 @@
         (click)="expandAll()"
         [title]="treeActionsTranslations().expandAll"
       >
-        <i class="fa-solid fa-angles-down text-primary me-1"></i>
+        <i class="bi bi-chevron-double-down text-primary me-1"></i>
         <span>{{ treeActionsTranslations().expandAll }}</span>
       </button>
       <button
@@ -83,7 +91,7 @@
         (click)="collapseAll()"
         [title]="treeActionsTranslations().collapseAll"
       >
-        <i class="fa-solid fa-angles-up text-muted me-1"></i>
+        <i class="bi bi-chevron-double-up text-muted me-1"></i>
         <span>{{ treeActionsTranslations().collapseAll }}</span>
       </button>
     </div>
@@ -96,20 +104,19 @@
         [disabled]="loading()"
         [title]="treeActionsTranslations().refresh"
       >
-        <i class="fa-solid fa-arrows-rotate text-success" [class.fa-spin]="loading()"></i>
+        <i class="bi bi-arrow-clockwise text-success" [class.spin-refresh]="loading()"></i>
         <span>{{ treeActionsTranslations().refresh }}</span>
       </button>
     </div>
   </div>
 
-  <!-- Master-Detail Layout: Tree + Side Details Column -->
-  <div class="row g-3 align-items-start">
-    <!-- Master Column: Hierarchy Tree (col-12 col-lg-8) -->
-    <div class="col-12 col-lg-8">
+  <!-- Master Hierarchy Tree: Full-width on all viewports -->
+  <div class="row g-3">
+    <div class="col-12">
       <app-service-hierarchy-tree
         [nodes]="filteredNodes()"
         [expandedNodeIds]="expandedIds()"
-        [selectedServiceId]="selectedNode()?.id ?? null"
+        [selectedServiceId]="selectedServiceId()"
         [translations]="serviceTranslations()"
         [language]="language()"
         [direction]="direction()"
@@ -124,7 +131,7 @@
         [includeInactive]="includeInactive()"
         [includeDeleted]="includeDeleted()"
         [canCreate]="false"
-        [canViewDetails]="false"
+        [canViewDetails]="true"
         [canUpdate]="false"
         [canDelete]="false"
         [canRestore]="false"
@@ -134,392 +141,375 @@
         (includeDeletedChange)="isTechnicalAdmin() && updateFilter('deleted', $event)"
         (toggleNode)="toggleNode($event)"
         (selectNode)="onNodeSelected($event)"
+        (viewNode)="openPreview($event)"
       />
     </div>
+  </div>
 
-    <!-- Detail Column: Side Card (col-12 col-lg-4) -->
-    <aside class="col-12 col-lg-4">
-      <div class="service-side-details-panel sticky-lg-top">
-        @if (selectedNode(); as node) {
-          <article class="side-details-card">
-            <!-- ── Top Header & Identity ──────────────────────────── -->
-            <header
-              class="side-details-header d-flex align-items-start justify-content-between gap-2 pb-3 border-bottom border-light-subtle"
-            >
-              <div class="d-flex align-items-start gap-2.5 overflow-hidden">
-                <span class="service-icon-circle flex-shrink-0 mt-0.5">
-                  @if (node.children && node.children.length > 0) {
-                    <i class="fa-solid fa-folder-tree fa-lg"></i>
-                  } @else {
-                    <i class="fa-solid fa-ticket fa-lg"></i>
-                  }
-                </span>
-                <div class="d-flex flex-column text-truncate">
-                  <!-- Parent Service Breadcrumb if present -->
-                  @if (
-                    selectedServiceDetails()?.parentServiceNameAr ||
-                    selectedServiceDetails()?.parentServiceNameEn
-                  ) {
-                    <span class="service-parent-breadcrumb text-truncate">
-                      <i class="fa-solid fa-chevron-left me-1 small"></i>
-                      {{
-                        language() === 'ar'
-                          ? selectedServiceDetails()?.parentServiceNameAr ||
-                            selectedServiceDetails()?.parentServiceNameEn
-                          : selectedServiceDetails()?.parentServiceNameEn ||
-                            selectedServiceDetails()?.parentServiceNameAr
-                      }}
-                    </span>
-                  }
-                  <h5 class="side-service-title m-0 fw-bold text-dark text-truncate">
-                    {{ language() === 'ar' ? node.arabicName : node.englishName }}
-                  </h5>
-                  <span class="side-service-subtitle text-muted text-truncate">
-                    {{ language() === 'ar' ? node.englishName : node.arabicName }}
-                  </span>
-                </div>
-              </div>
+  <!-- Offcanvas Details Drawer: Appears on any screen when preview is active -->
+  @if (selectedNode(); as node) {
+    <div class="service-details-backdrop" (click)="closeDetails()" aria-hidden="true"></div>
 
-              <button
-                type="button"
-                class="side-details-close-btn"
-                (click)="closeDetails()"
-                [title]="treeActionsTranslations().close"
-                [attr.aria-label]="treeActionsTranslations().close"
-              >
-                <i class="fa-solid fa-xmark"></i>
-              </button>
-            </header>
-
-            <div class="side-details-body d-flex flex-column gap-3 pt-3">
-              <!-- ── Quick Badges Bar ─────────────────────────────── -->
-              <div class="d-flex align-items-center flex-wrap gap-2">
-                <!-- Active / Deleted status -->
-                @if (node.isDeleted) {
-                  <span class="q-detail-pill q-detail-pill--danger">
-                    <span class="status-dot"></span>
-                    <span>{{ treeActionsTranslations().deleted }}</span>
-                  </span>
-                } @else if (node.isActive) {
-                  <span class="q-detail-pill q-detail-pill--active">
-                    <span class="status-dot"></span>
-                    <span>{{ treeActionsTranslations().active }}</span>
-                  </span>
+    <aside
+      class="service-details-column"
+      role="dialog"
+      aria-modal="true"
+      [attr.aria-label]="treeActionsTranslations().serviceDetails"
+    >
+      <div class="service-side-details-panel">
+        <article class="side-details-card">
+          <!-- ── Top Header & Identity ──────────────────────────── -->
+          <header
+            class="side-details-header d-flex align-items-start justify-content-between gap-2 pb-3 border-bottom border-light-subtle"
+          >
+            <div class="d-flex align-items-start gap-2.5 overflow-hidden">
+              <span class="service-icon-circle flex-shrink-0 mt-0.5">
+                @if (node.children && node.children.length > 0) {
+                  <i class="bi bi-folder2 fs-5"></i>
                 } @else {
-                  <span class="q-detail-pill q-detail-pill--inactive">
-                    <span class="status-dot"></span>
-                    <span>{{ treeActionsTranslations().inactive }}</span>
-                  </span>
+                  <i class="bi bi-ticket-perforated fs-5"></i>
                 }
-
-                <!-- Scope Badge -->
-                <span class="q-detail-pill q-detail-pill--neutral" role="listitem">
-                  <i class="fa-solid fa-globe text-muted small" aria-hidden="true"></i>
-                  <span>{{
-                    node.scope === 'Global'
-                      ? treeActionsTranslations().globalScope
-                      : treeActionsTranslations().branchScoped
-                  }}</span>
-                </span>
-
-                <!-- Reservation Badge -->
-                @if (selectedServiceDetails()?.hasReservation) {
-                  <span class="q-detail-pill q-detail-pill--amber" role="listitem">
-                    <i class="fa-solid fa-calendar-check small" aria-hidden="true"></i>
-                    <span>{{ treeActionsTranslations().reservation }}</span>
-                  </span>
-                }
-
-                <!-- Code or ID Badge -->
-                <span class="q-detail-pill q-detail-pill--neutral" role="listitem">
-                  <i class="fa-solid fa-hashtag text-muted small" aria-hidden="true"></i>
-                  <span>{{ node.serviceCode ? node.serviceCode : node.id }}</span>
-                </span>
-              </div>
-
-              <!-- ── Section 1: معلمات الطابور والتذاكر ────────────── -->
-              <div class="details-section-card">
-                <div class="section-card-header">
-                  <span class="q-field-icon-badge q-field-icon-badge--teal">
-                    <i class="fa-solid fa-ticket"></i>
-                  </span>
-                  <span>{{
-                    language() === 'ar' ? 'إعدادات الطابور والتذاكر' : 'Queue & Ticket Settings'
-                  }}</span>
-                </div>
-
-                <div class="row g-2">
-                  <!-- Prefix & Number Range -->
-                  <div class="col-6">
-                    <div class="bento-field-box">
-                      <div class="bento-field-header">
-                        <span class="bento-field-label">{{
-                          treeActionsTranslations().ticketPrefix
-                        }}</span>
-                        <span class="q-field-icon-badge q-field-icon-badge--indigo">
-                          <i class="fa-solid fa-signature"></i>
-                        </span>
-                      </div>
-                      <div class="d-flex align-items-baseline gap-1 flex-wrap">
-                        <span class="bento-highlight-val text-primary fw-bold">
-                          {{ selectedServiceDetails()?.rangePrefix || node.serviceCode || '—' }}
-                        </span>
-                        @if (
-                          selectedServiceDetails()?.rangeStartNumber !== undefined &&
-                          selectedServiceDetails()?.rangeEndNumber !== undefined
-                        ) {
-                          <span class="bento-sub-text">
-                            ({{ selectedServiceDetails()?.rangeStartNumber }} -
-                            {{ selectedServiceDetails()?.rangeEndNumber }})
-                          </span>
-                        }
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Waiting Duration -->
-                  <div class="col-6">
-                    <div class="bento-field-box">
-                      <div class="bento-field-header">
-                        <span class="bento-field-label">{{
-                          treeActionsTranslations().waitingDuration
-                        }}</span>
-                        <span class="q-field-icon-badge q-field-icon-badge--amber">
-                          <i class="fa-solid fa-clock"></i>
-                        </span>
-                      </div>
-                      <span class="bento-field-val fw-bold">
-                        {{ selectedServiceDetails()?.waitingDuration ?? 0 }}
-                        {{ treeActionsTranslations().minutes }}
-                      </span>
-                    </div>
-                  </div>
-
-                  <!-- Ticket Copies -->
-                  <div class="col-6">
-                    <div class="bento-field-box">
-                      <div class="bento-field-header">
-                        <span class="bento-field-label">{{
-                          treeActionsTranslations().ticketCopies
-                        }}</span>
-                        <span class="q-field-icon-badge q-field-icon-badge--sky">
-                          <i class="fa-solid fa-copy"></i>
-                        </span>
-                      </div>
-                      <span class="bento-field-val fw-bold">
-                        {{ selectedServiceDetails()?.noOfTicketCopies ?? 1 }}
-                        {{
-                          (selectedServiceDetails()?.noOfTicketCopies ?? 1) > 1
-                            ? treeActionsTranslations().copies
-                            : treeActionsTranslations().copy
-                        }}
-                      </span>
-                    </div>
-                  </div>
-
-                  <!-- Priority & Order -->
-                  <div class="col-6">
-                    <div class="bento-field-box">
-                      <div class="bento-field-header">
-                        <span class="bento-field-label"
-                          >{{ treeActionsTranslations().priority }} /
-                          {{ treeActionsTranslations().orderNo }}</span
-                        >
-                        <span class="q-field-icon-badge q-field-icon-badge--violet">
-                          <i class="fa-solid fa-arrow-up-wide-short"></i>
-                        </span>
-                      </div>
-                      <span class="bento-field-val fw-bold text-dark">
-                        {{ selectedServiceDetails()?.priority ?? node.orderNo }}
-                        <span class="text-muted fw-normal">|</span> #{{ node.orderNo }}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- ── Section 2: رسالة التوجيه للعميل (User Message) ── -->
-              @if (
-                selectedServiceDetails()?.arabicUserMessage ||
-                selectedServiceDetails()?.englishUserMessage
-              ) {
-                <div class="customer-instruction-box">
-                  <div class="customer-instruction-header">
-                    <span class="q-field-icon-badge q-field-icon-badge--teal">
-                      <i class="fa-solid fa-bullhorn"></i>
-                    </span>
-                    <span>{{ treeActionsTranslations().customerMessage }}</span>
-                  </div>
-                  <p class="customer-instruction-text mb-0">
+              </span>
+              <div class="d-flex flex-column text-truncate">
+                <!-- Parent Service Breadcrumb if present -->
+                @if (
+                  selectedServiceDetails()?.parentServiceNameAr ||
+                  selectedServiceDetails()?.parentServiceNameEn
+                ) {
+                  <span class="service-parent-breadcrumb text-truncate">
+                    <i class="bi bi-chevron-left me-1 small"></i>
                     {{
                       language() === 'ar'
-                        ? selectedServiceDetails()?.arabicUserMessage ||
-                          selectedServiceDetails()?.englishUserMessage
-                        : selectedServiceDetails()?.englishUserMessage ||
-                          selectedServiceDetails()?.arabicUserMessage
+                        ? selectedServiceDetails()?.parentServiceNameAr ||
+                          selectedServiceDetails()?.parentServiceNameEn
+                        : selectedServiceDetails()?.parentServiceNameEn ||
+                          selectedServiceDetails()?.parentServiceNameAr
                     }}
-                  </p>
-                </div>
-              }
-
-              <!-- ── Section 3: الخصائص والمعلمات الفنية ─────────────── -->
-              <div class="details-section-card">
-                <div class="section-card-header">
-                  <span class="q-field-icon-badge q-field-icon-badge--violet">
-                    <i class="fa-solid fa-sliders"></i>
                   </span>
-                  <span>{{
-                    language() === 'ar' ? 'الخصائص الفنية والهيكلية' : 'Technical Attributes'
-                  }}</span>
-                </div>
-
-                <div class="row g-2">
-                  <!-- Node Type -->
-                  <div class="col-6">
-                    <div class="bento-field-box">
-                      <div class="bento-field-header">
-                        <span class="bento-field-label">{{
-                          treeActionsTranslations().hasChildren
-                        }}</span>
-                        <span class="q-field-icon-badge q-field-icon-badge--violet">
-                          <i class="fa-solid fa-folder-tree"></i>
-                        </span>
-                      </div>
-                      <span class="bento-field-val fw-semibold">
-                        {{
-                          node.children && node.children.length > 0
-                            ? treeActionsTranslations().categoryNode
-                            : treeActionsTranslations().leafNode
-                        }}
-                      </span>
-                    </div>
-                  </div>
-
-                  <!-- Ticket Issuing -->
-                  <div class="col-6">
-                    <div class="bento-field-box">
-                      <div class="bento-field-header">
-                        <span class="bento-field-label">{{
-                          treeActionsTranslations().ticketIssuing
-                        }}</span>
-                        <span class="q-field-icon-badge q-field-icon-badge--teal">
-                          <i class="fa-solid fa-ticket"></i>
-                        </span>
-                      </div>
-                      <span
-                        class="bento-field-val fw-semibold"
-                        [class.text-success]="node.canIssueTicket"
-                        [class.text-muted]="!node.canIssueTicket"
-                      >
-                        {{
-                          node.canIssueTicket
-                            ? treeActionsTranslations().allowed
-                            : treeActionsTranslations().notAllowed
-                        }}
-                      </span>
-                    </div>
-                  </div>
-
-                  <!-- Client Input Required -->
-                  <div class="col-6">
-                    <div class="bento-field-box">
-                      <div class="bento-field-header">
-                        <span class="bento-field-label">{{
-                          treeActionsTranslations().clientInput
-                        }}</span>
-                        <span class="q-field-icon-badge q-field-icon-badge--amber">
-                          <i class="fa-solid fa-keyboard"></i>
-                        </span>
-                      </div>
-                      <span class="bento-field-val fw-semibold">
-                        {{
-                          selectedServiceDetails()?.isClientInputRequired
-                            ? treeActionsTranslations().required
-                            : treeActionsTranslations().notRequired
-                        }}
-                      </span>
-                    </div>
-                  </div>
-
-                  <!-- Owner Branch or Service ID -->
-                  @if (node.scope === 'BranchScoped') {
-                    <div class="col-6">
-                      <div class="bento-field-box">
-                        <div class="bento-field-header">
-                          <span class="bento-field-label">{{
-                            treeActionsTranslations().ownerBranch
-                          }}</span>
-                          <span class="q-field-icon-badge q-field-icon-badge--sky">
-                            <i class="fa-solid fa-building"></i>
-                          </span>
-                        </div>
-                        <span class="bento-field-val fw-semibold text-truncate">
-                          {{
-                            language() === 'ar'
-                              ? node.ownerBranchArabicName || '—'
-                              : node.ownerBranchEnglishName || '—'
-                          }}
-                        </span>
-                      </div>
-                    </div>
-                  } @else {
-                    <div class="col-6">
-                      <div class="bento-field-box">
-                        <div class="bento-field-header">
-                          <span class="bento-field-label">{{
-                            treeActionsTranslations().serviceId
-                          }}</span>
-                          <span class="q-field-icon-badge q-field-icon-badge--sky">
-                            <i class="fa-solid fa-hashtag"></i>
-                          </span>
-                        </div>
-                        <span class="bento-field-val fw-bold text-muted">#{{ node.id }}</span>
-                      </div>
-                    </div>
-                  }
-                </div>
+                }
+                <h5 class="side-service-title m-0 fw-bold text-dark text-truncate">
+                  {{ language() === 'ar' ? node.arabicName : node.englishName }}
+                </h5>
+                <span class="side-service-subtitle text-muted text-truncate">
+                  {{ language() === 'ar' ? node.englishName : node.arabicName }}
+                </span>
               </div>
-
-              <!-- Loading spinner for details if still fetching -->
-              @if (detailsLoading()) {
-                <div class="text-center py-2 text-muted">
-                  <div
-                    class="spinner-border spinner-border-sm text-primary me-2"
-                    role="status"
-                  ></div>
-                  <small>{{
-                    language() === 'ar'
-                      ? 'جارٍ تحميل البيانات الإضافية...'
-                      : 'Loading extended details...'
-                  }}</small>
-                </div>
-              }
             </div>
-          </article>
-        } @else {
-          <!-- Empty Guidance State in the Side Column -->
-          <article class="side-details-card side-details-empty text-center py-5 px-3">
-            <div class="side-details-empty-icon mb-3">
-              <span
-                class="q-field-icon-badge q-field-icon-badge--sky"
-                style="width: 52px; height: 52px; font-size: 1.5rem; border-radius: 14px"
-              >
-                <i class="fa-solid fa-sitemap"></i>
+
+            <button
+              type="button"
+              class="side-details-close-btn"
+              (click)="closeDetails()"
+              [title]="treeActionsTranslations().close"
+              [attr.aria-label]="treeActionsTranslations().close"
+            >
+              <i class="bi bi-x-lg"></i>
+            </button>
+          </header>
+
+          <div class="side-details-body d-flex flex-column gap-3 pt-3">
+            <!-- ── Quick Badges Bar ─────────────────────────────── -->
+            <div class="d-flex align-items-center flex-wrap gap-2">
+              <!-- Active / Deleted status -->
+              @if (node.isDeleted) {
+                <span class="q-detail-pill q-detail-pill--danger">
+                  <span class="status-dot"></span>
+                  <span>{{ treeActionsTranslations().deleted }}</span>
+                </span>
+              } @else if (node.isActive) {
+                <span class="q-detail-pill q-detail-pill--active">
+                  <span class="status-dot"></span>
+                  <span>{{ treeActionsTranslations().active }}</span>
+                </span>
+              } @else {
+                <span class="q-detail-pill q-detail-pill--inactive">
+                  <span class="status-dot"></span>
+                  <span>{{ treeActionsTranslations().inactive }}</span>
+                </span>
+              }
+
+              <!-- Scope Badge -->
+              <span class="q-detail-pill q-detail-pill--neutral" role="listitem">
+                <i class="bi bi-globe text-muted small" aria-hidden="true"></i>
+                <span>{{
+                  node.scope === 'Global'
+                    ? treeActionsTranslations().globalScope
+                    : treeActionsTranslations().branchScoped
+                }}</span>
+              </span>
+
+              <!-- Reservation Badge -->
+              @if (selectedServiceDetails()?.hasReservation) {
+                <span class="q-detail-pill q-detail-pill--amber" role="listitem">
+                  <i class="bi bi-calendar2-check small" aria-hidden="true"></i>
+                  <span>{{ treeActionsTranslations().reservation }}</span>
+                </span>
+              }
+
+              <!-- Code or ID Badge -->
+              <span class="q-detail-pill q-detail-pill--neutral" role="listitem">
+                <i class="bi bi-hash text-muted small" aria-hidden="true"></i>
+                <span>{{ node.serviceCode ? node.serviceCode : node.id }}</span>
               </span>
             </div>
-            <h6 class="fw-bold text-dark mb-1">
-              {{ language() === 'ar' ? 'معاينة تفاصيل الخدمة' : 'Service Details Preview' }}
-            </h6>
-            <p class="text-muted small mb-0">
-              {{
-                language() === 'ar'
-                  ? 'انقر على أي خدمة في الشجرة لاستعراض تفاصيلها ومعلماتها هنا مباشرة.'
-                  : 'Click on any service in the tree to view its details and parameters here directly.'
-              }}
-            </p>
-          </article>
-        }
+
+            <!-- ── Section 1: معلمات الطابور والتذاكر ────────────── -->
+            <div class="details-section-card">
+              <div class="section-card-header">
+                <span class="q-field-icon-badge q-field-icon-badge--teal">
+                  <i class="bi bi-ticket-perforated"></i>
+                </span>
+                <span>{{
+                  language() === 'ar' ? 'إعدادات الطابور والتذاكر' : 'Queue & Ticket Settings'
+                }}</span>
+              </div>
+
+              <div class="row g-2">
+                <!-- Prefix & Number Range -->
+                <div class="col-6">
+                  <div class="bento-field-box">
+                    <div class="bento-field-header">
+                      <span class="bento-field-label">{{
+                        treeActionsTranslations().ticketPrefix
+                      }}</span>
+                      <span class="q-field-icon-badge q-field-icon-badge--indigo">
+                        <i class="bi bi-pen"></i>
+                      </span>
+                    </div>
+                    <div class="d-flex align-items-baseline gap-1 flex-wrap">
+                      <span class="bento-highlight-val text-primary fw-bold">
+                        {{ selectedServiceDetails()?.rangePrefix || node.serviceCode || '—' }}
+                      </span>
+                      @if (
+                        selectedServiceDetails()?.rangeStartNumber !== undefined &&
+                        selectedServiceDetails()?.rangeEndNumber !== undefined
+                      ) {
+                        <span class="bento-sub-text">
+                          ({{ selectedServiceDetails()?.rangeStartNumber }} -
+                          {{ selectedServiceDetails()?.rangeEndNumber }})
+                        </span>
+                      }
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Waiting Duration -->
+                <div class="col-6">
+                  <div class="bento-field-box">
+                    <div class="bento-field-header">
+                      <span class="bento-field-label">{{
+                        treeActionsTranslations().waitingDuration
+                      }}</span>
+                      <span class="q-field-icon-badge q-field-icon-badge--amber">
+                        <i class="bi bi-clock"></i>
+                      </span>
+                    </div>
+                    <span class="bento-field-val fw-bold">
+                      {{ selectedServiceDetails()?.waitingDuration ?? 0 }}
+                      {{ treeActionsTranslations().minutes }}
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Ticket Copies -->
+                <div class="col-6">
+                  <div class="bento-field-box">
+                    <div class="bento-field-header">
+                      <span class="bento-field-label">{{
+                        treeActionsTranslations().ticketCopies
+                      }}</span>
+                      <span class="q-field-icon-badge q-field-icon-badge--sky">
+                        <i class="bi bi-copy"></i>
+                      </span>
+                    </div>
+                    <span class="bento-field-val fw-bold">
+                      {{ selectedServiceDetails()?.noOfTicketCopies ?? 1 }}
+                      {{
+                        (selectedServiceDetails()?.noOfTicketCopies ?? 1) > 1
+                          ? treeActionsTranslations().copies
+                          : treeActionsTranslations().copy
+                      }}
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Priority & Order -->
+                <div class="col-6">
+                  <div class="bento-field-box">
+                    <div class="bento-field-header">
+                      <span class="bento-field-label"
+                        >{{ treeActionsTranslations().priority }} /
+                        {{ treeActionsTranslations().orderNo }}</span
+                      >
+                      <span class="q-field-icon-badge q-field-icon-badge--violet">
+                        <i class="bi bi-sort-up"></i>
+                      </span>
+                    </div>
+                    <span class="bento-field-val fw-bold text-dark">
+                      {{ selectedServiceDetails()?.priority ?? node.orderNo }}
+                      <span class="text-muted fw-normal">|</span> #{{ node.orderNo }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ── Section 2: رسالة التوجيه للعميل (User Message) ── -->
+            @if (
+              selectedServiceDetails()?.arabicUserMessage ||
+              selectedServiceDetails()?.englishUserMessage
+            ) {
+              <div class="customer-instruction-box">
+                <div class="customer-instruction-header">
+                  <span class="q-field-icon-badge q-field-icon-badge--teal">
+                    <i class="bi bi-megaphone"></i>
+                  </span>
+                  <span>{{ treeActionsTranslations().customerMessage }}</span>
+                </div>
+                <p class="customer-instruction-text mb-0">
+                  {{
+                    language() === 'ar'
+                      ? selectedServiceDetails()?.arabicUserMessage ||
+                        selectedServiceDetails()?.englishUserMessage
+                      : selectedServiceDetails()?.englishUserMessage ||
+                        selectedServiceDetails()?.arabicUserMessage
+                  }}
+                </p>
+              </div>
+            }
+
+            <!-- ── Section 3: الخصائص والمعلمات الفنية ─────────────── -->
+            <div class="details-section-card">
+              <div class="section-card-header">
+                <span class="q-field-icon-badge q-field-icon-badge--violet">
+                  <i class="bi bi-sliders"></i>
+                </span>
+                <span>{{
+                  language() === 'ar' ? 'الخصائص الفنية والهيكلية' : 'Technical Attributes'
+                }}</span>
+              </div>
+
+              <div class="row g-2">
+                <!-- Node Type -->
+                <div class="col-6">
+                  <div class="bento-field-box">
+                    <div class="bento-field-header">
+                      <span class="bento-field-label">{{
+                        treeActionsTranslations().hasChildren
+                      }}</span>
+                      <span class="q-field-icon-badge q-field-icon-badge--violet">
+                        <i class="bi bi-folder2"></i>
+                      </span>
+                    </div>
+                    <span class="bento-field-val fw-semibold">
+                      {{
+                        node.children && node.children.length > 0
+                          ? treeActionsTranslations().categoryNode
+                          : treeActionsTranslations().leafNode
+                      }}
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Ticket Issuing -->
+                <div class="col-6">
+                  <div class="bento-field-box">
+                    <div class="bento-field-header">
+                      <span class="bento-field-label">{{
+                        treeActionsTranslations().ticketIssuing
+                      }}</span>
+                      <span class="q-field-icon-badge q-field-icon-badge--teal">
+                        <i class="bi bi-ticket-perforated"></i>
+                      </span>
+                    </div>
+                    <span
+                      class="bento-field-val fw-semibold"
+                      [class.text-success]="node.canIssueTicket"
+                      [class.text-muted]="!node.canIssueTicket"
+                    >
+                      {{
+                        node.canIssueTicket
+                          ? treeActionsTranslations().allowed
+                          : treeActionsTranslations().notAllowed
+                      }}
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Client Input Required -->
+                <div class="col-6">
+                  <div class="bento-field-box">
+                    <div class="bento-field-header">
+                      <span class="bento-field-label">{{
+                        treeActionsTranslations().clientInput
+                      }}</span>
+                      <span class="q-field-icon-badge q-field-icon-badge--amber">
+                        <i class="bi bi-keyboard"></i>
+                      </span>
+                    </div>
+                    <span class="bento-field-val fw-semibold">
+                      {{
+                        selectedServiceDetails()?.isClientInputRequired
+                          ? treeActionsTranslations().required
+                          : treeActionsTranslations().notRequired
+                      }}
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Owner Branch or Service ID -->
+                @if (node.scope === 'BranchScoped') {
+                  <div class="col-6">
+                    <div class="bento-field-box">
+                      <div class="bento-field-header">
+                        <span class="bento-field-label">{{
+                          treeActionsTranslations().ownerBranch
+                        }}</span>
+                        <span class="q-field-icon-badge q-field-icon-badge--sky">
+                          <i class="bi bi-building"></i>
+                        </span>
+                      </div>
+                      <span class="bento-field-val fw-semibold text-truncate">
+                        {{
+                          language() === 'ar'
+                            ? node.ownerBranchArabicName || '—'
+                            : node.ownerBranchEnglishName || '—'
+                        }}
+                      </span>
+                    </div>
+                  </div>
+                } @else {
+                  <div class="col-6">
+                    <div class="bento-field-box">
+                      <div class="bento-field-header">
+                        <span class="bento-field-label">{{
+                          treeActionsTranslations().serviceId
+                        }}</span>
+                        <span class="q-field-icon-badge q-field-icon-badge--sky">
+                          <i class="bi bi-hash"></i>
+                        </span>
+                      </div>
+                      <span class="bento-field-val fw-bold text-muted">#{{ node.id }}</span>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+
+            <!-- Loading spinner for details if still fetching -->
+            @if (detailsLoading()) {
+              <div class="text-center py-2 text-muted">
+                <div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
+                <small>{{
+                  language() === 'ar'
+                    ? 'جارٍ تحميل البيانات الإضافية...'
+                    : 'Loading extended details...'
+                }}</small>
+              </div>
+            }
+          </div>
+        </article>
       </div>
     </aside>
-  </div>
+  }
 </section>

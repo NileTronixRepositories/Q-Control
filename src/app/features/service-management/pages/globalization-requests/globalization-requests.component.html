@@ -119,7 +119,7 @@
   }
 
   <!-- FILTER PANEL -->
-  <form class="glob-filter-card" (submit)="submitSearch($event)">
+  <form class="glob-filter-card queue-filters-wrapper" (submit)="submitSearch($event)">
     <div class="glob-filter-grid">
       <div class="glob-filter-row-top">
         <label class="glob-filter-field">
@@ -246,7 +246,7 @@
 
         <button type="submit" class="glob-btn-search">
           <i class="bi bi-search" aria-hidden="true"></i>
-          {{ translations().search }}
+          <span>{{ language() === 'ar' ? 'بحث' : 'Search' }}</span>
         </button>
       </div>
     </div>
@@ -257,14 +257,14 @@
     @if (store.loading()) {
       <app-niletronix-loading-state [title]="translations().loading" variant="panel" size="lg" />
     } @else if (store.page().data.length === 0) {
-      <div class="py-5 text-center">
-        <div
-          class="d-inline-flex align-items-center justify-content-center rounded-circle bg-light p-3 text-muted mb-3"
-          style="width: 56px; height: 56px"
-        >
-          <i class="bi bi-inbox fs-3" aria-hidden="true"></i>
+      <div class="empty-state-craft py-5 text-center">
+        <div class="empty-icon-wrapper mb-3">
+          <div class="empty-icon-pulse"></div>
+          <div class="empty-icon-box">
+            <i class="bi bi-inbox" aria-hidden="true"></i>
+          </div>
         </div>
-        <p class="mb-0 fw-bold text-muted fs-6">{{ translations().empty }}</p>
+        <h4 class="empty-title">{{ translations().empty }}</h4>
       </div>
     } @else {
       <!-- Desktop Table -->
@@ -295,7 +295,7 @@
                     <span class="glob-service-icon">
                       <i class="bi bi-grid-1x2-fill" aria-hidden="true"></i>
                     </span>
-                    <strong class="fw-bold text-dark">{{ serviceName(item) }}</strong>
+                    <strong class="fw-bold text-dark text-nowrap">{{ serviceName(item) }}</strong>
                   </div>
                 </td>
                 <td>
@@ -311,7 +311,7 @@
                   </span>
                 </td>
                 <td>
-                  <span class="text-secondary fw-semibold">{{ parentName(item) }}</span>
+                  <span class="text-secondary fw-semibold text-nowrap">{{ parentName(item) }}</span>
                 </td>
                 <td class="text-center">
                   <span class="glob-count-badge">{{ item.servicesCount }}</span>

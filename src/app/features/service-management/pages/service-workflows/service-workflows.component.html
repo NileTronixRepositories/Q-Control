@@ -63,21 +63,27 @@
 
   @if (!canViewAll()) {
     <section class="workflow-state-card">
-      <div class="empty-icon-box danger-box mb-2">
-        <i class="bi bi-shield-lock-fill" aria-hidden="true"></i>
+      <div class="empty-icon-wrapper mb-3">
+        <div class="empty-icon-pulse"></div>
+        <div class="empty-icon-box danger-box">
+          <i class="bi bi-shield-lock-fill" aria-hidden="true"></i>
+        </div>
       </div>
-      <h2 class="text-danger fw-bold fs-5">{{ translations().accessDenied }}</h2>
-      <p class="text-muted fs-7 m-0">{{ translations().noPermissionHint }}</p>
+      <h2 class="empty-title text-danger">{{ translations().accessDenied }}</h2>
+      <p class="empty-subtitle">{{ translations().noPermissionHint }}</p>
     </section>
   } @else if (scopeError(); as error) {
     <section class="workflow-state-card">
-      <div class="empty-icon-box warning-box mb-2">
-        <i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>
+      <div class="empty-icon-wrapper mb-3">
+        <div class="empty-icon-pulse"></div>
+        <div class="empty-icon-box warning-box">
+          <i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>
+        </div>
       </div>
-      <h2 class="text-dark fw-bold fs-5">{{ error }}</h2>
+      <h2 class="empty-title">{{ error }}</h2>
       <button
         type="button"
-        class="branch-services-primary-btn compact-btn"
+        class="branch-services-primary-btn compact-btn mt-2"
         (click)="backToScopeSelection()"
       >
         {{ translations().backToWorkflowSelection }}
@@ -85,10 +91,13 @@
     </section>
   } @else if (!store.selectedBranchId()) {
     <section class="workflow-state-card">
-      <div class="empty-icon-box mb-2">
-        <i class="bi bi-building" aria-hidden="true"></i>
+      <div class="empty-icon-wrapper mb-3">
+        <div class="empty-icon-pulse"></div>
+        <div class="empty-icon-box">
+          <i class="bi bi-building" aria-hidden="true"></i>
+        </div>
       </div>
-      <h2 class="fw-bold text-dark fs-5">{{ translations().selectBranchFirst }}</h2>
+      <h2 class="empty-title">{{ translations().selectBranchFirst }}</h2>
     </section>
   } @else {
     <div class="workflow-workspace row g-3 align-items-start">
@@ -268,7 +277,7 @@
               </header>
 
               @if (filtersExpanded()) {
-                <div class="workflow-filter-grid row g-3 m-0">
+                <div class="workflow-filter-grid queue-filters-wrapper row g-3 m-0">
                   <div class="col-12 col-xl-5">
                     <label class="filter-field d-grid gap-2 m-0 w-100">
                       <span class="filter-label">{{ translations().search }}</span>

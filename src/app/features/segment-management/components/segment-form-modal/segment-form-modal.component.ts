@@ -61,6 +61,10 @@ export class SegmentFormModalComponent {
     return this.translations.editSegment;
   }
 
+  get modalSubtitle(): string {
+    return this.translations?.priorityHelpText ?? '';
+  }
+
   closeModal(): void {
     this.closed.emit();
   }

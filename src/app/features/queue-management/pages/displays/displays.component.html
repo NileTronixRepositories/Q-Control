@@ -7,7 +7,7 @@
     [eyebrow]="translations().title"
     [title]="translations().title"
     [description]="translations().description"
-    icon="fa-solid fa-tv"
+    icon="bi bi-tv"
     iconVariant="amber"
   >
     <div hero-actions class="d-flex flex-wrap align-items-center gap-2">
@@ -19,7 +19,7 @@
         [title]="translations().refresh"
       >
         <i
-          class="fa-solid fa-arrows-rotate"
+          class="bi bi-arrow-clockwise"
           style="color: #059669"
           [class.spin]="activeTab() === 'active' ? activeLoading() : deletedLoading()"
           aria-hidden="true"
@@ -33,146 +33,148 @@
           class="primary-action d-inline-flex align-items-center gap-2"
           (click)="openCreate()"
         >
-          <i class="fa-solid fa-plus"></i>
+          <i class="bi bi-plus-lg" aria-hidden="true"></i>
           <span class="text-white">{{ translations().addDisplay }}</span>
         </button>
       }
     </div>
 
     <div hero-filters class="w-100">
-      @if (activeTab() === 'active') {
-        <div class="row g-3 align-items-end">
-          <div class="col-12 col-md-5 col-lg-5">
-            <label class="filter-field w-100">
-              <span class="d-flex align-items-center gap-2">
-                <span class="q-field-icon-badge q-field-icon-badge--indigo">
-                  <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+      <div class="queue-filters-wrapper">
+        @if (activeTab() === 'active') {
+          <div class="row g-3 align-items-end">
+            <div class="col-12 col-md-5 col-lg-5">
+              <label class="filter-field w-100">
+                <span class="d-flex align-items-center gap-2">
+                  <span class="q-field-icon-badge q-field-icon-badge--indigo">
+                    <i class="bi bi-search" aria-hidden="true"></i>
+                  </span>
+                  {{ translations().searchPlaceholder }}
                 </span>
-                {{ translations().searchPlaceholder }}
-              </span>
-              <div class="search-input-wrapper">
-                <i class="fa-solid fa-magnifying-glass search-icon" aria-hidden="true"></i>
-                <input
-                  class="form-control"
-                  type="search"
-                  [value]="activeSearch()"
-                  [placeholder]="translations().searchPlaceholder"
-                  (input)="updateActiveSearch($event)"
-                />
-              </div>
-            </label>
-          </div>
-          <div class="col-12 col-md-4 col-lg-4">
-            <label class="filter-field w-100">
-              <span class="d-flex align-items-center gap-2">
-                <span class="q-field-icon-badge q-field-icon-badge--violet">
-                  <i class="fa-solid fa-building" aria-hidden="true"></i>
+                <div class="search-input-wrapper">
+                  <i class="bi bi-search search-icon" aria-hidden="true"></i>
+                  <input
+                    class="form-control"
+                    type="search"
+                    [value]="activeSearch()"
+                    [placeholder]="translations().searchPlaceholder"
+                    (input)="updateActiveSearch($event)"
+                  />
+                </div>
+              </label>
+            </div>
+            <div class="col-12 col-md-4 col-lg-4">
+              <label class="filter-field w-100">
+                <span class="d-flex align-items-center gap-2">
+                  <span class="q-field-icon-badge q-field-icon-badge--violet">
+                    <i class="bi bi-building" aria-hidden="true"></i>
+                  </span>
+                  {{ translations().branchFilter }}
                 </span>
-                {{ translations().branchFilter }}
-              </span>
-              <select
-                class="form-select"
-                data-testid="displays-active-branch-filter"
-                [value]="activeBranchId() ?? ''"
-                [disabled]="isBranchContextLocked()"
-                (change)="updateActiveBranchFilter($event)"
-              >
-                <option value="">{{ translations().allBranches }}</option>
-                @for (branch of branches(); track branch.id) {
-                  <option [value]="branch.id">{{ branchOptionLabel(branch) }}</option>
-                }
-              </select>
-            </label>
-          </div>
-          <div class="col-12 col-md-3 col-lg-3">
-            <label class="filter-field w-100">
-              <span class="d-flex align-items-center gap-2">
-                <span class="q-field-icon-badge q-field-icon-badge--amber">
-                  <i class="fa-solid fa-list-ol" aria-hidden="true"></i>
+                <select
+                  class="form-select"
+                  data-testid="displays-active-branch-filter"
+                  [value]="activeBranchId() ?? ''"
+                  [disabled]="isBranchContextLocked()"
+                  (change)="updateActiveBranchFilter($event)"
+                >
+                  <option value="">{{ translations().allBranches }}</option>
+                  @for (branch of branches(); track branch.id) {
+                    <option [value]="branch.id">{{ branchOptionLabel(branch) }}</option>
+                  }
+                </select>
+              </label>
+            </div>
+            <div class="col-12 col-md-3 col-lg-3">
+              <label class="filter-field w-100">
+                <span class="d-flex align-items-center gap-2">
+                  <span class="q-field-icon-badge q-field-icon-badge--amber">
+                    <i class="bi bi-list-ol" aria-hidden="true"></i>
+                  </span>
+                  {{ translations().pageSize }}
                 </span>
-                {{ translations().pageSize }}
-              </span>
-              <select
-                class="form-select"
-                [value]="activePageSize()"
-                (change)="updateActivePageSize($event)"
-              >
-                <option value="10">10</option>
-                <option value="25">25</option>
-                <option value="50">50</option>
-                <option value="100">100</option>
-              </select>
-            </label>
+                <select
+                  class="form-select"
+                  [value]="activePageSize()"
+                  (change)="updateActivePageSize($event)"
+                >
+                  <option value="10">10</option>
+                  <option value="25">25</option>
+                  <option value="50">50</option>
+                  <option value="100">100</option>
+                </select>
+              </label>
+            </div>
           </div>
-        </div>
-      }
+        }
 
-      @if (activeTab() === 'deleted') {
-        <div class="row g-3 align-items-end">
-          <div class="col-12 col-md-5 col-lg-5">
-            <label class="filter-field w-100">
-              <span class="d-flex align-items-center gap-2">
-                <span class="q-field-icon-badge q-field-icon-badge--indigo">
-                  <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+        @if (activeTab() === 'deleted') {
+          <div class="row g-3 align-items-end">
+            <div class="col-12 col-md-5 col-lg-5">
+              <label class="filter-field w-100">
+                <span class="d-flex align-items-center gap-2">
+                  <span class="q-field-icon-badge q-field-icon-badge--indigo">
+                    <i class="bi bi-search" aria-hidden="true"></i>
+                  </span>
+                  {{ translations().searchPlaceholder }}
                 </span>
-                {{ translations().searchPlaceholder }}
-              </span>
-              <div class="search-input-wrapper">
-                <i class="fa-solid fa-magnifying-glass search-icon" aria-hidden="true"></i>
-                <input
-                  class="form-control"
-                  type="search"
-                  [value]="deletedSearch()"
-                  [placeholder]="translations().searchPlaceholder"
-                  (input)="updateDeletedSearch($event)"
-                />
-              </div>
-            </label>
-          </div>
-          <div class="col-12 col-md-4 col-lg-4">
-            <label class="filter-field w-100">
-              <span class="d-flex align-items-center gap-2">
-                <span class="q-field-icon-badge q-field-icon-badge--violet">
-                  <i class="fa-solid fa-building" aria-hidden="true"></i>
+                <div class="search-input-wrapper">
+                  <i class="bi bi-search search-icon" aria-hidden="true"></i>
+                  <input
+                    class="form-control"
+                    type="search"
+                    [value]="deletedSearch()"
+                    [placeholder]="translations().searchPlaceholder"
+                    (input)="updateDeletedSearch($event)"
+                  />
+                </div>
+              </label>
+            </div>
+            <div class="col-12 col-md-4 col-lg-4">
+              <label class="filter-field w-100">
+                <span class="d-flex align-items-center gap-2">
+                  <span class="q-field-icon-badge q-field-icon-badge--violet">
+                    <i class="bi bi-building" aria-hidden="true"></i>
+                  </span>
+                  {{ translations().branchFilter }}
                 </span>
-                {{ translations().branchFilter }}
-              </span>
-              <select
-                class="form-select"
-                data-testid="displays-deleted-branch-filter"
-                [value]="deletedBranchId() ?? ''"
-                [disabled]="isBranchContextLocked()"
-                (change)="updateDeletedBranchFilter($event)"
-              >
-                <option value="">{{ translations().allBranches }}</option>
-                @for (branch of branches(); track branch.id) {
-                  <option [value]="branch.id">{{ branchOptionLabel(branch) }}</option>
-                }
-              </select>
-            </label>
-          </div>
-          <div class="col-12 col-md-3 col-lg-3">
-            <label class="filter-field w-100">
-              <span class="d-flex align-items-center gap-2">
-                <span class="q-field-icon-badge q-field-icon-badge--amber">
-                  <i class="fa-solid fa-list-ol" aria-hidden="true"></i>
+                <select
+                  class="form-select"
+                  data-testid="displays-deleted-branch-filter"
+                  [value]="deletedBranchId() ?? ''"
+                  [disabled]="isBranchContextLocked()"
+                  (change)="updateDeletedBranchFilter($event)"
+                >
+                  <option value="">{{ translations().allBranches }}</option>
+                  @for (branch of branches(); track branch.id) {
+                    <option [value]="branch.id">{{ branchOptionLabel(branch) }}</option>
+                  }
+                </select>
+              </label>
+            </div>
+            <div class="col-12 col-md-3 col-lg-3">
+              <label class="filter-field w-100">
+                <span class="d-flex align-items-center gap-2">
+                  <span class="q-field-icon-badge q-field-icon-badge--amber">
+                    <i class="bi bi-list-ol" aria-hidden="true"></i>
+                  </span>
+                  {{ translations().pageSize }}
                 </span>
-                {{ translations().pageSize }}
-              </span>
-              <select
-                class="form-select"
-                [value]="deletedPageSize()"
-                (change)="updateDeletedPageSize($event)"
-              >
-                <option value="10">10</option>
-                <option value="25">25</option>
-                <option value="50">50</option>
-                <option value="100">100</option>
-              </select>
-            </label>
+                <select
+                  class="form-select"
+                  [value]="deletedPageSize()"
+                  (change)="updateDeletedPageSize($event)"
+                >
+                  <option value="10">10</option>
+                  <option value="25">25</option>
+                  <option value="50">50</option>
+                  <option value="100">100</option>
+                </select>
+              </label>
+            </div>
           </div>
-        </div>
-      }
+        }
+      </div>
     </div>
   </app-page-hero>
   @if (message(); as currentMessage) {
@@ -213,15 +215,17 @@
       </p>
     </section>
   } @else {
-    <div class="tabs d-flex flex-wrap gap-2 mb-3">
+    <div class="q-segmented-tabs mb-3" role="tablist">
       @if (canViewActive()) {
         <button
           type="button"
-          [class.primary-action]="activeTab() === 'active'"
-          [class.secondary-action]="activeTab() !== 'active'"
+          role="tab"
+          class="q-segment-tab"
+          [class.active]="activeTab() === 'active'"
+          [attr.aria-selected]="activeTab() === 'active'"
           (click)="switchTab('active')"
         >
-          <i class="fa-solid fa-circle-check"></i>
+          <i class="bi bi-tv" aria-hidden="true"></i>
           <span>{{ translations().activeTab }}</span>
         </button>
       }
@@ -229,11 +233,13 @@
       @if (canViewDeleted()) {
         <button
           type="button"
-          [class.primary-action]="activeTab() === 'deleted'"
-          [class.secondary-action]="activeTab() !== 'deleted'"
+          role="tab"
+          class="q-segment-tab"
+          [class.active]="activeTab() === 'deleted'"
+          [attr.aria-selected]="activeTab() === 'deleted'"
           (click)="switchTab('deleted')"
         >
-          <i class="fa-solid fa-trash-can"></i>
+          <i class="bi bi-trash3-fill" aria-hidden="true"></i>
           <span>{{ translations().deletedTab }}</span>
         </button>
       }
@@ -311,7 +317,7 @@
                             [title]="translations().view"
                             (click)="openView(item.id)"
                           >
-                            <i class="fa-solid fa-eye" aria-hidden="true"></i>
+                            <i class="bi bi-eye" aria-hidden="true"></i>
                           </button>
                         }
 
@@ -323,7 +329,7 @@
                             [title]="translations().edit"
                             (click)="openEdit(item.id)"
                           >
-                            <i class="fa-solid fa-pen-to-square" aria-hidden="true"></i>
+                            <i class="bi bi-pencil-square" aria-hidden="true"></i>
                           </button>
                         }
 
@@ -335,7 +341,7 @@
                             [title]="translations().delete"
                             (click)="requestSoftDelete(item)"
                           >
-                            <i class="fa-solid fa-power-off" aria-hidden="true"></i>
+                            <i class="bi bi-power" aria-hidden="true"></i>
                           </button>
                         }
                       </div>
@@ -350,7 +356,7 @@
               <app-mobile-record-card
                 [eyebrow]="translations().displayNumber"
                 [title]="formatText(item.type)"
-                icon="fa-solid fa-tv"
+                icon="bi bi-tv"
                 [recordId]="item.number"
               >
                 <div record-fields>
@@ -386,7 +392,7 @@
                     [title]="translations().view"
                     (click)="openView(item.id)"
                   >
-                    <i class="fa-solid fa-eye" aria-hidden="true"></i>
+                    <i class="bi bi-eye" aria-hidden="true"></i>
                   </button>
                 }
                 @if (canUpdate()) {
@@ -398,7 +404,7 @@
                     [title]="translations().edit"
                     (click)="openEdit(item.id)"
                   >
-                    <i class="fa-solid fa-pen-to-square" aria-hidden="true"></i>
+                    <i class="bi bi-pencil" aria-hidden="true"></i>
                   </button>
                 }
                 @if (canDeactivate()) {
@@ -410,21 +416,20 @@
                     [title]="translations().delete"
                     (click)="requestSoftDelete(item)"
                   >
-                    <i class="fa-solid fa-power-off" aria-hidden="true"></i>
+                    <i class="bi bi-power" aria-hidden="true"></i>
                   </button>
                 }
               </app-mobile-record-card>
             }
           </div>
         } @else if (!activeLoading()) {
-          <div class="admin-list-empty d-flex align-items-center gap-3 p-4" role="status">
-            <span
-              class="admin-list-empty-icon d-inline-flex align-items-center justify-content-center flex-shrink-0"
-              aria-hidden="true"
-            >
-              <i class="fa-solid fa-tv"></i>
-            </span>
-            <h2 class="mb-0 fs-6 fw-bold text-secondary">{{ translations().noItems }}</h2>
+          <div class="empty-state-craft text-center py-5" role="status">
+            <div class="empty-icon-pulse mb-3">
+              <span class="empty-icon-box">
+                <i class="bi bi-tv"></i>
+              </span>
+            </div>
+            <h3 class="empty-title mb-2">{{ translations().noItems }}</h3>
           </div>
         }
         <footer
@@ -445,9 +450,9 @@
               (click)="previousActivePage()"
             >
               <i
-                class="fa-solid"
-                [class.fa-chevron-right]="direction() === 'rtl'"
-                [class.fa-chevron-left]="direction() !== 'rtl'"
+                class="bi"
+                [class.bi-chevron-right]="direction() === 'rtl'"
+                [class.bi-chevron-left]="direction() !== 'rtl'"
                 aria-hidden="true"
               ></i>
               <span>{{ translations().previous }}</span>
@@ -467,9 +472,9 @@
             >
               <span>{{ translations().next }}</span>
               <i
-                class="fa-solid"
-                [class.fa-chevron-left]="direction() === 'rtl'"
-                [class.fa-chevron-right]="direction() !== 'rtl'"
+                class="bi"
+                [class.bi-chevron-left]="direction() === 'rtl'"
+                [class.bi-chevron-right]="direction() !== 'rtl'"
                 aria-hidden="true"
               ></i>
             </button>
@@ -551,7 +556,7 @@
                             [title]="translations().restore"
                             (click)="requestRestore(item)"
                           >
-                            <i class="fa-solid fa-rotate-left" aria-hidden="true"></i>
+                            <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
                           </button>
                         }
 
@@ -563,7 +568,7 @@
                             [title]="translations().permanentDelete"
                             (click)="requestPermanentDelete(item)"
                           >
-                            <i class="fa-solid fa-trash-can" aria-hidden="true"></i>
+                            <i class="bi bi-trash3" aria-hidden="true"></i>
                           </button>
                         }
                       </div>
@@ -578,7 +583,7 @@
               <app-mobile-record-card
                 [eyebrow]="translations().displayNumber"
                 [title]="formatText(item.type)"
-                icon="fa-solid fa-tv"
+                icon="bi bi-tv"
                 [recordId]="item.number"
               >
                 <span record-badges class="status-pill status-inactive">{{
@@ -617,7 +622,7 @@
                     [title]="translations().restore"
                     (click)="requestRestore(item)"
                   >
-                    <i class="fa-solid fa-rotate-left" aria-hidden="true"></i>
+                    <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
                   </button>
                 }
                 @if (canDeletePermanent()) {
@@ -629,21 +634,20 @@
                     [title]="translations().permanentDelete"
                     (click)="requestPermanentDelete(item)"
                   >
-                    <i class="fa-solid fa-trash-can" aria-hidden="true"></i>
+                    <i class="bi bi-trash3" aria-hidden="true"></i>
                   </button>
                 }
               </app-mobile-record-card>
             }
           </div>
         } @else if (!deletedLoading()) {
-          <div class="admin-list-empty d-flex align-items-center gap-3 p-4" role="status">
-            <span
-              class="admin-list-empty-icon d-inline-flex align-items-center justify-content-center flex-shrink-0"
-              aria-hidden="true"
-            >
-              <i class="fa-solid fa-tv"></i>
-            </span>
-            <h2 class="mb-0 fs-6 fw-bold text-secondary">{{ translations().noItems }}</h2>
+          <div class="empty-state-craft text-center py-5" role="status">
+            <div class="empty-icon-pulse mb-3">
+              <span class="empty-icon-box">
+                <i class="bi bi-trash3"></i>
+              </span>
+            </div>
+            <h3 class="empty-title mb-2">{{ translations().noItems }}</h3>
           </div>
         }
 
@@ -665,9 +669,9 @@
               (click)="previousDeletedPage()"
             >
               <i
-                class="fa-solid"
-                [class.fa-chevron-right]="direction() === 'rtl'"
-                [class.fa-chevron-left]="direction() !== 'rtl'"
+                class="bi"
+                [class.bi-chevron-right]="direction() === 'rtl'"
+                [class.bi-chevron-left]="direction() !== 'rtl'"
                 aria-hidden="true"
               ></i>
               <span>{{ translations().previous }}</span>
@@ -687,9 +691,9 @@
             >
               <span>{{ translations().next }}</span>
               <i
-                class="fa-solid"
-                [class.fa-chevron-left]="direction() === 'rtl'"
-                [class.fa-chevron-right]="direction() !== 'rtl'"
+                class="bi"
+                [class.bi-chevron-left]="direction() === 'rtl'"
+                [class.bi-chevron-right]="direction() !== 'rtl'"
                 aria-hidden="true"
               ></i>
             </button>

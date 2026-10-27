@@ -8,7 +8,7 @@
     [eyebrow]="copy().pageEyebrow"
     [title]="copy().pageTitle"
     [description]="copy().pageDescription"
-    icon="fa-solid fa-palette"
+    icon="bi bi-palette"
     iconVariant="violet"
   >
     <div hero-actions class="d-flex align-items-center gap-2">
@@ -20,7 +20,7 @@
         (click)="refresh()"
       >
         <i
-          class="fa-solid fa-arrows-rotate"
+          class="bi bi-arrow-clockwise"
           style="color: #059669"
           [class.spin]="loading()"
           aria-hidden="true"
@@ -40,10 +40,10 @@
         [class.toast-info]="currentMessage.tone === 'info'"
       >
         <i
-          class="fa-solid"
-          [class.fa-circle-check]="currentMessage.tone === 'success'"
-          [class.fa-circle-xmark]="currentMessage.tone === 'error'"
-          [class.fa-circle-info]="currentMessage.tone === 'info'"
+          class="bi"
+          [class.bi-check-circle-fill]="currentMessage.tone === 'success'"
+          [class.bi-x-circle-fill]="currentMessage.tone === 'error'"
+          [class.bi-info-circle-fill]="currentMessage.tone === 'info'"
           aria-hidden="true"
         ></i>
         <p>{{ currentMessage.text }}</p>
@@ -54,7 +54,7 @@
           [attr.aria-label]="copy().close"
           [attr.title]="copy().close"
         >
-          <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+          <i class="bi bi-x-lg" aria-hidden="true"></i>
         </button>
       </div>
     </div>
@@ -63,7 +63,7 @@
   @if (!canModify()) {
     <div class="notice-glass-banner banner-warning" role="alert">
       <div class="banner-icon">
-        <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+        <i class="bi bi-shield-lock" aria-hidden="true"></i>
       </div>
       <span>{{ copy().readOnlyNotice }}</span>
     </div>
@@ -72,7 +72,7 @@
   @if (!isConfigured() && !loading()) {
     <div class="notice-glass-banner banner-info" role="alert">
       <div class="banner-icon">
-        <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+        <i class="bi bi-info-circle-fill" aria-hidden="true"></i>
       </div>
       <span>{{ copy().notConfiguredNotice }}</span>
     </div>
@@ -91,7 +91,7 @@
             <div class="panel-header d-flex align-items-center justify-content-between">
               <div class="d-flex align-items-center gap-2">
                 <span class="q-field-icon-badge q-field-icon-badge--sky">
-                  <i class="fa-solid fa-palette"></i>
+                  <i class="bi bi-palette"></i>
                 </span>
                 <div>
                   <h5 class="panel-title m-0">{{ copy().themeColors }}</h5>
@@ -112,7 +112,7 @@
                 <div class="col-12 col-sm-6">
                   <label for="gbMainColor" class="form-label d-flex align-items-center gap-2">
                     <span class="q-field-icon-badge q-field-icon-badge--sky">
-                      <i class="fa-solid fa-brush"></i>
+                      <i class="bi bi-brush"></i>
                     </span>
                     <span>{{ copy().mainColor }}<span class="text-danger ms-1">*</span></span>
                   </label>
@@ -143,7 +143,7 @@
                 <div class="col-12 col-sm-6">
                   <label for="gbSecondaryColor" class="form-label d-flex align-items-center gap-2">
                     <span class="q-field-icon-badge q-field-icon-badge--violet">
-                      <i class="fa-solid fa-swatchbook"></i>
+                      <i class="bi bi-collection"></i>
                     </span>
                     <span>{{ copy().secondaryColor }}<span class="text-danger ms-1">*</span></span>
                   </label>
@@ -176,7 +176,7 @@
                 <div class="col-12 col-sm-6">
                   <label for="gbBackgroundColor" class="form-label d-flex align-items-center gap-2">
                     <span class="q-field-icon-badge q-field-icon-badge--teal">
-                      <i class="fa-solid fa-border-all"></i>
+                      <i class="bi bi-grid-3x3"></i>
                     </span>
                     <span>{{ copy().backgroundColor }}<span class="text-danger ms-1">*</span></span>
                   </label>
@@ -209,7 +209,7 @@
                 <div class="col-12 col-sm-6">
                   <label for="gbHeaderColor" class="form-label d-flex align-items-center gap-2">
                     <span class="q-field-icon-badge q-field-icon-badge--indigo">
-                      <i class="fa-solid fa-window-maximize"></i>
+                      <i class="bi bi-window"></i>
                     </span>
                     <span>{{ copy().headerColor }}</span>
                   </label>
@@ -242,7 +242,7 @@
                 <div class="col-12 col-sm-6">
                   <label for="gbFooterColor" class="form-label d-flex align-items-center gap-2">
                     <span class="q-field-icon-badge q-field-icon-badge--amber">
-                      <i class="fa-solid fa-window-minimize"></i>
+                      <i class="bi bi-dash-square"></i>
                     </span>
                     <span>{{ copy().footerColor }}</span>
                   </label>
@@ -275,7 +275,7 @@
                 <div class="col-12 col-sm-6">
                   <label for="gbMainTextColor" class="form-label d-flex align-items-center gap-2">
                     <span class="q-field-icon-badge q-field-icon-badge--rose">
-                      <i class="fa-solid fa-font"></i>
+                      <i class="bi bi-fonts"></i>
                     </span>
                     <span>{{ copy().mainTextColor }}</span>
                   </label>
@@ -316,7 +316,7 @@
             <div class="panel-header d-flex align-items-center justify-content-between">
               <div class="d-flex align-items-center gap-2">
                 <span class="q-field-icon-badge q-field-icon-badge--violet">
-                  <i class="fa-solid fa-sliders"></i>
+                  <i class="bi bi-sliders"></i>
                 </span>
                 <div>
                   <h5 class="panel-title m-0">{{ copy().behaviorSection }}</h5>
@@ -334,7 +334,7 @@
                   >
                     <div class="d-flex align-items-center gap-3">
                       <span class="q-field-icon-badge q-field-icon-badge--teal">
-                        <i class="fa-solid fa-language"></i>
+                        <i class="bi bi-translate"></i>
                       </span>
                       <div>
                         <label
@@ -364,7 +364,7 @@
                   >
                     <div class="d-flex align-items-center gap-3">
                       <span class="q-field-icon-badge q-field-icon-badge--sky">
-                        <i class="fa-solid fa-earth-africa"></i>
+                        <i class="bi bi-globe"></i>
                       </span>
                       <div>
                         <label
@@ -396,7 +396,7 @@
                   >
                     <div class="d-flex align-items-center gap-3">
                       <span class="q-field-icon-badge q-field-icon-badge--amber">
-                        <i class="fa-solid fa-id-card"></i>
+                        <i class="bi bi-card-text"></i>
                       </span>
                       <div>
                         <label
@@ -428,7 +428,7 @@
                   >
                     <div class="d-flex align-items-center gap-3">
                       <span class="q-field-icon-badge q-field-icon-badge--violet">
-                        <i class="fa-solid fa-route"></i>
+                        <i class="bi bi-signpost-2"></i>
                       </span>
                       <div>
                         <label
@@ -460,7 +460,7 @@
                   >
                     <div class="d-flex align-items-center gap-3">
                       <span class="q-field-icon-badge q-field-icon-badge--indigo">
-                        <i class="fa-solid fa-user-tie"></i>
+                        <i class="bi bi-person-badge"></i>
                       </span>
                       <div>
                         <label
@@ -492,7 +492,7 @@
                   >
                     <div class="d-flex align-items-center gap-3">
                       <span class="q-field-icon-badge q-field-icon-badge--teal">
-                        <i class="fa-solid fa-layer-group"></i>
+                        <i class="bi bi-layers"></i>
                       </span>
                       <div>
                         <label
@@ -529,7 +529,7 @@
             <div class="panel-header">
               <div class="d-flex align-items-center gap-2">
                 <span class="q-field-icon-badge q-field-icon-badge--teal">
-                  <i class="fa-solid fa-language"></i>
+                  <i class="bi bi-translate"></i>
                 </span>
                 <div>
                   <h5 class="panel-title m-0">{{ copy().languageButtonSection }}</h5>
@@ -543,7 +543,7 @@
                 <div class="col-sm-6">
                   <label for="gbLangBgColor" class="form-label d-flex align-items-center gap-2">
                     <span class="q-field-icon-badge q-field-icon-badge--teal">
-                      <i class="fa-solid fa-fill-drip"></i>
+                      <i class="bi bi-paint-bucket"></i>
                     </span>
                     <span>{{ copy().buttonBackgroundColorLabel }}</span>
                   </label>
@@ -570,7 +570,7 @@
                 <div class="col-sm-6">
                   <label for="gbLangTextColor" class="form-label d-flex align-items-center gap-2">
                     <span class="q-field-icon-badge q-field-icon-badge--sky">
-                      <i class="fa-solid fa-font"></i>
+                      <i class="bi bi-fonts"></i>
                     </span>
                     <span>{{ copy().buttonTextColorLabel }}</span>
                   </label>
@@ -597,7 +597,7 @@
                 <div class="col-sm-6">
                   <label for="gbLangWidth" class="form-label d-flex align-items-center gap-2">
                     <span class="q-field-icon-badge q-field-icon-badge--amber">
-                      <i class="fa-solid fa-arrows-left-right"></i>
+                      <i class="bi bi-arrows"></i>
                     </span>
                     <span>{{ copy().buttonWidthLabel }}</span>
                   </label>
@@ -619,7 +619,7 @@
                 <div class="col-sm-6">
                   <label for="gbLangHeight" class="form-label d-flex align-items-center gap-2">
                     <span class="q-field-icon-badge q-field-icon-badge--violet">
-                      <i class="fa-solid fa-arrows-up-down"></i>
+                      <i class="bi bi-arrows-vertical"></i>
                     </span>
                     <span>{{ copy().buttonHeightLabel }}</span>
                   </label>
@@ -641,7 +641,7 @@
                 <div class="col-12">
                   <label for="gbLangText" class="form-label d-flex align-items-center gap-2">
                     <span class="q-field-icon-badge q-field-icon-badge--indigo">
-                      <i class="fa-solid fa-signature"></i>
+                      <i class="bi bi-pen"></i>
                     </span>
                     <span>{{ copy().buttonTextLabel }}</span>
                   </label>
@@ -668,7 +668,7 @@
             <div class="panel-header">
               <div class="d-flex align-items-center gap-2">
                 <span class="q-field-icon-badge q-field-icon-badge--amber">
-                  <i class="fa-solid fa-calculator"></i>
+                  <i class="bi bi-calculator"></i>
                 </span>
                 <div>
                   <h5 class="panel-title m-0">{{ copy().keypadButtonSection }}</h5>
@@ -682,7 +682,7 @@
                 <div class="col-sm-6">
                   <label for="gbKeypadBgColor" class="form-label d-flex align-items-center gap-2">
                     <span class="q-field-icon-badge q-field-icon-badge--amber">
-                      <i class="fa-solid fa-fill-drip"></i>
+                      <i class="bi bi-paint-bucket"></i>
                     </span>
                     <span>{{ copy().buttonBackgroundColorLabel }}</span>
                   </label>
@@ -709,7 +709,7 @@
                 <div class="col-sm-6">
                   <label for="gbKeypadTextColor" class="form-label d-flex align-items-center gap-2">
                     <span class="q-field-icon-badge q-field-icon-badge--sky">
-                      <i class="fa-solid fa-font"></i>
+                      <i class="bi bi-fonts"></i>
                     </span>
                     <span>{{ copy().buttonTextColorLabel }}</span>
                   </label>
@@ -736,7 +736,7 @@
                 <div class="col-sm-6">
                   <label for="gbKeypadWidth" class="form-label d-flex align-items-center gap-2">
                     <span class="q-field-icon-badge q-field-icon-badge--teal">
-                      <i class="fa-solid fa-arrows-left-right"></i>
+                      <i class="bi bi-arrows"></i>
                     </span>
                     <span>{{ copy().buttonWidthLabel }}</span>
                   </label>
@@ -758,7 +758,7 @@
                 <div class="col-sm-6">
                   <label for="gbKeypadHeight" class="form-label d-flex align-items-center gap-2">
                     <span class="q-field-icon-badge q-field-icon-badge--violet">
-                      <i class="fa-solid fa-arrows-up-down"></i>
+                      <i class="bi bi-arrows-vertical"></i>
                     </span>
                     <span>{{ copy().buttonHeightLabel }}</span>
                   </label>
@@ -780,7 +780,7 @@
                 <div class="col-12">
                   <label for="gbKeypadText" class="form-label d-flex align-items-center gap-2">
                     <span class="q-field-icon-badge q-field-icon-badge--indigo">
-                      <i class="fa-solid fa-signature"></i>
+                      <i class="bi bi-pen"></i>
                     </span>
                     <span>{{ copy().buttonTextLabel }}</span>
                   </label>
@@ -807,7 +807,7 @@
             <div class="panel-header">
               <div class="d-flex align-items-center gap-2">
                 <span class="q-field-icon-badge q-field-icon-badge--indigo">
-                  <i class="fa-solid fa-table-cells-large"></i>
+                  <i class="bi bi-grid"></i>
                 </span>
                 <div>
                   <h5 class="panel-title m-0">{{ copy().serviceButtonSection }}</h5>
@@ -821,7 +821,7 @@
                 <div class="col-sm-6">
                   <label for="gbSrvBgColor" class="form-label d-flex align-items-center gap-2">
                     <span class="q-field-icon-badge q-field-icon-badge--indigo">
-                      <i class="fa-solid fa-fill-drip"></i>
+                      <i class="bi bi-paint-bucket"></i>
                     </span>
                     <span>{{ copy().buttonBackgroundColorLabel }}</span>
                   </label>
@@ -848,7 +848,7 @@
                 <div class="col-sm-6">
                   <label for="gbSrvTextColor" class="form-label d-flex align-items-center gap-2">
                     <span class="q-field-icon-badge q-field-icon-badge--sky">
-                      <i class="fa-solid fa-font"></i>
+                      <i class="bi bi-fonts"></i>
                     </span>
                     <span>{{ copy().buttonTextColorLabel }}</span>
                   </label>
@@ -875,7 +875,7 @@
                 <div class="col-6 col-sm-3">
                   <label for="gbSrvWidth" class="form-label d-flex align-items-center gap-2">
                     <span class="q-field-icon-badge q-field-icon-badge--teal">
-                      <i class="fa-solid fa-arrows-left-right"></i>
+                      <i class="bi bi-arrows"></i>
                     </span>
                     <span>{{ copy().buttonWidthLabel }}</span>
                   </label>
@@ -897,7 +897,7 @@
                 <div class="col-6 col-sm-3">
                   <label for="gbSrvHeight" class="form-label d-flex align-items-center gap-2">
                     <span class="q-field-icon-badge q-field-icon-badge--violet">
-                      <i class="fa-solid fa-arrows-up-down"></i>
+                      <i class="bi bi-arrows-vertical"></i>
                     </span>
                     <span>{{ copy().buttonHeightLabel }}</span>
                   </label>
@@ -919,7 +919,7 @@
                 <div class="col-6 col-sm-3">
                   <label for="gbSrvSpace" class="form-label d-flex align-items-center gap-2">
                     <span class="q-field-icon-badge q-field-icon-badge--amber">
-                      <i class="fa-solid fa-arrows-split-up-and-left"></i>
+                      <i class="bi bi-box-arrow-up-right"></i>
                     </span>
                     <span>{{ copy().serviceButtonSpaceLabel }}</span>
                   </label>
@@ -941,7 +941,7 @@
                 <div class="col-6 col-sm-3">
                   <label for="gbSrvFontSize" class="form-label d-flex align-items-center gap-2">
                     <span class="q-field-icon-badge q-field-icon-badge--sky">
-                      <i class="fa-solid fa-text-height"></i>
+                      <i class="bi bi-textarea-resize"></i>
                     </span>
                     <span>{{ copy().serviceButtonFontSizeLabel }}</span>
                   </label>
@@ -964,7 +964,7 @@
                 <div class="col-12">
                   <label for="gbSrvText" class="form-label d-flex align-items-center gap-2">
                     <span class="q-field-icon-badge q-field-icon-badge--violet">
-                      <i class="fa-solid fa-signature"></i>
+                      <i class="bi bi-pen"></i>
                     </span>
                     <span>{{ copy().buttonTextLabel }}</span>
                   </label>
@@ -991,7 +991,7 @@
             <div class="panel-header">
               <div class="d-flex align-items-center gap-2">
                 <span class="q-field-icon-badge q-field-icon-badge--sky">
-                  <i class="fa-solid fa-arrow-left"></i>
+                  <i class="bi bi-arrow-left"></i>
                 </span>
                 <div>
                   <h5 class="panel-title m-0">{{ copy().footerButtonSection }}</h5>
@@ -1005,7 +1005,7 @@
                 <div class="col-sm-6">
                   <label for="gbFooterBgColor" class="form-label d-flex align-items-center gap-2">
                     <span class="q-field-icon-badge q-field-icon-badge--sky">
-                      <i class="fa-solid fa-fill-drip"></i>
+                      <i class="bi bi-paint-bucket"></i>
                     </span>
                     <span>{{ copy().buttonBackgroundColorLabel }}</span>
                   </label>
@@ -1032,7 +1032,7 @@
                 <div class="col-sm-6">
                   <label for="gbFooterTextColor" class="form-label d-flex align-items-center gap-2">
                     <span class="q-field-icon-badge q-field-icon-badge--indigo">
-                      <i class="fa-solid fa-font"></i>
+                      <i class="bi bi-fonts"></i>
                     </span>
                     <span>{{ copy().buttonTextColorLabel }}</span>
                   </label>
@@ -1059,7 +1059,7 @@
                 <div class="col-sm-6">
                   <label for="gbFooterWidth" class="form-label d-flex align-items-center gap-2">
                     <span class="q-field-icon-badge q-field-icon-badge--amber">
-                      <i class="fa-solid fa-arrows-left-right"></i>
+                      <i class="bi bi-arrows"></i>
                     </span>
                     <span>{{ copy().buttonWidthLabel }}</span>
                   </label>
@@ -1081,7 +1081,7 @@
                 <div class="col-sm-6">
                   <label for="gbFooterHeight" class="form-label d-flex align-items-center gap-2">
                     <span class="q-field-icon-badge q-field-icon-badge--violet">
-                      <i class="fa-solid fa-arrows-up-down"></i>
+                      <i class="bi bi-arrows-vertical"></i>
                     </span>
                     <span>{{ copy().buttonHeightLabel }}</span>
                   </label>
@@ -1103,7 +1103,7 @@
                 <div class="col-12">
                   <label for="gbFooterText" class="form-label d-flex align-items-center gap-2">
                     <span class="q-field-icon-badge q-field-icon-badge--teal">
-                      <i class="fa-solid fa-signature"></i>
+                      <i class="bi bi-pen"></i>
                     </span>
                     <span>{{ copy().buttonTextLabel }}</span>
                   </label>
@@ -1131,13 +1131,13 @@
               @if (themeDirty()) {
                 <div class="save-status-pill status-unsaved">
                   <span class="status-pulse-dot warning"></span>
-                  <i class="fa-solid fa-triangle-exclamation text-warning"></i>
+                  <i class="bi bi-exclamation-triangle-fill text-warning"></i>
                   <span class="fw-semibold">{{ copy().unsavedChanges }}</span>
                 </div>
               } @else {
                 <div class="save-status-pill status-saved">
                   <span class="status-pulse-dot success"></span>
-                  <i class="fa-solid fa-circle-check text-success"></i>
+                  <i class="bi bi-check-circle-fill text-success"></i>
                   <span class="fw-semibold">{{ copy().allSaved }}</span>
                 </div>
               }
@@ -1155,7 +1155,7 @@
                   aria-hidden="true"
                 ></span>
               } @else {
-                <i class="fa-solid fa-cloud-arrow-up fs-6"></i>
+                <i class="bi bi-cloud-arrow-up fs-6"></i>
               }
               <span class="fw-bold text-white">{{
                 isConfigured() ? copy().saveBrand : copy().createBrand

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, effect, input, output, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, input, output, inject, signal } from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import { AppDirection, AppLanguage } from '../../../../shared/models/app-language/app-language.model';
@@ -36,6 +36,17 @@ export class CreateBranchAdminDialogComponent {
   protected readonly copy = computed<BranchAdminsTranslations>(
     () => BRANCH_ADMINS_TRANSLATIONS[this.language()],
   );
+
+  protected readonly showTemporaryPassword = signal<boolean>(false);
+  protected readonly showConfirmPassword = signal<boolean>(false);
+
+  protected toggleTemporaryPasswordVisibility(): void {
+    this.showTemporaryPassword.update((visible) => !visible);
+  }
+
+  protected toggleConfirmPasswordVisibility(): void {
+    this.showConfirmPassword.update((visible) => !visible);
+  }
 
   protected readonly branchAdminForm = this.formBuilder.group({
     userName: ['', [Validators.required, Validators.maxLength(100)]],
@@ -198,6 +209,8 @@ export class CreateBranchAdminDialogComponent {
   }
 
   private resetForm(): void {
+    this.showTemporaryPassword.set(false);
+    this.showConfirmPassword.set(false);
     this.branchAdminForm.reset({
       userName: '',
       email: '',

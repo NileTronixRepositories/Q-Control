@@ -3,29 +3,29 @@
     [eyebrow]="translations().title"
     [title]="translations().title"
     [description]="translations().description"
-    icon="fa-solid fa-window-restore"
+    icon="bi bi-window-stack"
     iconVariant="violet"
   >
     @if (activeTab() === 'active' && canCreate() && canViewActive()) {
-      <button hero-actions type="button" class="primary-action" (click)="openCreate()">
-        <i class="fa-solid fa-plus" aria-hidden="true"></i>
+      <button hero-actions type="button" class="primary-action d-inline-flex align-items-center gap-2" (click)="openCreate()">
+        <i class="bi bi-plus-lg" aria-hidden="true"></i>
         <span class="text-white">{{ translations().addWindow }}</span>
       </button>
     }
 
-    <div hero-filters class="w-100">
+    <div hero-filters class="w-100 queue-filters-wrapper">
       @if (activeTab() === 'active') {
         <div class="row g-3 align-items-end" data-testid="windows-active-filters">
           <div class="col-12 col-xl-5">
-            <label class="filter-field w-100">
+            <label class="filter-field w-100 mb-0">
               <span class="d-flex align-items-center gap-2">
                 <span class="q-field-icon-badge q-field-icon-badge--indigo">
-                  <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+                  <i class="bi bi-search" aria-hidden="true"></i>
                 </span>
                 {{ translations().searchPlaceholder }}
               </span>
               <div class="search-input-wrapper">
-                <i class="fa-solid fa-magnifying-glass search-icon" aria-hidden="true"></i>
+                <i class="bi bi-search search-icon" aria-hidden="true"></i>
                 <input
                   class="form-control"
                   type="search"
@@ -37,10 +37,10 @@
             </label>
           </div>
           <div class="col-12 col-md-6 col-xl-3">
-            <label class="filter-field">
+            <label class="filter-field mb-0">
               <span class="d-flex align-items-center gap-2">
                 <span class="q-field-icon-badge q-field-icon-badge--violet">
-                  <i class="fa-solid fa-couch" aria-hidden="true"></i>
+                  <i class="bi bi-couch" aria-hidden="true"></i>
                 </span>
                 {{ translations().waitingAreaFilter }}
               </span>
@@ -53,10 +53,10 @@
             </label>
           </div>
           <div class="col-12 col-sm-6 col-md-3 col-xl-2">
-            <label class="filter-field">
+            <label class="filter-field mb-0">
               <span class="d-flex align-items-center gap-2">
                 <span class="q-field-icon-badge q-field-icon-badge--amber">
-                  <i class="fa-solid fa-list-ol" aria-hidden="true"></i>
+                  <i class="bi bi-list-ol" aria-hidden="true"></i>
                 </span>
                 {{ translations().pageSize }}
               </span>
@@ -70,7 +70,7 @@
           </div>
           <div class="col-12 col-sm-6 col-md-3 col-xl-2 d-grid">
             <button type="button" class="secondary-action w-100" [disabled]="activeLoading()" (click)="refreshActive()">
-              <i class="fa-solid fa-arrows-rotate" style="color: #059669;" [class.spin]="activeLoading()" aria-hidden="true"></i>
+              <i class="bi bi-arrow-clockwise" style="color: #059669;" [class.spin]="activeLoading()" aria-hidden="true"></i>
               <span>{{ translations().refresh }}</span>
             </button>
           </div>
@@ -80,15 +80,15 @@
       @if (activeTab() === 'deleted') {
         <div class="row g-3 align-items-end" data-testid="windows-deleted-filters">
           <div class="col-12 col-xl-5">
-            <label class="filter-field w-100">
+            <label class="filter-field w-100 mb-0">
               <span class="d-flex align-items-center gap-2">
                 <span class="q-field-icon-badge q-field-icon-badge--indigo">
-                  <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+                  <i class="bi bi-search" aria-hidden="true"></i>
                 </span>
                 {{ translations().searchPlaceholder }}
               </span>
               <div class="search-input-wrapper">
-                <i class="fa-solid fa-magnifying-glass search-icon" aria-hidden="true"></i>
+                <i class="bi bi-search search-icon" aria-hidden="true"></i>
                 <input
                   class="form-control"
                   type="search"
@@ -100,10 +100,10 @@
             </label>
           </div>
           <div class="col-12 col-md-6 col-xl-3">
-            <label class="filter-field">
+            <label class="filter-field mb-0">
               <span class="d-flex align-items-center gap-2">
                 <span class="q-field-icon-badge q-field-icon-badge--violet">
-                  <i class="fa-solid fa-couch" aria-hidden="true"></i>
+                  <i class="bi bi-couch" aria-hidden="true"></i>
                 </span>
                 {{ translations().waitingAreaFilter }}
               </span>
@@ -116,10 +116,10 @@
             </label>
           </div>
           <div class="col-12 col-sm-6 col-md-3 col-xl-2">
-            <label class="filter-field">
+            <label class="filter-field mb-0">
               <span class="d-flex align-items-center gap-2">
                 <span class="q-field-icon-badge q-field-icon-badge--amber">
-                  <i class="fa-solid fa-list-ol" aria-hidden="true"></i>
+                  <i class="bi bi-list-ol" aria-hidden="true"></i>
                 </span>
                 {{ translations().pageSize }}
               </span>
@@ -133,7 +133,7 @@
           </div>
           <div class="col-12 col-sm-6 col-md-3 col-xl-2 d-grid">
             <button type="button" class="secondary-action w-100" [disabled]="deletedLoading()" (click)="refreshDeleted()">
-              <i class="fa-solid fa-arrows-rotate" style="color: #059669;" [class.spin]="deletedLoading()" aria-hidden="true"></i>
+              <i class="bi bi-arrow-clockwise" style="color: #059669;" [class.spin]="deletedLoading()" aria-hidden="true"></i>
               <span>{{ translations().refresh }}</span>
             </button>
           </div>
@@ -173,16 +173,18 @@
     </section>
   } @else {
     <section class="content-grid">
-      <div class="tabs d-flex flex-wrap align-items-center gap-2" data-testid="windows-tabs">
+      <div class="q-segmented-tabs mb-3" role="tablist" data-testid="windows-tabs">
         @if (canViewActive()) {
           <button
             data-testid="windows-active-tab"
             type="button"
-            [class.primary-action]="activeTab() === 'active'"
-            [class.secondary-action]="activeTab() !== 'active'"
+            role="tab"
+            class="q-segment-tab"
+            [class.active]="activeTab() === 'active'"
+            [attr.aria-selected]="activeTab() === 'active'"
             (click)="switchTab('active')"
           >
-            <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+            <i class="bi bi-check-circle-fill" aria-hidden="true"></i>
             <span>{{ translations().activeTab }}</span>
           </button>
         }
@@ -190,11 +192,13 @@
           <button
             data-testid="windows-deleted-tab"
             type="button"
-            [class.primary-action]="activeTab() === 'deleted'"
-            [class.secondary-action]="activeTab() !== 'deleted'"
+            role="tab"
+            class="q-segment-tab"
+            [class.active]="activeTab() === 'deleted'"
+            [attr.aria-selected]="activeTab() === 'deleted'"
             (click)="switchTab('deleted')"
           >
-            <i class="fa-solid fa-trash-can" aria-hidden="true"></i>
+            <i class="bi bi-trash3-fill" aria-hidden="true"></i>
             <span>{{ translations().deletedTab }}</span>
           </button>
         }
@@ -233,17 +237,17 @@
                         <div class="d-flex flex-wrap align-items-center justify-content-center gap-2">
                           @if (canViewDetails()) {
                             <button type="button" class="icon-action" [attr.aria-label]="translations().view" [title]="translations().view" (click)="openView(item.id)">
-                              <i class="fa-solid fa-eye" aria-hidden="true"></i>
+                              <i class="bi bi-eye" aria-hidden="true"></i>
                             </button>
                           }
                           @if (canUpdate()) {
                             <button type="button" class="icon-action" [attr.aria-label]="translations().edit" [title]="translations().edit" (click)="openEdit(item.id)">
-                              <i class="fa-solid fa-pen-to-square" aria-hidden="true"></i>
+                              <i class="bi bi-pencil-square" aria-hidden="true"></i>
                             </button>
                           }
                           @if (canDeactivate()) {
                             <button type="button" class="icon-action warning-action" [attr.aria-label]="translations().deactivate" [title]="translations().deactivate" (click)="requestSoftDelete(item)">
-                              <i class="fa-solid fa-power-off" aria-hidden="true"></i>
+                              <i class="bi bi-power" aria-hidden="true"></i>
                             </button>
                           }
                         </div>
@@ -256,7 +260,7 @@
 
             <div data-testid="windows-active-mobile" class="d-grid gap-2 d-md-none">
               @for (item of activeWindowsPage().data; track item.id) {
-                <app-mobile-record-card [eyebrow]="translations().windowNumber" [title]="formatText(item.descriptiveName)" icon="fa-solid fa-window-restore" [recordId]="item.number">
+                <app-mobile-record-card [eyebrow]="translations().windowNumber" [title]="formatText(item.descriptiveName)" icon="bi bi-window-stack" [recordId]="item.number">
                   <div record-fields>
                     <dt class="small fw-bold text-muted text-uppercase">{{ translations().waitingAreaNumberLabel }}</dt>
                     <dd class="mb-0 mt-1 text-break fw-bold">{{ item.waitingAreaNumber }} - {{ formatText(item.waitingAreaDescriptiveName) }}</dd>
@@ -292,11 +296,13 @@
               }
             </div>
           } @else if (!activeLoading()) {
-            <div class="admin-list-empty d-flex align-items-center gap-3 p-3" role="status">
-              <span class="admin-list-empty-icon d-inline-flex align-items-center justify-content-center flex-shrink-0" aria-hidden="true">
-                <i class="bi bi-window-stack"></i>
-              </span>
-              <h2>{{ translations().noItems }}</h2>
+            <div class="empty-state-craft text-center py-5" role="status">
+              <div class="empty-icon-pulse mb-3">
+                <span class="empty-icon-box">
+                  <i class="bi bi-window-stack"></i>
+                </span>
+              </div>
+              <h3 class="empty-title mb-2">{{ translations().noItems }}</h3>
             </div>
           }
 
@@ -350,12 +356,12 @@
                         <div class="d-flex flex-wrap align-items-center justify-content-center gap-2">
                           @if (canReactivate()) {
                             <button type="button" class="icon-action success-action" [attr.aria-label]="translations().reactivate" [title]="translations().reactivate" (click)="requestReactivate(item)">
-                              <i class="fa-solid fa-rotate-left" aria-hidden="true"></i>
+                              <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
                             </button>
                           }
                           @if (canDeletePermanent()) {
                             <button type="button" class="icon-action danger-action" [attr.aria-label]="translations().permanentDelete" [title]="translations().permanentDelete" (click)="requestPermanentDelete(item)">
-                              <i class="fa-solid fa-trash-can" aria-hidden="true"></i>
+                              <i class="bi bi-trash3" aria-hidden="true"></i>
                             </button>
                           }
                         </div>
@@ -368,7 +374,7 @@
 
             <div data-testid="windows-deleted-mobile" class="d-grid gap-2 d-md-none">
               @for (item of deletedWindowsPage().data; track item.id) {
-                <app-mobile-record-card [eyebrow]="translations().windowNumber" [title]="formatText(item.descriptiveName)" icon="fa-solid fa-window-restore" [recordId]="item.number">
+                <app-mobile-record-card [eyebrow]="translations().windowNumber" [title]="formatText(item.descriptiveName)" icon="bi bi-window-stack" [recordId]="item.number">
                   <span record-badges class="status-pill status-inactive">{{ translations().deletedTab }}</span>
                   <div record-fields>
                     <dt class="small fw-bold text-muted text-uppercase">{{ translations().waitingAreaNumberLabel }}</dt>
@@ -400,11 +406,13 @@
               }
             </div>
           } @else if (!deletedLoading()) {
-            <div class="admin-list-empty d-flex align-items-center gap-3 p-3" role="status">
-              <span class="admin-list-empty-icon d-inline-flex align-items-center justify-content-center flex-shrink-0" aria-hidden="true">
-                <i class="bi bi-window-stack"></i>
-              </span>
-              <h2>{{ translations().noItems }}</h2>
+            <div class="empty-state-craft text-center py-5" role="status">
+              <div class="empty-icon-pulse mb-3">
+                <span class="empty-icon-box">
+                  <i class="bi bi-trash3"></i>
+                </span>
+              </div>
+              <h3 class="empty-title mb-2">{{ translations().noItems }}</h3>
             </div>
           }
 

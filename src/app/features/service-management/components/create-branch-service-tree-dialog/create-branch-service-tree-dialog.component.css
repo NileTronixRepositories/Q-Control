@@ -1,27 +1,205 @@
-/* Keep only component-specific overrides.
-   All common dialog styles are in dialog-system.css */
+:host {
+  display: contents;
+}
 
-.branch-tree-parent-label {
-  color: #0284c7;
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.03em;
+.branch-tree-dialog {
+  z-index: 1060;
+  max-width: 960px;
+  width: min(960px, calc(100vw - 32px));
 }
 
 .branch-tree-scroll-body {
-  padding: 20px;
+  padding: 24px;
+  max-height: calc(88vh - 140px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.branch-tree-parent-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--q-primary, #0b8aa8);
+  background: rgba(11, 138, 168, 0.08);
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 11.5px;
+  font-weight: 700;
+}
+
+/* ── Section Dividers & Tag ─────────────────────────────────────────── */
+.tree-section-header {
+  display: flex;
+  align-items: center;
+  margin-top: 6px;
+  margin-bottom: 12px;
+}
+
+.tree-section-tag {
+  display: inline-flex;
+  align-items: center;
+  font-size: 12px;
+  font-weight: 750;
+  color: var(--q-primary, #0b8aa8);
+  background: rgba(11, 138, 168, 0.08);
+  padding: 3px 10px;
+  border-radius: 6px;
+  letter-spacing: -0.01em;
+}
+
+/* ── Q-Option Cards & Grid ─────────────────────────────────────────── */
+.q-option-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 12px;
+}
+
+.q-option-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: #ffffff;
+  border: 1.5px solid var(--q-border-subtle, #e2e8f0);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.02);
+}
+
+.q-option-card input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.q-option-card:hover {
+  border-color: #cbd5e1;
+  background: #f8fafc;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(15, 23, 42, 0.05);
+}
+
+.q-option-card.active {
+  background: rgba(11, 138, 168, 0.06);
+  border-color: var(--q-primary, #0b8aa8);
+  box-shadow: 0 2px 8px rgba(11, 138, 168, 0.14);
+}
+
+.q-option-card .q-option-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: #f1f5f9;
+  color: #64748b;
+  font-size: 16px;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.q-option-card:hover .q-option-icon {
+  color: var(--q-primary, #0b8aa8);
+  background: rgba(11, 138, 168, 0.1);
+}
+
+.q-option-card.active .q-option-icon {
+  background: var(--q-primary, #0b8aa8);
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(11, 138, 168, 0.3);
+}
+
+.q-option-card .q-option-label {
+  flex: 1;
+  min-width: 0;
+}
+
+.q-option-card .q-option-title {
+  display: block;
+  font-size: 13px;
+  font-weight: 750;
+  color: var(--q-text-primary, #1e293b);
+  line-height: 1.35;
+}
+
+.q-option-card .q-option-indicator {
+  font-size: 18px;
+  color: #cbd5e1;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.q-option-card.active .q-option-indicator {
+  color: var(--q-primary, #0b8aa8);
+  transform: scale(1.08);
+}
+
+/* ── Node Card & Nesting ────────────────────────────────────────────── */
+.branch-tree-node {
+  margin-bottom: 20px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.branch-tree-node--child {
+  background: #fcfdfe;
+  border-color: rgba(11, 138, 168, 0.22);
+  box-shadow: 0 2px 8px rgba(11, 138, 168, 0.04);
 }
 
 .branch-tree-children {
   position: relative;
+  border-inline-start: 2px dashed rgba(11, 138, 168, 0.35);
+  padding-inline-start: 20px;
+  margin-inline-start: 16px;
 }
 
-.branch-tree-children::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  width: 2px;
-  background-color: #bae6fd;
+.animate-fade-in {
+  animation: qTreeFadeIn 0.2s ease both;
+}
+
+@keyframes qTreeFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .branch-tree-dialog {
+    width: 100%;
+    margin: 0;
+    border-radius: 0;
+    max-height: 100vh;
+  }
+
+  .branch-tree-scroll-body {
+    padding: 16px;
+  }
+
+  .q-dialog-footer {
+    flex-direction: column-reverse;
+  }
+
+  .q-dialog-footer .q-btn {
+    width: 100%;
+  }
+
+  .q-option-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .branch-tree-children {
+    padding-inline-start: 10px;
+    margin-inline-start: 6px;
+  }
 }

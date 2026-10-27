@@ -485,3 +485,31 @@
 
 /* Unified toast notifications inherited from components.css */
 
+/* ─── Responsive Media Queries ───────────────────────────────────────── */
+@media (max-width: 767.98px) {
+  .branch-branding-page {
+    padding-bottom: 5rem;
+  }
+
+  .sticky-save-bar {
+    flex-direction: column !important;
+    gap: 12px !important;
+    align-items: stretch !important;
+    padding: 12px 14px !important;
+  }
+
+  .btn-catchy-save {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
+  .branch-select-wrapper {
+    width: 100% !important;
+  }
+
+  .branch-selector-control {
+    max-width: none !important;
+    flex: 1 !important;
+  }
+}
+

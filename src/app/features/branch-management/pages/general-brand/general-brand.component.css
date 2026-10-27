@@ -414,3 +414,39 @@
     transform: rotate(360deg);
   }
 }
+
+/* ─── Responsive Adjustments ─────────────────────────────────────────── */
+
+@media (max-width: 767.98px) {
+  .branch-branding-page {
+    padding-bottom: 5rem;
+  }
+
+  .sticky-save-bar {
+    flex-direction: column !important;
+    gap: 12px !important;
+    align-items: stretch !important;
+    padding: 12px 14px !important;
+  }
+
+  .sticky-save-bar .primary-action {
+    width: 100% !important;
+  }
+
+  .sticky-save-bar .save-status-pill {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
+  .color-picker-control {
+    width: 100% !important;
+  }
+
+  .panel-header {
+    padding: 12px 14px !important;
+  }
+
+  .panel-body {
+    padding: 14px !important;
+  }
+}

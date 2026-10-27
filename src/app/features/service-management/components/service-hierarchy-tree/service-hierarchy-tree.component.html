@@ -1,13 +1,42 @@
 <section
   class="svc-tree svc-tree-panel"
+  [class.svc-tree-panel--drop-target]="dropTarget()"
+  [class.svc-tree-panel--drop-active]="isDropActive()"
   [attr.dir]="direction()"
   [attr.lang]="language()"
+  (dragover)="onDropTargetDragOver($event)"
+  (dragleave)="onDropTargetDragLeave($event)"
+  (drop)="onDropTargetDrop($event)"
 >
+  @if (dropTarget() && isDropActive()) {
+    <div class="svc-tree-drop-overlay" aria-hidden="true">
+      <i class="bi bi-box-arrow-in-down"></i>
+      <span>{{
+        language() === 'ar'
+          ? 'أفلت الخدمة هنا لإسنادها إلى هذا الفرع'
+          : 'Drop service here to assign to this branch'
+      }}</span>
+    </div>
+  }
   @if (showSearch()) {
     <div class="svc-tree-toolbar">
       <div class="svc-tree-search">
         <div class="search-input-wrapper w-100">
-          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="15"
+            height="15"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>
           <input
             [id]="searchInputId"
             type="search"
@@ -59,9 +88,7 @@
         </div>
       }
     </div>
-  }
-
-  @else if (loading()) {
+  } @else if (loading()) {
     <div
       class="sticky-top z-1 overflow-hidden rounded-3 border border-info-subtle px-3 py-2 text-primary shadow-sm"
       role="status"
@@ -76,202 +103,261 @@
   @if (flatNodes().length > 0) {
     <div class="svc-tree-body">
       <div class="svc-tree-list" role="tree" [attr.aria-label]="translations().serviceHierarchy">
-      @for (entry of flatNodes(); track entry.node.id) {
-        <article
-          [class]="entry.rowClassList"
-          [class.svc-tree-node--filtered]="normalizedSearchText() && !loading()"
-          [class.svc-tree-node--draggable]="entry.canDragLeaf"
-          [class.svc-tree-node--selectable]="selectableLeaves()"
-          [style.--tree-offset]="entry.offset + 'px'"
-          [attr.data-level]="entry.level"
-          role="treeitem"
-          [attr.aria-level]="entry.level"
-          [attr.aria-expanded]="entry.hasChildren ? entry.isExpanded : null"
-          [attr.draggable]="entry.canDragLeaf ? 'true' : null"
-          (dragstart)="onLeafDragStart(entry.node, $event)"
-          (dragend)="onLeafDragEnd()"
-          (click)="onNodeClick(entry.node, $event)"
-        >
-          <button
-            type="button"
-            [class]="entry.toggleClassList"
-            [disabled]="!entry.hasChildren"
-            [attr.aria-label]="entry.toggleLabel"
-            (click)="requestToggle(entry.node, $event)"
+        @for (entry of flatNodes(); track entry.node.id) {
+          <article
+            [class]="entry.rowClassList"
+            [class.svc-tree-node--filtered]="normalizedSearchText() && !loading()"
+            [class.svc-tree-node--draggable]="entry.canDragLeaf"
+            [class.svc-tree-node--selectable]="selectableLeaves()"
+            [style.--tree-offset]="entry.offset + 'px'"
+            [attr.data-level]="entry.level"
+            role="treeitem"
+            [attr.aria-level]="entry.level"
+            [attr.aria-expanded]="entry.hasChildren ? entry.isExpanded : null"
+            [attr.draggable]="entry.canDragLeaf ? 'true' : null"
+            (dragstart)="onLeafDragStart(entry.node, $event)"
+            (dragend)="onLeafDragEnd()"
+            (click)="onNodeClick(entry.node, $event)"
           >
-            <i [class]="entry.toggleIconClass" aria-hidden="true"></i>
-          </button>
+            <button
+              type="button"
+              [class]="entry.toggleClassList"
+              [disabled]="!entry.hasChildren"
+              [attr.aria-label]="entry.toggleLabel"
+              (click)="requestToggle(entry.node, $event)"
+            >
+              <i [class]="entry.toggleIconClass" aria-hidden="true"></i>
+            </button>
 
-          @if (selectableLeaves()) {
-            <label class="svc-tree-select" (click)="$event.stopPropagation()">
-              <input
-                type="checkbox"
-                [checked]="entry.isSelectedLeaf"
-                [disabled]="!entry.canSelectLeaf"
-                (change)="onLeafSelectionChange(entry.node, $event)"
-              />
-            </label>
-          }
+            @if (selectableLeaves()) {
+              <label class="svc-tree-select" (click)="$event.stopPropagation()">
+                <input
+                  type="checkbox"
+                  [checked]="entry.isSelectedLeaf"
+                  [disabled]="!entry.canSelectLeaf"
+                  (change)="onLeafSelectionChange(entry.node, $event)"
+                />
+              </label>
+            }
 
-          <div class="svc-tree-content">
-            <div class="svc-tree-meta">
-              <strong class="svc-tree-name">{{ entry.name }}</strong>
-              @if (entry.serviceCodeLabel) {
-                <span class="svc-tree-code">{{ entry.serviceCodeLabel }}</span>
-              }
-              <span class="svc-tree-order"
-                >{{ translations().orderNo }}: {{ entry.node.orderNo }}</span
-              >
-            </div>
-            <div class="svc-tree-chips">
-              <span class="svc-tree-chip svc-tree-chip--scope">{{ entry.scopeLabel }}</span>
-              @if (entry.ownerLabel) {
-                <span class="svc-tree-chip svc-tree-chip--owner">{{ entry.ownerLabel }}</span>
-              }
-              @if (entry.assignedLabel) {
-                <span class="svc-tree-chip svc-tree-chip--assigned">{{ entry.assignedLabel }}</span>
-              }
-              @if (entry.ownedLabel) {
-                <span class="svc-tree-chip svc-tree-chip--owned">{{ entry.ownedLabel }}</span>
-              }
-              <span [class]="entry.statusClassList">{{ entry.statusLabel }}</span>
-              @if (entry.showOperationalBadge) {
-                <span [class]="entry.operationalClassList">{{ entry.operationalLabel }}</span>
-              }
-              <span [class]="entry.ticketClassList">{{ entry.ticketLabel }}</span>
-              @if (entry.hasChildren) {
-                <span class="svc-tree-chip svc-tree-chip--children"
-                  >{{ entry.node.children.length }} {{ translations().hasChildren }}</span
+            <div class="svc-tree-content">
+              <div class="svc-tree-meta">
+                <strong class="svc-tree-name">{{ entry.name }}</strong>
+                @if (entry.serviceCodeLabel) {
+                  <span class="svc-tree-code">{{ entry.serviceCodeLabel }}</span>
+                }
+                <span class="svc-tree-order"
+                  >{{ translations().orderNo }}: {{ entry.node.orderNo }}</span
                 >
+              </div>
+              <div class="svc-tree-chips">
+                <span class="svc-tree-chip svc-tree-chip--scope">{{ entry.scopeLabel }}</span>
+                @if (entry.ownerLabel) {
+                  <span class="svc-tree-chip svc-tree-chip--owner">{{ entry.ownerLabel }}</span>
+                }
+                @if (entry.assignedLabel) {
+                  <span class="svc-tree-chip svc-tree-chip--assigned">{{
+                    entry.assignedLabel
+                  }}</span>
+                }
+                @if (entry.ownedLabel) {
+                  <span class="svc-tree-chip svc-tree-chip--owned">{{ entry.ownedLabel }}</span>
+                }
+                <span [class]="entry.statusClassList">{{ entry.statusLabel }}</span>
+                @if (entry.showOperationalBadge) {
+                  <span [class]="entry.operationalClassList">{{ entry.operationalLabel }}</span>
+                }
+                <span [class]="entry.ticketClassList">{{ entry.ticketLabel }}</span>
+                @if (entry.hasChildren) {
+                  <span class="svc-tree-chip svc-tree-chip--children"
+                    >{{ entry.node.children.length }} {{ translations().hasChildren }}</span
+                  >
+                }
+              </div>
+            </div>
+
+            <div class="svc-tree-actions">
+              @if (canViewDetails()) {
+                <button
+                  type="button"
+                  class="svc-tree-action-btn svc-tree-preview-btn"
+                  [title]="
+                    translations().details ||
+                    (language() === 'ar' ? 'معاينة التفاصيل' : 'Preview Details')
+                  "
+                  [attr.aria-label]="
+                    translations().details ||
+                    (language() === 'ar' ? 'معاينة التفاصيل' : 'Preview Details')
+                  "
+                  (click)="requestView(entry.node, $event)"
+                >
+                  <i class="bi bi-eye" aria-hidden="true"></i>
+                  <span class="d-none d-sm-inline">{{
+                    language() === 'ar' ? 'معاينة' : 'Preview'
+                  }}</span>
+                </button>
+              }
+
+              @if (entry.canManageWorkflow) {
+                <button
+                  type="button"
+                  class="svc-tree-action-btn svc-tree-workflow-btn"
+                  [title]="
+                    manageWorkflowsLabel() ||
+                    (language() === 'ar' ? 'مسارات العمل' : 'Manage Workflows')
+                  "
+                  [attr.aria-label]="
+                    manageWorkflowsLabel() ||
+                    (language() === 'ar' ? 'مسارات العمل' : 'Manage Workflows')
+                  "
+                  (click)="requestManageWorkflows(entry.node, $event)"
+                >
+                  <i class="bi bi-signpost-split" aria-hidden="true"></i>
+                  <span class="svc-tree-btn-text">{{
+                    manageWorkflowsLabel() || (language() === 'ar' ? 'مسارات العمل' : 'Workflows')
+                  }}</span>
+                </button>
+              }
+              @if (entry.canManageSchedule) {
+                <button
+                  type="button"
+                  class="svc-tree-action-btn svc-tree-schedule-btn"
+                  [title]="
+                    manageScheduleLabel() ||
+                    (language() === 'ar' ? 'جدول المواعيد' : 'Manage Schedule')
+                  "
+                  [attr.aria-label]="
+                    manageScheduleLabel() ||
+                    (language() === 'ar' ? 'جدول المواعيد' : 'Manage Schedule')
+                  "
+                  (click)="requestManageSchedule(entry.node, $event)"
+                >
+                  <i class="bi bi-calendar-week" aria-hidden="true"></i>
+                  <span class="svc-tree-btn-text">{{
+                    manageScheduleLabel() || (language() === 'ar' ? 'جدول المواعيد' : 'Schedule')
+                  }}</span>
+                </button>
+              }
+
+              @if (
+                (canViewDetails() || entry.canManageWorkflow || entry.canManageSchedule) &&
+                (entry.canManageSegments ||
+                  entry.canManageMedia ||
+                  entry.canUnassign ||
+                  (canCreate() && canCreateChildFor()(entry.node)) ||
+                  (canUpdate() && entry.node.canEditDefinition && !entry.node.isDeleted) ||
+                  entry.canDelete ||
+                  entry.canRestore ||
+                  entry.canPermanentDelete)
+              ) {
+                <div class="svc-tree-actions-separator" aria-hidden="true"></div>
+              }
+
+              @if (entry.canManageSegments) {
+                <button
+                  type="button"
+                  class="svc-tree-action-btn svc-tree-aux-btn"
+                  [title]="manageSegmentsLabel() || (language() === 'ar' ? 'الشرائح' : 'Segments')"
+                  [attr.aria-label]="
+                    manageSegmentsLabel() || (language() === 'ar' ? 'الشرائح' : 'Segments')
+                  "
+                  (click)="requestManageSegments(entry.node, $event)"
+                >
+                  <i class="bi bi-tags-fill" aria-hidden="true"></i>
+                </button>
+              }
+              @if (entry.canManageMedia) {
+                <button
+                  type="button"
+                  class="svc-tree-action-btn svc-tree-aux-btn"
+                  [title]="
+                    manageMediaLabel() || (language() === 'ar' ? 'وسائط الخدمة' : 'Service Media')
+                  "
+                  [attr.aria-label]="
+                    manageMediaLabel() || (language() === 'ar' ? 'وسائط الخدمة' : 'Service Media')
+                  "
+                  (click)="requestManageMedia(entry.node, $event)"
+                >
+                  <i class="bi bi-images" aria-hidden="true"></i>
+                </button>
+              }
+              @if (entry.canUnassign) {
+                <button
+                  type="button"
+                  class="svc-tree-action-btn svc-tree-action-btn--danger"
+                  [disabled]="actionsDisabled() || unassigning()"
+                  [title]="
+                    unassignLabel() || (language() === 'ar' ? 'إلغاء التسكين من الفرع' : 'Unassign')
+                  "
+                  [attr.aria-label]="
+                    unassignLabel() || (language() === 'ar' ? 'إلغاء التسكين من الفرع' : 'Unassign')
+                  "
+                  (click)="requestUnassign(entry.node, $event)"
+                >
+                  <i class="bi bi-node-minus" aria-hidden="true"></i>
+                </button>
+              }
+              @if (canCreate() && canCreateChildFor()(entry.node)) {
+                <button
+                  type="button"
+                  class="svc-tree-action-btn"
+                  [title]="translations().addChildService"
+                  [attr.aria-label]="translations().addChildService"
+                  (click)="requestCreateChild(entry.node, $event)"
+                >
+                  <i class="bi bi-plus-lg" aria-hidden="true"></i>
+                </button>
+              }
+              @if (canUpdate() && entry.node.canEditDefinition && !entry.node.isDeleted) {
+                <button
+                  type="button"
+                  class="svc-tree-action-btn"
+                  [title]="translations().edit"
+                  [attr.aria-label]="translations().edit"
+                  (click)="requestEdit(entry.node, $event)"
+                >
+                  <i class="bi bi-pencil-square" aria-hidden="true"></i>
+                </button>
+              }
+              @if (entry.canDelete) {
+                <button
+                  type="button"
+                  class="svc-tree-action-btn svc-tree-action-btn--danger"
+                  [disabled]="actionsDisabled()"
+                  [title]="translations().delete"
+                  [attr.aria-label]="translations().delete"
+                  (click)="requestDelete(entry.node, $event)"
+                >
+                  <i class="bi bi-trash3" aria-hidden="true"></i>
+                </button>
+              }
+              @if (entry.canRestore) {
+                <button
+                  type="button"
+                  class="svc-tree-action-btn svc-tree-action-btn--success"
+                  [disabled]="actionsDisabled()"
+                  [title]="translations().restore"
+                  [attr.aria-label]="translations().restore"
+                  (click)="requestRestore(entry.node, $event)"
+                >
+                  <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
+                </button>
+              }
+              @if (entry.canPermanentDelete) {
+                <button
+                  type="button"
+                  class="svc-tree-action-btn svc-tree-action-btn--danger"
+                  [disabled]="actionsDisabled()"
+                  [title]="translations().permanentlyDelete"
+                  [attr.aria-label]="translations().permanentlyDelete"
+                  (click)="requestPermanentDelete(entry.node, $event)"
+                >
+                  <i class="bi bi-trash-fill" aria-hidden="true"></i>
+                </button>
               }
             </div>
-          </div>
-
-          <div class="svc-tree-actions">
-            @if (entry.canManageWorkflow) {
-              <button
-                type="button"
-                class="svc-tree-action-btn svc-tree-workflow-btn"
-                [title]="manageWorkflowsLabel() || (language() === 'ar' ? 'مسارات العمل' : 'Manage Workflows')"
-                [attr.aria-label]="manageWorkflowsLabel() || (language() === 'ar' ? 'مسارات العمل' : 'Manage Workflows')"
-                (click)="requestManageWorkflows(entry.node, $event)"
-              >
-                <i class="bi bi-signpost-split" aria-hidden="true"></i>
-                <span class="svc-tree-btn-text">{{ manageWorkflowsLabel() || (language() === 'ar' ? 'مسارات العمل' : 'Workflows') }}</span>
-              </button>
-            }
-            @if (entry.canManageSchedule) {
-              <button
-                type="button"
-                class="svc-tree-action-btn svc-tree-schedule-btn"
-                [title]="manageScheduleLabel() || (language() === 'ar' ? 'جدول المواعيد' : 'Manage Schedule')"
-                [attr.aria-label]="manageScheduleLabel() || (language() === 'ar' ? 'جدول المواعيد' : 'Manage Schedule')"
-                (click)="requestManageSchedule(entry.node, $event)"
-              >
-                <i class="bi bi-calendar-week" aria-hidden="true"></i>
-                <span class="svc-tree-btn-text">{{ manageScheduleLabel() || (language() === 'ar' ? 'جدول المواعيد' : 'Schedule') }}</span>
-              </button>
-            }
-
-            @if ((entry.canManageWorkflow || entry.canManageSchedule) && (entry.canManageSegments || entry.canManageMedia || entry.canUnassign || (canCreate() && canCreateChildFor()(entry.node)) || (canUpdate() && entry.node.canEditDefinition && !entry.node.isDeleted) || entry.canDelete || entry.canRestore || entry.canPermanentDelete)) {
-              <div class="svc-tree-actions-separator" aria-hidden="true"></div>
-            }
-
-            @if (entry.canManageSegments) {
-              <button
-                type="button"
-                class="svc-tree-action-btn svc-tree-aux-btn"
-                [title]="manageSegmentsLabel() || (language() === 'ar' ? 'الشرائح' : 'Segments')"
-                [attr.aria-label]="manageSegmentsLabel() || (language() === 'ar' ? 'الشرائح' : 'Segments')"
-                (click)="requestManageSegments(entry.node, $event)"
-              >
-                <i class="bi bi-tags-fill" aria-hidden="true"></i>
-              </button>
-            }
-            @if (entry.canManageMedia) {
-              <button
-                type="button"
-                class="svc-tree-action-btn svc-tree-aux-btn"
-                [title]="manageMediaLabel() || (language() === 'ar' ? 'وسائط الخدمة' : 'Service Media')"
-                [attr.aria-label]="manageMediaLabel() || (language() === 'ar' ? 'وسائط الخدمة' : 'Service Media')"
-                (click)="requestManageMedia(entry.node, $event)"
-              >
-                <i class="bi bi-images" aria-hidden="true"></i>
-              </button>
-            }
-            @if (entry.canUnassign) {
-              <button
-                type="button"
-                class="svc-tree-action-btn svc-tree-action-btn--danger"
-                [disabled]="actionsDisabled() || unassigning()"
-                [title]="unassignLabel() || (language() === 'ar' ? 'إلغاء التسكين من الفرع' : 'Unassign')"
-                [attr.aria-label]="unassignLabel() || (language() === 'ar' ? 'إلغاء التسكين من الفرع' : 'Unassign')"
-                (click)="requestUnassign(entry.node, $event)"
-              >
-                <i class="bi bi-node-minus" aria-hidden="true"></i>
-              </button>
-            }
-            @if (canCreate() && canCreateChildFor()(entry.node)) {
-              <button
-                type="button"
-                class="svc-tree-action-btn"
-                [title]="translations().addChildService"
-                [attr.aria-label]="translations().addChildService"
-                (click)="requestCreateChild(entry.node, $event)"
-              >
-                <i class="bi bi-plus-lg" aria-hidden="true"></i>
-              </button>
-            }
-            @if (canUpdate() && entry.node.canEditDefinition && !entry.node.isDeleted) {
-              <button
-                type="button"
-                class="svc-tree-action-btn"
-                [title]="translations().edit"
-                [attr.aria-label]="translations().edit"
-                (click)="requestEdit(entry.node, $event)"
-              >
-                <i class="bi bi-pencil-square" aria-hidden="true"></i>
-              </button>
-            }
-            @if (entry.canDelete) {
-              <button
-                type="button"
-                class="svc-tree-action-btn svc-tree-action-btn--danger"
-                [disabled]="actionsDisabled()"
-                [title]="translations().delete"
-                [attr.aria-label]="translations().delete"
-                (click)="requestDelete(entry.node, $event)"
-              >
-                <i class="bi bi-trash3" aria-hidden="true"></i>
-              </button>
-            }
-            @if (entry.canRestore) {
-              <button
-                type="button"
-                class="svc-tree-action-btn svc-tree-action-btn--success"
-                [disabled]="actionsDisabled()"
-                [title]="translations().restore"
-                [attr.aria-label]="translations().restore"
-                (click)="requestRestore(entry.node, $event)"
-              >
-                <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
-              </button>
-            }
-            @if (entry.canPermanentDelete) {
-              <button
-                type="button"
-                class="svc-tree-action-btn svc-tree-action-btn--danger"
-                [disabled]="actionsDisabled()"
-                [title]="translations().permanentlyDelete"
-                [attr.aria-label]="translations().permanentlyDelete"
-                (click)="requestPermanentDelete(entry.node, $event)"
-              >
-                <i class="bi bi-trash-fill" aria-hidden="true"></i>
-              </button>
-            }
-          </div>
-        </article>
-      }
+          </article>
+        }
       </div>
     </div>
   } @else if (!loading()) {
@@ -280,7 +366,9 @@
         <div class="svc-tree-empty-icon">
           <i class="bi bi-diagram-3" aria-hidden="true"></i>
         </div>
-        <h3>{{ normalizedSearchText() ? translations().noSearchResults : translations().noTreeItems }}</h3>
+        <h3>
+          {{ normalizedSearchText() ? translations().noSearchResults : translations().noTreeItems }}
+        </h3>
         @if (canCreate()) {
           <button type="button" class="svc-tree-primary-btn" (click)="createRoot.emit()">
             <i class="bi bi-plus-lg" aria-hidden="true"></i>

@@ -7,14 +7,14 @@
     [eyebrow]="copy().pageEyebrow"
     [title]="copy().pageTitle"
     [description]="copy().pageDescription"
-    icon="fa-solid fa-palette"
+    icon="bi bi-palette"
     iconVariant="violet"
   >
     <div hero-actions class="d-flex align-items-center gap-2 flex-wrap">
       @if (isTechnicalAdmin() && branches().length > 1) {
         <div class="branch-select-wrapper">
           <div class="branch-icon-badge bi-buildings" aria-hidden="true">
-            <i class="fa-solid fa-building"></i>
+            <i class="bi bi-building"></i>
           </div>
           <label class="visually-hidden" for="branchBrandingBranch">{{ copy().branchLabel }}</label>
           <select
@@ -37,7 +37,7 @@
       } @else if (selectedBranchId()) {
         <div class="branch-select-wrapper static-badge">
           <div class="branch-icon-badge bi-buildings" aria-hidden="true">
-            <i class="fa-solid fa-building"></i>
+            <i class="bi bi-building"></i>
           </div>
           <span class="fw-bold text-dark px-2 small">{{ selectedBranchLabel() }}</span>
         </div>
@@ -51,7 +51,7 @@
         (click)="refreshSelectedBranch()"
       >
         <i
-          class="fa-solid fa-arrows-rotate"
+          class="bi bi-arrow-clockwise"
           style="color: #059669"
           [class.spin]="brandingLoading()"
           aria-hidden="true"
@@ -66,7 +66,7 @@
         [attr.title]="copy().previewKioskLabel"
         (click)="openKioskPreview()"
       >
-        <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>
+        <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i>
         <span>{{ copy().previewKioskLabel }}</span>
       </button>
     </div>
@@ -81,10 +81,10 @@
         [class.toast-info]="currentMessage.tone === 'info'"
       >
         <i
-          class="fa-solid"
-          [class.fa-circle-check]="currentMessage.tone === 'success'"
-          [class.fa-circle-xmark]="currentMessage.tone === 'error'"
-          [class.fa-circle-info]="currentMessage.tone === 'info'"
+          class="bi"
+          [class.bi-check-circle-fill]="currentMessage.tone === 'success'"
+          [class.bi-x-circle-fill]="currentMessage.tone === 'error'"
+          [class.bi-info-circle-fill]="currentMessage.tone === 'info'"
           aria-hidden="true"
         ></i>
         <p>{{ currentMessage.text }}</p>
@@ -95,7 +95,7 @@
           [attr.aria-label]="copy().close"
           [attr.title]="copy().close"
         >
-          <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+          <i class="bi bi-x-lg" aria-hidden="true"></i>
         </button>
       </div>
     </div>
@@ -134,7 +134,7 @@
                   [attr.title]="copy().previewKioskLabel"
                   (click)="openKioskPreview()"
                 >
-                  <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>
+                  <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i>
                   <span class="d-none d-sm-inline">{{ copy().previewKioskLabel }}</span>
                 </button>
               </div>
@@ -181,7 +181,7 @@
                   [disabled]="!selectedBranchId()"
                   (click)="openKioskPreview()"
                 >
-                  <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>
+                  <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i>
                   <span>{{ copy().previewKioskLabel }}</span>
                 </button>
 
