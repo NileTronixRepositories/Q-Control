@@ -15,6 +15,7 @@ import {
   ValidationErrors,
   Validators,
 } from '@angular/forms';
+import { AppModalComponent } from '../../../../shared/components/app-modal/app-modal.component';
 import { MobileRecordCardComponent } from '../../../../shared/components/mobile-record-card/mobile-record-card.component';
 import { NiletronixLoadingStateComponent } from '../../../../shared/components/niletronix-loading-state/niletronix-loading-state.component';
 import { PageHeroComponent } from '../../../../shared/components/page-hero/page-hero.component';
@@ -111,6 +112,12 @@ interface WindowTranslations {
   readonly modifiedOn: string;
   readonly traceIdLabel: string;
   readonly notAvailable: string;
+  readonly basicInfoSection: string;
+  readonly timestampsSection: string;
+  readonly detailsSubtitle: string;
+  readonly createSubtitle: string;
+  readonly editSubtitle: string;
+  readonly settingsSection: string;
 }
 
 interface WindowConfirmState {
@@ -188,6 +195,12 @@ const WINDOW_TRANSLATIONS: Record<AppLanguage, WindowTranslations> = {
     modifiedOn: 'تاريخ آخر تعديل',
     traceIdLabel: 'معرف التتبع',
     notAvailable: '-',
+    basicInfoSection: 'بيانات مكان الخدمة',
+    timestampsSection: 'التاريخ والوقت',
+    detailsSubtitle: 'عرض بيانات مكان الخدمة وإعدادات الربط والتشغيل',
+    createSubtitle: 'إضافة مكان خدمة جديد وربطه بمنطقة الانتظار',
+    editSubtitle: 'تحديث بيانات وإعدادات مكان الخدمة',
+    settingsSection: 'الإعدادات والربط التشغيلي',
   },
   en: {
     title: 'Service Location Management',
@@ -238,7 +251,8 @@ const WINDOW_TRANSLATIONS: Record<AppLanguage, WindowTranslations> = {
     deleteConfirm: 'Deactivate Service Location',
     permanentDeleteConfirm: 'Permanently Delete Service Location',
     deleteConfirmBody: 'Are you sure you want to deactivate this service location?',
-    permanentDeleteConfirmBody: 'This action permanently deletes the service location and cannot be undone.',
+    permanentDeleteConfirmBody:
+      'This action permanently deletes the service location and cannot be undone.',
     permanentDeleteAdditionalBody:
       'Operation will fail when the service location is linked to a terminal or display service location.',
     fallbackSuccess: 'Operation completed successfully.',
@@ -249,6 +263,12 @@ const WINDOW_TRANSLATIONS: Record<AppLanguage, WindowTranslations> = {
     modifiedOn: 'Modified On',
     traceIdLabel: 'Trace ID',
     notAvailable: '-',
+    basicInfoSection: 'Service Location Info',
+    timestampsSection: 'Date & Time',
+    detailsSubtitle: 'View service location data and operational settings',
+    createSubtitle: 'Add a new service location and link to a waiting area',
+    editSubtitle: 'Update service location details and settings',
+    settingsSection: 'Settings & Operational Links',
   },
 };
 
@@ -274,7 +294,13 @@ const EMPTY_DELETED_WINDOW_PAGE: PaginationResponse<DeletedWindowListItemRespons
 
 @Component({
   selector: 'app-windows',
-  imports: [ReactiveFormsModule, MobileRecordCardComponent, PageHeroComponent, NiletronixLoadingStateComponent],
+  imports: [
+    ReactiveFormsModule,
+    MobileRecordCardComponent,
+    PageHeroComponent,
+    NiletronixLoadingStateComponent,
+    AppModalComponent,
+  ],
   templateUrl: './windows.component.html',
   styleUrl: './windows.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -305,7 +331,9 @@ export class WindowsComponent implements OnInit, OnDestroy {
   protected readonly canDeactivate = this.permissionService.canDeactivate;
   protected readonly canReactivate = this.permissionService.canReactivate;
   protected readonly canDeletePermanent = this.permissionService.canDeletePermanent;
-  protected readonly canViewDeleted = computed(() => this.canReactivate() || this.canDeletePermanent());
+  protected readonly canViewDeleted = computed(
+    () => this.canReactivate() || this.canDeletePermanent(),
+  );
 
   protected readonly activeTab = signal<WindowTab>(this.canViewActive() ? 'active' : 'deleted');
   protected readonly hasWindowAccess = computed(
@@ -330,6 +358,7 @@ export class WindowsComponent implements OnInit, OnDestroy {
   protected readonly selectedDetails = signal<WindowDetailsResponse | null>(null);
   protected readonly selectedEditId = signal<number | null>(null);
   protected readonly panelMode = signal<WindowPanelMode>('closed');
+  protected readonly panelLoading = signal(false);
   protected readonly waitingAreas = signal<readonly WaitingAreaOption[]>([]);
   protected readonly confirmDialog = signal<WindowConfirmState | null>(null);
   protected readonly traceId = signal<string | null>(null);
@@ -339,7 +368,13 @@ export class WindowsComponent implements OnInit, OnDestroy {
     waitingAreaId: [0, [Validators.required, Validators.min(1)]],
     number: ['', [Validators.required, Validators.maxLength(20), this.notWhitespaceValidator]],
     descriptiveName: ['', [Validators.maxLength(100)]],
-    ipAddress: ['', [Validators.maxLength(45), (control: AbstractControl<string>) => this.ipAddressValidator(control)]],
+    ipAddress: [
+      '',
+      [
+        Validators.maxLength(45),
+        (control: AbstractControl<string>) => this.ipAddressValidator(control),
+      ],
+    ],
     enableTicketBooking: [false],
     enableDirectCall: [false],
   });
@@ -477,6 +512,7 @@ export class WindowsComponent implements OnInit, OnDestroy {
 
     this.panelRequestId += 1;
     this.panelMode.set('create');
+    this.panelLoading.set(false);
     this.selectedEditId.set(null);
     this.selectedDetails.set(null);
     this.confirmDialog.set(null);
@@ -513,6 +549,7 @@ export class WindowsComponent implements OnInit, OnDestroy {
   protected closePanel(): void {
     this.panelRequestId += 1;
     this.panelMode.set('closed');
+    this.panelLoading.set(false);
     this.selectedEditId.set(null);
     this.selectedDetails.set(null);
     this.windowForm.markAsPristine();
@@ -530,6 +567,18 @@ export class WindowsComponent implements OnInit, OnDestroy {
     }
 
     return this.translations().windowDetails;
+  }
+
+  protected panelSubtitle(): string {
+    if (this.panelMode() === 'create') {
+      return this.translations().createSubtitle;
+    }
+
+    if (this.panelMode() === 'edit') {
+      return this.translations().editSubtitle;
+    }
+
+    return this.translations().detailsSubtitle;
   }
 
   protected saveWindow(): void {
@@ -649,17 +698,24 @@ export class WindowsComponent implements OnInit, OnDestroy {
       return this.translations().notAvailable;
     }
 
-    const parsed = new Date(dateValue);
+    try {
+      const parsed = new Date(dateValue);
 
-    if (Number.isNaN(parsed.getTime())) {
+      if (Number.isNaN(parsed.getTime())) {
+        return dateValue;
+      }
+
+      const locale = this.i18nStore.language() === 'ar' ? 'ar-EG' : 'en-US';
+      return new Intl.DateTimeFormat(locale, {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      }).format(parsed);
+    } catch {
       return dateValue;
     }
-
-    return new Intl.DateTimeFormat(this.i18nStore.language(), {
-      dateStyle: 'medium',
-      timeStyle: 'short',
-      timeZoneName: 'short',
-    }).format(parsed);
   }
 
   protected formatText(value: string | null | undefined): string {
@@ -684,7 +740,10 @@ export class WindowsComponent implements OnInit, OnDestroy {
     this.loadDeletedWindows(1);
   }
 
-  private loadActiveWindows(pageNumber = this.activeWindowsPage().currentPage, force = false): void {
+  private loadActiveWindows(
+    pageNumber = this.activeWindowsPage().currentPage,
+    force = false,
+  ): void {
     if (!this.canViewActive() || (this.activeLoading() && !force)) {
       return;
     }
@@ -694,7 +753,13 @@ export class WindowsComponent implements OnInit, OnDestroy {
 
     this.windowsApiService
       .getWindows(
-        this.buildQuery(this.activeSearch(), this.activeWaitingAreaId(), pageNumber, this.activePageSize(), true),
+        this.buildQuery(
+          this.activeSearch(),
+          this.activeWaitingAreaId(),
+          pageNumber,
+          this.activePageSize(),
+          true,
+        ),
       )
       .subscribe({
         next: (response) => {
@@ -715,7 +780,14 @@ export class WindowsComponent implements OnInit, OnDestroy {
     this.traceId.set(null);
 
     this.windowsApiService
-      .getWindows(this.buildQuery(this.deletedSearch(), this.deletedWaitingAreaId(), pageNumber, this.deletedPageSize(), false),
+      .getWindows(
+        this.buildQuery(
+          this.deletedSearch(),
+          this.deletedWaitingAreaId(),
+          pageNumber,
+          this.deletedPageSize(),
+          false,
+        ),
       )
       .subscribe({
         next: (response) => this.deletedWindowsPage.set(response),
@@ -731,7 +803,7 @@ export class WindowsComponent implements OnInit, OnDestroy {
         search: '',
         pageNumber: 1,
         pageSize: 100,
-      isActive: true,
+        isActive: true,
       })
       .subscribe({
         next: (response) => {
@@ -758,6 +830,7 @@ export class WindowsComponent implements OnInit, OnDestroy {
     this.selectedDetails.set(null);
     this.confirmDialog.set(null);
     this.clearMessage();
+    this.panelLoading.set(true);
 
     this.windowForm.enable({ emitEvent: false });
 
@@ -772,6 +845,7 @@ export class WindowsComponent implements OnInit, OnDestroy {
         }
 
         this.selectedDetails.set(response);
+        this.panelLoading.set(false);
 
         this.windowForm.reset({
           waitingAreaId: response.waitingAreaId,
@@ -791,6 +865,7 @@ export class WindowsComponent implements OnInit, OnDestroy {
           return;
         }
 
+        this.panelLoading.set(false);
         this.handleApiError(error);
         this.closePanel();
       },
@@ -1050,10 +1125,13 @@ export class WindowsComponent implements OnInit, OnDestroy {
 
     this.message.set({ tone, text });
 
-    this.toastTimeoutId = setTimeout(() => {
-      this.message.set(null);
-      this.toastTimeoutId = null;
-    }, tone === 'error' ? 6500 : 4200);
+    this.toastTimeoutId = setTimeout(
+      () => {
+        this.message.set(null);
+        this.toastTimeoutId = null;
+      },
+      tone === 'error' ? 6500 : 4200,
+    );
   }
 
   private notWhitespaceValidator(control: AbstractControl<string>): ValidationErrors | null {
@@ -1110,4 +1188,3 @@ export class WindowsComponent implements OnInit, OnDestroy {
       : value.split(':').length <= 8;
   }
 }
-

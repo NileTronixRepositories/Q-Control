@@ -8,23 +8,30 @@
     [eyebrow]="copy().pageEyebrow"
     [title]="copy().pageTitle"
     [description]="copy().pageDescription"
-    icon="bi bi-palette"
+    icon="fa-solid fa-palette"
+    iconVariant="violet"
   >
     <div hero-actions class="d-flex align-items-center gap-2">
       <button
         type="button"
-        class="btn btn-outline-secondary d-inline-flex align-items-center gap-2"
+        class="secondary-action d-inline-flex align-items-center gap-2 branding-refresh-action"
         [disabled]="loading()"
+        [attr.title]="copy().refreshLabel"
         (click)="refresh()"
       >
-        <i class="bi bi-arrow-clockwise" [class.spin]="loading()" aria-hidden="true"></i>
+        <i
+          class="fa-solid fa-arrows-rotate"
+          style="color: #059669"
+          [class.spin]="loading()"
+          aria-hidden="true"
+        ></i>
         <span>{{ copy().refreshLabel }}</span>
       </button>
     </div>
   </app-page-hero>
 
   <!-- Alerts / Notices -->
-  @if (message(); as currentMessage) {
+  @if (activeMessage(); as currentMessage) {
     <div class="toast-stack" role="status" aria-live="polite" aria-atomic="true">
       <div
         class="toast-item"
@@ -33,15 +40,21 @@
         [class.toast-info]="currentMessage.tone === 'info'"
       >
         <i
-          class="bi"
-          [class.bi-check-circle-fill]="currentMessage.tone === 'success'"
-          [class.bi-x-octagon-fill]="currentMessage.tone === 'error'"
-          [class.bi-info-circle-fill]="currentMessage.tone === 'info'"
+          class="fa-solid"
+          [class.fa-circle-check]="currentMessage.tone === 'success'"
+          [class.fa-circle-xmark]="currentMessage.tone === 'error'"
+          [class.fa-circle-info]="currentMessage.tone === 'info'"
           aria-hidden="true"
         ></i>
         <p>{{ currentMessage.text }}</p>
-        <button type="button" class="toast-close" (click)="clearMessage()" aria-label="Close">
-          <i class="bi bi-x-lg" aria-hidden="true"></i>
+        <button
+          type="button"
+          class="toast-close"
+          (click)="clearMessage()"
+          [attr.aria-label]="copy().close"
+          [attr.title]="copy().close"
+        >
+          <i class="fa-solid fa-xmark" aria-hidden="true"></i>
         </button>
       </div>
     </div>
@@ -50,7 +63,7 @@
   @if (!canModify()) {
     <div class="notice-glass-banner banner-warning" role="alert">
       <div class="banner-icon">
-        <i class="bi bi-shield-lock-fill" aria-hidden="true"></i>
+        <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
       </div>
       <span>{{ copy().readOnlyNotice }}</span>
     </div>
@@ -59,14 +72,14 @@
   @if (!isConfigured() && !loading()) {
     <div class="notice-glass-banner banner-info" role="alert">
       <div class="banner-icon">
-        <i class="bi bi-info-circle-fill" aria-hidden="true"></i>
+        <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
       </div>
       <span>{{ copy().notConfiguredNotice }}</span>
     </div>
   }
 
   @if (loading()) {
-    <app-niletronix-loading-state [title]="copy().loading" />
+    <app-niletronix-loading-state [title]="copy().loading" variant="skeleton" />
   } @else {
     <form [formGroup]="themeForm" (ngSubmit)="save()" class="branding-form mt-4">
       <div class="row g-4">
@@ -77,7 +90,9 @@
           <div class="card config-panel h-100 shadow-sm">
             <div class="panel-header d-flex align-items-center justify-content-between">
               <div class="d-flex align-items-center gap-2">
-                <span class="panel-icon"><i class="bi bi-palette-fill"></i></span>
+                <span class="q-field-icon-badge q-field-icon-badge--sky">
+                  <i class="fa-solid fa-palette"></i>
+                </span>
                 <div>
                   <h5 class="panel-title m-0">{{ copy().themeColors }}</h5>
                   <small class="text-muted">
@@ -95,8 +110,11 @@
               <div class="row g-3">
                 <!-- Main Color -->
                 <div class="col-12 col-sm-6">
-                  <label for="gbMainColor" class="form-label">
-                    <span>{{ copy().mainColor }}<span class="text-danger">*</span></span>
+                  <label for="gbMainColor" class="form-label d-flex align-items-center gap-2">
+                    <span class="q-field-icon-badge q-field-icon-badge--sky">
+                      <i class="fa-solid fa-brush"></i>
+                    </span>
+                    <span>{{ copy().mainColor }}<span class="text-danger ms-1">*</span></span>
                   </label>
                   <div class="color-picker-control">
                     <input
@@ -123,8 +141,11 @@
 
                 <!-- Secondary Color -->
                 <div class="col-12 col-sm-6">
-                  <label for="gbSecondaryColor" class="form-label">
-                    <span>{{ copy().secondaryColor }}<span class="text-danger">*</span></span>
+                  <label for="gbSecondaryColor" class="form-label d-flex align-items-center gap-2">
+                    <span class="q-field-icon-badge q-field-icon-badge--violet">
+                      <i class="fa-solid fa-swatchbook"></i>
+                    </span>
+                    <span>{{ copy().secondaryColor }}<span class="text-danger ms-1">*</span></span>
                   </label>
                   <div class="color-picker-control">
                     <input
@@ -153,8 +174,11 @@
 
                 <!-- Background Color -->
                 <div class="col-12 col-sm-6">
-                  <label for="gbBackgroundColor" class="form-label">
-                    <span>{{ copy().backgroundColor }}<span class="text-danger">*</span></span>
+                  <label for="gbBackgroundColor" class="form-label d-flex align-items-center gap-2">
+                    <span class="q-field-icon-badge q-field-icon-badge--teal">
+                      <i class="fa-solid fa-border-all"></i>
+                    </span>
+                    <span>{{ copy().backgroundColor }}<span class="text-danger ms-1">*</span></span>
                   </label>
                   <div class="color-picker-control">
                     <input
@@ -183,7 +207,10 @@
 
                 <!-- Header Color -->
                 <div class="col-12 col-sm-6">
-                  <label for="gbHeaderColor" class="form-label">
+                  <label for="gbHeaderColor" class="form-label d-flex align-items-center gap-2">
+                    <span class="q-field-icon-badge q-field-icon-badge--indigo">
+                      <i class="fa-solid fa-window-maximize"></i>
+                    </span>
                     <span>{{ copy().headerColor }}</span>
                   </label>
                   <div class="color-picker-control">
@@ -213,7 +240,10 @@
 
                 <!-- Footer Color -->
                 <div class="col-12 col-sm-6">
-                  <label for="gbFooterColor" class="form-label">
+                  <label for="gbFooterColor" class="form-label d-flex align-items-center gap-2">
+                    <span class="q-field-icon-badge q-field-icon-badge--amber">
+                      <i class="fa-solid fa-window-minimize"></i>
+                    </span>
                     <span>{{ copy().footerColor }}</span>
                   </label>
                   <div class="color-picker-control">
@@ -243,7 +273,10 @@
 
                 <!-- Main Text Color -->
                 <div class="col-12 col-sm-6">
-                  <label for="gbMainTextColor" class="form-label">
+                  <label for="gbMainTextColor" class="form-label d-flex align-items-center gap-2">
+                    <span class="q-field-icon-badge q-field-icon-badge--rose">
+                      <i class="fa-solid fa-font"></i>
+                    </span>
                     <span>{{ copy().mainTextColor }}</span>
                   </label>
                   <div class="color-picker-control">
@@ -282,7 +315,9 @@
           <div class="card config-panel h-100 shadow-sm">
             <div class="panel-header d-flex align-items-center justify-content-between">
               <div class="d-flex align-items-center gap-2">
-                <span class="panel-icon"><i class="bi bi-sliders2-vertical"></i></span>
+                <span class="q-field-icon-badge q-field-icon-badge--violet">
+                  <i class="fa-solid fa-sliders"></i>
+                </span>
                 <div>
                   <h5 class="panel-title m-0">{{ copy().behaviorSection }}</h5>
                   <small class="text-muted">{{ copy().behaviorSubtitle }}</small>
@@ -297,14 +332,19 @@
                   <div
                     class="behavior-switch-box d-flex align-items-center justify-content-between p-2 px-3 border rounded"
                   >
-                    <div>
-                      <label
-                        class="form-check-label fw-bold d-block small mb-0"
-                        for="gbShowLanguagePage"
-                      >
-                        {{ copy().showLanguagePageLabel }}
-                      </label>
-                      <small class="text-muted">{{ copy().showLanguagePageSubtitle }}</small>
+                    <div class="d-flex align-items-center gap-3">
+                      <span class="q-field-icon-badge q-field-icon-badge--teal">
+                        <i class="fa-solid fa-language"></i>
+                      </span>
+                      <div>
+                        <label
+                          class="form-check-label fw-bold d-block small mb-0"
+                          for="gbShowLanguagePage"
+                        >
+                          {{ copy().showLanguagePageLabel }}
+                        </label>
+                        <small class="text-muted">{{ copy().showLanguagePageSubtitle }}</small>
+                      </div>
                     </div>
                     <div class="form-check form-switch m-0">
                       <input
@@ -322,14 +362,21 @@
                   <div
                     class="behavior-switch-box d-flex align-items-center justify-content-between p-2 px-3 border rounded"
                   >
-                    <div>
-                      <label
-                        class="form-check-label fw-bold d-block small mb-0"
-                        for="gbDefaultLanguageIsArabic"
-                      >
-                        {{ copy().defaultLanguageIsArabicLabel }}
-                      </label>
-                      <small class="text-muted">{{ copy().defaultLanguageIsArabicSubtitle }}</small>
+                    <div class="d-flex align-items-center gap-3">
+                      <span class="q-field-icon-badge q-field-icon-badge--sky">
+                        <i class="fa-solid fa-earth-africa"></i>
+                      </span>
+                      <div>
+                        <label
+                          class="form-check-label fw-bold d-block small mb-0"
+                          for="gbDefaultLanguageIsArabic"
+                        >
+                          {{ copy().defaultLanguageIsArabicLabel }}
+                        </label>
+                        <small class="text-muted">{{
+                          copy().defaultLanguageIsArabicSubtitle
+                        }}</small>
+                      </div>
                     </div>
                     <div class="form-check form-switch m-0">
                       <input
@@ -347,14 +394,21 @@
                   <div
                     class="behavior-switch-box d-flex align-items-center justify-content-between p-2 px-3 border rounded"
                   >
-                    <div>
-                      <label
-                        class="form-check-label fw-bold d-block small mb-0"
-                        for="gbAlwaysRequireUserInput"
-                      >
-                        {{ copy().alwaysRequireUserInputLabel }}
-                      </label>
-                      <small class="text-muted">{{ copy().alwaysRequireUserInputSubtitle }}</small>
+                    <div class="d-flex align-items-center gap-3">
+                      <span class="q-field-icon-badge q-field-icon-badge--amber">
+                        <i class="fa-solid fa-id-card"></i>
+                      </span>
+                      <div>
+                        <label
+                          class="form-check-label fw-bold d-block small mb-0"
+                          for="gbAlwaysRequireUserInput"
+                        >
+                          {{ copy().alwaysRequireUserInputLabel }}
+                        </label>
+                        <small class="text-muted">{{
+                          copy().alwaysRequireUserInputSubtitle
+                        }}</small>
+                      </div>
                     </div>
                     <div class="form-check form-switch m-0">
                       <input
@@ -372,16 +426,21 @@
                   <div
                     class="behavior-switch-box d-flex align-items-center justify-content-between p-2 px-3 border rounded"
                   >
-                    <div>
-                      <label
-                        class="form-check-label fw-bold d-block small mb-0"
-                        for="gbShowServiceNavigationPath"
-                      >
-                        {{ copy().showServiceNavigationPathLabel }}
-                      </label>
-                      <small class="text-muted">{{
-                        copy().showServiceNavigationPathSubtitle
-                      }}</small>
+                    <div class="d-flex align-items-center gap-3">
+                      <span class="q-field-icon-badge q-field-icon-badge--violet">
+                        <i class="fa-solid fa-route"></i>
+                      </span>
+                      <div>
+                        <label
+                          class="form-check-label fw-bold d-block small mb-0"
+                          for="gbShowServiceNavigationPath"
+                        >
+                          {{ copy().showServiceNavigationPathLabel }}
+                        </label>
+                        <small class="text-muted">{{
+                          copy().showServiceNavigationPathSubtitle
+                        }}</small>
+                      </div>
                     </div>
                     <div class="form-check form-switch m-0">
                       <input
@@ -399,14 +458,21 @@
                   <div
                     class="behavior-switch-box d-flex align-items-center justify-content-between p-2 px-3 border rounded"
                   >
-                    <div>
-                      <label
-                        class="form-check-label fw-bold d-block small mb-0"
-                        for="gbAllowOperatorSelection"
-                      >
-                        {{ copy().allowOperatorSelectionLabel }}
-                      </label>
-                      <small class="text-muted">{{ copy().allowOperatorSelectionSubtitle }}</small>
+                    <div class="d-flex align-items-center gap-3">
+                      <span class="q-field-icon-badge q-field-icon-badge--indigo">
+                        <i class="fa-solid fa-user-tie"></i>
+                      </span>
+                      <div>
+                        <label
+                          class="form-check-label fw-bold d-block small mb-0"
+                          for="gbAllowOperatorSelection"
+                        >
+                          {{ copy().allowOperatorSelectionLabel }}
+                        </label>
+                        <small class="text-muted">{{
+                          copy().allowOperatorSelectionSubtitle
+                        }}</small>
+                      </div>
                     </div>
                     <div class="form-check form-switch m-0">
                       <input
@@ -424,16 +490,21 @@
                   <div
                     class="behavior-switch-box d-flex align-items-center justify-content-between p-2 px-3 border rounded"
                   >
-                    <div>
-                      <label
-                        class="form-check-label fw-bold d-block small mb-0"
-                        for="gbAllowRequestMoreServices"
-                      >
-                        {{ copy().allowRequestMoreServicesLabel }}
-                      </label>
-                      <small class="text-muted">{{
-                        copy().allowRequestMoreServicesSubtitle
-                      }}</small>
+                    <div class="d-flex align-items-center gap-3">
+                      <span class="q-field-icon-badge q-field-icon-badge--teal">
+                        <i class="fa-solid fa-layer-group"></i>
+                      </span>
+                      <div>
+                        <label
+                          class="form-check-label fw-bold d-block small mb-0"
+                          for="gbAllowRequestMoreServices"
+                        >
+                          {{ copy().allowRequestMoreServicesLabel }}
+                        </label>
+                        <small class="text-muted">{{
+                          copy().allowRequestMoreServicesSubtitle
+                        }}</small>
+                      </div>
                     </div>
                     <div class="form-check form-switch m-0">
                       <input
@@ -457,7 +528,9 @@
           <div class="card config-panel h-100 shadow-sm">
             <div class="panel-header">
               <div class="d-flex align-items-center gap-2">
-                <span class="panel-icon"><i class="bi bi-translate"></i></span>
+                <span class="q-field-icon-badge q-field-icon-badge--teal">
+                  <i class="fa-solid fa-language"></i>
+                </span>
                 <div>
                   <h5 class="panel-title m-0">{{ copy().languageButtonSection }}</h5>
                   <small class="text-muted">{{ copy().languageButtonSubtitle }}</small>
@@ -468,9 +541,12 @@
             <div class="panel-body p-3 p-xl-4">
               <div class="row g-3">
                 <div class="col-sm-6">
-                  <label for="gbLangBgColor" class="form-label">{{
-                    copy().buttonBackgroundColorLabel
-                  }}</label>
+                  <label for="gbLangBgColor" class="form-label d-flex align-items-center gap-2">
+                    <span class="q-field-icon-badge q-field-icon-badge--teal">
+                      <i class="fa-solid fa-fill-drip"></i>
+                    </span>
+                    <span>{{ copy().buttonBackgroundColorLabel }}</span>
+                  </label>
                   <div class="color-picker-control">
                     <input
                       type="color"
@@ -492,9 +568,12 @@
                 </div>
 
                 <div class="col-sm-6">
-                  <label for="gbLangTextColor" class="form-label">{{
-                    copy().buttonTextColorLabel
-                  }}</label>
+                  <label for="gbLangTextColor" class="form-label d-flex align-items-center gap-2">
+                    <span class="q-field-icon-badge q-field-icon-badge--sky">
+                      <i class="fa-solid fa-font"></i>
+                    </span>
+                    <span>{{ copy().buttonTextColorLabel }}</span>
+                  </label>
                   <div class="color-picker-control">
                     <input
                       type="color"
@@ -516,7 +595,12 @@
                 </div>
 
                 <div class="col-sm-6">
-                  <label for="gbLangWidth" class="form-label">{{ copy().buttonWidthLabel }}</label>
+                  <label for="gbLangWidth" class="form-label d-flex align-items-center gap-2">
+                    <span class="q-field-icon-badge q-field-icon-badge--amber">
+                      <i class="fa-solid fa-arrows-left-right"></i>
+                    </span>
+                    <span>{{ copy().buttonWidthLabel }}</span>
+                  </label>
                   <div class="input-group">
                     <input
                       type="number"
@@ -533,9 +617,12 @@
                 </div>
 
                 <div class="col-sm-6">
-                  <label for="gbLangHeight" class="form-label">{{
-                    copy().buttonHeightLabel
-                  }}</label>
+                  <label for="gbLangHeight" class="form-label d-flex align-items-center gap-2">
+                    <span class="q-field-icon-badge q-field-icon-badge--violet">
+                      <i class="fa-solid fa-arrows-up-down"></i>
+                    </span>
+                    <span>{{ copy().buttonHeightLabel }}</span>
+                  </label>
                   <div class="input-group">
                     <input
                       type="number"
@@ -552,7 +639,12 @@
                 </div>
 
                 <div class="col-12">
-                  <label for="gbLangText" class="form-label">{{ copy().buttonTextLabel }}</label>
+                  <label for="gbLangText" class="form-label d-flex align-items-center gap-2">
+                    <span class="q-field-icon-badge q-field-icon-badge--indigo">
+                      <i class="fa-solid fa-signature"></i>
+                    </span>
+                    <span>{{ copy().buttonTextLabel }}</span>
+                  </label>
                   <input
                     type="text"
                     class="form-control"
@@ -575,7 +667,9 @@
           <div class="card config-panel h-100 shadow-sm">
             <div class="panel-header">
               <div class="d-flex align-items-center gap-2">
-                <span class="panel-icon"><i class="bi bi-calculator-fill"></i></span>
+                <span class="q-field-icon-badge q-field-icon-badge--amber">
+                  <i class="fa-solid fa-calculator"></i>
+                </span>
                 <div>
                   <h5 class="panel-title m-0">{{ copy().keypadButtonSection }}</h5>
                   <small class="text-muted">{{ copy().keypadButtonSubtitle }}</small>
@@ -586,9 +680,12 @@
             <div class="panel-body p-3 p-xl-4">
               <div class="row g-3">
                 <div class="col-sm-6">
-                  <label for="gbKeypadBgColor" class="form-label">{{
-                    copy().buttonBackgroundColorLabel
-                  }}</label>
+                  <label for="gbKeypadBgColor" class="form-label d-flex align-items-center gap-2">
+                    <span class="q-field-icon-badge q-field-icon-badge--amber">
+                      <i class="fa-solid fa-fill-drip"></i>
+                    </span>
+                    <span>{{ copy().buttonBackgroundColorLabel }}</span>
+                  </label>
                   <div class="color-picker-control">
                     <input
                       type="color"
@@ -610,9 +707,12 @@
                 </div>
 
                 <div class="col-sm-6">
-                  <label for="gbKeypadTextColor" class="form-label">{{
-                    copy().buttonTextColorLabel
-                  }}</label>
+                  <label for="gbKeypadTextColor" class="form-label d-flex align-items-center gap-2">
+                    <span class="q-field-icon-badge q-field-icon-badge--sky">
+                      <i class="fa-solid fa-font"></i>
+                    </span>
+                    <span>{{ copy().buttonTextColorLabel }}</span>
+                  </label>
                   <div class="color-picker-control">
                     <input
                       type="color"
@@ -634,9 +734,12 @@
                 </div>
 
                 <div class="col-sm-6">
-                  <label for="gbKeypadWidth" class="form-label">{{
-                    copy().buttonWidthLabel
-                  }}</label>
+                  <label for="gbKeypadWidth" class="form-label d-flex align-items-center gap-2">
+                    <span class="q-field-icon-badge q-field-icon-badge--teal">
+                      <i class="fa-solid fa-arrows-left-right"></i>
+                    </span>
+                    <span>{{ copy().buttonWidthLabel }}</span>
+                  </label>
                   <div class="input-group">
                     <input
                       type="number"
@@ -653,9 +756,12 @@
                 </div>
 
                 <div class="col-sm-6">
-                  <label for="gbKeypadHeight" class="form-label">{{
-                    copy().buttonHeightLabel
-                  }}</label>
+                  <label for="gbKeypadHeight" class="form-label d-flex align-items-center gap-2">
+                    <span class="q-field-icon-badge q-field-icon-badge--violet">
+                      <i class="fa-solid fa-arrows-up-down"></i>
+                    </span>
+                    <span>{{ copy().buttonHeightLabel }}</span>
+                  </label>
                   <div class="input-group">
                     <input
                       type="number"
@@ -672,7 +778,12 @@
                 </div>
 
                 <div class="col-12">
-                  <label for="gbKeypadText" class="form-label">{{ copy().buttonTextLabel }}</label>
+                  <label for="gbKeypadText" class="form-label d-flex align-items-center gap-2">
+                    <span class="q-field-icon-badge q-field-icon-badge--indigo">
+                      <i class="fa-solid fa-signature"></i>
+                    </span>
+                    <span>{{ copy().buttonTextLabel }}</span>
+                  </label>
                   <input
                     type="text"
                     class="form-control"
@@ -695,7 +806,9 @@
           <div class="card config-panel h-100 shadow-sm">
             <div class="panel-header">
               <div class="d-flex align-items-center gap-2">
-                <span class="panel-icon"><i class="bi bi-grid-3x3-gap-fill"></i></span>
+                <span class="q-field-icon-badge q-field-icon-badge--indigo">
+                  <i class="fa-solid fa-table-cells-large"></i>
+                </span>
                 <div>
                   <h5 class="panel-title m-0">{{ copy().serviceButtonSection }}</h5>
                   <small class="text-muted">{{ copy().serviceButtonSubtitle }}</small>
@@ -706,9 +819,12 @@
             <div class="panel-body p-3 p-xl-4">
               <div class="row g-3">
                 <div class="col-sm-6">
-                  <label for="gbSrvBgColor" class="form-label">{{
-                    copy().buttonBackgroundColorLabel
-                  }}</label>
+                  <label for="gbSrvBgColor" class="form-label d-flex align-items-center gap-2">
+                    <span class="q-field-icon-badge q-field-icon-badge--indigo">
+                      <i class="fa-solid fa-fill-drip"></i>
+                    </span>
+                    <span>{{ copy().buttonBackgroundColorLabel }}</span>
+                  </label>
                   <div class="color-picker-control">
                     <input
                       type="color"
@@ -730,9 +846,12 @@
                 </div>
 
                 <div class="col-sm-6">
-                  <label for="gbSrvTextColor" class="form-label">{{
-                    copy().buttonTextColorLabel
-                  }}</label>
+                  <label for="gbSrvTextColor" class="form-label d-flex align-items-center gap-2">
+                    <span class="q-field-icon-badge q-field-icon-badge--sky">
+                      <i class="fa-solid fa-font"></i>
+                    </span>
+                    <span>{{ copy().buttonTextColorLabel }}</span>
+                  </label>
                   <div class="color-picker-control">
                     <input
                       type="color"
@@ -754,7 +873,12 @@
                 </div>
 
                 <div class="col-6 col-sm-3">
-                  <label for="gbSrvWidth" class="form-label">{{ copy().buttonWidthLabel }}</label>
+                  <label for="gbSrvWidth" class="form-label d-flex align-items-center gap-2">
+                    <span class="q-field-icon-badge q-field-icon-badge--teal">
+                      <i class="fa-solid fa-arrows-left-right"></i>
+                    </span>
+                    <span>{{ copy().buttonWidthLabel }}</span>
+                  </label>
                   <div class="input-group">
                     <input
                       type="number"
@@ -771,7 +895,12 @@
                 </div>
 
                 <div class="col-6 col-sm-3">
-                  <label for="gbSrvHeight" class="form-label">{{ copy().buttonHeightLabel }}</label>
+                  <label for="gbSrvHeight" class="form-label d-flex align-items-center gap-2">
+                    <span class="q-field-icon-badge q-field-icon-badge--violet">
+                      <i class="fa-solid fa-arrows-up-down"></i>
+                    </span>
+                    <span>{{ copy().buttonHeightLabel }}</span>
+                  </label>
                   <div class="input-group">
                     <input
                       type="number"
@@ -788,9 +917,12 @@
                 </div>
 
                 <div class="col-6 col-sm-3">
-                  <label for="gbSrvSpace" class="form-label">{{
-                    copy().serviceButtonSpaceLabel
-                  }}</label>
+                  <label for="gbSrvSpace" class="form-label d-flex align-items-center gap-2">
+                    <span class="q-field-icon-badge q-field-icon-badge--amber">
+                      <i class="fa-solid fa-arrows-split-up-and-left"></i>
+                    </span>
+                    <span>{{ copy().serviceButtonSpaceLabel }}</span>
+                  </label>
                   <div class="input-group">
                     <input
                       type="number"
@@ -807,9 +939,12 @@
                 </div>
 
                 <div class="col-6 col-sm-3">
-                  <label for="gbSrvFontSize" class="form-label">{{
-                    copy().serviceButtonFontSizeLabel
-                  }}</label>
+                  <label for="gbSrvFontSize" class="form-label d-flex align-items-center gap-2">
+                    <span class="q-field-icon-badge q-field-icon-badge--sky">
+                      <i class="fa-solid fa-text-height"></i>
+                    </span>
+                    <span>{{ copy().serviceButtonFontSizeLabel }}</span>
+                  </label>
                   <div class="input-group">
                     <input
                       type="number"
@@ -827,7 +962,12 @@
                 </div>
 
                 <div class="col-12">
-                  <label for="gbSrvText" class="form-label">{{ copy().buttonTextLabel }}</label>
+                  <label for="gbSrvText" class="form-label d-flex align-items-center gap-2">
+                    <span class="q-field-icon-badge q-field-icon-badge--violet">
+                      <i class="fa-solid fa-signature"></i>
+                    </span>
+                    <span>{{ copy().buttonTextLabel }}</span>
+                  </label>
                   <input
                     type="text"
                     class="form-control"
@@ -850,7 +990,9 @@
           <div class="card config-panel h-100 shadow-sm">
             <div class="panel-header">
               <div class="d-flex align-items-center gap-2">
-                <span class="panel-icon"><i class="bi bi-arrow-left-square-fill"></i></span>
+                <span class="q-field-icon-badge q-field-icon-badge--sky">
+                  <i class="fa-solid fa-arrow-left"></i>
+                </span>
                 <div>
                   <h5 class="panel-title m-0">{{ copy().footerButtonSection }}</h5>
                   <small class="text-muted">{{ copy().footerButtonSubtitle }}</small>
@@ -861,9 +1003,12 @@
             <div class="panel-body p-3 p-xl-4">
               <div class="row g-3">
                 <div class="col-sm-6">
-                  <label for="gbFooterBgColor" class="form-label">{{
-                    copy().buttonBackgroundColorLabel
-                  }}</label>
+                  <label for="gbFooterBgColor" class="form-label d-flex align-items-center gap-2">
+                    <span class="q-field-icon-badge q-field-icon-badge--sky">
+                      <i class="fa-solid fa-fill-drip"></i>
+                    </span>
+                    <span>{{ copy().buttonBackgroundColorLabel }}</span>
+                  </label>
                   <div class="color-picker-control">
                     <input
                       type="color"
@@ -885,9 +1030,12 @@
                 </div>
 
                 <div class="col-sm-6">
-                  <label for="gbFooterTextColor" class="form-label">{{
-                    copy().buttonTextColorLabel
-                  }}</label>
+                  <label for="gbFooterTextColor" class="form-label d-flex align-items-center gap-2">
+                    <span class="q-field-icon-badge q-field-icon-badge--indigo">
+                      <i class="fa-solid fa-font"></i>
+                    </span>
+                    <span>{{ copy().buttonTextColorLabel }}</span>
+                  </label>
                   <div class="color-picker-control">
                     <input
                       type="color"
@@ -909,9 +1057,12 @@
                 </div>
 
                 <div class="col-sm-6">
-                  <label for="gbFooterWidth" class="form-label">{{
-                    copy().buttonWidthLabel
-                  }}</label>
+                  <label for="gbFooterWidth" class="form-label d-flex align-items-center gap-2">
+                    <span class="q-field-icon-badge q-field-icon-badge--amber">
+                      <i class="fa-solid fa-arrows-left-right"></i>
+                    </span>
+                    <span>{{ copy().buttonWidthLabel }}</span>
+                  </label>
                   <div class="input-group">
                     <input
                       type="number"
@@ -928,9 +1079,12 @@
                 </div>
 
                 <div class="col-sm-6">
-                  <label for="gbFooterHeight" class="form-label">{{
-                    copy().buttonHeightLabel
-                  }}</label>
+                  <label for="gbFooterHeight" class="form-label d-flex align-items-center gap-2">
+                    <span class="q-field-icon-badge q-field-icon-badge--violet">
+                      <i class="fa-solid fa-arrows-up-down"></i>
+                    </span>
+                    <span>{{ copy().buttonHeightLabel }}</span>
+                  </label>
                   <div class="input-group">
                     <input
                       type="number"
@@ -947,7 +1101,12 @@
                 </div>
 
                 <div class="col-12">
-                  <label for="gbFooterText" class="form-label">{{ copy().buttonTextLabel }}</label>
+                  <label for="gbFooterText" class="form-label d-flex align-items-center gap-2">
+                    <span class="q-field-icon-badge q-field-icon-badge--teal">
+                      <i class="fa-solid fa-signature"></i>
+                    </span>
+                    <span>{{ copy().buttonTextLabel }}</span>
+                  </label>
                   <input
                     type="text"
                     class="form-control"
@@ -972,19 +1131,23 @@
               @if (themeDirty()) {
                 <div class="save-status-pill status-unsaved">
                   <span class="status-pulse-dot warning"></span>
-                  <i class="bi bi-exclamation-triangle-fill text-warning"></i>
+                  <i class="fa-solid fa-triangle-exclamation text-warning"></i>
                   <span class="fw-semibold">{{ copy().unsavedChanges }}</span>
                 </div>
               } @else {
                 <div class="save-status-pill status-saved">
                   <span class="status-pulse-dot success"></span>
-                  <i class="bi bi-check-circle-fill text-success"></i>
+                  <i class="fa-solid fa-circle-check text-success"></i>
                   <span class="fw-semibold">{{ copy().allSaved }}</span>
                 </div>
               }
             </div>
 
-            <button type="submit" class="btn btn-catchy-save" [disabled]="!canSave()">
+            <button
+              type="submit"
+              class="primary-action d-inline-flex align-items-center justify-content-center gap-2 px-4 py-2"
+              [disabled]="!canSave()"
+            >
               @if (saving()) {
                 <span
                   class="spinner-border spinner-border-sm"
@@ -992,9 +1155,11 @@
                   aria-hidden="true"
                 ></span>
               } @else {
-                <i class="bi bi-check2-circle fs-5"></i>
+                <i class="fa-solid fa-cloud-arrow-up fs-6"></i>
               }
-              <span>{{ isConfigured() ? copy().saveBrand : copy().createBrand }}</span>
+              <span class="fw-bold text-white">{{
+                isConfigured() ? copy().saveBrand : copy().createBrand
+              }}</span>
             </button>
           </div>
         </div>

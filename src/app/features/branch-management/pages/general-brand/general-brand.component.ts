@@ -25,6 +25,7 @@ import { GeneralBrandApiService } from '@features/branch-management/services/gen
 import { GeneralBrandPermissionService } from '@features/branch-management/services/general-brand-permission/general-brand-permission.service';
 import { AdminI18nStore } from '@layout/admin-shell/store/admin-i18n.store';
 import { formatApiError } from '@shared/utils/api-error-message.util';
+import { localizeToastMessage } from '@shared/utils/toast-message.util';
 
 type UiMessageTone = 'success' | 'error' | 'info';
 
@@ -274,6 +275,16 @@ export class GeneralBrandComponent implements OnInit, OnDestroy {
   protected readonly rowVersion = computed(() => this.generalBrand()?.rowVersion ?? null);
 
   protected readonly message = signal<UiMessage | null>(null);
+  protected readonly activeMessage = computed(() => {
+    const msg = this.message();
+    if (!msg) {
+      return null;
+    }
+    return {
+      tone: msg.tone,
+      text: localizeToastMessage(msg.text, this.language(), msg.text),
+    };
+  });
   protected readonly loading = signal(false);
   protected readonly saving = signal(false);
 
@@ -625,7 +636,7 @@ export class GeneralBrandComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.showMessage('error', formatApiError(error, this.copy().genericError));
+    this.showMessage('error', formatApiError(error, this.copy().genericError, this.language()));
   }
 
   protected clearMessage(): void {

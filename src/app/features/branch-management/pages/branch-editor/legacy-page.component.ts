@@ -13,7 +13,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 
 import { AppLanguage, AuthSessionService } from '@core';
 import { MobileRecordCardComponent } from '../../../../shared/components/mobile-record-card/mobile-record-card.component';
-import { NiletronixLoadingStateComponent } from '../../../../shared/components/niletronix-loading-state/niletronix-loading-state.component';
 import { PageHeroComponent } from '../../../../shared/components/page-hero/page-hero.component';
 import {
   MapLocationPickerComponent,
@@ -35,6 +34,7 @@ import { BranchPermissionService } from '@features/branch-management/services/br
 import { AdminBranchContextStore } from '@layout/admin-shell/store/admin-branch-context.store';
 import { AdminI18nStore } from '@layout/admin-shell/store/admin-i18n.store';
 import { formatApiError } from '@shared/utils/api-error-message.util';
+import { localizeToastMessage } from '@shared/utils/toast-message.util';
 
 type BranchManagementPageKey = 'branch-editor';
 type BranchFormValidationError = 'required' | 'maxlength' | 'min' | 'max';
@@ -268,7 +268,6 @@ const EMPTY_BRANCH_TABLE_META: BranchTableMeta = {
     CreateBranchAdminDialogComponent,
     MobileRecordCardComponent,
     PageHeroComponent,
-    NiletronixLoadingStateComponent,
     MapLocationPickerComponent,
   ],
   templateUrl: './legacy-page.component.html',
@@ -312,6 +311,8 @@ export class LegacyPageComponent implements OnInit, OnDestroy {
   protected readonly branchMessage = signal<UiMessage | null>(null);
   protected readonly branchTableMeta = signal<BranchTableMeta>(EMPTY_BRANCH_TABLE_META);
   protected readonly branches = signal<readonly BranchEditorRow[]>([]);
+  protected readonly skeletonRows = [1, 2, 3, 4, 5];
+  protected readonly skeletonCards = [1, 2, 3];
   protected readonly canCreateBranchAdmin = this.branchPermissionService.canCreateBranchAdmin;
   protected readonly selectedContextBranchId = this.branchContextStore.selectedBranchId;
   protected readonly canSelectBranchContext = computed(
@@ -935,7 +936,8 @@ export class LegacyPageComponent implements OnInit, OnDestroy {
       clearTimeout(this.toastTimeoutId);
     }
 
-    this.branchMessage.set({ tone, text });
+    const localizedText = localizeToastMessage(text, this.i18nStore.language());
+    this.branchMessage.set({ tone, text: localizedText });
 
     this.toastTimeoutId = setTimeout(
       () => {

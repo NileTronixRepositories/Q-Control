@@ -4,7 +4,7 @@
   display: flex !important;
   flex-direction: column !important;
   align-items: stretch !important;
-  gap: var(--craft-space-3, 12px);
+  gap: 1rem;
   padding: 1.25rem 2rem !important;
   background: linear-gradient(135deg, #ffffff 0%, #fbfdff 55%, #f1f8fc 100%) !important;
   border: 1px solid #d9e6ee !important;
@@ -121,14 +121,50 @@
   inset-inline-end: 130px !important;
 }
 
+/* Modern icon container with color variants complementing Niletronix Brand Palette */
 .hero-icon-container {
-  width: 44px;
-  height: 44px;
-  font-size: 1.25rem;
-  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
-  color: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(2, 132, 199, 0.25);
+  width: 48px;
+  height: 48px;
+  font-size: 1.35rem;
+  color: #ffffff !important;
+  border-radius: 12px !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Default / Coral Accent (Niletronix Signature Warm Accent) */
+.hero-icon-container,
+.hero-icon-container--coral {
+  background: linear-gradient(135deg, #f22745 0%, #c81330 100%) !important;
+  box-shadow: 0 4px 14px rgba(242, 39, 69, 0.32) !important;
+}
+
+.hero-icon-container--amber {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.3) !important;
+}
+
+.hero-icon-container--emerald {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3) !important;
+}
+
+.hero-icon-container--violet {
+  background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%) !important;
+  box-shadow: 0 4px 14px rgba(139, 92, 246, 0.3) !important;
+}
+
+.hero-icon-container--dark {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.25) !important;
+}
+
+.hero-icon-container--teal {
+  background: linear-gradient(135deg, #0b8aa8 0%, #086f92 100%) !important;
+  box-shadow: 0 4px 14px rgba(11, 138, 168, 0.28) !important;
 }
 
 .hero-eyebrow {
@@ -136,13 +172,14 @@
   font-size: var(--craft-font-size-xs, 0.75rem);
   font-weight: 800;
   line-height: 1.45;
+  color: var(--q-primary, #0b8aa8);
 }
 
 .hero-title {
-  font-size: 1.25rem !important;
-  font-weight: 800;
-  color: #0f172a;
-  line-height: 1.4;
+  font-size: 1.3rem !important;
+  font-weight: 800 !important;
+  color: #0f172a !important;
+  line-height: 1.35;
   margin: 0;
 }
 
@@ -150,4 +187,17 @@
   font-size: 0.85rem;
   color: #64748b;
   line-height: 1.45;
+}
+
+.header-filters {
+  margin-top: 0.25rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid rgba(217, 230, 238, 0.7);
+}
+
+.header-filters:empty {
+  display: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: none !important;
 }

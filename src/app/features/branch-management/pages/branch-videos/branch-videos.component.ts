@@ -21,6 +21,7 @@ import {
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Subscription } from 'rxjs';
 
+import { AppModalComponent } from '../../../../shared/components/app-modal/app-modal.component';
 import { NiletronixLoadingStateComponent } from '../../../../shared/components/niletronix-loading-state/niletronix-loading-state.component';
 import { PageHeroComponent } from '../../../../shared/components/page-hero/page-hero.component';
 import { AuthSessionService } from '../../../auth/services/auth-session/auth-session.service';
@@ -33,7 +34,10 @@ import {
   ReorderBranchVideosRequest,
   VideoProcessingStatus,
 } from '@features/branch-management/models/branch-video/branch-video.model';
-import { BranchListItem, PagedBranchResponse } from '@features/branch-management/models/branch-management/branch-management.model';
+import {
+  BranchListItem,
+  PagedBranchResponse,
+} from '@features/branch-management/models/branch-management/branch-management.model';
 import { BranchManagementApiService } from '@features/branch-management/services/branch-management-api/branch-management-api.service';
 import { BranchPermissionService } from '@features/branch-management/services/branch-permission/branch-permission.service';
 import { BranchVideosApiService } from '@features/branch-management/services/branch-videos-api/branch-videos-api.service';
@@ -60,6 +64,7 @@ interface UiToastMessage {
     RouterLink,
     PageHeroComponent,
     NiletronixLoadingStateComponent,
+    AppModalComponent,
   ],
   templateUrl: './branch-videos.component.html',
   styleUrls: ['./branch-videos.component.scss'],
@@ -233,7 +238,9 @@ export class BranchVideosComponent implements OnInit, OnDestroy {
 
   loadBranches(): void {
     const currentSession = this.authSessionService.currentSession();
-    const activeBranchId = currentSession?.activeBranchId ? Number(currentSession.activeBranchId) : null;
+    const activeBranchId = currentSession?.activeBranchId
+      ? Number(currentSession.activeBranchId)
+      : null;
     const isTechAdmin = currentSession?.userType === 'TechnicalAdmin';
 
     if (!isTechAdmin && activeBranchId) {
@@ -315,10 +322,7 @@ export class BranchVideosComponent implements OnInit, OnDestroy {
         this.stopPolling();
         if (!silent) {
           this.showMessage(
-            formatApiError(
-              err,
-              this.isAr() ? 'فشل تحميل الفيديوهات' : 'Failed to load videos',
-            ),
+            formatApiError(err, this.isAr() ? 'فشل تحميل الفيديوهات' : 'Failed to load videos'),
             'error',
           );
         }
@@ -411,10 +415,7 @@ export class BranchVideosComponent implements OnInit, OnDestroy {
       error: (err: HttpErrorResponse) => {
         this.isSubmitting.set(false);
         this.showMessage(
-          formatApiError(
-            err,
-            this.isAr() ? 'فشل رفع الفيديو' : 'Failed to upload video',
-          ),
+          formatApiError(err, this.isAr() ? 'فشل رفع الفيديو' : 'Failed to upload video'),
           'error',
         );
         if (err.status === 409) {
@@ -470,10 +471,7 @@ export class BranchVideosComponent implements OnInit, OnDestroy {
       error: (err: HttpErrorResponse) => {
         this.isSubmitting.set(false);
         this.showMessage(
-          formatApiError(
-            err,
-            this.isAr() ? 'فشل إعادة الترتيب' : 'Failed to reorder videos',
-          ),
+          formatApiError(err, this.isAr() ? 'فشل إعادة الترتيب' : 'Failed to reorder videos'),
           'error',
         );
         this.loadVideos(branchId);
@@ -497,10 +495,7 @@ export class BranchVideosComponent implements OnInit, OnDestroy {
         error: (err: HttpErrorResponse) => {
           this.isSubmitting.set(false);
           this.showMessage(
-            formatApiError(
-              err,
-              this.isAr() ? 'فشل إلغاء التفعيل' : 'Failed to deactivate video',
-            ),
+            formatApiError(err, this.isAr() ? 'فشل إلغاء التفعيل' : 'Failed to deactivate video'),
             'error',
           );
           if (err.status === 409 || err.status === 412) {
@@ -521,10 +516,7 @@ export class BranchVideosComponent implements OnInit, OnDestroy {
         error: (err: HttpErrorResponse) => {
           this.isSubmitting.set(false);
           this.showMessage(
-            formatApiError(
-              err,
-              this.isAr() ? 'فشل تفعيل الفيديو' : 'Failed to reactivate video',
-            ),
+            formatApiError(err, this.isAr() ? 'فشل تفعيل الفيديو' : 'Failed to reactivate video'),
             'error',
           );
           if (err.status === 409 || err.status === 412) {
@@ -590,10 +582,7 @@ export class BranchVideosComponent implements OnInit, OnDestroy {
           this.isSubmitting.set(false);
           this.videoToDelete.set(null);
           this.showMessage(
-            formatApiError(
-              err,
-              this.isAr() ? 'فشل الحذف النهائي' : 'Failed to delete video',
-            ),
+            formatApiError(err, this.isAr() ? 'فشل الحذف النهائي' : 'Failed to delete video'),
             'error',
           );
           this.loadVideos(branchId);
@@ -632,10 +621,7 @@ export class BranchVideosComponent implements OnInit, OnDestroy {
       error: (err: HttpErrorResponse) => {
         this.playlistLoading.set(false);
         this.showMessage(
-          formatApiError(
-            err,
-            this.isAr() ? 'فشل تحميل قائمة التشغيل' : 'Failed to load playlist',
-          ),
+          formatApiError(err, this.isAr() ? 'فشل تحميل قائمة التشغيل' : 'Failed to load playlist'),
           'error',
         );
       },

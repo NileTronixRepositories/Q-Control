@@ -28,7 +28,11 @@
 }
 
 .modal-container {
-  position: relative;
+  position: relative !important;
+  top: auto !important;
+  left: auto !important;
+  right: auto !important;
+  bottom: auto !important;
   width: 100%;
   max-height: calc(92vh);
   display: flex;
@@ -41,7 +45,7 @@
     0 0 0 1px rgba(0, 0, 0, 0.04);
   border: 1px solid #e2e8f0;
   animation: modalScaleIn 0.22s cubic-bezier(0.16, 1, 0.3, 1);
-  margin: auto;
+  margin: auto !important;
 }
 
 @keyframes modalScaleIn {

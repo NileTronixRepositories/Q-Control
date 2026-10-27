@@ -172,8 +172,14 @@ export class ServiceRequestStore {
       });
   }
 
+  private currentBranchId: number | null = null;
+
   loadServices(branchId?: number, silent = false): void {
-    const targetBranchId = branchId ?? this.authSessionService.activeSession()?.activeBranchId ?? 1;
+    if (branchId !== undefined) {
+      this.currentBranchId = branchId;
+    }
+    const targetBranchId =
+      this.currentBranchId ?? this.authSessionService.activeSession()?.activeBranchId ?? 1;
     if (!silent) {
       this.loadingServicesSignal.set(true);
       this.errorLoadingServicesSignal.set(false);

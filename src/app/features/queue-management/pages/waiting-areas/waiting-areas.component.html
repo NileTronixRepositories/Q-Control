@@ -7,30 +7,50 @@
     [eyebrow]="translations().branch"
     [title]="translations().title"
     [description]="translations().description"
-    icon="bi bi-people-fill"
+    icon="fa-solid fa-chair"
+    iconVariant="emerald"
   >
     <button hero-actions type="button" class="primary-action" (click)="openCreate()">
-      <i class="bi bi-plus-lg" aria-hidden="true"></i>
+      <i class="fa-solid fa-plus" aria-hidden="true"></i>
       <span class="text-white">{{ translations().addButton }}</span>
     </button>
     <div hero-filters class="w-100">
       <div class="row g-3 align-items-end" data-testid="waiting-areas-filters">
         <div class="col-12 col-xl-4">
           <label class="filter-field w-100">
-            <span>{{ translations().searchPlaceholder }}</span>
+            <span class="d-flex align-items-center gap-2">
+              <span class="q-field-icon-badge q-field-icon-badge--indigo">
+                <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+              </span>
+              {{ translations().searchPlaceholder }}
+            </span>
             <div class="search-input-wrapper">
-              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-              </svg>
-              <input class="form-control" type="search" [value]="search()" [placeholder]="translations().searchPlaceholder" (input)="updateSearch($event)" />
+              <i class="fa-solid fa-magnifying-glass search-icon" aria-hidden="true"></i>
+              <input
+                class="form-control"
+                type="search"
+                [value]="search()"
+                [placeholder]="translations().searchPlaceholder"
+                (input)="updateSearch($event)"
+              />
             </div>
           </label>
         </div>
         <div class="col-12 col-md-6 col-xl-3">
           <label class="filter-field">
-            <span>{{ translations().branchFilter }}</span>
-            <!-- <i class="bi bi-building filter-icon" aria-hidden="true"></i> -->
-            <select data-testid="waiting-areas-branch-filter" class="form-select" [value]="selectedBranchId() ?? ''" [disabled]="isBranchContextLocked()" (change)="updateBranchFilter($event)">
+            <span class="d-flex align-items-center gap-2">
+              <span class="q-field-icon-badge q-field-icon-badge--violet">
+                <i class="fa-solid fa-building" aria-hidden="true"></i>
+              </span>
+              {{ translations().branchFilter }}
+            </span>
+            <select
+              data-testid="waiting-areas-branch-filter"
+              class="form-select"
+              [value]="selectedBranchId() ?? ''"
+              [disabled]="isBranchContextLocked()"
+              (change)="updateBranchFilter($event)"
+            >
               <option value="">{{ translations().allBranches }}</option>
               @for (branch of branchOptions(); track branch.id) {
                 <option [value]="branch.id">{{ optionName(branch) }}</option>
@@ -40,9 +60,17 @@
         </div>
         <div class="col-12 col-md-6 col-xl-2">
           <label class="filter-field">
-            <span>{{ translations().status }}</span>
-            <!-- <i class="bi bi-check2-circle filter-icon pe-2" aria-hidden="true"></i> -->
-            <select class="form-select" [value]="statusFilter() === null ? '' : statusFilter()" (change)="updateStatusFilter($event)">
+            <span class="d-flex align-items-center gap-2">
+              <span class="q-field-icon-badge q-field-icon-badge--emerald">
+                <i class="fa-solid fa-toggle-on" aria-hidden="true"></i>
+              </span>
+              {{ translations().status }}
+            </span>
+            <select
+              class="form-select"
+              [value]="statusFilter() === null ? '' : statusFilter()"
+              (change)="updateStatusFilter($event)"
+            >
               <option value="">{{ translations().allStatuses }}</option>
               <option value="true">{{ translations().active }}</option>
               <option value="false">{{ translations().inactive }}</option>
@@ -51,8 +79,12 @@
         </div>
         <div class="col-12 col-sm-6 col-md-4 col-xl-1">
           <label class="filter-field">
-            <span>{{ translations().pageSize }}</span>
-            <!-- <i class="bi bi-list-ul filter-icon" aria-hidden="true"></i> -->
+            <span class="d-flex align-items-center gap-2">
+              <span class="q-field-icon-badge q-field-icon-badge--amber">
+                <i class="fa-solid fa-list-ol" aria-hidden="true"></i>
+              </span>
+              {{ translations().pageSize }}
+            </span>
             <select class="form-select" [value]="pageSize()" (change)="updatePageSize($event)">
               <option value="10">10</option>
               <option value="25">25</option>
@@ -62,8 +94,18 @@
           </label>
         </div>
         <div class="col-12 col-sm-6 col-md-4 col-xl-2 d-grid">
-          <button type="button" class="btn secondary-action w-100" [disabled]="loading()" (click)="refresh()">
-            <i class="bi bi-arrow-repeat" aria-hidden="true"></i>
+          <button
+            type="button"
+            class="btn secondary-action w-100"
+            [disabled]="loading()"
+            (click)="refresh()"
+          >
+            <i
+              class="fa-solid fa-arrows-rotate"
+              style="color: #059669"
+              [class.spin]="loading()"
+              aria-hidden="true"
+            ></i>
             <span>{{ translations().refresh }}</span>
           </button>
         </div>
@@ -159,7 +201,7 @@
                         [title]="translations().view"
                         (click)="openView(item.id)"
                       >
-                        <i class="bi bi-eye" aria-hidden="true"></i>
+                        <i class="fa-solid fa-eye" aria-hidden="true"></i>
                       </button>
                       <button
                         type="button"
@@ -179,7 +221,7 @@
                           [disabled]="deletingId() === item.id"
                           (click)="deactivateWaitingArea(item)"
                         >
-                          <i class="bi bi-power" aria-hidden="true"></i>
+                          <i class="fa-solid fa-power-off" aria-hidden="true"></i>
                         </button>
                       } @else {
                         <button
@@ -190,7 +232,7 @@
                           [disabled]="deletingId() === item.id"
                           (click)="reactivateWaitingArea(item)"
                         >
-                          <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
+                          <i class="fa-solid fa-rotate-left" aria-hidden="true"></i>
                         </button>
                         <button
                           type="button"
@@ -200,7 +242,7 @@
                           [disabled]="deletingId() === item.id"
                           (click)="permanentlyDeleteWaitingArea(item)"
                         >
-                          <i class="bi bi-trash3" aria-hidden="true"></i>
+                          <i class="fa-solid fa-trash-can" aria-hidden="true"></i>
                         </button>
                       }
                     </div>
@@ -216,7 +258,7 @@
             <app-mobile-record-card
               [eyebrow]="translations().number"
               [title]="textOrFallback(item.descriptiveName)"
-              icon="bi bi-hourglass-split"
+              icon="fa-solid fa-chair"
               [recordId]="item.number"
             >
               <span
@@ -259,7 +301,7 @@
                 [title]="translations().view"
                 (click)="openView(item.id)"
               >
-                <i class="bi bi-eye" aria-hidden="true"></i>
+                <i class="fa-solid fa-eye" aria-hidden="true"></i>
               </button>
               <button
                 record-actions
@@ -269,7 +311,7 @@
                 [title]="translations().edit"
                 (click)="openEdit(item.id)"
               >
-                <i class="bi bi-pencil" aria-hidden="true"></i>
+                <i class="fa-solid fa-pen-to-square" aria-hidden="true"></i>
               </button>
               @if (item.isActive) {
                 <button
@@ -281,7 +323,7 @@
                   [disabled]="deletingId() === item.id"
                   (click)="deactivateWaitingArea(item)"
                 >
-                  <i class="bi bi-power" aria-hidden="true"></i>
+                  <i class="fa-solid fa-power-off" aria-hidden="true"></i>
                 </button>
               } @else {
                 <ng-container record-actions>
@@ -293,7 +335,7 @@
                     [disabled]="deletingId() === item.id"
                     (click)="reactivateWaitingArea(item)"
                   >
-                    <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
+                    <i class="fa-solid fa-rotate-left" aria-hidden="true"></i>
                   </button>
                   <button
                     type="button"
@@ -303,7 +345,7 @@
                     [disabled]="deletingId() === item.id"
                     (click)="permanentlyDeleteWaitingArea(item)"
                   >
-                    <i class="bi bi-trash3" aria-hidden="true"></i>
+                    <i class="fa-solid fa-trash-can" aria-hidden="true"></i>
                   </button>
                 </ng-container>
               }
@@ -316,7 +358,7 @@
             class="admin-list-empty-icon d-inline-flex align-items-center justify-content-center flex-shrink-0"
             aria-hidden="true"
           >
-            <i class="bi bi-hourglass-split"></i>
+            <i class="fa-solid fa-chair"></i>
           </span>
           <div class="d-grid gap-1">
             <h2>{{ translations().emptyTitle }}</h2>
@@ -340,7 +382,12 @@
             [disabled]="!waitingAreaPage().hasPreviousPage || loading()"
             (click)="previousPage()"
           >
-            <i class="bi bi-chevron-left" aria-hidden="true"></i>
+            <i
+              class="bi"
+              [class.bi-chevron-right]="direction() === 'rtl'"
+              [class.bi-chevron-left]="direction() !== 'rtl'"
+              aria-hidden="true"
+            ></i>
             <span>{{ translations().previous }}</span>
           </button>
           <span class="page-indicator"
@@ -353,169 +400,367 @@
             (click)="nextPage()"
           >
             <span>{{ translations().next }}</span>
-            <i class="bi bi-chevron-right" aria-hidden="true"></i>
+            <i
+              class="bi"
+              [class.bi-chevron-left]="direction() === 'rtl'"
+              [class.bi-chevron-right]="direction() !== 'rtl'"
+              aria-hidden="true"
+            ></i>
           </button>
         </div>
       </footer>
     </div>
-
-    @if (panelMode() !== 'closed') {
-      <div class="editor-backdrop app-popup-overlay" (click)="closePanel()"></div>
-      <aside
-        class="editor-panel app-popup-panel waiting-area-editor-panel"
-        role="dialog"
-        [attr.aria-label]="formTitle()"
-      >
-        <header class="panel-header">
-          <h2>{{ formTitle() }}</h2>
-          <button
-            type="button"
-            class="icon-action"
-            [attr.aria-label]="translations().close"
-            (click)="closePanel()"
-          >
-            <i class="bi bi-x-lg" aria-hidden="true"></i>
-          </button>
-        </header>
-
-        @if (panelLoading()) {
-          <app-niletronix-loading-state
-            [title]="translations().loading"
-            variant="inline"
-            size="sm"
-          />
-        }
-
-        @if (panelMode() === 'view' && selectedDetails(); as details) {
-          <dl class="details-list">
-            <div>
-              <dt>{{ translations().number }}</dt>
-              <dd>{{ details.number }}</dd>
-            </div>
-            <div>
-              <dt>{{ translations().descriptiveName }}</dt>
-              <dd>{{ textOrFallback(details.descriptiveName) }}</dd>
-            </div>
-            <div>
-              <dt>{{ translations().branch }}</dt>
-              <dd>{{ branchName(details) }}</dd>
-            </div>
-            <div>
-              <dt>{{ translations().audioDevice }}</dt>
-              <dd>{{ textOrFallback(details.audioDevice) }}</dd>
-            </div>
-            <div>
-              <dt>{{ translations().controlDevice }}</dt>
-              <dd>{{ textOrFallback(details.controlDevice) }}</dd>
-            </div>
-          </dl>
-        }
-
-        @if (panelMode() === 'create' || panelMode() === 'edit') {
-          <form
-            class="waiting-area-form row g-3"
-            [formGroup]="waitingAreaForm"
-            (ngSubmit)="save()"
-            novalidate
-          >
-            <div class="col-12">
-              <label class="form-field has-field-icon w-100">
-                <span>{{ translations().branch }}</span>
-                <i class="bi bi-diagram-3 form-field-icon" aria-hidden="true"></i>
-                <select
-                  class="form-select"
-                  formControlName="branchId"
-                  [class.is-invalid]="hasFieldError('branchId')"
-                  [disabled]="panelMode() === 'edit' || isBranchContextLocked()"
-                >
-                  <option [ngValue]="0">{{ translations().selectBranch }}</option>
-                  @for (branch of branchOptions(); track branch.id) {
-                    <option [ngValue]="branch.id">{{ optionName(branch) }}</option>
-                  }
-                </select>
-                @if (hasFieldError('branchId')) {
-                  <small>{{ translations().requiredField }}</small>
-                }
-              </label>
-            </div>
-            <div class="col-12 col-md-6">
-              <label class="form-field has-field-icon w-100">
-                <span>{{ translations().number }}</span>
-                <i class="bi bi-hash form-field-icon" aria-hidden="true"></i>
-                <input
-                  class="form-control"
-                  type="number"
-                  formControlName="number"
-                  [class.is-invalid]="hasFieldError('number') || !isFormNumberValid()"
-                />
-                @if (hasFieldError('number') || !isFormNumberValid()) {
-                  <small>{{ translations().positiveNumber }}</small>
-                }
-              </label>
-            </div>
-            <div class="col-12 col-md-6">
-              <label class="form-field has-field-icon w-100">
-                <span>{{ translations().descriptiveName }}</span>
-                <i class="bi bi-card-text form-field-icon" aria-hidden="true"></i>
-                <input
-                  class="form-control"
-                  type="text"
-                  maxlength="100"
-                  formControlName="descriptiveName"
-                  [class.is-invalid]="hasFieldError('descriptiveName')"
-                />
-                @if (hasFieldError('descriptiveName')) {
-                  <small>{{ translations().maxLength }}</small>
-                }
-              </label>
-            </div>
-            <div class="col-12 col-md-6">
-              <label class="form-field has-field-icon w-100">
-                <span>{{ translations().audioDevice }}</span>
-                <i class="bi bi-volume-up form-field-icon" aria-hidden="true"></i>
-                <input
-                  class="form-control"
-                  type="text"
-                  maxlength="100"
-                  formControlName="audioDevice"
-                  [class.is-invalid]="hasFieldError('audioDevice')"
-                />
-                @if (hasFieldError('audioDevice')) {
-                  <small>{{ translations().maxLength }}</small>
-                }
-              </label>
-            </div>
-            <div class="col-12 col-md-6">
-              <label class="form-field has-field-icon w-100">
-                <span>{{ translations().controlDevice }}</span>
-                <i class="bi bi-cpu form-field-icon" aria-hidden="true"></i>
-                <input
-                  class="form-control"
-                  type="text"
-                  maxlength="100"
-                  formControlName="controlDevice"
-                  [class.is-invalid]="hasFieldError('controlDevice')"
-                />
-                @if (hasFieldError('controlDevice')) {
-                  <small>{{ translations().maxLength }}</small>
-                }
-              </label>
-            </div>
-            <div
-              class="panel-actions col-12 d-flex flex-column flex-sm-row justify-content-end gap-2"
-            >
-              <button type="button" class="btn secondary-action" (click)="closePanel()">
-                <i class="bi bi-x-lg" aria-hidden="true"></i>
-                <span>{{ translations().cancel }}</span>
-              </button>
-              <button type="submit" class="btn primary-action" [disabled]="saving()">
-                <i class="bi bi-check2" aria-hidden="true"></i>
-                <span>{{ translations().save }}</span>
-              </button>
-            </div>
-          </form>
-        }
-      </aside>
-    }
   </section>
+
+  <app-modal
+    [isOpen]="panelMode() !== 'closed'"
+    [title]="formTitle()"
+    [subtitle]="formSubtitle()"
+    [size]="'lg'"
+    icon="fa-solid fa-chair"
+    [direction]="direction()"
+    [loading]="panelLoading()"
+    [closeLabel]="translations().close"
+    (closed)="closePanel()"
+  >
+    <div modal-body>
+      @if (panelMode() === 'view' && selectedDetails(); as details) {
+        <div class="q-detail-sections">
+          <!-- Card 1: Core Waiting Area Data -->
+          <div class="q-dialog-card mb-3">
+            <div class="q-dialog-card-header">
+              <div class="d-flex align-items-center gap-3">
+                <span class="q-dialog-card-icon q-dialog-card-icon--teal">
+                  <i class="bi bi-info-circle-fill" aria-hidden="true"></i>
+                </span>
+                <div>
+                  <h4 class="q-dialog-card-title m-0">{{ translations().areaInfoSection }}</h4>
+                  <p class="q-dialog-card-subtitle m-0 text-muted">{{ formSubtitle() }}</p>
+                </div>
+              </div>
+              <div class="d-flex align-items-center gap-2">
+                <span
+                  class="q-detail-pill"
+                  [class.q-detail-pill--active]="details.isActive"
+                  [class.q-detail-pill--inactive]="!details.isActive"
+                >
+                  <span class="status-dot" aria-hidden="true"></span>
+                  {{ statusLabel(details) }}
+                </span>
+                @if (showOperationalWarning(details)) {
+                  <span
+                    class="badge rounded-pill bg-warning-subtle text-warning border border-warning-subtle d-inline-flex align-items-center gap-1"
+                    [title]="translations().operationalUnavailable"
+                  >
+                    <i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>
+                    <span>{{ translations().operationalStatus }}</span>
+                  </span>
+                }
+              </div>
+            </div>
+
+            <div class="q-dialog-card-body">
+              <div class="row g-3">
+                <div class="col-12 col-md-4">
+                  <div class="q-detail-item">
+                    <span class="q-detail-label">
+                      <span class="q-field-icon-badge q-field-icon-badge--teal">
+                        <i class="bi bi-hash"></i>
+                      </span>
+                      <span>{{ translations().number }}</span>
+                    </span>
+                    <span class="q-detail-value font-monospace">#{{ details.number }}</span>
+                  </div>
+                </div>
+
+                <div class="col-12 col-md-4">
+                  <div class="q-detail-item">
+                    <span class="q-detail-label">
+                      <span class="q-field-icon-badge q-field-icon-badge--sky">
+                        <i class="bi bi-card-text"></i>
+                      </span>
+                      <span>{{ translations().descriptiveName }}</span>
+                    </span>
+                    <span class="q-detail-value">{{
+                      textOrFallback(details.descriptiveName)
+                    }}</span>
+                  </div>
+                </div>
+
+                <div class="col-12 col-md-4">
+                  <div class="q-detail-item">
+                    <span class="q-detail-label">
+                      <span class="q-field-icon-badge q-field-icon-badge--violet">
+                        <i class="bi bi-building"></i>
+                      </span>
+                      <span>{{ translations().branch }}</span>
+                    </span>
+                    <span class="q-detail-value">{{ branchName(details) }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 2: Devices & Service Windows -->
+          <div class="q-dialog-card mb-2">
+            <div class="q-dialog-card-header">
+              <div class="d-flex align-items-center gap-3">
+                <span class="q-dialog-card-icon q-dialog-card-icon--cyan">
+                  <i class="bi bi-cpu-fill" aria-hidden="true"></i>
+                </span>
+                <div>
+                  <h4 class="q-dialog-card-title m-0">{{ translations().devicesSection }}</h4>
+                  <p class="q-dialog-card-subtitle m-0 text-muted">
+                    {{ translations().description }}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div class="q-dialog-card-body">
+              <div class="row g-3">
+                <div class="col-12 col-md-4">
+                  <div class="q-detail-item">
+                    <span class="q-detail-label">
+                      <span class="q-field-icon-badge q-field-icon-badge--emerald">
+                        <i class="bi bi-speaker-fill"></i>
+                      </span>
+                      <span>{{ translations().audioDevice }}</span>
+                    </span>
+                    <span class="q-detail-value" dir="ltr">{{
+                      textOrFallback(details.audioDevice)
+                    }}</span>
+                  </div>
+                </div>
+
+                <div class="col-12 col-md-4">
+                  <div class="q-detail-item">
+                    <span class="q-detail-label">
+                      <span class="q-field-icon-badge q-field-icon-badge--amber">
+                        <i class="bi bi-motherboard-fill"></i>
+                      </span>
+                      <span>{{ translations().controlDevice }}</span>
+                    </span>
+                    <span class="q-detail-value" dir="ltr">{{
+                      textOrFallback(details.controlDevice)
+                    }}</span>
+                  </div>
+                </div>
+
+                <div class="col-12 col-md-4">
+                  <div class="q-detail-item">
+                    <span class="q-detail-label">
+                      <span class="q-field-icon-badge q-field-icon-badge--teal">
+                        <i class="bi bi-window-stack"></i>
+                      </span>
+                      <span>{{ translations().windowsCount }}</span>
+                    </span>
+                    <span class="q-detail-value font-monospace">{{ details.windowsCount }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+
+      @if (panelMode() === 'create' || panelMode() === 'edit') {
+        <form id="waitingAreaForm" [formGroup]="waitingAreaForm" (ngSubmit)="save()" novalidate>
+          <div class="q-dialog-card mb-2">
+            <div class="q-dialog-card-header">
+              <div class="d-flex align-items-center gap-3">
+                <span class="q-dialog-card-icon q-dialog-card-icon--teal">
+                  <i class="bi bi-diagram-3-fill" aria-hidden="true"></i>
+                </span>
+                <div>
+                  <h4 class="q-dialog-card-title m-0">{{ formTitle() }}</h4>
+                  <p class="q-dialog-card-subtitle m-0 text-muted">{{ formSubtitle() }}</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="q-dialog-card-body">
+              <div class="row g-3">
+                <div class="col-12">
+                  <div class="q-field">
+                    <label class="q-field-label">
+                      <span class="q-field-icon-badge q-field-icon-badge--teal">
+                        <i class="bi bi-diagram-3"></i>
+                      </span>
+                      <span>{{ translations().branch }}</span>
+                      <span class="q-field-required">*</span>
+                    </label>
+                    <select
+                      class="form-select"
+                      formControlName="branchId"
+                      [class.is-invalid]="hasFieldError('branchId')"
+                      [disabled]="panelMode() === 'edit' || isBranchContextLocked()"
+                    >
+                      <option [ngValue]="0">{{ translations().selectBranch }}</option>
+                      @for (branch of branchOptions(); track branch.id) {
+                        <option [ngValue]="branch.id">{{ optionName(branch) }}</option>
+                      }
+                    </select>
+                    @if (hasFieldError('branchId')) {
+                      <small class="text-danger mt-1 d-block">{{
+                        translations().requiredField
+                      }}</small>
+                    }
+                  </div>
+                </div>
+
+                <div class="col-12 col-md-6">
+                  <div class="q-field">
+                    <label class="q-field-label">
+                      <span class="q-field-icon-badge q-field-icon-badge--sky">
+                        <i class="bi bi-hash"></i>
+                      </span>
+                      <span>{{ translations().number }}</span>
+                      <span class="q-field-required">*</span>
+                    </label>
+                    <input
+                      class="form-control"
+                      type="number"
+                      formControlName="number"
+                      [class.is-invalid]="hasFieldError('number') || !isFormNumberValid()"
+                    />
+                    @if (hasFieldError('number') || !isFormNumberValid()) {
+                      <small class="text-danger mt-1 d-block">{{
+                        translations().positiveNumber
+                      }}</small>
+                    }
+                  </div>
+                </div>
+
+                <div class="col-12 col-md-6">
+                  <div class="q-field">
+                    <label class="q-field-label">
+                      <span class="q-field-icon-badge q-field-icon-badge--amber">
+                        <i class="bi bi-card-text"></i>
+                      </span>
+                      <span>{{ translations().descriptiveName }}</span>
+                    </label>
+                    <input
+                      class="form-control"
+                      type="text"
+                      maxlength="100"
+                      formControlName="descriptiveName"
+                      [class.is-invalid]="hasFieldError('descriptiveName')"
+                    />
+                    @if (hasFieldError('descriptiveName')) {
+                      <small class="text-danger mt-1 d-block">{{ translations().maxLength }}</small>
+                    }
+                  </div>
+                </div>
+
+                <div class="col-12 col-md-6">
+                  <div class="q-field">
+                    <label class="q-field-label">
+                      <span class="q-field-icon-badge q-field-icon-badge--emerald">
+                        <i class="bi bi-volume-up"></i>
+                      </span>
+                      <span>{{ translations().audioDevice }}</span>
+                    </label>
+                    <input
+                      class="form-control"
+                      type="text"
+                      maxlength="100"
+                      formControlName="audioDevice"
+                      [class.is-invalid]="hasFieldError('audioDevice')"
+                    />
+                    @if (hasFieldError('audioDevice')) {
+                      <small class="text-danger mt-1 d-block">{{ translations().maxLength }}</small>
+                    }
+                  </div>
+                </div>
+
+                <div class="col-12 col-md-6">
+                  <div class="q-field">
+                    <label class="q-field-label">
+                      <span class="q-field-icon-badge q-field-icon-badge--violet">
+                        <i class="bi bi-cpu"></i>
+                      </span>
+                      <span>{{ translations().controlDevice }}</span>
+                    </label>
+                    <input
+                      class="form-control"
+                      type="text"
+                      maxlength="100"
+                      formControlName="controlDevice"
+                      [class.is-invalid]="hasFieldError('controlDevice')"
+                    />
+                    @if (hasFieldError('controlDevice')) {
+                      <small class="text-danger mt-1 d-block">{{ translations().maxLength }}</small>
+                    }
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      }
+    </div>
+
+    <div modal-footer class="d-flex align-items-center gap-2">
+      @if (panelMode() === 'view') {
+        <button type="button" class="q-btn q-btn--secondary" (click)="closePanel()">
+          <svg
+            width="13"
+            height="13"
+            viewBox="0 0 16 16"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M12 4L4 12M4 4l8 8" />
+          </svg>
+          <span>{{ translations().close }}</span>
+        </button>
+      }
+      @if (panelMode() === 'create' || panelMode() === 'edit') {
+        <button type="button" class="q-btn q-btn--secondary" (click)="closePanel()">
+          <svg
+            width="13"
+            height="13"
+            viewBox="0 0 16 16"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M12 4L4 12M4 4l8 8" />
+          </svg>
+          <span>{{ translations().cancel }}</span>
+        </button>
+        <button
+          type="submit"
+          form="waitingAreaForm"
+          class="q-btn q-btn--primary"
+          [disabled]="saving()"
+        >
+          @if (saving()) {
+            <div class="spinner-border spinner-border-sm" role="status"></div>
+          } @else {
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 16 16"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M3 8.5l3.5 3.5 7-7" />
+            </svg>
+          }
+          <span>{{ translations().save }}</span>
+        </button>
+      }
+    </div>
+  </app-modal>
 </section>

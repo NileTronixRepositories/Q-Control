@@ -7,35 +7,14 @@
     [eyebrow]="copy().pageEyebrow"
     [title]="copy().pageTitle"
     [description]="copy().pageDescription"
-    icon="bi bi-vector-pen"
+    icon="fa-solid fa-palette"
+    iconVariant="violet"
   >
     <div hero-actions class="d-flex align-items-center gap-2 flex-wrap">
       @if (isTechnicalAdmin() && branches().length > 1) {
         <div class="branch-select-wrapper">
           <div class="branch-icon-badge bi-buildings" aria-hidden="true">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="17"
-              height="17"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <rect width="16" height="20" x="4" y="2" rx="2" ry="2"/>
-              <path d="M9 22v-4h6v4"/>
-              <path d="M8 6h.01"/>
-              <path d="M16 6h.01"/>
-              <path d="M12 6h.01"/>
-              <path d="M12 10h.01"/>
-              <path d="M12 14h.01"/>
-              <path d="M16 10h.01"/>
-              <path d="M16 14h.01"/>
-              <path d="M8 10h.01"/>
-              <path d="M8 14h.01"/>
-            </svg>
+            <i class="fa-solid fa-building"></i>
           </div>
           <label class="visually-hidden" for="branchBrandingBranch">{{ copy().branchLabel }}</label>
           <select
@@ -58,29 +37,7 @@
       } @else if (selectedBranchId()) {
         <div class="branch-select-wrapper static-badge">
           <div class="branch-icon-badge bi-buildings" aria-hidden="true">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="17"
-              height="17"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <rect width="16" height="20" x="4" y="2" rx="2" ry="2"/>
-              <path d="M9 22v-4h6v4"/>
-              <path d="M8 6h.01"/>
-              <path d="M16 6h.01"/>
-              <path d="M12 6h.01"/>
-              <path d="M12 10h.01"/>
-              <path d="M12 14h.01"/>
-              <path d="M16 10h.01"/>
-              <path d="M16 14h.01"/>
-              <path d="M8 10h.01"/>
-              <path d="M8 14h.01"/>
-            </svg>
+            <i class="fa-solid fa-building"></i>
           </div>
           <span class="fw-bold text-dark px-2 small">{{ selectedBranchLabel() }}</span>
         </div>
@@ -93,13 +50,29 @@
         [attr.title]="copy().refreshLabel"
         (click)="refreshSelectedBranch()"
       >
-        <i class="bi bi-arrow-clockwise" [class.spin]="brandingLoading()" aria-hidden="true"></i>
+        <i
+          class="fa-solid fa-arrows-rotate"
+          style="color: #059669"
+          [class.spin]="brandingLoading()"
+          aria-hidden="true"
+        ></i>
         <span>{{ copy().refreshLabel }}</span>
+      </button>
+
+      <button
+        type="button"
+        class="btn btn-primary d-inline-flex align-items-center gap-2 branding-preview-action"
+        [disabled]="!selectedBranchId()"
+        [attr.title]="copy().previewKioskLabel"
+        (click)="openKioskPreview()"
+      >
+        <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>
+        <span>{{ copy().previewKioskLabel }}</span>
       </button>
     </div>
   </app-page-hero>
 
-  @if (message(); as currentMessage) {
+  @if (activeMessage(); as currentMessage) {
     <div class="toast-stack" role="status" aria-live="polite" aria-atomic="true">
       <div
         class="toast-item"
@@ -108,15 +81,21 @@
         [class.toast-info]="currentMessage.tone === 'info'"
       >
         <i
-          class="bi"
-          [class.bi-check-circle-fill]="currentMessage.tone === 'success'"
-          [class.bi-x-octagon-fill]="currentMessage.tone === 'error'"
-          [class.bi-info-circle-fill]="currentMessage.tone === 'info'"
+          class="fa-solid"
+          [class.fa-circle-check]="currentMessage.tone === 'success'"
+          [class.fa-circle-xmark]="currentMessage.tone === 'error'"
+          [class.fa-circle-info]="currentMessage.tone === 'info'"
           aria-hidden="true"
         ></i>
         <p>{{ currentMessage.text }}</p>
-        <button type="button" class="toast-close" (click)="clearMessage()" aria-label="Close">
-          <i class="bi bi-x-lg" aria-hidden="true"></i>
+        <button
+          type="button"
+          class="toast-close"
+          (click)="clearMessage()"
+          [attr.aria-label]="copy().close"
+          [attr.title]="copy().close"
+        >
+          <i class="fa-solid fa-xmark" aria-hidden="true"></i>
         </button>
       </div>
     </div>
@@ -130,7 +109,7 @@
   }
 
   @if (branchesLoading()) {
-    <app-niletronix-loading-state [title]="copy().loading" variant="inline" size="sm" />
+    <app-niletronix-loading-state [title]="copy().loading" variant="skeleton" size="sm" />
   }
 
   @if (selectedBranchId()) {
@@ -138,13 +117,26 @@
       <!-- MAIN IDENTITY FORM & LOGO -->
       <form class="branding-theme-form" [formGroup]="themeForm" (ngSubmit)="saveTheme()" novalidate>
         <div class="row g-4">
-          <!-- TOP ROW: LOGO (col-lg-4) & COLORS + BEHAVIOR (col-lg-8) -->
+          <!-- TOP ROW: LOGO (col-lg-4 col-md-5) & COLORS + BEHAVIOR (col-lg-8 col-md-7) -->
           <div class="col-lg-4 col-md-5">
             <!-- Branch Logo Panel -->
             <div class="card config-panel h-100 shadow-sm">
-              <div class="panel-header d-flex align-items-center gap-2">
-                <span class="panel-icon"><i class="bi bi-image"></i></span>
-                <h5 class="panel-title m-0">{{ copy().logoLabel }}</h5>
+              <div class="panel-header d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center gap-2">
+                  <span class="panel-icon"><i class="bi bi-image"></i></span>
+                  <h5 class="panel-title m-0">{{ copy().logoLabel }}</h5>
+                </div>
+
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-1"
+                  [disabled]="!selectedBranchId()"
+                  [attr.title]="copy().previewKioskLabel"
+                  (click)="openKioskPreview()"
+                >
+                  <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>
+                  <span class="d-none d-sm-inline">{{ copy().previewKioskLabel }}</span>
+                </button>
               </div>
               <div class="panel-body p-3 p-xl-4 d-flex flex-column gap-3">
                 <div
@@ -181,6 +173,17 @@
                     title="Background Color"
                   ></span>
                 </div>
+
+                <!-- Preview Kiosk in New Tab Button -->
+                <button
+                  type="button"
+                  class="btn btn-outline-primary w-100 d-inline-flex align-items-center justify-content-center gap-2"
+                  [disabled]="!selectedBranchId()"
+                  (click)="openKioskPreview()"
+                >
+                  <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>
+                  <span>{{ copy().previewKioskLabel }}</span>
+                </button>
 
                 <small class="text-muted d-flex align-items-center gap-1">
                   <i class="bi bi-info-circle text-primary"></i>
@@ -239,7 +242,7 @@
             </div>
           </div>
 
-          <!-- TOP ROW RIGHT: GENERAL COLORS & BEHAVIOR (col-lg-8) -->
+          <!-- TOP ROW RIGHT: GENERAL COLORS & BEHAVIOR (col-lg-8 col-md-7) -->
           <div class="col-lg-8 col-md-7 d-flex flex-column gap-4">
             <!-- SECTION A: General Colors -->
             <div class="card config-panel shadow-sm">

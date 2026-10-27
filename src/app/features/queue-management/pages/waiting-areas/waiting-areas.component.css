@@ -1,7 +1,21 @@
-﻿:host {
+:host {
   display: block;
 }
 
-.waiting-area-editor-panel {
-  --q-popup-width: min(720px, calc(100dvw - 96px));
+.status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.q-detail-pill--active .status-dot {
+  background: #10b981;
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+}
+
+.q-detail-pill--inactive .status-dot {
+  background: #ef4444;
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
 }

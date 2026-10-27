@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 
-type NiletronixLoadingVariant = 'page' | 'panel' | 'inline';
-type NiletronixLoadingSize = 'sm' | 'md' | 'lg';
+export type NiletronixLoadingVariant = 'page' | 'panel' | 'inline' | 'skeleton';
+export type NiletronixLoadingSize = 'sm' | 'md' | 'lg';
 
 @Component({
   selector: 'app-niletronix-loading-state',

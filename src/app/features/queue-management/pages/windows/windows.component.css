@@ -1,7 +1,43 @@
-﻿:host {
+:host {
   display: block;
 }
 
-.window-editor-panel {
-  --q-popup-width: min(760px, calc(100dvw - 96px));
+.status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.q-detail-pill--active .status-dot {
+  background: #10b981;
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+}
+
+.q-detail-pill--inactive .status-dot {
+  background: #ef4444;
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+}
+
+.q-switch-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--q-border-subtle, #e2e8f0);
+  background: #f8fafc;
+  transition: all 0.15s ease;
+  cursor: pointer;
+}
+
+.q-switch-card:hover {
+  background: #ffffff;
+  border-color: #cbd5e1;
+}
+
+.q-switch-card.active {
+  background: rgba(11, 138, 168, 0.05);
+  border-color: rgba(11, 138, 168, 0.35);
 }

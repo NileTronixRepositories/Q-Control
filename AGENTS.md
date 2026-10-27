@@ -3,8 +3,9 @@
 All development, modifications, and feature integrations in this workspace MUST adhere to:
 
 1. **AcademyOps Integration Standards** (Phase 0 API Contract)
-2. **Angular Enterprise Architecture Master Guide** ([angular_architecture_best_practices_prompt.md](file:///c:/Users/win10/Music/ACADEMY/angular_architecture_best_practices_prompt.md))
-3. Detailed specifications in [.agents/rules/academyops-architecture-rules.md](file:///c:/Users/win10/Music/ACADEMY/.agents/rules/academyops-architecture-rules.md)
+2. **Q-SYSTEM Design & UI/UX Standards**: [.agents/rules/q-system-standards.md](file:///c:/Users/win10/OneDrive/Desktop/Q-SYSTEM/.agents/rules/q-system-standards.md)
+3. **Angular Enterprise Architecture Master Guide** ([angular_architecture_best_practices_prompt.md](file:///c:/Users/win10/Music/ACADEMY/angular_architecture_best_practices_prompt.md))
+4. Detailed specifications in [.agents/rules/academyops-architecture-rules.md](file:///c:/Users/win10/Music/ACADEMY/.agents/rules/academyops-architecture-rules.md)
 
 ---
 

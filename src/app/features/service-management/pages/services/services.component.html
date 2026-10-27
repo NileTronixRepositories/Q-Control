@@ -7,16 +7,17 @@
     [eyebrow]="translations().title"
     [title]="translations().title"
     [description]="translations().description"
-    icon="bi bi-grid-1x2-fill"
+    icon="fa-solid fa-layer-group"
+    iconVariant="teal"
   >
     @if (canCreateGlobal() && canViewAll()) {
       <button
         hero-actions
         type="button"
-        class="svc-primary-btn d-inline-flex align-items-center justify-content-center gap-2"
+        class="primary-action d-inline-flex align-items-center justify-content-center gap-2"
         (click)="openCreateRoot()"
       >
-        <i class="bi bi-plus-lg" aria-hidden="true"></i> {{ translations().addRootService }}
+        <i class="fa-solid fa-plus" aria-hidden="true"></i> {{ translations().addRootService }}
       </button>
     }
 
@@ -24,8 +25,13 @@
       <div hero-filters class="w-100" [attr.inert]="isWriteDrawerOpen() ? '' : null">
         <div class="row g-3 align-items-end">
           <div class="col-12 col-md-4 col-lg-3">
-            <label class="filter-field">
-              <span>{{ translations().scopeFilter }}</span>
+            <label class="filter-field d-flex flex-column gap-1">
+              <span class="d-flex align-items-center gap-2 fw-bold small text-dark">
+                <span class="q-field-icon-badge q-field-icon-badge--teal">
+                  <i class="fa-solid fa-filter"></i>
+                </span>
+                <span>{{ translations().scopeFilter }}</span>
+              </span>
               <select
                 class="form-select"
                 [value]="scopeFilterValue()"
@@ -38,8 +44,13 @@
             </label>
           </div>
           <div class="col-12 col-md-4 col-lg-3">
-            <label class="filter-field">
-              <span>{{ translations().ownerBranchFilter }}</span>
+            <label class="filter-field d-flex flex-column gap-1">
+              <span class="d-flex align-items-center gap-2 fw-bold small text-dark">
+                <span class="q-field-icon-badge q-field-icon-badge--violet">
+                  <i class="fa-solid fa-building"></i>
+                </span>
+                <span>{{ translations().ownerBranchFilter }}</span>
+              </span>
               <input
                 class="form-control"
                 type="number"
@@ -52,8 +63,13 @@
           </div>
           @if (!isTechnicalAdmin()) {
             <div class="col-12 col-md-4 col-lg-3">
-              <label class="filter-field">
-                <span>{{ translations().assignedFilter }}</span>
+              <label class="filter-field d-flex flex-column gap-1">
+                <span class="d-flex align-items-center gap-2 fw-bold small text-dark">
+                  <span class="q-field-icon-badge q-field-icon-badge--sky">
+                    <i class="fa-solid fa-code-branch"></i>
+                  </span>
+                  <span>{{ translations().assignedFilter }}</span>
+                </span>
                 <select
                   class="form-select"
                   [value]="assignedFilterValue()"
@@ -138,38 +154,39 @@
                   </div>
                 </div>
 
-                <div class="svc-summary-badges" role="list">
+                <div class="svc-summary-badges d-flex align-items-center gap-2" role="list">
+                  @if (details.isActive && !details.isDeleted) {
+                    <span class="q-detail-pill q-detail-pill--active">
+                      <span class="q-detail-pill__dot"></span>
+                      <span>{{ statusLabel(details) }}</span>
+                    </span>
+                  } @else {
+                    <span class="q-detail-pill q-detail-pill--inactive">
+                      <span class="q-detail-pill__dot"></span>
+                      <span>{{ statusLabel(details) }}</span>
+                    </span>
+                  }
+                  <span class="q-detail-pill q-detail-pill--neutral" role="listitem">
+                    <i class="fa-solid fa-diagram-project text-muted small" aria-hidden="true"></i>
+                    <span>{{ scopeLabel(details.scope) }}</span>
+                  </span>
                   <span
-                    class="svc-summary-badge"
-                    [class.status-active]="details.isActive && !details.isDeleted"
-                    [class.status-inactive]="!details.isActive && !details.isDeleted"
-                    [class.status-deleted]="details.isDeleted"
+                    class="q-detail-pill"
+                    [class.q-detail-pill--active]="details.isTicketIssuable"
+                    [class.q-detail-pill--inactive]="!details.isTicketIssuable"
                     role="listitem"
                   >
                     <i
-                      class="bi"
-                      [class.bi-check-circle-fill]="details.isActive && !details.isDeleted"
-                      [class.bi-x-circle-fill]="!details.isActive || details.isDeleted"
+                      [class]="details.isTicketIssuable ? 'fa-solid fa-ticket text-teal small' : 'fa-solid fa-ticket text-muted small'"
                       aria-hidden="true"
                     ></i>
-                    {{ statusLabel(details) }}
-                  </span>
-                  <span class="svc-summary-badge is-neutral" role="listitem">
-                    <i class="bi bi-diagram-3" aria-hidden="true"></i>
-                    {{ scopeLabel(details.scope) }}
-                  </span>
-                  <span
-                    class="svc-summary-badge"
-                    [class.is-positive]="details.isTicketIssuable"
-                    [class.is-neutral]="!details.isTicketIssuable"
-                    role="listitem"
-                  >
-                    <i class="bi bi-ticket-perforated" aria-hidden="true"></i>
-                    {{
-                      details.isTicketIssuable
-                        ? translations().ticketIssuable
-                        : translations().notTicketIssuable
-                    }}
+                    <span>
+                      {{
+                        details.isTicketIssuable
+                          ? translations().ticketIssuable
+                          : translations().notTicketIssuable
+                      }}
+                    </span>
                   </span>
                 </div>
               </header>
@@ -215,20 +232,27 @@
               @if (activeDetailsTab() === 'data') {
                 <div class="svc-details-bento-grid">
                   @for (section of detailSections(); track section.key) {
-                    <section class="svc-bento-card" [attr.data-section]="section.key">
-                      <header class="svc-bento-card-header">
-                        <span class="svc-bento-icon"
-                          ><i [class]="'bi ' + section.icon" aria-hidden="true"></i
-                        ></span>
-                        <h4>{{ section.title }}</h4>
+                    <section class="svc-bento-card shadow-sm" [attr.data-section]="section.key">
+                      <header class="svc-bento-card-header d-flex align-items-center gap-2">
+                        <span class="q-field-icon-badge q-field-icon-badge--{{ section.badgeVariant || 'teal' }}">
+                          <i [class]="section.icon" aria-hidden="true"></i>
+                        </span>
+                        <h4 class="m-0 fw-bold fs-7 text-dark">{{ section.title }}</h4>
                       </header>
                       <div class="svc-bento-card-body">
                         @for (item of section.items; track item.key) {
                           <div class="svc-bento-row">
-                            <span class="svc-bento-label">{{ item.label }}</span>
+                            <span class="svc-bento-label d-inline-flex align-items-center gap-2">
+                              @if (item.icon) {
+                                <span class="q-field-icon-badge q-field-icon-badge--{{ item.badgeVariant || 'sky' }}" style="width: 24px; height: 24px; font-size: 0.75rem;">
+                                  <i [class]="item.icon"></i>
+                                </span>
+                              }
+                              <span>{{ item.label }}</span>
+                            </span>
                             <div class="svc-bento-val">
                               @if (item.kind === 'text') {
-                                <span class="svc-detail-text">{{ item.value }}</span>
+                                <span class="svc-detail-text font-monospace">{{ item.value }}</span>
                               } @else {
                                 <span
                                   class="svc-detail-state"
@@ -237,13 +261,10 @@
                                   [class.is-neutral]="item.tone === 'neutral'"
                                 >
                                   <i
-                                    class="bi"
-                                    [class.bi-check-circle-fill]="item.tone === 'positive'"
-                                    [class.bi-x-circle-fill]="item.tone === 'negative'"
-                                    [class.bi-dash-circle]="item.tone === 'neutral'"
+                                    [class]="item.tone === 'positive' ? 'fa-solid fa-circle-check text-success' : item.tone === 'negative' ? 'fa-solid fa-circle-xmark text-danger' : 'fa-solid fa-minus text-muted'"
                                     aria-hidden="true"
                                   ></i>
-                                  {{ item.value }}
+                                  <span>{{ item.value }}</span>
                                 </span>
                               }
                             </div>

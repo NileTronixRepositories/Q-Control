@@ -16,7 +16,7 @@
         ? 'متابعة وإدارة دورة حياة التذاكر الفورية والحجوزات المجدولة وسجل العمليات والأرشيف.'
         : 'Manage live ticket queues, scheduled reservations, workflow journeys, and operational archives.'
     "
-    icon="bi bi-ticket-perforated-fill"
+    icon="fa-solid fa-ticket"
   >
     <!-- Hero Actions -->
     <div hero-actions class="d-flex flex-wrap align-items-center gap-2">
@@ -27,8 +27,18 @@
         (click)="loadData()"
         [title]="isRtl() ? 'تحديث البيانات' : 'Refresh queue'"
       >
-        <i class="bi bi-arrow-clockwise" [class.spin]="loading()" aria-hidden="true"></i>
+        <i class="fa-solid fa-arrows-rotate" style="color: #059669;" [class.spin]="loading()" aria-hidden="true"></i>
         <span>{{ isRtl() ? 'تحديث' : 'Refresh' }}</span>
+      </button>
+
+      <button
+        type="button"
+        class="secondary-action d-inline-flex align-items-center gap-2"
+        (click)="resetFilters()"
+        [title]="isRtl() ? 'إعادة ضبط الفلاتر' : 'Reset filters'"
+      >
+        <i class="fa-solid fa-arrow-rotate-left" style="color: #d97706;" aria-hidden="true"></i>
+        <span>{{ isRtl() ? 'إعادة ضبط' : 'Reset' }}</span>
       </button>
 
       <!-- @if (activeTab() === 'tickets' && canCreateTicket()) {
@@ -37,7 +47,7 @@
           class="primary-action d-inline-flex align-items-center gap-2"
           (click)="openCreateTicketModal()"
         >
-          <i class="bi bi-plus-lg" aria-hidden="true"></i>
+          <i class="fa-solid fa-plus" aria-hidden="true"></i>
           <span class="text-white">{{ isRtl() ? 'إصدار تذكرة جديدة' : 'Issue Ticket' }}</span>
         </button>
       } -->
@@ -48,7 +58,7 @@
           class="primary-action d-inline-flex align-items-center gap-2"
           (click)="openCreateReservationModal()"
         >
-          <i class="bi bi-calendar-plus" aria-hidden="true"></i>
+          <i class="fa-solid fa-calendar-plus" aria-hidden="true"></i>
           <span class="text-white">{{ isRtl() ? 'حجز جديد' : 'New Reservation' }}</span>
         </button>
       }
@@ -64,23 +74,14 @@
         ) {
           <div class="col-12 col-sm-6 col-lg-3">
             <label class="filter-field w-100">
-              <span>{{ isRtl() ? 'رقم التذكرة' : 'Ticket Number' }}</span>
+              <span class="d-flex align-items-center gap-2">
+                <span class="q-field-icon-badge q-field-icon-badge--indigo">
+                  <i class="fa-solid fa-hashtag"></i>
+                </span>
+                <span>{{ isRtl() ? 'رقم التذكرة' : 'Ticket Number' }}</span>
+              </span>
               <div class="search-input-wrapper">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="15"
-                  height="15"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2.5"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  aria-hidden="true"
-                >
-                  <circle cx="11" cy="11" r="8" />
-                  <line x1="21" y1="21" x2="16.65" y2="16.65" />
-                </svg>
+                <i class="fa-solid fa-magnifying-glass search-icon" aria-hidden="true"></i>
                 <input
                   id="searchTicketNumber"
                   type="search"
@@ -95,9 +96,24 @@
         }
 
         <!-- Status Filter -->
-        <div class="col-6 col-sm-6 col-lg-2">
+        <div
+          class="col-6 col-sm-6"
+          [class.col-lg-2]="
+            activeTab() === 'tickets' ||
+            (activeTab() === 'archive' && archiveSubTab() === 'archived-tickets')
+          "
+          [class.col-lg-3]="
+            activeTab() === 'reservations' ||
+            (activeTab() === 'archive' && archiveSubTab() === 'archived-reservations')
+          "
+        >
           <label class="filter-field w-100">
-            <span>{{ isRtl() ? 'الحالة' : 'Status' }}</span>
+            <span class="d-flex align-items-center gap-2">
+              <span class="q-field-icon-badge q-field-icon-badge--emerald">
+                <i class="fa-solid fa-chart-line"></i>
+              </span>
+              <span>{{ isRtl() ? 'الحالة' : 'Status' }}</span>
+            </span>
             <select
               id="filterStatus"
               class="form-select"
@@ -122,9 +138,14 @@
         </div>
 
         <!-- Service Filter -->
-        <div class="col-6 col-sm-6 col-lg-2">
+        <div class="col-6 col-sm-6 col-lg-3">
           <label class="filter-field w-100">
-            <span>{{ isRtl() ? 'الخدمة' : 'Service' }}</span>
+            <span class="d-flex align-items-center gap-2">
+              <span class="q-field-icon-badge q-field-icon-badge--violet">
+                <i class="fa-solid fa-layer-group"></i>
+              </span>
+              <span>{{ isRtl() ? 'الخدمة' : 'Service' }}</span>
+            </span>
             <select
               id="filterService"
               class="form-select"
@@ -142,9 +163,24 @@
         </div>
 
         <!-- Segment Filter -->
-        <div class="col-6 col-sm-6 col-lg-2">
+        <div
+          class="col-6 col-sm-6"
+          [class.col-lg-2]="
+            activeTab() === 'tickets' ||
+            (activeTab() === 'archive' && archiveSubTab() === 'archived-tickets')
+          "
+          [class.col-lg-3]="
+            activeTab() === 'reservations' ||
+            (activeTab() === 'archive' && archiveSubTab() === 'archived-reservations')
+          "
+        >
           <label class="filter-field w-100">
-            <span>{{ isRtl() ? 'الشريحة' : 'Segment' }}</span>
+            <span class="d-flex align-items-center gap-2">
+              <span class="q-field-icon-badge q-field-icon-badge--amber">
+                <i class="fa-solid fa-users"></i>
+              </span>
+              <span>{{ isRtl() ? 'الشريحة' : 'Segment' }}</span>
+            </span>
             <select
               id="filterSegment"
               class="form-select"
@@ -160,9 +196,24 @@
         </div>
 
         <!-- Business Date Filter -->
-        <div class="col-6 col-sm-6 col-lg-2">
+        <div
+          class="col-6 col-sm-6"
+          [class.col-lg-2]="
+            activeTab() === 'tickets' ||
+            (activeTab() === 'archive' && archiveSubTab() === 'archived-tickets')
+          "
+          [class.col-lg-3]="
+            activeTab() === 'reservations' ||
+            (activeTab() === 'archive' && archiveSubTab() === 'archived-reservations')
+          "
+        >
           <label class="filter-field w-100">
-            <span>{{ isRtl() ? 'تاريخ العمل' : 'Business Date' }}</span>
+            <span class="d-flex align-items-center gap-2">
+              <span class="q-field-icon-badge q-field-icon-badge--rose">
+                <i class="fa-solid fa-calendar-days"></i>
+              </span>
+              <span>{{ isRtl() ? 'تاريخ العمل' : 'Business Date' }}</span>
+            </span>
             <input
               id="filterDate"
               type="date"
@@ -171,19 +222,6 @@
               (ngModelChange)="filterBusinessDate.set($event); onFilterChange()"
             />
           </label>
-        </div>
-
-        <!-- Reset Button -->
-        <div class="col-12 col-lg-1 d-grid">
-          <button
-            type="button"
-            class="secondary-action w-100"
-            (click)="resetFilters()"
-            [title]="isRtl() ? 'إعادة ضبط الفلاتر' : 'Reset filters'"
-          >
-            <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
-            <span>{{ isRtl() ? 'إلغاء' : 'Reset' }}</span>
-          </button>
         </div>
       </div>
     </div>
@@ -199,10 +237,10 @@
         [class.toast-info]="alert.tone === 'info' || alert.tone === 'warning'"
       >
         <i
-          class="bi"
-          [class.bi-check-circle-fill]="alert.tone === 'success'"
-          [class.bi-x-octagon-fill]="alert.tone === 'danger'"
-          [class.bi-info-circle-fill]="alert.tone === 'info' || alert.tone === 'warning'"
+          class="fa-solid"
+          [class.fa-circle-check]="alert.tone === 'success'"
+          [class.fa-circle-xmark]="alert.tone === 'danger'"
+          [class.fa-circle-info]="alert.tone === 'info' || alert.tone === 'warning'"
           aria-hidden="true"
         ></i>
         <p class="mb-0">{{ alert.text }}</p>
@@ -212,7 +250,7 @@
           [attr.aria-label]="isRtl() ? 'إغلاق' : 'Close'"
           (click)="alertMessage.set(null)"
         >
-          <i class="bi bi-x-lg" aria-hidden="true"></i>
+          <i class="fa-solid fa-xmark" aria-hidden="true"></i>
         </button>
       </div>
     </div>
@@ -232,7 +270,7 @@
           [class.secondary-action]="activeTab() !== 'tickets'"
           (click)="switchTab('tickets')"
         >
-          <i class="bi bi-ticket-perforated" aria-hidden="true"></i>
+          <i class="fa-solid fa-ticket" aria-hidden="true"></i>
           <span>{{ isRtl() ? 'التذاكر الحالية' : 'Live Tickets' }}</span>
           @if (ticketPage().totalItems > 0) {
             <span class="tab-count-badge">{{ ticketPage().totalItems }}</span>
@@ -248,7 +286,7 @@
           [class.secondary-action]="activeTab() !== 'reservations'"
           (click)="switchTab('reservations')"
         >
-          <i class="bi bi-calendar-check" aria-hidden="true"></i>
+          <i class="fa-solid fa-calendar-check" aria-hidden="true"></i>
           <span>{{ isRtl() ? 'الحجوزات' : 'Reservations' }}</span>
           @if (reservationPage().totalItems > 0) {
             <span class="tab-count-badge">{{ reservationPage().totalItems }}</span>
@@ -264,7 +302,7 @@
           [class.secondary-action]="activeTab() !== 'archive'"
           (click)="switchTab('archive')"
         >
-          <i class="bi bi-archive" aria-hidden="true"></i>
+          <i class="fa-solid fa-box-archive" aria-hidden="true"></i>
           <span>{{ isRtl() ? 'الأرشيف' : 'Archive' }}</span>
         </button>
       }
@@ -280,7 +318,7 @@
             [class.active]="archiveSubTab() === 'archived-tickets'"
             (click)="switchArchiveSubTab('archived-tickets')"
           >
-            <i class="bi bi-ticket-detailed" aria-hidden="true"></i>
+            <i class="fa-solid fa-ticket-simple" aria-hidden="true"></i>
             <span>{{ isRtl() ? 'أرشيف التذاكر' : 'Archived Tickets' }}</span>
           </button>
         }
@@ -291,7 +329,7 @@
             [class.active]="archiveSubTab() === 'archived-reservations'"
             (click)="switchArchiveSubTab('archived-reservations')"
           >
-            <i class="bi bi-calendar-event" aria-hidden="true"></i>
+            <i class="fa-solid fa-calendar-days" aria-hidden="true"></i>
             <span>{{ isRtl() ? 'أرشيف الحجوزات' : 'Archived Reservations' }}</span>
           </button>
         }
@@ -324,20 +362,85 @@
                   activeTab() === 'reservations' ||
                   (activeTab() === 'archive' && archiveSubTab() === 'archived-reservations')
                 ) {
-                  <th scope="col">{{ isRtl() ? 'رقم الحجز' : 'Reservation #' }}</th>
-                  <th scope="col">{{ isRtl() ? 'الحالة' : 'Status' }}</th>
-                  <th scope="col">{{ isRtl() ? 'الخدمة' : 'Service' }}</th>
-                  <th scope="col">{{ isRtl() ? 'الشريحة' : 'Segment' }}</th>
-                  <th scope="col">{{ isRtl() ? 'الموعد المجدول' : 'Scheduled Time' }}</th>
-                  <th scope="col" class="text-center">{{ isRtl() ? 'الإجراءات' : 'Actions' }}</th>
+                  <th scope="col">
+                    <span class="d-inline-flex align-items-center gap-1">
+                      <i class="bi bi-hash text-muted"></i>
+                      <span>{{ isRtl() ? 'رقم الحجز' : 'Reservation #' }}</span>
+                    </span>
+                  </th>
+                  <th scope="col">
+                    <span class="d-inline-flex align-items-center gap-1">
+                      <i class="bi bi-activity text-muted"></i>
+                      <span>{{ isRtl() ? 'الحالة' : 'Status' }}</span>
+                    </span>
+                  </th>
+                  <th scope="col">
+                    <span class="d-inline-flex align-items-center gap-1">
+                      <i class="bi bi-gear-wide-connected text-muted"></i>
+                      <span>{{ isRtl() ? 'الخدمة' : 'Service' }}</span>
+                    </span>
+                  </th>
+                  <th scope="col">
+                    <span class="d-inline-flex align-items-center gap-1">
+                      <i class="bi bi-diagram-2 text-muted"></i>
+                      <span>{{ isRtl() ? 'الشريحة' : 'Segment' }}</span>
+                    </span>
+                  </th>
+                  <th scope="col">
+                    <span class="d-inline-flex align-items-center gap-1">
+                      <i class="bi bi-calendar-check text-muted"></i>
+                      <span>{{ isRtl() ? 'الموعد المجدول' : 'Scheduled Time' }}</span>
+                    </span>
+                  </th>
+                  <th scope="col" class="text-center">
+                    <span class="d-inline-flex align-items-center gap-1">
+                      <i class="bi bi-lightning-charge text-muted"></i>
+                      <span>{{ isRtl() ? 'الإجراءات' : 'Actions' }}</span>
+                    </span>
+                  </th>
                 } @else {
-                  <th scope="col">{{ isRtl() ? 'رقم التذكرة' : 'Ticket #' }}</th>
-                  <th scope="col">{{ isRtl() ? 'الحالة' : 'Status' }}</th>
-                  <th scope="col">{{ isRtl() ? 'الخدمة الحالية' : 'Current Service' }}</th>
-                  <th scope="col">{{ isRtl() ? 'الشريحة' : 'Segment' }}</th>
-                  <th scope="col">{{ isRtl() ? 'تاريخ العمل' : 'Business Date' }}</th>
-                  <th scope="col">{{ isRtl() ? 'وقت الدخول' : 'Queue Entry' }}</th>
-                  <th scope="col" class="text-center">{{ isRtl() ? 'الإجراءات' : 'Actions' }}</th>
+                  <th scope="col">
+                    <span class="d-inline-flex align-items-center gap-1">
+                      <i class="bi bi-hash text-muted"></i>
+                      <span>{{ isRtl() ? 'رقم التذكرة' : 'Ticket #' }}</span>
+                    </span>
+                  </th>
+                  <th scope="col">
+                    <span class="d-inline-flex align-items-center gap-1">
+                      <i class="bi bi-activity text-muted"></i>
+                      <span>{{ isRtl() ? 'الحالة' : 'Status' }}</span>
+                    </span>
+                  </th>
+                  <th scope="col">
+                    <span class="d-inline-flex align-items-center gap-1">
+                      <i class="bi bi-gear-wide-connected text-muted"></i>
+                      <span>{{ isRtl() ? 'الخدمة الحالية' : 'Current Service' }}</span>
+                    </span>
+                  </th>
+                  <th scope="col">
+                    <span class="d-inline-flex align-items-center gap-1">
+                      <i class="bi bi-diagram-2 text-muted"></i>
+                      <span>{{ isRtl() ? 'الشريحة' : 'Segment' }}</span>
+                    </span>
+                  </th>
+                  <th scope="col">
+                    <span class="d-inline-flex align-items-center gap-1">
+                      <i class="bi bi-calendar-event text-muted"></i>
+                      <span>{{ isRtl() ? 'تاريخ العمل' : 'Business Date' }}</span>
+                    </span>
+                  </th>
+                  <th scope="col">
+                    <span class="d-inline-flex align-items-center gap-1">
+                      <i class="bi bi-clock-history text-muted"></i>
+                      <span>{{ isRtl() ? 'وقت الدخول' : 'Queue Entry' }}</span>
+                    </span>
+                  </th>
+                  <th scope="col" class="text-center">
+                    <span class="d-inline-flex align-items-center gap-1">
+                      <i class="bi bi-lightning-charge text-muted"></i>
+                      <span>{{ isRtl() ? 'الإجراءات' : 'Actions' }}</span>
+                    </span>
+                  </th>
                 }
               </tr>
             </thead>
@@ -350,19 +453,20 @@
                 @for (res of reservationPage().data; track res.id) {
                   <tr [class.table-active]="selectedReservation()?.id === res.id">
                     <td class="admin-number-cell">
-                      <strong class="text-primary">#{{ res.id }}</strong>
+                      <strong class="text-primary font-monospace">#{{ res.id }}</strong>
                     </td>
                     <td>
                       <span
                         class="badge status-pill"
                         [ngClass]="'status-' + res.status.toLowerCase()"
                       >
-                        {{ getStatusLabel(res.status) }}
+                        <span class="status-dot" aria-hidden="true"></span>
+                        <span>{{ getStatusLabel(res.status) }}</span>
                       </span>
                     </td>
                     <td>{{ getServiceName(res.serviceId) }}</td>
                     <td>{{ getSegmentName(res.segmentId) }}</td>
-                    <td>{{ formatDate(res.scheduledOnUtc) }}</td>
+                    <td class="font-monospace small">{{ formatDate(res.scheduledOnUtc) }}</td>
                     <td class="text-center">
                       <button
                         type="button"
@@ -408,13 +512,16 @@
                         class="badge status-pill"
                         [ngClass]="'status-' + t.status.toLowerCase()"
                       >
-                        {{ getStatusLabel(t.status) }}
+                        <span class="status-dot" aria-hidden="true"></span>
+                        <span>{{ getStatusLabel(t.status) }}</span>
                       </span>
                     </td>
                     <td>{{ getServiceName(t.currentServiceId) }}</td>
                     <td>{{ getSegmentName(t.segmentId) }}</td>
-                    <td>{{ t.businessDate }}</td>
-                    <td>{{ formatDate(t.currentQueueEnteredOnUtc) }}</td>
+                    <td class="font-monospace">{{ t.businessDate }}</td>
+                    <td class="font-monospace small">
+                      {{ formatDate(t.currentQueueEnteredOnUtc) }}
+                    </td>
                     <td class="text-center">
                       <button
                         type="button"
@@ -503,12 +610,15 @@
       <aside class="col-12 col-lg-4 col-xl-4 drawer-container">
         <div class="card shadow-sm border rounded-4 overflow-hidden sticky-top drawer-card">
           <!-- Drawer Header -->
-          <header
-            class="card-header bg-white d-flex align-items-center justify-content-between py-3 border-bottom"
-          >
-            <div>
-              <p class="text-muted small text-uppercase mb-0 fw-semibold">
-                {{
+          <header class="drawer-header">
+            <div class="d-flex flex-column gap-1">
+              <div class="d-flex align-items-center gap-1 text-muted small fw-semibold">
+                <i
+                  class="bi"
+                  [class.bi-ticket-detailed]="selectedTicket()"
+                  [class.bi-calendar-event]="selectedReservation()"
+                ></i>
+                <span>{{
                   selectedTicket()
                     ? isRtl()
                       ? 'تفاصيل التذكرة'
@@ -516,267 +626,509 @@
                     : isRtl()
                       ? 'تفاصيل الحجز'
                       : 'Reservation Details'
-                }}
-              </p>
-              <h2 class="h5 mb-0 fw-bold d-flex align-items-center gap-2">
+                }}</span>
+              </div>
+              <div class="d-flex align-items-center gap-2 flex-wrap">
                 @if (selectedTicket(); as t) {
-                  <span class="ticket-title-badge">{{ t.ticketNumber }}</span>
+                  <span class="ticket-title-badge fw-bold">#{{ t.ticketNumber }}</span>
                   <span class="badge status-pill" [ngClass]="'status-' + t.status.toLowerCase()">
-                    {{ getStatusLabel(t.status) }}
+                    <span class="status-dot" aria-hidden="true"></span>
+                    <span>{{ getStatusLabel(t.status) }}</span>
                   </span>
                   @if (t.isArchived) {
-                    <span class="badge bg-secondary text-white">{{
+                    <span class="badge bg-secondary-subtle text-secondary border px-2 py-1 small">{{
                       isRtl() ? 'مؤرشف' : 'ARCHIVED'
                     }}</span>
                   }
                 }
                 @if (selectedReservation(); as r) {
-                  <span class="text-primary">#{{ r.id }}</span>
+                  <span class="ticket-title-badge font-monospace">#{{ r.id }}</span>
                   <span class="badge status-pill" [ngClass]="'status-' + r.status.toLowerCase()">
-                    {{ getStatusLabel(r.status) }}
+                    <span class="status-dot" aria-hidden="true"></span>
+                    <span>{{ getStatusLabel(r.status) }}</span>
                   </span>
                   @if (r.isArchived) {
-                    <span class="badge bg-secondary text-white">{{
+                    <span class="badge bg-secondary-subtle text-secondary border px-2 py-1 small">{{
                       isRtl() ? 'مؤرشف' : 'ARCHIVED'
                     }}</span>
                   }
                 }
-              </h2>
+              </div>
             </div>
             <button
               type="button"
-              class="btn-close"
-              aria-label="Close Details"
+              class="modal-close-btn"
+              [attr.aria-label]="isRtl() ? 'إغلاق التفاصيل' : 'Close Details'"
               (click)="closeDrawer()"
-            ></button>
+            >
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 16 16"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M12 4L4 12M4 4l8 8" />
+              </svg>
+            </button>
           </header>
 
           <!-- Drawer Body -->
           <div class="card-body drawer-body p-3">
             <!-- Ticket Details Sections -->
             @if (selectedTicket(); as t) {
-              <!-- Overview Grid -->
-              <section class="mb-3" aria-label="Ticket Overview">
-                <h3 class="h6 fw-bold border-bottom pb-2 mb-2 text-secondary">
-                  <i class="bi bi-info-circle me-1"></i>
-                  {{ isRtl() ? 'بيانات التذكرة الأساسية' : 'Summary Overview' }}
-                </h3>
-                <div class="details-grid small">
-                  <div class="detail-row">
-                    <span class="text-muted">{{
-                      isRtl() ? 'الخدمة المصدرة:' : 'Issuing Service:'
-                    }}</span>
-                    <strong class="text-dark">{{ getServiceName(t.issuingServiceId) }}</strong>
+              <!-- Bento Card 1: Core Overview -->
+              <div class="q-dialog-card mb-3" aria-label="Ticket Overview">
+                <div class="q-dialog-card-header">
+                  <div class="d-flex align-items-center gap-2">
+                    <span class="q-dialog-card-icon q-dialog-card-icon--teal">
+                      <i class="bi bi-info-circle-fill"></i>
+                    </span>
+                    <div>
+                      <h4 class="q-dialog-card-title m-0">
+                        {{ isRtl() ? 'بيانات التذكرة الأساسية' : 'Summary Overview' }}
+                      </h4>
+                      <span class="q-dialog-card-subtitle m-0">
+                        {{
+                          isRtl()
+                            ? 'معلومات الخدمة والشريحة وتوقيت الطابور'
+                            : 'Core queue service & segment data'
+                        }}
+                      </span>
+                    </div>
                   </div>
-                  <div class="detail-row">
-                    <span class="text-muted">{{
-                      isRtl() ? 'الخدمة الحالية:' : 'Current Service:'
-                    }}</span>
-                    <strong class="text-dark">{{ getServiceName(t.currentServiceId) }}</strong>
-                  </div>
-                  <div class="detail-row">
-                    <span class="text-muted">{{ isRtl() ? 'الشريحة:' : 'Segment:' }}</span>
-                    <strong class="text-dark">{{ getSegmentName(t.segmentId) }}</strong>
-                  </div>
-                  <div class="detail-row">
-                    <span class="text-muted">{{
-                      isRtl() ? 'تاريخ العمل:' : 'Business Date:'
-                    }}</span>
-                    <span>{{ t.businessDate }}</span>
-                  </div>
-                  @if (t.reservationId) {
-                    <div class="detail-row">
-                      <span class="text-muted">{{
-                        isRtl() ? 'الحجز المرتبط:' : 'Linked Reservation:'
-                      }}</span>
-                      <span class="badge bg-light text-dark border">#{{ t.reservationId }}</span>
-                    </div>
-                  }
-                  @if (t.currentWindowId) {
-                    <div class="detail-row">
-                      <span class="text-muted">{{
-                        isRtl() ? 'الشباك الحالي:' : 'Current Window:'
-                      }}</span>
-                      <span
-                        class="badge bg-primary-subtle text-primary border border-primary-subtle"
-                        >#{{ t.currentWindowId }}</span
-                      >
-                    </div>
-                  }
-                  <div class="detail-row">
-                    <span class="text-muted">{{
-                      isRtl() ? 'دخول الطابور:' : 'Queue Entered:'
-                    }}</span>
-                    <span>{{ formatDate(t.currentQueueEnteredOnUtc) }}</span>
-                  </div>
-                  @if (t.currentServiceStartedOnUtc) {
-                    <div class="detail-row">
-                      <span class="text-muted">{{
-                        isRtl() ? 'بدء الخدمة:' : 'Service Started:'
-                      }}</span>
-                      <span>{{ formatDate(t.currentServiceStartedOnUtc) }}</span>
-                    </div>
-                  }
-                  @if (t.completedOnUtc) {
-                    <div class="detail-row">
-                      <span class="text-muted">{{
-                        isRtl() ? 'اكتمال الخدمة:' : 'Completed On:'
-                      }}</span>
-                      <span>{{ formatDate(t.completedOnUtc) }}</span>
-                    </div>
-                  }
-                  @if (t.cancelledOnUtc) {
-                    <div class="detail-row">
-                      <span class="text-muted">{{
-                        isRtl() ? 'تاريخ الإلغاء:' : 'Cancelled On:'
-                      }}</span>
-                      <span>{{ formatDate(t.cancelledOnUtc) }}</span>
-                    </div>
-                  }
-                  @if (t.cancellationReason) {
-                    <div class="detail-row alert alert-danger py-1 px-2 mb-0">
-                      <span class="fw-bold">{{ isRtl() ? 'سبب الإلغاء:' : 'Reason:' }}</span>
-                      <span>{{ t.cancellationReason }}</span>
-                    </div>
-                  }
                 </div>
-              </section>
 
-              <!-- Workflow Info Section -->
-              @if (t.boundWorkflowId) {
-                <section class="mb-3 p-2 bg-light rounded-3 border" aria-label="Workflow Info">
-                  <h3 class="h6 fw-bold mb-1 text-primary">
-                    <i class="bi bi-diagram-3 me-1"></i>
-                    {{ isRtl() ? 'مسار العمل المرتبط (Workflow)' : 'Bound Workflow' }}
-                  </h3>
-                  <p class="small text-muted mb-0">
-                    {{ isRtl() ? 'معرف المسار:' : 'Workflow ID:' }}
-                    <strong>#{{ t.boundWorkflowId }}</strong> |
-                    {{ isRtl() ? 'الخطوة الحالية:' : 'Current Step:' }}
-                    <strong>#{{ t.currentWorkflowStepOrder }}</strong>
-                  </p>
-                </section>
-              }
+                <div class="q-dialog-card-body p-3">
+                  <div class="row g-2">
+                    <!-- Issuing Service -->
+                    <div class="col-12 col-sm-6">
+                      <div class="q-detail-item">
+                        <span class="q-detail-label">
+                          <span class="q-field-icon-badge q-field-icon-badge--teal">
+                            <i class="bi bi-gear-wide-connected"></i>
+                          </span>
+                          <span>{{ isRtl() ? 'الخدمة المصدرة' : 'Issuing Service' }}</span>
+                        </span>
+                        <span class="q-detail-value">{{ getServiceName(t.issuingServiceId) }}</span>
+                      </div>
+                    </div>
 
-              <!-- Dynamic Custom Inputs Section -->
-              @if (t.customInputs && t.customInputs.length > 0) {
-                <section class="mb-3" aria-label="Custom Inputs">
-                  <h3 class="h6 fw-bold border-bottom pb-2 mb-2 text-secondary">
-                    <i class="bi bi-input-cursor-text me-1"></i>
-                    {{ isRtl() ? 'الحقول المخصصة' : 'Custom Inputs' }}
-                  </h3>
-                  <ul class="list-group list-group-flush small">
-                    @for (inp of t.customInputs; track inp.serviceCustomInputId) {
-                      <li
-                        class="list-group-item d-flex justify-content-between align-items-center px-0 py-1"
-                      >
-                        <span class="text-muted"
-                          >{{ isRtl() ? inp.labelAr || inp.name : inp.labelEn || inp.name }}:</span
-                        >
-                        <strong class="text-dark">{{ inp.value || '—' }}</strong>
-                      </li>
+                    <!-- Current Service -->
+                    <div class="col-12 col-sm-6">
+                      <div class="q-detail-item">
+                        <span class="q-detail-label">
+                          <span class="q-field-icon-badge q-field-icon-badge--sky">
+                            <i class="bi bi-arrow-repeat"></i>
+                          </span>
+                          <span>{{ isRtl() ? 'الخدمة الحالية' : 'Current Service' }}</span>
+                        </span>
+                        <span class="q-detail-value">{{ getServiceName(t.currentServiceId) }}</span>
+                      </div>
+                    </div>
+
+                    <!-- Segment -->
+                    <div class="col-12 col-sm-6">
+                      <div class="q-detail-item">
+                        <span class="q-detail-label">
+                          <span class="q-field-icon-badge q-field-icon-badge--amber">
+                            <i class="bi bi-diagram-2"></i>
+                          </span>
+                          <span>{{ isRtl() ? 'الشريحة' : 'Segment' }}</span>
+                        </span>
+                        <span class="q-detail-value">{{ getSegmentName(t.segmentId) }}</span>
+                      </div>
+                    </div>
+
+                    <!-- Business Date -->
+                    <div class="col-12 col-sm-6">
+                      <div class="q-detail-item">
+                        <span class="q-detail-label">
+                          <span class="q-field-icon-badge q-field-icon-badge--violet">
+                            <i class="bi bi-calendar-event"></i>
+                          </span>
+                          <span>{{ isRtl() ? 'تاريخ العمل' : 'Business Date' }}</span>
+                        </span>
+                        <span class="q-detail-value font-monospace">{{ t.businessDate }}</span>
+                      </div>
+                    </div>
+
+                    @if (t.reservationId) {
+                      <!-- Linked Reservation -->
+                      <div class="col-12 col-sm-6">
+                        <div class="q-detail-item">
+                          <span class="q-detail-label">
+                            <span class="q-field-icon-badge q-field-icon-badge--emerald">
+                              <i class="bi bi-calendar-check"></i>
+                            </span>
+                            <span>{{ isRtl() ? 'الحجز المرتبط' : 'Linked Reservation' }}</span>
+                          </span>
+                          <span class="q-detail-value font-monospace text-success"
+                            >#{{ t.reservationId }}</span
+                          >
+                        </div>
+                      </div>
                     }
-                  </ul>
-                </section>
-              }
 
-              <!-- Service Journeys Stepper -->
-              @if (t.journeys && t.journeys.length > 0) {
-                <section class="mb-3" aria-label="Service Journeys">
-                  <h3 class="h6 fw-bold border-bottom pb-2 mb-2 text-secondary">
-                    <i class="bi bi-signpost-split me-1"></i>
-                    {{ isRtl() ? 'رحلات تقديم الخدمة' : 'Service Journeys' }}
-                  </h3>
-                  <div class="journeys-list">
-                    @for (j of t.journeys; track $index) {
-                      <div class="journey-card p-2 mb-2 rounded-3 border bg-light small">
-                        <div class="d-flex justify-content-between align-items-center mb-1">
-                          <strong class="text-primary">{{ getServiceName(j.serviceId) }}</strong>
-                          @if (j.outcome) {
-                            <span class="badge bg-secondary-subtle text-secondary border">{{
-                              j.outcome
-                            }}</span>
-                          }
+                    @if (t.currentWindowId) {
+                      <!-- Current Window -->
+                      <div class="col-12 col-sm-6">
+                        <div class="q-detail-item">
+                          <span class="q-detail-label">
+                            <span class="q-field-icon-badge q-field-icon-badge--cyan">
+                              <i class="bi bi-window-stack"></i>
+                            </span>
+                            <span>{{ isRtl() ? 'الشباك الحالي' : 'Current Window' }}</span>
+                          </span>
+                          <span class="q-detail-value font-monospace text-primary"
+                            >#{{ t.currentWindowId }}</span
+                          >
                         </div>
-                        <div class="text-muted d-flex flex-wrap gap-2">
-                          @if (j.entryType) {
-                            <span
-                              ><i class="bi bi-box-arrow-in-right me-1"></i>{{ j.entryType }}</span
-                            >
-                          }
-                          @if (j.workflowStepOrder) {
-                            <span
-                              ><i class="bi bi-list-ol me-1"></i>Step #{{
-                                j.workflowStepOrder
-                              }}</span
-                            >
-                          }
+                      </div>
+                    }
+
+                    <!-- Queue Entered -->
+                    <div class="col-12 col-sm-6">
+                      <div class="q-detail-item">
+                        <span class="q-detail-label">
+                          <span class="q-field-icon-badge q-field-icon-badge--emerald">
+                            <i class="bi bi-clock-history"></i>
+                          </span>
+                          <span>{{ isRtl() ? 'دخول الطابور' : 'Queue Entered' }}</span>
+                        </span>
+                        <span class="q-detail-value font-monospace small">{{
+                          formatDate(t.currentQueueEnteredOnUtc)
+                        }}</span>
+                      </div>
+                    </div>
+
+                    @if (t.currentServiceStartedOnUtc) {
+                      <!-- Service Started -->
+                      <div class="col-12 col-sm-6">
+                        <div class="q-detail-item">
+                          <span class="q-detail-label">
+                            <span class="q-field-icon-badge q-field-icon-badge--sky">
+                              <i class="bi bi-play-circle"></i>
+                            </span>
+                            <span>{{ isRtl() ? 'بدء الخدمة' : 'Service Started' }}</span>
+                          </span>
+                          <span class="q-detail-value font-monospace small text-primary">{{
+                            formatDate(t.currentServiceStartedOnUtc)
+                          }}</span>
                         </div>
-                        <div class="text-muted mt-1 small">
-                          @if (j.enteredWaitingOnUtc) {
-                            <div>
-                              {{ isRtl() ? 'دخول الانتظار:' : 'Entered:' }}
-                              {{ formatDate(j.enteredWaitingOnUtc) }}
-                            </div>
-                          }
-                          @if (j.serviceStartedOnUtc) {
-                            <div>
-                              {{ isRtl() ? 'بدء الخدمة:' : 'Started:' }}
-                              {{ formatDate(j.serviceStartedOnUtc) }}
-                            </div>
-                          }
-                          @if (j.serviceEndedOnUtc) {
-                            <div>
-                              {{ isRtl() ? 'انتهاء الخدمة:' : 'Ended:' }}
-                              {{ formatDate(j.serviceEndedOnUtc) }}
-                            </div>
-                          }
+                      </div>
+                    }
+
+                    @if (t.completedOnUtc) {
+                      <!-- Completed On -->
+                      <div class="col-12 col-sm-6">
+                        <div class="q-detail-item">
+                          <span class="q-detail-label">
+                            <span class="q-field-icon-badge q-field-icon-badge--teal">
+                              <i class="bi bi-check-circle"></i>
+                            </span>
+                            <span>{{ isRtl() ? 'اكتمال الخدمة' : 'Completed On' }}</span>
+                          </span>
+                          <span class="q-detail-value font-monospace small text-success">{{
+                            formatDate(t.completedOnUtc)
+                          }}</span>
+                        </div>
+                      </div>
+                    }
+
+                    @if (t.cancelledOnUtc) {
+                      <!-- Cancelled On -->
+                      <div class="col-12 col-sm-6">
+                        <div class="q-detail-item">
+                          <span class="q-detail-label">
+                            <span class="q-field-icon-badge q-field-icon-badge--rose">
+                              <i class="bi bi-x-circle"></i>
+                            </span>
+                            <span>{{ isRtl() ? 'تاريخ الإلغاء' : 'Cancelled On' }}</span>
+                          </span>
+                          <span class="q-detail-value font-monospace small text-danger">{{
+                            formatDate(t.cancelledOnUtc)
+                          }}</span>
+                        </div>
+                      </div>
+                    }
+
+                    @if (t.cancellationReason) {
+                      <div class="col-12">
+                        <div
+                          class="alert alert-danger py-2 px-3 mb-0 rounded-3 d-flex align-items-center gap-2 small"
+                        >
+                          <i
+                            class="bi bi-exclamation-triangle-fill flex-shrink-0 text-danger fs-6"
+                          ></i>
+                          <div>
+                            <strong class="d-block">{{
+                              isRtl() ? 'سبب الإلغاء:' : 'Reason:'
+                            }}</strong>
+                            <span>{{ t.cancellationReason }}</span>
+                          </div>
                         </div>
                       </div>
                     }
                   </div>
-                </section>
+                </div>
+              </div>
+
+              <!-- Bento Card 2: Workflow Info Section -->
+              @if (t.boundWorkflowId) {
+                <div class="q-dialog-card mb-3" aria-label="Workflow Info">
+                  <div class="q-dialog-card-header">
+                    <div class="d-flex align-items-center gap-2">
+                      <span class="q-dialog-card-icon q-dialog-card-icon--sky">
+                        <i class="bi bi-diagram-3-fill"></i>
+                      </span>
+                      <div>
+                        <h4 class="q-dialog-card-title m-0">
+                          {{ isRtl() ? 'مسار العمل المرتبط (Workflow)' : 'Bound Workflow' }}
+                        </h4>
+                        <span class="q-dialog-card-subtitle m-0">
+                          {{
+                            isRtl()
+                              ? 'المسار الإجرائي والمرحلة الحالية'
+                              : 'Workflow execution sequence'
+                          }}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="q-dialog-card-body p-3">
+                    <div class="row g-2">
+                      <div class="col-6">
+                        <div class="q-detail-item">
+                          <span class="q-detail-label">
+                            <span class="q-field-icon-badge q-field-icon-badge--indigo">
+                              <i class="bi bi-hash"></i>
+                            </span>
+                            <span>{{ isRtl() ? 'معرف المسار' : 'Workflow ID' }}</span>
+                          </span>
+                          <span class="q-detail-value font-monospace text-primary"
+                            >#{{ t.boundWorkflowId }}</span
+                          >
+                        </div>
+                      </div>
+                      <div class="col-6">
+                        <div class="q-detail-item">
+                          <span class="q-detail-label">
+                            <span class="q-field-icon-badge q-field-icon-badge--emerald">
+                              <i class="bi bi-list-ol"></i>
+                            </span>
+                            <span>{{ isRtl() ? 'الخطوة الحالية' : 'Current Step' }}</span>
+                          </span>
+                          <span class="q-detail-value font-monospace text-success"
+                            >#{{ t.currentWorkflowStepOrder }}</span
+                          >
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              }
+
+              <!-- Bento Card 3: Dynamic Custom Inputs Section -->
+              @if (t.customInputs && t.customInputs.length > 0) {
+                <div class="q-dialog-card mb-3" aria-label="Custom Inputs">
+                  <div class="q-dialog-card-header">
+                    <div class="d-flex align-items-center gap-2">
+                      <span class="q-dialog-card-icon q-dialog-card-icon--amber">
+                        <i class="bi bi-input-cursor-text"></i>
+                      </span>
+                      <div>
+                        <h4 class="q-dialog-card-title m-0">
+                          {{ isRtl() ? 'الحقول المخصصة' : 'Custom Inputs' }}
+                        </h4>
+                        <span class="q-dialog-card-subtitle m-0">
+                          {{
+                            isRtl()
+                              ? 'بيانات إضافية تم إدخالها مع التذكرة'
+                              : 'Captured customer form inputs'
+                          }}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="q-dialog-card-body p-3">
+                    <div class="row g-2">
+                      @for (inp of t.customInputs; track inp.serviceCustomInputId) {
+                        <div class="col-12">
+                          <div class="q-detail-item">
+                            <span class="q-detail-label">
+                              <span class="q-field-icon-badge q-field-icon-badge--amber">
+                                <i
+                                  class="bi"
+                                  [ngClass]="
+                                    inp.name?.toLowerCase()?.includes('phone') ||
+                                    inp.labelAr?.includes('هاتف') ||
+                                    inp.labelAr?.includes('محمول')
+                                      ? 'bi-telephone-fill'
+                                      : inp.name?.toLowerCase()?.includes('national') ||
+                                          inp.labelAr?.includes('قومي')
+                                        ? 'bi-person-vcard-fill'
+                                        : 'bi-card-text'
+                                  "
+                                ></i>
+                              </span>
+                              <span>{{
+                                isRtl() ? inp.labelAr || inp.name : inp.labelEn || inp.name
+                              }}</span>
+                            </span>
+                            <span class="q-detail-value font-monospace">{{
+                              inp.value || '—'
+                            }}</span>
+                          </div>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                </div>
+              }
+
+              <!-- Bento Card 4: Service Journeys Stepper -->
+              @if (t.journeys && t.journeys.length > 0) {
+                <div class="q-dialog-card mb-3" aria-label="Service Journeys">
+                  <div class="q-dialog-card-header">
+                    <div class="d-flex align-items-center gap-2">
+                      <span class="q-dialog-card-icon q-dialog-card-icon--indigo">
+                        <i class="bi bi-signpost-split-fill"></i>
+                      </span>
+                      <div>
+                        <h4 class="q-dialog-card-title m-0">
+                          {{ isRtl() ? 'رحلات تقديم الخدمة' : 'Service Journeys' }}
+                        </h4>
+                        <span class="q-dialog-card-subtitle m-0">
+                          {{
+                            isRtl()
+                              ? 'سجل المحطات والخدمات التي تمت زيارتها'
+                              : 'Service interaction lifecycle'
+                          }}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="q-dialog-card-body p-3">
+                    <div class="d-flex flex-column gap-2">
+                      @for (j of t.journeys; track $index) {
+                        <div class="journey-step-card p-3 rounded-3 bg-light">
+                          <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div class="d-flex align-items-center gap-2">
+                              <span class="q-field-icon-badge q-field-icon-badge--teal">
+                                <i class="bi bi-geo-alt-fill"></i>
+                              </span>
+                              <strong class="text-dark fs-6">{{
+                                getServiceName(j.serviceId)
+                              }}</strong>
+                            </div>
+                            @if (j.outcome) {
+                              <span
+                                class="badge bg-secondary-subtle text-secondary border px-2 py-1 small"
+                                >{{ j.outcome }}</span
+                              >
+                            }
+                          </div>
+                          <div class="d-flex flex-wrap gap-2 mb-2">
+                            @if (j.entryType) {
+                              <span class="badge bg-white text-muted border px-2 py-1 small">
+                                <i class="bi bi-box-arrow-in-right me-1"></i>{{ j.entryType }}
+                              </span>
+                            }
+                            @if (j.workflowStepOrder) {
+                              <span
+                                class="badge bg-info-subtle text-info-emphasis border border-info-subtle px-2 py-1 small"
+                              >
+                                <i class="bi bi-list-ol me-1"></i>Step #{{ j.workflowStepOrder }}
+                              </span>
+                            }
+                          </div>
+                          <div class="journey-timestamps text-muted small pt-2 border-top">
+                            @if (j.enteredWaitingOnUtc) {
+                              <div class="d-flex align-items-center justify-content-between mb-1">
+                                <span class="d-inline-flex align-items-center gap-1">
+                                  <i class="bi bi-clock text-primary"></i>
+                                  <span>{{ isRtl() ? 'دخول الانتظار:' : 'Entered:' }}</span>
+                                </span>
+                                <span class="font-monospace text-dark">{{
+                                  formatDate(j.enteredWaitingOnUtc)
+                                }}</span>
+                              </div>
+                            }
+                            @if (j.serviceStartedOnUtc) {
+                              <div class="d-flex align-items-center justify-content-between mb-1">
+                                <span class="d-inline-flex align-items-center gap-1">
+                                  <i class="bi bi-play-circle text-success"></i>
+                                  <span>{{ isRtl() ? 'بدء الخدمة:' : 'Started:' }}</span>
+                                </span>
+                                <span class="font-monospace text-dark">{{
+                                  formatDate(j.serviceStartedOnUtc)
+                                }}</span>
+                              </div>
+                            }
+                            @if (j.serviceEndedOnUtc) {
+                              <div class="d-flex align-items-center justify-content-between">
+                                <span class="d-inline-flex align-items-center gap-1">
+                                  <i class="bi bi-check-circle text-secondary"></i>
+                                  <span>{{ isRtl() ? 'انتهاء الخدمة:' : 'Ended:' }}</span>
+                                </span>
+                                <span class="font-monospace text-dark">{{
+                                  formatDate(j.serviceEndedOnUtc)
+                                }}</span>
+                              </div>
+                            }
+                          </div>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                </div>
               }
 
               <!-- History Timeline Component -->
-              <app-history-timeline [events]="historyEvents()" />
+              <div class="mb-3">
+                <app-history-timeline [events]="historyEvents()" />
+              </div>
 
               <!-- Ticket Action Matrix Buttons -->
               @if (!t.isArchived) {
-                <div class="actions-panel d-flex flex-wrap gap-2 mt-4 pt-3 border-top">
+                <div class="actions-panel d-flex flex-wrap gap-2 pt-3 border-top">
                   @if (t.status === 'Waiting' && canCancelTicket()) {
                     <button
                       type="button"
-                      class="btn btn-outline-danger btn-sm rounded-pill"
+                      class="q-btn q-btn--danger"
                       [disabled]="actionLoading()"
                       (click)="openCancelModal('ticket')"
                     >
-                      <i class="bi bi-x-circle me-1"></i>
-                      {{ isRtl() ? 'إلغاء التذكرة' : 'Cancel Ticket' }}
+                      <i class="bi bi-x-circle"></i>
+                      <span>{{ isRtl() ? 'إلغاء التذكرة' : 'Cancel Ticket' }}</span>
                     </button>
                   }
 
                   @if (t.status === 'Called' && canStartService()) {
                     <button
                       type="button"
-                      class="primary-action btn-sm"
+                      class="q-btn q-btn--primary"
                       [disabled]="actionLoading()"
                       (click)="openConfirmModal('startService')"
                     >
-                      <i class="bi bi-play-fill me-1"></i>
-                      {{ isRtl() ? 'بدء تقديم الخدمة' : 'Start Service' }}
+                      <i class="bi bi-play-fill"></i>
+                      <span>{{ isRtl() ? 'بدء تقديم الخدمة' : 'Start Service' }}</span>
                     </button>
                   }
 
                   @if (t.status === 'InProgress' && canCompleteService()) {
                     <button
                       type="button"
-                      class="btn btn-success btn-sm rounded-pill"
+                      class="q-btn q-btn--success"
                       [disabled]="actionLoading()"
                       (click)="openConfirmModal('completeService')"
                     >
-                      <i class="bi bi-check2-circle me-1"></i>
-                      {{ isRtl() ? 'إنهاء الخدمة' : 'Complete Service' }}
+                      <i class="bi bi-check2-circle"></i>
+                      <span>{{ isRtl() ? 'إنهاء الخدمة' : 'Complete Service' }}</span>
                     </button>
                   }
 
@@ -785,36 +1137,36 @@
                   ) {
                     <button
                       type="button"
-                      class="btn btn-outline-primary btn-sm rounded-pill"
+                      class="q-btn q-btn--secondary"
                       [disabled]="actionLoading()"
                       (click)="openTransferModal()"
                     >
-                      <i class="bi bi-arrow-left-right me-1"></i>
-                      {{ isRtl() ? 'تحويل يدوي' : 'Manual Transfer' }}
+                      <i class="bi bi-arrow-left-right"></i>
+                      <span>{{ isRtl() ? 'تحويل يدوي' : 'Manual Transfer' }}</span>
                     </button>
                   }
 
                   @if (t.status === 'NoShow' && canReturnNoShow()) {
                     <button
                       type="button"
-                      class="btn btn-outline-primary btn-sm rounded-pill"
+                      class="q-btn q-btn--secondary"
                       [disabled]="actionLoading()"
                       (click)="openConfirmModal('returnToWaiting')"
                     >
-                      <i class="bi bi-arrow-counterclockwise me-1"></i>
-                      {{ isRtl() ? 'إعادة لقائمة الانتظار' : 'Return to Queue' }}
+                      <i class="bi bi-arrow-counterclockwise"></i>
+                      <span>{{ isRtl() ? 'إعادة لقائمة الانتظار' : 'Return to Queue' }}</span>
                     </button>
                   }
 
                   @if (t.status === 'NoShow' && canCancelTicket()) {
                     <button
                       type="button"
-                      class="btn btn-outline-danger btn-sm rounded-pill"
+                      class="q-btn q-btn--danger"
                       [disabled]="actionLoading()"
                       (click)="openCancelModal('ticket')"
                     >
-                      <i class="bi bi-x-circle me-1"></i>
-                      {{ isRtl() ? 'إلغاء التذكرة' : 'Cancel Ticket' }}
+                      <i class="bi bi-x-circle"></i>
+                      <span>{{ isRtl() ? 'إلغاء التذكرة' : 'Cancel Ticket' }}</span>
                     </button>
                   }
                 </div>
@@ -823,102 +1175,211 @@
 
             <!-- Reservation Details Sections -->
             @if (selectedReservation(); as r) {
-              <section class="mb-3" aria-label="Reservation Overview">
-                <h3 class="h6 fw-bold border-bottom pb-2 mb-2 text-secondary">
-                  <i class="bi bi-info-circle me-1"></i>
-                  {{ isRtl() ? 'بيانات الحجز الأساسية' : 'Summary Overview' }}
-                </h3>
-                <div class="details-grid small">
-                  <div class="detail-row">
-                    <span class="text-muted">{{ isRtl() ? 'الخدمة:' : 'Service:' }}</span>
-                    <strong class="text-dark">{{ getServiceName(r.serviceId) }}</strong>
-                  </div>
-                  <div class="detail-row">
-                    <span class="text-muted">{{ isRtl() ? 'الشريحة:' : 'Segment:' }}</span>
-                    <strong class="text-dark">{{ getSegmentName(r.segmentId) }}</strong>
-                  </div>
-                  <div class="detail-row">
-                    <span class="text-muted">{{
-                      isRtl() ? 'الموعد المجدول:' : 'Scheduled For:'
-                    }}</span>
-                    <span>{{ formatDate(r.scheduledOnUtc) }}</span>
-                  </div>
-                  @if (r.convertedTicketId) {
-                    <div class="detail-row">
-                      <span class="text-muted">{{
-                        isRtl() ? 'التذكرة المحولة:' : 'Converted Ticket:'
-                      }}</span>
-                      <span class="badge bg-success-subtle text-success border"
-                        >#{{ r.convertedTicketId }}</span
-                      >
+              <!-- Bento Card 1: Core Overview -->
+              <div class="q-dialog-card mb-3" aria-label="Reservation Overview">
+                <div class="q-dialog-card-header">
+                  <div class="d-flex align-items-center gap-2">
+                    <span class="q-dialog-card-icon q-dialog-card-icon--teal">
+                      <i class="bi bi-info-circle-fill"></i>
+                    </span>
+                    <div>
+                      <h4 class="q-dialog-card-title m-0">
+                        {{ isRtl() ? 'بيانات الحجز الأساسية' : 'Summary Overview' }}
+                      </h4>
+                      <span class="q-dialog-card-subtitle m-0">
+                        {{
+                          isRtl()
+                            ? 'تفاصيل الحجز المجدول والخدمة المستهدفة'
+                            : 'Scheduled reservation details'
+                        }}
+                      </span>
                     </div>
-                  }
-                  @if (r.cancelledOnUtc) {
-                    <div class="detail-row">
-                      <span class="text-muted">{{
-                        isRtl() ? 'تاريخ الإلغاء:' : 'Cancelled On:'
-                      }}</span>
-                      <span>{{ formatDate(r.cancelledOnUtc) }}</span>
-                    </div>
-                  }
-                  @if (r.cancellationReason) {
-                    <div class="detail-row alert alert-danger py-1 px-2 mb-0">
-                      <span class="fw-bold">{{ isRtl() ? 'سبب الإلغاء:' : 'Reason:' }}</span>
-                      <span>{{ r.cancellationReason }}</span>
-                    </div>
-                  }
+                  </div>
                 </div>
-              </section>
 
-              <!-- Dynamic Custom Inputs Section -->
-              @if (r.customInputs && r.customInputs.length > 0) {
-                <section class="mb-3" aria-label="Custom Inputs">
-                  <h3 class="h6 fw-bold border-bottom pb-2 mb-2 text-secondary">
-                    <i class="bi bi-input-cursor-text me-1"></i>
-                    {{ isRtl() ? 'الحقول المخصصة' : 'Custom Inputs' }}
-                  </h3>
-                  <ul class="list-group list-group-flush small">
-                    @for (inp of r.customInputs; track inp.serviceCustomInputId) {
-                      <li
-                        class="list-group-item d-flex justify-content-between align-items-center px-0 py-1"
-                      >
-                        <span class="text-muted"
-                          >{{ isRtl() ? inp.labelAr || inp.name : inp.labelEn || inp.name }}:</span
-                        >
-                        <strong class="text-dark">{{ inp.value || '—' }}</strong>
-                      </li>
+                <div class="q-dialog-card-body p-3">
+                  <div class="row g-2">
+                    <!-- Service -->
+                    <div class="col-12 col-sm-6">
+                      <div class="q-detail-item">
+                        <span class="q-detail-label">
+                          <span class="q-field-icon-badge q-field-icon-badge--teal">
+                            <i class="bi bi-gear-wide-connected"></i>
+                          </span>
+                          <span>{{ isRtl() ? 'الخدمة' : 'Service' }}</span>
+                        </span>
+                        <span class="q-detail-value">{{ getServiceName(r.serviceId) }}</span>
+                      </div>
+                    </div>
+
+                    <!-- Segment -->
+                    <div class="col-12 col-sm-6">
+                      <div class="q-detail-item">
+                        <span class="q-detail-label">
+                          <span class="q-field-icon-badge q-field-icon-badge--amber">
+                            <i class="bi bi-diagram-2"></i>
+                          </span>
+                          <span>{{ isRtl() ? 'الشريحة' : 'Segment' }}</span>
+                        </span>
+                        <span class="q-detail-value">{{ getSegmentName(r.segmentId) }}</span>
+                      </div>
+                    </div>
+
+                    <!-- Scheduled For -->
+                    <div class="col-12">
+                      <div class="q-detail-item">
+                        <span class="q-detail-label">
+                          <span class="q-field-icon-badge q-field-icon-badge--violet">
+                            <i class="bi bi-calendar-check"></i>
+                          </span>
+                          <span>{{ isRtl() ? 'الموعد المجدول' : 'Scheduled For' }}</span>
+                        </span>
+                        <span class="q-detail-value font-monospace">{{
+                          formatDate(r.scheduledOnUtc)
+                        }}</span>
+                      </div>
+                    </div>
+
+                    @if (r.convertedTicketId) {
+                      <div class="col-12">
+                        <div class="q-detail-item">
+                          <span class="q-detail-label">
+                            <span class="q-field-icon-badge q-field-icon-badge--emerald">
+                              <i class="bi bi-ticket-perforated"></i>
+                            </span>
+                            <span>{{ isRtl() ? 'التذكرة المحولة' : 'Converted Ticket' }}</span>
+                          </span>
+                          <span class="q-detail-value font-monospace text-success"
+                            >#{{ r.convertedTicketId }}</span
+                          >
+                        </div>
+                      </div>
                     }
-                  </ul>
-                </section>
+
+                    @if (r.cancelledOnUtc) {
+                      <div class="col-12">
+                        <div class="q-detail-item">
+                          <span class="q-detail-label">
+                            <span class="q-field-icon-badge q-field-icon-badge--rose">
+                              <i class="bi bi-x-circle"></i>
+                            </span>
+                            <span>{{ isRtl() ? 'تاريخ الإلغاء' : 'Cancelled On' }}</span>
+                          </span>
+                          <span class="q-detail-value font-monospace text-danger">{{
+                            formatDate(r.cancelledOnUtc)
+                          }}</span>
+                        </div>
+                      </div>
+                    }
+
+                    @if (r.cancellationReason) {
+                      <div class="col-12">
+                        <div
+                          class="alert alert-danger py-2 px-3 mb-0 rounded-3 d-flex align-items-center gap-2 small"
+                        >
+                          <i
+                            class="bi bi-exclamation-triangle-fill flex-shrink-0 text-danger fs-6"
+                          ></i>
+                          <div>
+                            <strong class="d-block">{{
+                              isRtl() ? 'سبب الإلغاء:' : 'Reason:'
+                            }}</strong>
+                            <span>{{ r.cancellationReason }}</span>
+                          </div>
+                        </div>
+                      </div>
+                    }
+                  </div>
+                </div>
+              </div>
+
+              <!-- Bento Card 2: Dynamic Custom Inputs Section -->
+              @if (r.customInputs && r.customInputs.length > 0) {
+                <div class="q-dialog-card mb-3" aria-label="Custom Inputs">
+                  <div class="q-dialog-card-header">
+                    <div class="d-flex align-items-center gap-2">
+                      <span class="q-dialog-card-icon q-dialog-card-icon--amber">
+                        <i class="bi bi-input-cursor-text"></i>
+                      </span>
+                      <div>
+                        <h4 class="q-dialog-card-title m-0">
+                          {{ isRtl() ? 'الحقول المخصصة' : 'Custom Inputs' }}
+                        </h4>
+                        <span class="q-dialog-card-subtitle m-0">
+                          {{
+                            isRtl()
+                              ? 'بيانات إضافية تم إدخالها عند الحجز'
+                              : 'Captured reservation form inputs'
+                          }}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="q-dialog-card-body p-3">
+                    <div class="row g-2">
+                      @for (inp of r.customInputs; track inp.serviceCustomInputId) {
+                        <div class="col-12">
+                          <div class="q-detail-item">
+                            <span class="q-detail-label">
+                              <span class="q-field-icon-badge q-field-icon-badge--amber">
+                                <i
+                                  class="bi"
+                                  [ngClass]="
+                                    inp.name?.toLowerCase()?.includes('phone') ||
+                                    inp.labelAr?.includes('هاتف') ||
+                                    inp.labelAr?.includes('محمول')
+                                      ? 'bi-telephone-fill'
+                                      : inp.name?.toLowerCase()?.includes('national') ||
+                                          inp.labelAr?.includes('قومي')
+                                        ? 'bi-person-vcard-fill'
+                                        : 'bi-card-text'
+                                  "
+                                ></i>
+                              </span>
+                              <span>{{
+                                isRtl() ? inp.labelAr || inp.name : inp.labelEn || inp.name
+                              }}</span>
+                            </span>
+                            <span class="q-detail-value font-monospace">{{
+                              inp.value || '—'
+                            }}</span>
+                          </div>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                </div>
               }
 
               <!-- History Timeline Component -->
-              <app-history-timeline [events]="historyEvents()" />
+              <div class="mb-3">
+                <app-history-timeline [events]="historyEvents()" />
+              </div>
 
               <!-- Reservation Action Matrix Buttons -->
               @if (!r.isArchived) {
-                <div class="actions-panel d-flex flex-wrap gap-2 mt-4 pt-3 border-top">
+                <div class="actions-panel d-flex flex-wrap gap-2 pt-3 border-top">
                   @if (r.status === 'Active' && canCancelReservation()) {
                     <button
                       type="button"
-                      class="btn btn-outline-danger btn-sm rounded-pill"
+                      class="q-btn q-btn--danger"
                       [disabled]="actionLoading()"
                       (click)="openCancelModal('reservation')"
                     >
-                      <i class="bi bi-x-circle me-1"></i>
-                      {{ isRtl() ? 'إلغاء الحجز' : 'Cancel Reservation' }}
+                      <i class="bi bi-x-circle"></i>
+                      <span>{{ isRtl() ? 'إلغاء الحجز' : 'Cancel Reservation' }}</span>
                     </button>
                   }
 
                   @if (r.status === 'Active' && canConvertReservation()) {
                     <button
                       type="button"
-                      class="primary-action btn-sm"
+                      class="q-btn q-btn--primary"
                       [disabled]="actionLoading()"
                       (click)="openConfirmModal('convertToTicket')"
                     >
-                      <i class="bi bi-arrow-repeat me-1"></i>
-                      {{ isRtl() ? 'تحويل لتذكرة' : 'Convert to Ticket' }}
+                      <i class="bi bi-arrow-repeat"></i>
+                      <span>{{ isRtl() ? 'تحويل لتذكرة' : 'Convert to Ticket' }}</span>
                     </button>
                   }
                 </div>

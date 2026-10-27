@@ -147,14 +147,6 @@
           </p>
         }
 
-        @if (branchTableLoading()) {
-          <app-niletronix-loading-state
-            [title]="translations().loadingLabel"
-            variant="inline"
-            size="sm"
-          />
-        }
-
         <div data-testid="branches-desktop" class="table-responsive table-wrap d-none d-md-block">
           <table class="table align-middle custom-table">
             <thead>
@@ -172,7 +164,30 @@
               </tr>
             </thead>
             <tbody>
-              @for (branch of branches(); track branch.id) {
+              @if (branchTableLoading()) {
+                @for (item of skeletonRows; track $index) {
+                  <tr class="table-skeleton-row" aria-hidden="true">
+                    <td><div class="skeleton-shimmer skeleton-bar skeleton-bar--code"></div></td>
+                    <td><div class="skeleton-shimmer skeleton-bar skeleton-bar--title"></div></td>
+                    <td><div class="skeleton-shimmer skeleton-bar skeleton-bar--text"></div></td>
+                    <td><div class="skeleton-shimmer skeleton-bar skeleton-bar--ip"></div></td>
+                    <td><div class="skeleton-shimmer skeleton-bar skeleton-bar--text-sm"></div></td>
+                    <td><div class="skeleton-shimmer skeleton-bar skeleton-bar--text-sm"></div></td>
+                    <td><div class="skeleton-shimmer skeleton-pill"></div></td>
+                    <td><div class="skeleton-shimmer skeleton-pill"></div></td>
+                    <td><div class="skeleton-shimmer skeleton-bar skeleton-bar--creator"></div></td>
+                    <td class="text-center">
+                      <div class="skeleton-actions">
+                        <div class="skeleton-shimmer skeleton-action-btn"></div>
+                        <div class="skeleton-shimmer skeleton-action-btn"></div>
+                        <div class="skeleton-shimmer skeleton-action-btn"></div>
+                        <div class="skeleton-shimmer skeleton-action-btn"></div>
+                      </div>
+                    </td>
+                  </tr>
+                }
+              } @else {
+                @for (branch of branches(); track branch.id) {
                 <tr
                   class="branch-selectable-row"
                   [class.branch-context-selected]="selectedContextBranchId() === branch.id"
@@ -332,13 +347,36 @@
                   </td>
                 </tr>
               }
+            }
             </tbody>
           </table>
         </div>
 
         <div data-testid="branches-mobile" class="d-grid gap-3 d-md-none">
-          @for (branch of branches(); track branch.id) {
-            <app-mobile-record-card
+          @if (branchTableLoading()) {
+            @for (item of skeletonCards; track $index) {
+              <div class="skeleton-card" aria-hidden="true">
+                <div class="d-flex align-items-center justify-content-between">
+                  <div class="skeleton-shimmer skeleton-bar skeleton-bar--code"></div>
+                  <div class="skeleton-shimmer skeleton-pill"></div>
+                </div>
+                <div class="skeleton-shimmer skeleton-bar skeleton-bar--title mt-2"></div>
+                <div class="row g-2 mt-2">
+                  <div class="col-6"><div class="skeleton-shimmer skeleton-bar skeleton-bar--text"></div></div>
+                  <div class="col-6"><div class="skeleton-shimmer skeleton-bar skeleton-bar--text"></div></div>
+                  <div class="col-6"><div class="skeleton-shimmer skeleton-bar skeleton-bar--text-sm"></div></div>
+                  <div class="col-6"><div class="skeleton-shimmer skeleton-bar skeleton-bar--creator"></div></div>
+                </div>
+                <div class="d-flex gap-2 mt-2 pt-2 border-top">
+                  <div class="skeleton-shimmer skeleton-action-btn"></div>
+                  <div class="skeleton-shimmer skeleton-action-btn"></div>
+                  <div class="skeleton-shimmer skeleton-action-btn"></div>
+                </div>
+              </div>
+            }
+          } @else {
+            @for (branch of branches(); track branch.id) {
+              <app-mobile-record-card
               class="branch-selectable-card"
               [class.branch-context-selected]="selectedContextBranchId() === branch.id"
               [attr.role]="canSelectBranchContext() ? 'link' : null"
@@ -493,6 +531,7 @@
               }
             </app-mobile-record-card>
           }
+        }
         </div>
 
         @if (branches().length === 0 && !branchTableLoading()) {
@@ -514,7 +553,7 @@
               [disabled]="!branchTableMeta().hasPreviousPage || branchTableLoading()"
               (click)="previousBranchPage()"
             >
-              <i class="bi bi-chevron-right me-1" aria-hidden="true"></i>
+              <i class="bi me-1" [class.bi-chevron-right]="direction() === 'rtl'" [class.bi-chevron-left]="direction() !== 'rtl'" aria-hidden="true"></i>
               {{ translations().previousLabel }}
             </button>
             <span class="page-indicator">
@@ -527,7 +566,7 @@
               (click)="nextBranchPage()"
             >
               {{ translations().nextLabel }}
-              <i class="bi bi-chevron-left ms-1" aria-hidden="true"></i>
+              <i class="bi ms-1" [class.bi-chevron-left]="direction() === 'rtl'" [class.bi-chevron-right]="direction() !== 'rtl'" aria-hidden="true"></i>
             </button>
           </div>
         </div>
@@ -601,11 +640,12 @@
 
           <div class="q-dialog-body">
             @if (branchPanelLoading()) {
-              <app-niletronix-loading-state
-                [title]="translations().loadingLabel"
-                variant="inline"
-                size="sm"
-              />
+              <div class="p-3 d-flex flex-column gap-3" aria-hidden="true">
+                <div class="skeleton-shimmer skeleton-bar" style="width: 45%; height: 18px;"></div>
+                <div class="skeleton-shimmer skeleton-bar" style="width: 100%; height: 38px; border-radius: 6px;"></div>
+                <div class="skeleton-shimmer skeleton-bar" style="width: 100%; height: 38px; border-radius: 6px;"></div>
+                <div class="skeleton-shimmer skeleton-bar" style="width: 75%; height: 38px; border-radius: 6px;"></div>
+              </div>
             }
 
             @if (branchPanelMode() === 'view' && selectedBranchDetails(); as details) {

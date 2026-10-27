@@ -29,6 +29,7 @@ import { BranchManagementApiService } from '@features/branch-management/services
 import { BranchPermissionService } from '@features/branch-management/services/branch-permission/branch-permission.service';
 import { AdminI18nStore } from '@layout/admin-shell/store/admin-i18n.store';
 import { formatApiError } from '@shared/utils/api-error-message.util';
+import { localizeToastMessage } from '@shared/utils/toast-message.util';
 
 type ThemeColorControl = 'mainColor' | 'secondaryColor' | 'backgroundColor';
 type UiMessageTone = 'success' | 'error' | 'info';
@@ -99,6 +100,16 @@ interface BranchBrandingPageTranslations {
   readonly moveDown: string;
   readonly saveOrder: string;
   readonly orderLabel: string;
+  readonly kioskPreviewTitle: string;
+  readonly kioskPreviewSubtitle: string;
+  readonly previewLangAr: string;
+  readonly previewLangEn: string;
+  readonly previewStepLang: string;
+  readonly previewStepService: string;
+  readonly previewStepKeypad: string;
+  readonly previewOrientationLandscape: string;
+  readonly previewOrientationPortrait: string;
+  readonly previewKioskLabel: string;
   readonly confirmDelete: string;
   readonly loading: string;
   readonly conflict: string;
@@ -106,8 +117,11 @@ interface BranchBrandingPageTranslations {
   readonly tooManyImages: string;
   readonly genericError: string;
   readonly themeSaved: string;
+  readonly logoUploaded: string;
   readonly advertisementsUploaded: string;
   readonly orderSaved: string;
+  readonly advertisementStatusUpdated: string;
+  readonly advertisementDeleted: string;
   readonly close: string;
 }
 
@@ -198,6 +212,16 @@ const PAGE_TRANSLATIONS: Record<AppLanguage, BranchBrandingPageTranslations> = {
     moveDown: 'تحريك لأسفل',
     saveOrder: 'حفظ الترتيب',
     orderLabel: 'الترتيب',
+    kioskPreviewTitle: 'معاينة شاشة الكيوسك المباشرة',
+    kioskPreviewSubtitle: 'معاينة حية وتفاعلية لجميع عناصر الشاشة بالثيم المخصص',
+    previewLangAr: 'عربي (RTL)',
+    previewLangEn: 'English (LTR)',
+    previewStepLang: 'اللغة',
+    previewStepService: 'الخدمات',
+    previewStepKeypad: 'الأرقام',
+    previewOrientationLandscape: 'أفقي',
+    previewOrientationPortrait: 'رأسي',
+    previewKioskLabel: 'معاينة شاشة الكيوسك',
     confirmDelete: 'هل أنت متأكد من حذف هذا الإعلان نهائيا؟ لا يمكن التراجع عن هذا الإجراء.',
     loading: 'جاري التحميل...',
     conflict:
@@ -206,8 +230,11 @@ const PAGE_TRANSLATIONS: Record<AppLanguage, BranchBrandingPageTranslations> = {
     tooManyImages: 'عدد الصور المحددة يتجاوز الحد المتاح لهذا الفرع.',
     genericError: 'حدث خطأ غير متوقع.',
     themeSaved: 'تم حفظ إعدادات الهوية البصرية والتصميم بنجاح.',
+    logoUploaded: 'تم رفع شعار الفرع بنجاح.',
     advertisementsUploaded: 'تم رفع الإعلانات بنجاح.',
     orderSaved: 'تم حفظ ترتيب الإعلانات بنجاح.',
+    advertisementStatusUpdated: 'تم تحديث حالة الإعلان بنجاح.',
+    advertisementDeleted: 'تم حذف الإعلان بنجاح.',
     close: 'إغلاق',
   },
   en: {
@@ -276,6 +303,16 @@ const PAGE_TRANSLATIONS: Record<AppLanguage, BranchBrandingPageTranslations> = {
     moveDown: 'Move down',
     saveOrder: 'Save order',
     orderLabel: 'Order',
+    kioskPreviewTitle: 'Live Kiosk Preview',
+    kioskPreviewSubtitle: 'Interactive real-time preview of the kiosk with active theme',
+    previewLangAr: 'Arabic (RTL)',
+    previewLangEn: 'English (LTR)',
+    previewStepLang: 'Languages',
+    previewStepService: 'Services',
+    previewStepKeypad: 'Keypad',
+    previewOrientationLandscape: 'Landscape',
+    previewOrientationPortrait: 'Portrait',
+    previewKioskLabel: 'Preview Kiosk Screen',
     confirmDelete:
       'Are you sure you want to permanently delete this advertisement? This action cannot be undone.',
     loading: 'Loading...',
@@ -285,8 +322,11 @@ const PAGE_TRANSLATIONS: Record<AppLanguage, BranchBrandingPageTranslations> = {
     tooManyImages: 'Selected images exceed the available slots for this branch.',
     genericError: 'Unexpected error occurred.',
     themeSaved: 'Visual identity and layout settings saved successfully.',
+    logoUploaded: 'Branch logo uploaded successfully.',
     advertisementsUploaded: 'Advertisements uploaded successfully.',
     orderSaved: 'Advertisement order saved successfully.',
+    advertisementStatusUpdated: 'Advertisement status updated successfully.',
+    advertisementDeleted: 'Advertisement deleted successfully.',
     close: 'Close',
   },
 };
@@ -335,6 +375,16 @@ export class BranchBrandingComponent implements OnInit, OnDestroy {
   protected readonly logoValidationMessage = signal('');
   protected readonly advertisementValidationMessage = signal('');
   protected readonly message = signal<UiMessage | null>(null);
+  protected readonly activeMessage = computed(() => {
+    const msg = this.message();
+    if (!msg) {
+      return null;
+    }
+    return {
+      tone: msg.tone,
+      text: localizeToastMessage(msg.text, this.i18nStore.language(), msg.text),
+    };
+  });
   protected readonly branchesLoading = signal(false);
   protected readonly brandingLoading = signal(false);
   protected readonly advertisementsLoading = signal(false);
@@ -347,6 +397,14 @@ export class BranchBrandingComponent implements OnInit, OnDestroy {
   protected readonly draggingAdvertisementId = signal<number | null>(null);
   protected readonly dragOverAdvertisementId = signal<number | null>(null);
   protected readonly dragOverPlacement = signal<DropPlacement>('before');
+
+  protected readonly kioskPreviewUrl = computed(() => {
+    const branchId = this.selectedBranchId();
+    return branchId ? `/service-request?branchId=${branchId}` : '/service-request';
+  });
+  protected openKioskPreview(): void {
+    window.open(this.kioskPreviewUrl(), '_blank');
+  }
 
   protected readonly themeForm = this.formBuilder.group({
     // SECTION A — General Colors
@@ -525,6 +583,15 @@ export class BranchBrandingComponent implements OnInit, OnDestroy {
     return String(this.themeForm.controls[controlName].value ?? '');
   }
 
+  protected themeControlNumber(
+    controlName: keyof typeof this.themeForm.controls,
+    fallback = 0,
+  ): number {
+    const value = this.themeForm.controls[controlName].value;
+    const num = Number(value);
+    return Number.isFinite(num) && num > 0 ? num : fallback;
+  }
+
   protected themePickerValue(
     controlName: keyof typeof this.themeForm.controls,
     fallback = '#000000',
@@ -693,7 +760,7 @@ export class BranchBrandingComponent implements OnInit, OnDestroy {
         next: (branding) => {
           this.applyBranding(branding);
           this.clearLogoSelection();
-          this.showMessage('success', branding.message ?? this.copy().themeSaved);
+          this.showMessage('success', branding.message ?? this.copy().logoUploaded);
         },
         error: (error: HttpErrorResponse) => this.handleApiError(error, () => this.loadBranding()),
         complete: () => this.logoUploading.set(false),
@@ -996,7 +1063,7 @@ export class BranchBrandingComponent implements OnInit, OnDestroy {
     request.subscribe({
       next: (response) => {
         this.updateAdvertisementState(response);
-        this.showMessage('success', response.message);
+        this.showMessage('success', response.message ?? this.copy().advertisementStatusUpdated);
       },
       error: (error: HttpErrorResponse) =>
         this.handleApiError(error, () => this.loadAdvertisements()),
@@ -1017,7 +1084,7 @@ export class BranchBrandingComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (response) => {
           this.removeAdvertisement(response.advertisementId);
-          this.showMessage('success', response.message);
+          this.showMessage('success', response.message ?? this.copy().advertisementDeleted);
         },
         error: (error: HttpErrorResponse) =>
           this.handleApiError(error, () => this.loadAdvertisements()),
@@ -1040,13 +1107,17 @@ export class BranchBrandingComponent implements OnInit, OnDestroy {
 
   private loadBranches(): void {
     const currentSession = this.authSessionService.currentSession();
-    const activeBranchId = currentSession?.activeBranchId ? Number(currentSession.activeBranchId) : null;
+    const activeBranchId = currentSession?.activeBranchId
+      ? Number(currentSession.activeBranchId)
+      : null;
     const isTechAdmin = currentSession?.userType === 'TechnicalAdmin';
 
     if (!isTechAdmin && activeBranchId) {
       const branch = currentSession?.branches?.find((b) => b.branchId === activeBranchId);
       const branchName = branch
-        ? (this.language() === 'ar' ? branch.arabicName : branch.englishName) || branch.arabicName || branch.englishName
+        ? (this.language() === 'ar' ? branch.arabicName : branch.englishName) ||
+          branch.arabicName ||
+          branch.englishName
         : `فرع ${activeBranchId}`;
       const branchOption: BranchOption = { id: activeBranchId, label: branchName };
       this.branches.set([branchOption]);
@@ -1075,7 +1146,10 @@ export class BranchBrandingComponent implements OnInit, OnDestroy {
         error: (error: HttpErrorResponse) => {
           this.branchesLoading.set(false);
           if (activeBranchId) {
-            const branchOption: BranchOption = { id: activeBranchId, label: `فرع ${activeBranchId}` };
+            const branchOption: BranchOption = {
+              id: activeBranchId,
+              label: `فرع ${activeBranchId}`,
+            };
             this.branches.set([branchOption]);
             this.selectedBranchId.set(activeBranchId);
             this.loadSelectedBranchData();
@@ -1344,7 +1418,7 @@ export class BranchBrandingComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.showMessage('error', formatApiError(error, this.copy().genericError));
+    this.showMessage('error', formatApiError(error, this.copy().genericError, this.i18nStore.language()));
   }
 
   private showMessage(tone: UiMessageTone, text: string): void {

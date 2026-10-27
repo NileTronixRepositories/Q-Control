@@ -12,4 +12,5 @@ export class PageHeroComponent {
   readonly title = input.required<string>();
   readonly description = input('');
   readonly icon = input.required<string>();
+  readonly iconVariant = input<'coral' | 'amber' | 'emerald' | 'violet' | 'dark' | 'teal'>('coral');
 }

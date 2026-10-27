@@ -1,9 +1,18 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  OnDestroy,
+  OnInit,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MobileRecordCardComponent } from '../../../../shared/components/mobile-record-card/mobile-record-card.component';
 import { NiletronixLoadingStateComponent } from '../../../../shared/components/niletronix-loading-state/niletronix-loading-state.component';
 import { PageHeroComponent } from '../../../../shared/components/page-hero/page-hero.component';
+import { AppModalComponent } from '../../../../shared/components/app-modal/app-modal.component';
 import { Router } from '@angular/router';
 
 import { AppLanguage, AuthSessionService } from '@core';
@@ -82,15 +91,23 @@ interface WaitingAreaPageTranslations {
   readonly deleteConfirm: string;
   readonly fallbackSuccess: string;
   readonly fallbackError: string;
+  readonly areaInfoSection: string;
+  readonly devicesSection: string;
+  readonly detailsSubtitle: string;
+  readonly createSubtitle: string;
+  readonly editSubtitle: string;
   readonly notAvailable: string;
 }
 
 const WAITING_AREA_TRANSLATIONS: Record<AppLanguage, WaitingAreaPageTranslations> = {
   ar: {
     title: '\u0645\u0646\u0627\u0637\u0642 \u0627\u0644\u0627\u0646\u062a\u0638\u0627\u0631',
-    description: '\u0625\u062f\u0627\u0631\u0629 \u0645\u0646\u0627\u0637\u0642 \u0627\u0644\u0627\u0646\u062a\u0638\u0627\u0631 \u0627\u0644\u0645\u0631\u062a\u0628\u0637\u0629 \u0628\u0627\u0644\u0641\u0631\u0648\u0639 \u0648\u0623\u062c\u0647\u0632\u0629 \u0627\u0644\u0635\u0648\u062a \u0648\u0627\u0644\u062a\u062d\u0643\u0645.',
-    addButton: '\u0625\u0636\u0627\u0641\u0629 \u0645\u0646\u0637\u0642\u0629 \u0627\u0646\u062a\u0638\u0627\u0631',
-    searchPlaceholder: '\u0628\u062d\u062b \u0628\u0627\u0644\u0627\u0633\u0645 \u0623\u0648 \u0627\u0644\u062c\u0647\u0627\u0632 \u0623\u0648 \u0627\u0644\u0631\u0642\u0645',
+    description:
+      '\u0625\u062f\u0627\u0631\u0629 \u0645\u0646\u0627\u0637\u0642 \u0627\u0644\u0627\u0646\u062a\u0638\u0627\u0631 \u0627\u0644\u0645\u0631\u062a\u0628\u0637\u0629 \u0628\u0627\u0644\u0641\u0631\u0648\u0639 \u0648\u0623\u062c\u0647\u0632\u0629 \u0627\u0644\u0635\u0648\u062a \u0648\u0627\u0644\u062a\u062d\u0643\u0645.',
+    addButton:
+      '\u0625\u0636\u0627\u0641\u0629 \u0645\u0646\u0637\u0642\u0629 \u0627\u0646\u062a\u0638\u0627\u0631',
+    searchPlaceholder:
+      '\u0628\u062d\u062b \u0628\u0627\u0644\u0627\u0633\u0645 \u0623\u0648 \u0627\u0644\u062c\u0647\u0627\u0632 \u0623\u0648 \u0627\u0644\u0631\u0642\u0645',
     branchFilter: '\u0627\u0644\u0641\u0631\u0639',
     allBranches: '\u0643\u0644 \u0627\u0644\u0641\u0631\u0648\u0639',
     pageSize: '\u062d\u062c\u0645 \u0627\u0644\u0635\u0641\u062d\u0629',
@@ -107,36 +124,55 @@ const WAITING_AREA_TRANSLATIONS: Record<AppLanguage, WaitingAreaPageTranslations
     allStatuses: '\u0643\u0644 \u0627\u0644\u062d\u0627\u0644\u0627\u062a',
     active: '\u0646\u0634\u0637',
     inactive: '\u063a\u064a\u0631 \u0646\u0634\u0637',
-    operationalStatus: '\u0627\u0644\u062d\u0627\u0644\u0629 \u0627\u0644\u062a\u0634\u063a\u064a\u0644\u064a\u0629',
-    operationalUnavailable: '\u063a\u064a\u0631 \u0645\u062a\u0627\u062d \u0628\u0633\u0628\u0628 \u062d\u0627\u0644\u0629 \u0627\u0644\u0639\u0646\u0635\u0631 \u0627\u0644\u0623\u0628',
+    operationalStatus:
+      '\u0627\u0644\u062d\u0627\u0644\u0629 \u0627\u0644\u062a\u0634\u063a\u064a\u0644\u064a\u0629',
+    operationalUnavailable:
+      '\u063a\u064a\u0631 \u0645\u062a\u0627\u062d \u0628\u0633\u0628\u0628 \u062d\u0627\u0644\u0629 \u0627\u0644\u0639\u0646\u0635\u0631 \u0627\u0644\u0623\u0628',
     deactivate: '\u0625\u064a\u0642\u0627\u0641',
     reactivate: '\u0625\u0639\u0627\u062f\u0629 \u062a\u0646\u0634\u064a\u0637',
     permanentDelete: '\u062d\u0630\u0641 \u0646\u0647\u0627\u0626\u064a',
     refresh: '\u062a\u062d\u062f\u064a\u062b',
     loading: '\u062c\u0627\u0631\u064a \u0627\u0644\u062a\u062d\u0645\u064a\u0644...',
-    emptyTitle: '\u0644\u0627 \u062a\u0648\u062c\u062f \u0645\u0646\u0627\u0637\u0642 \u0627\u0646\u062a\u0638\u0627\u0631',
-    emptyDescription: '\u063a\u064a\u0631 \u0627\u0644\u0628\u062d\u062b \u0623\u0648 \u0627\u0644\u0641\u0631\u0639 \u0623\u0648 \u0623\u0636\u0641 \u0645\u0646\u0637\u0642\u0629 \u0627\u0646\u062a\u0638\u0627\u0631 \u062c\u062f\u064a\u062f\u0629.',
+    emptyTitle:
+      '\u0644\u0627 \u062a\u0648\u062c\u062f \u0645\u0646\u0627\u0637\u0642 \u0627\u0646\u062a\u0638\u0627\u0631',
+    emptyDescription:
+      '\u063a\u064a\u0631 \u0627\u0644\u0628\u062d\u062b \u0623\u0648 \u0627\u0644\u0641\u0631\u0639 \u0623\u0648 \u0623\u0636\u0641 \u0645\u0646\u0637\u0642\u0629 \u0627\u0646\u062a\u0638\u0627\u0631 \u062c\u062f\u064a\u062f\u0629.',
     totalItems: '\u0625\u062c\u0645\u0627\u0644\u064a \u0627\u0644\u0639\u0646\u0627\u0635\u0631',
     previous: '\u0627\u0644\u0633\u0627\u0628\u0642',
     next: '\u0627\u0644\u062a\u0627\u0644\u064a',
-    createTitle: '\u0625\u0636\u0627\u0641\u0629 \u0645\u0646\u0637\u0642\u0629 \u0627\u0646\u062a\u0638\u0627\u0631',
-    editTitle: '\u062a\u0639\u062f\u064a\u0644 \u0645\u0646\u0637\u0642\u0629 \u0627\u0646\u062a\u0638\u0627\u0631',
-    detailsTitle: '\u062a\u0641\u0627\u0635\u064a\u0644 \u0645\u0646\u0637\u0642\u0629 \u0627\u0646\u062a\u0638\u0627\u0631',
+    createTitle:
+      '\u0625\u0636\u0627\u0641\u0629 \u0645\u0646\u0637\u0642\u0629 \u0627\u0646\u062a\u0638\u0627\u0631',
+    editTitle:
+      '\u062a\u0639\u062f\u064a\u0644 \u0645\u0646\u0637\u0642\u0629 \u0627\u0646\u062a\u0638\u0627\u0631',
+    detailsTitle:
+      '\u062a\u0641\u0627\u0635\u064a\u0644 \u0645\u0646\u0637\u0642\u0629 \u0627\u0646\u062a\u0638\u0627\u0631',
     save: '\u062d\u0641\u0638',
     cancel: '\u0625\u0644\u063a\u0627\u0621',
     close: '\u0625\u063a\u0644\u0627\u0642',
     selectBranch: '\u0627\u062e\u062a\u0631 \u0641\u0631\u0639',
-    requiredField: '\u0647\u0630\u0627 \u0627\u0644\u062d\u0642\u0644 \u0645\u0637\u0644\u0648\u0628.',
-    positiveNumber: '\u0627\u0644\u0642\u064a\u0645\u0629 \u064a\u062c\u0628 \u0623\u0646 \u062a\u0643\u0648\u0646 \u0623\u0643\u0628\u0631 \u0645\u0646 \u0635\u0641\u0631.',
-    maxLength: '\u0627\u0644\u062d\u062f \u0627\u0644\u0623\u0642\u0635\u0649 100 \u062d\u0631\u0641.',
-    deleteConfirm: '\u062a\u0623\u0643\u064a\u062f \u062d\u0630\u0641 \u0645\u0646\u0637\u0642\u0629 \u0627\u0644\u0627\u0646\u062a\u0638\u0627\u0631',
-    fallbackSuccess: '\u062a\u0645 \u062a\u0646\u0641\u064a\u0630 \u0627\u0644\u0639\u0645\u0644\u064a\u0629 \u0628\u0646\u062c\u0627\u062d.',
-    fallbackError: '\u062d\u062f\u062b \u062e\u0637\u0623 \u063a\u064a\u0631 \u0645\u062a\u0648\u0642\u0639.',
-    notAvailable: '-'
+    requiredField:
+      '\u0647\u0630\u0627 \u0627\u0644\u062d\u0642\u0644 \u0645\u0637\u0644\u0648\u0628.',
+    positiveNumber:
+      '\u0627\u0644\u0642\u064a\u0645\u0629 \u064a\u062c\u0628 \u0623\u0646 \u062a\u0643\u0648\u0646 \u0623\u0643\u0628\u0631 \u0645\u0646 \u0635\u0641\u0631.',
+    maxLength:
+      '\u0627\u0644\u062d\u062f \u0627\u0644\u0623\u0642\u0635\u0649 100 \u062d\u0631\u0641.',
+    deleteConfirm:
+      '\u062a\u0623\u0643\u064a\u062f \u062d\u0630\u0641 \u0645\u0646\u0637\u0642\u0629 \u0627\u0644\u0627\u0646\u062a\u0638\u0627\u0631',
+    fallbackSuccess:
+      '\u062a\u0645 \u062a\u0646\u0641\u064a\u0630 \u0627\u0644\u0639\u0645\u0644\u064a\u0629 \u0628\u0646\u062c\u0627\u062d.',
+    fallbackError:
+      '\u062d\u062f\u062b \u062e\u0637\u0623 \u063a\u064a\u0631 \u0645\u062a\u0648\u0642\u0639.',
+    areaInfoSection: 'بيانات منطقة الانتظار',
+    devicesSection: 'الأجهزة والربط التشغيلي',
+    detailsSubtitle: 'عرض بيانات وإعدادات منطقة الانتظار وأجهزة الصوت والتحكم',
+    createSubtitle: 'إدخال بيانات منطقة انتظار جديدة وربطها بالفرع والأجهزة',
+    editSubtitle: 'تحديث بيانات منطقة الانتظار والأجهزة المرتبطة',
+    notAvailable: '-',
   },
   en: {
     title: 'Waiting Areas',
-    description: 'Manage branch waiting areas, audio devices, control devices, and related service locations.',
+    description:
+      'Manage branch waiting areas, audio devices, control devices, and related service locations.',
     addButton: 'Add Waiting Area',
     searchPlaceholder: 'Search by name, device, or number',
     branchFilter: 'Branch',
@@ -180,8 +216,13 @@ const WAITING_AREA_TRANSLATIONS: Record<AppLanguage, WaitingAreaPageTranslations
     deleteConfirm: 'Delete waiting area',
     fallbackSuccess: 'Operation completed successfully.',
     fallbackError: 'Unexpected error occurred.',
-    notAvailable: '-'
-  }
+    areaInfoSection: 'Waiting Area Information',
+    devicesSection: 'Devices & Operational Setup',
+    detailsSubtitle: 'View waiting area configuration, audio, and control devices',
+    createSubtitle: 'Enter details to register a new waiting area for this branch',
+    editSubtitle: 'Update waiting area details and associated devices',
+    notAvailable: '-',
+  },
 };
 
 const EMPTY_PAGE: Pagination<WaitingAreaListItem> = {
@@ -191,15 +232,21 @@ const EMPTY_PAGE: Pagination<WaitingAreaListItem> = {
   totalItems: 0,
   data: [],
   hasPreviousPage: false,
-  hasNextPage: false
+  hasNextPage: false,
 };
 
 @Component({
   selector: 'app-waiting-areas',
-  imports: [ReactiveFormsModule, MobileRecordCardComponent, PageHeroComponent, NiletronixLoadingStateComponent],
+  imports: [
+    ReactiveFormsModule,
+    MobileRecordCardComponent,
+    PageHeroComponent,
+    NiletronixLoadingStateComponent,
+    AppModalComponent,
+  ],
   templateUrl: './waiting-areas.component.html',
   styleUrl: './waiting-areas.component.css',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class WaitingAreasComponent implements OnInit, OnDestroy {
   private readonly formBuilder = inject(NonNullableFormBuilder);
@@ -215,7 +262,9 @@ export class WaitingAreasComponent implements OnInit, OnDestroy {
   private panelRequestId = 0;
   private toastTimeoutId: ReturnType<typeof setTimeout> | null = null;
 
-  protected readonly translations = computed(() => WAITING_AREA_TRANSLATIONS[this.i18nStore.language()]);
+  protected readonly translations = computed(
+    () => WAITING_AREA_TRANSLATIONS[this.i18nStore.language()],
+  );
   protected readonly branchOptions = signal<readonly BranchOption[]>([]);
   protected readonly waitingAreaPage = signal<Pagination<WaitingAreaListItem>>(EMPTY_PAGE);
   protected readonly search = signal('');
@@ -241,7 +290,7 @@ export class WaitingAreasComponent implements OnInit, OnDestroy {
     number: [1, [Validators.required, Validators.min(1)]],
     descriptiveName: ['', [Validators.maxLength(100)]],
     audioDevice: ['', [Validators.maxLength(100)]],
-    controlDevice: ['', [Validators.maxLength(100)]]
+    controlDevice: ['', [Validators.maxLength(100)]],
   });
 
   protected readonly branchIdControl = this.waitingAreaForm.controls.branchId;
@@ -275,8 +324,13 @@ export class WaitingAreasComponent implements OnInit, OnDestroy {
     }
   }
 
-  protected branchName(branch: Pick<WaitingAreaListItem, 'branchArabicName' | 'branchEnglishName'>): string {
-    return this.resolveBranchName(branch.branchArabicName ?? null, branch.branchEnglishName ?? null);
+  protected branchName(
+    branch: Pick<WaitingAreaListItem, 'branchArabicName' | 'branchEnglishName'>,
+  ): string {
+    return this.resolveBranchName(
+      branch.branchArabicName ?? null,
+      branch.branchEnglishName ?? null,
+    );
   }
 
   protected optionName(branch: BranchOption): string {
@@ -348,7 +402,7 @@ export class WaitingAreasComponent implements OnInit, OnDestroy {
       number: 1,
       descriptiveName: '',
       audioDevice: '',
-      controlDevice: ''
+      controlDevice: '',
     });
 
     if (this.isBranchContextLocked()) {
@@ -393,7 +447,9 @@ export class WaitingAreasComponent implements OnInit, OnDestroy {
   }
 
   protected deactivateWaitingArea(item: WaitingAreaListItem): void {
-    if (!window.confirm(`${this.translations().deactivate}: ${item.descriptiveName || item.number}?`)) {
+    if (
+      !window.confirm(`${this.translations().deactivate}: ${item.descriptiveName || item.number}?`)
+    ) {
       return;
     }
 
@@ -401,7 +457,9 @@ export class WaitingAreasComponent implements OnInit, OnDestroy {
   }
 
   protected reactivateWaitingArea(item: WaitingAreaListItem): void {
-    if (!window.confirm(`${this.translations().reactivate}: ${item.descriptiveName || item.number}?`)) {
+    if (
+      !window.confirm(`${this.translations().reactivate}: ${item.descriptiveName || item.number}?`)
+    ) {
       return;
     }
 
@@ -409,7 +467,11 @@ export class WaitingAreasComponent implements OnInit, OnDestroy {
   }
 
   protected permanentlyDeleteWaitingArea(item: WaitingAreaListItem): void {
-    if (!window.confirm(`${this.translations().permanentDelete}: ${item.descriptiveName || item.number}?`)) {
+    if (
+      !window.confirm(
+        `${this.translations().permanentDelete}: ${item.descriptiveName || item.number}?`,
+      )
+    ) {
       return;
     }
 
@@ -429,7 +491,23 @@ export class WaitingAreasComponent implements OnInit, OnDestroy {
     return translations.detailsTitle;
   }
 
-  protected hasFieldError(controlName: 'branchId' | 'number' | 'descriptiveName' | 'audioDevice' | 'controlDevice'): boolean {
+  protected formSubtitle(): string {
+    const translations = this.translations();
+
+    if (this.panelMode() === 'create') {
+      return translations.createSubtitle;
+    }
+
+    if (this.panelMode() === 'edit') {
+      return translations.editSubtitle;
+    }
+
+    return translations.detailsSubtitle;
+  }
+
+  protected hasFieldError(
+    controlName: 'branchId' | 'number' | 'descriptiveName' | 'audioDevice' | 'controlDevice',
+  ): boolean {
     const control = this.waitingAreaForm.controls[controlName];
     return control.touched && control.invalid;
   }
@@ -456,7 +534,7 @@ export class WaitingAreasComponent implements OnInit, OnDestroy {
         search: this.search().trim(),
         pageNumber,
         pageSize: this.pageSize(),
-        isActive: this.statusFilter()
+        isActive: this.statusFilter(),
       })
       .subscribe({
         next: (page) => {
@@ -464,7 +542,7 @@ export class WaitingAreasComponent implements OnInit, OnDestroy {
           this.clearMessage();
         },
         error: (error: HttpErrorResponse) => this.handleApiError(error),
-        complete: () => this.loading.set(false)
+        complete: () => this.loading.set(false),
       });
   }
 
@@ -475,7 +553,7 @@ export class WaitingAreasComponent implements OnInit, OnDestroy {
         orderSort: 'Newest',
         pageNumber: 1,
         pageSize: 100,
-        isActive: true
+        isActive: true,
       })
       .subscribe({
         next: (page) => {
@@ -492,11 +570,14 @@ export class WaitingAreasComponent implements OnInit, OnDestroy {
 
           this.branchOptions.set(options);
         },
-        error: (error: HttpErrorResponse) => this.handleApiError(error, false)
+        error: (error: HttpErrorResponse) => this.handleApiError(error, false),
       });
   }
 
-  private openDetails(waitingAreaId: number, mode: Extract<WaitingAreaPanelMode, 'edit' | 'view'>): void {
+  private openDetails(
+    waitingAreaId: number,
+    mode: Extract<WaitingAreaPanelMode, 'edit' | 'view'>,
+  ): void {
     const requestId = ++this.panelRequestId;
 
     this.panelLoading.set(true);
@@ -518,7 +599,7 @@ export class WaitingAreasComponent implements OnInit, OnDestroy {
             number: details.number,
             descriptiveName: details.descriptiveName ?? '',
             audioDevice: details.audioDevice ?? '',
-            controlDevice: details.controlDevice ?? ''
+            controlDevice: details.controlDevice ?? '',
           });
         }
       },
@@ -534,7 +615,7 @@ export class WaitingAreasComponent implements OnInit, OnDestroy {
         if (requestId === this.panelRequestId && this.panelMode() === mode) {
           this.panelLoading.set(false);
         }
-      }
+      },
     });
   }
 
@@ -548,7 +629,7 @@ export class WaitingAreasComponent implements OnInit, OnDestroy {
         this.loadWaitingAreas(1, true);
       },
       error: (error: HttpErrorResponse) => this.handleApiError(error),
-      complete: () => this.saving.set(false)
+      complete: () => this.saving.set(false),
     });
   }
 
@@ -561,15 +642,17 @@ export class WaitingAreasComponent implements OnInit, OnDestroy {
 
     this.saving.set(true);
 
-    this.waitingAreaApiService.updateWaitingArea(waitingAreaId, this.createUpdateRequest()).subscribe({
-      next: (response) => {
-        this.showSuccess(response);
-        this.closePanel();
-        this.loadWaitingAreas(this.waitingAreaPage().currentPage);
-      },
-      error: (error: HttpErrorResponse) => this.handleApiError(error),
-      complete: () => this.saving.set(false)
-    });
+    this.waitingAreaApiService
+      .updateWaitingArea(waitingAreaId, this.createUpdateRequest())
+      .subscribe({
+        next: (response) => {
+          this.showSuccess(response);
+          this.closePanel();
+          this.loadWaitingAreas(this.waitingAreaPage().currentPage);
+        },
+        error: (error: HttpErrorResponse) => this.handleApiError(error),
+        complete: () => this.saving.set(false),
+      });
   }
 
   private createUpdateRequest(): UpdateWaitingAreaRequest {
@@ -581,32 +664,34 @@ export class WaitingAreasComponent implements OnInit, OnDestroy {
       descriptiveName: this.toOptionalString(value.descriptiveName),
       audioDevice: this.toOptionalString(value.audioDevice),
       controlDevice: this.toOptionalString(value.controlDevice),
-      rowVersion
+      rowVersion,
     };
   }
 
   private runLifecycleAction(
     item: WaitingAreaListItem,
-    action: 'deactivate' | 'reactivate' | 'permanent'
+    action: 'deactivate' | 'reactivate' | 'permanent',
   ): void {
     this.deletingId.set(item.id);
-    const request = action === 'deactivate'
-      ? this.waitingAreaApiService.deactivateWaitingArea(item.id, item.rowVersion)
-      : action === 'reactivate'
-        ? this.waitingAreaApiService.reactivateWaitingArea(item.id, item.rowVersion)
-        : this.waitingAreaApiService.permanentlyDeleteWaitingArea(item.id, item.rowVersion);
+    const request =
+      action === 'deactivate'
+        ? this.waitingAreaApiService.deactivateWaitingArea(item.id, item.rowVersion)
+        : action === 'reactivate'
+          ? this.waitingAreaApiService.reactivateWaitingArea(item.id, item.rowVersion)
+          : this.waitingAreaApiService.permanentlyDeleteWaitingArea(item.id, item.rowVersion);
 
     request.subscribe({
       next: (response) => {
         this.showMessage('success', response.message || this.translations().fallbackSuccess);
         const page = this.waitingAreaPage();
-        const nextPage = action === 'permanent' && page.data.length === 1 && page.currentPage > 1
-          ? page.currentPage - 1
-          : page.currentPage;
+        const nextPage =
+          action === 'permanent' && page.data.length === 1 && page.currentPage > 1
+            ? page.currentPage - 1
+            : page.currentPage;
         this.loadWaitingAreas(nextPage, true);
       },
       error: (error: HttpErrorResponse) => this.handleApiError(error),
-      complete: () => this.deletingId.set(null)
+      complete: () => this.deletingId.set(null),
     });
   }
   private createRequest(): CreateWaitingAreaRequest {
@@ -617,7 +702,7 @@ export class WaitingAreasComponent implements OnInit, OnDestroy {
       number: Number(value.number),
       descriptiveName: this.toOptionalString(value.descriptiveName),
       audioDevice: this.toOptionalString(value.audioDevice),
-      controlDevice: this.toOptionalString(value.controlDevice)
+      controlDevice: this.toOptionalString(value.controlDevice),
     };
   }
 
@@ -625,7 +710,7 @@ export class WaitingAreasComponent implements OnInit, OnDestroy {
     return {
       id: branch.branchId,
       arabicName: branch.arabicName,
-      englishName: branch.englishName
+      englishName: branch.englishName,
     };
   }
 
@@ -664,10 +749,13 @@ export class WaitingAreasComponent implements OnInit, OnDestroy {
 
     this.message.set({ tone, text });
 
-    this.toastTimeoutId = setTimeout(() => {
-      this.message.set(null);
-      this.toastTimeoutId = null;
-    }, tone === 'error' ? 6500 : 4200);
+    this.toastTimeoutId = setTimeout(
+      () => {
+        this.message.set(null);
+        this.toastTimeoutId = null;
+      },
+      tone === 'error' ? 6500 : 4200,
+    );
   }
   private extractApiMessage(error: HttpErrorResponse): string {
     return formatApiError(error, this.translations().fallbackError);
@@ -685,4 +773,3 @@ export class WaitingAreasComponent implements OnInit, OnDestroy {
     return (event.target as HTMLInputElement | HTMLSelectElement).value;
   }
 }
-

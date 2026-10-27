@@ -1,4 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
+import { AppLanguage } from '../models/app-language/app-language.model';
+import { localizeToastMessage } from './toast-message.util';
 
 interface ApiErrorItem {
   readonly message?: string | null;
@@ -16,15 +18,17 @@ const MAX_TOAST_ERROR_LENGTH = 220;
 export function formatApiError(
   error: HttpErrorResponse,
   fallbackMessage: string,
+  language?: AppLanguage,
 ): string {
   const rawMessage = extractRawApiMessage(error.error);
   const normalizedMessage = sanitizeApiMessage(rawMessage);
 
-  if (normalizedMessage) {
-    return normalizedMessage;
+  const resolved = normalizedMessage || fallbackMessage;
+  if (language) {
+    return localizeToastMessage(resolved, language, fallbackMessage);
   }
 
-  return fallbackMessage;
+  return resolved;
 }
 
 function extractRawApiMessage(errorBody: unknown): string | null {
@@ -56,9 +60,8 @@ function sanitizeApiMessage(message: string | null): string | null {
     '',
   );
   const stackStart = findStackStart(withoutExceptionPrefix);
-  const withoutStack = stackStart >= 0
-    ? withoutExceptionPrefix.slice(0, stackStart).trim()
-    : withoutExceptionPrefix;
+  const withoutStack =
+    stackStart >= 0 ? withoutExceptionPrefix.slice(0, stackStart).trim() : withoutExceptionPrefix;
   const withoutTrace = withoutStack
     .replace(/\s*ClientConnectionId:[^ ]+(?:\s.*)?$/i, '')
     .replace(/\s*Error Number:\d+(?:\s.*)?$/i, '')
@@ -81,9 +84,7 @@ function findStackStart(message: string): number {
     ' in E:',
     ' in C:',
   ];
-  const indexes = markers
-    .map((marker) => message.indexOf(marker))
-    .filter((index) => index >= 0);
+  const indexes = markers.map((marker) => message.indexOf(marker)).filter((index) => index >= 0);
 
   return indexes.length > 0 ? Math.min(...indexes) : -1;
 }

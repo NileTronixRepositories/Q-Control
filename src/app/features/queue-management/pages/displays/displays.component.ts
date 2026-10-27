@@ -15,6 +15,7 @@ import {
   ValidationErrors,
   Validators,
 } from '@angular/forms';
+import { AppModalComponent } from '../../../../shared/components/app-modal/app-modal.component';
 import { MobileRecordCardComponent } from '../../../../shared/components/mobile-record-card/mobile-record-card.component';
 import { NiletronixLoadingStateComponent } from '../../../../shared/components/niletronix-loading-state/niletronix-loading-state.component';
 import { PageHeroComponent } from '../../../../shared/components/page-hero/page-hero.component';
@@ -109,6 +110,13 @@ interface DisplayTranslations {
   readonly noPermissionHint: string;
   readonly traceIdLabel: string;
   readonly notAvailable: string;
+  readonly basicInfoSection: string;
+  readonly timestampsSection: string;
+  readonly enabled: string;
+  readonly disabled: string;
+  readonly displaySubtitle: string;
+  readonly createSubtitle: string;
+  readonly editSubtitle: string;
 }
 
 interface DisplayConfirmState {
@@ -160,10 +168,9 @@ const DISPLAY_TRANSLATIONS: Record<AppLanguage, DisplayTranslations> = {
     createdOn: '\u062a\u0627\u0631\u064a\u062e \u0627\u0644\u0625\u0646\u0634\u0627\u0621',
     modifiedOn: '\u062a\u0627\u0631\u064a\u062e \u0622\u062e\u0631 \u062a\u0639\u062f\u064a\u0644',
     details: '\u0627\u0644\u062a\u0641\u0627\u0635\u064a\u0644',
-    displayDetails:
-      '\u062a\u0641\u0627\u0635\u064a\u0644 \u0627\u0644\u062c\u0647\u0627\u0632 \u0627\u0644\u0637\u0631\u0641\u064a',
-    createTitle: '\u0625\u0646\u0634\u0627\u0621 \u062c\u0647\u0627\u0632',
-    editTitle: '\u062a\u0639\u062f\u064a\u0644 \u062c\u0647\u0627\u0632',
+    displayDetails: 'تفاصيل الشاشة',
+    createTitle: 'إضافة شاشة',
+    editTitle: 'تعديل بيانات الشاشة',
     close: '\u0625\u063a\u0644\u0627\u0642',
     cancel: '\u0625\u0644\u063a\u0627\u0621',
     save: '\u062d\u0641\u0638',
@@ -201,6 +208,13 @@ const DISPLAY_TRANSLATIONS: Record<AppLanguage, DisplayTranslations> = {
       '\u0644\u0627 \u062a\u0648\u062c\u062f \u0635\u0644\u0627\u062d\u064a\u0627\u062a \u0643\u0627\u0641\u064a\u0629 \u0644\u0647\u0630\u0627 \u0627\u0644\u0625\u062c\u0631\u0627\u0621.',
     traceIdLabel: '\u0645\u0639\u0631\u0641 \u0627\u0644\u062a\u062a\u0628\u0639',
     notAvailable: '-',
+    basicInfoSection: 'معلومات الشاشة الأساسية',
+    timestampsSection: 'سجل النظام والتاريخ',
+    enabled: 'نشط',
+    disabled: 'غير نشط',
+    displaySubtitle: 'عرض التفاصيل الفنية للشاشة وسجل البيانات',
+    createSubtitle: 'إدخال بيانات شاشة جديدة وربطها بالفرع',
+    editSubtitle: 'تحديث بيانات الشاشة الفنية والشبكية',
   },
   en: {
     title: 'Display Management',
@@ -259,6 +273,13 @@ const DISPLAY_TRANSLATIONS: Record<AppLanguage, DisplayTranslations> = {
     noPermissionHint: 'You do not have permission for this action.',
     traceIdLabel: 'Trace ID',
     notAvailable: '-',
+    basicInfoSection: 'Basic Display Information',
+    timestampsSection: 'System History & Timestamps',
+    enabled: 'Active',
+    disabled: 'Inactive',
+    displaySubtitle: 'Display technical details and audit history',
+    createSubtitle: 'Create a new display and configure branch assignment',
+    editSubtitle: 'Update display configuration and network details',
   },
 };
 
@@ -289,6 +310,7 @@ const EMPTY_DELETED_DISPLAY_PAGE: PaginationResponse<DeletedDisplayListItemRespo
     MobileRecordCardComponent,
     PageHeroComponent,
     NiletronixLoadingStateComponent,
+    AppModalComponent,
   ],
   templateUrl: './displays.component.html',
   styleUrl: './displays.component.css',
@@ -561,10 +583,11 @@ export class DisplaysComponent implements OnInit, OnDestroy {
     this.selectedDetails.set(null);
     this.displayForm.markAsPristine();
     this.displayForm.enable();
+    this.panelLoading.set(false);
     this.confirmDialog.set(null);
   }
 
-  protected panelTitle(): string {
+  protected readonly panelTitle = computed(() => {
     if (this.panelMode() === 'create') {
       return this.translations().createTitle;
     }
@@ -574,7 +597,26 @@ export class DisplaysComponent implements OnInit, OnDestroy {
     }
 
     return this.translations().displayDetails;
-  }
+  });
+
+  protected readonly panelSubtitle = computed(() => {
+    if (this.panelMode() === 'create') {
+      return this.translations().createSubtitle;
+    }
+
+    if (this.panelMode() === 'edit') {
+      return this.translations().editSubtitle;
+    }
+
+    const details = this.selectedDetails();
+    if (details) {
+      return `${this.translations().displayNumber}: #${details.number} • ${this.translations().typeLabel}: ${details.type || '-'}`;
+    }
+
+    return this.translations().displaySubtitle;
+  });
+
+  protected readonly panelLoading = signal(false);
 
   protected saveDisplay(): void {
     if (this.saving()) {
@@ -688,17 +730,24 @@ export class DisplaysComponent implements OnInit, OnDestroy {
       return this.translations().notAvailable;
     }
 
-    const parsed = new Date(dateValue);
+    try {
+      const parsed = new Date(dateValue);
 
-    if (Number.isNaN(parsed.getTime())) {
+      if (Number.isNaN(parsed.getTime())) {
+        return dateValue;
+      }
+
+      const locale = this.i18nStore.language() === 'ar' ? 'ar-EG' : 'en-US';
+      return new Intl.DateTimeFormat(locale, {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      }).format(parsed);
+    } catch {
       return dateValue;
     }
-
-    return new Intl.DateTimeFormat(this.i18nStore.language(), {
-      dateStyle: 'medium',
-      timeStyle: 'short',
-      timeZoneName: 'short',
-    }).format(parsed);
   }
 
   protected formatText(value: string | null | undefined): string {
@@ -836,6 +885,7 @@ export class DisplaysComponent implements OnInit, OnDestroy {
     this.confirmDialog.set(null);
     this.clearMessage();
     this.displayForm.enable();
+    this.panelLoading.set(true);
 
     this.displayManagementApiService.getDisplayById(displayId).subscribe({
       next: (response) => {
@@ -844,6 +894,7 @@ export class DisplaysComponent implements OnInit, OnDestroy {
         }
 
         this.selectedDetails.set(response);
+        this.panelLoading.set(false);
         this.displayForm.reset({
           branchId: response.branchId,
           number: response.number,
@@ -861,6 +912,7 @@ export class DisplaysComponent implements OnInit, OnDestroy {
           return;
         }
 
+        this.panelLoading.set(false);
         this.handleApiError(error);
         this.closePanel();
       },

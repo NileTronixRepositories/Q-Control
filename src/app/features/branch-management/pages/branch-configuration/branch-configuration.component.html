@@ -3,39 +3,47 @@
     [eyebrow]="copy().topbarEyebrow"
     [title]="copy().branchConfigurationLabel"
     [description]="copy().branchConfigurationDescription"
-    icon="bi bi-clock-history"
+    icon="fa-solid fa-clock"
+    iconVariant="teal"
   >
-    <div hero-actions class="d-flex align-items-center gap-2 hero-controls flex-nowrap">
+    <div hero-actions class="d-flex align-items-center gap-2 hero-controls flex-wrap">
       @if (isTechnicalAdmin() && branches().length > 1) {
-        <label class="visually-hidden" for="branchConfigBranch">{{ copy().branchLabel }}</label>
-        <select
-          id="branchConfigBranch"
-          class="form-select branch-selector-control custom-select"
-          [value]="selectedBranchId() ?? ''"
-          [disabled]="branchesLoading() || configLoading() || saving()"
-          (change)="selectBranch($event)"
-        >
-          <option value="" [selected]="!selectedBranchId()">--</option>
-          @for (branch of branches(); track branch.id) {
-            <option [value]="branch.id" [selected]="branch.id === selectedBranchId()">
-              {{ branch.label }}
-            </option>
-          }
-        </select>
+        <div class="branch-select-wrapper">
+          <span class="q-field-icon-badge q-field-icon-badge--violet">
+            <i class="fa-solid fa-building" aria-hidden="true"></i>
+          </span>
+          <label class="visually-hidden" for="branchConfigBranch">{{ copy().branchLabel }}</label>
+          <select
+            id="branchConfigBranch"
+            class="form-select branch-selector-control"
+            [value]="selectedBranchId() ?? ''"
+            [disabled]="branchesLoading() || configLoading() || saving()"
+            (change)="selectBranch($event)"
+          >
+            <option value="" [selected]="!selectedBranchId()">--</option>
+            @for (branch of branches(); track branch.id) {
+              <option [value]="branch.id" [selected]="branch.id === selectedBranchId()">
+                {{ branch.label }}
+              </option>
+            }
+          </select>
+        </div>
       } @else if (selectedBranchId()) {
-        <div class="d-inline-flex align-items-center gap-2 px-3 py-2 bg-white border rounded text-dark fw-bold small shadow-sm">
-          <i class="bi bi-buildings text-primary"></i>
-          <span>{{ currentBranchName() }}</span>
+        <div class="branch-select-wrapper static-badge">
+          <span class="q-field-icon-badge q-field-icon-badge--violet">
+            <i class="fa-solid fa-building" aria-hidden="true"></i>
+          </span>
+          <span class="fw-bold text-dark px-2 small">{{ currentBranchName() }}</span>
         </div>
       }
       <button
         type="button"
-        class="btn btn-refresh d-inline-flex align-items-center gap-2 flex-shrink-0"
+        class="secondary-action d-inline-flex align-items-center gap-2 branding-refresh-action"
         [disabled]="!selectedBranchId() || configLoading() || saving()"
         [attr.title]="copy().refreshLabel"
         (click)="refresh()"
       >
-        <i class="bi bi-arrow-repeat fs-5" [class.spin]="configLoading()" aria-hidden="true"></i>
+        <i class="fa-solid fa-arrows-rotate" style="color: #059669;" [class.spin]="configLoading()" aria-hidden="true"></i>
         <span>{{ copy().refreshLabel }}</span>
       </button>
     </div>
@@ -72,7 +80,7 @@
   @if (!canModify() && selectedBranchId()) {
     <div class="alert alert-warning read-only-banner my-3 d-flex align-items-center gap-3 shadow-sm" role="alert">
       <div class="alert-icon-wrap bg-warning-subtle text-warning-emphasis">
-        <i class="bi bi-shield-lock-fill fs-4" aria-hidden="true"></i>
+        <i class="fa-solid fa-shield-halved fs-4" aria-hidden="true"></i>
       </div>
       <div>
         <h6 class="mb-1 fw-bold">{{ language() === 'ar' ? 'وضع القراءة فقط' : 'Read-Only Mode' }}</h6>
@@ -90,7 +98,7 @@
   @if (!selectedBranchId() && !branchesLoading()) {
     <div class="empty-branch-placeholder card shadow-sm border-0 my-4 p-5 text-center">
       <div class="empty-icon-circle mx-auto mb-3">
-        <i class="bi bi-buildings text-primary fs-1"></i>
+        <i class="fa-solid fa-building text-primary fs-1"></i>
       </div>
       <h4 class="fw-bold text-dark mb-2">
         {{ language() === 'ar' ? 'يرجى اختيار الفرع للبدء في ضبط الإعدادات' : 'Please select a branch to configure settings' }}
@@ -112,10 +120,10 @@
           <div class="config-card shadow-sm h-100">
             <!-- Card Header Strip -->
             <div class="config-card-header d-flex align-items-center justify-content-between flex-wrap gap-3">
-              <div class="d-flex align-items-center gap-3">
-                <div class="section-icon-box" aria-hidden="true">
-                  <i class="bi bi-sliders text-primary fs-5"></i>
-                </div>
+              <div class="d-flex align-items-center gap-2">
+                <span class="q-field-icon-badge q-field-icon-badge--sky">
+                  <i class="fa-solid fa-sliders"></i>
+                </span>
                 <div>
                   <h4 class="m-0 fw-bold card-title fs-6 text-dark">{{ copy().branchConfigurationLabel }}</h4>
                   <p class="text-muted small m-0 mt-1">{{ copy().branchConfigurationDescription }}</p>
@@ -124,13 +132,13 @@
 
               <div class="status-badge-wrapper">
                 @if (isConfigured()) {
-                  <span class="badge status-badge badge-active d-inline-flex align-items-center gap-2">
-                    <span class="pulse-dot active-dot"></span>
+                  <span class="q-detail-pill q-detail-pill--active">
+                    <span class="q-detail-pill__dot"></span>
                     <span>{{ copy().activeBranchLabel }}</span>
                   </span>
                 } @else {
-                  <span class="badge status-badge badge-inactive d-inline-flex align-items-center gap-2">
-                    <span class="pulse-dot inactive-dot"></span>
+                  <span class="q-detail-pill q-detail-pill--inactive">
+                    <span class="q-detail-pill__dot"></span>
                     <span>{{ copy().inactiveLabel }}</span>
                   </span>
                 }
@@ -143,7 +151,9 @@
               <div class="config-section general-config-section">
                 <div class="section-heading mb-3">
                   <div class="d-flex align-items-center gap-2">
-                    <i class="bi bi-stopwatch text-primary"></i>
+                    <span class="q-field-icon-badge q-field-icon-badge--teal">
+                      <i class="fa-solid fa-stopwatch"></i>
+                    </span>
                     <h5 class="m-0 fw-bold fs-6 text-dark">{{ copy().allowedTimeLabel }}</h5>
                   </div>
                   <p class="text-muted small m-0 mt-1">{{ copy().allowedTimeHelp }}</p>
@@ -152,8 +162,10 @@
                 <div class="time-inputs-grid mb-3">
                   <!-- Hours Control Card -->
                   <div class="time-unit-box" [class.disabled]="!canModify() || saving()">
-                    <div class="unit-header">
-                      <span class="unit-icon"><i class="bi bi-hourglass-top"></i></span>
+                    <div class="unit-header d-flex align-items-center justify-content-center gap-2">
+                      <span class="q-field-icon-badge q-field-icon-badge--sky">
+                        <i class="fa-solid fa-hourglass-start"></i>
+                      </span>
                       <label for="configHours" class="unit-label">{{ copy().hoursLabel }}</label>
                     </div>
                     <div class="input-wrapper my-2">
@@ -178,8 +190,10 @@
 
                   <!-- Minutes Control Card -->
                   <div class="time-unit-box" [class.disabled]="!canModify() || saving()">
-                    <div class="unit-header">
-                      <span class="unit-icon"><i class="bi bi-clock"></i></span>
+                    <div class="unit-header d-flex align-items-center justify-content-center gap-2">
+                      <span class="q-field-icon-badge q-field-icon-badge--amber">
+                        <i class="fa-solid fa-clock"></i>
+                      </span>
                       <label for="configMinutes" class="unit-label">{{ copy().minutesLabel }}</label>
                     </div>
                     <div class="input-wrapper my-2">
@@ -204,8 +218,10 @@
 
                   <!-- Seconds Control Card -->
                   <div class="time-unit-box" [class.disabled]="!canModify() || saving()">
-                    <div class="unit-header">
-                      <span class="unit-icon"><i class="bi bi-stopwatch-fill"></i></span>
+                    <div class="unit-header d-flex align-items-center justify-content-center gap-2">
+                      <span class="q-field-icon-badge q-field-icon-badge--teal">
+                        <i class="fa-solid fa-stopwatch-20"></i>
+                      </span>
                       <label for="configSeconds" class="unit-label">{{ copy().secondsLabel }}</label>
                     </div>
                     <div class="input-wrapper my-2">
@@ -226,7 +242,7 @@
 
                 @if ((configForm.controls.hours.invalid || configForm.controls.minutes.invalid || configForm.controls.seconds.invalid) && configForm.touched) {
                   <div class="alert alert-danger custom-error-box p-2 d-flex align-items-center gap-2 my-2" role="alert">
-                    <i class="bi bi-exclamation-circle-fill text-danger" aria-hidden="true"></i>
+                    <i class="fa-solid fa-circle-exclamation text-danger" aria-hidden="true"></i>
                     <span class="small">{{ ticketLabels().timeError }}</span>
                   </div>
                 }
@@ -236,7 +252,9 @@
               <section class="config-section ticket-settings mt-4 pt-4 border-top" [class.disabled]="!canModify() || saving()" aria-labelledby="ticketSettingsTitle">
                 <div class="ticket-settings-header mb-3">
                   <div class="d-flex align-items-center gap-2">
-                    <i class="bi bi-ticket-perforated-fill text-primary"></i>
+                    <span class="q-field-icon-badge q-field-icon-badge--indigo">
+                      <i class="fa-solid fa-ticket"></i>
+                    </span>
                     <h5 id="ticketSettingsTitle" class="m-0 fw-bold fs-6 text-dark">{{ ticketLabels().title }}</h5>
                   </div>
                   <p class="text-muted small m-0 mt-1">{{ ticketLabels().description }}</p>
@@ -245,10 +263,13 @@
                 <div class="row g-3">
                   <!-- Maximum Ticket Call Attempts -->
                   <div class="col-12 col-md-4">
-                    <div class="ticket-field-card p-3 rounded border h-100 d-flex flex-column justify-content-between">
+                    <div class="ticket-field-card p-3 rounded-3 border h-100 d-flex flex-column justify-content-between">
                       <div>
-                        <label class="form-label fw-bold text-dark small mb-1" for="maximumTicketCallAttempts">
-                          {{ ticketLabels().callAttempts }}
+                        <label class="form-label d-flex align-items-center gap-2 mb-2" for="maximumTicketCallAttempts">
+                          <span class="q-field-icon-badge q-field-icon-badge--violet">
+                            <i class="fa-solid fa-bullhorn"></i>
+                          </span>
+                          <span>{{ ticketLabels().callAttempts }}</span>
                         </label>
                         <div class="input-group input-group-sm mb-1">
                           <input
@@ -269,10 +290,13 @@
 
                   <!-- No-Show Auto Cancellation Time -->
                   <div class="col-12 col-md-4">
-                    <div class="ticket-field-card p-3 rounded border h-100 d-flex flex-column justify-content-between">
+                    <div class="ticket-field-card p-3 rounded-3 border h-100 d-flex flex-column justify-content-between">
                       <div>
-                        <label class="form-label fw-bold text-dark small mb-1" for="ticketNoShowAutoCancellationMinutes">
-                          {{ ticketLabels().noShowCancellation }}
+                        <label class="form-label d-flex align-items-center gap-2 mb-2" for="ticketNoShowAutoCancellationMinutes">
+                          <span class="q-field-icon-badge q-field-icon-badge--amber">
+                            <i class="fa-solid fa-user-xmark"></i>
+                          </span>
+                          <span>{{ ticketLabels().noShowCancellation }}</span>
                         </label>
                         <div class="input-group input-group-sm mb-1">
                           <input
@@ -293,10 +317,13 @@
 
                   <!-- Ticket Archive Retention Days -->
                   <div class="col-12 col-md-4">
-                    <div class="ticket-field-card p-3 rounded border h-100 d-flex flex-column justify-content-between">
+                    <div class="ticket-field-card p-3 rounded-3 border h-100 d-flex flex-column justify-content-between">
                       <div>
-                        <label class="form-label fw-bold text-dark small mb-1" for="ticketArchiveRetentionDays">
-                          {{ ticketLabels().archiveRetention }}
+                        <label class="form-label d-flex align-items-center gap-2 mb-2" for="ticketArchiveRetentionDays">
+                          <span class="q-field-icon-badge q-field-icon-badge--teal">
+                            <i class="fa-solid fa-box-archive"></i>
+                          </span>
+                          <span>{{ ticketLabels().archiveRetention }}</span>
                         </label>
                         <div class="input-group input-group-sm mb-1">
                           <input
@@ -318,7 +345,7 @@
 
                 @if ((configForm.controls.maximumTicketCallAttempts.invalid || configForm.controls.ticketNoShowAutoCancellationMinutes.invalid || configForm.controls.ticketArchiveRetentionDays.invalid) && configForm.touched) {
                   <div class="alert alert-danger custom-error-box p-2 d-flex align-items-center gap-2 mt-3 mb-0" role="alert">
-                    <i class="bi bi-exclamation-circle-fill text-danger" aria-hidden="true"></i>
+                    <i class="fa-solid fa-circle-exclamation text-danger" aria-hidden="true"></i>
                     <span class="small">{{ ticketLabels().positiveIntegerError }}</span>
                   </div>
                 }
@@ -328,7 +355,7 @@
             <!-- Action Footer Bar -->
             <div class="config-card-footer d-flex align-items-center justify-content-between flex-wrap gap-3">
               <div class="footer-hint text-muted d-flex align-items-center gap-2">
-                <i class="bi bi-info-circle-fill text-primary"></i>
+                <i class="fa-solid fa-circle-info text-primary"></i>
                 <span class="small">
                   {{ language() === 'ar'
                     ? 'يتم تطبيق هذا الترتيب والقواعد زمنياً على الخادم المركزي للفرع بعد الحفظ.'
@@ -340,15 +367,15 @@
               @if (canModify()) {
                 <button
                   type="submit"
-                  class="btn btn-save-action px-4 py-2 d-inline-flex align-items-center justify-content-center gap-2"
+                  class="primary-action d-inline-flex align-items-center justify-content-center gap-2 px-4 py-2"
                   [disabled]="saving() || configForm.invalid"
                 >
                   @if (saving()) {
                     <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
                   } @else {
-                    <i class="bi bi-cloud-check-fill fs-5" aria-hidden="true"></i>
+                    <i class="fa-solid fa-cloud-arrow-up fs-6" aria-hidden="true"></i>
                   }
-                  <span class="fw-bold">{{ copy().saveConfigurationLabel }}</span>
+                  <span class="fw-bold text-white">{{ copy().saveConfigurationLabel }}</span>
                 </button>
               }
             </div>
@@ -360,7 +387,9 @@
           <div class="widget-tech-card shadow-sm h-100 p-4 d-flex flex-column justify-content-between">
             <div>
               <div class="widget-header d-flex align-items-center gap-2 pb-3 border-bottom mb-3">
-                <div class="widget-header-icon"><i class="bi bi-activity text-primary fs-5"></i></div>
+                <span class="q-field-icon-badge q-field-icon-badge--sky">
+                  <i class="fa-solid fa-chart-line"></i>
+                </span>
                 <h6 class="m-0 text-dark fw-bold fs-7">
                   {{ language() === 'ar' ? 'المحاكاة والأثر التشغيلي' : 'Operational Impact Simulation' }}
                 </h6>
@@ -383,9 +412,9 @@
               <!-- Operational Impact Card -->
               <div class="impact-summary-box p-3 rounded-3 mb-3">
                 <div class="d-flex align-items-start gap-3">
-                  <div class="impact-icon-circle">
-                    <i class="bi bi-ticket-perforated-fill text-warning fs-5"></i>
-                  </div>
+                  <span class="q-field-icon-badge q-field-icon-badge--amber flex-shrink-0">
+                    <i class="fa-solid fa-ticket"></i>
+                  </span>
                   <div class="flex-grow-1">
                     <span class="d-block fw-bold text-dark mb-1 fs-7">
                       {{ language() === 'ar' ? 'نافذة شاشة التذاكر:' : 'Ticket Screen Window:' }}
@@ -403,9 +432,11 @@
 
               <!-- Ticket Runtime Metrics Overview Card -->
               <div class="runtime-overview-box p-3 rounded-3 border bg-light mb-3">
-                <span class="d-block fw-bold text-dark small mb-2">
-                  <i class="bi bi-clock-history text-primary me-1"></i>
-                  {{ ticketLabels().runtimeSummaryTitle }}
+                <span class="d-flex align-items-center gap-2 fw-bold text-dark small mb-2">
+                  <span class="q-field-icon-badge q-field-icon-badge--teal" style="width: 22px; height: 22px; font-size: 0.7rem;">
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                  </span>
+                  <span>{{ ticketLabels().runtimeSummaryTitle }}</span>
                 </span>
                 <div class="d-flex flex-column gap-2 small">
                   <div class="d-flex justify-content-between align-items-center text-muted">
@@ -432,7 +463,7 @@
 
             <!-- System Behavior Footer Tip -->
             <div class="widget-tips pt-3 mt-3 border-top d-flex align-items-center gap-2 text-muted small">
-              <i class="bi bi-shield-check text-success fs-5"></i>
+              <i class="fa-solid fa-shield-check text-success fs-5"></i>
               <span>
                 {{ language() === 'ar'
                   ? 'يتم تطبيق هذا الترتيب تلقائياً في حسابات التذاكر بالخادم المركزي للفرع.'

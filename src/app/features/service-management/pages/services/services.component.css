@@ -411,52 +411,8 @@ textarea.svc-input,
   letter-spacing: 0.4px;
 }
 
-/* ============================================
-   TOAST NOTIFICATION
-   ============================================ */
-.toast-stack {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  z-index: 1300;
-  animation: slideInDown 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
+/* Unified toast notifications inherited from components.css */
 
-@keyframes slideInDown {
-  from {
-    transform: translateY(-20px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-.toast-item {
-  align-items: center;
-  background: rgba(255, 255, 255, 0.96);
-  backdrop-filter: blur(12px);
-  border: 1px solid var(--q-border-subtle, #d8e5ec);
-  border-radius: var(--q-radius-md, 12px);
-  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.12);
-  display: flex;
-  gap: 12px;
-  max-width: 480px;
-  padding: 12px 16px;
-  font-size: 13px;
-  font-weight: 600;
-}
-
-.toast-success {
-  color: var(--q-success, #138a5b);
-}
-.toast-error {
-  color: var(--q-danger, #d21f35);
-}
-.toast-info {
-  color: var(--q-primary, #0b8aa8);
-}
 
 .toast-close {
   padding: 0;

@@ -11,39 +11,47 @@
         ? 'إدارة ألوان ونصوص شاشة العرض الخاصة بالفرع ورسائل الشريط المتحرك.'
         : 'Manage display colors, texts, and ticker messages for the branch.'
     "
-    icon="bi bi-display"
+    icon="fa-solid fa-tv"
+    iconVariant="teal"
   >
-    <div hero-actions class="d-flex align-items-center gap-2 hero-controls flex-nowrap">
+    <div hero-actions class="d-flex align-items-center gap-2 hero-controls flex-wrap">
       @if (isTechnicalAdmin() && branches().length > 1) {
-        <label class="visually-hidden" for="displayConfigBranch">{{ copy().branchLabel }}</label>
-        <select
-          id="displayConfigBranch"
-          class="form-select branch-selector-control custom-select"
-          [value]="selectedBranchId() ?? ''"
-          [disabled]="branchesLoading() || configLoading() || saving()"
-          (change)="selectBranch($event)"
-        >
-          <option value="" [selected]="!selectedBranchId()">--</option>
-          @for (branch of branches(); track branch.id) {
-            <option [value]="branch.id" [selected]="branch.id === selectedBranchId()">
-              {{ branch.label }}
-            </option>
-          }
-        </select>
+        <div class="branch-select-wrapper">
+          <span class="q-field-icon-badge q-field-icon-badge--violet">
+            <i class="fa-solid fa-building" aria-hidden="true"></i>
+          </span>
+          <label class="visually-hidden" for="displayConfigBranch">{{ copy().branchLabel }}</label>
+          <select
+            id="displayConfigBranch"
+            class="form-select branch-selector-control"
+            [value]="selectedBranchId() ?? ''"
+            [disabled]="branchesLoading() || configLoading() || saving()"
+            (change)="selectBranch($event)"
+          >
+            <option value="" [selected]="!selectedBranchId()">--</option>
+            @for (branch of branches(); track branch.id) {
+              <option [value]="branch.id" [selected]="branch.id === selectedBranchId()">
+                {{ branch.label }}
+              </option>
+            }
+          </select>
+        </div>
       } @else if (selectedBranchId()) {
-        <div class="d-inline-flex align-items-center gap-2 px-3 py-2 bg-white border rounded text-dark fw-bold small shadow-sm">
-          <i class="bi bi-buildings text-primary"></i>
-          <span>{{ selectedBranchLabel() }}</span>
+        <div class="branch-select-wrapper static-badge">
+          <span class="q-field-icon-badge q-field-icon-badge--violet">
+            <i class="fa-solid fa-building" aria-hidden="true"></i>
+          </span>
+          <span class="fw-bold text-dark px-2 small">{{ selectedBranchLabel() }}</span>
         </div>
       }
       <button
         type="button"
-        class="btn btn-refresh d-inline-flex align-items-center gap-2 flex-shrink-0"
+        class="secondary-action d-inline-flex align-items-center gap-2 branding-refresh-action"
         [disabled]="!selectedBranchId() || configLoading() || saving()"
         [attr.title]="copy().refreshLabel"
         (click)="refresh()"
       >
-        <i class="bi bi-arrow-repeat fs-5" [class.spin]="configLoading()" aria-hidden="true"></i>
+        <i class="fa-solid fa-arrows-rotate" style="color: #059669;" [class.spin]="configLoading()" aria-hidden="true"></i>
         <span>{{ copy().refreshLabel }}</span>
       </button>
     </div>
@@ -80,7 +88,7 @@
       role="alert"
     >
       <div class="alert-icon-wrap bg-warning-subtle text-warning-emphasis">
-        <i class="bi bi-shield-lock-fill fs-4" aria-hidden="true"></i>
+        <i class="fa-solid fa-shield-halved fs-4" aria-hidden="true"></i>
       </div>
       <div>
         <h6 class="mb-1 fw-bold">
@@ -102,7 +110,7 @@
   @if (!selectedBranchId() && !branchesLoading()) {
     <div class="empty-branch-placeholder card shadow-sm border-0 my-4 p-5 text-center">
       <div class="empty-icon-circle mx-auto mb-3">
-        <i class="bi bi-display text-primary fs-1"></i>
+        <i class="fa-solid fa-tv text-primary fs-1"></i>
       </div>
       <h4 class="fw-bold text-dark mb-2">
         {{
@@ -122,7 +130,7 @@
   }
 
   <!-- ═══════════════════════════════════════════════════════════════════ -->
-  <!--       CONFIGURATION FORM (REFACTORED WITH BOOTSTRAP GRID)          -->
+  <!--       CONFIGURATION FORM (WITH MODERN CARDS & FIELD BADGES)         -->
   <!-- ═══════════════════════════════════════════════════════════════════ -->
   @if (selectedBranchId() && !branchesLoading() && !configLoading()) {
     <form [formGroup]="configForm" (ngSubmit)="saveConfig()" class="configuration-workspace mt-3">
@@ -130,15 +138,15 @@
       <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
         <div>
           @if (isConfigured()) {
-            <span class="badge status-badge badge-active d-inline-flex align-items-center gap-2">
-              <span class="pulse-dot active-dot"></span>
+            <span class="q-detail-pill q-detail-pill--active">
+              <span class="q-detail-pill__dot"></span>
               <span>{{
                 language() === 'ar' ? 'وضع التعديل (إعدادات محفوظة)' : 'Edit Mode (Configured)'
               }}</span>
             </span>
           } @else {
-            <span class="badge status-badge badge-create d-inline-flex align-items-center gap-2">
-              <i class="bi bi-plus-circle-fill" aria-hidden="true"></i>
+            <span class="q-detail-pill q-detail-pill--info">
+              <i class="fa-solid fa-plus-circle" aria-hidden="true"></i>
               <span>{{
                 language() === 'ar'
                   ? 'وضع الإنشاء (إعدادات جديدة)'
@@ -147,12 +155,13 @@
             </span>
           }
         </div>
-        <span class="text-muted small">
-          {{
+        <span class="text-muted small fw-medium d-inline-flex align-items-center gap-2">
+          <i class="fa-solid fa-circle-info text-primary"></i>
+          <span>{{
             language() === 'ar'
               ? 'يتم تطبيق الإعدادات على جميع شاشات هذا الفرع'
               : 'Settings apply to all displays in this branch'
-          }}
+          }}</span>
         </span>
       </div>
 
@@ -160,20 +169,23 @@
         <!-- ─── Panel 1: Display & Header (col-lg-6) ───────────────────── -->
         <div class="col-lg-6">
           <div class="card config-panel h-100 shadow-sm">
-            <div class="panel-header">
-              <div class="d-flex align-items-center gap-2">
-                <span class="panel-icon"><i class="bi bi-palette2"></i></span>
-                <h5 class="panel-title m-0">
-                  {{ language() === 'ar' ? 'الشاشة والترويسة' : 'Display & Header' }}
-                </h5>
-              </div>
+            <div class="panel-header d-flex align-items-center gap-2">
+              <span class="q-field-icon-badge q-field-icon-badge--sky">
+                <i class="fa-solid fa-palette"></i>
+              </span>
+              <h5 class="panel-title m-0">
+                {{ language() === 'ar' ? 'الشاشة والترويسة' : 'Display & Header' }}
+              </h5>
             </div>
             <div class="panel-body p-3 p-xl-4">
               <div class="row g-3">
                 <!-- Display Background Color -->
                 <div class="col-sm-6">
-                  <label class="form-label" for="displayBackgroundColor">
-                    {{ language() === 'ar' ? 'لون خلفية الشاشة' : 'Display Background' }}
+                  <label class="form-label d-flex align-items-center gap-2" for="displayBackgroundColor">
+                    <span class="q-field-icon-badge q-field-icon-badge--teal">
+                      <i class="fa-solid fa-fill-drip"></i>
+                    </span>
+                    <span>{{ language() === 'ar' ? 'لون خلفية الشاشة' : 'Display Background' }}</span>
                   </label>
                   <div class="color-picker-control">
                     <input
@@ -196,8 +208,11 @@
 
                 <!-- Header Background Color -->
                 <div class="col-sm-6">
-                  <label class="form-label" for="headerBackgroundColor">
-                    {{ language() === 'ar' ? 'لون خلفية الترويسة' : 'Header Background' }}
+                  <label class="form-label d-flex align-items-center gap-2" for="headerBackgroundColor">
+                    <span class="q-field-icon-badge q-field-icon-badge--indigo">
+                      <i class="fa-solid fa-heading"></i>
+                    </span>
+                    <span>{{ language() === 'ar' ? 'لون خلفية الترويسة' : 'Header Background' }}</span>
                   </label>
                   <div class="color-picker-control">
                     <input
@@ -220,8 +235,11 @@
 
                 <!-- Main Title Ar -->
                 <div class="col-12">
-                  <label class="form-label" for="mainTitleAr">
-                    {{ language() === 'ar' ? 'العنوان الرئيسي (عربي)' : 'Main Title (Arabic)' }}
+                  <label class="form-label d-flex align-items-center gap-2" for="mainTitleAr">
+                    <span class="q-field-icon-badge q-field-icon-badge--sky">
+                      <i class="fa-solid fa-font"></i>
+                    </span>
+                    <span>{{ language() === 'ar' ? 'العنوان الرئيسي (عربي)' : 'Main Title (Arabic)' }}</span>
                   </label>
                   <input
                     type="text"
@@ -236,8 +254,11 @@
 
                 <!-- Main Title En -->
                 <div class="col-12">
-                  <label class="form-label" for="mainTitleEn">
-                    {{ language() === 'ar' ? 'العنوان الرئيسي (إنجليزي)' : 'Main Title (English)' }}
+                  <label class="form-label d-flex align-items-center gap-2" for="mainTitleEn">
+                    <span class="q-field-icon-badge q-field-icon-badge--sky">
+                      <i class="fa-solid fa-font"></i>
+                    </span>
+                    <span>{{ language() === 'ar' ? 'العنوان الرئيسي (إنجليزي)' : 'Main Title (English)' }}</span>
                   </label>
                   <input
                     type="text"
@@ -252,8 +273,11 @@
 
                 <!-- Title Text Color -->
                 <div class="col-sm-6">
-                  <label class="form-label" for="mainTitleTextColor">
-                    {{ language() === 'ar' ? 'لون نص العنوان' : 'Title Text Color' }}
+                  <label class="form-label d-flex align-items-center gap-2" for="mainTitleTextColor">
+                    <span class="q-field-icon-badge q-field-icon-badge--amber">
+                      <i class="fa-solid fa-paint-roller"></i>
+                    </span>
+                    <span>{{ language() === 'ar' ? 'لون نص العنوان' : 'Title Text Color' }}</span>
                   </label>
                   <div class="color-picker-control">
                     <input
@@ -275,8 +299,11 @@
 
                 <!-- Title Font Size -->
                 <div class="col-sm-6">
-                  <label class="form-label" for="mainTitleFontSize">
-                    {{ language() === 'ar' ? 'حجم خط العنوان (px)' : 'Title Font Size (px)' }}
+                  <label class="form-label d-flex align-items-center gap-2" for="mainTitleFontSize">
+                    <span class="q-field-icon-badge q-field-icon-badge--violet">
+                      <i class="fa-solid fa-text-height"></i>
+                    </span>
+                    <span>{{ language() === 'ar' ? 'حجم خط العنوان (px)' : 'Title Font Size (px)' }}</span>
                   </label>
                   <input
                     type="number"
@@ -296,20 +323,23 @@
         <!-- ─── Panel 2: Ticker & Clock (col-lg-6) ──────────────────────── -->
         <div class="col-lg-6">
           <div class="card config-panel h-100 shadow-sm">
-            <div class="panel-header">
-              <div class="d-flex align-items-center gap-2">
-                <span class="panel-icon"><i class="bi bi-clock-history"></i></span>
-                <h5 class="panel-title m-0">
-                  {{ language() === 'ar' ? 'شريط التيكر والساعة' : 'Ticker & Clock' }}
-                </h5>
-              </div>
+            <div class="panel-header d-flex align-items-center gap-2">
+              <span class="q-field-icon-badge q-field-icon-badge--amber">
+                <i class="fa-solid fa-clock"></i>
+              </span>
+              <h5 class="panel-title m-0">
+                {{ language() === 'ar' ? 'شريط التيكر والساعة' : 'Ticker & Clock' }}
+              </h5>
             </div>
             <div class="panel-body p-3 p-xl-4">
               <div class="row g-3">
                 <!-- Ticker Background -->
                 <div class="col-sm-6">
-                  <label class="form-label" for="tickerBackgroundColor">
-                    {{ language() === 'ar' ? 'خلفية شريط التيكر' : 'Ticker Background' }}
+                  <label class="form-label d-flex align-items-center gap-2" for="tickerBackgroundColor">
+                    <span class="q-field-icon-badge q-field-icon-badge--indigo">
+                      <i class="fa-solid fa-bars-staggered"></i>
+                    </span>
+                    <span>{{ language() === 'ar' ? 'خلفية شريط التيكر' : 'Ticker Background' }}</span>
                   </label>
                   <div class="color-picker-control">
                     <input
@@ -331,8 +361,11 @@
 
                 <!-- Ticker Text Color -->
                 <div class="col-sm-6">
-                  <label class="form-label" for="tickerTextColor">
-                    {{ language() === 'ar' ? 'لون نص التيكر' : 'Ticker Text Color' }}
+                  <label class="form-label d-flex align-items-center gap-2" for="tickerTextColor">
+                    <span class="q-field-icon-badge q-field-icon-badge--sky">
+                      <i class="fa-solid fa-font"></i>
+                    </span>
+                    <span>{{ language() === 'ar' ? 'لون نص التيكر' : 'Ticker Text Color' }}</span>
                   </label>
                   <div class="color-picker-control">
                     <input
@@ -354,8 +387,11 @@
 
                 <!-- Ticker Font Size -->
                 <div class="col-sm-6">
-                  <label class="form-label" for="tickerFontSize">
-                    {{ language() === 'ar' ? 'حجم خط التيكر (px)' : 'Ticker Font Size (px)' }}
+                  <label class="form-label d-flex align-items-center gap-2" for="tickerFontSize">
+                    <span class="q-field-icon-badge q-field-icon-badge--violet">
+                      <i class="fa-solid fa-text-height"></i>
+                    </span>
+                    <span>{{ language() === 'ar' ? 'حجم خط التيكر (px)' : 'Ticker Font Size (px)' }}</span>
                   </label>
                   <input
                     type="number"
@@ -378,16 +414,22 @@
                       formControlName="showClock"
                       [attr.disabled]="!canUpdate() || saving() ? true : null"
                     />
-                    <label class="form-check-label fw-semibold" for="showClock">
-                      {{ language() === 'ar' ? 'إظهار الساعة بالشريط' : 'Show Clock in Ticker' }}
+                    <label class="form-check-label fw-semibold d-inline-flex align-items-center gap-2" for="showClock">
+                      <span class="q-field-icon-badge q-field-icon-badge--amber">
+                        <i class="fa-solid fa-clock"></i>
+                      </span>
+                      <span>{{ language() === 'ar' ? 'إظهار الساعة بالشريط' : 'Show Clock in Ticker' }}</span>
                     </label>
                   </div>
                 </div>
 
                 <!-- Clock Background -->
                 <div class="col-sm-6">
-                  <label class="form-label" for="clockBackgroundColor">
-                    {{ language() === 'ar' ? 'لون خلفية الساعة' : 'Clock Background' }}
+                  <label class="form-label d-flex align-items-center gap-2" for="clockBackgroundColor">
+                    <span class="q-field-icon-badge q-field-icon-badge--teal">
+                      <i class="fa-solid fa-fill-drip"></i>
+                    </span>
+                    <span>{{ language() === 'ar' ? 'لون خلفية الساعة' : 'Clock Background' }}</span>
                   </label>
                   <div class="color-picker-control">
                     <input
@@ -409,8 +451,11 @@
 
                 <!-- Clock Text Color -->
                 <div class="col-sm-6">
-                  <label class="form-label" for="clockTextColor">
-                    {{ language() === 'ar' ? 'لون نص الساعة' : 'Clock Text Color' }}
+                  <label class="form-label d-flex align-items-center gap-2" for="clockTextColor">
+                    <span class="q-field-icon-badge q-field-icon-badge--sky">
+                      <i class="fa-solid fa-clock-rotate-left"></i>
+                    </span>
+                    <span>{{ language() === 'ar' ? 'لون نص الساعة' : 'Clock Text Color' }}</span>
                   </label>
                   <div class="color-picker-control">
                     <input
@@ -437,22 +482,24 @@
         <!-- ─── Panel 3: Calling Table & Columns (col-12) ──────────────── -->
         <div class="col-12">
           <div class="card config-panel shadow-sm">
-            <div class="panel-header">
-              <div class="d-flex align-items-center gap-2">
-                <span class="panel-icon"><i class="bi bi-table"></i></span>
-                <h5 class="panel-title m-0">
-                  {{
-                    language() === 'ar'
-                      ? 'جدول النداء وعناوين الأعمدة'
-                      : 'Calling Table & Column Titles'
-                  }}
-                </h5>
-              </div>
+            <div class="panel-header d-flex align-items-center gap-2">
+              <span class="q-field-icon-badge q-field-icon-badge--indigo">
+                <i class="fa-solid fa-table-cells"></i>
+              </span>
+              <h5 class="panel-title m-0">
+                {{
+                  language() === 'ar'
+                    ? 'جدول النداء وعناوين الأعمدة'
+                    : 'Calling Table & Column Titles'
+                }}
+              </h5>
             </div>
             <div class="panel-body p-3 p-xl-4">
               <!-- Subheading: Column Titles -->
               <h6 class="section-subtitle mb-3 d-flex align-items-center gap-2">
-                <i class="bi bi-layout-three-columns text-primary"></i>
+                <span class="q-field-icon-badge q-field-icon-badge--sky">
+                  <i class="fa-solid fa-table-columns"></i>
+                </span>
                 <span>{{
                   language() === 'ar' ? 'عناوين الأعمدة في شاشة العرض' : 'Display Column Titles'
                 }}</span>
@@ -460,9 +507,12 @@
               <div class="row g-3 mb-4">
                 <!-- Ticket Column Titles -->
                 <div class="col-md-4 col-sm-6">
-                  <label class="form-label" for="ticketColumnTitleAr">{{
-                    language() === 'ar' ? 'عمود التذكرة (عربي)' : 'Ticket (Arabic)'
-                  }}</label>
+                  <label class="form-label d-flex align-items-center gap-2" for="ticketColumnTitleAr">
+                    <span class="q-field-icon-badge q-field-icon-badge--sky">
+                      <i class="fa-solid fa-ticket"></i>
+                    </span>
+                    <span>{{ language() === 'ar' ? 'عمود التذكرة (عربي)' : 'Ticket (Arabic)' }}</span>
+                  </label>
                   <input
                     type="text"
                     id="ticketColumnTitleAr"
@@ -474,9 +524,12 @@
                   />
                 </div>
                 <div class="col-md-4 col-sm-6">
-                  <label class="form-label" for="serviceColumnTitleAr">{{
-                    language() === 'ar' ? 'عمود الخدمة (عربي)' : 'Service (Arabic)'
-                  }}</label>
+                  <label class="form-label d-flex align-items-center gap-2" for="serviceColumnTitleAr">
+                    <span class="q-field-icon-badge q-field-icon-badge--teal">
+                      <i class="fa-solid fa-briefcase"></i>
+                    </span>
+                    <span>{{ language() === 'ar' ? 'عمود الخدمة (عربي)' : 'Service (Arabic)' }}</span>
+                  </label>
                   <input
                     type="text"
                     id="serviceColumnTitleAr"
@@ -488,9 +541,12 @@
                   />
                 </div>
                 <div class="col-md-4 col-sm-6">
-                  <label class="form-label" for="windowColumnTitleAr">{{
-                    language() === 'ar' ? 'عمود الشباك (عربي)' : 'Window (Arabic)'
-                  }}</label>
+                  <label class="form-label d-flex align-items-center gap-2" for="windowColumnTitleAr">
+                    <span class="q-field-icon-badge q-field-icon-badge--violet">
+                      <i class="fa-solid fa-window-maximize"></i>
+                    </span>
+                    <span>{{ language() === 'ar' ? 'عمود الشباك (عربي)' : 'Window (Arabic)' }}</span>
+                  </label>
                   <input
                     type="text"
                     id="windowColumnTitleAr"
@@ -503,9 +559,12 @@
                 </div>
 
                 <div class="col-md-4 col-sm-6">
-                  <label class="form-label" for="ticketColumnTitleEn">{{
-                    language() === 'ar' ? 'عمود التذكرة (إنجليزي)' : 'Ticket (English)'
-                  }}</label>
+                  <label class="form-label d-flex align-items-center gap-2" for="ticketColumnTitleEn">
+                    <span class="q-field-icon-badge q-field-icon-badge--sky">
+                      <i class="fa-solid fa-ticket"></i>
+                    </span>
+                    <span>{{ language() === 'ar' ? 'عمود التذكرة (إنجليزي)' : 'Ticket (English)' }}</span>
+                  </label>
                   <input
                     type="text"
                     id="ticketColumnTitleEn"
@@ -517,9 +576,12 @@
                   />
                 </div>
                 <div class="col-md-4 col-sm-6">
-                  <label class="form-label" for="serviceColumnTitleEn">{{
-                    language() === 'ar' ? 'عمود الخدمة (إنجليزي)' : 'Service (English)'
-                  }}</label>
+                  <label class="form-label d-flex align-items-center gap-2" for="serviceColumnTitleEn">
+                    <span class="q-field-icon-badge q-field-icon-badge--teal">
+                      <i class="fa-solid fa-briefcase"></i>
+                    </span>
+                    <span>{{ language() === 'ar' ? 'عمود الخدمة (إنجليزي)' : 'Service (English)' }}</span>
+                  </label>
                   <input
                     type="text"
                     id="serviceColumnTitleEn"
@@ -531,9 +593,12 @@
                   />
                 </div>
                 <div class="col-md-4 col-sm-6">
-                  <label class="form-label" for="windowColumnTitleEn">{{
-                    language() === 'ar' ? 'عمود الشباك (إنجليزي)' : 'Window (English)'
-                  }}</label>
+                  <label class="form-label d-flex align-items-center gap-2" for="windowColumnTitleEn">
+                    <span class="q-field-icon-badge q-field-icon-badge--violet">
+                      <i class="fa-solid fa-window-maximize"></i>
+                    </span>
+                    <span>{{ language() === 'ar' ? 'عمود الشباك (إنجليزي)' : 'Window (English)' }}</span>
+                  </label>
                   <input
                     type="text"
                     id="windowColumnTitleEn"
@@ -548,7 +613,9 @@
 
               <!-- Subheading: Table Colors -->
               <h6 class="section-subtitle mb-3 d-flex align-items-center gap-2 pt-3 border-top">
-                <i class="bi bi-brush text-primary"></i>
+                <span class="q-field-icon-badge q-field-icon-badge--teal">
+                  <i class="fa-solid fa-paint-roller"></i>
+                </span>
                 <span>{{
                   language() === 'ar'
                     ? 'ألوان جدول النداء وبادج التذكرة'
@@ -557,9 +624,12 @@
               </h6>
               <div class="row g-3">
                 <div class="col-lg-4 col-sm-6">
-                  <label class="form-label" for="tableHeaderBackgroundColor">{{
-                    language() === 'ar' ? 'خلفية ترويسة الجدول' : 'Header Background'
-                  }}</label>
+                  <label class="form-label d-flex align-items-center gap-2" for="tableHeaderBackgroundColor">
+                    <span class="q-field-icon-badge q-field-icon-badge--indigo">
+                      <i class="fa-solid fa-table-columns"></i>
+                    </span>
+                    <span>{{ language() === 'ar' ? 'خلفية ترويسة الجدول' : 'Header Background' }}</span>
+                  </label>
                   <div class="color-picker-control">
                     <input
                       type="color"
@@ -579,9 +649,12 @@
                 </div>
 
                 <div class="col-lg-4 col-sm-6">
-                  <label class="form-label" for="tableHeaderTextColor">{{
-                    language() === 'ar' ? 'نص ترويسة الجدول' : 'Header Text'
-                  }}</label>
+                  <label class="form-label d-flex align-items-center gap-2" for="tableHeaderTextColor">
+                    <span class="q-field-icon-badge q-field-icon-badge--sky">
+                      <i class="fa-solid fa-font"></i>
+                    </span>
+                    <span>{{ language() === 'ar' ? 'نص ترويسة الجدول' : 'Header Text' }}</span>
+                  </label>
                   <div class="color-picker-control">
                     <input
                       type="color"
@@ -601,9 +674,12 @@
                 </div>
 
                 <div class="col-lg-4 col-sm-6">
-                  <label class="form-label" for="tableRowBackgroundColor">{{
-                    language() === 'ar' ? 'خلفية صفوف الجدول' : 'Row Background'
-                  }}</label>
+                  <label class="form-label d-flex align-items-center gap-2" for="tableRowBackgroundColor">
+                    <span class="q-field-icon-badge q-field-icon-badge--teal">
+                      <i class="fa-solid fa-table-cells-large"></i>
+                    </span>
+                    <span>{{ language() === 'ar' ? 'خلفية صفوف الجدول' : 'Row Background' }}</span>
+                  </label>
                   <div class="color-picker-control">
                     <input
                       type="color"
@@ -623,9 +699,12 @@
                 </div>
 
                 <div class="col-lg-4 col-sm-6">
-                  <label class="form-label" for="tableRowTextColor">{{
-                    language() === 'ar' ? 'نص صفوف الجدول' : 'Row Text'
-                  }}</label>
+                  <label class="form-label d-flex align-items-center gap-2" for="tableRowTextColor">
+                    <span class="q-field-icon-badge q-field-icon-badge--sky">
+                      <i class="fa-solid fa-font"></i>
+                    </span>
+                    <span>{{ language() === 'ar' ? 'نص صفوف الجدول' : 'Row Text' }}</span>
+                  </label>
                   <div class="color-picker-control">
                     <input
                       type="color"
@@ -645,9 +724,12 @@
                 </div>
 
                 <div class="col-lg-4 col-sm-6">
-                  <label class="form-label" for="ticketNumberBackgroundColor">{{
-                    language() === 'ar' ? 'خلفية بادج التذكرة' : 'Ticket Badge Background'
-                  }}</label>
+                  <label class="form-label d-flex align-items-center gap-2" for="ticketNumberBackgroundColor">
+                    <span class="q-field-icon-badge q-field-icon-badge--amber">
+                      <i class="fa-solid fa-ticket"></i>
+                    </span>
+                    <span>{{ language() === 'ar' ? 'خلفية بادج التذكرة' : 'Ticket Badge Background' }}</span>
+                  </label>
                   <div class="color-picker-control">
                     <input
                       type="color"
@@ -667,9 +749,12 @@
                 </div>
 
                 <div class="col-lg-4 col-sm-6">
-                  <label class="form-label" for="ticketNumberTextColor">{{
-                    language() === 'ar' ? 'نص بادج التذكرة' : 'Ticket Badge Text'
-                  }}</label>
+                  <label class="form-label d-flex align-items-center gap-2" for="ticketNumberTextColor">
+                    <span class="q-field-icon-badge q-field-icon-badge--rose">
+                      <i class="fa-solid fa-font"></i>
+                    </span>
+                    <span>{{ language() === 'ar' ? 'نص بادج التذكرة' : 'Ticket Badge Text' }}</span>
+                  </label>
                   <div class="color-picker-control">
                     <input
                       type="color"
@@ -699,7 +784,9 @@
               class="panel-header d-flex align-items-center justify-content-between flex-wrap gap-2"
             >
               <div class="d-flex align-items-center gap-2">
-                <span class="panel-icon"><i class="bi bi-chat-left-text"></i></span>
+                <span class="q-field-icon-badge q-field-icon-badge--violet">
+                  <i class="fa-solid fa-bullhorn"></i>
+                </span>
                 <h5 class="panel-title m-0">
                   {{
                     language() === 'ar'
@@ -711,14 +798,14 @@
               @if (canUpdate()) {
                 <button
                   type="button"
-                  class="btn btn-sm btn-primary d-inline-flex align-items-center gap-2"
+                  class="primary-action d-inline-flex align-items-center gap-2"
                   (click)="openAddMessageForm()"
                   [disabled]="
                     messageSaving() || showAddMessageForm() || editingMessageId() !== null
                   "
                 >
-                  <i class="bi bi-plus-lg" aria-hidden="true"></i>
-                  <span>{{ language() === 'ar' ? 'إضافة رسالة' : 'Add Message' }}</span>
+                  <i class="fa-solid fa-plus"></i>
+                  <span class="text-white">{{ language() === 'ar' ? 'إضافة رسالة' : 'Add Message' }}</span>
                 </button>
               }
             </div>
@@ -738,11 +825,13 @@
                 <div class="message-composer card border p-3 mb-3 bg-light">
                   <div class="d-flex align-items-center justify-content-between mb-2">
                     <h6 class="m-0 fw-bold text-primary d-flex align-items-center gap-2">
-                      <i
-                        class="bi"
-                        [class.bi-plus-circle]="showAddMessageForm()"
-                        [class.bi-pencil-square]="editingMessageId() !== null"
-                      ></i>
+                      <span class="q-field-icon-badge q-field-icon-badge--sky">
+                        <i
+                          class="fa-solid"
+                          [class.fa-plus-circle]="showAddMessageForm()"
+                          [class.fa-pen-to-square]="editingMessageId() !== null"
+                        ></i>
+                      </span>
                       <span>
                         {{
                           showAddMessageForm()
@@ -758,9 +847,12 @@
                   </div>
                   <div class="row g-2" [formGroup]="messageForm">
                     <div class="col-md-5">
-                      <label class="form-label small" for="msgTextAr">{{
-                        language() === 'ar' ? 'النص العربي' : 'Arabic Text'
-                      }}</label>
+                      <label class="form-label small d-flex align-items-center gap-1" for="msgTextAr">
+                        <span class="q-field-icon-badge q-field-icon-badge--sky" style="width: 20px; height: 20px; font-size: 0.65rem;">
+                          <i class="fa-solid fa-font"></i>
+                        </span>
+                        <span>{{ language() === 'ar' ? 'النص العربي' : 'Arabic Text' }}</span>
+                      </label>
                       <input
                         type="text"
                         id="msgTextAr"
@@ -771,9 +863,12 @@
                       />
                     </div>
                     <div class="col-md-5">
-                      <label class="form-label small" for="msgTextEn">{{
-                        language() === 'ar' ? 'النص الإنجليزي' : 'English Text'
-                      }}</label>
+                      <label class="form-label small d-flex align-items-center gap-1" for="msgTextEn">
+                        <span class="q-field-icon-badge q-field-icon-badge--sky" style="width: 20px; height: 20px; font-size: 0.65rem;">
+                          <i class="fa-solid fa-font"></i>
+                        </span>
+                        <span>{{ language() === 'ar' ? 'النص الإنجليزي' : 'English Text' }}</span>
+                      </label>
                       <input
                         type="text"
                         id="msgTextEn"
@@ -784,9 +879,12 @@
                       />
                     </div>
                     <div class="col-md-2">
-                      <label class="form-label small" for="msgOrder">{{
-                        language() === 'ar' ? 'الترتيب' : 'Order'
-                      }}</label>
+                      <label class="form-label small d-flex align-items-center gap-1" for="msgOrder">
+                        <span class="q-field-icon-badge q-field-icon-badge--amber" style="width: 20px; height: 20px; font-size: 0.65rem;">
+                          <i class="fa-solid fa-list-ol"></i>
+                        </span>
+                        <span>{{ language() === 'ar' ? 'الترتيب' : 'Order' }}</span>
+                      </label>
                       <input
                         type="number"
                         id="msgOrder"
@@ -799,7 +897,7 @@
                   <div class="d-flex gap-2 justify-content-end mt-3">
                     <button
                       type="button"
-                      class="btn btn-sm btn-outline-secondary"
+                      class="secondary-action"
                       (click)="cancelMessageForm()"
                       [disabled]="messageSaving()"
                     >
@@ -808,7 +906,7 @@
                     @if (showAddMessageForm()) {
                       <button
                         type="button"
-                        class="btn btn-sm btn-primary"
+                        class="primary-action d-inline-flex align-items-center gap-2"
                         (click)="submitNewMessage()"
                         [disabled]="messageSaving() || messageForm.invalid"
                       >
@@ -819,12 +917,12 @@
                             aria-hidden="true"
                           ></span>
                         }
-                        {{ language() === 'ar' ? 'حفظ الرسالة' : 'Save Message' }}
+                        <span class="text-white">{{ language() === 'ar' ? 'حفظ الرسالة' : 'Save Message' }}</span>
                       </button>
                     } @else {
                       <button
                         type="button"
-                        class="btn btn-sm btn-primary"
+                        class="primary-action d-inline-flex align-items-center gap-2"
                         (click)="submitEditMessage()"
                         [disabled]="messageSaving() || messageForm.invalid"
                       >
@@ -835,7 +933,7 @@
                             aria-hidden="true"
                           ></span>
                         }
-                        {{ language() === 'ar' ? 'تحديث الرسالة' : 'Update Message' }}
+                        <span class="text-white">{{ language() === 'ar' ? 'تحديث الرسالة' : 'Update Message' }}</span>
                       </button>
                     }
                   </div>
@@ -844,32 +942,37 @@
 
               <!-- Empty Messages State -->
               @if (!messagesLoading() && messages().length === 0 && !showAddMessageForm()) {
-                <div class="text-center py-4 text-muted">
-                  <i class="bi bi-chat-square-dots fs-2 d-block mb-2 opacity-50"></i>
-                  <p class="mb-0">
-                    {{
-                      language() === 'ar'
-                        ? 'لا توجد رسائل تيكر مضافة لهذا الفرع بعد.'
-                        : 'No ticker messages added for this branch yet.'
-                    }}
-                  </p>
+                <div class="admin-list-empty d-flex align-items-center gap-3 p-4 my-2" role="status">
+                  <span class="admin-list-empty-icon d-inline-flex align-items-center justify-content-center flex-shrink-0" aria-hidden="true">
+                    <i class="fa-solid fa-comment-dots"></i>
+                  </span>
+                  <div>
+                    <h6 class="fw-bold mb-1">{{ language() === 'ar' ? 'لا توجد رسائل تيكر حالياً' : 'No Ticker Messages' }}</h6>
+                    <p class="text-muted small mb-0">
+                      {{
+                        language() === 'ar'
+                          ? 'قم بإضافة رسائل تيكر ليتم عرضها في الشريط المتحرك أسفل الشاشات.'
+                          : 'Add ticker messages to display in the scrolling bar at bottom of screens.'
+                      }}
+                    </p>
+                  </div>
                 </div>
               }
 
               <!-- Messages Compact Table -->
               @if (!messagesLoading() && messages().length > 0) {
-                <div class="table-responsive">
-                  <table class="table table-hover align-middle messages-table mb-0">
+                <div class="table-responsive table-wrap">
+                  <table class="admin-data-table table table-sm table-hover align-middle custom-table mb-0">
                     <thead>
                       <tr>
-                        <th style="width: 60px" class="text-center">#</th>
+                        <th style="width: 70px" class="text-center">{{ language() === 'ar' ? 'الترتيب' : '#' }}</th>
                         <th>{{ language() === 'ar' ? 'النص العربي' : 'Arabic Text' }}</th>
                         <th>{{ language() === 'ar' ? 'النص الإنجليزي' : 'English Text' }}</th>
-                        <th style="width: 100px" class="text-center">
+                        <th style="width: 120px" class="text-center">
                           {{ language() === 'ar' ? 'الحالة' : 'Status' }}
                         </th>
                         @if (canUpdate()) {
-                          <th style="width: 110px" class="text-end">
+                          <th style="width: 120px" class="admin-actions-column text-center">
                             {{ language() === 'ar' ? 'الإجراءات' : 'Actions' }}
                           </th>
                         }
@@ -878,7 +981,7 @@
                     <tbody>
                       @for (msg of messages(); track msg.id; let i = $index) {
                         <tr
-                          [class.table-light]="!msg.isActive"
+                          [class.opacity-75]="!msg.isActive"
                           [class.table-active]="editingMessageId() === msg.id"
                           [attr.draggable]="
                             canUpdate() && editingMessageId() === null && !showAddMessageForm()
@@ -894,16 +997,16 @@
                             <div class="d-flex align-items-center justify-content-center gap-1">
                               @if (canUpdate() && editingMessageId() === null) {
                                 <i
-                                  class="bi bi-grip-vertical text-muted drag-handle"
+                                  class="fa-solid fa-grip-vertical text-muted drag-handle"
                                   title="اسحب لإعادة الترتيب"
                                 ></i>
                               }
-                              <span class="badge bg-light text-dark border">{{
+                              <span class="q-order-badge">{{
                                 msg.displayOrder
                               }}</span>
                             </div>
                           </td>
-                          <td dir="rtl" class="text-truncate" style="max-width: 250px">
+                          <td dir="rtl" class="text-truncate fw-semibold text-dark" style="max-width: 250px">
                             {{ msg.textAr }}
                           </td>
                           <td dir="ltr" class="text-truncate text-muted" style="max-width: 250px">
@@ -911,54 +1014,55 @@
                           </td>
                           <td class="text-center">
                             @if (msg.isActive) {
-                              <span
-                                class="badge bg-success-subtle text-success border border-success-subtle"
-                              >
+                              <span class="q-detail-pill q-detail-pill--active">
+                                <span class="q-detail-pill__dot"></span>
                                 {{ language() === 'ar' ? 'نشط' : 'Active' }}
                               </span>
                             } @else {
-                              <span
-                                class="badge bg-secondary-subtle text-secondary border border-secondary-subtle"
-                              >
+                              <span class="q-detail-pill q-detail-pill--inactive">
+                                <span class="q-detail-pill__dot"></span>
                                 {{ language() === 'ar' ? 'متوقف' : 'Inactive' }}
                               </span>
                             }
                           </td>
                           @if (canUpdate()) {
-                            <td class="text-end">
-                              <div class="d-inline-flex align-items-center gap-1">
+                            <td class="admin-actions-column text-center">
+                              <div class="d-inline-flex align-items-center justify-content-center gap-2">
                                 <button
                                   type="button"
-                                  class="btn btn-sm btn-outline-primary action-icon-btn"
+                                  class="icon-action"
                                   (click)="startEditMessage(msg)"
                                   [disabled]="
                                     messageSaving() ||
                                     editingMessageId() !== null ||
                                     showAddMessageForm()
                                   "
+                                  [attr.aria-label]="language() === 'ar' ? 'تعديل' : 'Edit'"
                                   [title]="language() === 'ar' ? 'تعديل' : 'Edit'"
                                 >
-                                  <i class="bi bi-pencil-fill"></i>
+                                  <i class="fa-solid fa-pen-to-square"></i>
                                 </button>
                                 @if (msg.isActive) {
                                   <button
                                     type="button"
-                                    class="btn btn-sm btn-outline-danger action-icon-btn"
+                                    class="icon-action warning-action"
                                     (click)="deactivateMessage(msg)"
                                     [disabled]="messageSaving()"
+                                    [attr.aria-label]="language() === 'ar' ? 'إيقاف' : 'Deactivate'"
                                     [title]="language() === 'ar' ? 'إيقاف' : 'Deactivate'"
                                   >
-                                    <i class="bi bi-pause-fill"></i>
+                                    <i class="fa-solid fa-power-off"></i>
                                   </button>
                                 } @else {
                                   <button
                                     type="button"
-                                    class="btn btn-sm btn-outline-success action-icon-btn"
+                                    class="icon-action success-action"
                                     (click)="reactivateMessage(msg)"
                                     [disabled]="messageSaving()"
+                                    [attr.aria-label]="language() === 'ar' ? 'تفعيل' : 'Reactivate'"
                                     [title]="language() === 'ar' ? 'تفعيل' : 'Reactivate'"
                                   >
-                                    <i class="bi bi-play-fill"></i>
+                                    <i class="fa-solid fa-rotate-left"></i>
                                   </button>
                                 }
                               </div>
@@ -980,17 +1084,15 @@
             <div class="sticky-save-bar">
               <div class="d-flex align-items-center gap-2">
                 @if (configForm.dirty) {
-                  <div class="save-status-pill status-unsaved">
-                    <span class="status-pulse-dot warning"></span>
-                    <i class="bi bi-exclamation-triangle-fill text-warning"></i>
+                  <div class="q-detail-pill q-detail-pill--warning">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
                     <span class="fw-semibold">{{
                       language() === 'ar' ? 'توجد تعديلات غير محفوظة' : 'Unsaved Changes'
                     }}</span>
                   </div>
                 } @else {
-                  <div class="save-status-pill status-saved">
-                    <span class="status-pulse-dot success"></span>
-                    <i class="bi bi-check-circle-fill text-success"></i>
+                  <div class="q-detail-pill q-detail-pill--active">
+                    <i class="fa-solid fa-circle-check"></i>
                     <span class="fw-semibold">{{
                       language() === 'ar' ? 'جميع الإعدادات محفوظة ومحدثة' : 'All Settings Saved'
                     }}</span>
@@ -999,7 +1101,7 @@
               </div>
               <button
                 type="submit"
-                class="btn btn-catchy-save"
+                class="primary-action d-inline-flex align-items-center gap-2"
                 [disabled]="saving() || configForm.invalid"
               >
                 @if (saving()) {
@@ -1009,9 +1111,9 @@
                     aria-hidden="true"
                   ></span>
                 } @else {
-                  <i class="bi bi-cloud-check-fill fs-5"></i>
+                  <i class="fa-solid fa-cloud-arrow-up"></i>
                 }
-                <span>{{ copy().saveConfigurationLabel }}</span>
+                <span class="text-white">{{ copy().saveConfigurationLabel }}</span>
               </button>
             </div>
           </div>

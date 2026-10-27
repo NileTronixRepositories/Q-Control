@@ -15,6 +15,7 @@ import {
   ValidationErrors,
   Validators,
 } from '@angular/forms';
+import { AppModalComponent } from '../../../../shared/components/app-modal/app-modal.component';
 import { MobileRecordCardComponent } from '../../../../shared/components/mobile-record-card/mobile-record-card.component';
 import { NiletronixLoadingStateComponent } from '../../../../shared/components/niletronix-loading-state/niletronix-loading-state.component';
 import { PageHeroComponent } from '../../../../shared/components/page-hero/page-hero.component';
@@ -111,6 +112,13 @@ interface TerminalTranslations {
   readonly noPermissionHint: string;
   readonly traceIdLabel: string;
   readonly notAvailable: string;
+  readonly basicInfoSection: string;
+  readonly timestampsSection: string;
+  readonly enabled: string;
+  readonly disabled: string;
+  readonly terminalSubtitle: string;
+  readonly createSubtitle: string;
+  readonly editSubtitle: string;
 }
 
 interface TerminalConfirmState {
@@ -187,6 +195,13 @@ const TERMINAL_TRANSLATIONS: Record<AppLanguage, TerminalTranslations> = {
     noPermissionHint: '\u0644\u0627 \u062a\u0648\u062c\u062f \u0635\u0644\u0627\u062d\u064a\u0627\u062a \u0643\u0627\u0641\u064a\u0629 \u0644\u0647\u0630\u0627 \u0627\u0644\u0625\u062c\u0631\u0627\u0621.',
     traceIdLabel: '\u0645\u0639\u0631\u0641 \u0627\u0644\u062a\u062a\u0628\u0639',
     notAvailable: '-',
+    basicInfoSection: 'معلومات الجهاز الطرفي الأساسية',
+    timestampsSection: 'سجل النظام والتاريخ',
+    enabled: 'نشط',
+    disabled: 'غير نشط',
+    terminalSubtitle: 'عرض التفاصيل الفنية للجهاز الطرفي وسجل البيانات',
+    createSubtitle: 'إدخال بيانات جهاز طرفي جديد وربطه بالنافذة',
+    editSubtitle: 'تحديث بيانات الجهاز الفنية والشبكية',
   },
   en: {
     title: 'Terminal Management',
@@ -247,6 +262,13 @@ const TERMINAL_TRANSLATIONS: Record<AppLanguage, TerminalTranslations> = {
     noPermissionHint: 'You do not have permission for this action.',
     traceIdLabel: 'Trace ID',
     notAvailable: '-',
+    basicInfoSection: 'Basic Terminal Information',
+    timestampsSection: 'System History & Timestamps',
+    enabled: 'Active',
+    disabled: 'Inactive',
+    terminalSubtitle: 'Terminal technical details and audit history',
+    createSubtitle: 'Create a new terminal and configure window assignment',
+    editSubtitle: 'Update terminal configuration and network details',
   },
 };
 
@@ -272,7 +294,13 @@ const EMPTY_DELETED_TERMINAL_PAGE: PaginationResponse<DeletedTerminalListItemRes
 
 @Component({
   selector: 'app-terminals',
-  imports: [ReactiveFormsModule, MobileRecordCardComponent, PageHeroComponent, NiletronixLoadingStateComponent],
+  imports: [
+    ReactiveFormsModule,
+    MobileRecordCardComponent,
+    PageHeroComponent,
+    NiletronixLoadingStateComponent,
+    AppModalComponent,
+  ],
   templateUrl: './terminals.component.html',
   styleUrl: './terminals.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -520,10 +548,11 @@ export class TerminalsComponent implements OnInit, OnDestroy {
     this.selectedDetails.set(null);
     this.terminalForm.enable({ emitEvent: false });
     this.resetTerminalForm();
+    this.panelLoading.set(false);
     this.confirmDialog.set(null);
   }
 
-  protected panelTitle(): string {
+  protected readonly panelTitle = computed(() => {
     if (this.panelMode() === 'create') {
       return this.translations().createTitle;
     }
@@ -533,7 +562,26 @@ export class TerminalsComponent implements OnInit, OnDestroy {
     }
 
     return this.translations().terminalDetails;
-  }
+  });
+
+  protected readonly panelSubtitle = computed(() => {
+    if (this.panelMode() === 'create') {
+      return this.translations().createSubtitle;
+    }
+
+    if (this.panelMode() === 'edit') {
+      return this.translations().editSubtitle;
+    }
+
+    const details = this.selectedDetails();
+    if (details) {
+      return `${this.translations().terminalNumber}: #${details.number} • ${this.translations().typeLabel}: ${details.type || '-'}`;
+    }
+
+    return this.translations().terminalSubtitle;
+  });
+
+  protected readonly panelLoading = signal(false);
 
   protected saveTerminal(): void {
     if (this.saving()) {
@@ -689,17 +737,24 @@ export class TerminalsComponent implements OnInit, OnDestroy {
       return this.translations().notAvailable;
     }
 
-    const parsed = new Date(dateValue);
+    try {
+      const parsed = new Date(dateValue);
 
-    if (Number.isNaN(parsed.getTime())) {
+      if (Number.isNaN(parsed.getTime())) {
+        return dateValue;
+      }
+
+      const locale = this.i18nStore.language() === 'ar' ? 'ar-EG' : 'en-US';
+      return new Intl.DateTimeFormat(locale, {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      }).format(parsed);
+    } catch {
       return dateValue;
     }
-
-    return new Intl.DateTimeFormat(this.i18nStore.language(), {
-      dateStyle: 'medium',
-      timeStyle: 'short',
-      timeZoneName: 'short',
-    }).format(parsed);
   }
 
   protected formatText(value: string | null | undefined): string {
@@ -816,6 +871,7 @@ export class TerminalsComponent implements OnInit, OnDestroy {
     }
 
     this.panelMode.set(mode);
+    this.panelLoading.set(true);
 
     this.terminalManagementApiService.getTerminalById(terminalId).subscribe({
       next: (response) => {
@@ -824,6 +880,7 @@ export class TerminalsComponent implements OnInit, OnDestroy {
         }
 
         this.selectedDetails.set(response);
+        this.panelLoading.set(false);
         this.patchTerminalForm(response);
 
         if (mode === 'edit') {
@@ -835,6 +892,7 @@ export class TerminalsComponent implements OnInit, OnDestroy {
           return;
         }
 
+        this.panelLoading.set(false);
         this.handleApiError(error);
 
         if (mode !== 'edit' || !sourceItem) {

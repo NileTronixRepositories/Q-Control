@@ -3,7 +3,9 @@
   <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 w-100">
     <div class="d-flex align-items-center gap-4">
       <span
-        class="d-flex align-items-center flex-shrink-0 justify-content-center text-white rounded-4 shadow-sm hero-icon-container"
+        class="d-flex align-items-center flex-shrink-0 justify-content-center text-white rounded-4 shadow-sm hero-icon-container hero-icon-container--{{
+          iconVariant()
+        }}"
       >
         <i [class]="icon()" aria-hidden="true"></i>
       </span>

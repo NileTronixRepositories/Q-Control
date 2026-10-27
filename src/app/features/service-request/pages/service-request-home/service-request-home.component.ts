@@ -8,6 +8,7 @@ import {
   effect,
 } from '@angular/core';
 import { Subscription } from 'rxjs';
+import { ActivatedRoute } from '@angular/router';
 
 import { ServiceRequestStep } from '../../enums/service-request-step.enum';
 import { ServiceType } from '../../models/service-type/service-type.model';
@@ -56,6 +57,7 @@ export class ServiceRequestHomeComponent implements OnDestroy {
   private searchSubscription: Subscription | null = null;
   private convertSubscription: Subscription | null = null;
   private autoRestartTimeoutId: ReturnType<typeof setTimeout> | null = null;
+  private adRotationIntervalId: ReturnType<typeof setInterval> | null = null;
 
   // Step state tracking
   protected readonly isLanguageStepActive = signal<boolean>(false);
@@ -77,9 +79,14 @@ export class ServiceRequestHomeComponent implements OnDestroy {
     field?: string;
   } | null = null;
   private initializedLanguageStep = false;
-  private adRotationIntervalId: ReturnType<typeof setInterval> | null = null;
+  private readonly route = inject(ActivatedRoute);
 
   constructor() {
+    const qBranchId = Number(this.route.snapshot.queryParams['branchId']);
+    if (Number.isInteger(qBranchId) && qBranchId > 0) {
+      this.store.loadServices(qBranchId);
+    }
+
     effect(() => {
       const behavior = this.store.behavior();
       if (behavior && !this.initializedLanguageStep) {

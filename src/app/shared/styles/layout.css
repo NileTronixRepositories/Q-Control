@@ -317,6 +317,39 @@ body[data-admin-theme] .filter-field:has(.filter-icon) .form-select {
   padding-inline-start: var(--admin-icon-padding);
 }
 
+body[data-admin-theme] .search-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+body[data-admin-theme] .search-input-wrapper svg,
+body[data-admin-theme] .search-input-wrapper i {
+  position: absolute;
+  inset-inline-start: 13px;
+  pointer-events: none;
+  color: #94a3b8;
+  width: 16px;
+  height: 16px;
+  font-size: 14px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s ease;
+}
+
+body[data-admin-theme] .search-input-wrapper:focus-within svg,
+body[data-admin-theme] .search-input-wrapper:focus-within i {
+  color: var(--q-primary, #0b8aa8);
+}
+
+body[data-admin-theme] .search-input-wrapper .form-control {
+  padding-inline-start: 38px !important;
+  width: 100%;
+}
+
 /* ── 6. Workspace Page Layout ─────────────────────────────────────────────── */
 body .workspace {
   background: transparent !important;
